@@ -1870,7 +1870,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                   sx={{
                     width: cellSize,
                     height: cellSize,
-                    borderRadius: 0,
                     background: `linear-gradient(135deg, ${getStatusColor(service.status)} 0%, ${getStatusColor(service.status)}dd 100%)`,
                     border: 0,
                     boxShadow: (theme) =>
@@ -1956,7 +1955,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         color: 'white',
                         backdropFilter: 'blur(2px)',
                         maxWidth: '100%',
-                        borderRadius: 0,
                         '& .MuiChip-label': {
                           px: 0.5,
                           display: 'block',
@@ -2089,7 +2087,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                 sx={{
                   width: cellSize,
                   height: cellSize,
-                  borderRadius: 0,
                   border: '2px dashed',
                   borderColor: 'divider',
                   bgcolor: 'transparent',
@@ -2209,7 +2206,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                 alignItems: 'center',
                 px: 1.5,
                 py: 0.5,
-                borderRadius: 0,
                 bgcolor: depth === 0 ? 'primary.main' : 'action.selected',
                 color: depth === 0 ? 'primary.contrastText' : 'text.primary',
                 boxShadow: depth === 0 ? '0 3px 8px rgba(0,0,0,0.12)' : 'none',
@@ -2994,13 +2990,13 @@ const ServerListPage: React.FC = () => {
 
   const handleCleanupConfirm = async () => {
     try {
-      console.log('🗑️ Starting cleanup...');
+      console.log('?뿊截?Starting cleanup...');
 
       // Call backend cleanup endpoint (handles all terminated/error/no-response servers)
       const result = await serviceDiscoveryService.cleanupServices();
 
       console.log(
-        `✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`
+        `??Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`
       );
 
       // Remove from frontend state immediately
@@ -3021,7 +3017,7 @@ const ServerListPage: React.FC = () => {
         }
       );
     } catch (error) {
-      console.error('❌ Cleanup failed:', error);
+      console.error('??Cleanup failed:', error);
       enqueueSnackbar(t('serverList.cleanupFailed'), { variant: 'error' });
     } finally {
       // Always close dialog, regardless of success or failure
@@ -3864,7 +3860,7 @@ const ServerListPage: React.FC = () => {
           label={status}
           color="default"
           size="small"
-          sx={{ fontWeight: 600, borderRadius: 0 }}
+          sx={{ fontWeight: 600 }}
         />
       );
     }
@@ -3880,7 +3876,7 @@ const ServerListPage: React.FC = () => {
           label={config.label}
           color={config.color}
           size="small"
-          sx={{ fontWeight: 600, borderRadius: 0 }}
+          sx={{ fontWeight: 600 }}
         />
       </Tooltip>
     );
@@ -3985,7 +3981,7 @@ const ServerListPage: React.FC = () => {
         label={type}
         size="small"
         variant="outlined"
-        sx={{ fontWeight: 600, borderRadius: 0 }}
+        sx={{ fontWeight: 600 }}
       />
     );
   };
@@ -4155,7 +4151,6 @@ const ServerListPage: React.FC = () => {
                   sx={{
                     height: 28,
                     fontSize: '0.75rem',
-                    borderRadius: 0,
                     bgcolor: 'background.paper',
                     minWidth: 120,
                   }}
@@ -4182,7 +4177,6 @@ const ServerListPage: React.FC = () => {
                       bgcolor: 'background.paper',
                       border: '1px solid',
                       borderColor: 'divider',
-                      borderRadius: 0,
                     }}
                   >
                     {sortOrder === 'asc' ? (
@@ -4201,7 +4195,6 @@ const ServerListPage: React.FC = () => {
                       width: 28,
                       border: '1px solid',
                       borderColor: 'divider',
-                      borderRadius: 0,
                       bgcolor: 'background.paper',
                     }}
                   >
@@ -4237,7 +4230,6 @@ const ServerListPage: React.FC = () => {
                       size="small"
                       sx={{
                         height: 24,
-                        borderRadius: 0,
                         fontWeight: 700,
                         bgcolor: 'primary.main',
                         color: 'primary.contrastText',
@@ -4255,7 +4247,6 @@ const ServerListPage: React.FC = () => {
                         px: 1,
                         fontSize: '0.65rem',
                         borderStyle: 'dashed',
-                        borderRadius: 0,
                       }}
                     >
                       {t('serverList.grouping.add')}
@@ -4312,7 +4303,6 @@ const ServerListPage: React.FC = () => {
                         size="small"
                         onClick={() => handleViewModeChange(item.mode as any)}
                         sx={{
-                          borderRadius: 0,
                           bgcolor:
                             viewMode === item.mode
                               ? 'primary.main'
@@ -4358,7 +4348,6 @@ const ServerListPage: React.FC = () => {
                       sx={{
                         height: 28,
                         width: 28,
-                        borderRadius: 0,
                         bgcolor: isPaused ? 'warning.main' : 'background.paper',
                         color: isPaused ? 'warning.contrastText' : 'inherit',
                         border: '1px solid',
@@ -4386,7 +4375,6 @@ const ServerListPage: React.FC = () => {
                       sx={{
                         height: 28,
                         width: 28,
-                        borderRadius: 0,
                         border: '1px solid',
                         borderColor: 'divider',
                         bgcolor: 'background.paper',
@@ -4411,7 +4399,6 @@ const ServerListPage: React.FC = () => {
                       sx={{
                         height: 28,
                         width: 28,
-                        borderRadius: 0,
                         border: '1px solid',
                         borderColor: 'divider',
                         bgcolor: 'background.paper',
@@ -4430,7 +4417,10 @@ const ServerListPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      <PageContentLoader loading={isLoading && services.length === 0}>
+      <PageContentLoader
+        loading={isLoading && services.length === 0}
+        sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+      >
         {/* List View */}
         {(services.length > 0 || !isLoading) &&
           viewMode === 'list' &&
@@ -4569,7 +4559,7 @@ const ServerListPage: React.FC = () => {
                                 size="small"
                                 variant="outlined"
                                 color="primary"
-                                sx={{ fontWeight: 600, borderRadius: 0 }}
+                                sx={{ fontWeight: 600 }}
                               />
                             ) : (
                               '-'
@@ -4585,7 +4575,7 @@ const ServerListPage: React.FC = () => {
                                 size="small"
                                 variant="outlined"
                                 color="secondary"
-                                sx={{ fontWeight: 600, borderRadius: 0 }}
+                                sx={{ fontWeight: 600 }}
                               />
                             ) : (
                               '-'
@@ -4613,7 +4603,6 @@ const ServerListPage: React.FC = () => {
                                   minWidth: 70,
                                   fontSize: '0.65rem',
                                   fontWeight: 900,
-                                  borderRadius: 0,
                                   bgcolor: alpha(
                                     getStatusColor(service.status),
                                     0.1
@@ -4701,7 +4690,6 @@ const ServerListPage: React.FC = () => {
                                     fontFamily: '"D2Coding", monospace',
                                     fontSize: '0.7rem',
                                     height: '22px',
-                                    borderRadius: 0,
                                   }}
                                 />
                               ))}
@@ -4835,7 +4823,6 @@ const ServerListPage: React.FC = () => {
                                 justifyContent: 'center',
                                 border: '1px solid',
                                 borderColor: 'divider',
-                                borderRadius: 0,
                               }}
                             >
                               {(() => {
@@ -5030,7 +5017,6 @@ const ServerListPage: React.FC = () => {
                                         height: 20,
                                         fontSize: '0.65rem',
                                         fontWeight: 800,
-                                        borderRadius: 0,
                                         bgcolor: rowHealthStatus.result.healthy
                                           ? 'success.main'
                                           : 'error.main',
@@ -5168,7 +5154,6 @@ const ServerListPage: React.FC = () => {
                   flexDirection: 'column',
                   minHeight: 0,
                   overflow: 'hidden',
-                  borderRadius: 0,
                 }}
               >
                 <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
@@ -5271,7 +5256,6 @@ const ServerListPage: React.FC = () => {
                   onContextMenu={(e) => handleContextMenu(e, service)}
                   sx={{
                     p: 1.5,
-                    borderRadius: 0, // NO ROUNDED CORNERS
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: 'background.paper', // MONOCHROMATIC
@@ -5305,7 +5289,6 @@ const ServerListPage: React.FC = () => {
                           minWidth: 60,
                           fontSize: '0.6rem',
                           fontWeight: 900,
-                          borderRadius: 0,
                           bgcolor: alpha(getStatusColor(service.status), 0.1),
                           color: getStatusColor(service.status),
                           border: '1px solid',
@@ -5351,7 +5334,6 @@ const ServerListPage: React.FC = () => {
                                     height: 18,
                                     fontSize: '0.6rem',
                                     fontWeight: 900,
-                                    borderRadius: 0,
                                     bgcolor: gridHealthStatus.result.healthy
                                       ? 'success.main'
                                       : 'error.main',
@@ -5689,7 +5671,6 @@ const ServerListPage: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     padding: 1.5,
-                    borderRadius: 0,
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: isUpdated
@@ -5822,14 +5803,13 @@ const ServerListPage: React.FC = () => {
                                     label={
                                       cardHealthStatus.result.healthy
                                         ? `${cardHealthStatus.result.latency} ms`
-                                        : '✕'
+                                        : '\u2715'
                                     }
                                     size="small"
                                     sx={{
                                       height: 22,
                                       fontSize: '0.7rem',
                                       fontWeight: 800,
-                                      borderRadius: 0,
                                       bgcolor: cardHealthStatus.result.healthy
                                         ? 'success.main'
                                         : 'error.main',
@@ -5964,7 +5944,6 @@ const ServerListPage: React.FC = () => {
                             height: 24,
                             fontSize: '0.8rem',
                             fontFamily: '"D2Coding", monospace',
-                            borderRadius: 0,
                             '& .MuiChip-label': { px: 1 },
                           }}
                         />
@@ -5992,7 +5971,6 @@ const ServerListPage: React.FC = () => {
                             fontSize: '0.8rem',
                             height: 24,
                             fontFamily: '"D2Coding", monospace',
-                            borderRadius: 0,
                           }}
                         />
                       ))}
@@ -6009,7 +5987,6 @@ const ServerListPage: React.FC = () => {
                         mt: 1,
                         p: 0.75,
                         bgcolor: 'action.hover',
-                        borderRadius: 0,
                         display: 'flex',
                         gap: 2,
                         flexWrap: 'wrap',
@@ -6078,7 +6055,6 @@ const ServerListPage: React.FC = () => {
                           bgcolor: 'primary.main',
                           mr: 0.5,
                           opacity: 0.4,
-                          borderRadius: 0,
                         }}
                       />
                     )}
@@ -6089,7 +6065,6 @@ const ServerListPage: React.FC = () => {
                         alignItems: 'center',
                         px: 2,
                         py: 0.75,
-                        borderRadius: 0,
                         bgcolor:
                           group.level === 0
                             ? 'primary.main'
@@ -6140,7 +6115,6 @@ const ServerListPage: React.FC = () => {
                           ml: 1.5,
                           px: 1,
                           py: 0.25,
-                          borderRadius: 0,
                           bgcolor: (theme) =>
                             group.level === 0
                               ? alpha(theme.palette.common.white, 0.2)
