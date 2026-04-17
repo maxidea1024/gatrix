@@ -4129,6 +4129,7 @@ const ServerListPage: React.FC = () => {
                     : 'rgba(0,0,0,0.02)',
                 border: '1px solid',
                 borderColor: 'divider',
+                borderRadius: 1,
                 flexWrap: 'wrap',
               }}
             >
@@ -5264,6 +5265,7 @@ const ServerListPage: React.FC = () => {
                     p: 1.5,
                     border: '1px solid',
                     borderColor: 'divider',
+                    borderRadius: 1,
                     bgcolor: 'background.paper', // MONOCHROMATIC
                     transition: 'all 0.1s ease-in-out',
                     display: 'flex',
@@ -5673,12 +5675,12 @@ const ServerListPage: React.FC = () => {
                   key={serviceKey}
                   onContextMenu={(e) => handleContextMenu(e, service)}
                   sx={{
-                    minHeight: 300,
                     display: 'flex',
                     flexDirection: 'column',
                     padding: 1.5,
                     border: '1px solid',
                     borderColor: 'divider',
+                    borderRadius: 1,
                     bgcolor: isUpdated
                       ? (theme) => getHighlightColor(highlightStatus, theme)
                       : (theme) =>
@@ -6185,6 +6187,7 @@ const ServerListPage: React.FC = () => {
                     display: 'grid',
                     gridTemplateColumns: 'repeat(3, 1fr)',
                     gap: 1.5,
+                    alignContent: 'start',
                     '@media (max-width: 1200px)': {
                       gridTemplateColumns: 'repeat(2, 1fr)',
                     },
