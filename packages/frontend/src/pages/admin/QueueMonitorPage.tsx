@@ -20,6 +20,9 @@ import {
   Switch,
   FormControlLabel,
   alpha,
+  ButtonGroup,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import {
   Monitor as MonitorIcon,
@@ -33,6 +36,7 @@ import {
   HourglassEmpty as WaitingIcon,
   PlayArrow as ActiveIcon,
   Timer as DelayedIcon,
+  ArrowDropDown as ArrowDropDownIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -125,7 +129,8 @@ const QueueMonitorPage: React.FC = () => {
   const [jobs, setJobs] = useState<QueueJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [jobsLoading, setJobsLoading] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState<number>(5000);
+  const [refreshMenuAnchor, setRefreshMenuAnchor] = useState<null | HTMLElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
@@ -193,16 +198,16 @@ const QueueMonitorPage: React.FC = () => {
 
   // Auto-refresh
   useEffect(() => {
-    if (autoRefresh) {
+    if (refreshInterval > 0) {
       intervalRef.current = setInterval(() => {
         loadStats();
         loadQueueDetails(true);
-      }, 5000);
+      }, refreshInterval);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [autoRefresh, loadStats, loadQueueDetails]);
+  }, [refreshInterval, loadStats, loadQueueDetails]);
 
   // Handlers
   const handleRetry = async (jobId: string) => {
@@ -328,33 +333,81 @@ const QueueMonitorPage: React.FC = () => {
         title={t('queueMonitor.title')}
         subtitle={t('queueMonitor.description')}
         actions={
-          <Stack direction="row" spacing={2} alignItems="center">
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={autoRefresh}
-                  onChange={(e) => setAutoRefresh(e.target.checked)}
-                />
-              }
-              label={
-                <Typography variant="caption">
-                  {t('queueMonitor.autoRefresh')}
-                </Typography>
-              }
-            />
-            <Button
-              size="small"
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={() => {
-                loadStats();
-                loadQueueDetails();
-              }}
+          <>
+            <ButtonGroup variant="contained" size="small">
+              <Button
+                startIcon={<RefreshIcon />}
+                onClick={() => {
+                  loadStats();
+                  loadQueueDetails();
+                }}
+              >
+                {t('common.refresh')}
+              </Button>
+              <Button
+                size="small"
+                onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+              >
+                {refreshInterval === 0
+                  ? 'Off'
+                  : refreshInterval < 60000
+                    ? `${refreshInterval / 1000}s`
+                    : `${refreshInterval / 60000}m`}
+                <ArrowDropDownIcon sx={{ ml: -0.5, mr: -1 }} />
+              </Button>
+            </ButtonGroup>
+            <Menu
+              anchorEl={refreshMenuAnchor}
+              open={Boolean(refreshMenuAnchor)}
+              onClose={() => setRefreshMenuAnchor(null)}
             >
-              {t('common.refresh')}
-            </Button>
-          </Stack>
+              <MenuItem
+                onClick={() => {
+                  setRefreshInterval(0);
+                  setRefreshMenuAnchor(null);
+                }}
+                selected={refreshInterval === 0}
+              >
+                Off
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setRefreshInterval(5000);
+                  setRefreshMenuAnchor(null);
+                }}
+                selected={refreshInterval === 5000}
+              >
+                5s
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setRefreshInterval(10000);
+                  setRefreshMenuAnchor(null);
+                }}
+                selected={refreshInterval === 10000}
+              >
+                10s
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setRefreshInterval(30000);
+                  setRefreshMenuAnchor(null);
+                }}
+                selected={refreshInterval === 30000}
+              >
+                30s
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setRefreshInterval(60000);
+                  setRefreshMenuAnchor(null);
+                }}
+                selected={refreshInterval === 60000}
+              >
+                1m
+              </MenuItem>
+            </Menu>
+          </>
         }
       />
 
@@ -372,33 +425,14 @@ const QueueMonitorPage: React.FC = () => {
                     variant="outlined"
                     sx={{
                       cursor: 'pointer',
-                      border: 2,
-                      borderColor:
-                        selectedQueue === q.name
-                          ? 'primary.main'
-                          : 'transparent',
-                      bgcolor:
-                        selectedQueue === q.name
-                          ? (theme) =>
-                              `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`
-                          : 'background.paper',
-                      ...(selectedQueue === q.name && {
-                        background: (theme: any) =>
-                          `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
-                        boxShadow: (theme: any) =>
-                          `0 2px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
-                      }),
-                      transition:
-                        'border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRight: 4,
+                      borderRightColor: selectedQueue === q.name ? 'primary.main' : 'transparent',
+                      bgcolor: selectedQueue === q.name ? (theme) => alpha(theme.palette.primary.main, 0.15) : 'background.paper',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        borderColor:
-                          selectedQueue === q.name
-                            ? 'primary.main'
-                            : 'primary.light',
-                        ...(selectedQueue !== q.name && {
-                          bgcolor: (theme: any) =>
-                            alpha(theme.palette.primary.main, 0.02),
-                        }),
+                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
                       },
                     }}
                     onClick={() => handleSelectQueue(q.name)}
@@ -410,6 +444,7 @@ const QueueMonitorPage: React.FC = () => {
                         variant="subtitle2"
                         sx={{
                           fontWeight: selectedQueue === q.name ? 700 : 600,
+                          color: selectedQueue === q.name ? 'primary.main' : 'text.primary',
                           mb: 0.5,
                           fontFamily: 'monospace',
                           fontSize: '0.85rem',
@@ -541,7 +576,7 @@ const QueueMonitorPage: React.FC = () => {
                       jobs.length > 0 && (
                         <Button
                           size="small"
-                          variant="outlined"
+                          variant="contained"
                           color="warning"
                           startIcon={<CleanIcon />}
                           onClick={() => handleClean(statusTabs[activeTab - 1])}
