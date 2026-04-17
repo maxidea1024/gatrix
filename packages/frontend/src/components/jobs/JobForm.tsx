@@ -221,7 +221,12 @@ const JobForm: React.FC<JobFormProps> = ({
                 value={formData.name}
                 onChange={(e) => handleFieldChange('name', e.target.value)}
                 error={!!errors.name}
-                helperText={errors.name || (job ? t('jobs.helperText.nameReadonly') : t('jobs.helperText.name'))}
+                helperText={
+                  errors.name ||
+                  (job
+                    ? t('jobs.helperText.nameReadonly')
+                    : t('jobs.helperText.name'))
+                }
                 required
                 disabled={!!job}
               />
@@ -353,7 +358,8 @@ const JobForm: React.FC<JobFormProps> = ({
             type="submit"
             variant="contained"
             disabled={
-              !formData.name.trim() || !formData.jobTypeId ||
+              !formData.name.trim() ||
+              !formData.jobTypeId ||
               (!!job && JSON.stringify(formData) === initialFormData)
             }
           >
@@ -476,7 +482,8 @@ const JobForm: React.FC<JobFormProps> = ({
             type="submit"
             variant="contained"
             disabled={
-              !formData.name.trim() || !formData.jobTypeId ||
+              !formData.name.trim() ||
+              !formData.jobTypeId ||
               (!!job && JSON.stringify(formData) === initialFormData)
             }
           >

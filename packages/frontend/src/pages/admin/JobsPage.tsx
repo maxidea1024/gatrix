@@ -136,7 +136,8 @@ const JobsPage: React.FC = () => {
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
   // Context menu state
-  const [contextMenuAnchor, setContextMenuAnchor] = useState<HTMLElement | null>(null);
+  const [contextMenuAnchor, setContextMenuAnchor] =
+    useState<HTMLElement | null>(null);
   const [contextMenuJob, setContextMenuJob] = useState<Job | null>(null);
 
   // Column handlers
@@ -392,8 +393,12 @@ const JobsPage: React.FC = () => {
   };
 
   const getJobTypeLabel = (jobTypeId: string | number) => {
-    const jobType = jobTypes.find((jt) => jt.id.toString() === jobTypeId.toString());
-    return jobType?.displayName ? t(jobType.displayName) : jobType?.name || 'Unknown';
+    const jobType = jobTypes.find(
+      (jt) => jt.id.toString() === jobTypeId.toString()
+    );
+    return jobType?.displayName
+      ? t(jobType.displayName)
+      : jobType?.name || 'Unknown';
   };
 
   // 텍스트 길이 제한 함수
@@ -576,10 +581,7 @@ const JobsPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {jobs.map((job) => (
-                    <TableRow
-                      hover
-                      key={job.id}
-                    >
+                    <TableRow hover key={job.id}>
                       {columns
                         .filter((col) => col.visible)
                         .map((column) => (
@@ -638,7 +640,9 @@ const JobsPage: React.FC = () => {
           }}
           disabled={!contextMenuJob?.isEnabled}
         >
-          <ListItemIcon><ExecuteIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <ExecuteIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('jobs.execute')}</ListItemText>
         </MuiMenuItem>
         <MuiMenuItem
@@ -648,7 +652,9 @@ const JobsPage: React.FC = () => {
             setContextMenuJob(null);
           }}
         >
-          <ListItemIcon><HistoryIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <HistoryIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('jobs.viewHistory')}</ListItemText>
         </MuiMenuItem>
         <MuiMenuItem
@@ -658,7 +664,9 @@ const JobsPage: React.FC = () => {
             setContextMenuJob(null);
           }}
         >
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
         </MuiMenuItem>
         <MuiMenuItem
@@ -669,7 +677,9 @@ const JobsPage: React.FC = () => {
           }}
           sx={{ color: 'error.main' }}
         >
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete')}</ListItemText>
         </MuiMenuItem>
       </Menu>
