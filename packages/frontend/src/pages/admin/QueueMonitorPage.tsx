@@ -599,7 +599,7 @@ const QueueMonitorPage: React.FC = () => {
                     {activeTab === 0 && (
                       <Box>
                         {repeatables.length === 0 ? (
-                          <Box sx={{ py: 4, textAlign: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
                             <Typography color="text.secondary">
                               {t('queueMonitor.noRepeatableJobs')}
                             </Typography>
@@ -692,7 +692,7 @@ const QueueMonitorPage: React.FC = () => {
                     {activeTab > 0 && (
                       <Box>
                         {jobs.length === 0 ? (
-                          <Box sx={{ py: 4, textAlign: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
                             <Typography color="text.secondary">
                               {t('queueMonitor.noJobs')}
                             </Typography>
