@@ -129,7 +129,14 @@ const QueueMonitorPage: React.FC = () => {
   const [jobs, setJobs] = useState<QueueJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [jobsLoading, setJobsLoading] = useState(false);
-  const [refreshInterval, setRefreshInterval] = useState<number>(5000);
+  const [refreshInterval, setRefreshInterval] = useState<number>(() => {
+    const saved = localStorage.getItem('queueMonitorRefreshInterval');
+    return saved !== null ? parseInt(saved, 10) : 5000;
+  });
+  const handleSetRefreshInterval = (val: number) => {
+    setRefreshInterval(val);
+    localStorage.setItem('queueMonitorRefreshInterval', val.toString());
+  };
   const [refreshMenuAnchor, setRefreshMenuAnchor] = useState<null | HTMLElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -363,7 +370,7 @@ const QueueMonitorPage: React.FC = () => {
             >
               <MenuItem
                 onClick={() => {
-                  setRefreshInterval(0);
+                  handleSetRefreshInterval(0);
                   setRefreshMenuAnchor(null);
                 }}
                 selected={refreshInterval === 0}
@@ -372,7 +379,7 @@ const QueueMonitorPage: React.FC = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  setRefreshInterval(5000);
+                  handleSetRefreshInterval(5000);
                   setRefreshMenuAnchor(null);
                 }}
                 selected={refreshInterval === 5000}
@@ -381,7 +388,7 @@ const QueueMonitorPage: React.FC = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  setRefreshInterval(10000);
+                  handleSetRefreshInterval(10000);
                   setRefreshMenuAnchor(null);
                 }}
                 selected={refreshInterval === 10000}
@@ -390,7 +397,7 @@ const QueueMonitorPage: React.FC = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  setRefreshInterval(30000);
+                  handleSetRefreshInterval(30000);
                   setRefreshMenuAnchor(null);
                 }}
                 selected={refreshInterval === 30000}
@@ -399,7 +406,7 @@ const QueueMonitorPage: React.FC = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  setRefreshInterval(60000);
+                  handleSetRefreshInterval(60000);
                   setRefreshMenuAnchor(null);
                 }}
                 selected={refreshInterval === 60000}

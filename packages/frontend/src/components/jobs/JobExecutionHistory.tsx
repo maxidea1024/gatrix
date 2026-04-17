@@ -152,11 +152,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                   <Table size="small">
                     <TableBody>
                       <TableRow>
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          sx={{ width: '120px', bgcolor: 'grey.50', py: 1 }}
-                        >
+                        <TableCell component="th" scope="row" sx={{ width: '120px', bgcolor: 'action.hover', py: 1 }}>
                           {t('jobs.executionId')}
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>{execution.id}</TableCell>
@@ -165,7 +161,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                         <TableCell
                           component="th"
                           scope="row"
-                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                          sx={{ bgcolor: 'action.hover', py: 1 }}
                         >
                           {t('jobs.retryAttempt')}
                         </TableCell>
@@ -179,7 +175,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                         <TableCell
                           component="th"
                           scope="row"
-                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                          sx={{ bgcolor: 'action.hover', py: 1 }}
                         >
                           {t('jobs.startedAt')}
                         </TableCell>
@@ -193,7 +189,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                         <TableCell
                           component="th"
                           scope="row"
-                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                          sx={{ bgcolor: 'action.hover', py: 1 }}
                         >
                           {t('jobs.completedAt')}
                         </TableCell>
@@ -207,7 +203,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                         <TableCell
                           component="th"
                           scope="row"
-                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                          sx={{ bgcolor: 'action.hover', py: 1 }}
                         >
                           {t('jobs.executionTime')}
                         </TableCell>
