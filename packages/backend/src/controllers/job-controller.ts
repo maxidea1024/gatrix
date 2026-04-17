@@ -3,6 +3,11 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { JobModel, CreateJobData, UpdateJobData } from '../models/job';
 import { JobTypeModel } from '../models/job-type';
 import {
+  JobExecutionModel,
+  JobExecutionStatus,
+} from '../models/job-execution';
+import { createLogger } from '../config/logger';
+import {
   sendBadRequest,
   sendNotFound,
   sendConflict,
@@ -243,14 +248,104 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// Execute job manually (temporary implementation)
-export const executeJob = async (_req: AuthenticatedRequest, res: Response) => {
-  return sendErrorResponse(
-    res,
-    501,
-    'NOT_IMPLEMENTED',
-    'Job execution not implemented yet'
-  );
+// Execute job manually
+export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
+  const jobLogger = createLogger('JobExecution');
+  try {
+    const { id } = req.params;
+    const environmentId = req.environmentId!;
+
+    // Validate job exists and is enabled
+    const job = await JobModel.findById(id, environmentId);
+    if (!job) {
+      return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
+    }
+    if (!job.isEnabled) {
+      return sendBadRequest(res, 'Job is disabled and cannot be executed');
+    }
+
+    // Create execution record
+    const execution = await JobExecutionModel.create({
+      jobId: id,
+      status: JobExecutionStatus.PENDING,
+    });
+
+    // Mark as running
+    const startTime = Date.now();
+    await JobExecutionModel.update(execution.id, {
+      status: JobExecutionStatus.RUNNING,
+      startedAt: new Date().toISOString(),
+    });
+
+    // Execute based on job type
+    try {
+      const jobType = await JobTypeModel.findById(job.jobTypeId, environmentId);
+      const jobData = job.jobDataMap || {};
+
+      let result: any = {};
+
+      switch (jobType?.name) {
+        case 'log_message':
+          jobLogger.info(`[Job:${job.name}] ${jobData.message || '(no message)'}`, {
+            level: jobData.level || 'info',
+            category: jobData.category || 'job',
+          });
+          result = { logged: true, message: jobData.message };
+          break;
+
+        case 'http_request':
+          // TODO: Implement HTTP request execution
+          result = { message: 'HTTP request execution not yet implemented' };
+          break;
+
+        case 'mailsend':
+          // TODO: Implement mail sending
+          result = { message: 'Mail sending not yet implemented' };
+          break;
+
+        case 'ssh_command':
+          // TODO: Implement SSH command execution
+          result = { message: 'SSH command execution not yet implemented' };
+          break;
+
+        default:
+          result = { message: `Unknown job type: ${jobType?.name}` };
+          break;
+      }
+
+      const executionTimeMs = Date.now() - startTime;
+      const updated = await JobExecutionModel.update(execution.id, {
+        status: JobExecutionStatus.COMPLETED,
+        completedAt: new Date().toISOString(),
+        executionTimeMs,
+        result,
+      });
+
+      return sendSuccessResponse(res, updated, 'Job executed successfully');
+    } catch (execError: any) {
+      const executionTimeMs = Date.now() - startTime;
+      await JobExecutionModel.update(execution.id, {
+        status: JobExecutionStatus.FAILED,
+        completedAt: new Date().toISOString(),
+        executionTimeMs,
+        errorMessage: execError.message || 'Unknown execution error',
+      });
+
+      return sendInternalError(
+        res,
+        'Job execution failed',
+        execError,
+        ErrorCodes.RESOURCE_UPDATE_FAILED
+      );
+    }
+  } catch (error) {
+    return sendInternalError(
+      res,
+      'Failed to execute job',
+      error,
+      ErrorCodes.RESOURCE_UPDATE_FAILED
+    );
+  }
 };
 
 // Get job execution history (temporary implementation)
