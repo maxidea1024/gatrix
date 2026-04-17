@@ -37,6 +37,7 @@ import {
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
   MoreVert as MoreVertIcon,
+  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
@@ -419,9 +420,35 @@ const JobsPage: React.FC = () => {
     switch (columnId) {
       case 'jobName':
         return (
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {truncateText(job.name, 30)}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                color: 'primary.main',
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+              onClick={() => handleEditJob(job)}
+            >
+              {truncateText(job.name, 30)}
+            </Typography>
+            <Tooltip title={t('common.copy')}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(job.name);
+                  enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                }}
+                sx={{ p: 0.5 }}
+              >
+                <ContentCopyIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         );
       case 'jobType':
         return (
