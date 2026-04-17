@@ -229,7 +229,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                     component="pre"
                     sx={{
                       fontSize: '0.75rem',
-                      backgroundColor: 'grey.100',
+                      bgcolor: 'action.hover',
                       p: 1,
                       borderRadius: 1,
                       overflow: 'auto',
