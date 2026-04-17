@@ -137,7 +137,8 @@ const QueueMonitorPage: React.FC = () => {
     setRefreshInterval(val);
     localStorage.setItem('queueMonitorRefreshInterval', val.toString());
   };
-  const [refreshMenuAnchor, setRefreshMenuAnchor] = useState<null | HTMLElement>(null);
+  const [refreshMenuAnchor, setRefreshMenuAnchor] =
+    useState<null | HTMLElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
@@ -435,11 +436,18 @@ const QueueMonitorPage: React.FC = () => {
                       border: 1,
                       borderColor: 'divider',
                       borderRight: 4,
-                      borderRightColor: selectedQueue === q.name ? 'primary.main' : 'transparent',
-                      bgcolor: selectedQueue === q.name ? (theme) => alpha(theme.palette.primary.main, 0.15) : 'background.paper',
+                      borderRightColor:
+                        selectedQueue === q.name
+                          ? 'primary.main'
+                          : 'transparent',
+                      bgcolor:
+                        selectedQueue === q.name
+                          ? (theme) => alpha(theme.palette.primary.main, 0.15)
+                          : 'background.paper',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                        bgcolor: (theme) =>
+                          alpha(theme.palette.primary.main, 0.08),
                       },
                     }}
                     onClick={() => handleSelectQueue(q.name)}
@@ -451,7 +459,10 @@ const QueueMonitorPage: React.FC = () => {
                         variant="subtitle2"
                         sx={{
                           fontWeight: selectedQueue === q.name ? 700 : 600,
-                          color: selectedQueue === q.name ? 'primary.main' : 'text.primary',
+                          color:
+                            selectedQueue === q.name
+                              ? 'primary.main'
+                              : 'text.primary',
                           mb: 0.5,
                           fontFamily: 'monospace',
                           fontSize: '0.85rem',
@@ -599,7 +610,14 @@ const QueueMonitorPage: React.FC = () => {
                     {activeTab === 0 && (
                       <Box>
                         {repeatables.length === 0 ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              minHeight: 240,
+                            }}
+                          >
                             <Typography color="text.secondary">
                               {t('queueMonitor.noRepeatableJobs')}
                             </Typography>
@@ -692,7 +710,14 @@ const QueueMonitorPage: React.FC = () => {
                     {activeTab > 0 && (
                       <Box>
                         {jobs.length === 0 ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              minHeight: 240,
+                            }}
+                          >
                             <Typography color="text.secondary">
                               {t('queueMonitor.noJobs')}
                             </Typography>

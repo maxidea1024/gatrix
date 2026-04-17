@@ -152,7 +152,15 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                   <Table size="small">
                     <TableBody>
                       <TableRow>
-                        <TableCell component="th" scope="row" sx={{ width: '120px', bgcolor: 'action.hover', py: 1 }}>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{
+                            width: '120px',
+                            bgcolor: 'action.hover',
+                            py: 1,
+                          }}
+                        >
                           {t('jobs.executionId')}
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>{execution.id}</TableCell>
