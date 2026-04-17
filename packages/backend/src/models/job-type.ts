@@ -252,7 +252,7 @@ export class JobTypeModel {
           'uu.name as updatedByName',
         ])
         .where('jt.environmentId', envName)
-        .where('jt.isEnabled', true)
+        .where('jt.isActive', true)
         .orderBy('jt.name', 'asc');
 
       return results.map((row: any) => ({
@@ -261,7 +261,7 @@ export class JobTypeModel {
         displayName: row.displayName,
         description: row.description,
         jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
-        isEnabled: Boolean(row.isEnabled),
+        isEnabled: Boolean(row.isActive),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         createdBy: row.createdBy,
