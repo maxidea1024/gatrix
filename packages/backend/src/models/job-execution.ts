@@ -65,12 +65,10 @@ export class JobExecutionModel {
       const baseQuery = db('g_job_executions as je')
         .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
-        .leftJoin('g_schedules as s', 'je.scheduleId', 's.id')
         .select([
           'je.*',
           'j.name as jobName',
           'jt.name as jobTypeName',
-          's.name as scheduleName',
         ]);
 
       // Apply filters
@@ -106,12 +104,10 @@ export class JobExecutionModel {
       const results = await db('g_job_executions as je')
         .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
-        .leftJoin('g_schedules as s', 'je.scheduleId', 's.id')
         .select([
           'je.*',
           'j.name as jobName',
           'jt.name as jobTypeName',
-          's.name as scheduleName',
         ])
         .where('je.id', id);
       if (results.length === 0) return null;
