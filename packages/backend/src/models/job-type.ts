@@ -80,7 +80,7 @@ export class JobTypeModel {
         displayName: row.displayName,
         description: row.description,
         jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
-        isEnabled: Boolean(row.isActive),
+        isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         createdBy: row.createdBy,
@@ -145,7 +145,7 @@ export class JobTypeModel {
 
       return {
         ...row,
-        isEnabled: Boolean(row.isActive),
+        isEnabled: Boolean(row.isEnabled),
         jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
       };
     } catch (error) {
@@ -168,7 +168,7 @@ export class JobTypeModel {
         displayName: data.displayName,
         description: data.description || null,
         jobSchema: schemaJson,
-        isActive: data.isEnabled ?? true,
+        isEnabled: data.isEnabled ?? true,
         createdBy: data.createdBy || null,
       });
 
@@ -252,7 +252,7 @@ export class JobTypeModel {
           'uu.name as updatedByName',
         ])
         .where('jt.environmentId', envName)
-        .where('jt.isActive', true)
+        .where('jt.isEnabled', true)
         .orderBy('jt.name', 'asc');
 
       return results.map((row: any) => ({
@@ -261,7 +261,7 @@ export class JobTypeModel {
         displayName: row.displayName,
         description: row.description,
         jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
-        isEnabled: Boolean(row.isActive),
+        isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         createdBy: row.createdBy,

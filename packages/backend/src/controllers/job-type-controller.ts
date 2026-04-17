@@ -144,7 +144,7 @@ async function seedDefaultJobTypes(environmentId: string): Promise<void> {
         displayName: jt.displayName,
         description: jt.description,
         jobSchema: JSON.stringify(jt.jobSchema),
-        isActive: true,
+        isEnabled: true,
       });
     }
     logger.info('Seeded default job types for environment:', environmentId);
