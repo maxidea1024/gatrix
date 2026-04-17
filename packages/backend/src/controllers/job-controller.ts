@@ -350,8 +350,22 @@ export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
 
 // Get job execution history (temporary implementation)
 export const getJobExecutions = async (
-  _req: AuthenticatedRequest,
+  req: AuthenticatedRequest,
   res: Response
 ) => {
-  return sendSuccessResponse(res, []);
+  try {
+    const jobId = req.params.id;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    const executions = await JobExecutionModel.findAll({
+      jobId,
+      limit,
+      offset,
+    });
+
+    return sendSuccessResponse(res, executions);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to get job executions', error);
+  }
 };

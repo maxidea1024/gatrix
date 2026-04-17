@@ -100,7 +100,7 @@ export const jobService = {
     return response.data?.success ?? true;
   },
 
-  async executeJob(id: number): Promise<{ executionId: number }> {
+  async executeJob(id: number): Promise<JobExecution> {
     const response = await api.post(`/admin/jobs/${id}/execute`);
     return response.data?.data || response.data;
   },

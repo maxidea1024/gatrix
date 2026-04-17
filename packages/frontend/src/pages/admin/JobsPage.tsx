@@ -325,7 +325,7 @@ const JobsPage: React.FC = () => {
       enqueueSnackbar(
         t('jobs.executeStarted', {
           name: job.name,
-          executionId: result.executionId,
+          executionId: result.id,
         }),
         {
           variant: 'success',
@@ -775,7 +775,7 @@ const JobsPage: React.FC = () => {
         >
           <Button
             onClick={() => setHistoryDialogOpen(false)}
-            variant="outlined"
+            variant="contained"
           >
             {t('common.close')}
           </Button>
