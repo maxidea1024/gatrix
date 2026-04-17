@@ -88,7 +88,7 @@ export class JobExecutionModel {
       return results.map((row: any) => ({
         ...row,
         errorMessage: row.error,
-        result: row.result ? JSON.parse(row.result) : null,
+        result: typeof row.result === 'string' ? JSON.parse(row.result) : row.result,
       }));
     } catch (error) {
       logger.error('Error finding all job executions:', error);
@@ -109,7 +109,7 @@ export class JobExecutionModel {
       return {
         ...row,
         errorMessage: row.error,
-        result: row.result ? JSON.parse(row.result) : null,
+        result: typeof row.result === 'string' ? JSON.parse(row.result) : row.result,
       };
     } catch (error) {
       logger.error('Error finding job execution by id:', error);
