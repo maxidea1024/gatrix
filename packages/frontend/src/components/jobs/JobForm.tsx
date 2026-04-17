@@ -68,6 +68,7 @@ const JobForm: React.FC<JobFormProps> = ({
   const [selectedJobType, setSelectedJobType] = useState<JobType | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [initialFormData, setInitialFormData] = useState<string>('');
 
   // Initialize form data
   useEffect(() => {
@@ -85,18 +86,19 @@ const JobForm: React.FC<JobFormProps> = ({
       };
 
       setFormData(newFormData);
+      setInitialFormData(JSON.stringify(newFormData));
       setSelectedTags(job.tags || []);
 
       const jobType = jobTypes.find((jt) => jt.id === job.jobTypeId);
       setSelectedJobType(jobType || null);
     } else {
-      // New job — no initialization needed
+      setInitialFormData(JSON.stringify(formData));
     }
   }, [job, jobTypes]);
 
   // Handle job type change
   const handleJobTypeChange = (jobTypeId: string) => {
-    const jobType = jobTypes.find((jt) => jt.id === parseInt(jobTypeId));
+    const jobType = jobTypes.find((jt) => jt.id.toString() === jobTypeId);
     setSelectedJobType(jobType || null);
     setFormData((prev) => ({
       ...prev,
@@ -176,7 +178,7 @@ const JobForm: React.FC<JobFormProps> = ({
 
     const submitData = {
       name: formData.name,
-      jobTypeId: parseInt(formData.jobTypeId),
+      jobTypeId: formData.jobTypeId,
       memo: formData.memo || undefined,
       isEnabled: formData.isEnabled,
       tagIds: formData.tagIds,
@@ -214,13 +216,14 @@ const JobForm: React.FC<JobFormProps> = ({
             <Box>
               <TextField
                 fullWidth
-                autoFocus
+                autoFocus={!job}
                 label={t('common.name')}
                 value={formData.name}
                 onChange={(e) => handleFieldChange('name', e.target.value)}
                 error={!!errors.name}
-                helperText={errors.name || t('jobs.helperText.name')}
+                helperText={errors.name || (job ? t('jobs.helperText.nameReadonly') : t('jobs.helperText.name'))}
                 required
+                disabled={!!job}
               />
             </Box>
 
@@ -349,9 +352,12 @@ const JobForm: React.FC<JobFormProps> = ({
           <Button
             type="submit"
             variant="contained"
-            disabled={!formData.name.trim() || !formData.jobTypeId}
+            disabled={
+              !formData.name.trim() || !formData.jobTypeId ||
+              (!!job && JSON.stringify(formData) === initialFormData)
+            }
           >
-            {job ? t('common.save') : t('jobs.addJob')}
+            {job ? t('common.update') : t('jobs.addJob')}
           </Button>
         </Box>
       </Box>
@@ -466,8 +472,15 @@ const JobForm: React.FC<JobFormProps> = ({
           sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}
         >
           <Button onClick={onCancel}>{t('common.cancel')}</Button>
-          <Button type="submit" variant="contained">
-            {job ? t('common.save') : t('jobs.addJob')}
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={
+              !formData.name.trim() || !formData.jobTypeId ||
+              (!!job && JSON.stringify(formData) === initialFormData)
+            }
+          >
+            {job ? t('common.update') : t('jobs.addJob')}
           </Button>
         </Box>
       </Box>

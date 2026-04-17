@@ -12,7 +12,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Chip,
   IconButton,
   Tooltip,
@@ -23,7 +22,10 @@ import {
   Card,
   CardContent,
   Drawer,
-  useTheme,
+  Menu,
+  MenuItem as MuiMenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -34,6 +36,7 @@ import {
   History as HistoryIcon,
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
@@ -79,7 +82,6 @@ const defaultColumns: ColumnConfig[] = [
 const JobsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const theme = useTheme();
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -133,6 +135,10 @@ const JobsPage: React.FC = () => {
     useState<Job | null>(null);
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
+  // Context menu state
+  const [contextMenuAnchor, setContextMenuAnchor] = useState<HTMLElement | null>(null);
+  const [contextMenuJob, setContextMenuJob] = useState<Job | null>(null);
+
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
@@ -169,7 +175,7 @@ const JobsPage: React.FC = () => {
         type: 'select',
         options: jobTypes.map((jt) => ({
           value: jt.id,
-          label: jt.displayName || jt.name,
+          label: jt.displayName ? t(jt.displayName) : jt.name,
         })),
       },
       {
@@ -385,9 +391,9 @@ const JobsPage: React.FC = () => {
     return <Chip label={t('common.usable')} color="success" size="small" />;
   };
 
-  const getJobTypeLabel = (jobTypeId: number) => {
-    const jobType = jobTypes.find((jt) => jt.id === jobTypeId);
-    return jobType?.displayName || jobType?.name || 'Unknown';
+  const getJobTypeLabel = (jobTypeId: string | number) => {
+    const jobType = jobTypes.find((jt) => jt.id.toString() === jobTypeId.toString());
+    return jobType?.displayName ? t(jobType.displayName) : jobType?.name || 'Unknown';
   };
 
   // 텍스트 길이 제한 함수
@@ -509,7 +515,6 @@ const JobsPage: React.FC = () => {
                   onFilterRemove={handleFilterRemove}
                   onFilterChange={handleDynamicFilterChange}
                   onOperatorChange={handleOperatorChange}
-                  onRefresh={loadData}
                 />
 
                 {/* Column Settings Button */}
@@ -544,103 +549,130 @@ const JobsPage: React.FC = () => {
             addButtonLabel={t('jobs.addJob')}
           />
         ) : (
-          <TableContainer
-            component={Paper}
-            sx={{
-              maxWidth: '100%',
-              overflow: 'auto',
-            }}
-          >
-            <Table sx={{ tableLayout: 'auto' }}>
-              <TableHead>
-                <TableRow>
-                  {columns
-                    .filter((col) => col.visible)
-                    .map((column) => (
-                      <TableCell key={column.id}>
-                        {t(column.labelKey)}
-                      </TableCell>
-                    ))}
-                  {canManage && (
-                    <TableCell align="right" sx={{ width: 150 }}>
-                      {t('common.actions')}
-                    </TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {jobs.map((job, index) => (
-                  <TableRow
-                    hover
-                    key={job.id}
-                    sx={{
-                      bgcolor:
-                        index % 2 === 0
-                          ? theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.02)'
-                            : 'rgba(0, 0, 0, 0.02)'
-                          : 'transparent',
-                    }}
-                  >
+          <Card variant="outlined" sx={{ position: 'relative' }}>
+            <TableContainer
+              sx={{
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.15s ease-in-out',
+                pointerEvents: loading ? 'none' : 'auto',
+              }}
+            >
+              <Table sx={{ tableLayout: 'auto' }}>
+                <TableHead>
+                  <TableRow>
                     {columns
                       .filter((col) => col.visible)
                       .map((column) => (
                         <TableCell key={column.id}>
-                          {renderCellContent(job, column.id)}
+                          {t(column.labelKey)}
                         </TableCell>
                       ))}
                     {canManage && (
-                      <TableCell align="right">
-                        <Tooltip title={t('jobs.execute')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleExecuteJob(job)}
-                            disabled={!job.isEnabled}
-                          >
-                            <ExecuteIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('jobs.viewHistory')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewHistory(job)}
-                          >
-                            <HistoryIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditJob(job)}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteJob(job)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
+                      <TableCell align="center">
+                        {t('common.actions')}
                       </TableCell>
                     )}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {jobs.map((job) => (
+                    <TableRow
+                      hover
+                      key={job.id}
+                    >
+                      {columns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell key={column.id}>
+                            {renderCellContent(job, column.id)}
+                          </TableCell>
+                        ))}
+                      {canManage && (
+                        <TableCell align="center">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              setContextMenuAnchor(e.currentTarget);
+                              setContextMenuJob(job);
+                            }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-            <SimplePagination
-              count={total}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-          </TableContainer>
+            {total > 0 && (
+              <SimplePagination
+                count={total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+              />
+            )}
+          </Card>
         )}
       </PageContentLoader>
+
+      {/* Row Context Menu */}
+      <Menu
+        anchorEl={contextMenuAnchor}
+        open={Boolean(contextMenuAnchor)}
+        onClose={() => {
+          setContextMenuAnchor(null);
+          setContextMenuJob(null);
+        }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MuiMenuItem
+          onClick={() => {
+            if (contextMenuJob) handleExecuteJob(contextMenuJob);
+            setContextMenuAnchor(null);
+            setContextMenuJob(null);
+          }}
+          disabled={!contextMenuJob?.isEnabled}
+        >
+          <ListItemIcon><ExecuteIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('jobs.execute')}</ListItemText>
+        </MuiMenuItem>
+        <MuiMenuItem
+          onClick={() => {
+            if (contextMenuJob) handleViewHistory(contextMenuJob);
+            setContextMenuAnchor(null);
+            setContextMenuJob(null);
+          }}
+        >
+          <ListItemIcon><HistoryIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('jobs.viewHistory')}</ListItemText>
+        </MuiMenuItem>
+        <MuiMenuItem
+          onClick={() => {
+            if (contextMenuJob) handleEditJob(contextMenuJob);
+            setContextMenuAnchor(null);
+            setContextMenuJob(null);
+          }}
+        >
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MuiMenuItem>
+        <MuiMenuItem
+          onClick={() => {
+            if (contextMenuJob) handleDeleteJob(contextMenuJob);
+            setContextMenuAnchor(null);
+            setContextMenuJob(null);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MuiMenuItem>
+      </Menu>
 
       {/* Job Form Drawer */}
       <ResizableDrawer

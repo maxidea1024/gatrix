@@ -1,7 +1,7 @@
 import { Tag } from '../services/tagService';
 
 export interface JobType {
-  id: number;
+  id: string;
   name: string;
   displayName: string;
   description?: string;
@@ -47,7 +47,7 @@ export interface JobSchemaField {
 export interface Job {
   id: number;
   name: string;
-  jobTypeId: number;
+  jobTypeId: string;
   jobDataMap?: any;
   memo?: string;
   isEnabled: boolean;
@@ -69,7 +69,7 @@ export interface Job {
 
 export interface CreateJobData {
   name: string;
-  jobTypeId: number;
+  jobTypeId: string;
   jobDataMap?: any;
   memo?: string;
   isEnabled?: boolean;
@@ -78,7 +78,7 @@ export interface CreateJobData {
 
 export interface UpdateJobData {
   name?: string;
-  jobTypeId?: number;
+  jobTypeId?: string;
   jobDataMap?: any;
   memo?: string;
   isEnabled?: boolean;

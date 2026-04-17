@@ -26,7 +26,7 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId!;
     const filters: any = { environmentId };
-    if (jobTypeId) filters.jobTypeId = parseInt(jobTypeId as string);
+    if (jobTypeId) filters.jobTypeId = jobTypeId as string;
     if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
     if (search) filters.search = search as string;
 
