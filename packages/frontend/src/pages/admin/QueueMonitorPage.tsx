@@ -578,9 +578,7 @@ const QueueMonitorPage: React.FC = () => {
                                 <TableCell sx={{ fontWeight: 600 }}>
                                   {t('queueMonitor.nextRun')}
                                 </TableCell>
-                                <TableCell
-                                  sx={{ fontWeight: 600, width: 60 }}
-                                >
+                                <TableCell sx={{ fontWeight: 600, width: 60 }}>
                                   {t('common.actions')}
                                 </TableCell>
                               </TableRow>
@@ -681,9 +679,7 @@ const QueueMonitorPage: React.FC = () => {
                                     {t('queueMonitor.failedReason')}
                                   </TableCell>
                                 )}
-                                <TableCell
-                                  sx={{ fontWeight: 600, width: 80 }}
-                                >
+                                <TableCell sx={{ fontWeight: 600, width: 80 }}>
                                   {t('common.actions')}
                                 </TableCell>
                               </TableRow>
