@@ -323,21 +323,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-  // Event Lens
-  {
-    id: 'event-lens',
-    text: 'sidebar.eventLens',
-    icon: 'Insights',
-    children: [
-      {
-        text: 'sidebar.projects',
-        icon: 'Folder',
-        path: '/admin/event-lens/projects',
-        requiredPermission: P.EVENT_LENS_READ,
-      },
-    ],
-  },
-
   // Feature Flags
   {
     id: 'feature-flags',

@@ -779,7 +779,7 @@ const QueueMonitorPage: React.FC = () => {
                                             </IconButton>
                                           </Tooltip>
                                         )}
-                                        {!job.id.startsWith('repeat:') && (
+                                        {(statusTabs[activeTab - 1] === 'completed' || statusTabs[activeTab - 1] === 'failed') && (
                                           <Tooltip
                                             title={t('queueMonitor.remove')}
                                           >
