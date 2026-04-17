@@ -141,75 +141,82 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.executionDetails')}
                 </Typography>
-                <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden' }}>
+                <TableContainer
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    overflow: 'hidden',
+                  }}
+                >
                   <Table size="small">
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{ width: '120px', bgcolor: 'grey.50', py: 1 }}
-                      >
-                        {t('jobs.executionId')}
-                      </TableCell>
-                      <TableCell sx={{ py: 1 }}>{execution.id}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{ bgcolor: 'grey.50', py: 1 }}
-                      >
-                        {t('jobs.retryAttempt')}
-                      </TableCell>
-                      <TableCell sx={{ py: 1 }}>
-                        {execution.retryAttempt > 0
-                          ? execution.retryAttempt
-                          : t('common.none')}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{ bgcolor: 'grey.50', py: 1 }}
-                      >
-                        {t('jobs.startedAt')}
-                      </TableCell>
-                      <TableCell sx={{ py: 1 }}>
-                        {execution.startedAt
-                          ? formatDateTimeDetailed(execution.startedAt)
-                          : '-'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{ bgcolor: 'grey.50', py: 1 }}
-                      >
-                        {t('jobs.completedAt')}
-                      </TableCell>
-                      <TableCell sx={{ py: 1 }}>
-                        {execution.completedAt
-                          ? formatDateTimeDetailed(execution.completedAt)
-                          : '-'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{ bgcolor: 'grey.50', py: 1 }}
-                      >
-                        {t('jobs.executionTime')}
-                      </TableCell>
-                      <TableCell sx={{ py: 1 }}>
-                        {formatExecutionTime(execution)}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ width: '120px', bgcolor: 'grey.50', py: 1 }}
+                        >
+                          {t('jobs.executionId')}
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>{execution.id}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                        >
+                          {t('jobs.retryAttempt')}
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>
+                          {execution.retryAttempt > 0
+                            ? execution.retryAttempt
+                            : t('common.none')}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                        >
+                          {t('jobs.startedAt')}
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>
+                          {execution.startedAt
+                            ? formatDateTimeDetailed(execution.startedAt)
+                            : '-'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                        >
+                          {t('jobs.completedAt')}
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>
+                          {execution.completedAt
+                            ? formatDateTimeDetailed(execution.completedAt)
+                            : '-'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ bgcolor: 'grey.50', py: 1 }}
+                        >
+                          {t('jobs.executionTime')}
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>
+                          {formatExecutionTime(execution)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </TableContainer>
               </CardContent>
             </Card>
@@ -316,9 +323,11 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
               <TableBody>
                 {executions.map((execution, index) => (
                   <React.Fragment key={execution.id}>
-                    <TableRow 
+                    <TableRow
                       hover
-                      sx={{ bgcolor: index % 2 === 1 ? 'action.hover' : 'inherit' }}
+                      sx={{
+                        bgcolor: index % 2 === 1 ? 'action.hover' : 'inherit',
+                      }}
                     >
                       <TableCell>
                         <IconButton
