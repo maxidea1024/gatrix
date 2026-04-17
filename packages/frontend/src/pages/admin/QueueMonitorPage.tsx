@@ -779,7 +779,10 @@ const QueueMonitorPage: React.FC = () => {
                                             </IconButton>
                                           </Tooltip>
                                         )}
-                                        {(statusTabs[activeTab - 1] === 'completed' || statusTabs[activeTab - 1] === 'failed') && (
+                                        {(statusTabs[activeTab - 1] ===
+                                          'completed' ||
+                                          statusTabs[activeTab - 1] ===
+                                            'failed') && (
                                           <Tooltip
                                             title={t('queueMonitor.remove')}
                                           >
