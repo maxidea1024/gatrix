@@ -79,6 +79,8 @@ const defaultColumns: ColumnConfig[] = [
   { id: 'tags', labelKey: 'common.tags', visible: true },
 ];
 
+const EMPTY_TAGS: number[] = [];
+
 const JobsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -164,7 +166,8 @@ const JobsPage: React.FC = () => {
 
   const tagFilterIds = useMemo(() => {
     const f = activeFilters.find((f) => f.key === 'tags');
-    return Array.isArray(f?.value) ? f.value : [];
+    const val = Array.isArray(f?.value) ? f.value : EMPTY_TAGS;
+    return val.length === 0 ? EMPTY_TAGS : val;
   }, [activeFilters]);
 
   // Filter definitions for DynamicFilterBar
@@ -277,7 +280,7 @@ const JobsPage: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [debouncedSearch, activeFilters]);
+  }, [debouncedSearch, selectedJobType, enabledFilter, tagFilterIds]);
 
   // Load data and tags
   useEffect(() => {
