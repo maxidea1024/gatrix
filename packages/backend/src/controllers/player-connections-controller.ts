@@ -247,10 +247,10 @@ export class PlayerConnectionsController {
         });
       } else if (type === 'user') {
         if (!userId) {
-          throw new GatrixError('userId (gnid) is required for user kick', 400);
+          throw new GatrixError('userId is required for user kick', 400);
         }
         data = await admindRequest(admindUrl, 'POST', '/gatrix/v1/kick/user', {
-          gnid: userId,
+          userId,
         });
       }
 
