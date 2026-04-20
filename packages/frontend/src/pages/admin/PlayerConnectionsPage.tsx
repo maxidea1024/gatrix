@@ -167,8 +167,9 @@ const PlayerConnectionsPage: React.FC = () => {
         userId: kickType === 'user' ? kickUserId : undefined,
         message: kickMessage || undefined,
       });
+      const kickedCount = typeof result.kicked === 'boolean' ? (result.kicked ? 1 : 0) : (result.kicked || 0);
       enqueueSnackbar(
-        t('playerConnections.kick.success', { count: result.kicked }),
+        t('playerConnections.kick.success', { count: kickedCount }),
         { variant: 'success' }
       );
       setKickOpen(false);
