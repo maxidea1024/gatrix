@@ -40,7 +40,9 @@ export class CcuPollingService {
         .where('varValue', '!=', '');
 
       if (rows.length === 0) {
-        logger.debug('No environments with admindApiUrl configured, skipping CCU poll');
+        logger.debug(
+          'No environments with admindApiUrl configured, skipping CCU poll'
+        );
         return;
       }
 
@@ -50,7 +52,9 @@ export class CcuPollingService {
         try {
           await this.pollEnvironment(row.environmentId, row.varValue, now);
         } catch (err: any) {
-          logger.warn(`CCU poll failed for env ${row.environmentId}: ${err.message}`);
+          logger.warn(
+            `CCU poll failed for env ${row.environmentId}: ${err.message}`
+          );
         }
       }
 
@@ -82,7 +86,9 @@ export class CcuPollingService {
       clearTimeout(timeout);
 
       if (!response.ok) {
-        logger.warn(`Admind CCU endpoint returned ${response.status} for env ${environmentId}`);
+        logger.warn(
+          `Admind CCU endpoint returned ${response.status} for env ${environmentId}`
+        );
         return;
       }
 
@@ -99,7 +105,8 @@ export class CcuPollingService {
 
       // Total CCU record
       const totalCount = typeof data.total === 'number' ? data.total : 0;
-      const totalBotCount = typeof data.botTotal === 'number' ? data.botTotal : 0;
+      const totalBotCount =
+        typeof data.botTotal === 'number' ? data.botTotal : 0;
       records.push({
         environmentId,
         worldId: null,
@@ -116,7 +123,8 @@ export class CcuPollingService {
             environmentId,
             worldId: world.worldId || world.id || 'unknown',
             worldName: world.worldId || null,
-            playerCount: typeof world.userCount === 'number' ? world.userCount : 0,
+            playerCount:
+              typeof world.userCount === 'number' ? world.userCount : 0,
             botCount: typeof world.botCount === 'number' ? world.botCount : 0,
             recordedAt,
           });
@@ -124,7 +132,9 @@ export class CcuPollingService {
       }
 
       await CcuHistoryModel.insertBatch(records);
-      logger.debug(`CCU polled for env ${environmentId}: total=${totalCount}, worlds=${records.length - 1}`);
+      logger.debug(
+        `CCU polled for env ${environmentId}: total=${totalCount}, worlds=${records.length - 1}`
+      );
     } catch (err: any) {
       clearTimeout(timeout);
       if (err.name === 'AbortError') {

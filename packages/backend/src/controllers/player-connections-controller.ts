@@ -123,11 +123,16 @@ export class PlayerConnectionsController {
 
       // Default: last 24 hours
       const now = new Date();
-      const fromDate = from ? new Date(from as string) : new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const fromDate = from
+        ? new Date(from as string)
+        : new Date(now.getTime() - 24 * 60 * 60 * 1000);
       const toDate = to ? new Date(to as string) : now;
 
       if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        throw new GatrixError('Invalid date format for from/to parameters', 400);
+        throw new GatrixError(
+          'Invalid date format for from/to parameters',
+          400
+        );
       }
 
       const records = await CcuHistoryModel.getHistory(
@@ -158,32 +163,44 @@ export class PlayerConnectionsController {
       const { page, limit, worldId, search, sortBy, sortDesc } = req.query;
 
       const admindUrl = await getAdmindApiUrl(environmentId);
-      
+
       const queryParams = new URLSearchParams();
       if (page) queryParams.append('page', String(page));
       if (limit) queryParams.append('limit', String(limit));
       if (worldId) queryParams.append('worldId', String(worldId));
       if (search) queryParams.append('search', String(search));
       if (sortBy) queryParams.append('sortBy', String(sortBy));
-      if (sortDesc !== undefined) queryParams.append('sortDesc', String(sortDesc));
+      if (sortDesc !== undefined)
+        queryParams.append('sortDesc', String(sortDesc));
 
-      const queryStr = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const queryStr = queryParams.toString()
+        ? `?${queryParams.toString()}`
+        : '';
 
       try {
-        const response = await axios.get(`${admindUrl}/gatrix/v1/users${queryStr}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          timeout: 5000,
-        });
+        const response = await axios.get(
+          `${admindUrl}/gatrix/v1/users${queryStr}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: 5000,
+          }
+        );
 
         res.json({
           success: true,
           data: response.data,
         });
       } catch (error: any) {
-        logger.error('Failed to get connected users from admind:', error.message);
-        throw new GatrixError('Failed to retrieve connected users from game server', 502);
+        logger.error(
+          'Failed to get connected users from admind:',
+          error.message
+        );
+        throw new GatrixError(
+          'Failed to retrieve connected users from game server',
+          502
+        );
       }
     }
   );
@@ -203,15 +220,21 @@ export class PlayerConnectionsController {
       const { type, worldId, userId } = req.body;
 
       if (!type || !['all', 'world', 'user'].includes(type)) {
-        throw new GatrixError('Invalid kick type. Must be "all", "world", or "user"', 400);
+        throw new GatrixError(
+          'Invalid kick type. Must be "all", "world", or "user"',
+          400
+        );
       }
 
       const admindUrl = await getAdmindApiUrl(environmentId);
 
-      logger.info(`Player kick requested: type=${type}, worldId=${worldId}, userId=${userId}`, {
-        environmentId,
-        user: req.user?.userId,
-      });
+      logger.info(
+        `Player kick requested: type=${type}, worldId=${worldId}, userId=${userId}`,
+        {
+          environmentId,
+          user: req.user?.userId,
+        }
+      );
 
       let data: any;
 

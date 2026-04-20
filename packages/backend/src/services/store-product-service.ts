@@ -11,7 +11,6 @@ import { CmsCashShopProduct } from './cms-cash-shop-service';
 import { pubSubService } from './pub-sub-service';
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
 
-
 export interface StoreProduct {
   id: string;
   environmentId: string;
@@ -597,14 +596,22 @@ class StoreProductService {
                 );
                 if (existingUpdateIdx >= 0) {
                   // Replace the value in the existing update
-                  if (resetField === 'saleStartAt' || resetField === 'saleEndAt') {
-                    values[existingUpdateIdx] = planVal ? new Date(planVal) : null;
+                  if (
+                    resetField === 'saleStartAt' ||
+                    resetField === 'saleEndAt'
+                  ) {
+                    values[existingUpdateIdx] = planVal
+                      ? new Date(planVal)
+                      : null;
                   } else {
                     values[existingUpdateIdx] = planVal;
                   }
                 } else {
                   updates.push(`${resetField} = ?`);
-                  if (resetField === 'saleStartAt' || resetField === 'saleEndAt') {
+                  if (
+                    resetField === 'saleStartAt' ||
+                    resetField === 'saleEndAt'
+                  ) {
                     values.push(planVal ? new Date(planVal) : null);
                   } else {
                     values.push(planVal);
@@ -625,7 +632,10 @@ class StoreProductService {
       }
     }
 
-    if (updates.length === 0 && (!input.overrideResets || input.overrideResets.length === 0)) {
+    if (
+      updates.length === 0 &&
+      (!input.overrideResets || input.overrideResets.length === 0)
+    ) {
       return this.getStoreProductById(id, environmentId);
     }
 
@@ -757,7 +767,10 @@ class StoreProductService {
             // mysql2 with timezone:'local' preserves UTC in Date objects.
             // Use .toISOString() to get the correct UTC representation.
             const isoFinal = finalVal
-              ? (finalVal instanceof Date ? finalVal : new Date(finalVal)).toISOString()
+              ? (finalVal instanceof Date
+                  ? finalVal
+                  : new Date(finalVal)
+                ).toISOString()
               : null;
             const isoPlanning = planningVal
               ? new Date(planningVal).toISOString()
@@ -1311,21 +1324,30 @@ class StoreProductService {
           }
 
           // Check multi-language description changes (normalize null/empty)
-          if (normStr(dbProduct.descriptionKo as string | null) !== normStr(descKo)) {
+          if (
+            normStr(dbProduct.descriptionKo as string | null) !==
+            normStr(descKo)
+          ) {
             changes.push({
               field: 'descriptionKo',
               oldValue: dbProduct.descriptionKo,
               newValue: descKo,
             });
           }
-          if (normStr(dbProduct.descriptionEn as string | null) !== normStr(descEn)) {
+          if (
+            normStr(dbProduct.descriptionEn as string | null) !==
+            normStr(descEn)
+          ) {
             changes.push({
               field: 'descriptionEn',
               oldValue: dbProduct.descriptionEn,
               newValue: descEn,
             });
           }
-          if (normStr(dbProduct.descriptionZh as string | null) !== normStr(descZh)) {
+          if (
+            normStr(dbProduct.descriptionZh as string | null) !==
+            normStr(descZh)
+          ) {
             changes.push({
               field: 'descriptionZh',
               oldValue: dbProduct.descriptionZh,
@@ -1723,7 +1745,9 @@ class StoreProductService {
         descKo,
         descEn,
         descZh,
-        planningProduct.saleStartAt ? new Date(planningProduct.saleStartAt) : null,
+        planningProduct.saleStartAt
+          ? new Date(planningProduct.saleStartAt)
+          : null,
         planningProduct.saleEndAt ? new Date(planningProduct.saleEndAt) : null,
         userId || null,
         id,

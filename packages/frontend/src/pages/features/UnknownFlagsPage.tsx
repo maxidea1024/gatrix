@@ -273,7 +273,14 @@ const UnknownFlagsPage: React.FC = () => {
         options: sdkVersionOptions,
       },
     ],
-    [t, environmentOptions, projectOptions, organisationOptions, appNameOptions, sdkVersionOptions]
+    [
+      t,
+      environmentOptions,
+      projectOptions,
+      organisationOptions,
+      appNameOptions,
+      sdkVersionOptions,
+    ]
   );
 
   const loadFlags = useCallback(async () => {
@@ -378,31 +385,50 @@ const UnknownFlagsPage: React.FC = () => {
 
     // Apply environment filter
     if (environmentFilter && environmentFilter.length > 0) {
-      result = result.filter((f) => environmentFilter.includes(f.environmentId));
+      result = result.filter((f) =>
+        environmentFilter.includes(f.environmentId)
+      );
     }
 
     // Apply project filter
     if (projectFilter && projectFilter.length > 0) {
-      result = result.filter((f) => f.projectName && projectFilter.includes(f.projectName));
+      result = result.filter(
+        (f) => f.projectName && projectFilter.includes(f.projectName)
+      );
     }
 
     // Apply organisation filter
     if (organisationFilter && organisationFilter.length > 0) {
-      result = result.filter((f) => f.orgName && organisationFilter.includes(f.orgName));
+      result = result.filter(
+        (f) => f.orgName && organisationFilter.includes(f.orgName)
+      );
     }
 
     // Apply app name filter
     if (appNameFilter && appNameFilter.length > 0) {
-      result = result.filter((f) => f.appName && appNameFilter.includes(f.appName));
+      result = result.filter(
+        (f) => f.appName && appNameFilter.includes(f.appName)
+      );
     }
 
     // Apply SDK version filter
     if (sdkVersionFilter && sdkVersionFilter.length > 0) {
-      result = result.filter((f) => f.sdkVersion && sdkVersionFilter.includes(f.sdkVersion));
+      result = result.filter(
+        (f) => f.sdkVersion && sdkVersionFilter.includes(f.sdkVersion)
+      );
     }
 
     return result;
-  }, [flags, debouncedSearchTerm, statusFilter, environmentFilter, projectFilter, organisationFilter, appNameFilter, sdkVersionFilter]);
+  }, [
+    flags,
+    debouncedSearchTerm,
+    statusFilter,
+    environmentFilter,
+    projectFilter,
+    organisationFilter,
+    appNameFilter,
+    sdkVersionFilter,
+  ]);
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,

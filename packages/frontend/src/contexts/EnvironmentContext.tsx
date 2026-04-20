@@ -188,7 +188,13 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated, hasAnyPermissions, permissionsLoading, currentProjectId, loadEnvironments]);
+  }, [
+    isAuthenticated,
+    hasAnyPermissions,
+    permissionsLoading,
+    currentProjectId,
+    loadEnvironments,
+  ]);
 
   const switchEnvironment = useCallback(
     (orgId: string, projectId: string, environmentId: string) => {

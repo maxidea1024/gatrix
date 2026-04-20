@@ -78,7 +78,12 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated, hasAnyPermissions, permissionsLoading, currentProjectId]);
+  }, [
+    isAuthenticated,
+    hasAnyPermissions,
+    permissionsLoading,
+    currentProjectId,
+  ]);
 
   // Listen for platform/channel updates from backend (only when authenticated)
   useEffect(() => {

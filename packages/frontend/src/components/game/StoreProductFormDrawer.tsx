@@ -467,20 +467,31 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         productId: productId.trim(),
         productName: productName.trim(),
         // Multi-language name fields: send null (not undefined) if resetting
-        nameKo: nameKo.trim() || (isResettingField('nameKo') ? null : undefined),
-        nameEn: nameEn.trim() || (isResettingField('nameEn') ? null : undefined),
-        nameZh: nameZh.trim() || (isResettingField('nameZh') ? null : undefined),
+        nameKo:
+          nameKo.trim() || (isResettingField('nameKo') ? null : undefined),
+        nameEn:
+          nameEn.trim() || (isResettingField('nameEn') ? null : undefined),
+        nameZh:
+          nameZh.trim() || (isResettingField('nameZh') ? null : undefined),
         store,
         price,
         currency,
         isActive,
         saleStartAt,
         saleEndAt,
-        description: description.trim() || (isResettingField('description') ? null : undefined),
+        description:
+          description.trim() ||
+          (isResettingField('description') ? null : undefined),
         // Multi-language description fields: send null (not undefined) if resetting
-        descriptionKo: descriptionKo.trim() || (isResettingField('descriptionKo') ? null : undefined),
-        descriptionEn: descriptionEn.trim() || (isResettingField('descriptionEn') ? null : undefined),
-        descriptionZh: descriptionZh.trim() || (isResettingField('descriptionZh') ? null : undefined),
+        descriptionKo:
+          descriptionKo.trim() ||
+          (isResettingField('descriptionKo') ? null : undefined),
+        descriptionEn:
+          descriptionEn.trim() ||
+          (isResettingField('descriptionEn') ? null : undefined),
+        descriptionZh:
+          descriptionZh.trim() ||
+          (isResettingField('descriptionZh') ? null : undefined),
         tagIds,
       };
 

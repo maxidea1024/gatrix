@@ -1,11 +1,29 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, ToggleButton, ToggleButtonGroup, Card, Chip, Stack } from '@mui/material';
-import { People as PeopleIcon, SmartToy as BotIcon, Groups as AllIcon } from '@mui/icons-material';
+import {
+  Box,
+  ToggleButton,
+  ToggleButtonGroup,
+  Card,
+  Chip,
+  Stack,
+} from '@mui/material';
+import {
+  People as PeopleIcon,
+  SmartToy as BotIcon,
+  Groups as AllIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Chart as ChartJS, CategoryScale, LinearScale, PointElement,
-  LineElement, Title, Tooltip as ChartTooltip, Legend, Filler,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import playerConnectionService from '../../services/playerConnectionService';
@@ -13,7 +31,16 @@ import type { CcuHistoryRecord } from '../../services/playerConnectionService';
 import PageContentLoader from '../common/PageContentLoader';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+);
 
 const TIME_RANGES = [
   { value: '1h', label: '1H', hours: 1 },
@@ -46,7 +73,9 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
   const [timeRange, setTimeRange] = useState(
     () => searchParams.get('range') || '24h'
   );
-  const [displayMode, setDisplayMode] = useState<'all' | 'users' | 'bots'>('all');
+  const [displayMode, setDisplayMode] = useState<'all' | 'users' | 'bots'>(
+    'all'
+  );
 
   const getDateRange = useCallback(() => {
     const opt = TIME_RANGES.find((r) => r.value === timeRange);
@@ -72,7 +101,9 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
     }
   }, [projectApiPath, getDateRange]);
 
-  useEffect(() => { loadHistory(); }, [loadHistory]);
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
   // Persist range to URL
   useEffect(() => {
@@ -108,9 +139,10 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
     if (totalRecords.length > 0) {
       if (displayMode === 'all' || displayMode === 'users') {
         datasets.push({
-          label: displayMode === 'users'
-            ? t('playerConnections.ccu.total') + ' (Users)'
-            : t('playerConnections.ccu.total'),
+          label:
+            displayMode === 'users'
+              ? t('playerConnections.ccu.total') + ' (Users)'
+              : t('playerConnections.ccu.total'),
           data: totalRecords.map((r) => r.playerCount),
           borderColor: '#1976d2',
           backgroundColor: 'rgba(25,118,210,0.15)',
@@ -123,9 +155,10 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
       }
       if (displayMode === 'all' || displayMode === 'bots') {
         datasets.push({
-          label: displayMode === 'bots'
-            ? t('playerConnections.ccu.total') + ' (Bots)'
-            : t('playerConnections.ccu.botTotal'),
+          label:
+            displayMode === 'bots'
+              ? t('playerConnections.ccu.total') + ' (Bots)'
+              : t('playerConnections.ccu.botTotal'),
           data: totalRecords.map((r) => r.botCount || 0),
           borderColor: '#9c27b0',
           backgroundColor: 'rgba(156,39,176,0.10)',
@@ -146,7 +179,8 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
       const c = WORLD_COLORS[colorIdx % WORLD_COLORS.length];
       if (displayMode === 'all' || displayMode === 'users') {
         datasets.push({
-          label: (recs[0]?.worldName || key) + (displayMode === 'all' ? '' : ''),
+          label:
+            (recs[0]?.worldName || key) + (displayMode === 'all' ? '' : ''),
           data: recs.map((r) => r.playerCount),
           borderColor: c.border,
           backgroundColor: c.bg,
@@ -176,26 +210,47 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
     return { labels, datasets };
   }, [records, t, displayMode]);
 
-  const chartOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: true, position: 'top' as const },
-      tooltip: { mode: 'index' as const, intersect: false },
-    },
-    scales: {
-      x: {
-        grid: { display: true, color: 'rgba(0,0,0,0.05)' },
-        ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 16 },
+  const chartOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top' as const },
+        tooltip: { mode: 'index' as const, intersect: false },
       },
-      y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-    },
-    interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false },
-  }), []);
+      scales: {
+        x: {
+          grid: { display: true, color: 'rgba(0,0,0,0.05)' },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 45,
+            autoSkip: true,
+            maxTicksLimit: 16,
+          },
+        },
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+      },
+      interaction: {
+        mode: 'nearest' as const,
+        axis: 'x' as const,
+        intersect: false,
+      },
+    }),
+    []
+  );
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+          flexWrap: 'wrap',
+          gap: 1,
+        }}
+      >
         <Stack direction="row" spacing={0.5}>
           <Chip
             icon={<AllIcon sx={{ fontSize: 16 }} />}
@@ -232,7 +287,11 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
           size="small"
         >
           {TIME_RANGES.map((r) => (
-            <ToggleButton key={r.value} value={r.value} sx={{ px: 1.5, py: 0.5, textTransform: 'none' }}>
+            <ToggleButton
+              key={r.value}
+              value={r.value}
+              sx={{ px: 1.5, py: 0.5, textTransform: 'none' }}
+            >
               {r.label}
             </ToggleButton>
           ))}
@@ -241,7 +300,10 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
 
       <PageContentLoader loading={loading}>
         {chartData.datasets.length === 0 ? (
-          <EmptyPlaceholder message={t('playerConnections.ccuGraph.noData')} minHeight={300} />
+          <EmptyPlaceholder
+            message={t('playerConnections.ccuGraph.noData')}
+            minHeight={300}
+          />
         ) : (
           <Card variant="outlined" sx={{ p: 2 }}>
             <Box sx={{ height: 400 }}>

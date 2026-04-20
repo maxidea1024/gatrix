@@ -161,8 +161,10 @@ const StoreProductsPage: React.FC = () => {
   const [rowMenuProduct, setRowMenuProduct] = useState<StoreProduct | null>(
     null
   );
-  const [resetOverrideConfirmOpen, setResetOverrideConfirmOpen] = useState(false);
-  const [resetOverrideProduct, setResetOverrideProduct] = useState<StoreProduct | null>(null);
+  const [resetOverrideConfirmOpen, setResetOverrideConfirmOpen] =
+    useState(false);
+  const [resetOverrideProduct, setResetOverrideProduct] =
+    useState<StoreProduct | null>(null);
 
   // Sync state
   const [syncDialogOpen, setSyncDialogOpen] = useState(false);
@@ -733,10 +735,19 @@ const StoreProductsPage: React.FC = () => {
   const handleResetOverridesConfirm = async () => {
     if (!resetOverrideProduct) return;
     try {
-      await storeProductService.resetOverrides(projectApiPath, resetOverrideProduct.id);
-      enqueueSnackbar(t('storeProducts.resetOverridesSuccess', '오버라이드가 초기화되었습니다'), {
-        variant: 'success',
-      });
+      await storeProductService.resetOverrides(
+        projectApiPath,
+        resetOverrideProduct.id
+      );
+      enqueueSnackbar(
+        t(
+          'storeProducts.resetOverridesSuccess',
+          '오버라이드가 초기화되었습니다'
+        ),
+        {
+          variant: 'success',
+        }
+      );
       await loadProducts();
       loadStats();
     } catch (error: any) {
@@ -1913,7 +1924,8 @@ const StoreProductsPage: React.FC = () => {
                 <br />
                 {t('storeProducts.overrideDescription', {
                   count: resetOverrideProduct.overriddenFields?.length || 0,
-                  fields: resetOverrideProduct.overriddenFields?.join(', ') || '',
+                  fields:
+                    resetOverrideProduct.overriddenFields?.join(', ') || '',
                 })}
               </>
             )}

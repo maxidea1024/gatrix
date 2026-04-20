@@ -180,9 +180,7 @@ export class QueueService {
         }
 
         // Register CCU polling job (every minute)
-        const ccuPollExists = repeatables.some(
-          (r) => r.name === 'ccu:poll'
-        );
+        const ccuPollExists = repeatables.some((r) => r.name === 'ccu:poll');
         if (!ccuPollExists) {
           await this.addJob(
             'scheduler',
@@ -190,9 +188,7 @@ export class QueueService {
             {},
             { repeat: { every: 60000 } }
           );
-          logger.info(
-            'Registered repeatable job: ccu:poll (every minute)'
-          );
+          logger.info('Registered repeatable job: ccu:poll (every minute)');
         } else {
           logger.info('Repeatable job already exists: ccu:poll');
         }

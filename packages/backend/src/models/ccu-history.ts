@@ -18,7 +18,9 @@ export class CcuHistoryModel {
   /**
    * Insert a batch of CCU records (total + per-world)
    */
-  static async insertBatch(records: Omit<CcuHistoryRecord, 'id'>[]): Promise<void> {
+  static async insertBatch(
+    records: Omit<CcuHistoryRecord, 'id'>[]
+  ): Promise<void> {
     if (records.length === 0) return;
 
     const rows = records.map((r) => ({ id: ulid(), ...r }));
@@ -62,7 +64,9 @@ export class CcuHistoryModel {
       .delete();
 
     if (deleted > 0) {
-      logger.info(`Cleaned up ${deleted} CCU history records older than ${days} days`);
+      logger.info(
+        `Cleaned up ${deleted} CCU history records older than ${days} days`
+      );
     }
 
     return deleted;

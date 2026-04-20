@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Table, TableHead, TableRow, TableCell, TableBody,
-  TableContainer, IconButton, Tooltip, Typography, Card,
-  Alert, TableSortLabel
+  Box,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  IconButton,
+  Tooltip,
+  Typography,
+  Card,
+  Alert,
+  TableSortLabel,
 } from '@mui/material';
 import {
   Block as KickIcon,
@@ -33,12 +43,36 @@ const COLUMNS_STORAGE_KEY = 'playerConnections.columns';
 
 const DEFAULT_COLUMNS: ColumnConfig[] = [
   { id: 'userId', labelKey: 'playerConnections.players.userId', visible: true },
-  { id: 'accountId', labelKey: 'playerConnections.players.accountId', visible: true },
-  { id: 'characterId', labelKey: 'playerConnections.players.characterId', visible: true },
-  { id: 'userName', labelKey: 'playerConnections.players.userName', visible: true },
-  { id: 'worldId', labelKey: 'playerConnections.players.worldId', visible: true },
-  { id: 'worldName', labelKey: 'playerConnections.players.worldName', visible: true },
-  { id: 'connectedAt', labelKey: 'playerConnections.players.connectedAt', visible: true },
+  {
+    id: 'accountId',
+    labelKey: 'playerConnections.players.accountId',
+    visible: true,
+  },
+  {
+    id: 'characterId',
+    labelKey: 'playerConnections.players.characterId',
+    visible: true,
+  },
+  {
+    id: 'userName',
+    labelKey: 'playerConnections.players.userName',
+    visible: true,
+  },
+  {
+    id: 'worldId',
+    labelKey: 'playerConnections.players.worldId',
+    visible: true,
+  },
+  {
+    id: 'worldName',
+    labelKey: 'playerConnections.players.worldName',
+    visible: true,
+  },
+  {
+    id: 'connectedAt',
+    labelKey: 'playerConnections.players.connectedAt',
+    visible: true,
+  },
   { id: 'ip', labelKey: 'playerConnections.players.ip', visible: false },
 ];
 
@@ -48,7 +82,11 @@ interface Props {
   onKickUser: (userId: string) => void;
 }
 
-const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) => {
+const PlayerListTab: React.FC<Props> = ({
+  projectApiPath,
+  worlds,
+  onKickUser,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -67,12 +105,16 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     try {
       const saved = localStorage.getItem('playerConnections.listSettings');
       if (saved) return JSON.parse(saved);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return { rowsPerPage: 20, sortBy: 'connectedAt', sortDesc: true };
   });
 
   const [rowsPerPage, setRowsPerPage] = useState(listSettings.rowsPerPage);
-  const [sortBy, setSortBy] = useState(() => searchParams.get('sortBy') || listSettings.sortBy);
+  const [sortBy, setSortBy] = useState(
+    () => searchParams.get('sortBy') || listSettings.sortBy
+  );
   const [sortDesc, setSortDesc] = useState(() => {
     const param = searchParams.get('sortDesc');
     if (param !== null) return param !== 'false';
@@ -82,7 +124,10 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
 
   // Persist settings
   useEffect(() => {
-    localStorage.setItem('playerConnections.listSettings', JSON.stringify({ rowsPerPage, sortBy, sortDesc }));
+    localStorage.setItem(
+      'playerConnections.listSettings',
+      JSON.stringify({ rowsPerPage, sortBy, sortDesc })
+    );
   }, [rowsPerPage, sortBy, sortDesc]);
 
   // Filters
@@ -90,7 +135,11 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     const filters: ActiveFilter[] = [];
     const worldFilter = searchParams.get('worldId');
     if (worldFilter) {
-      filters.push({ key: 'worldId', value: worldFilter, label: t('playerConnections.players.worldId') });
+      filters.push({
+        key: 'worldId',
+        value: worldFilter,
+        label: t('playerConnections.players.worldId'),
+      });
     }
     return filters;
   });
@@ -112,10 +161,13 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     try {
       const saved = localStorage.getItem(COLUMNS_STORAGE_KEY);
       if (saved) return JSON.parse(saved);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return DEFAULT_COLUMNS;
   });
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
 
   const handleColumnsChange = (newCols: ColumnConfig[]) => {
     setColumns(newCols);
@@ -134,14 +186,17 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     setLoading(true);
     setError(null);
     try {
-      const data = await playerConnectionService.getConnectedUsers(projectApiPath, {
-        page: page + 1,
-        limit: rowsPerPage,
-        worldId: getFilterValue('worldId'),
-        search,
-        sortBy,
-        sortDesc,
-      });
+      const data = await playerConnectionService.getConnectedUsers(
+        projectApiPath,
+        {
+          page: page + 1,
+          limit: rowsPerPage,
+          worldId: getFilterValue('worldId'),
+          search,
+          sortBy,
+          sortDesc,
+        }
+      );
       setUsers(data.users);
       setTotal(data.total);
     } catch (err: any) {
@@ -156,9 +211,19 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [projectApiPath, page, rowsPerPage, activeFilters, search, sortBy, sortDesc]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    projectApiPath,
+    page,
+    rowsPerPage,
+    activeFilters,
+    search,
+    sortBy,
+    sortDesc,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { loadUsers(); }, [loadUsers]);
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   // Persist to URL
   useEffect(() => {
@@ -175,13 +240,16 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     else params.delete('sortBy');
     if (!sortDesc) params.set('sortDesc', 'false');
     else params.delete('sortDesc');
-    
+
     setSearchParams(params, { replace: true });
   }, [page, activeFilters, search, sortBy, sortDesc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
-    setActiveFilters((prev) => [...prev.filter((f) => f.key !== filter.key), filter]);
+    setActiveFilters((prev) => [
+      ...prev.filter((f) => f.key !== filter.key),
+      filter,
+    ]);
     setPage(0);
   };
   const handleFilterRemove = (key: string) => {
@@ -189,7 +257,9 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     setPage(0);
   };
   const handleFilterChange = (key: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, value } : f))
+    );
     setPage(0);
   };
   const handleSearchChange = (newVal: string) => {
@@ -211,17 +281,35 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
   const handleCopy = (text: string) => {
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copied') || 'Copied', { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed') || 'Copy failed', { variant: 'error' })
+      () =>
+        enqueueSnackbar(t('common.copied') || 'Copied', { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copyFailed') || 'Copy failed', {
+          variant: 'error',
+        })
     );
   };
 
-  const COPY_COLUMNS = ['userId', 'accountId', 'characterId', 'userName', 'worldId', 'worldName', 'ip'];
+  const COPY_COLUMNS = [
+    'userId',
+    'accountId',
+    'characterId',
+    'userName',
+    'worldId',
+    'worldName',
+    'ip',
+  ];
   const MONO_COLUMNS = ['userId', 'accountId', 'characterId', 'ip'];
 
   const renderCell = (user: ConnectedUser, colId: string) => {
     if (colId === 'connectedAt') {
-      return <RelativeTime date={user.connectedAt} variant="body2" color="text.primary" />;
+      return (
+        <RelativeTime
+          date={user.connectedAt}
+          variant="body2"
+          color="text.primary"
+        />
+      );
     }
 
     const value = user[colId] ?? '-';
@@ -231,10 +319,20 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     if (hasCopy) {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography variant="body2" sx={isMono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {}}>
+          <Typography
+            variant="body2"
+            sx={isMono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {}}
+          >
             {value}
           </Typography>
-          <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(String(value)); }} sx={{ p: 0.25 }}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopy(String(value));
+            }}
+            sx={{ p: 0.25 }}
+          >
             <CopyIcon sx={{ fontSize: 14 }} color="action" />
           </IconButton>
         </Box>
@@ -242,7 +340,10 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
     }
 
     return (
-      <Typography variant="body2" sx={isMono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {}}>
+      <Typography
+        variant="body2"
+        sx={isMono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {}}
+      >
         {value}
       </Typography>
     );
@@ -257,7 +358,15 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
   return (
     <Box>
       {/* Filter bar */}
-      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', mb: 1.5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          mb: 1.5,
+        }}
+      >
         <SearchTextField
           placeholder={t('playerConnections.players.searchPlaceholder')}
           value={search}
@@ -274,7 +383,12 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
         <Tooltip title={t('common.columnSettings')}>
           <IconButton
             onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-            sx={{ bgcolor: 'background.paper', border: 1, borderColor: 'divider', '&:hover': { bgcolor: 'action.hover' } }}
+            sx={{
+              bgcolor: 'background.paper',
+              border: 1,
+              borderColor: 'divider',
+              '&:hover': { bgcolor: 'action.hover' },
+            }}
           >
             <ColumnIcon />
           </IconButton>
@@ -283,7 +397,11 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
 
       {/* Error banner */}
       {error && (
-        <Alert severity="error" icon={<ErrorIcon />} sx={{ mb: 3, borderRadius: 2 }}>
+        <Alert
+          severity="error"
+          icon={<ErrorIcon />}
+          sx={{ mb: 3, borderRadius: 2 }}
+        >
           {error}
         </Alert>
       )}
@@ -291,7 +409,10 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
       {/* Table */}
       <PageContentLoader loading={isInitialLoad && loading}>
         {!error && users.length === 0 ? (
-          <EmptyPlaceholder message={t('playerConnections.players.noUsers')} minHeight={300} />
+          <EmptyPlaceholder
+            message={t('playerConnections.players.noUsers')}
+            minHeight={300}
+          />
         ) : !error ? (
           <Card variant="outlined" sx={{ position: 'relative' }}>
             <TableContainer
@@ -308,7 +429,13 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
                       <TableCell key={col.id}>
                         <TableSortLabel
                           active={sortBy === col.id}
-                          direction={sortBy === col.id ? (sortDesc ? 'desc' : 'asc') : 'desc'}
+                          direction={
+                            sortBy === col.id
+                              ? sortDesc
+                                ? 'desc'
+                                : 'asc'
+                              : 'desc'
+                          }
                           onClick={() => handleSortRequest(col.id)}
                         >
                           {t(col.labelKey)}
@@ -327,7 +454,13 @@ const PlayerListTab: React.FC<Props> = ({ projectApiPath, worlds, onKickUser }) 
                         </TableCell>
                       ))}
                       <TableCell align="center">
-                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); onKickUser(user.userId); }}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onKickUser(user.userId);
+                          }}
+                        >
                           <KickIcon fontSize="small" color="error" />
                         </IconButton>
                       </TableCell>

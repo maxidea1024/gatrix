@@ -1,15 +1,37 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Box, Tabs, Tab, Alert, Button, Typography, Card, CardContent,
-  Grid, ButtonGroup, Menu, MenuItem, Dialog, DialogTitle, DialogContent,
-  DialogActions, TextField, FormControl, InputLabel, Select,
-  SelectChangeEvent, alpha,
+  Box,
+  Tabs,
+  Tab,
+  Alert,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  ButtonGroup,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  SelectChangeEvent,
+  alpha,
 } from '@mui/material';
 import {
-  People as PeopleIcon, Refresh as RefreshIcon,
-  ArrowDropDown as ArrowDropDownIcon, Settings as SettingsIcon,
-  Block as KickIcon, TrendingUp as TrendingUpIcon,
-  Public as WorldIcon, Warning as WarningIcon,
+  People as PeopleIcon,
+  Refresh as RefreshIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Settings as SettingsIcon,
+  Block as KickIcon,
+  TrendingUp as TrendingUpIcon,
+  Public as WorldIcon,
+  Warning as WarningIcon,
   SignalCellularAlt as CcuIcon,
   ErrorOutline as ErrorIcon,
   SmartToy as BotIcon,
@@ -58,7 +80,8 @@ const PlayerConnectionsPage: React.FC = () => {
     const saved = localStorage.getItem(REFRESH_STORAGE_KEY);
     return saved !== null ? parseInt(saved, 10) : 30000;
   });
-  const [refreshMenuAnchor, setRefreshMenuAnchor] = useState<null | HTMLElement>(null);
+  const [refreshMenuAnchor, setRefreshMenuAnchor] =
+    useState<null | HTMLElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Kick dialog
@@ -79,7 +102,10 @@ const PlayerConnectionsPage: React.FC = () => {
     if (!projectApiPath) return;
     varsService
       .get(projectApiPath, 'admindApiUrl')
-      .then((val) => { setAdmindApiUrl(val); setUrlChecked(true); })
+      .then((val) => {
+        setAdmindApiUrl(val);
+        setUrlChecked(true);
+      })
       .catch(() => setUrlChecked(true));
   }, [projectApiPath]);
 
@@ -95,7 +121,9 @@ const PlayerConnectionsPage: React.FC = () => {
       if (status === 502 || status === 504) {
         setCcuError(t('playerConnections.error.unreachable'));
       } else if (status === 400) {
-        setCcuError(err?.response?.data?.message || t('playerConnections.error.config'));
+        setCcuError(
+          err?.response?.data?.message || t('playerConnections.error.config')
+        );
       } else {
         setCcuError(t('playerConnections.error.unknown'));
       }
@@ -115,7 +143,9 @@ const PlayerConnectionsPage: React.FC = () => {
     if (refreshInterval > 0 && admindApiUrl) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [refreshInterval, loadCcu, admindApiUrl]);
 
   const handleTabChange = (_: React.SyntheticEvent, val: number) => {
@@ -137,12 +167,18 @@ const PlayerConnectionsPage: React.FC = () => {
         userId: kickType === 'user' ? kickUserId : undefined,
         message: kickMessage || undefined,
       });
-      enqueueSnackbar(t('playerConnections.kick.success', { count: result.kicked }), { variant: 'success' });
+      enqueueSnackbar(
+        t('playerConnections.kick.success', { count: result.kicked }),
+        { variant: 'success' }
+      );
       setKickOpen(false);
       setKickMessage('');
       loadCcu();
     } catch (err: any) {
-      enqueueSnackbar(err?.response?.data?.message || t('playerConnections.kick.failed'), { variant: 'error' });
+      enqueueSnackbar(
+        err?.response?.data?.message || t('playerConnections.kick.failed'),
+        { variant: 'error' }
+      );
     } finally {
       setKicking(false);
     }
@@ -158,12 +194,20 @@ const PlayerConnectionsPage: React.FC = () => {
   if (urlChecked && !admindApiUrl) {
     return (
       <Box sx={{ p: 3 }}>
-        <PageHeader icon={<PeopleIcon />} title={t('playerConnections.title')} subtitle={t('playerConnections.subtitle')} />
+        <PageHeader
+          icon={<PeopleIcon />}
+          title={t('playerConnections.title')}
+          subtitle={t('playerConnections.subtitle')}
+        />
         <Alert
           severity="warning"
           icon={<WarningIcon />}
           action={
-            <Button color="inherit" size="small" variant="outlined" startIcon={<SettingsIcon />}
+            <Button
+              color="inherit"
+              size="small"
+              variant="outlined"
+              startIcon={<SettingsIcon />}
               onClick={() => navigate('/settings/system?tab=0')}
             >
               {t('playerConnections.goToSettings')}
@@ -177,7 +221,8 @@ const PlayerConnectionsPage: React.FC = () => {
     );
   }
 
-  const activeRefreshLabel = REFRESH_OPTIONS.find((o) => o.value === refreshInterval)?.label || 'Off';
+  const activeRefreshLabel =
+    REFRESH_OPTIONS.find((o) => o.value === refreshInterval)?.label || 'Off';
 
   return (
     <Box sx={{ p: 3 }}>
@@ -187,23 +232,41 @@ const PlayerConnectionsPage: React.FC = () => {
         subtitle={t('playerConnections.subtitle')}
         actions={
           <>
-            <ButtonGroup variant="contained" size="small" sx={{ borderRadius: 1.5, overflow: 'hidden' }}>
+            <ButtonGroup
+              variant="contained"
+              size="small"
+              sx={{ borderRadius: 1.5, overflow: 'hidden' }}
+            >
               <Button startIcon={<RefreshIcon />} onClick={loadCcu}>
                 {t('common.refresh')}
               </Button>
               <Button
                 size="small"
                 onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
-                sx={{ minWidth: 'auto', px: 1, fontSize: '0.75rem', fontWeight: 600 }}
+                sx={{
+                  minWidth: 'auto',
+                  px: 1,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                }}
               >
                 {activeRefreshLabel}
                 <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
               </Button>
             </ButtonGroup>
-            <Menu anchorEl={refreshMenuAnchor} open={Boolean(refreshMenuAnchor)} onClose={() => setRefreshMenuAnchor(null)}>
+            <Menu
+              anchorEl={refreshMenuAnchor}
+              open={Boolean(refreshMenuAnchor)}
+              onClose={() => setRefreshMenuAnchor(null)}
+            >
               {REFRESH_OPTIONS.map((opt) => (
-                <MenuItem key={opt.value} selected={refreshInterval === opt.value}
-                  onClick={() => { handleSetRefreshInterval(opt.value); setRefreshMenuAnchor(null); }}
+                <MenuItem
+                  key={opt.value}
+                  selected={refreshInterval === opt.value}
+                  onClick={() => {
+                    handleSetRefreshInterval(opt.value);
+                    setRefreshMenuAnchor(null);
+                  }}
                 >
                   {opt.label}
                 </MenuItem>
@@ -213,8 +276,15 @@ const PlayerConnectionsPage: React.FC = () => {
         }
       />
 
-      <Tabs value={activeTab} onChange={handleTabChange}
-        sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 } }}
+      <Tabs
+        value={activeTab}
+        onChange={handleTabChange}
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          mb: 3,
+          '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 },
+        }}
       >
         <Tab label={t('playerConnections.tabs.overview')} />
         <Tab label={t('playerConnections.tabs.ccuGraph')} />
@@ -226,7 +296,9 @@ const PlayerConnectionsPage: React.FC = () => {
         <PageContentLoader loading={loading}>
           {/* Error banner */}
           {ccuError && (
-            <Alert severity="error" icon={<ErrorIcon />}
+            <Alert
+              severity="error"
+              icon={<ErrorIcon />}
               sx={{ mb: 3, borderRadius: 2 }}
             >
               {ccuError}
@@ -236,28 +308,67 @@ const PlayerConnectionsPage: React.FC = () => {
           {/* Stat cards */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined" sx={(theme) => ({
-                borderRadius: 3, background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
-                borderColor: alpha(theme.palette.primary.main, 0.2), height: '100%',
-              })}>
+              <Card
+                variant="outlined"
+                sx={(theme) => ({
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+                  borderColor: alpha(theme.palette.primary.main, 0.2),
+                  height: '100%',
+                })}
+              >
                 <CardContent sx={{ py: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      mb: 1,
+                    }}
+                  >
                     <CcuIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       {t('playerConnections.ccu.total')}
                     </Typography>
                   </Box>
-                  <Typography variant="h3" fontWeight={700} color="primary.main">
+                  <Typography
+                    variant="h3"
+                    fontWeight={700}
+                    color="primary.main"
+                  >
                     {ccuData?.total?.toLocaleString() ?? '-'}
                   </Typography>
                   {ccuData && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        mt: 0.5,
+                      }}
+                    >
                       <Typography variant="caption" color="text.secondary">
-                        <PeopleIcon sx={{ fontSize: 12, mr: 0.25, verticalAlign: 'middle' }} />
+                        <PeopleIcon
+                          sx={{
+                            fontSize: 12,
+                            mr: 0.25,
+                            verticalAlign: 'middle',
+                          }}
+                        />
                         {ccuData.total.toLocaleString()}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        <BotIcon sx={{ fontSize: 12, mr: 0.25, verticalAlign: 'middle' }} />
+                        <BotIcon
+                          sx={{
+                            fontSize: 12,
+                            mr: 0.25,
+                            verticalAlign: 'middle',
+                          }}
+                        />
                         {(ccuData.botTotal || 0).toLocaleString()}
                       </Typography>
                     </Box>
@@ -266,14 +377,30 @@ const PlayerConnectionsPage: React.FC = () => {
               </Card>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined" sx={(theme) => ({
-                borderRadius: 3, background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.main, 0.02)} 100%)`,
-                borderColor: alpha(theme.palette.info.main, 0.2), height: '100%',
-              })}>
+              <Card
+                variant="outlined"
+                sx={(theme) => ({
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.main, 0.02)} 100%)`,
+                  borderColor: alpha(theme.palette.info.main, 0.2),
+                  height: '100%',
+                })}
+              >
                 <CardContent sx={{ py: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      mb: 1,
+                    }}
+                  >
                     <WorldIcon sx={{ fontSize: 18, color: 'info.main' }} />
-                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       {t('playerConnections.ccu.worldCount')}
                     </Typography>
                   </Box>
@@ -284,20 +411,48 @@ const PlayerConnectionsPage: React.FC = () => {
               </Card>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined" sx={(theme) => ({
-                borderRadius: 3, background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.08)} 0%, ${alpha(theme.palette.success.main, 0.02)} 100%)`,
-                borderColor: alpha(theme.palette.success.main, 0.2), height: '100%',
-              })}>
+              <Card
+                variant="outlined"
+                sx={(theme) => ({
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.08)} 0%, ${alpha(theme.palette.success.main, 0.02)} 100%)`,
+                  borderColor: alpha(theme.palette.success.main, 0.2),
+                  height: '100%',
+                })}
+              >
                 <CardContent sx={{ py: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <TrendingUpIcon sx={{ fontSize: 18, color: 'success.main' }} />
-                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      mb: 1,
+                    }}
+                  >
+                    <TrendingUpIcon
+                      sx={{ fontSize: 18, color: 'success.main' }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       {t('playerConnections.ccu.peakWorld')}
                     </Typography>
                   </Box>
-                  <Typography variant="h5" fontWeight={700} color="success.main" noWrap>
+                  <Typography
+                    variant="h5"
+                    fontWeight={700}
+                    color="success.main"
+                    noWrap
+                  >
                     {ccuData?.worlds?.length
-                      ? (() => { const top = [...ccuData.worlds].sort((a, b) => b.count - a.count)[0]; return `${top.name || top.worldId}`; })()
+                      ? (() => {
+                          const top = [...ccuData.worlds].sort(
+                            (a, b) => b.count - a.count
+                          )[0];
+                          return `${top.name || top.worldId}`;
+                        })()
                       : '-'}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -309,19 +464,49 @@ const PlayerConnectionsPage: React.FC = () => {
               </Card>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined" sx={(theme) => ({
-                borderRadius: 3, background: `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.08)} 0%, ${alpha(theme.palette.error.main, 0.02)} 100%)`,
-                borderColor: alpha(theme.palette.error.main, 0.2),
-                height: '100%', display: 'flex', alignItems: 'center',
-              })}>
-                <CardContent sx={{ py: 2, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <Button variant="contained" color="error" size="small" startIcon={<KickIcon />}
-                    onClick={() => { setKickType('all'); setKickOpen(true); }}
-                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+              <Card
+                variant="outlined"
+                sx={(theme) => ({
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.08)} 0%, ${alpha(theme.palette.error.main, 0.02)} 100%)`,
+                  borderColor: alpha(theme.palette.error.main, 0.2),
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                })}
+              >
+                <CardContent
+                  sx={{
+                    py: 2,
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    startIcon={<KickIcon />}
+                    onClick={() => {
+                      setKickType('all');
+                      setKickOpen(true);
+                    }}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
                   >
                     {t('playerConnections.kick.openDialog')}
                   </Button>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
                     {t('playerConnections.kick.title')}
                   </Typography>
                 </CardContent>
@@ -332,34 +517,81 @@ const PlayerConnectionsPage: React.FC = () => {
           {/* Per-world cards */}
           {ccuData?.worlds && ccuData.worlds.length > 0 && (
             <Box>
-              <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Typography
+                variant="subtitle2"
+                fontWeight={600}
+                color="text.secondary"
+                sx={{ mb: 1.5, textTransform: 'uppercase', letterSpacing: 0.5 }}
+              >
                 {t('playerConnections.ccu.perWorld')}
               </Typography>
               <Grid container spacing={1.5}>
-                {[...ccuData.worlds].sort((a, b) => b.count - a.count).map((w) => (
-                  <Grid size={{ xs: 6, sm: 4, md: 3, lg: 2 }} key={w.worldId}>
-                    <Card variant="outlined" sx={{ borderRadius: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 2 } }}>
-                      <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                        <Typography variant="caption" color="text.secondary" noWrap title={w.name || w.worldId} sx={{ display: 'block', mb: 0.5 }}>
-                          {w.name || w.worldId}
-                        </Typography>
-                        <Typography variant="h6" fontWeight={700}>
-                          {w.count.toLocaleString()}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25 }}>
-                          <Typography variant="caption" color="text.secondary">
-                            <PeopleIcon sx={{ fontSize: 11, mr: 0.25, verticalAlign: 'middle' }} />
+                {[...ccuData.worlds]
+                  .sort((a, b) => b.count - a.count)
+                  .map((w) => (
+                    <Grid size={{ xs: 6, sm: 4, md: 3, lg: 2 }} key={w.worldId}>
+                      <Card
+                        variant="outlined"
+                        sx={{
+                          borderRadius: 2,
+                          transition: 'box-shadow 0.2s',
+                          '&:hover': { boxShadow: 2 },
+                        }}
+                      >
+                        <CardContent
+                          sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                        >
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            noWrap
+                            title={w.name || w.worldId}
+                            sx={{ display: 'block', mb: 0.5 }}
+                          >
+                            {w.name || w.worldId}
+                          </Typography>
+                          <Typography variant="h6" fontWeight={700}>
                             {w.count.toLocaleString()}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            <BotIcon sx={{ fontSize: 11, mr: 0.25, verticalAlign: 'middle' }} />
-                            {(w.botCount || 0).toLocaleString()}
-                          </Typography>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                              mt: 0.25,
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              <PeopleIcon
+                                sx={{
+                                  fontSize: 11,
+                                  mr: 0.25,
+                                  verticalAlign: 'middle',
+                                }}
+                              />
+                              {w.count.toLocaleString()}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              <BotIcon
+                                sx={{
+                                  fontSize: 11,
+                                  mr: 0.25,
+                                  verticalAlign: 'middle',
+                                }}
+                              />
+                              {(w.botCount || 0).toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
               </Grid>
             </Box>
           )}
@@ -367,53 +599,99 @@ const PlayerConnectionsPage: React.FC = () => {
       )}
 
       {/* Tab 1: CCU Graph */}
-      {activeTab === 1 && projectApiPath && <CcuGraphTab projectApiPath={projectApiPath} />}
+      {activeTab === 1 && projectApiPath && (
+        <CcuGraphTab projectApiPath={projectApiPath} />
+      )}
 
       {/* Tab 2: Player List */}
       {activeTab === 2 && projectApiPath && (
-        <PlayerListTab projectApiPath={projectApiPath} worlds={ccuData?.worlds || []} onKickUser={openKickForUser} />
+        <PlayerListTab
+          projectApiPath={projectApiPath}
+          worlds={ccuData?.worlds || []}
+          onKickUser={openKickForUser}
+        />
       )}
 
       {/* Kick Dialog */}
-      <Dialog open={kickOpen} onClose={() => setKickOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
-        <DialogTitle sx={{ fontWeight: 600 }}>{t('playerConnections.kick.title')}</DialogTitle>
+      <Dialog
+        open={kickOpen}
+        onClose={() => setKickOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          {t('playerConnections.kick.title')}
+        </DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
             <InputLabel>{t('playerConnections.kick.type')}</InputLabel>
-            <Select value={kickType} label={t('playerConnections.kick.type')}
-              onChange={(e: SelectChangeEvent) => setKickType(e.target.value as any)}
+            <Select
+              value={kickType}
+              label={t('playerConnections.kick.type')}
+              onChange={(e: SelectChangeEvent) =>
+                setKickType(e.target.value as any)
+              }
             >
               <MenuItem value="all">{t('playerConnections.kick.all')}</MenuItem>
-              <MenuItem value="world">{t('playerConnections.kick.world')}</MenuItem>
-              <MenuItem value="user">{t('playerConnections.kick.user')}</MenuItem>
+              <MenuItem value="world">
+                {t('playerConnections.kick.world')}
+              </MenuItem>
+              <MenuItem value="user">
+                {t('playerConnections.kick.user')}
+              </MenuItem>
             </Select>
           </FormControl>
           {kickType === 'world' && (
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel>{t('playerConnections.kick.selectWorld')}</InputLabel>
-              <Select value={kickWorldId} label={t('playerConnections.kick.selectWorld')}
-                onChange={(e: SelectChangeEvent) => setKickWorldId(e.target.value)}
+              <Select
+                value={kickWorldId}
+                label={t('playerConnections.kick.selectWorld')}
+                onChange={(e: SelectChangeEvent) =>
+                  setKickWorldId(e.target.value)
+                }
               >
                 {(ccuData?.worlds || []).map((w) => (
-                  <MenuItem key={w.worldId} value={w.worldId}>{w.name || w.worldId} ({w.count})</MenuItem>
+                  <MenuItem key={w.worldId} value={w.worldId}>
+                    {w.name || w.worldId} ({w.count})
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
           )}
           {kickType === 'user' && (
-            <TextField fullWidth label={t('playerConnections.kick.userId')} value={kickUserId}
-              onChange={(e) => setKickUserId(e.target.value)} sx={{ mb: 2 }}
+            <TextField
+              fullWidth
+              label={t('playerConnections.kick.userId')}
+              value={kickUserId}
+              onChange={(e) => setKickUserId(e.target.value)}
+              sx={{ mb: 2 }}
             />
           )}
-          <TextField fullWidth multiline rows={3} label={t('playerConnections.kick.message')}
-            placeholder={t('playerConnections.kick.messagePlaceholder')} value={kickMessage}
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label={t('playerConnections.kick.message')}
+            placeholder={t('playerConnections.kick.messagePlaceholder')}
+            value={kickMessage}
             onChange={(e) => setKickMessage(e.target.value)}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setKickOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" color="error" onClick={handleKick}
-            disabled={kicking || (kickType === 'world' && !kickWorldId) || (kickType === 'user' && !kickUserId)}
+          <Button onClick={() => setKickOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleKick}
+            disabled={
+              kicking ||
+              (kickType === 'world' && !kickWorldId) ||
+              (kickType === 'user' && !kickUserId)
+            }
             sx={{ borderRadius: 2 }}
           >
             {t('playerConnections.kick.execute')}

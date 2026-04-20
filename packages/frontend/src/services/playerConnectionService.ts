@@ -102,14 +102,13 @@ const playerConnectionService = {
     if (params.worldId) searchParams.set('worldId', params.worldId);
     if (params.search) searchParams.set('search', params.search);
     if (params.sortBy) searchParams.set('sortBy', params.sortBy);
-    if (params.sortDesc !== undefined) searchParams.set('sortDesc', String(params.sortDesc));
+    if (params.sortDesc !== undefined)
+      searchParams.set('sortDesc', String(params.sortDesc));
 
     const res = await api.get(
       `${projectApiPath}/player-connections/users?${searchParams}`
     );
-    return (
-      res.data || { users: [], total: 0, page: 1, limit: 20 }
-    );
+    return res.data || { users: [], total: 0, page: 1, limit: 20 };
   },
 
   /**
