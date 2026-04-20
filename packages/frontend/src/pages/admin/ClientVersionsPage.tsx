@@ -1594,9 +1594,9 @@ const ClientVersionsPage: React.FC = () => {
                         })
                     );
                   }}
-                  sx={{ p: 0.5 }}
+                  sx={{ p: 0.25 }}
                 >
-                  <CopyIcon sx={{ fontSize: '1.25rem' }} />
+                  <CopyIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -1626,9 +1626,9 @@ const ClientVersionsPage: React.FC = () => {
                         })
                     );
                   }}
-                  sx={{ p: 0.5 }}
+                  sx={{ p: 0.25 }}
                 >
-                  <CopyIcon sx={{ fontSize: '1.25rem' }} />
+                  <CopyIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -2108,7 +2108,7 @@ const ClientVersionsPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <CopyIcon fontSize="small" />
+            <CopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           <ListItemText>{t('clientVersions.copyVersion')}</ListItemText>
         </MenuItem>

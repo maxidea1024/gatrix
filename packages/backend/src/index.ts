@@ -413,6 +413,8 @@ const startServer = async () => {
       );
     }
 
+    // CCU polling is handled by BullMQ scheduler job 'ccu:poll' (every minute)
+
     // Start HTTP server (handles WebSocket upgrades directly from chat server)
     const server = createServer(app);
     httpServer = server; // Store reference for graceful shutdown

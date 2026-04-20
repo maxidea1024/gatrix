@@ -178,6 +178,24 @@ export class QueueService {
         } else {
           logger.info('Repeatable job already exists: file-storage:cleanup');
         }
+
+        // Register CCU polling job (every minute)
+        const ccuPollExists = repeatables.some(
+          (r) => r.name === 'ccu:poll'
+        );
+        if (!ccuPollExists) {
+          await this.addJob(
+            'scheduler',
+            'ccu:poll',
+            {},
+            { repeat: { every: 60000 } }
+          );
+          logger.info(
+            'Registered repeatable job: ccu:poll (every minute)'
+          );
+        } else {
+          logger.info('Repeatable job already exists: ccu:poll');
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }

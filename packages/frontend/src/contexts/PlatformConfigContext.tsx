@@ -61,7 +61,14 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({
   };
 
   // Fetch when authenticated and project is selected
+  // IMPORTANT: Wait for permissions to finish loading before deciding.
+  // Without this guard, the effect fires while permissions are still loading,
+  // falls into the else branch (clearing platforms), and never re-fires
+  // because hasAnyPermissions was not in the dependency array.
   useEffect(() => {
+    // Don't act while permissions are still loading — wait for stable state
+    if (permissionsLoading) return;
+
     if (isAuthenticated && hasAnyPermissions && currentProjectId) {
       loadPlatformConfig();
     } else {
@@ -71,7 +78,7 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated, currentProjectId]);
+  }, [isAuthenticated, hasAnyPermissions, permissionsLoading, currentProjectId]);
 
   // Listen for platform/channel updates from backend (only when authenticated)
   useEffect(() => {

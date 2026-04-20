@@ -2239,7 +2239,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   )
                 }
               >
-                <CopyIcon fontSize="small" />
+                <CopyIcon sx={{ fontSize: 14 }} />
               </IconButton>
             </Tooltip>
           </Box>

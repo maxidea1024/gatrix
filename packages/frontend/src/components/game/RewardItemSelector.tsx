@@ -321,8 +321,8 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
             </>
           )}
 
-        {/* Quantity Input - Only show if reward type is selected */}
-        {value.rewardType && (
+        {/* Quantity Input - Only show if item is selected */}
+        {value.rewardType && value.itemId && (
           <TextField
             type="number"
             value={value.quantity}

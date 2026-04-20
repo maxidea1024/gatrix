@@ -17,6 +17,10 @@ import {
   Tooltip,
   Typography,
   Chip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -25,6 +29,7 @@ import {
   Lock as LockIcon,
   ContentCopy as CopyIcon,
   FileCopy as DuplicateIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -61,6 +66,8 @@ const KeyValuePage: React.FC = () => {
     open: false,
     item: null,
   });
+  const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
+  const [rowMenuItem, setRowMenuItem] = useState<VarItem | null>(null);
 
   // Load KV items
   const loadItems = async () => {
@@ -339,7 +346,7 @@ const KeyValuePage: React.FC = () => {
                               }
                               sx={{ p: 0.5 }}
                             >
-                              <CopyIcon fontSize="small" />
+                              <CopyIcon sx={{ fontSize: 14 }} />
                             </IconButton>
                           </Tooltip>
                           {item.isSystemDefined && (
@@ -395,49 +402,16 @@ const KeyValuePage: React.FC = () => {
                         </Tooltip>
                       </TableCell>
                       {canManage && (
-                        <TableCell align="center">
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(item)}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip
-                            title={
-                              !item.isCopyable
-                                ? t('settings.kv.cannotCopy')
-                                : t('common.duplicate')
-                            }
+                        <TableCell align="right">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              setRowMenuAnchor(e.currentTarget);
+                              setRowMenuItem(item);
+                            }}
                           >
-                            <span>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDuplicate(item)}
-                                disabled={!item.isCopyable}
-                              >
-                                <DuplicateIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                          <Tooltip
-                            title={
-                              item.isSystemDefined
-                                ? t('settings.kv.systemDefined')
-                                : t('common.delete')
-                            }
-                          >
-                            <span>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDeleteClick(item)}
-                                disabled={item.isSystemDefined}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
                         </TableCell>
                       )}
                     </TableRow>
@@ -448,6 +422,57 @@ const KeyValuePage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Row Context Menu */}
+      <Menu
+        anchorEl={rowMenuAnchor}
+        open={Boolean(rowMenuAnchor)}
+        onClose={() => {
+          setRowMenuAnchor(null);
+          setRowMenuItem(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (rowMenuItem) handleEdit(rowMenuItem);
+            setRowMenuAnchor(null);
+            setRowMenuItem(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon sx={{ fontSize: 14 }} />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (rowMenuItem) handleDuplicate(rowMenuItem);
+            setRowMenuAnchor(null);
+            setRowMenuItem(null);
+          }}
+          disabled={rowMenuItem ? !rowMenuItem.isCopyable : true}
+        >
+          <ListItemIcon>
+            <DuplicateIcon sx={{ fontSize: 14 }} />
+          </ListItemIcon>
+          <ListItemText>{t('common.duplicate')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (rowMenuItem) handleDeleteClick(rowMenuItem);
+            setRowMenuAnchor(null);
+            setRowMenuItem(null);
+          }}
+          disabled={rowMenuItem?.isSystemDefined}
+        >
+          <ListItemIcon>
+            <DeleteIcon sx={{ fontSize: 14 }} color="error" />
+          </ListItemIcon>
+          <ListItemText sx={{ color: 'error.main' }}>
+            {t('common.delete')}
+          </ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Form Drawer */}
       <KeyValueFormDrawer

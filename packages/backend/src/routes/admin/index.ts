@@ -48,6 +48,7 @@ import serverLifecycleRoutes from './server-lifecycle';
 import changeRequestRoutes from './change-requests';
 import featureRoutes from './features';
 import platformDefaultsRoutes from './platform-defaults';
+import playerConnectionRoutes from './player-connections';
 import unknownFlagsRoutes from './unknown-flags';
 import integrationRoutes from './integrations';
 import releaseFlowRoutes from './release-flows';
@@ -441,6 +442,14 @@ projectRouter.use(
 );
 
 // Mount project-scoped router
+
+// Player Connections (CCU monitoring, kick, user list)
+projectRouter.use(
+  '/player-connections',
+  requireEnvPermission([P.MAINTENANCE_READ, P.MAINTENANCE_UPDATE]) as any,
+  playerConnectionRoutes
+);
+
 router.use('/orgs/:orgId/projects/:projectId', projectRouter);
 
 // ========================================

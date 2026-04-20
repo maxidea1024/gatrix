@@ -3190,7 +3190,7 @@ const FeatureFlagsPage: React.FC = () => {
       >
         <MenuItem onClick={handleCopyName}>
           <ListItemIcon>
-            <CopyIcon fontSize="small" />
+            <CopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           <ListItemText>{t('featureFlags.copyName')}</ListItemText>
         </MenuItem>

@@ -970,7 +970,7 @@ const RewardTemplatesPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           <ListItemText>{t('rewardTemplates.copyTemplate')}</ListItemText>
         </MenuItem>

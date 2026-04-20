@@ -931,7 +931,7 @@ const MessageTemplatesPage: React.FC = () => {
                   )
                 }
               >
-                <ContentCopyIcon fontSize="small" />
+                <ContentCopyIcon sx={{ fontSize: 14 }} />
               </IconButton>
             </Tooltip>
           </Box>

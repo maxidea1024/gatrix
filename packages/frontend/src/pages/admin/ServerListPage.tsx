@@ -6943,25 +6943,25 @@ const ServerListPage: React.FC = () => {
       >
         <MenuItem onClick={handleCopyServiceJson}>
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyJson')}
         </MenuItem>
         <MenuItem onClick={handleCopyInstanceId}>
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyInstanceId')}
         </MenuItem>
         <MenuItem onClick={handleCopyHostname}>
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyHostname')}
         </MenuItem>
         <MenuItem onClick={handleCopyAddress}>
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyAddress')}
         </MenuItem>

@@ -764,7 +764,7 @@ const WhitelistPage: React.FC = () => {
                                       }
                                       sx={{ p: 0.5 }}
                                     >
-                                      <ContentCopyIcon fontSize="small" />
+                                      <ContentCopyIcon sx={{ fontSize: 14 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>
@@ -795,7 +795,7 @@ const WhitelistPage: React.FC = () => {
                                         }
                                         sx={{ p: 0.5 }}
                                       >
-                                        <ContentCopyIcon fontSize="small" />
+                                        <ContentCopyIcon sx={{ fontSize: 14 }} />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>

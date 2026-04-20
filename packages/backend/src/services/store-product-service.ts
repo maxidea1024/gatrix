@@ -10,7 +10,7 @@ import { PlanningDataService } from './planning-data-service';
 import { CmsCashShopProduct } from './cms-cash-shop-service';
 import { pubSubService } from './pub-sub-service';
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
-import { convertFromMySQLDateTime } from '../utils/date-utils';
+
 
 export interface StoreProduct {
   id: string;
@@ -543,11 +543,95 @@ class StoreProductService {
       values.push(input.updatedBy);
     }
 
-    if (updates.length === 0) {
+    // Handle overrideResets FIRST: restore specified fields to planning data values
+    // This must happen before the override tracking logic below, so that the tracking
+    // sees the final values (restored to planning data) and correctly excludes them.
+    if (input.overrideResets && input.overrideResets.length > 0) {
+      try {
+        // Get current product to find cmsProductId
+        const [currentRows] = await pool.execute(
+          'SELECT cmsProductId, overriddenFields FROM g_store_products WHERE id = ? AND environmentId = ?',
+          [id, environmentId]
+        );
+        const current = (currentRows as any[])[0];
+        if (current?.cmsProductId) {
+          const planningData =
+            await PlanningDataService.getCashShopLookup(environmentId);
+          const planningProducts: CmsCashShopProduct[] =
+            planningData.items || [];
+          const planningProduct = planningProducts.find(
+            (p: CmsCashShopProduct) => p.id === current.cmsProductId
+          );
+
+          if (planningProduct) {
+            const fieldValueMap: Record<string, any> = {
+              productId: planningProduct.productCode,
+              productName:
+                planningProduct.name?.zh || planningProduct.name?.ko || '',
+              nameKo: planningProduct.name?.ko || null,
+              nameEn: planningProduct.name?.en || null,
+              nameZh: planningProduct.name?.zh || null,
+              store: 'sdo',
+              price: planningProduct.price,
+              currency: 'CNY',
+              saleStartAt: planningProduct.saleStartAt || null,
+              saleEndAt: planningProduct.saleEndAt || null,
+              description:
+                planningProduct.description?.zh ||
+                planningProduct.description?.ko ||
+                null,
+              descriptionKo: planningProduct.description?.ko || null,
+              descriptionEn: planningProduct.description?.en || null,
+              descriptionZh: planningProduct.description?.zh || null,
+            };
+
+            for (const resetField of input.overrideResets) {
+              if (resetField in fieldValueMap) {
+                // Override the input value so subsequent logic sees the planning data value
+                // This ensures the override tracking logic won't re-flag this field
+                const planVal = fieldValueMap[resetField];
+
+                // Also replace any already-pushed update for this field
+                const existingUpdateIdx = updates.findIndex((u) =>
+                  u.startsWith(`${resetField} = ?`)
+                );
+                if (existingUpdateIdx >= 0) {
+                  // Replace the value in the existing update
+                  if (resetField === 'saleStartAt' || resetField === 'saleEndAt') {
+                    values[existingUpdateIdx] = planVal ? new Date(planVal) : null;
+                  } else {
+                    values[existingUpdateIdx] = planVal;
+                  }
+                } else {
+                  updates.push(`${resetField} = ?`);
+                  if (resetField === 'saleStartAt' || resetField === 'saleEndAt') {
+                    values.push(planVal ? new Date(planVal) : null);
+                  } else {
+                    values.push(planVal);
+                  }
+                }
+
+                // Override the input so the tracking logic below sees the planning value
+                (input as any)[resetField] = planVal;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        logger.warn('Failed to process overrideResets', {
+          err,
+          overrideResets: input.overrideResets,
+        });
+      }
+    }
+
+    if (updates.length === 0 && (!input.overrideResets || input.overrideResets.length === 0)) {
       return this.getStoreProductById(id, environmentId);
     }
 
     // Track overridden fields: compare with planning data to detect real overrides
+    // NOTE: overrideResets have already been applied above, so reset fields will have
+    // their planning data values in `input`, causing them to match and not be flagged.
     const OVERRIDABLE_FIELDS = [
       'productId',
       'productName',
@@ -600,6 +684,8 @@ class StoreProductService {
                 store: 'sdo',
                 price: planningProduct.price,
                 currency: 'CNY',
+                saleStartAt: planningProduct.saleStartAt || null,
+                saleEndAt: planningProduct.saleEndAt || null,
                 description:
                   planningProduct.description?.zh ||
                   planningProduct.description?.ko ||
@@ -617,9 +703,17 @@ class StoreProductService {
           }
         }
 
+        // Fields that were reset via overrideResets should never be flagged as overridden
+        const resetFields = new Set(input.overrideResets || []);
+
         // Determine which fields should be overridden based on final saved value vs planning data
         const newOverrides: string[] = [];
         for (const field of OVERRIDABLE_FIELDS) {
+          // Skip fields that are being reset to planning data
+          if (resetFields.has(field)) {
+            continue;
+          }
+
           const inputVal = input[field as keyof UpdateStoreProductInput];
           // Use input value if provided, otherwise current DB value
           const finalVal = inputVal !== undefined ? inputVal : existing[field];
@@ -660,11 +754,11 @@ class StoreProductService {
             normalizedFinal = Number(finalVal ?? 0);
             normalizedPlanning = Number(planningVal ?? 0);
           } else if (field === 'saleStartAt' || field === 'saleEndAt') {
-            // finalVal could be a raw mysql2 Date. We MUST use convertFromMySQLDateTime
-            // to properly recover the correct UTC string representation.
-            const isoFinal = convertFromMySQLDateTime(
-              finalVal as Date | string | null
-            );
+            // mysql2 with timezone:'local' preserves UTC in Date objects.
+            // Use .toISOString() to get the correct UTC representation.
+            const isoFinal = finalVal
+              ? (finalVal instanceof Date ? finalVal : new Date(finalVal)).toISOString()
+              : null;
             const isoPlanning = planningVal
               ? new Date(planningVal).toISOString()
               : null;
@@ -689,7 +783,15 @@ class StoreProductService {
         }
 
         const uniqueOverrides = [...new Set(newOverrides)];
-        if (
+        // Check if overriddenFields column needs updating
+        const existingOverrideIdx = updates.findIndex(
+          (u) => u === 'overriddenFields = ?'
+        );
+        if (existingOverrideIdx >= 0) {
+          // Already pushed by overrideResets or prior logic — replace with computed value
+          values[existingOverrideIdx] =
+            uniqueOverrides.length > 0 ? JSON.stringify(uniqueOverrides) : null;
+        } else if (
           JSON.stringify(uniqueOverrides.sort()) !==
           JSON.stringify(currentOverrides.sort())
         ) {
@@ -702,99 +804,6 @@ class StoreProductService {
     } catch (err) {
       // Column might not exist yet (pre-migration), skip
       logger.debug('Could not update overriddenFields', { err });
-    }
-
-    // Handle overrideResets: restore specified fields to planning data values
-    if (input.overrideResets && input.overrideResets.length > 0) {
-      try {
-        // Get current product to find cmsProductId
-        const [currentRows] = await pool.execute(
-          'SELECT cmsProductId, overriddenFields FROM g_store_products WHERE id = ? AND environmentId = ?',
-          [id, environmentId]
-        );
-        const current = (currentRows as any[])[0];
-        if (current?.cmsProductId) {
-          const planningData =
-            await PlanningDataService.getCashShopLookup(environmentId);
-          const planningProducts: CmsCashShopProduct[] =
-            planningData.items || [];
-          const planningProduct = planningProducts.find(
-            (p: CmsCashShopProduct) => p.id === current.cmsProductId
-          );
-
-          if (planningProduct) {
-            const fieldValueMap: Record<string, any> = {
-              productId: planningProduct.productCode,
-              productName:
-                planningProduct.name?.zh || planningProduct.name?.ko || '',
-              nameKo: planningProduct.name?.ko || '',
-              nameEn: planningProduct.name?.en || '',
-              nameZh: planningProduct.name?.zh || '',
-              store: 'sdo',
-              price: planningProduct.price,
-              currency: 'CNY',
-              description:
-                planningProduct.description?.zh ||
-                planningProduct.description?.ko ||
-                null,
-              descriptionKo: planningProduct.description?.ko || null,
-              descriptionEn: planningProduct.description?.en || null,
-              descriptionZh: planningProduct.description?.zh || null,
-            };
-
-            for (const resetField of input.overrideResets) {
-              if (resetField in fieldValueMap) {
-                // Check if this field isn't already being explicitly set by the user in this same update
-                const isAlsoBeingUpdated = updates.some((u) =>
-                  u.startsWith(`${resetField} = ?`)
-                );
-                if (!isAlsoBeingUpdated) {
-                  updates.push(`${resetField} = ?`);
-                  values.push(fieldValueMap[resetField]);
-                }
-              }
-            }
-
-            // Remove reset fields from overriddenFields
-            let currentOverrides: string[] = current.overriddenFields
-              ? typeof current.overriddenFields === 'string'
-                ? JSON.parse(current.overriddenFields)
-                : current.overriddenFields
-              : [];
-            currentOverrides = currentOverrides.filter(
-              (f) => !input.overrideResets!.includes(f)
-            );
-
-            // Update overriddenFields (might already have been pushed by the tracking logic above)
-            const existingOverrideIdx = updates.findIndex(
-              (u) => u === 'overriddenFields = ?'
-            );
-            if (existingOverrideIdx >= 0) {
-              // Merge: the tracking logic added new overrides; now also remove the reset ones
-              const trackedValue = JSON.parse(
-                values[existingOverrideIdx] as string
-              );
-              const merged = trackedValue.filter(
-                (f: string) => !input.overrideResets!.includes(f)
-              );
-              values[existingOverrideIdx] =
-                merged.length > 0 ? JSON.stringify(merged) : null;
-            } else {
-              updates.push('overriddenFields = ?');
-              values.push(
-                currentOverrides.length > 0
-                  ? JSON.stringify(currentOverrides)
-                  : null
-              );
-            }
-          }
-        }
-      } catch (err) {
-        logger.warn('Failed to process overrideResets', {
-          err,
-          overrideResets: input.overrideResets,
-        });
-      }
     }
 
     updates.push('updatedAt = UTC_TIMESTAMP()');
@@ -1257,22 +1266,26 @@ class StoreProductService {
           // Check for changes
           const changes: SyncChange[] = [];
 
-          // Check multi-language name changes
-          if (dbProduct.nameKo !== nameKo) {
+          // Helper: normalize string/null for comparison (treat null and '' as equal)
+          const normStr = (v: string | null | undefined): string | null =>
+            v === '' || v == null ? null : String(v);
+
+          // Check multi-language name changes (normalize null/empty)
+          if (normStr(dbProduct.nameKo as string | null) !== normStr(nameKo)) {
             changes.push({
               field: 'nameKo',
               oldValue: dbProduct.nameKo,
               newValue: nameKo,
             });
           }
-          if (dbProduct.nameEn !== nameEn) {
+          if (normStr(dbProduct.nameEn as string | null) !== normStr(nameEn)) {
             changes.push({
               field: 'nameEn',
               oldValue: dbProduct.nameEn,
               newValue: nameEn,
             });
           }
-          if (dbProduct.nameZh !== nameZh) {
+          if (normStr(dbProduct.nameZh as string | null) !== normStr(nameZh)) {
             changes.push({
               field: 'nameZh',
               oldValue: dbProduct.nameZh,
@@ -1297,22 +1310,22 @@ class StoreProductService {
             });
           }
 
-          // Check multi-language description changes
-          if ((dbProduct.descriptionKo || '') !== (descKo || '')) {
+          // Check multi-language description changes (normalize null/empty)
+          if (normStr(dbProduct.descriptionKo as string | null) !== normStr(descKo)) {
             changes.push({
               field: 'descriptionKo',
               oldValue: dbProduct.descriptionKo,
               newValue: descKo,
             });
           }
-          if ((dbProduct.descriptionEn || '') !== (descEn || '')) {
+          if (normStr(dbProduct.descriptionEn as string | null) !== normStr(descEn)) {
             changes.push({
               field: 'descriptionEn',
               oldValue: dbProduct.descriptionEn,
               newValue: descEn,
             });
           }
-          if ((dbProduct.descriptionZh || '') !== (descZh || '')) {
+          if (normStr(dbProduct.descriptionZh as string | null) !== normStr(descZh)) {
             changes.push({
               field: 'descriptionZh',
               oldValue: dbProduct.descriptionZh,
@@ -1321,20 +1334,21 @@ class StoreProductService {
           }
 
           // Check date changes
+          // mysql2 with timezone:'local' preserves UTC internally in Date objects.
+          // Use .toISOString() to get the correct UTC representation for comparison.
           const checkDateChange = (
             field: string,
             dbVal: Date | string | null | undefined,
             planVal: string | null | undefined
           ) => {
-            const getIso = (val: Date | string | null | undefined) => {
-              if (!val) return null;
-              const d = typeof val === 'string' ? new Date(val) : val;
-              if (isNaN(d.getTime())) return null;
-              return d.toISOString();
-            };
-            const isoDb = getIso(dbVal);
-            const isoPl = getIso(planVal);
-            if (isoDb !== isoPl) {
+            const isoDb = dbVal
+              ? (dbVal instanceof Date ? dbVal : new Date(dbVal)).toISOString()
+              : null;
+            const isoPl = planVal ? new Date(planVal).toISOString() : null;
+            // Compare as timestamps to avoid string format differences
+            const tsDb = isoDb ? new Date(isoDb).getTime() : null;
+            const tsPl = isoPl ? new Date(isoPl).getTime() : null;
+            if (tsDb !== tsPl) {
               changes.push({
                 field,
                 oldValue: isoDb,
@@ -1709,8 +1723,8 @@ class StoreProductService {
         descKo,
         descEn,
         descZh,
-        planningProduct.saleStartAt || null,
-        planningProduct.saleEndAt || null,
+        planningProduct.saleStartAt ? new Date(planningProduct.saleStartAt) : null,
+        planningProduct.saleEndAt ? new Date(planningProduct.saleEndAt) : null,
         userId || null,
         id,
         environmentId,

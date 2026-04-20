@@ -350,7 +350,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
               }}
             >
               <ListItemIcon>
-                <CopyIcon fontSize="small" />
+                <CopyIcon sx={{ fontSize: 14 }} />
               </ListItemIcon>
               <ListItemText>{t('common.copy')}</ListItemText>
             </MenuItem>
@@ -1634,9 +1634,9 @@ const GameWorldsPage: React.FC = () => {
                 onClick={() =>
                   handleCopy(world.worldId, t('gameWorlds.worldId'))
                 }
-                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+                sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon fontSize="small" />
+                <CopyIcon sx={{ fontSize: 14 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -1651,9 +1651,9 @@ const GameWorldsPage: React.FC = () => {
               <IconButton
                 size="small"
                 onClick={() => handleCopy(world.name, t('gameWorlds.name'))}
-                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+                sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon fontSize="small" />
+                <CopyIcon sx={{ fontSize: 14 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -1687,9 +1687,9 @@ const GameWorldsPage: React.FC = () => {
                       t('gameWorlds.worldServerAddress')
                     )
                   }
-                  sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+                  sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
                 >
-                  <CopyIcon fontSize="small" />
+                  <CopyIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Tooltip>
             )}

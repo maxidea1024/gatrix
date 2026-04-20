@@ -386,6 +386,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
           store: setStore,
           price: setPrice,
           currency: setCurrency,
+          saleStartAt: (v) => setSaleStartAt(v || null),
+          saleEndAt: (v) => setSaleEndAt(v || null),
           description: (v) => setDescription(v || ''),
           descriptionKo: (v) => setDescriptionKo(v || ''),
           descriptionEn: (v) => setDescriptionEn(v || ''),
@@ -455,24 +457,30 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     setSaving(true);
     try {
       const tagIds = selectedTags.map((tag) => tag.id);
+
+      // For fields included in overrideResets, we must send explicit null/value
+      // instead of undefined, so the backend properly receives the reset value.
+      const isResettingField = (field: string) =>
+        pendingOverrideResets.includes(field);
+
       const payload: any = {
         productId: productId.trim(),
         productName: productName.trim(),
-        // Multi-language name fields
-        nameKo: nameKo.trim() || undefined,
-        nameEn: nameEn.trim() || undefined,
-        nameZh: nameZh.trim() || undefined,
+        // Multi-language name fields: send null (not undefined) if resetting
+        nameKo: nameKo.trim() || (isResettingField('nameKo') ? null : undefined),
+        nameEn: nameEn.trim() || (isResettingField('nameEn') ? null : undefined),
+        nameZh: nameZh.trim() || (isResettingField('nameZh') ? null : undefined),
         store,
         price,
         currency,
         isActive,
         saleStartAt,
         saleEndAt,
-        description: description.trim() || undefined,
-        // Multi-language description fields
-        descriptionKo: descriptionKo.trim() || undefined,
-        descriptionEn: descriptionEn.trim() || undefined,
-        descriptionZh: descriptionZh.trim() || undefined,
+        description: description.trim() || (isResettingField('description') ? null : undefined),
+        // Multi-language description fields: send null (not undefined) if resetting
+        descriptionKo: descriptionKo.trim() || (isResettingField('descriptionKo') ? null : undefined),
+        descriptionEn: descriptionEn.trim() || (isResettingField('descriptionEn') ? null : undefined),
+        descriptionZh: descriptionZh.trim() || (isResettingField('descriptionZh') ? null : undefined),
         tagIds,
       };
 

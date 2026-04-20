@@ -784,7 +784,7 @@ const BannerManagementPage: React.FC = () => {
         </MenuItem>
         <MenuItem onClick={handleDuplicate}>
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           <ListItemText>{t('banners.duplicate')}</ListItemText>
         </MenuItem>

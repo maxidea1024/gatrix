@@ -1387,7 +1387,7 @@ const CrashEventsPage: React.FC = () => {
                                                   );
                                                 }}
                                               >
-                                                <CopyIcon fontSize="small" />
+                                                <CopyIcon sx={{ fontSize: 14 }} />
                                               </IconButton>
                                             </Box>
                                           </TableCell>
@@ -1462,7 +1462,7 @@ const CrashEventsPage: React.FC = () => {
                                                   );
                                                 }}
                                               >
-                                                <CopyIcon fontSize="small" />
+                                                <CopyIcon sx={{ fontSize: 14 }} />
                                               </IconButton>
                                             </Box>
                                           </TableCell>
@@ -1519,7 +1519,7 @@ const CrashEventsPage: React.FC = () => {
                                                   );
                                                 }}
                                               >
-                                                <CopyIcon fontSize="small" />
+                                                <CopyIcon sx={{ fontSize: 14 }} />
                                               </IconButton>
                                             </Box>
                                           </TableCell>
@@ -1610,7 +1610,7 @@ const CrashEventsPage: React.FC = () => {
                                                   );
                                                 }}
                                               >
-                                                <CopyIcon fontSize="small" />
+                                                <CopyIcon sx={{ fontSize: 14 }} />
                                               </IconButton>
                                             </Box>
                                           </TableCell>
@@ -1667,7 +1667,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               )}
                                             </Box>
@@ -1725,7 +1725,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               )}
                                             </Box>
@@ -1782,7 +1782,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -1839,7 +1839,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -1896,7 +1896,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -1953,7 +1953,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -2012,7 +2012,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -2069,7 +2069,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -2126,7 +2126,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -2207,7 +2207,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               )}
                                             </Box>
@@ -2271,7 +2271,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               )}
                                             </Box>
@@ -2335,7 +2335,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -2401,7 +2401,7 @@ const CrashEventsPage: React.FC = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <CopyIcon fontSize="small" />
+                                                  <CopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                               </Box>
                                             </TableCell>
@@ -2488,7 +2488,7 @@ const CrashEventsPage: React.FC = () => {
                                         }
                                       }}
                                     >
-                                      <CopyIcon fontSize="small" />
+                                      <CopyIcon sx={{ fontSize: 14 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>
@@ -2573,7 +2573,7 @@ const CrashEventsPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <CopyIcon fontSize="small" />
+            <CopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           <ListItemText>{t('common.copyData')}</ListItemText>
         </MenuItem>

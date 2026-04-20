@@ -171,7 +171,14 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({
   }, [getProjectApiPath]);
 
   // Reload environments when project changes
+  // IMPORTANT: Wait for permissions to finish loading before deciding.
+  // Without this guard, the effect may fire while permissions are still loading,
+  // see hasAnyPermissions=false, skip loading, and never re-fire because
+  // hasAnyPermissions was not in the dependency array — leaving the list empty.
   useEffect(() => {
+    // Don't act while permissions are still loading — wait for stable state
+    if (permissionsLoading) return;
+
     if (isAuthenticated && hasAnyPermissions && currentProjectId) {
       loadEnvironments();
     } else if (!isAuthenticated) {
@@ -181,7 +188,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated, currentProjectId, loadEnvironments]);
+  }, [isAuthenticated, hasAnyPermissions, permissionsLoading, currentProjectId, loadEnvironments]);
 
   const switchEnvironment = useCallback(
     (orgId: string, projectId: string, environmentId: string) => {

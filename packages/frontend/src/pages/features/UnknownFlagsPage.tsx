@@ -129,6 +129,85 @@ const UnknownFlagsPage: React.FC = () => {
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
+  const environmentFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === 'environment');
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
+  const projectFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === 'project');
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
+  const organisationFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === 'organisation');
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
+  const appNameFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === 'appName');
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
+  const sdkVersionFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === 'sdkVersion');
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
+  // Build dynamic options from loaded flags data
+  const environmentOptions = useMemo(() => {
+    const unique = new Map<string, string>();
+    for (const f of flags) {
+      const key = f.environmentId;
+      if (key && !unique.has(key)) {
+        unique.set(key, f.environmentName || f.environmentId);
+      }
+    }
+    return Array.from(unique.entries())
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [flags]);
+
+  const projectOptions = useMemo(() => {
+    const unique = new Set<string>();
+    for (const f of flags) {
+      if (f.projectName) unique.add(f.projectName);
+    }
+    return Array.from(unique)
+      .sort()
+      .map((v) => ({ value: v, label: v }));
+  }, [flags]);
+
+  const organisationOptions = useMemo(() => {
+    const unique = new Set<string>();
+    for (const f of flags) {
+      if (f.orgName) unique.add(f.orgName);
+    }
+    return Array.from(unique)
+      .sort()
+      .map((v) => ({ value: v, label: v }));
+  }, [flags]);
+
+  const appNameOptions = useMemo(() => {
+    const unique = new Set<string>();
+    for (const f of flags) {
+      if (f.appName) unique.add(f.appName);
+    }
+    return Array.from(unique)
+      .sort()
+      .map((v) => ({ value: v, label: v }));
+  }, [flags]);
+
+  const sdkVersionOptions = useMemo(() => {
+    const unique = new Set<string>();
+    for (const f of flags) {
+      if (f.sdkVersion) unique.add(f.sdkVersion);
+    }
+    return Array.from(unique)
+      .sort()
+      .map((v) => ({ value: v, label: v }));
+  }, [flags]);
+
   // Filter definitions
   const filterDefinitions: FilterDefinition[] = useMemo(
     () => [
@@ -163,8 +242,38 @@ const UnknownFlagsPage: React.FC = () => {
           },
         ],
       },
+      {
+        key: 'environment',
+        label: t('common.environment'),
+        type: 'multiselect',
+        options: environmentOptions,
+      },
+      {
+        key: 'project',
+        label: t('common.project'),
+        type: 'multiselect',
+        options: projectOptions,
+      },
+      {
+        key: 'organisation',
+        label: t('common.organisation'),
+        type: 'multiselect',
+        options: organisationOptions,
+      },
+      {
+        key: 'appName',
+        label: t('featureFlags.appName'),
+        type: 'multiselect',
+        options: appNameOptions,
+      },
+      {
+        key: 'sdkVersion',
+        label: t('featureFlags.sdkVersion'),
+        type: 'multiselect',
+        options: sdkVersionOptions,
+      },
     ],
-    [t]
+    [t, environmentOptions, projectOptions, organisationOptions, appNameOptions, sdkVersionOptions]
   );
 
   const loadFlags = useCallback(async () => {
@@ -244,7 +353,7 @@ const UnknownFlagsPage: React.FC = () => {
     localStorage.setItem('unknownFlagsColumns', JSON.stringify(newColumns));
   }, []);
 
-  // Filter flags based on search and status filter
+  // Filter flags based on search and all active filters
   const filteredFlags = useMemo(() => {
     let result = flags;
 
@@ -267,8 +376,33 @@ const UnknownFlagsPage: React.FC = () => {
       }
     }
 
+    // Apply environment filter
+    if (environmentFilter && environmentFilter.length > 0) {
+      result = result.filter((f) => environmentFilter.includes(f.environmentId));
+    }
+
+    // Apply project filter
+    if (projectFilter && projectFilter.length > 0) {
+      result = result.filter((f) => f.projectName && projectFilter.includes(f.projectName));
+    }
+
+    // Apply organisation filter
+    if (organisationFilter && organisationFilter.length > 0) {
+      result = result.filter((f) => f.orgName && organisationFilter.includes(f.orgName));
+    }
+
+    // Apply app name filter
+    if (appNameFilter && appNameFilter.length > 0) {
+      result = result.filter((f) => f.appName && appNameFilter.includes(f.appName));
+    }
+
+    // Apply SDK version filter
+    if (sdkVersionFilter && sdkVersionFilter.length > 0) {
+      result = result.filter((f) => f.sdkVersion && sdkVersionFilter.includes(f.sdkVersion));
+    }
+
     return result;
-  }, [flags, debouncedSearchTerm, statusFilter]);
+  }, [flags, debouncedSearchTerm, statusFilter, environmentFilter, projectFilter, organisationFilter, appNameFilter, sdkVersionFilter]);
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -521,7 +655,7 @@ const UnknownFlagsPage: React.FC = () => {
                                         '&:hover': { opacity: 1 },
                                       }}
                                     >
-                                      <CopyIcon fontSize="small" />
+                                      <CopyIcon sx={{ fontSize: 14 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>

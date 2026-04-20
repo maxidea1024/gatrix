@@ -30,6 +30,11 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import {
@@ -45,6 +50,7 @@ import {
   MoreVert as MoreVertIcon,
   Build as BuildIcon,
   CloudUpload as CloudUploadIcon,
+  RestorePage as RestoreOverrideIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -155,6 +161,8 @@ const StoreProductsPage: React.FC = () => {
   const [rowMenuProduct, setRowMenuProduct] = useState<StoreProduct | null>(
     null
   );
+  const [resetOverrideConfirmOpen, setResetOverrideConfirmOpen] = useState(false);
+  const [resetOverrideProduct, setResetOverrideProduct] = useState<StoreProduct | null>(null);
 
   // Sync state
   const [syncDialogOpen, setSyncDialogOpen] = useState(false);
@@ -717,6 +725,28 @@ const StoreProductsPage: React.FC = () => {
     setDeletingProduct(null);
   };
 
+  const handleResetOverrides = (product: StoreProduct) => {
+    setResetOverrideProduct(product);
+    setResetOverrideConfirmOpen(true);
+  };
+
+  const handleResetOverridesConfirm = async () => {
+    if (!resetOverrideProduct) return;
+    try {
+      await storeProductService.resetOverrides(projectApiPath, resetOverrideProduct.id);
+      enqueueSnackbar(t('storeProducts.resetOverridesSuccess', '오버라이드가 초기화되었습니다'), {
+        variant: 'success',
+      });
+      await loadProducts();
+      loadStats();
+    } catch (error: any) {
+      handleApiError(error, 'storeProducts.resetOverridesFailed');
+    } finally {
+      setResetOverrideConfirmOpen(false);
+      setResetOverrideProduct(null);
+    }
+  };
+
   const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
     setBulkDeleteConfirmOpen(true);
@@ -849,7 +879,7 @@ const StoreProductsPage: React.FC = () => {
             {canManage && (
               <>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   startIcon={<SyncIcon />}
                   onClick={handleSyncPreview}
                   disabled={syncLoading}
@@ -1020,7 +1050,7 @@ const StoreProductsPage: React.FC = () => {
                         alignItems: 'center',
                         gap: 0,
                         ml: 1,
-                        borderRadius: 0,
+                        borderRadius: 1,
                         bgcolor: 'background.paper',
                         border: 1,
                         borderColor: 'divider',
@@ -1153,7 +1183,7 @@ const StoreProductsPage: React.FC = () => {
                     {/* Divider and Batch Process Button */}
                     <Divider orientation="vertical" flexItem sx={{ mx: 1.5 }} />
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
                       startIcon={<BatchProcessIcon />}
                       onClick={() => setBatchProcessDialogOpen(true)}
@@ -1190,7 +1220,7 @@ const StoreProductsPage: React.FC = () => {
             {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
           <Button
-            variant="outlined"
+            variant="contained"
             color="success"
             size="small"
             onClick={handleBulkActivate}
@@ -1198,7 +1228,7 @@ const StoreProductsPage: React.FC = () => {
             {t('storeProducts.bulkActivate')}
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             color="warning"
             size="small"
             onClick={handleBulkDeactivate}
@@ -1206,7 +1236,7 @@ const StoreProductsPage: React.FC = () => {
             {t('storeProducts.bulkDeactivate')}
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             size="small"
             startIcon={<DeleteIcon />}
@@ -1741,10 +1771,32 @@ const StoreProductsPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon sx={{ fontSize: 14 }} />
           </ListItemIcon>
           <ListItemText>{t('storeProducts.copyProduct')}</ListItemText>
         </MenuItem>
+        {rowMenuProduct &&
+          rowMenuProduct.overriddenFields &&
+          rowMenuProduct.overriddenFields.length > 0 && (
+            <MenuItem
+              onClick={() => {
+                if (rowMenuProduct) handleResetOverrides(rowMenuProduct);
+                setRowMenuAnchor(null);
+                setRowMenuProduct(null);
+              }}
+            >
+              <ListItemIcon>
+                <RestoreOverrideIcon fontSize="small" color="warning" />
+              </ListItemIcon>
+              <ListItemText>
+                {t('storeProducts.resetAllOverrides', '오버라이드 초기화')}
+                {' ('}
+                {rowMenuProduct.overriddenFields.length}
+                {')'}
+              </ListItemText>
+            </MenuItem>
+          )}
+        <Divider />
         <MenuItem
           onClick={() => {
             if (rowMenuProduct) handleDelete(rowMenuProduct);
@@ -1837,6 +1889,54 @@ const StoreProductsPage: React.FC = () => {
           </Table>
         </TableContainer>
       </ConfirmDeleteDialog>
+
+      {/* Reset Overrides Confirmation Dialog */}
+      <Dialog
+        open={resetOverrideConfirmOpen}
+        onClose={() => {
+          setResetOverrideConfirmOpen(false);
+          setResetOverrideProduct(null);
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('storeProducts.resetAllOverrides', '오버라이드 초기화')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {resetOverrideProduct && (
+              <>
+                <strong>{resetOverrideProduct.productName}</strong>
+                {' (' + resetOverrideProduct.productId + ')'}
+                <br />
+                <br />
+                {t('storeProducts.overrideDescription', {
+                  count: resetOverrideProduct.overriddenFields?.length || 0,
+                  fields: resetOverrideProduct.overriddenFields?.join(', ') || '',
+                })}
+              </>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setResetOverrideConfirmOpen(false);
+              setResetOverrideProduct(null);
+            }}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleResetOverridesConfirm}
+          >
+            {t('storeProducts.resetAllOverrides', '오버라이드 초기화')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Sync Preview Dialog */}
       <SyncPreviewDialog

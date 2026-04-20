@@ -226,7 +226,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
                       )
                     }
                   >
-                    <CopyIcon fontSize="small" />
+                    <CopyIcon sx={{ fontSize: 14 }} />
                   </IconButton>
                 </span>
               </Tooltip>
@@ -372,7 +372,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
                       )
                     }
                   >
-                    <CopyIcon fontSize="small" />
+                    <CopyIcon sx={{ fontSize: 14 }} />
                   </IconButton>
                 ),
               }}
@@ -810,7 +810,7 @@ const SignalEndpointsPage: React.FC = () => {
                                     )
                                   }
                                 >
-                                  <CopyIcon fontSize="small" />
+                                  <CopyIcon sx={{ fontSize: 14 }} />
                                 </IconButton>
                               </Tooltip>
                             </Box>

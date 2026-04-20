@@ -1651,7 +1651,7 @@ const UsersManagementPage: React.FC = () => {
                 onClick={() => copyToClipboard(user.name, 'name')}
                 sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
-                <ContentCopyIcon fontSize="small" />
+                <ContentCopyIcon sx={{ fontSize: 14 }} />
               </IconButton>
             </Box>
           </Box>
@@ -1665,7 +1665,7 @@ const UsersManagementPage: React.FC = () => {
               onClick={() => copyToClipboard(user.email, 'email')}
               sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
             >
-              <ContentCopyIcon fontSize="small" />
+              <ContentCopyIcon sx={{ fontSize: 14 }} />
             </IconButton>
           </Box>
         );

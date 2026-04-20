@@ -173,5 +173,11 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
       const deleted = await processFileStorageCleanupJob(retentionDays);
       logger.info('file-storage:cleanup completed', { jobId: job.id, deleted });
     },
+
+    'ccu:poll': async (job) => {
+      const { ccuPollingService } = await import('./ccu-polling-service');
+      await ccuPollingService.pollAll();
+      logger.info('ccu:poll completed', { jobId: job.id });
+    },
   };
 }

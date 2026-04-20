@@ -159,6 +159,18 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
   }, [template, name, description, rewardItems, selectedTags]);
 
+  // Check if form has all required fields filled
+  const isFormValid = useMemo(() => {
+    if (!name.trim()) return false;
+    if (rewardItems.length === 0) return false;
+    for (const reward of rewardItems) {
+      if (!reward.rewardType) return false;
+      if (!reward.itemId) return false;
+      if (!reward.quantity || reward.quantity < 1) return false;
+    }
+    return true;
+  }, [name, rewardItems]);
+
   // Handlers
   const handleAddReward = () => {
     setRewardItems([
@@ -462,7 +474,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
                         <Button
                           size="small"
                           onClick={handleAddReward}
-                          variant="outlined"
+                          variant="contained"
                         >
                           {t('rewardTemplates.addReward')}
                         </Button>
@@ -493,7 +505,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           <Button
             variant="contained"
             onClick={handleSave}
-            disabled={saving || (!!template?.id && !isDirty)}
+            disabled={saving || !isFormValid || (!!template?.id && !isDirty)}
           >
             {saving
               ? t('common.saving')
