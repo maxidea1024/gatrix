@@ -19,6 +19,7 @@ import {
   ViewColumn as ColumnIcon,
   ErrorOutline as ErrorIcon,
   ContentCopy as CopyIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -391,6 +392,21 @@ const PlayerListTab: React.FC<Props> = ({
             }}
           >
             <ColumnIcon />
+          </IconButton>
+        </Tooltip>
+        <Box sx={{ flex: 1 }} />
+        <Tooltip title={t('common.refresh')}>
+          <IconButton
+            onClick={loadUsers}
+            disabled={loading}
+            sx={{
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              '&:hover': { bgcolor: 'primary.dark' },
+              '&.Mui-disabled': { bgcolor: 'action.disabledBackground' },
+            }}
+          >
+            <RefreshIcon />
           </IconButton>
         </Tooltip>
       </Box>
