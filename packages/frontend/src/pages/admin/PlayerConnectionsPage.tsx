@@ -238,50 +238,50 @@ const PlayerConnectionsPage: React.FC = () => {
         subtitle={t('playerConnections.subtitle')}
         actions={
           activeTab !== 2 ? (
-          <>
-            <ButtonGroup
-              variant="contained"
-              size="small"
-              sx={{ borderRadius: 1.5, overflow: 'hidden' }}
-            >
-              <Button startIcon={<RefreshIcon />} onClick={loadCcu}>
-                {t('common.refresh')}
-              </Button>
-              {activeTab !== 2 && (
-                <Button
-                  size="small"
-                  onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
-                  sx={{
-                    minWidth: 'auto',
-                    px: 1,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  {activeRefreshLabel}
-                  <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
+            <>
+              <ButtonGroup
+                variant="contained"
+                size="small"
+                sx={{ borderRadius: 1.5, overflow: 'hidden' }}
+              >
+                <Button startIcon={<RefreshIcon />} onClick={loadCcu}>
+                  {t('common.refresh')}
                 </Button>
-              )}
-            </ButtonGroup>
-            <Menu
-              anchorEl={refreshMenuAnchor}
-              open={Boolean(refreshMenuAnchor)}
-              onClose={() => setRefreshMenuAnchor(null)}
-            >
-              {REFRESH_OPTIONS.map((opt) => (
-                <MenuItem
-                  key={opt.value}
-                  selected={refreshInterval === opt.value}
-                  onClick={() => {
-                    handleSetRefreshInterval(opt.value);
-                    setRefreshMenuAnchor(null);
-                  }}
-                >
-                  {opt.label}
-                </MenuItem>
-              ))}
-            </Menu>
-          </>
+                {activeTab !== 2 && (
+                  <Button
+                    size="small"
+                    onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 1,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {activeRefreshLabel}
+                    <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
+                  </Button>
+                )}
+              </ButtonGroup>
+              <Menu
+                anchorEl={refreshMenuAnchor}
+                open={Boolean(refreshMenuAnchor)}
+                onClose={() => setRefreshMenuAnchor(null)}
+              >
+                {REFRESH_OPTIONS.map((opt) => (
+                  <MenuItem
+                    key={opt.value}
+                    selected={refreshInterval === opt.value}
+                    onClick={() => {
+                      handleSetRefreshInterval(opt.value);
+                      setRefreshMenuAnchor(null);
+                    }}
+                  >
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
           ) : null
         }
       />
