@@ -138,15 +138,15 @@ const PlayerConnectionsPage: React.FC = () => {
     else setLoading(false);
   }, [admindApiUrl, loadCcu]);
 
-  // Auto-refresh
+  // Auto-refresh (only for Overview and CCU Graph tabs, not Player List)
   useEffect(() => {
-    if (refreshInterval > 0 && admindApiUrl) {
+    if (refreshInterval > 0 && admindApiUrl && activeTab !== 2) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [refreshInterval, loadCcu, admindApiUrl]);
+  }, [refreshInterval, loadCcu, admindApiUrl, activeTab]);
 
   const handleTabChange = (_: React.SyntheticEvent, val: number) => {
     setActiveTab(val);
@@ -237,6 +237,7 @@ const PlayerConnectionsPage: React.FC = () => {
         title={t('playerConnections.title')}
         subtitle={t('playerConnections.subtitle')}
         actions={
+          activeTab !== 2 ? (
           <>
             <ButtonGroup
               variant="contained"
@@ -246,19 +247,21 @@ const PlayerConnectionsPage: React.FC = () => {
               <Button startIcon={<RefreshIcon />} onClick={loadCcu}>
                 {t('common.refresh')}
               </Button>
-              <Button
-                size="small"
-                onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
-                sx={{
-                  minWidth: 'auto',
-                  px: 1,
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                }}
-              >
-                {activeRefreshLabel}
-                <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
-              </Button>
+              {activeTab !== 2 && (
+                <Button
+                  size="small"
+                  onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+                  sx={{
+                    minWidth: 'auto',
+                    px: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  {activeRefreshLabel}
+                  <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
+                </Button>
+              )}
             </ButtonGroup>
             <Menu
               anchorEl={refreshMenuAnchor}
@@ -279,6 +282,7 @@ const PlayerConnectionsPage: React.FC = () => {
               ))}
             </Menu>
           </>
+          ) : null
         }
       />
 
