@@ -151,6 +151,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
           fill: true,
           pointRadius: 0,
           pointHoverRadius: 4,
+          spanGaps: true,
         });
       }
       if (displayMode === 'all' || displayMode === 'bots') {
@@ -168,6 +169,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
           borderDash: displayMode === 'all' ? [5, 3] : undefined,
           pointRadius: 0,
           pointHoverRadius: 4,
+          spanGaps: true,
         });
       }
     }
@@ -189,6 +191,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
           fill: false,
           pointRadius: 0,
           pointHoverRadius: 3,
+          spanGaps: true,
         });
       }
       if (displayMode === 'bots') {
@@ -202,6 +205,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
           fill: false,
           pointRadius: 0,
           pointHoverRadius: 3,
+          spanGaps: true,
         });
       }
       colorIdx++;
