@@ -38,6 +38,8 @@ import {
   ErrorOutline as ErrorIcon,
   SmartToy as BotIcon,
   SwapVert as SortIcon,
+  ArrowUpward as ArrowUpIcon,
+  ArrowDownward as ArrowDownIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -79,6 +81,7 @@ const PlayerConnectionsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [ccuData, setCcuData] = useState<CcuData | null>(null);
   const [ccuError, setCcuError] = useState<string | null>(null);
+  const prevCcuRef = useRef<CcuData | null>(null);
   const [refreshInterval, setRefreshInterval] = useState(() => {
     const saved = localStorage.getItem(REFRESH_STORAGE_KEY);
     return saved !== null ? parseInt(saved, 10) : 30000;
@@ -137,7 +140,10 @@ const PlayerConnectionsPage: React.FC = () => {
     try {
       setCcuError(null);
       const data = await playerConnectionService.getCcu(projectApiPath);
-      setCcuData(data);
+      setCcuData((prev) => {
+        if (prev) prevCcuRef.current = prev;
+        return data;
+      });
     } catch (err: any) {
       const status = err?.response?.status || err?.status;
       if (status === 502 || status === 504) {
@@ -374,6 +380,20 @@ const PlayerConnectionsPage: React.FC = () => {
                   >
                     {ccuData?.total?.toLocaleString() ?? '-'}
                   </Typography>
+                  {ccuData && prevCcuRef.current && (() => {
+                    const delta = ccuData.total - prevCcuRef.current.total;
+                    if (delta === 0) return null;
+                    return (
+                      <Typography
+                        variant="caption"
+                        fontWeight={600}
+                        sx={{ display: 'inline-flex', alignItems: 'center', ml: 1, color: delta > 0 ? 'success.main' : 'error.main' }}
+                      >
+                        {delta > 0 ? <ArrowUpIcon sx={{ fontSize: 14 }} /> : <ArrowDownIcon sx={{ fontSize: 14 }} />}
+                        {Math.abs(delta).toLocaleString()}
+                      </Typography>
+                    );
+                  })()}
                   {ccuData && (
                     <Box
                       sx={{
@@ -698,9 +718,27 @@ const PlayerConnectionsPage: React.FC = () => {
                           >
                             {w.name || w.worldId}
                           </Typography>
-                          <Typography variant="h6" fontWeight={700}>
-                            {w.count.toLocaleString()}
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="h6" fontWeight={700}>
+                              {w.count.toLocaleString()}
+                            </Typography>
+                            {prevCcuRef.current && (() => {
+                              const prev = prevCcuRef.current.worlds?.find((pw) => pw.worldId === w.worldId);
+                              if (!prev) return null;
+                              const delta = w.count - prev.count;
+                              if (delta === 0) return null;
+                              return (
+                                <Typography
+                                  variant="caption"
+                                  fontWeight={600}
+                                  sx={{ display: 'inline-flex', alignItems: 'center', color: delta > 0 ? 'success.main' : 'error.main' }}
+                                >
+                                  {delta > 0 ? <ArrowUpIcon sx={{ fontSize: 12 }} /> : <ArrowDownIcon sx={{ fontSize: 12 }} />}
+                                  {Math.abs(delta)}
+                                </Typography>
+                              );
+                            })()}
+                          </Box>
                           <Box
                             sx={{
                               display: 'flex',
