@@ -22,6 +22,8 @@ import {
   Select,
   SelectChangeEvent,
   alpha,
+  Divider,
+  Chip,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -90,6 +92,7 @@ const PlayerConnectionsPage: React.FC = () => {
   const [kickWorldId, setKickWorldId] = useState('');
   const [kickUserId, setKickUserId] = useState('');
   const [kickMessage, setKickMessage] = useState('');
+  const [kickConfirmText, setKickConfirmText] = useState('');
   const [kicking, setKicking] = useState(false);
 
   const handleSetRefreshInterval = (val: number) => {
@@ -654,12 +657,16 @@ const PlayerConnectionsPage: React.FC = () => {
       {/* Kick Dialog */}
       <Dialog
         open={kickOpen}
-        onClose={() => setKickOpen(false)}
+        onClose={() => {
+          setKickOpen(false);
+          setKickConfirmText('');
+        }}
         maxWidth="sm"
         fullWidth
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        <DialogTitle sx={{ fontWeight: 600 }}>
+        <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <KickIcon sx={{ color: 'error.main' }} />
           {t('playerConnections.kick.title')}
         </DialogTitle>
         <DialogContent>
@@ -668,9 +675,10 @@ const PlayerConnectionsPage: React.FC = () => {
             <Select
               value={kickType}
               label={t('playerConnections.kick.type')}
-              onChange={(e: SelectChangeEvent) =>
-                setKickType(e.target.value as any)
-              }
+              onChange={(e: SelectChangeEvent) => {
+                setKickType(e.target.value as any);
+                setKickConfirmText('');
+              }}
             >
               <MenuItem value="all">{t('playerConnections.kick.all')}</MenuItem>
               <MenuItem value="world">
@@ -687,9 +695,10 @@ const PlayerConnectionsPage: React.FC = () => {
               <Select
                 value={kickWorldId}
                 label={t('playerConnections.kick.selectWorld')}
-                onChange={(e: SelectChangeEvent) =>
-                  setKickWorldId(e.target.value)
-                }
+                onChange={(e: SelectChangeEvent) => {
+                  setKickWorldId(e.target.value);
+                  setKickConfirmText('');
+                }}
               >
                 {(ccuData?.worlds || []).map((w) => (
                   <MenuItem key={w.worldId} value={w.worldId}>
@@ -708,10 +717,119 @@ const PlayerConnectionsPage: React.FC = () => {
               sx={{ mb: 2 }}
             />
           )}
+
+          {/* Impact Summary — only for all/world */}
+          {kickType !== 'user' && (() => {
+            const isAll = kickType === 'all';
+            const worlds = ccuData?.worlds || [];
+            const targetCount = isAll
+              ? (ccuData?.total || 0)
+              : (worlds.find((w) => w.worldId === kickWorldId)?.count || 0);
+            const targetLabel = isAll
+              ? t('playerConnections.kick.all')
+              : (worlds.find((w) => w.worldId === kickWorldId)?.name || kickWorldId);
+            const hasTargets = targetCount > 0;
+            const confirmWord = 'KICK';
+            const isConfirmed = kickConfirmText === confirmWord;
+
+            return (
+              <Box
+                sx={(theme) => ({
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: hasTargets
+                    ? alpha(theme.palette.error.main, 0.3)
+                    : alpha(theme.palette.warning.main, 0.3),
+                  bgcolor: hasTargets
+                    ? alpha(theme.palette.error.main, 0.04)
+                    : alpha(theme.palette.warning.main, 0.04),
+                  p: 2,
+                  mb: 2,
+                })}
+              >
+                {/* Impact Header */}
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={700}
+                  color={hasTargets ? 'error.main' : 'warning.main'}
+                  sx={{ mb: 1 }}
+                >
+                  {t('playerConnections.kick.impactTitle')}
+                </Typography>
+
+                {hasTargets ? (
+                  <>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {isAll
+                        ? t('playerConnections.kick.impactAll', { count: targetCount })
+                        : t('playerConnections.kick.impactWorld', {
+                            world: targetLabel,
+                            count: targetCount,
+                          })}
+                    </Typography>
+                    {isAll && worlds.length > 0 && (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1.5 }}>
+                        {worlds
+                          .filter((w) => w.count > 0)
+                          .sort((a, b) => b.count - a.count)
+                          .map((w) => (
+                            <Chip
+                              key={w.worldId}
+                              label={`${w.name || w.worldId}: ${w.count.toLocaleString()}`}
+                              size="small"
+                              variant="outlined"
+                              color="error"
+                              sx={{ fontSize: '0.7rem', borderRadius: 1 }}
+                            />
+                          ))}
+                      </Box>
+                    )}
+                    {/* Confirmation input */}
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.75 }}>
+                      {t('playerConnections.kick.confirmPrompt', { word: confirmWord })}
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder={confirmWord}
+                      value={kickConfirmText}
+                      onChange={(e) => setKickConfirmText(e.target.value)}
+                      error={kickConfirmText.length > 0 && !isConfirmed}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          fontFamily: 'monospace',
+                          fontWeight: 700,
+                          letterSpacing: 2,
+                        },
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                      {t('playerConnections.kick.noTargets')}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      size="small"
+                      startIcon={<KickIcon />}
+                      onClick={handleKick}
+                      disabled={kicking}
+                      sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                    >
+                      {t('playerConnections.kick.forceExecute')}
+                    </Button>
+                  </>
+                )}
+              </Box>
+            );
+          })()}
+
           <TextField
             fullWidth
             multiline
-            rows={3}
+            rows={2}
             label={t('playerConnections.kick.message')}
             placeholder={t('playerConnections.kick.messagePlaceholder')}
             value={kickMessage}
@@ -719,22 +837,35 @@ const PlayerConnectionsPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setKickOpen(false)}>
+          <Button
+            onClick={() => {
+              setKickOpen(false);
+              setKickConfirmText('');
+            }}
+          >
             {t('common.cancel')}
           </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleKick}
-            disabled={
-              kicking ||
-              (kickType === 'world' && !kickWorldId) ||
-              (kickType === 'user' && !kickUserId)
-            }
-            sx={{ borderRadius: 2 }}
-          >
-            {t('playerConnections.kick.execute')}
-          </Button>
+          {/* For user kick or confirmed all/world kick */}
+          {(kickType === 'user' || (() => {
+            const targetCount = kickType === 'all'
+              ? (ccuData?.total || 0)
+              : (ccuData?.worlds?.find((w) => w.worldId === kickWorldId)?.count || 0);
+            return targetCount > 0 && kickConfirmText === 'KICK';
+          })()) && (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleKick}
+              disabled={
+                kicking ||
+                (kickType === 'world' && !kickWorldId) ||
+                (kickType === 'user' && !kickUserId)
+              }
+              sx={{ borderRadius: 2, fontWeight: 600 }}
+            >
+              {t('playerConnections.kick.execute')}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Box>
