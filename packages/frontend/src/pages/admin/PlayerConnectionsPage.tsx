@@ -665,7 +665,14 @@ const PlayerConnectionsPage: React.FC = () => {
         fullWidth
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <KickIcon sx={{ color: 'error.main' }} />
           {t('playerConnections.kick.title')}
         </DialogTitle>
@@ -719,112 +726,137 @@ const PlayerConnectionsPage: React.FC = () => {
           )}
 
           {/* Impact Summary — only for all/world */}
-          {kickType !== 'user' && (() => {
-            const isAll = kickType === 'all';
-            const worlds = ccuData?.worlds || [];
-            const targetCount = isAll
-              ? (ccuData?.total || 0)
-              : (worlds.find((w) => w.worldId === kickWorldId)?.count || 0);
-            const targetLabel = isAll
-              ? t('playerConnections.kick.all')
-              : (worlds.find((w) => w.worldId === kickWorldId)?.name || kickWorldId);
-            const hasTargets = targetCount > 0;
-            const confirmWord = 'KICK';
-            const isConfirmed = kickConfirmText === confirmWord;
+          {kickType !== 'user' &&
+            (() => {
+              const isAll = kickType === 'all';
+              const worlds = ccuData?.worlds || [];
+              const targetCount = isAll
+                ? ccuData?.total || 0
+                : worlds.find((w) => w.worldId === kickWorldId)?.count || 0;
+              const targetLabel = isAll
+                ? t('playerConnections.kick.all')
+                : worlds.find((w) => w.worldId === kickWorldId)?.name ||
+                  kickWorldId;
+              const hasTargets = targetCount > 0;
+              const confirmWord = 'KICK';
+              const isConfirmed = kickConfirmText === confirmWord;
 
-            return (
-              <Box
-                sx={(theme) => ({
-                  borderRadius: 2,
-                  border: 1,
-                  borderColor: hasTargets
-                    ? alpha(theme.palette.error.main, 0.3)
-                    : alpha(theme.palette.warning.main, 0.3),
-                  bgcolor: hasTargets
-                    ? alpha(theme.palette.error.main, 0.04)
-                    : alpha(theme.palette.warning.main, 0.04),
-                  p: 2,
-                  mb: 2,
-                })}
-              >
-                {/* Impact Header */}
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={700}
-                  color={hasTargets ? 'error.main' : 'warning.main'}
-                  sx={{ mb: 1 }}
+              return (
+                <Box
+                  sx={(theme) => ({
+                    borderRadius: 2,
+                    border: 1,
+                    borderColor: hasTargets
+                      ? alpha(theme.palette.error.main, 0.3)
+                      : alpha(theme.palette.warning.main, 0.3),
+                    bgcolor: hasTargets
+                      ? alpha(theme.palette.error.main, 0.04)
+                      : alpha(theme.palette.warning.main, 0.04),
+                    p: 2,
+                    mb: 2,
+                  })}
                 >
-                  {t('playerConnections.kick.impactTitle')}
-                </Typography>
+                  {/* Impact Header */}
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={700}
+                    color={hasTargets ? 'error.main' : 'warning.main'}
+                    sx={{ mb: 1 }}
+                  >
+                    {t('playerConnections.kick.impactTitle')}
+                  </Typography>
 
-                {hasTargets ? (
-                  <>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      {isAll
-                        ? t('playerConnections.kick.impactAll', { count: targetCount })
-                        : t('playerConnections.kick.impactWorld', {
-                            world: targetLabel,
-                            count: targetCount,
-                          })}
-                    </Typography>
-                    {isAll && worlds.length > 0 && (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1.5 }}>
-                        {worlds
-                          .filter((w) => w.count > 0)
-                          .sort((a, b) => b.count - a.count)
-                          .map((w) => (
-                            <Chip
-                              key={w.worldId}
-                              label={`${w.name || w.worldId}: ${w.count.toLocaleString()}`}
-                              size="small"
-                              variant="outlined"
-                              color="error"
-                              sx={{ fontSize: '0.7rem', borderRadius: 1 }}
-                            />
-                          ))}
-                      </Box>
-                    )}
-                    {/* Confirmation input */}
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.75 }}>
-                      {t('playerConnections.kick.confirmPrompt', { word: confirmWord })}
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder={confirmWord}
-                      value={kickConfirmText}
-                      onChange={(e) => setKickConfirmText(e.target.value)}
-                      error={kickConfirmText.length > 0 && !isConfirmed}
-                      sx={{
-                        '& .MuiInputBase-input': {
-                          fontFamily: 'monospace',
-                          fontWeight: 700,
-                          letterSpacing: 2,
-                        },
-                      }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                      {t('playerConnections.kick.noTargets')}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      size="small"
-                      startIcon={<KickIcon />}
-                      onClick={handleKick}
-                      disabled={kicking}
-                      sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
-                    >
-                      {t('playerConnections.kick.forceExecute')}
-                    </Button>
-                  </>
-                )}
-              </Box>
-            );
-          })()}
+                  {hasTargets ? (
+                    <>
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        {isAll
+                          ? t('playerConnections.kick.impactAll', {
+                              count: targetCount,
+                            })
+                          : t('playerConnections.kick.impactWorld', {
+                              world: targetLabel,
+                              count: targetCount,
+                            })}
+                      </Typography>
+                      {isAll && worlds.length > 0 && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 0.5,
+                            mb: 1.5,
+                          }}
+                        >
+                          {worlds
+                            .filter((w) => w.count > 0)
+                            .sort((a, b) => b.count - a.count)
+                            .map((w) => (
+                              <Chip
+                                key={w.worldId}
+                                label={`${w.name || w.worldId}: ${w.count.toLocaleString()}`}
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                sx={{ fontSize: '0.7rem', borderRadius: 1 }}
+                              />
+                            ))}
+                        </Box>
+                      )}
+                      {/* Confirmation input */}
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block', mb: 0.75 }}
+                      >
+                        {t('playerConnections.kick.confirmPrompt', {
+                          word: confirmWord,
+                        })}
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        placeholder={confirmWord}
+                        value={kickConfirmText}
+                        onChange={(e) => setKickConfirmText(e.target.value)}
+                        error={kickConfirmText.length > 0 && !isConfirmed}
+                        sx={{
+                          '& .MuiInputBase-input': {
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: 2,
+                          },
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1.5 }}
+                      >
+                        {t('playerConnections.kick.noTargets')}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="warning"
+                        size="small"
+                        startIcon={<KickIcon />}
+                        onClick={handleKick}
+                        disabled={kicking}
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t('playerConnections.kick.forceExecute')}
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              );
+            })()}
 
           <TextField
             fullWidth
@@ -846,12 +878,15 @@ const PlayerConnectionsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           {/* For user kick or confirmed all/world kick */}
-          {(kickType === 'user' || (() => {
-            const targetCount = kickType === 'all'
-              ? (ccuData?.total || 0)
-              : (ccuData?.worlds?.find((w) => w.worldId === kickWorldId)?.count || 0);
-            return targetCount > 0 && kickConfirmText === 'KICK';
-          })()) && (
+          {(kickType === 'user' ||
+            (() => {
+              const targetCount =
+                kickType === 'all'
+                  ? ccuData?.total || 0
+                  : ccuData?.worlds?.find((w) => w.worldId === kickWorldId)
+                      ?.count || 0;
+              return targetCount > 0 && kickConfirmText === 'KICK';
+            })()) && (
             <Button
               variant="contained"
               color="error"
