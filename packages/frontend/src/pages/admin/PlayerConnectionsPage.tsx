@@ -99,12 +99,20 @@ const PlayerConnectionsPage: React.FC = () => {
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
   const [worldSortBy, setWorldSortBy] = useState<'name' | 'count'>(() => {
-    return (localStorage.getItem(SORT_STORAGE_KEY + '.by') as 'name' | 'count') || 'name';
+    return (
+      (localStorage.getItem(SORT_STORAGE_KEY + '.by') as 'name' | 'count') ||
+      'name'
+    );
   });
   const [worldSortDir, setWorldSortDir] = useState<'asc' | 'desc'>(() => {
-    return (localStorage.getItem(SORT_STORAGE_KEY + '.dir') as 'asc' | 'desc') || 'asc';
+    return (
+      (localStorage.getItem(SORT_STORAGE_KEY + '.dir') as 'asc' | 'desc') ||
+      'asc'
+    );
   });
-  const [sortMenuAnchor, setSortMenuAnchor] = useState<null | HTMLElement>(null);
+  const [sortMenuAnchor, setSortMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   const handleSetRefreshInterval = (val: number) => {
     setRefreshInterval(val);
@@ -570,7 +578,14 @@ const PlayerConnectionsPage: React.FC = () => {
           {/* Per-world cards */}
           {ccuData?.worlds && ccuData.worlds.length > 0 && (
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  mb: 1.5,
+                }}
+              >
                 <Typography
                   variant="subtitle2"
                   fontWeight={600}
@@ -585,7 +600,9 @@ const PlayerConnectionsPage: React.FC = () => {
                   onClick={(e) => setSortMenuAnchor(e.currentTarget)}
                   sx={{ textTransform: 'none', fontSize: '0.75rem' }}
                 >
-                  {worldSortBy === 'name' ? t('playerConnections.sort.byName') : t('playerConnections.sort.byCount')}
+                  {worldSortBy === 'name'
+                    ? t('playerConnections.sort.byName')
+                    : t('playerConnections.sort.byCount')}
                   {worldSortDir === 'asc' ? ' ↑' : ' ↓'}
                 </Button>
                 <Menu
@@ -595,26 +612,52 @@ const PlayerConnectionsPage: React.FC = () => {
                 >
                   <MenuItem
                     selected={worldSortBy === 'name' && worldSortDir === 'asc'}
-                    onClick={() => { setWorldSortBy('name'); setWorldSortDir('asc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'name'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'asc'); setSortMenuAnchor(null); }}
+                    onClick={() => {
+                      setWorldSortBy('name');
+                      setWorldSortDir('asc');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.by', 'name');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'asc');
+                      setSortMenuAnchor(null);
+                    }}
                   >
                     {t('playerConnections.sort.byName')} ↑
                   </MenuItem>
                   <MenuItem
                     selected={worldSortBy === 'name' && worldSortDir === 'desc'}
-                    onClick={() => { setWorldSortBy('name'); setWorldSortDir('desc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'name'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'desc'); setSortMenuAnchor(null); }}
+                    onClick={() => {
+                      setWorldSortBy('name');
+                      setWorldSortDir('desc');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.by', 'name');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'desc');
+                      setSortMenuAnchor(null);
+                    }}
                   >
                     {t('playerConnections.sort.byName')} ↓
                   </MenuItem>
                   <Divider />
                   <MenuItem
-                    selected={worldSortBy === 'count' && worldSortDir === 'desc'}
-                    onClick={() => { setWorldSortBy('count'); setWorldSortDir('desc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'count'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'desc'); setSortMenuAnchor(null); }}
+                    selected={
+                      worldSortBy === 'count' && worldSortDir === 'desc'
+                    }
+                    onClick={() => {
+                      setWorldSortBy('count');
+                      setWorldSortDir('desc');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.by', 'count');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'desc');
+                      setSortMenuAnchor(null);
+                    }}
                   >
                     {t('playerConnections.sort.byCount')} ↓
                   </MenuItem>
                   <MenuItem
                     selected={worldSortBy === 'count' && worldSortDir === 'asc'}
-                    onClick={() => { setWorldSortBy('count'); setWorldSortDir('asc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'count'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'asc'); setSortMenuAnchor(null); }}
+                    onClick={() => {
+                      setWorldSortBy('count');
+                      setWorldSortDir('asc');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.by', 'count');
+                      localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'asc');
+                      setSortMenuAnchor(null);
+                    }}
                   >
                     {t('playerConnections.sort.byCount')} ↑
                   </MenuItem>
@@ -625,7 +668,9 @@ const PlayerConnectionsPage: React.FC = () => {
                   .sort((a, b) => {
                     let cmp = 0;
                     if (worldSortBy === 'name') {
-                      cmp = (a.name || a.worldId).localeCompare(b.name || b.worldId);
+                      cmp = (a.name || a.worldId).localeCompare(
+                        b.name || b.worldId
+                      );
                     } else {
                       cmp = a.count - b.count;
                     }
@@ -908,7 +953,9 @@ const PlayerConnectionsPage: React.FC = () => {
                         size="small"
                         startIcon={<KickIcon />}
                         onClick={handleKick}
-                        disabled={kicking || (kickType === 'world' && !kickWorldId)}
+                        disabled={
+                          kicking || (kickType === 'world' && !kickWorldId)
+                        }
                         sx={{
                           borderRadius: 2,
                           textTransform: 'none',
