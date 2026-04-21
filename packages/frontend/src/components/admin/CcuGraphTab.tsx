@@ -142,8 +142,8 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
     });
 
     // Sort descending (most recent first)
-    return Array.from(bucketMap.values()).sort(
-      (a, b) => (b.time > a.time ? 1 : -1)
+    return Array.from(bucketMap.values()).sort((a, b) =>
+      b.time > a.time ? 1 : -1
     );
   }, [records]);
 
@@ -262,7 +262,8 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
                       sx={{
                         fontSize: '0.75rem',
                         py: 0.75,
-                        color: w && w.count > 0 ? 'text.primary' : 'text.disabled',
+                        color:
+                          w && w.count > 0 ? 'text.primary' : 'text.disabled',
                       }}
                     >
                       {w ? w.count.toLocaleString() : '-'}

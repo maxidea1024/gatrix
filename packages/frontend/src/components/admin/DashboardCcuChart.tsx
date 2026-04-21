@@ -247,9 +247,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
             <Tooltip title={t('dashboard.ccuChartViewDetail')}>
               <IconButton
                 size="small"
-                onClick={() =>
-                  navigate('/admin/player-connections?tab=1')
-                }
+                onClick={() => navigate('/admin/player-connections?tab=1')}
               >
                 <OpenInNewIcon fontSize="small" />
               </IconButton>
@@ -258,7 +256,11 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
         </Box>
 
         {loading ? (
-          <Skeleton variant="rectangular" height={210} sx={{ borderRadius: 1 }} />
+          <Skeleton
+            variant="rectangular"
+            height={210}
+            sx={{ borderRadius: 1 }}
+          />
         ) : chartData.datasets.length === 0 ? (
           <Box
             sx={{

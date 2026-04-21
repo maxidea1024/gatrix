@@ -1246,11 +1246,13 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* CCU Chart Section - only when admindApiUrl is configured */}
-      {hasAnyPermissions && hasPermission(P.MONITORING_READ) && hasAdmindUrl && (
-        <Box sx={{ mb: 4 }}>
-          <DashboardCcuChart projectApiPath={getProjectApiPath()} />
-        </Box>
-      )}
+      {hasAnyPermissions &&
+        hasPermission(P.MONITORING_READ) &&
+        hasAdmindUrl && (
+          <Box sx={{ mb: 4 }}>
+            <DashboardCcuChart projectApiPath={getProjectApiPath()} />
+          </Box>
+        )}
 
       {/* Environment Data Overview */}
       {environmentsWithCounts.length > 0 && (
