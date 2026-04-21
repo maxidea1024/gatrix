@@ -2556,7 +2556,7 @@ const ServerListPage: React.FC = () => {
       case 'group':
         return t('serverList.grouping.group');
       case 'environment':
-        return t('serverList.grouping.environmentId');
+        return t('serverList.grouping.environment');
       case 'cloudProvider':
         return t('serverList.grouping.cloudProvider');
       case 'cloudRegion':

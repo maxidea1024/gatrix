@@ -481,44 +481,73 @@ const PlayerConnectionsPage: React.FC = () => {
                   background: `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.08)} 0%, ${alpha(theme.palette.error.main, 0.02)} 100%)`,
                   borderColor: alpha(theme.palette.error.main, 0.2),
                   height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.error.main, 0.5),
+                    boxShadow: `0 4px 20px ${alpha(theme.palette.error.main, 0.15)}`,
+                    transform: 'translateY(-2px)',
+                    '& .kick-icon-wrapper': {
+                      transform: 'scale(1.1)',
+                      bgcolor: alpha(theme.palette.error.main, 0.2),
+                    },
+                  },
                 })}
+                onClick={() => {
+                  setKickType('all');
+                  setKickOpen(true);
+                }}
               >
-                <CardContent
-                  sx={{
-                    py: 2,
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    startIcon={<KickIcon />}
-                    onClick={() => {
-                      setKickType('all');
-                      setKickOpen(true);
-                    }}
+                <CardContent sx={{ py: 2 }}>
+                  <Box
                     sx={{
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      mb: 1.5,
                     }}
                   >
-                    {t('playerConnections.kick.openDialog')}
-                  </Button>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
+                    <KickIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
+                      {t('playerConnections.kick.title')}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 1,
+                      py: 1,
+                    }}
                   >
-                    {t('playerConnections.kick.title')}
-                  </Typography>
+                    <Box
+                      className="kick-icon-wrapper"
+                      sx={(theme) => ({
+                        width: 44,
+                        height: 44,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: alpha(theme.palette.error.main, 0.12),
+                        transition: 'all 0.2s ease-in-out',
+                      })}
+                    >
+                      <KickIcon sx={{ fontSize: 22, color: 'error.main' }} />
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      color="error.main"
+                      fontWeight={600}
+                    >
+                      {t('playerConnections.kick.openDialog')}
+                    </Typography>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>

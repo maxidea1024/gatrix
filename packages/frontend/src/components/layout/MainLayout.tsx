@@ -1854,6 +1854,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
                     <Typography
                       variant="caption"
+                      onClick={handleMaintenanceBannerClick}
                       sx={{
                         fontStyle: 'italic',
                         opacity: 0.8,
@@ -1862,6 +1863,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         mt: 1,
                         pt: 1,
                         borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          opacity: 1,
+                          textDecoration: 'underline',
+                        },
                       }}
                     >
                       💡 {t('maintenance.clickToManageTooltip')}
@@ -1871,7 +1877,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 arrow
                 placement="bottom"
                 enterDelay={500}
-                leaveDelay={200}
+                leaveDelay={300}
               >
                 <Box
                   onClick={handleMaintenanceBannerClick}
