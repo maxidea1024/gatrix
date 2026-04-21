@@ -380,20 +380,31 @@ const PlayerConnectionsPage: React.FC = () => {
                   >
                     {ccuData?.total?.toLocaleString() ?? '-'}
                   </Typography>
-                  {ccuData && prevCcuRef.current && (() => {
-                    const delta = ccuData.total - prevCcuRef.current.total;
-                    if (delta === 0) return null;
-                    return (
-                      <Typography
-                        variant="caption"
-                        fontWeight={600}
-                        sx={{ display: 'inline-flex', alignItems: 'center', ml: 1, color: delta > 0 ? 'success.main' : 'error.main' }}
-                      >
-                        {delta > 0 ? <ArrowUpIcon sx={{ fontSize: 14 }} /> : <ArrowDownIcon sx={{ fontSize: 14 }} />}
-                        {Math.abs(delta).toLocaleString()}
-                      </Typography>
-                    );
-                  })()}
+                  {ccuData &&
+                    prevCcuRef.current &&
+                    (() => {
+                      const delta = ccuData.total - prevCcuRef.current.total;
+                      if (delta === 0) return null;
+                      return (
+                        <Typography
+                          variant="caption"
+                          fontWeight={600}
+                          sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            ml: 1,
+                            color: delta > 0 ? 'success.main' : 'error.main',
+                          }}
+                        >
+                          {delta > 0 ? (
+                            <ArrowUpIcon sx={{ fontSize: 14 }} />
+                          ) : (
+                            <ArrowDownIcon sx={{ fontSize: 14 }} />
+                          )}
+                          {Math.abs(delta).toLocaleString()}
+                        </Typography>
+                      );
+                    })()}
                   {ccuData && (
                     <Box
                       sx={{
@@ -718,26 +729,46 @@ const PlayerConnectionsPage: React.FC = () => {
                           >
                             {w.name || w.worldId}
                           </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                            }}
+                          >
                             <Typography variant="h6" fontWeight={700}>
                               {w.count.toLocaleString()}
                             </Typography>
-                            {prevCcuRef.current && (() => {
-                              const prev = prevCcuRef.current.worlds?.find((pw) => pw.worldId === w.worldId);
-                              if (!prev) return null;
-                              const delta = w.count - prev.count;
-                              if (delta === 0) return null;
-                              return (
-                                <Typography
-                                  variant="caption"
-                                  fontWeight={600}
-                                  sx={{ display: 'inline-flex', alignItems: 'center', color: delta > 0 ? 'success.main' : 'error.main' }}
-                                >
-                                  {delta > 0 ? <ArrowUpIcon sx={{ fontSize: 12 }} /> : <ArrowDownIcon sx={{ fontSize: 12 }} />}
-                                  {Math.abs(delta)}
-                                </Typography>
-                              );
-                            })()}
+                            {prevCcuRef.current &&
+                              (() => {
+                                const prev = prevCcuRef.current.worlds?.find(
+                                  (pw) => pw.worldId === w.worldId
+                                );
+                                if (!prev) return null;
+                                const delta = w.count - prev.count;
+                                if (delta === 0) return null;
+                                return (
+                                  <Typography
+                                    variant="caption"
+                                    fontWeight={600}
+                                    sx={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      color:
+                                        delta > 0
+                                          ? 'success.main'
+                                          : 'error.main',
+                                    }}
+                                  >
+                                    {delta > 0 ? (
+                                      <ArrowUpIcon sx={{ fontSize: 12 }} />
+                                    ) : (
+                                      <ArrowDownIcon sx={{ fontSize: 12 }} />
+                                    )}
+                                    {Math.abs(delta)}
+                                  </Typography>
+                                );
+                              })()}
                           </Box>
                           <Box
                             sx={{
