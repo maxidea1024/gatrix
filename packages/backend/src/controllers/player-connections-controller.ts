@@ -238,9 +238,13 @@ export class PlayerConnectionsController {
 
       let data: any;
 
-      if (type === 'all' || type === 'world') {
+      if (type === 'all') {
+        data = await admindRequest(admindUrl, 'POST', '/gatrix/v1/kick/all', {
+          ...(worldId ? { gameServerId: worldId } : {}),
+        });
+      } else if (type === 'world') {
         if (!worldId) {
-          throw new GatrixError('worldId is required for all/world kick', 400);
+          throw new GatrixError('worldId is required for world kick', 400);
         }
         data = await admindRequest(admindUrl, 'POST', '/gatrix/v1/kick/all', {
           gameServerId: worldId,
