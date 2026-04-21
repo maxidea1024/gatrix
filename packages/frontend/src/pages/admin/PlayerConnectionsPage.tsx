@@ -37,6 +37,7 @@ import {
   SignalCellularAlt as CcuIcon,
   ErrorOutline as ErrorIcon,
   SmartToy as BotIcon,
+  SwapVert as SortIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -94,6 +95,16 @@ const PlayerConnectionsPage: React.FC = () => {
   const [kickMessage, setKickMessage] = useState('');
   const [kickConfirmText, setKickConfirmText] = useState('');
   const [kicking, setKicking] = useState(false);
+
+  // World card sort (persisted)
+  const SORT_STORAGE_KEY = 'playerConnections.worldSort';
+  const [worldSortBy, setWorldSortBy] = useState<'name' | 'count'>(() => {
+    return (localStorage.getItem(SORT_STORAGE_KEY + '.by') as 'name' | 'count') || 'name';
+  });
+  const [worldSortDir, setWorldSortDir] = useState<'asc' | 'desc'>(() => {
+    return (localStorage.getItem(SORT_STORAGE_KEY + '.dir') as 'asc' | 'desc') || 'asc';
+  });
+  const [sortMenuAnchor, setSortMenuAnchor] = useState<null | HTMLElement>(null);
 
   const handleSetRefreshInterval = (val: number) => {
     setRefreshInterval(val);
@@ -559,17 +570,67 @@ const PlayerConnectionsPage: React.FC = () => {
           {/* Per-world cards */}
           {ccuData?.worlds && ccuData.worlds.length > 0 && (
             <Box>
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                color="text.secondary"
-                sx={{ mb: 1.5, textTransform: 'uppercase', letterSpacing: 0.5 }}
-              >
-                {t('playerConnections.ccu.perWorld')}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  color="text.secondary"
+                  sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}
+                >
+                  {t('playerConnections.ccu.perWorld')}
+                </Typography>
+                <Button
+                  size="small"
+                  startIcon={<SortIcon />}
+                  onClick={(e) => setSortMenuAnchor(e.currentTarget)}
+                  sx={{ textTransform: 'none', fontSize: '0.75rem' }}
+                >
+                  {worldSortBy === 'name' ? t('playerConnections.sort.byName') : t('playerConnections.sort.byCount')}
+                  {worldSortDir === 'asc' ? ' ↑' : ' ↓'}
+                </Button>
+                <Menu
+                  anchorEl={sortMenuAnchor}
+                  open={Boolean(sortMenuAnchor)}
+                  onClose={() => setSortMenuAnchor(null)}
+                >
+                  <MenuItem
+                    selected={worldSortBy === 'name' && worldSortDir === 'asc'}
+                    onClick={() => { setWorldSortBy('name'); setWorldSortDir('asc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'name'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'asc'); setSortMenuAnchor(null); }}
+                  >
+                    {t('playerConnections.sort.byName')} ↑
+                  </MenuItem>
+                  <MenuItem
+                    selected={worldSortBy === 'name' && worldSortDir === 'desc'}
+                    onClick={() => { setWorldSortBy('name'); setWorldSortDir('desc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'name'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'desc'); setSortMenuAnchor(null); }}
+                  >
+                    {t('playerConnections.sort.byName')} ↓
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem
+                    selected={worldSortBy === 'count' && worldSortDir === 'desc'}
+                    onClick={() => { setWorldSortBy('count'); setWorldSortDir('desc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'count'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'desc'); setSortMenuAnchor(null); }}
+                  >
+                    {t('playerConnections.sort.byCount')} ↓
+                  </MenuItem>
+                  <MenuItem
+                    selected={worldSortBy === 'count' && worldSortDir === 'asc'}
+                    onClick={() => { setWorldSortBy('count'); setWorldSortDir('asc'); localStorage.setItem(SORT_STORAGE_KEY + '.by', 'count'); localStorage.setItem(SORT_STORAGE_KEY + '.dir', 'asc'); setSortMenuAnchor(null); }}
+                  >
+                    {t('playerConnections.sort.byCount')} ↑
+                  </MenuItem>
+                </Menu>
+              </Box>
               <Grid container spacing={1.5}>
                 {[...ccuData.worlds]
-                  .sort((a, b) => b.count - a.count)
+                  .sort((a, b) => {
+                    let cmp = 0;
+                    if (worldSortBy === 'name') {
+                      cmp = (a.name || a.worldId).localeCompare(b.name || b.worldId);
+                    } else {
+                      cmp = a.count - b.count;
+                    }
+                    return worldSortDir === 'asc' ? cmp : -cmp;
+                  })
                   .map((w) => (
                     <Grid size={{ xs: 6, sm: 4, md: 3, lg: 2 }} key={w.worldId}>
                       <Card
@@ -671,13 +732,17 @@ const PlayerConnectionsPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 1,
+            pb: 0.5,
           }}
         >
           <KickIcon sx={{ color: 'error.main' }} />
           {t('playerConnections.kick.title')}
         </DialogTitle>
         <DialogContent>
-          <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('playerConnections.kick.subtitle')}
+          </Typography>
+          <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>{t('playerConnections.kick.type')}</InputLabel>
             <Select
               value={kickType}
@@ -843,7 +908,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         size="small"
                         startIcon={<KickIcon />}
                         onClick={handleKick}
-                        disabled={kicking}
+                        disabled={kicking || (kickType === 'world' && !kickWorldId)}
                         sx={{
                           borderRadius: 2,
                           textTransform: 'none',
@@ -861,7 +926,8 @@ const PlayerConnectionsPage: React.FC = () => {
           <TextField
             fullWidth
             multiline
-            rows={2}
+            minRows={2}
+            maxRows={8}
             label={t('playerConnections.kick.message')}
             placeholder={t('playerConnections.kick.messagePlaceholder')}
             value={kickMessage}
