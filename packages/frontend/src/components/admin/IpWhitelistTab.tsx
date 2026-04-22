@@ -939,12 +939,16 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                 item[t('ipWhitelist.ipAddress')] ||
                 item.ipAddress ||
                 ''
-              ).toString().trim();
+              )
+                .toString()
+                .trim();
               const purpose = (
                 item[t('ipWhitelist.purpose')] ||
                 item.purpose ||
                 ''
-              ).toString().trim();
+              )
+                .toString()
+                .trim();
 
               if (!ipAddress) {
                 failCount++;
@@ -960,7 +964,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               successCount++;
             } catch (err: any) {
               failCount++;
-              const ip = item[t('ipWhitelist.ipAddress')] || item.ipAddress || '?';
+              const ip =
+                item[t('ipWhitelist.ipAddress')] || item.ipAddress || '?';
               failedItems.push(ip.toString());
             }
           }
@@ -973,7 +978,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           }
           if (failCount > 0) {
             enqueueSnackbar(
-              t('common.importFailed') + ` (${failCount}): ${failedItems.slice(0, 5).join(', ')}`,
+              t('common.importFailed') +
+                ` (${failCount}): ${failedItems.slice(0, 5).join(', ')}`,
               { variant: 'error' }
             );
           }

@@ -1260,9 +1260,7 @@ const WhitelistPage: React.FC = () => {
             } catch (err: any) {
               failCount++;
               const id =
-                item[t('whitelist.form.accountId')] ||
-                item.accountId ||
-                '?';
+                item[t('whitelist.form.accountId')] || item.accountId || '?';
               failedItems.push(String(id));
             }
           }

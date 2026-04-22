@@ -203,16 +203,13 @@ export class PlayerConnectionsController {
         const upstreamStatus = error.response?.status;
         const upstreamData = error.response?.data;
         const requestUrl = `${admindUrl}/gatrix/v1/users${queryStr}`;
-        logger.error(
-          'Failed to get connected users from admind',
-          {
-            message: error.message,
-            code: error.code,
-            url: requestUrl,
-            upstreamStatus,
-            upstreamError: upstreamData?.error || upstreamData,
-          }
-        );
+        logger.error('Failed to get connected users from admind', {
+          message: error.message,
+          code: error.code,
+          url: requestUrl,
+          upstreamStatus,
+          upstreamError: upstreamData?.error || upstreamData,
+        });
         const detail = upstreamStatus
           ? `Admind returned ${upstreamStatus}: ${upstreamData?.error || error.message}`
           : `Admind unreachable: ${error.code || error.message}`;
