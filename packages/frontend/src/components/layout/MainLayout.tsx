@@ -1337,8 +1337,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         )}
       </Box>
 
-
-
       {/* 메뉴 영역 - 스크롤 가능 */}
       <Box
         sx={{

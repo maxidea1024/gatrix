@@ -474,7 +474,10 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
           onSelect={handleSelectOrg}
           emptyMessage={t('sidebar.context.noOrgs')}
           searchable
-          onManageClick={() => { handleClose(); navigate('/admin/workspace?tab=organisations'); }}
+          onManageClick={() => {
+            handleClose();
+            navigate('/admin/workspace?tab=organisations');
+          }}
           manageTooltip={t('sidebar.context.manage')}
         />
 
@@ -491,7 +494,10 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
           onSelect={handleSelectProject}
           emptyMessage={t('sidebar.context.noProjects')}
           searchable
-          onManageClick={() => { handleClose(); navigate('/admin/workspace?tab=projects'); }}
+          onManageClick={() => {
+            handleClose();
+            navigate('/admin/workspace?tab=projects');
+          }}
           manageTooltip={t('sidebar.context.manage')}
         />
 
@@ -520,7 +526,10 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
           selectedKey={currentEnvironmentId}
           onSelect={handleSelectEnv}
           emptyMessage={t('sidebar.context.noEnvironments')}
-          onManageClick={() => { handleClose(); navigate('/admin/workspace?tab=environments'); }}
+          onManageClick={() => {
+            handleClose();
+            navigate('/admin/workspace?tab=environments');
+          }}
           manageTooltip={t('sidebar.context.manage')}
         />
       </Popover>
