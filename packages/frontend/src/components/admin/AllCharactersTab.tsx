@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Table,
@@ -153,15 +159,27 @@ const DETAIL_FIELDS = [
   { key: 'worldId', labelKey: 'playerConnections.allPlayers.worldId' },
   { key: 'nationCmsId', labelKey: 'playerConnections.allPlayers.nationCmsId' },
   { key: 'isOnline', labelKey: 'playerConnections.allPlayers.isOnline' },
-  { key: 'lastLoginTimeUtc', labelKey: 'playerConnections.allPlayers.lastLogin' },
+  {
+    key: 'lastLoginTimeUtc',
+    labelKey: 'playerConnections.allPlayers.lastLogin',
+  },
   { key: 'createTimeUtc', labelKey: 'playerConnections.allPlayers.createdAt' },
   { key: 'loginPlatform', labelKey: 'playerConnections.allPlayers.platform' },
-  { key: 'clientVersion', labelKey: 'playerConnections.allPlayers.clientVersion' },
+  {
+    key: 'clientVersion',
+    labelKey: 'playerConnections.allPlayers.clientVersion',
+  },
   { key: 'lastWorldId', labelKey: 'playerConnections.allPlayers.lastWorldId' },
   { key: 'lastUserId', labelKey: 'playerConnections.allPlayers.lastUserId' },
   { key: 'accessLevel', labelKey: 'playerConnections.allPlayers.accessLevel' },
-  { key: 'blockTimeUtcByAdmin', labelKey: 'playerConnections.allPlayers.blockTime' },
-  { key: 'revokedTimeUtc', labelKey: 'playerConnections.allPlayers.revokedTime' },
+  {
+    key: 'blockTimeUtcByAdmin',
+    labelKey: 'playerConnections.allPlayers.blockTime',
+  },
+  {
+    key: 'revokedTimeUtc',
+    labelKey: 'playerConnections.allPlayers.revokedTime',
+  },
 ];
 
 const SORTABLE_COLUMNS = new Set([
@@ -213,7 +231,10 @@ export default function AllCharactersTab({
     // URL takes priority, then localStorage
     const urlSize = parseInt(searchParams.get('size') || '', 10);
     if (!isNaN(urlSize) && VALID_PAGE_SIZES.includes(urlSize)) return urlSize;
-    const saved = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '', 10);
+    const saved = parseInt(
+      localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '',
+      10
+    );
     if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
     return DEFAULT_PAGE_SIZE;
   });
@@ -249,7 +270,11 @@ export default function AllCharactersTab({
 
   // Group by - from URL, fallback to localStorage
   const [groupBy, setGroupBy] = useState(() => {
-    return searchParams.get('group') || localStorage.getItem(GROUP_STORAGE_KEY) || 'none';
+    return (
+      searchParams.get('group') ||
+      localStorage.getItem(GROUP_STORAGE_KEY) ||
+      'none'
+    );
   });
 
   // Column settings (ColumnConfig[] pattern)
@@ -325,30 +350,55 @@ export default function AllCharactersTab({
   ]);
 
   // ── Sync state to URL query params ──
-  const AP_PARAM_KEYS = ['q', 'page', 'size', 'sortBy', 'sortDesc', 'world', 'group', 'online', 'platform'];
+  const AP_PARAM_KEYS = [
+    'q',
+    'page',
+    'size',
+    'sortBy',
+    'sortDesc',
+    'world',
+    'group',
+    'online',
+    'platform',
+  ];
   const isInitialSync = useRef(true);
   useEffect(() => {
     if (isInitialSync.current) {
       isInitialSync.current = false;
       return;
     }
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      // Clear old AllPlayers params
-      for (const key of AP_PARAM_KEYS) next.delete(key);
-      // Set non-default values
-      if (debouncedSearch) next.set('q', debouncedSearch);
-      if (page > 0) next.set('page', String(page));
-      if (rowsPerPage !== DEFAULT_PAGE_SIZE) next.set('size', String(rowsPerPage));
-      if (sortBy !== 'userId') next.set('sortBy', sortBy);
-      if (!sortDesc) next.set('sortDesc', 'false');
-      if (worldFilter !== 'all') next.set('world', worldFilter);
-      if (groupBy !== 'none') next.set('group', groupBy);
-      if (isOnlineFilter) next.set('online', isOnlineFilter);
-      if (loginPlatformFilter) next.set('platform', loginPlatformFilter);
-      return next;
-    }, { replace: true });
-  }, [debouncedSearch, page, rowsPerPage, sortBy, sortDesc, worldFilter, groupBy, isOnlineFilter, loginPlatformFilter, setSearchParams]);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        // Clear old AllPlayers params
+        for (const key of AP_PARAM_KEYS) next.delete(key);
+        // Set non-default values
+        if (debouncedSearch) next.set('q', debouncedSearch);
+        if (page > 0) next.set('page', String(page));
+        if (rowsPerPage !== DEFAULT_PAGE_SIZE)
+          next.set('size', String(rowsPerPage));
+        if (sortBy !== 'userId') next.set('sortBy', sortBy);
+        if (!sortDesc) next.set('sortDesc', 'false');
+        if (worldFilter !== 'all') next.set('world', worldFilter);
+        if (groupBy !== 'none') next.set('group', groupBy);
+        if (isOnlineFilter) next.set('online', isOnlineFilter);
+        if (loginPlatformFilter) next.set('platform', loginPlatformFilter);
+        return next;
+      },
+      { replace: true }
+    );
+  }, [
+    debouncedSearch,
+    page,
+    rowsPerPage,
+    sortBy,
+    sortDesc,
+    worldFilter,
+    groupBy,
+    isOnlineFilter,
+    loginPlatformFilter,
+    setSearchParams,
+  ]);
 
   // Persist page size to localStorage
   useEffect(() => {
@@ -404,7 +454,9 @@ export default function AllCharactersTab({
   ];
 
   // Track which filter keys are currently being edited (value not yet selected)
-  const [editingFilterKeys, setEditingFilterKeys] = useState<Set<string>>(new Set());
+  const [editingFilterKeys, setEditingFilterKeys] = useState<Set<string>>(
+    new Set()
+  );
 
   const activeFilters: ActiveFilter[] = useMemo(() => {
     const filters: ActiveFilter[] = [];
@@ -415,7 +467,11 @@ export default function AllCharactersTab({
         label: t('playerConnections.allPlayers.worldId'),
       });
     } else if (editingFilterKeys.has('worldId')) {
-      filters.push({ key: 'worldId', value: undefined, label: t('playerConnections.allPlayers.worldId') });
+      filters.push({
+        key: 'worldId',
+        value: undefined,
+        label: t('playerConnections.allPlayers.worldId'),
+      });
     }
     if (isOnlineFilter) {
       filters.push({
@@ -424,7 +480,11 @@ export default function AllCharactersTab({
         label: t('playerConnections.allPlayers.isOnline'),
       });
     } else if (editingFilterKeys.has('isOnline')) {
-      filters.push({ key: 'isOnline', value: undefined, label: t('playerConnections.allPlayers.isOnline') });
+      filters.push({
+        key: 'isOnline',
+        value: undefined,
+        label: t('playerConnections.allPlayers.isOnline'),
+      });
     }
     if (loginPlatformFilter) {
       filters.push({
@@ -433,7 +493,11 @@ export default function AllCharactersTab({
         label: t('playerConnections.allPlayers.platform'),
       });
     } else if (editingFilterKeys.has('loginPlatform')) {
-      filters.push({ key: 'loginPlatform', value: undefined, label: t('playerConnections.allPlayers.platform') });
+      filters.push({
+        key: 'loginPlatform',
+        value: undefined,
+        label: t('playerConnections.allPlayers.platform'),
+      });
     }
     return filters;
   }, [worldFilter, isOnlineFilter, loginPlatformFilter, editingFilterKeys, t]);
@@ -443,16 +507,42 @@ export default function AllCharactersTab({
     // Don't set values yet — wait for handleFilterChange when user picks a value
   };
   const handleFilterRemove = (key: string) => {
-    if (key === 'worldId') { setWorldFilter('all'); setPage(0); }
-    if (key === 'isOnline') { setIsOnlineFilter(''); setPage(0); }
-    if (key === 'loginPlatform') { setLoginPlatformFilter(''); setPage(0); }
-    setEditingFilterKeys((prev) => { const next = new Set(prev); next.delete(key); return next; });
+    if (key === 'worldId') {
+      setWorldFilter('all');
+      setPage(0);
+    }
+    if (key === 'isOnline') {
+      setIsOnlineFilter('');
+      setPage(0);
+    }
+    if (key === 'loginPlatform') {
+      setLoginPlatformFilter('');
+      setPage(0);
+    }
+    setEditingFilterKeys((prev) => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
   };
   const handleFilterChange = (key: string, value: any) => {
-    if (key === 'worldId') { setWorldFilter(value); setPage(0); }
-    if (key === 'isOnline') { setIsOnlineFilter(value); setPage(0); }
-    if (key === 'loginPlatform') { setLoginPlatformFilter(value); setPage(0); }
-    setEditingFilterKeys((prev) => { const next = new Set(prev); next.delete(key); return next; });
+    if (key === 'worldId') {
+      setWorldFilter(value);
+      setPage(0);
+    }
+    if (key === 'isOnline') {
+      setIsOnlineFilter(value);
+      setPage(0);
+    }
+    if (key === 'loginPlatform') {
+      setLoginPlatformFilter(value);
+      setPage(0);
+    }
+    setEditingFilterKeys((prev) => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
   };
 
   // ── Column settings handlers ──
@@ -489,7 +579,12 @@ export default function AllCharactersTab({
   };
 
   // Format detail value for display
-  const DATE_FIELDS = new Set(['lastLoginTimeUtc', 'createTimeUtc', 'blockTimeUtcByAdmin', 'revokedTimeUtc']);
+  const DATE_FIELDS = new Set([
+    'lastLoginTimeUtc',
+    'createTimeUtc',
+    'blockTimeUtcByAdmin',
+    'revokedTimeUtc',
+  ]);
   const formatDetailValue = (key: string, value: any): string => {
     if (value === null || value === undefined) return '-';
     if (key === 'isOnline') {
@@ -548,9 +643,15 @@ export default function AllCharactersTab({
               sx={{
                 fontFamily: 'monospace',
                 cursor: 'pointer',
-                '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
               }}
-              onClick={() => { setDetailUser(user); setDetailDialogOpen(true); }}
+              onClick={() => {
+                setDetailUser(user);
+                setDetailDialogOpen(true);
+              }}
             >
               {user.userId}
             </Typography>
@@ -571,9 +672,15 @@ export default function AllCharactersTab({
               sx={{
                 fontWeight: 500,
                 cursor: 'pointer',
-                '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
               }}
-              onClick={() => { setDetailUser(user); setDetailDialogOpen(true); }}
+              onClick={() => {
+                setDetailUser(user);
+                setDetailDialogOpen(true);
+              }}
             >
               {user.name || '-'}
             </Typography>
@@ -597,9 +704,15 @@ export default function AllCharactersTab({
                 fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
-                '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
               }}
-              onClick={() => { setDetailUser(user); setDetailDialogOpen(true); }}
+              onClick={() => {
+                setDetailUser(user);
+                setDetailDialogOpen(true);
+              }}
             >
               {user.characterId || '-'}
             </Typography>
@@ -623,9 +736,15 @@ export default function AllCharactersTab({
                 fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
-                '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
               }}
-              onClick={() => { setDetailUser(user); setDetailDialogOpen(true); }}
+              onClick={() => {
+                setDetailUser(user);
+                setDetailDialogOpen(true);
+              }}
             >
               {user.accountId || '-'}
             </Typography>
@@ -658,9 +777,7 @@ export default function AllCharactersTab({
       case 'nationCmsId':
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="body2">
-              {user.nationCmsId || '-'}
-            </Typography>
+            <Typography variant="body2">{user.nationCmsId || '-'}</Typography>
             {user.nationCmsId !== 0 && user.nationCmsId && (
               <IconButton
                 size="small"
@@ -690,7 +807,11 @@ export default function AllCharactersTab({
       case 'lastLoginTimeUtc':
         return (
           <Tooltip title={formatDateTimeDetailed(user.lastLoginTimeUtc)}>
-            <Typography variant="body2" component="span" sx={{ fontSize: '0.75rem' }}>
+            <Typography
+              variant="body2"
+              component="span"
+              sx={{ fontSize: '0.75rem' }}
+            >
               {formatRelativeTime(user.lastLoginTimeUtc)}
             </Typography>
           </Tooltip>
@@ -698,16 +819,18 @@ export default function AllCharactersTab({
       case 'createTimeUtc':
         return (
           <Tooltip title={formatDateTimeDetailed(user.createTimeUtc)}>
-            <Typography variant="body2" component="span" sx={{ fontSize: '0.75rem' }}>
+            <Typography
+              variant="body2"
+              component="span"
+              sx={{ fontSize: '0.75rem' }}
+            >
               {formatRelativeTime(user.createTimeUtc)}
             </Typography>
           </Tooltip>
         );
       case 'loginPlatform':
         return (
-          <Typography variant="body2">
-            {user.loginPlatform || '-'}
-          </Typography>
+          <Typography variant="body2">{user.loginPlatform || '-'}</Typography>
         );
       case 'clientVersion':
         return (
@@ -722,10 +845,7 @@ export default function AllCharactersTab({
         return <Typography variant="body2">{user.accessLevel}</Typography>;
       case 'actions':
         return (
-          <IconButton
-            size="small"
-            onClick={(e) => handleRowMenuOpen(e, user)}
-          >
+          <IconButton size="small" onClick={(e) => handleRowMenuOpen(e, user)}>
             <MoreVertIcon fontSize="small" />
           </IconButton>
         );
@@ -749,7 +869,11 @@ export default function AllCharactersTab({
         {visibleColumns.map((col) => (
           <TableCell
             key={col.id}
-            align={col.id === 'actions' || col.id === 'isOnline' ? 'center' : undefined}
+            align={
+              col.id === 'actions' || col.id === 'isOnline'
+                ? 'center'
+                : undefined
+            }
             sx={{ py: 0.75, px: 1.5 }}
           >
             {renderCell(user, col.id)}
@@ -771,9 +895,7 @@ export default function AllCharactersTab({
         }}
       >
         <SearchTextField
-          placeholder={t(
-            'playerConnections.allPlayers.searchPlaceholder'
-          )}
+          placeholder={t('playerConnections.allPlayers.searchPlaceholder')}
           value={searchTerm}
           onChange={handleSearchChange}
           sx={{ minWidth: 250 }}
@@ -809,7 +931,11 @@ export default function AllCharactersTab({
             }}
           >
             {GROUP_BY_OPTIONS.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: '0.8125rem' }}>
+              <MenuItem
+                key={opt.value}
+                value={opt.value}
+                sx={{ fontSize: '0.8125rem' }}
+              >
                 {t(opt.labelKey)}
               </MenuItem>
             ))}
@@ -819,9 +945,7 @@ export default function AllCharactersTab({
         {/* Column settings button */}
         <Tooltip title={t('common.columnSettings')}>
           <IconButton
-            onClick={(e) =>
-              setColumnSettingsAnchor(e.currentTarget)
-            }
+            onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
             sx={{
               bgcolor: 'background.paper',
               border: 1,
@@ -843,11 +967,7 @@ export default function AllCharactersTab({
         </Typography>
         <Tooltip title={t('common.refresh')}>
           <span>
-            <IconButton
-              size="small"
-              onClick={fetchData}
-              disabled={loading}
-            >
+            <IconButton size="small" onClick={fetchData} disabled={loading}>
               <RefreshIcon />
             </IconButton>
           </span>
@@ -878,7 +998,11 @@ export default function AllCharactersTab({
                     {visibleColumns.map((col) => (
                       <TableCell
                         key={col.id}
-                        align={col.id === 'actions' || col.id === 'isOnline' ? 'center' : undefined}
+                        align={
+                          col.id === 'actions' || col.id === 'isOnline'
+                            ? 'center'
+                            : undefined
+                        }
                         sx={{
                           fontWeight: 600,
                           fontSize: '0.75rem',
@@ -921,10 +1045,7 @@ export default function AllCharactersTab({
                               colSpan={visibleColumns.length}
                               sx={{
                                 bgcolor: (theme) =>
-                                  alpha(
-                                    theme.palette.primary.main,
-                                    0.06
-                                  ),
+                                  alpha(theme.palette.primary.main, 0.06),
                                 py: 0.75,
                                 px: 1.5,
                                 fontWeight: 600,
@@ -1005,10 +1126,7 @@ export default function AllCharactersTab({
           <Typography variant="h6" component="span" sx={{ fontWeight: 600 }}>
             {t('playerConnections.allPlayers.viewDetails')}
           </Typography>
-          <IconButton
-            size="small"
-            onClick={() => setDetailDialogOpen(false)}
-          >
+          <IconButton size="small" onClick={() => setDetailDialogOpen(false)}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -1026,10 +1144,7 @@ export default function AllCharactersTab({
                 <TableBody>
                   {DETAIL_FIELDS.map((field) => {
                     const rawValue = (detailUser as any)[field.key];
-                    const displayValue = formatDetailValue(
-                      field.key,
-                      rawValue
-                    );
+                    const displayValue = formatDetailValue(field.key, rawValue);
                     return (
                       <TableRow
                         key={field.key}
@@ -1113,8 +1228,13 @@ export default function AllCharactersTab({
             startIcon={<CopyIcon />}
             onClick={() => {
               if (detailUser) {
-                navigator.clipboard.writeText(JSON.stringify(detailUser, null, 2));
-                enqueueSnackbar(t('common.copied'), { variant: 'success', autoHideDuration: 1500 });
+                navigator.clipboard.writeText(
+                  JSON.stringify(detailUser, null, 2)
+                );
+                enqueueSnackbar(t('common.copied'), {
+                  variant: 'success',
+                  autoHideDuration: 1500,
+                });
               }
             }}
           >

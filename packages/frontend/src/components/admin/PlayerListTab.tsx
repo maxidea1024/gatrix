@@ -43,7 +43,10 @@ import {
   Info as InfoIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
-import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import {
+  formatRelativeTime,
+  formatDateTimeDetailed,
+} from '../../utils/dateFormat';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -297,7 +300,10 @@ const PlayerListTab: React.FC<Props> = ({
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailUser, setDetailUser] = useState<ConnectedUser | null>(null);
 
-  const handleRowMenuOpen = (e: React.MouseEvent<HTMLElement>, user: ConnectedUser) => {
+  const handleRowMenuOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    user: ConnectedUser
+  ) => {
     setRowMenuAnchor(e.currentTarget);
     setSelectedUser(user);
   };
@@ -321,7 +327,10 @@ const PlayerListTab: React.FC<Props> = ({
 
   const formatDetailValue = (key: string, value: any): string => {
     if (value === null || value === undefined) return '-';
-    if (key === 'isBot') return value ? t('playerConnections.players.botLabel') : t('playerConnections.players.playerLabel');
+    if (key === 'isBot')
+      return value
+        ? t('playerConnections.players.botLabel')
+        : t('playerConnections.players.playerLabel');
     if (key === 'connectedAt') return formatDateTimeDetailed(value);
     return String(value);
   };
@@ -469,7 +478,9 @@ const PlayerListTab: React.FC<Props> = ({
 
   const getGroupLabel = (colId: string, value: any): string => {
     if (colId === 'isBot') {
-      return value ? t('playerConnections.players.botLabel') : t('playerConnections.players.playerLabel');
+      return value
+        ? t('playerConnections.players.botLabel')
+        : t('playerConnections.players.playerLabel');
     }
     if (value === undefined || value === null || value === '') return '-';
     return String(value);
@@ -481,7 +492,10 @@ const PlayerListTab: React.FC<Props> = ({
     const groups = new Map<string, ConnectedUser[]>();
     for (const user of users) {
       const rawVal = user[groupBy];
-      const key = rawVal === undefined || rawVal === null || rawVal === '' ? '__empty__' : String(rawVal);
+      const key =
+        rawVal === undefined || rawVal === null || rawVal === ''
+          ? '__empty__'
+          : String(rawVal);
       if (!groups.has(key)) {
         groups.set(key, []);
       }
@@ -493,7 +507,10 @@ const PlayerListTab: React.FC<Props> = ({
       .sort((a, b) => b[1].length - a[1].length)
       .map(([key, groupUsers]) => ({
         key,
-        label: getGroupLabel(groupBy, key === '__empty__' ? '' : (groupBy === 'isBot' ? key === 'true' : key)),
+        label: getGroupLabel(
+          groupBy,
+          key === '__empty__' ? '' : groupBy === 'isBot' ? key === 'true' : key
+        ),
         users: groupUsers,
       }));
   }, [users, groupBy, t]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -509,8 +526,19 @@ const PlayerListTab: React.FC<Props> = ({
     'storeCode',
     'appVersion',
   ];
-  const MONO_COLUMNS = ['userId', 'accountId', 'characterId', 'ip', 'nationCmsId'];
-  const CLICKABLE_DETAIL_COLUMNS = ['userId', 'accountId', 'characterId', 'userName'];
+  const MONO_COLUMNS = [
+    'userId',
+    'accountId',
+    'characterId',
+    'ip',
+    'nationCmsId',
+  ];
+  const CLICKABLE_DETAIL_COLUMNS = [
+    'userId',
+    'accountId',
+    'characterId',
+    'userName',
+  ];
 
   const renderCell = (user: ConnectedUser, colId: string) => {
     if (colId === 'connectedAt') {
@@ -528,7 +556,11 @@ const PlayerListTab: React.FC<Props> = ({
       return (
         <Chip
           icon={isBot ? <BotIcon /> : <PersonIcon />}
-          label={isBot ? t('playerConnections.players.botLabel') : t('playerConnections.players.playerLabel')}
+          label={
+            isBot
+              ? t('playerConnections.players.botLabel')
+              : t('playerConnections.players.playerLabel')
+          }
           size="small"
           color={isBot ? 'warning' : 'success'}
           variant="outlined"
@@ -558,13 +590,27 @@ const PlayerListTab: React.FC<Props> = ({
           <Typography
             variant="body2"
             sx={{
-              ...(isMono ? { fontFamily: 'monospace', fontSize: '0.8rem' } : {}),
-              ...(isClickable ? {
-                cursor: 'pointer',
-                '&:hover': { color: 'primary.main', textDecoration: 'underline' },
-              } : {}),
+              ...(isMono
+                ? { fontFamily: 'monospace', fontSize: '0.8rem' }
+                : {}),
+              ...(isClickable
+                ? {
+                    cursor: 'pointer',
+                    '&:hover': {
+                      color: 'primary.main',
+                      textDecoration: 'underline',
+                    },
+                  }
+                : {}),
             }}
-            onClick={isClickable ? () => { setDetailUser(user); setDetailDialogOpen(true); } : undefined}
+            onClick={
+              isClickable
+                ? () => {
+                    setDetailUser(user);
+                    setDetailDialogOpen(true);
+                  }
+                : undefined
+            }
           >
             {value}
           </Typography>
@@ -603,15 +649,10 @@ const PlayerListTab: React.FC<Props> = ({
     userList.map((user, idx) => (
       <TableRow key={user.userId || idx} hover>
         {visibleColumns.map((col) => (
-          <TableCell key={col.id}>
-            {renderCell(user, col.id)}
-          </TableCell>
+          <TableCell key={col.id}>{renderCell(user, col.id)}</TableCell>
         ))}
         <TableCell align="center">
-          <IconButton
-            size="small"
-            onClick={(e) => handleRowMenuOpen(e, user)}
-          >
+          <IconButton size="small" onClick={(e) => handleRowMenuOpen(e, user)}>
             <MoreVertIcon fontSize="small" />
           </IconButton>
         </TableCell>
@@ -645,7 +686,11 @@ const PlayerListTab: React.FC<Props> = ({
                 <ExpandLessIcon fontSize="small" />
               )}
             </IconButton>
-            <Typography variant="subtitle2" fontWeight={700} color="primary.main">
+            <Typography
+              variant="subtitle2"
+              fontWeight={700}
+              color="primary.main"
+            >
               {group.label}
             </Typography>
             <Chip
@@ -693,10 +738,7 @@ const PlayerListTab: React.FC<Props> = ({
 
         {/* GroupBy selector */}
         <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel
-            id="groupby-label"
-            sx={{ fontSize: '0.8125rem' }}
-          >
+          <InputLabel id="groupby-label" sx={{ fontSize: '0.8125rem' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <GroupIcon sx={{ fontSize: 16 }} />
               {t('playerConnections.groupBy.label')}
@@ -713,7 +755,11 @@ const PlayerListTab: React.FC<Props> = ({
             }}
           >
             {GROUPABLE_COLUMNS.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: '0.8125rem' }}>
+              <MenuItem
+                key={opt.value}
+                value={opt.value}
+                sx={{ fontSize: '0.8125rem' }}
+              >
                 {t(opt.labelKey)}
               </MenuItem>
             ))}
@@ -846,12 +892,20 @@ const PlayerListTab: React.FC<Props> = ({
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <MenuItem onClick={handleViewDetails}>
-          <ListItemIcon><InfoIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('playerConnections.allPlayers.viewDetails')}</ListItemText>
+          <ListItemIcon>
+            <InfoIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {t('playerConnections.allPlayers.viewDetails')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={handleKickFromMenu}>
-          <ListItemIcon><KickIcon fontSize="small" color="error" /></ListItemIcon>
-          <ListItemText sx={{ color: 'error.main' }}>{t('common.kick') || 'Kick'}</ListItemText>
+          <ListItemIcon>
+            <KickIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText sx={{ color: 'error.main' }}>
+            {t('common.kick') || 'Kick'}
+          </ListItemText>
         </MenuItem>
       </Menu>
 
@@ -891,7 +945,11 @@ const PlayerListTab: React.FC<Props> = ({
                     return (
                       <TableRow
                         key={field.key}
-                        sx={{ '&:last-child td, &:last-child th': { borderBottom: 0 } }}
+                        sx={{
+                          '&:last-child td, &:last-child th': {
+                            borderBottom: 0,
+                          },
+                        }}
                       >
                         <TableCell
                           component="th"
@@ -909,11 +967,23 @@ const PlayerListTab: React.FC<Props> = ({
                           {t(field.labelKey)}
                         </TableCell>
                         <TableCell sx={{ borderColor: 'divider' }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}
+                          >
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: ['characterId', 'accountId', 'ip'].includes(field.key) ? 'monospace' : undefined,
+                                fontFamily: [
+                                  'characterId',
+                                  'accountId',
+                                  'ip',
+                                ].includes(field.key)
+                                  ? 'monospace'
+                                  : undefined,
                                 wordBreak: 'break-all',
                               }}
                             >
@@ -922,8 +992,15 @@ const PlayerListTab: React.FC<Props> = ({
                             {displayValue !== '-' && (
                               <IconButton
                                 size="small"
-                                onClick={() => handleCopy(String(rawValue ?? ''))}
-                                sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, ml: 1, flexShrink: 0 }}
+                                onClick={() =>
+                                  handleCopy(String(rawValue ?? ''))
+                                }
+                                sx={{
+                                  opacity: 0.4,
+                                  '&:hover': { opacity: 1 },
+                                  ml: 1,
+                                  flexShrink: 0,
+                                }}
                               >
                                 <CopyIcon sx={{ fontSize: 14 }} />
                               </IconButton>
@@ -945,8 +1022,13 @@ const PlayerListTab: React.FC<Props> = ({
             startIcon={<CopyIcon />}
             onClick={() => {
               if (detailUser) {
-                navigator.clipboard.writeText(JSON.stringify(detailUser, null, 2));
-                enqueueSnackbar(t('common.copied'), { variant: 'success', autoHideDuration: 1500 });
+                navigator.clipboard.writeText(
+                  JSON.stringify(detailUser, null, 2)
+                );
+                enqueueSnackbar(t('common.copied'), {
+                  variant: 'success',
+                  autoHideDuration: 1500,
+                });
               }
             }}
           >

@@ -224,7 +224,16 @@ export class PlayerConnectionsController {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const { page, limit, search, worldId, sortBy, sortDesc, isOnline, loginPlatform } = req.query;
+      const {
+        page,
+        limit,
+        search,
+        worldId,
+        sortBy,
+        sortDesc,
+        isOnline,
+        loginPlatform,
+      } = req.query;
 
       const admindUrl = await getAdmindApiUrl(environmentId);
 
@@ -259,10 +268,7 @@ export class PlayerConnectionsController {
           data: response.data,
         });
       } catch (error: any) {
-        logger.error(
-          'Failed to get all players from admind:',
-          error.message
-        );
+        logger.error('Failed to get all players from admind:', error.message);
         throw new GatrixError(
           'Failed to retrieve all players from game server',
           502
@@ -282,7 +288,16 @@ export class PlayerConnectionsController {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const { page, limit, search, worldId, sortBy, sortDesc, isOnline, loginPlatform } = req.query;
+      const {
+        page,
+        limit,
+        search,
+        worldId,
+        sortBy,
+        sortDesc,
+        isOnline,
+        loginPlatform,
+      } = req.query;
 
       const admindUrl = await getAdmindApiUrl(environmentId);
 

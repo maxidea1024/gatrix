@@ -393,20 +393,33 @@ const PlayerConnectionsPage: React.FC = () => {
                       >
                         {ccuData?.total?.toLocaleString() ?? '-'}
                       </Typography>
-                      {ccuData && prevCcuRef.current && (() => {
-                        const delta = ccuData.total - prevCcuRef.current.total;
-                        if (delta === 0) return null;
-                        return (
-                          <Typography
-                            variant="caption"
-                            fontWeight={600}
-                            sx={{ display: 'inline-flex', alignItems: 'center', mt: 0.5, color: delta > 0 ? 'success.main' : 'error.main' }}
-                          >
-                            {delta > 0 ? <ArrowUpIcon sx={{ fontSize: 14 }} /> : <ArrowDownIcon sx={{ fontSize: 14 }} />}
-                            {Math.abs(delta).toLocaleString()}
-                          </Typography>
-                        );
-                      })()}
+                      {ccuData &&
+                        prevCcuRef.current &&
+                        (() => {
+                          const delta =
+                            ccuData.total - prevCcuRef.current.total;
+                          if (delta === 0) return null;
+                          return (
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                mt: 0.5,
+                                color:
+                                  delta > 0 ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {delta > 0 ? (
+                                <ArrowUpIcon sx={{ fontSize: 14 }} />
+                              ) : (
+                                <ArrowDownIcon sx={{ fontSize: 14 }} />
+                              )}
+                              {Math.abs(delta).toLocaleString()}
+                            </Typography>
+                          );
+                        })()}
                       {ccuData && (
                         <Box
                           sx={{
@@ -489,7 +502,11 @@ const PlayerConnectionsPage: React.FC = () => {
                       >
                         {t('playerConnections.ccu.worldCount')}
                       </Typography>
-                      <Typography variant="h4" fontWeight={700} color="primary.main">
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color="primary.main"
+                      >
                         {ccuData?.worlds?.length ?? '-'}
                       </Typography>
                     </Box>

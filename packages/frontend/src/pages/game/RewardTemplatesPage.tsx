@@ -51,7 +51,10 @@ import ColumnSettingsDialog, {
 } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardTemplateFormDialog from '../../components/game/RewardTemplateFormDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
