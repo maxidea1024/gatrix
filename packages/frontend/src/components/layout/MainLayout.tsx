@@ -1280,13 +1280,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               display: 'flex',
               alignItems: 'center',
               gap: 1,
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.8,
-              },
-            }}
-            onClick={() => {
-              navigate('/dashboard');
+              flex: 1,
+              minWidth: 0,
             }}
           >
             <Tooltip
@@ -1299,6 +1294,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               arrow
             >
               <Box
+                onClick={() => navigate('/dashboard')}
                 sx={{
                   width: 32,
                   height: 32,
@@ -1311,6 +1307,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  '&:hover': { opacity: 0.8 },
                 }}
               >
                 <Typography
@@ -1321,12 +1320,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </Typography>
               </Box>
             </Tooltip>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 600, color: theme.palette.text.primary }}
-            >
-              Gatrix
-            </Typography>
+            <SidebarContextSwitcher collapsed={sidebarCollapsed} />
           </Box>
         )}
 
@@ -1336,43 +1330,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               width: '100%',
               display: 'flex',
               justifyContent: 'center',
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.8,
-              },
-            }}
-            onClick={() => {
-              navigate('/dashboard');
             }}
           >
-            <Box
-              sx={{
-                width: 32,
-                height: 32,
-                backgroundColor:
-                  sseConnection.connectionStatus === 'error'
-                    ? theme.palette.error.main
-                    : theme.palette.primary.main,
-                transition: 'background-color 0.3s ease',
-                borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ color: 'white', fontWeight: 'bold' }}
-              >
-                G
-              </Typography>
-            </Box>
+            <SidebarContextSwitcher collapsed={sidebarCollapsed} />
           </Box>
         )}
       </Box>
 
-      {/* Context Switcher: Org / Project / Environment */}
-      <SidebarContextSwitcher collapsed={sidebarCollapsed} />
+
 
       {/* 메뉴 영역 - 스크롤 가능 */}
       <Box

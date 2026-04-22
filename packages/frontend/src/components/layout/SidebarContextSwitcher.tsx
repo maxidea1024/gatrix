@@ -11,12 +11,15 @@ import {
   alpha,
   InputBase,
   Tooltip,
+  Divider,
+  useTheme,
 } from '@mui/material';
 import {
   Business as OrgIcon,
   Folder as ProjectIcon,
   Search as SearchIcon,
   Check as CheckIcon,
+  UnfoldMore as UnfoldMoreIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -39,115 +42,72 @@ const getEnvironmentColor = (type: string, customColor?: string): string => {
   }
 };
 
-// Fixed icon container width to ensure perfect alignment across all 3 rows
-const ICON_CELL = 24;
-
 interface SidebarContextSwitcherProps {
   collapsed: boolean;
 }
 
-// ─── Single row: label + manage icon ───
-interface ContextRowProps {
-  icon: React.ReactNode;
-  label: string;
-  sublabel?: string;
-  onClick: (e: React.MouseEvent<HTMLElement>) => void;
-  loading?: boolean;
-  collapsed?: boolean;
-  tooltipTitle?: string;
-  isLast?: boolean;
+// ─── Searchable list inside popover ───
+interface SelectionListProps<T> {
+  items: T[];
+  getKey: (item: T) => string;
+  getLabel: (item: T) => string;
+  getIcon?: (item: T) => React.ReactNode;
+  selectedKey: string | null;
+  onSelect: (item: T) => void;
+  emptyMessage: string;
+  searchable?: boolean;
+  title?: string;
   onManageClick?: () => void;
   manageTooltip?: string;
 }
 
-const ContextRow: React.FC<ContextRowProps> = ({
-  icon,
-  label,
-  sublabel,
-  onClick,
-  loading,
-  collapsed,
-  tooltipTitle,
-  isLast,
+function SelectionList<T>({
+  items,
+  getKey,
+  getLabel,
+  getIcon,
+  selectedKey,
+  onSelect,
+  emptyMessage,
+  searchable = false,
+  title,
   onManageClick,
   manageTooltip,
-}) => {
-  const content = (
-    <Box
-      onClick={onClick}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        px: collapsed ? 0 : 1.25,
-        py: 0.625,
-        cursor: 'pointer',
-        borderRadius: 0,
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        transition: 'background-color 0.15s ease',
-        borderBottom: !isLast && !collapsed ? '1px solid' : 'none',
-        borderColor: 'divider',
-        '&:hover': {
-          bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.05)'
-              : 'rgba(79,70,229,0.04)',
-        },
-      }}
-    >
-      {/* Fixed-width icon cell */}
-      <Box
-        sx={{
-          width: ICON_CELL,
-          height: ICON_CELL,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        {icon}
-      </Box>
+}: SelectionListProps<T>) {
+  const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
 
-      {/* Label */}
-      {!collapsed && (
-        <>
-          <Box sx={{ minWidth: 0, flex: 1 }}>
-            {loading ? (
-              <Skeleton width={80} height={16} sx={{ borderRadius: 0.5 }} />
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: '0.8125rem',
-                  lineHeight: 1.4,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {label}
-              </Typography>
-            )}
-            {sublabel && !loading && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{
-                  fontSize: '0.6875rem',
-                  lineHeight: 1.2,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  display: 'block',
-                  opacity: 0.7,
-                }}
-              >
-                {sublabel}
-              </Typography>
-            )}
-          </Box>
+  const filtered = useMemo(() => {
+    if (!search.trim()) return items;
+    const q = search.toLowerCase();
+    return items.filter((item) => getLabel(item).toLowerCase().includes(q));
+  }, [items, search, getLabel]);
+
+  return (
+    <Box>
+      {title && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 1.5,
+            pt: 1,
+            pb: 0.5,
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontSize: '0.6875rem',
+              opacity: 0.5,
+            }}
+          >
+            {title}
+          </Typography>
           {onManageClick && (
             <Tooltip title={manageTooltip || ''} placement="top" arrow>
               <Box
@@ -160,14 +120,14 @@ const ContextRow: React.FC<ContextRowProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
                   borderRadius: 0.5,
-                  flexShrink: 0,
-                  opacity: 0,
+                  cursor: 'pointer',
+                  opacity: 0.4,
                   transition: 'opacity 0.15s ease, background-color 0.15s ease',
-                  '.MuiBox-root:hover > &': { opacity: 1 },
                   '&:hover': {
+                    opacity: 1,
                     bgcolor: (theme) =>
                       theme.palette.mode === 'dark'
                         ? 'rgba(255,255,255,0.1)'
@@ -175,108 +135,14 @@ const ContextRow: React.FC<ContextRowProps> = ({
                   },
                 }}
               >
-                <SettingsIcon sx={{ fontSize: 13, opacity: 0.5 }} />
+                <SettingsIcon sx={{ fontSize: 13 }} />
               </Box>
             </Tooltip>
           )}
-        </>
+        </Box>
       )}
-    </Box>
-  );
-
-  if (collapsed && tooltipTitle) {
-    return (
-      <Tooltip title={tooltipTitle} placement="right" arrow>
-        {content}
-      </Tooltip>
-    );
-  }
-  return content;
-};
-
-// ─── Searchable popover list ───
-interface PopoverListProps<T> {
-  anchorEl: HTMLElement | null;
-  onClose: () => void;
-  items: T[];
-  getKey: (item: T) => string;
-  getLabel: (item: T) => string;
-  getSublabel?: (item: T) => string | undefined;
-  getIcon?: (item: T) => React.ReactNode;
-  selectedKey: string | null;
-  onSelect: (item: T) => void;
-  emptyMessage: string;
-  searchable?: boolean;
-}
-
-function PopoverList<T>({
-  anchorEl,
-  onClose,
-  items,
-  getKey,
-  getLabel,
-  getSublabel,
-  getIcon,
-  selectedKey,
-  onSelect,
-  emptyMessage,
-  searchable = false,
-}: PopoverListProps<T>) {
-  const [search, setSearch] = useState('');
-  const searchRef = useRef<HTMLInputElement>(null);
-
-  const filtered = useMemo(() => {
-    if (!search.trim()) return items;
-    const q = search.toLowerCase();
-    return items.filter((item) => getLabel(item).toLowerCase().includes(q));
-  }, [items, search, getLabel]);
-
-  const handleClose = () => {
-    setSearch('');
-    onClose();
-  };
-
-  return (
-    <Popover
-      open={Boolean(anchorEl)}
-      anchorEl={anchorEl}
-      onClose={handleClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-      transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-      slotProps={{
-        paper: {
-          sx: {
-            mt: 0.5,
-            minWidth: 220,
-            maxWidth: 320,
-            maxHeight: 360,
-            borderRadius: 1.5,
-            boxShadow: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)'
-                : '0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
-            overflow: 'hidden',
-          },
-        },
-      }}
-      TransitionProps={{
-        onEntered: () => {
-          if (searchable && searchRef.current) {
-            searchRef.current.focus();
-          }
-        },
-      }}
-    >
-      {/* Search */}
       {searchable && items.length > 3 && (
-        <Box
-          sx={{
-            px: 1.5,
-            py: 1,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
+        <Box sx={{ px: 1.5, pb: 0.5 }}>
           <Box
             sx={{
               display: 'flex',
@@ -291,7 +157,7 @@ function PopoverList<T>({
                   : 'rgba(0,0,0,0.03)',
             }}
           >
-            <SearchIcon sx={{ fontSize: 16, opacity: 0.4 }} />
+            <SearchIcon sx={{ fontSize: 14, opacity: 0.4 }} />
             <InputBase
               inputRef={searchRef}
               placeholder="Search..."
@@ -299,13 +165,12 @@ function PopoverList<T>({
               onChange={(e) => setSearch(e.target.value)}
               sx={{ fontSize: '0.8125rem', flex: 1 }}
               size="small"
+              autoFocus={searchable}
             />
           </Box>
         </Box>
       )}
-
-      {/* Items */}
-      <List dense sx={{ py: 0.5, overflow: 'auto', maxHeight: 300 }}>
+      <List dense sx={{ py: 0.5, maxHeight: 200, overflow: 'auto' }}>
         {filtered.length === 0 ? (
           <ListItemButton disabled dense>
             <ListItemText
@@ -321,15 +186,11 @@ function PopoverList<T>({
           filtered.map((item) => {
             const key = getKey(item);
             const isSelected = key === selectedKey;
-
             return (
               <ListItemButton
                 key={key}
                 selected={isSelected}
-                onClick={() => {
-                  onSelect(item);
-                  handleClose();
-                }}
+                onClick={() => onSelect(item)}
                 dense
                 sx={{
                   py: 0.5,
@@ -350,14 +211,9 @@ function PopoverList<T>({
                 )}
                 <ListItemText
                   primary={getLabel(item)}
-                  secondary={getSublabel?.(item)}
                   primaryTypographyProps={{
                     variant: 'body2',
                     fontWeight: isSelected ? 600 : 400,
-                    noWrap: true,
-                  }}
-                  secondaryTypographyProps={{
-                    variant: 'caption',
                     noWrap: true,
                   }}
                 />
@@ -371,16 +227,17 @@ function PopoverList<T>({
           })
         )}
       </List>
-    </Popover>
+    </Box>
   );
 }
 
-// ─── Main component ───
+// ─── Main component: Header-integrated context switcher ───
 const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
   collapsed,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const theme = useTheme();
   const {
     organisations,
     currentOrg,
@@ -401,27 +258,26 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
     switchEnvironment,
   } = useEnvironment();
 
-  // Popover anchors
-  const [orgAnchor, setOrgAnchor] = useState<HTMLElement | null>(null);
-  const [projAnchor, setProjAnchor] = useState<HTMLElement | null>(null);
-  const [envAnchor, setEnvAnchor] = useState<HTMLElement | null>(null);
+  // Main popover anchor
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const open = Boolean(anchorEl);
 
-  const handleOrgClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
+  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    setOrgAnchor(e.currentTarget);
+    setAnchorEl(e.currentTarget);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
   }, []);
 
   const handleSelectOrg = useCallback(
     (org: (typeof organisations)[0]) => {
       switchOrg(org.id);
+      handleClose();
     },
-    [switchOrg]
+    [switchOrg, handleClose]
   );
-
-  const handleProjClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    setProjAnchor(e.currentTarget);
-  }, []);
 
   const orgProjects = useMemo(
     () =>
@@ -434,22 +290,19 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
   const handleSelectProject = useCallback(
     (proj: (typeof projects)[0]) => {
       switchProject(proj.id);
+      handleClose();
     },
-    [switchProject]
+    [switchProject, handleClose]
   );
-
-  const handleEnvClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    setEnvAnchor(e.currentTarget);
-  }, []);
 
   const handleSelectEnv = useCallback(
     (env: (typeof environments)[0]) => {
       if (currentOrgId && currentProjectId) {
         switchEnvironment(currentOrgId, currentProjectId, env.environmentId);
       }
+      handleClose();
     },
-    [currentOrgId, currentProjectId, switchEnvironment]
+    [currentOrgId, currentProjectId, switchEnvironment, handleClose]
   );
 
   // Labels
@@ -472,130 +325,206 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
       )
     : '#757575';
 
-  // Environment color dot icon (consistent 18×18 cell like other icons)
-  const envDotIcon = (
-    <Box
-      sx={{
-        width: 8,
-        height: 8,
-        borderRadius: '50%',
-        bgcolor: envColor,
-        boxShadow: `0 0 6px ${alpha(envColor, 0.5)}`,
-      }}
-    />
-  );
+  const isLoading =
+    (orgLoading && organisations.length === 0) ||
+    (envLoading && environments.length === 0);
 
-  return (
+  // ─── Trigger element ───
+  const trigger = collapsed ? (
+    // Collapsed: G icon with env-color ring
+    <Tooltip
+      title={`${envLabel} — ${orgLabel} / ${projLabel}`}
+      placement="right"
+      arrow
+    >
+      <Box
+        onClick={handleOpen}
+        sx={{
+          width: 32,
+          height: 32,
+          backgroundColor: theme.palette.primary.main,
+          borderRadius: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          border: `2px solid ${envColor}`,
+          transition: 'all 0.15s ease',
+          '&:hover': { opacity: 0.8 },
+        }}
+      >
+        <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+          G
+        </Typography>
+      </Box>
+    </Tooltip>
+  ) : (
+    // Expanded: env name + breadcrumb + unfold icon
     <Box
+      onClick={handleOpen}
       sx={{
-        mx: collapsed ? 0.5 : 0,
-        my: 0,
-        flexShrink: 0,
-        borderRadius: 0,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        bgcolor: (theme) =>
-          theme.palette.mode === 'dark'
-            ? 'rgba(255,255,255,0.02)'
-            : 'rgba(79,70,229,0.015)',
-        overflow: 'hidden',
-        position: 'relative',
-        zIndex: 1,
-        boxShadow: (theme) =>
-          theme.palette.mode === 'dark'
-            ? '0 2px 6px rgba(0,0,0,0.3)'
-            : '0 2px 6px rgba(0,0,0,0.06)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.75,
+        cursor: 'pointer',
+        borderRadius: 1,
+        px: 0.75,
+        py: 0.5,
+        minWidth: 0,
+        flex: 1,
+        transition: 'background-color 0.15s ease',
+        '&:hover': {
+          bgcolor: (th) =>
+            th.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.04)',
+        },
       }}
     >
-      {/* Org */}
-      <ContextRow
-        icon={<OrgIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
-        label={orgLabel}
-        onClick={handleOrgClick}
-        loading={orgLoading && organisations.length === 0}
-        collapsed={collapsed}
-        tooltipTitle={orgLabel}
-        onManageClick={() => navigate('/admin/workspace?tab=organisations')}
-        manageTooltip={t('sidebar.context.manage')}
-      />
-
-      {/* Project */}
-      <ContextRow
-        icon={<ProjectIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
-        label={projLabel}
-        onClick={handleProjClick}
-        loading={orgLoading && projects.length === 0}
-        collapsed={collapsed}
-        tooltipTitle={projLabel}
-        onManageClick={() => navigate('/admin/workspace?tab=projects')}
-        manageTooltip={t('sidebar.context.manage')}
-      />
-
-      {/* Environment */}
-      <ContextRow
-        icon={envDotIcon}
-        label={envLabel}
-        onClick={handleEnvClick}
-        loading={envLoading && environments.length === 0}
-        collapsed={collapsed}
-        tooltipTitle={envLabel}
-        isLast
-        onManageClick={() => navigate('/admin/workspace?tab=environments')}
-        manageTooltip={t('sidebar.context.manage')}
-      />
-
-      {/* Popovers */}
-      <PopoverList
-        anchorEl={orgAnchor}
-        onClose={() => setOrgAnchor(null)}
-        items={organisations}
-        getKey={(o) => o.id}
-        getLabel={(o) => o.displayName || o.orgName}
-        getIcon={() => <OrgIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
-        selectedKey={currentOrgId}
-        onSelect={handleSelectOrg}
-        emptyMessage={t('sidebar.context.noOrgs')}
-        searchable
-      />
-
-      <PopoverList
-        anchorEl={projAnchor}
-        onClose={() => setProjAnchor(null)}
-        items={orgProjects}
-        getKey={(p) => p.id}
-        getLabel={(p) => p.displayName || p.projectName}
-        getIcon={() => <ProjectIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
-        selectedKey={currentProjectId}
-        onSelect={handleSelectProject}
-        emptyMessage={t('sidebar.context.noProjects')}
-        searchable
-      />
-
-      <PopoverList
-        anchorEl={envAnchor}
-        onClose={() => setEnvAnchor(null)}
-        items={environments}
-        getKey={(e) => e.environmentId}
-        getLabel={(e) => e.displayName || e.environmentName}
-        getIcon={(e) => {
-          const c = getEnvironmentColor(e.environmentType, e.color);
-          return (
-            <Box
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        {isLoading ? (
+          <Skeleton width={60} height={16} sx={{ borderRadius: 0.5 }} />
+        ) : (
+          <>
+            <Typography
+              variant="body2"
               sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                bgcolor: c,
-                boxShadow: `0 0 4px ${alpha(c, 0.5)}`,
+                fontWeight: 700,
+                fontSize: '0.875rem',
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                color: envColor,
               }}
-            />
-          );
+            >
+              {envLabel}
+            </Typography>
+            <Tooltip
+              title={`${orgLabel} / ${projLabel}`}
+              placement="bottom"
+              arrow
+            >
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  fontSize: '0.625rem',
+                  lineHeight: 1.2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'block',
+                  opacity: 0.6,
+                }}
+              >
+                {orgLabel} / {projLabel}
+              </Typography>
+            </Tooltip>
+          </>
+        )}
+      </Box>
+      <UnfoldMoreIcon
+        sx={{
+          fontSize: 16,
+          opacity: 0.4,
+          flexShrink: 0,
         }}
-        selectedKey={currentEnvironmentId}
-        onSelect={handleSelectEnv}
-        emptyMessage={t('sidebar.context.noEnvironments')}
       />
     </Box>
+  );
+
+  const triggerElement = trigger;
+
+  return (
+    <>
+      {triggerElement}
+
+      {/* ─── Combined popover with all 3 sections ─── */}
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 0.5,
+              width: 280,
+              maxHeight: 500,
+              borderRadius: 2,
+              boxShadow: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? '0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)'
+                  : '0 12px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.04)',
+              overflow: 'auto',
+            },
+          },
+        }}
+      >
+        {/* Organisation */}
+        <SelectionList
+          title={t('sidebar.context.organisation', 'Organisation')}
+          items={organisations}
+          getKey={(o) => o.id}
+          getLabel={(o) => o.displayName || o.orgName}
+          getIcon={() => <OrgIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
+          selectedKey={currentOrgId}
+          onSelect={handleSelectOrg}
+          emptyMessage={t('sidebar.context.noOrgs')}
+          searchable
+          onManageClick={() => { handleClose(); navigate('/admin/workspace?tab=organisations'); }}
+          manageTooltip={t('sidebar.context.manage')}
+        />
+
+        <Divider />
+
+        {/* Project */}
+        <SelectionList
+          title={t('sidebar.context.project', 'Project')}
+          items={orgProjects}
+          getKey={(p) => p.id}
+          getLabel={(p) => p.displayName || p.projectName}
+          getIcon={() => <ProjectIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
+          selectedKey={currentProjectId}
+          onSelect={handleSelectProject}
+          emptyMessage={t('sidebar.context.noProjects')}
+          searchable
+          onManageClick={() => { handleClose(); navigate('/admin/workspace?tab=projects'); }}
+          manageTooltip={t('sidebar.context.manage')}
+        />
+
+        <Divider />
+
+        {/* Environment */}
+        <SelectionList
+          title={t('sidebar.context.environment', 'Environment')}
+          items={environments}
+          getKey={(e) => e.environmentId}
+          getLabel={(e) => e.displayName || e.environmentName}
+          getIcon={(e) => {
+            const c = getEnvironmentColor(e.environmentType, e.color);
+            return (
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: c,
+                  boxShadow: `0 0 4px ${alpha(c, 0.5)}`,
+                }}
+              />
+            );
+          }}
+          selectedKey={currentEnvironmentId}
+          onSelect={handleSelectEnv}
+          emptyMessage={t('sidebar.context.noEnvironments')}
+          onManageClick={() => { handleClose(); navigate('/admin/workspace?tab=environments'); }}
+          manageTooltip={t('sidebar.context.manage')}
+        />
+      </Popover>
+    </>
   );
 };
 
