@@ -191,7 +191,7 @@ export class PlayerConnectionsController {
             headers: {
               'Content-Type': 'application/json',
             },
-            timeout: 5000,
+            timeout: 15000,
           }
         );
 
@@ -200,13 +200,34 @@ export class PlayerConnectionsController {
           data: response.data,
         });
       } catch (error: any) {
+        const upstreamStatus = error.response?.status;
+        const upstreamData = error.response?.data;
+        const requestUrl = `${admindUrl}/gatrix/v1/users${queryStr}`;
         logger.error(
-          'Failed to get connected users from admind:',
-          error.message
+          'Failed to get connected users from admind',
+          {
+            message: error.message,
+            code: error.code,
+            url: requestUrl,
+            upstreamStatus,
+            upstreamError: upstreamData?.error || upstreamData,
+          }
         );
+        const detail = upstreamStatus
+          ? `Admind returned ${upstreamStatus}: ${upstreamData?.error || error.message}`
+          : `Admind unreachable: ${error.code || error.message}`;
         throw new GatrixError(
-          'Failed to retrieve connected users from game server',
-          502
+          `Failed to retrieve connected users: ${detail}`,
+          502,
+          true,
+          'UPSTREAM_ERROR',
+          {
+            admindUrl: requestUrl,
+            upstreamStatus: upstreamStatus || null,
+            upstreamError: upstreamData?.error || null,
+            errorCode: error.code || null,
+            errorMessage: error.message,
+          }
         );
       }
     }

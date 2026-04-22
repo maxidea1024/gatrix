@@ -932,25 +932,50 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         onImport={async (data) => {
           let successCount = 0;
           let failCount = 0;
+          const failedItems: string[] = [];
           for (const item of data) {
             try {
+              const ipAddress = (
+                item[t('ipWhitelist.ipAddress')] ||
+                item.ipAddress ||
+                ''
+              ).toString().trim();
+              const purpose = (
+                item[t('ipWhitelist.purpose')] ||
+                item.purpose ||
+                ''
+              ).toString().trim();
+
+              if (!ipAddress) {
+                failCount++;
+                failedItems.push(`(empty ipAddress)`);
+                continue;
+              }
+
               await IpWhitelistService.createIpWhitelist({
-                ipAddress:
-                  item[t('ipWhitelist.ipAddress')] || item.ipAddress || '',
-                purpose: item[t('ipWhitelist.purpose')] || item.purpose || '',
+                ipAddress,
+                purpose: purpose || 'Imported',
                 isEnabled: true,
               });
               successCount++;
-            } catch (err) {
+            } catch (err: any) {
               failCount++;
+              const ip = item[t('ipWhitelist.ipAddress')] || item.ipAddress || '?';
+              failedItems.push(ip.toString());
             }
           }
           if (successCount > 0) {
-            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            enqueueSnackbar(
+              t('common.importSuccess') + ` (${successCount}/${data.length})`,
+              { variant: 'success' }
+            );
             loadIpWhitelists();
           }
           if (failCount > 0) {
-            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+            enqueueSnackbar(
+              t('common.importFailed') + ` (${failCount}): ${failedItems.slice(0, 5).join(', ')}`,
+              { variant: 'error' }
+            );
           }
         }}
       />
