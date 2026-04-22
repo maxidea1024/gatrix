@@ -737,7 +737,7 @@ const PlanningDataPage: React.FC = () => {
         actions={
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
-              variant="outlined"
+              variant="contained"
               startIcon={<RefreshIcon />}
               onClick={loadStats}
               disabled={loading || rebuilding}

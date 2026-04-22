@@ -219,7 +219,7 @@ const MultiLanguageMessageInput = forwardRef<
               <Tooltip title={translateTooltip}>
                 <span>
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     size="small"
                     startIcon={
                       isTranslating ? (

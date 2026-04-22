@@ -642,7 +642,7 @@ const GatrixEdgesPage: React.FC = () => {
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             size="small"
-            variant="outlined"
+            variant="contained"
             startIcon={
               fullJsonLoading === instance.instanceId ? (
                 <CircularProgress size={14} color="inherit" />
@@ -658,7 +658,7 @@ const GatrixEdgesPage: React.FC = () => {
           </Button>
           <Button
             size="small"
-            variant="outlined"
+            variant="contained"
             startIcon={<BarChartIcon fontSize="small" />}
             onClick={() => handleViewRequestStats(instance)}
             sx={{ fontSize: '0.75rem', textTransform: 'none' }}
@@ -667,7 +667,7 @@ const GatrixEdgesPage: React.FC = () => {
           </Button>
           <Button
             size="small"
-            variant="outlined"
+            variant="contained"
             startIcon={<StreamIcon fontSize="small" />}
             onClick={() => handleViewStreamingStats(instance)}
             sx={{ fontSize: '0.75rem', textTransform: 'none' }}
@@ -676,7 +676,7 @@ const GatrixEdgesPage: React.FC = () => {
           </Button>
           <Button
             size="small"
-            variant="outlined"
+            variant="contained"
             color="warning"
             startIcon={
               cacheInvalidating &&

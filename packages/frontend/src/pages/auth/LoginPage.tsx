@@ -1041,7 +1041,7 @@ const LoginPage: React.FC = () => {
         <DialogActions sx={{ p: 3, gap: 1 }}>
           <Button
             onClick={handleRememberMeCancel}
-            variant="outlined"
+            variant="contained"
             startIcon={<Cancel />}
             sx={{
               borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -1162,7 +1162,7 @@ const LoginPage: React.FC = () => {
           )}
           <Button
             fullWidth
-            variant="outlined"
+            variant="contained"
             onClick={() => setLockedDialogOpen(false)}
             sx={{
               color: 'rgba(255, 255, 255, 0.7)',

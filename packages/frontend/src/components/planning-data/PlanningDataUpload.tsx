@@ -544,7 +544,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {t('planningData.upload.or') || 'or'}
             </Typography>
-            <Button variant="outlined" component="label" disabled={uploading}>
+            <Button variant="contained" component="label" disabled={uploading}>
               {t('planningData.upload.selectFiles') || 'Select Files'}
               <input
                 ref={fileInputRef}
@@ -661,7 +661,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
               {filesToUpload.size})
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={handleClear}
               disabled={uploading || selectedFiles.length === 0}
             >
@@ -757,7 +757,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
         </DialogContent>
         <DialogActions>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={() => {
               setShowAlreadyUpToDateDialog(false);
               if (onClose) onClose();
@@ -1128,7 +1128,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
         </DialogContent>
         <DialogActions>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={() => setShowPreviewDialog(false)}
           >
             {t('common.cancel') || 'Cancel'}

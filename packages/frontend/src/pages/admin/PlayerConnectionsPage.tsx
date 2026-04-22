@@ -24,6 +24,7 @@ import {
   alpha,
   Divider,
   Chip,
+  Avatar,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -52,6 +53,8 @@ import PageContentLoader from '../../components/common/PageContentLoader';
 import PageHeader from '../../components/common/PageHeader';
 import CcuGraphTab from '../../components/admin/CcuGraphTab';
 import PlayerListTab from '../../components/admin/PlayerListTab';
+import AllPlayersTab from '../../components/admin/AllPlayersTab';
+import AllCharactersTab from '../../components/admin/AllCharactersTab';
 
 const REFRESH_STORAGE_KEY = 'playerConnections.refreshInterval';
 const REFRESH_OPTIONS = [
@@ -168,7 +171,7 @@ const PlayerConnectionsPage: React.FC = () => {
 
   // Auto-refresh (only for Overview and CCU Graph tabs, not Player List)
   useEffect(() => {
-    if (refreshInterval > 0 && admindApiUrl && activeTab !== 2) {
+    if (refreshInterval > 0 && admindApiUrl && activeTab < 2) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
     return () => {
@@ -240,7 +243,7 @@ const PlayerConnectionsPage: React.FC = () => {
             <Button
               color="inherit"
               size="small"
-              variant="outlined"
+              variant="contained"
               startIcon={<SettingsIcon />}
               onClick={() => navigate('/settings/system?tab=0')}
             >
@@ -265,7 +268,7 @@ const PlayerConnectionsPage: React.FC = () => {
         title={t('playerConnections.title')}
         subtitle={t('playerConnections.subtitle')}
         actions={
-          activeTab !== 2 ? (
+          activeTab < 2 ? (
             <>
               <ButtonGroup
                 variant="contained"
@@ -275,7 +278,7 @@ const PlayerConnectionsPage: React.FC = () => {
                 <Button startIcon={<RefreshIcon />} onClick={loadCcu}>
                   {t('common.refresh')}
                 </Button>
-                {activeTab !== 2 && (
+                {activeTab < 2 && (
                   <Button
                     size="small"
                     onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
@@ -327,6 +330,8 @@ const PlayerConnectionsPage: React.FC = () => {
         <Tab label={t('playerConnections.tabs.overview')} />
         <Tab label={t('playerConnections.tabs.ccuGraph')} />
         <Tab label={t('playerConnections.tabs.players')} />
+        <Tab label={t('playerConnections.tabs.allPlayers')} />
+        <Tab label={t('playerConnections.tabs.allCharacters')} />
       </Tabs>
 
       {/* Tab 0: Overview */}
@@ -347,203 +352,243 @@ const PlayerConnectionsPage: React.FC = () => {
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card
-                variant="outlined"
                 sx={(theme) => ({
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
                   height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
                 })}
               >
-                <CardContent sx={{ py: 2 }}>
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
                   <Box
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      mb: 1,
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <CcuIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
-                    >
-                      {t('playerConnections.ccu.total')}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h3"
-                    fontWeight={700}
-                    color="primary.main"
-                  >
-                    {ccuData?.total?.toLocaleString() ?? '-'}
-                  </Typography>
-                  {ccuData &&
-                    prevCcuRef.current &&
-                    (() => {
-                      const delta = ccuData.total - prevCcuRef.current.total;
-                      if (delta === 0) return null;
-                      return (
-                        <Typography
-                          variant="caption"
-                          fontWeight={600}
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.ccu.total')}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color="primary.main"
+                      >
+                        {ccuData?.total?.toLocaleString() ?? '-'}
+                      </Typography>
+                      {ccuData && prevCcuRef.current && (() => {
+                        const delta = ccuData.total - prevCcuRef.current.total;
+                        if (delta === 0) return null;
+                        return (
+                          <Typography
+                            variant="caption"
+                            fontWeight={600}
+                            sx={{ display: 'inline-flex', alignItems: 'center', mt: 0.5, color: delta > 0 ? 'success.main' : 'error.main' }}
+                          >
+                            {delta > 0 ? <ArrowUpIcon sx={{ fontSize: 14 }} /> : <ArrowDownIcon sx={{ fontSize: 14 }} />}
+                            {Math.abs(delta).toLocaleString()}
+                          </Typography>
+                        );
+                      })()}
+                      {ccuData && (
+                        <Box
                           sx={{
-                            display: 'inline-flex',
+                            display: 'flex',
                             alignItems: 'center',
-                            ml: 1,
-                            color: delta > 0 ? 'success.main' : 'error.main',
+                            gap: 1.5,
+                            mt: 0.5,
                           }}
                         >
-                          {delta > 0 ? (
-                            <ArrowUpIcon sx={{ fontSize: 14 }} />
-                          ) : (
-                            <ArrowDownIcon sx={{ fontSize: 14 }} />
-                          )}
-                          {Math.abs(delta).toLocaleString()}
-                        </Typography>
-                      );
-                    })()}
-                  {ccuData && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        mt: 0.5,
-                      }}
+                          <Typography variant="caption" color="text.secondary">
+                            <PeopleIcon
+                              sx={{
+                                fontSize: 12,
+                                mr: 0.25,
+                                verticalAlign: 'middle',
+                              }}
+                            />
+                            {ccuData.total.toLocaleString()}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            <BotIcon
+                              sx={{
+                                fontSize: 12,
+                                mr: 0.25,
+                                verticalAlign: 'middle',
+                              }}
+                            />
+                            {(ccuData.botTotal || 0).toLocaleString()}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                        color: 'primary.main',
+                        width: 48,
+                        height: 48,
+                      })}
                     >
-                      <Typography variant="caption" color="text.secondary">
-                        <PeopleIcon
-                          sx={{
-                            fontSize: 12,
-                            mr: 0.25,
-                            verticalAlign: 'middle',
-                          }}
-                        />
-                        {ccuData.total.toLocaleString()}
+                      <CcuIcon />
+                    </Avatar>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                sx={(theme) => ({
+                  height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                })}
+              >
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.ccu.worldCount')}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        <BotIcon
-                          sx={{
-                            fontSize: 12,
-                            mr: 0.25,
-                            verticalAlign: 'middle',
-                          }}
-                        />
-                        {(ccuData.botTotal || 0).toLocaleString()}
+                      <Typography variant="h4" fontWeight={700} color="primary.main">
+                        {ccuData?.worlds?.length ?? '-'}
                       </Typography>
                     </Box>
-                  )}
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                        color: 'primary.main',
+                        width: 48,
+                        height: 48,
+                      })}
+                    >
+                      <WorldIcon />
+                    </Avatar>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card
-                variant="outlined"
                 sx={(theme) => ({
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.main, 0.02)} 100%)`,
-                  borderColor: alpha(theme.palette.info.main, 0.2),
                   height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
                 })}
               >
-                <CardContent sx={{ py: 2 }}>
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
                   <Box
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      mb: 1,
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <WorldIcon sx={{ fontSize: 18, color: 'info.main' }} />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.ccu.peakWorld')}
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        fontWeight={700}
+                        color="primary.main"
+                        noWrap
+                      >
+                        {ccuData?.worlds?.length
+                          ? (() => {
+                              const top = [...ccuData.worlds].sort(
+                                (a, b) => b.count - a.count
+                              )[0];
+                              return `${top.name || top.worldId}`;
+                            })()
+                          : '-'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {ccuData?.worlds?.length
+                          ? `${[...ccuData.worlds].sort((a, b) => b.count - a.count)[0].count.toLocaleString()} players`
+                          : ''}
+                      </Typography>
+                    </Box>
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                        color: 'primary.main',
+                        width: 48,
+                        height: 48,
+                      })}
                     >
-                      {t('playerConnections.ccu.worldCount')}
-                    </Typography>
+                      <TrendingUpIcon />
+                    </Avatar>
                   </Box>
-                  <Typography variant="h3" fontWeight={700} color="info.main">
-                    {ccuData?.worlds?.length ?? '-'}
-                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card
-                variant="outlined"
                 sx={(theme) => ({
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.08)} 0%, ${alpha(theme.palette.success.main, 0.02)} 100%)`,
-                  borderColor: alpha(theme.palette.success.main, 0.2),
-                  height: '100%',
-                })}
-              >
-                <CardContent sx={{ py: 2 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      mb: 1,
-                    }}
-                  >
-                    <TrendingUpIcon
-                      sx={{ fontSize: 18, color: 'success.main' }}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
-                    >
-                      {t('playerConnections.ccu.peakWorld')}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h5"
-                    fontWeight={700}
-                    color="success.main"
-                    noWrap
-                  >
-                    {ccuData?.worlds?.length
-                      ? (() => {
-                          const top = [...ccuData.worlds].sort(
-                            (a, b) => b.count - a.count
-                          )[0];
-                          return `${top.name || top.worldId}`;
-                        })()
-                      : '-'}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {ccuData?.worlds?.length
-                      ? `${[...ccuData.worlds].sort((a, b) => b.count - a.count)[0].count.toLocaleString()} players`
-                      : ''}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card
-                variant="outlined"
-                sx={(theme) => ({
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.08)} 0%, ${alpha(theme.palette.error.main, 0.02)} 100%)`,
-                  borderColor: alpha(theme.palette.error.main, 0.2),
                   height: '100%',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease-in-out',
+                  position: 'relative',
+                  overflow: 'hidden',
                   '&:hover': {
-                    borderColor: alpha(theme.palette.error.main, 0.5),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.error.main, 0.15)}`,
-                    transform: 'translateY(-2px)',
-                    '& .kick-icon-wrapper': {
-                      transform: 'scale(1.1)',
-                      bgcolor: alpha(theme.palette.error.main, 0.2),
-                    },
+                    transform: 'translateY(-4px)',
+                    boxShadow: theme.shadows[8],
                   },
                 })}
                 onClick={() => {
@@ -551,55 +596,53 @@ const PlayerConnectionsPage: React.FC = () => {
                   setKickOpen(true);
                 }}
               >
-                <CardContent sx={{ py: 2 }}>
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.error.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
                   <Box
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      mb: 1.5,
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <KickIcon sx={{ fontSize: 18, color: 'error.main' }} />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
-                    >
-                      {t('playerConnections.kick.title')}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 1,
-                      py: 1,
-                    }}
-                  >
-                    <Box
-                      className="kick-icon-wrapper"
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.kick.title')}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="error.main"
+                        fontWeight={600}
+                        sx={{ mt: 1 }}
+                      >
+                        {t('playerConnections.kick.openDialog')}
+                      </Typography>
+                    </Box>
+                    <Avatar
                       sx={(theme) => ({
-                        width: 44,
-                        height: 44,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        bgcolor: alpha(theme.palette.error.main, 0.12),
-                        transition: 'all 0.2s ease-in-out',
+                        bgcolor: alpha(theme.palette.error.main, 0.15),
+                        color: 'error.main',
+                        width: 48,
+                        height: 48,
                       })}
                     >
-                      <KickIcon sx={{ fontSize: 22, color: 'error.main' }} />
-                    </Box>
-                    <Typography
-                      variant="body2"
-                      color="error.main"
-                      fontWeight={600}
-                    >
-                      {t('playerConnections.kick.openDialog')}
-                    </Typography>
+                      <KickIcon />
+                    </Avatar>
                   </Box>
                 </CardContent>
               </Card>
@@ -609,6 +652,7 @@ const PlayerConnectionsPage: React.FC = () => {
           {/* Per-world cards */}
           {ccuData?.worlds && ccuData.worlds.length > 0 && (
             <Box>
+              <Divider sx={{ mb: 3 }} />
               <Box
                 sx={{
                   display: 'flex',
@@ -826,6 +870,22 @@ const PlayerConnectionsPage: React.FC = () => {
           projectApiPath={projectApiPath}
           worlds={ccuData?.worlds || []}
           onKickUser={openKickForUser}
+        />
+      )}
+
+      {/* Tab 3: All Players (DB) */}
+      {activeTab === 3 && projectApiPath && (
+        <AllPlayersTab
+          projectApiPath={projectApiPath}
+          worlds={ccuData?.worlds || []}
+        />
+      )}
+
+      {/* Tab 4: All Characters (DB) */}
+      {activeTab === 4 && projectApiPath && (
+        <AllCharactersTab
+          projectApiPath={projectApiPath}
+          worlds={ccuData?.worlds || []}
         />
       )}
 

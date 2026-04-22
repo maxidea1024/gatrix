@@ -121,7 +121,7 @@ const WhitelistOverview: React.FC = () => {
             <Grid size={{ xs: 12, md: 3 }}>
               <Button
                 fullWidth
-                variant="outlined"
+                variant="contained"
                 onClick={handleReset}
                 disabled={testing}
                 sx={{ height: '56px' }}

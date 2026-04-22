@@ -551,7 +551,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             >
               <Button
                 size="small"
-                variant="outlined"
+                variant="contained"
                 startIcon={<DownloadIcon />}
                 onClick={handleExportSettings}
               >
@@ -559,7 +559,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               </Button>
               <Button
                 size="small"
-                variant="outlined"
+                variant="contained"
                 startIcon={<UploadIcon />}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -567,7 +567,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               </Button>
               <Button
                 size="small"
-                variant="outlined"
+                variant="contained"
                 startIcon={<CopyIcon />}
                 onClick={handleCopySettings}
               >

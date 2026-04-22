@@ -529,7 +529,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         const isResuming = actionLoadingType === 'resume';
         return (
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             size="small"
             onClick={handleResume}
@@ -561,7 +561,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       const isPausing = actionLoadingType === 'pause';
       return (
         <Button
-          variant="outlined"
+          variant="contained"
           color="warning"
           size="small"
           onClick={handlePause}
@@ -591,7 +591,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     return (
       <Button
         size="small"
-        variant="outlined"
+        variant="contained"
         color="primary"
         onClick={() => handleStartMilestoneClick(milestoneId)}
         startIcon={showStartNow ? <StartIcon /> : undefined}

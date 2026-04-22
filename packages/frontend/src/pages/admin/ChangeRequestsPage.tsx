@@ -758,7 +758,7 @@ const ChangeRequestsPage: React.FC = () => {
         subtitle={t('changeRequest.subtitle')}
         actions={
           <Button
-            variant="outlined"
+            variant="contained"
             startIcon={<RefreshIcon />}
             onClick={handleRefresh}
           >

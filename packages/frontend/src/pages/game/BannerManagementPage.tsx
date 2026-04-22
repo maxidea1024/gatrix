@@ -50,7 +50,7 @@ import ColumnSettingsDialog, {
 } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import BannerFormDialog from '../../components/game/BannerFormDialog';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -549,7 +549,7 @@ const BannerManagementPage: React.FC = () => {
             {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             size="small"
             startIcon={<DeleteIcon />}
@@ -715,7 +715,15 @@ const BannerManagementPage: React.FC = () => {
                           if (column.id === 'createdAt')
                             return (
                               <TableCell key={column.id}>
-                                {formatDateTimeDetailed(banner.createdAt)}
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    banner.createdAt
+                                  )}
+                                >
+                                  <Typography variant="body2" component="span">
+                                    {formatRelativeTime(banner.createdAt)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           if (column.id === 'tags') {

@@ -153,7 +153,7 @@ export const ChangeRequestSubmitButtons: React.FC<
                 <Box sx={{ p: 0.5 }}>
                   <Button
                     fullWidth
-                    variant="outlined"
+                    variant="contained"
                     color="warning"
                     size="small"
                     startIcon={<FlashOnIcon fontSize="small" />}

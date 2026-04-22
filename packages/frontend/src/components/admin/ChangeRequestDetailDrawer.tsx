@@ -1382,7 +1382,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               }}
                             >
                               <Button
-                                variant="outlined"
+                                variant="contained"
                                 color="error"
                                 size="small"
                                 startIcon={
@@ -1613,7 +1613,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                         variant="outlined"
                         action={
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             color="warning"
                             size="small"
                             startIcon={<UndoIcon />}
@@ -1658,7 +1658,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                             <Box sx={{ display: 'flex', gap: 1 }}>
                               <Button
                                 size="small"
-                                variant="outlined"
+                                variant="contained"
                                 color="error"
                                 startIcon={
                                   actionLoading ? (

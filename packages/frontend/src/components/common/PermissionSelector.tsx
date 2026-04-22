@@ -154,7 +154,7 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
           >
             {t('common.selectAll')}
           </Button>
-          <Button size="small" variant="outlined" onClick={handleClearAll}>
+          <Button size="small" variant="contained" onClick={handleClearAll}>
             {t('common.clearAll')}
           </Button>
           <Typography

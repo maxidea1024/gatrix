@@ -575,7 +575,7 @@ const WhitelistPage: React.FC = () => {
             subtitle={t('whitelist.subtitle')}
             actions={
               <Button
-                variant="outlined"
+                variant="contained"
                 startIcon={<InfoOutlinedIcon />}
                 onClick={() => setFullInfoDrawerOpen(true)}
               >

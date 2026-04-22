@@ -270,7 +270,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
         {(type === 'DUPLICATE' || type === 'CONFLICT') && onDelete && (
           <Button
             onClick={handleDelete}
-            variant="outlined"
+            variant="contained"
             color="error"
             startIcon={<DeleteIcon />}
           >

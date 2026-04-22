@@ -364,7 +364,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
             </Button>
             <Button
               size="small"
-              variant="outlined"
+              variant="contained"
               color="error"
               onClick={() => respondToInvitation(invitation.id, 'decline')}
               disabled={processingInvitations.has(invitation.id)}
@@ -419,7 +419,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
         <ListItemSecondaryAction>
           <Button
             size="small"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() => cancelInvitation(invitation.id)}
             disabled={processingInvitations.has(invitation.id)}

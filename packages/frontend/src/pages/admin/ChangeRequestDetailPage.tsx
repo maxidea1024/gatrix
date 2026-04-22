@@ -924,7 +924,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                           }}
                         >
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             color="error"
                             onClick={handleReject}
                             disabled={actionLoading || !comment.trim()}
@@ -1051,7 +1051,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                         )}
                       </Box>
                       <Button
-                        variant="outlined"
+                        variant="contained"
                         color="error"
                         startIcon={<DeleteIcon />}
                         onClick={handleDelete}
@@ -1119,7 +1119,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <Button
-                        variant="outlined"
+                        variant="contained"
                         color="error"
                         startIcon={<DeleteIcon />}
                         onClick={handleDelete}
@@ -1539,7 +1539,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                   autoFocus
                 />
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   color="error"
                   onClick={handleReject}
                   disabled={actionLoading || !comment.trim()}

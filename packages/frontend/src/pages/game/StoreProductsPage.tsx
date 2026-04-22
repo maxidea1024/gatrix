@@ -75,7 +75,7 @@ import ColumnSettingsDialog, {
 } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
@@ -1701,14 +1701,30 @@ const StoreProductsPage: React.FC = () => {
                           if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
-                                {formatDateTimeDetailed(product.createdAt)}
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    product.createdAt
+                                  )}
+                                >
+                                  <Typography variant="body2" component="span">
+                                    {formatRelativeTime(product.createdAt)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           }
                           if (column.id === 'updatedAt') {
                             return (
                               <TableCell key={column.id}>
-                                {formatDateTimeDetailed(product.updatedAt)}
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    product.updatedAt
+                                  )}
+                                >
+                                  <Typography variant="body2" component="span">
+                                    {formatRelativeTime(product.updatedAt)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           }

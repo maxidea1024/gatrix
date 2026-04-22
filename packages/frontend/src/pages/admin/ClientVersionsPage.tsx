@@ -1898,7 +1898,7 @@ const ClientVersionsPage: React.FC = () => {
                 )}
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   onClick={(e) => setSelectedExportMenuAnchor(e.currentTarget)}
                   startIcon={<DownloadIcon />}
                   endIcon={<ArrowDropDownIcon />}
@@ -1933,7 +1933,7 @@ const ClientVersionsPage: React.FC = () => {
                 </Menu>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   onClick={() => {
                     setSelectedIds([]);
                     setSelectAll(false);
@@ -2576,7 +2576,7 @@ const ClientVersionsPage: React.FC = () => {
           </Button>
           {requiresApproval && hasPermission([P.CHANGE_REQUESTS_SKIP]) && (
             <Button
-              variant="outlined"
+              variant="contained"
               color="warning"
               onClick={() => handleBulkDelete(true)}
               startIcon={<FlashOnIcon />}
@@ -2718,7 +2718,7 @@ const ClientVersionsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setTagDialogOpen(false)} variant="outlined">
+          <Button onClick={() => setTagDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

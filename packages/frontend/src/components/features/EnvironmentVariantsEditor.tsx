@@ -1466,7 +1466,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   })
                 : t('common.unsavedChanges')}
           </Typography>
-          <Button variant="outlined" size="small" onClick={handleResetAll}>
+          <Button variant="contained" size="small" onClick={handleResetAll}>
             {t('common.reset')}
           </Button>
           <Button

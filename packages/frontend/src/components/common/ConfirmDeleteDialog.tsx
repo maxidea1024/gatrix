@@ -96,7 +96,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
         <Button
           onClick={onClose}
-          variant="outlined"
+          variant="contained"
           disabled={loading}
           sx={{ minWidth: 80 }}
         >

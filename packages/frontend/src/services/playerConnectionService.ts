@@ -31,6 +31,12 @@ export interface ConnectedUser {
   worldName?: string;
   connectedAt?: string;
   ip?: string;
+  level?: number;
+  nationCmsId?: number;
+  isBot?: boolean;
+  storeCode?: string;
+  appVersion?: string;
+  deviceType?: string;
   [key: string]: any; // Allow additional fields from admind API
 }
 
@@ -50,6 +56,32 @@ export interface KickRequest {
 
 export interface KickResponse {
   kicked: number;
+}
+
+export interface AllPlayer {
+  userId: number;
+  characterId: string;
+  name: string;
+  nationCmsId: number;
+  worldId: string;
+  accountId: string;
+  isOnline: boolean;
+  lastLoginTimeUtc: string | null;
+  loginPlatform: string;
+  clientVersion: string;
+  lastWorldId: string;
+  accessLevel: number;
+  createTimeUtc: string | null;
+  blockTimeUtcByAdmin: string | null;
+  revokedTimeUtc: string | null;
+  lastUserId: number | null;
+}
+
+export interface AllPlayersResponse {
+  users: AllPlayer[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 // Service
@@ -123,6 +155,74 @@ const playerConnectionService = {
       request
     );
     return res.data || { kicked: 0 };
+  },
+
+  /**
+   * Get all registered players from game DB (via admind)
+   * Server-side pagination
+   */
+  async getAllPlayers(
+    projectApiPath: string,
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      worldId?: string;
+      sortBy?: string;
+      sortDesc?: boolean;
+      isOnline?: string;
+      loginPlatform?: string;
+    }
+  ): Promise<AllPlayersResponse> {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.search) searchParams.set('search', params.search);
+    if (params.worldId) searchParams.set('worldId', params.worldId);
+    if (params.sortBy) searchParams.set('sortBy', params.sortBy);
+    if (params.sortDesc !== undefined)
+      searchParams.set('sortDesc', String(params.sortDesc));
+    if (params.isOnline !== undefined && params.isOnline !== '')
+      searchParams.set('isOnline', params.isOnline);
+    if (params.loginPlatform)
+      searchParams.set('loginPlatform', params.loginPlatform);
+
+    const res = await api.get(
+      `${projectApiPath}/player-connections/all-players?${searchParams}`
+    );
+    return res.data || { users: [], total: 0, page: 1, limit: 20 };
+  },
+
+  async getAllCharacters(
+    projectApiPath: string,
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      worldId?: string;
+      sortBy?: string;
+      sortDesc?: boolean;
+      isOnline?: string;
+      loginPlatform?: string;
+    }
+  ): Promise<AllPlayersResponse> {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.search) searchParams.set('search', params.search);
+    if (params.worldId) searchParams.set('worldId', params.worldId);
+    if (params.sortBy) searchParams.set('sortBy', params.sortBy);
+    if (params.sortDesc !== undefined)
+      searchParams.set('sortDesc', String(params.sortDesc));
+    if (params.isOnline !== undefined && params.isOnline !== '')
+      searchParams.set('isOnline', params.isOnline);
+    if (params.loginPlatform)
+      searchParams.set('loginPlatform', params.loginPlatform);
+
+    const res = await api.get(
+      `${projectApiPath}/player-connections/all-characters?${searchParams}`
+    );
+    return res.data || { users: [], total: 0, page: 1, limit: 20 };
   },
 };
 

@@ -2094,7 +2094,7 @@ const ApiTokensPage: React.FC = () => {
               {t('common.selectedItems', { count: selectedTokenIds.length })}
             </Typography>
             <Button
-              variant="outlined"
+              variant="contained"
               color="error"
               size="small"
               startIcon={<DeleteIcon />}
@@ -2400,7 +2400,7 @@ const ApiTokensPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button
-            variant="outlined"
+            variant="contained"
             startIcon={<CopyIcon />}
             onClick={async () => {
               await copyToClipboardWithNotification(
@@ -3293,7 +3293,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeBulkDeleteDrawer} variant="outlined">
+          <Button onClick={closeBulkDeleteDrawer} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

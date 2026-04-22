@@ -2549,7 +2549,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   <>
                     <Divider />
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       color={flag.isArchived ? 'success' : 'warning'}
                       startIcon={<ArchiveIcon />}
                       onClick={handleArchiveClick}
@@ -2561,7 +2561,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         : t('featureFlags.archive')}
                     </Button>
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       color={flag.stale ? 'info' : 'secondary'}
                       startIcon={<StaleIcon />}
                       onClick={handleStaleClick}
@@ -2573,7 +2573,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         : t('featureFlags.markStale')}
                     </Button>
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       color="primary"
                       startIcon={<EditIcon />}
                       onClick={() => {
@@ -2600,7 +2600,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     </Button>
                     {flag.isArchived && (
                       <Button
-                        variant="outlined"
+                        variant="contained"
                         color="error"
                         startIcon={<DeleteIcon />}
                         onClick={() => setDeleteDialogOpen(true)}
@@ -3833,7 +3833,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     }}
                   >
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       onClick={() => {
                         if (originalFlag) {
                           setFlag((prev) =>

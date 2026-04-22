@@ -1817,7 +1817,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           {canManage && (
             <Button
               size="small"
-              variant="outlined"
+              variant="contained"
               startIcon={<AddIcon />}
               onClick={handleOpenAddDialog}
               sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}
@@ -1943,7 +1943,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             {expandedConfig?.title || t('impactMetrics.expandedView')}
           </Typography>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={() => setExpandedConfig(null)}
             size="small"
           >

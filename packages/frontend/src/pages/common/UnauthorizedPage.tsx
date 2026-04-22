@@ -112,7 +112,7 @@ const UnauthorizedPage: React.FC = () => {
 
         {/* Dashboard Button */}
         <Button
-          variant="outlined"
+          variant="contained"
           size="large"
           startIcon={<HomeIcon />}
           onClick={handleGoHome}
@@ -131,7 +131,7 @@ const UnauthorizedPage: React.FC = () => {
 
         {/* Go Back Button */}
         <Button
-          variant="outlined"
+          variant="contained"
           size="large"
           startIcon={<ArrowBackIcon />}
           onClick={handleGoBack}

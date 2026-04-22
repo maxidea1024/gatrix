@@ -100,7 +100,7 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
     <Box>
       {/* Dropdown Trigger Button */}
       <Button
-        variant="outlined"
+        variant="contained"
         onClick={handleClick}
         endIcon={<ArrowDownIcon />}
         sx={{
@@ -142,10 +142,10 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
             alignItems: 'center',
           }}
         >
-          <Button size="small" variant="outlined" onClick={handleSelectAll}>
+          <Button size="small" variant="contained" onClick={handleSelectAll}>
             {t('common.selectAll')}
           </Button>
-          <Button size="small" variant="outlined" onClick={handleDeselectAll}>
+          <Button size="small" variant="contained" onClick={handleDeselectAll}>
             {t('common.deselectAll')}
           </Button>
           <Typography

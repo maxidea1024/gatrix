@@ -421,7 +421,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
               <Tooltip title={t('releaseFlow.safeguard.evaluateDesc')}>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   startIcon={
                     evaluating ? (
                       <CircularProgress size={14} />
@@ -461,7 +461,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
               <Tooltip title={t('releaseFlow.safeguard.evaluateDesc')}>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   startIcon={
                     evaluating ? (
                       <CircularProgress size={14} />
@@ -955,7 +955,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                   placeholder="e.g. GET"
                 />
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   onClick={handleAddLabelFilter}
                   disabled={!newLabelKey.trim()}

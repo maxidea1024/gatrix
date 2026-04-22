@@ -101,7 +101,7 @@ const PendingApprovalPage: React.FC = () => {
 
         {/* Action Button */}
         <Button
-          variant="outlined"
+          variant="contained"
           size="large"
           startIcon={<ArrowBackIcon />}
           onClick={handleBackToLogin}

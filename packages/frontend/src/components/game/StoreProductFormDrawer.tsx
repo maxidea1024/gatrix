@@ -630,7 +630,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                         <Button
                           color="warning"
                           size="small"
-                          variant="outlined"
+                          variant="contained"
                           startIcon={<ResetIcon />}
                           onClick={handleResetAllOverrides}
                           disabled={saving}

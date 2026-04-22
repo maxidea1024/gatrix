@@ -1789,7 +1789,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
             {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             size="small"
             startIcon={<DeleteIcon />}

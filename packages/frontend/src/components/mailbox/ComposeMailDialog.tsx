@@ -636,7 +636,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                       : t('mailbox.retranslate')}
                   </Button>
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     color="secondary"
                     onClick={handleCancelTranslation}
                   >

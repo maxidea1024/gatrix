@@ -164,7 +164,7 @@ const ForgotPasswordPage: React.FC = () => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={() => {
               setEmailSent(false);
               setMessage(null);

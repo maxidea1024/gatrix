@@ -507,7 +507,7 @@ const ProfilePage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, mt: { xs: 2, sm: 2 } }}>
               {isEditing ? (
                 <>
-                  <Button variant="outlined" onClick={handleEditToggle}>
+                  <Button variant="contained" onClick={handleEditToggle}>
                     {t('common.cancel')}
                   </Button>
                   <Button
@@ -527,7 +527,7 @@ const ProfilePage: React.FC = () => {
                 </>
               ) : (
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   startIcon={<EditIcon />}
                   onClick={handleEditToggle}
                 >
@@ -626,7 +626,7 @@ const ProfilePage: React.FC = () => {
                 </Box>
                 <Divider sx={{ mb: 2 }} />
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   onClick={handlePasswordDialogOpen}
                   fullWidth
                 >

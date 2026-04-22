@@ -1433,7 +1433,7 @@ const MaintenancePage: React.FC = () => {
                     </Button>
                   )}
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     onClick={() => setEditMode((v) => !v)}
                     sx={{ width: 140 }}
                   >

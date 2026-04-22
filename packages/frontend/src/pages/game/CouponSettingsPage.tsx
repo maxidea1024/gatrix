@@ -2979,7 +2979,7 @@ const CouponSettingsPage: React.FC = () => {
                 sx={{ maxWidth: 'none', flex: 1 }}
               />
               <Button
-                variant="outlined"
+                variant="contained"
                 size="small"
                 startIcon={<DownloadIcon />}
                 endIcon={<ArrowDropDownIcon />}

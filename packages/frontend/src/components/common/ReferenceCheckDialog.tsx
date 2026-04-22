@@ -85,7 +85,7 @@ const ReferenceCheckDialog: React.FC<ReferenceCheckDialogProps> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} variant="outlined" sx={{ minWidth: 80 }}>
+        <Button onClick={onClose} variant="contained" sx={{ minWidth: 80 }}>
           {t('common.close')}
         </Button>
       </DialogActions>

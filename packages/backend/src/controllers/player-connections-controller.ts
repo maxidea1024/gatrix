@@ -71,6 +71,13 @@ async function admindRequest(
     if (err.name === 'AbortError') {
       throw new GatrixError('Admind API request timed out', 504);
     }
+    logger.error('Admind API connection failed', {
+      url,
+      method,
+      error: err.message,
+      code: err.code,
+      cause: err.cause?.message || err.cause?.code || undefined,
+    });
     throw new GatrixError(`Admind API connection failed: ${err.message}`, 502);
   }
 }
@@ -199,6 +206,123 @@ export class PlayerConnectionsController {
         );
         throw new GatrixError(
           'Failed to retrieve connected users from game server',
+          502
+        );
+      }
+    }
+  );
+
+  /**
+   * GET /all-players
+   * Query all registered players from game auth DB via admind.
+   * Server-side pagination is enforced.
+   */
+  static getAllPlayers = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const { page, limit, search, worldId, sortBy, sortDesc, isOnline, loginPlatform } = req.query;
+
+      const admindUrl = await getAdmindApiUrl(environmentId);
+
+      const queryParams = new URLSearchParams();
+      if (page) queryParams.append('page', String(page));
+      if (limit) queryParams.append('limit', String(limit));
+      if (search) queryParams.append('search', String(search));
+      if (worldId) queryParams.append('worldId', String(worldId));
+      if (sortBy) queryParams.append('sortBy', String(sortBy));
+      if (sortDesc !== undefined)
+        queryParams.append('sortDesc', String(sortDesc));
+      if (isOnline !== undefined && isOnline !== '')
+        queryParams.append('isOnline', String(isOnline));
+      if (loginPlatform)
+        queryParams.append('loginPlatform', String(loginPlatform));
+
+      const queryStr = queryParams.toString()
+        ? `?${queryParams.toString()}`
+        : '';
+
+      try {
+        const response = await axios.get(
+          `${admindUrl}/gatrix/v1/all-players${queryStr}`,
+          {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 10000,
+          }
+        );
+
+        res.json({
+          success: true,
+          data: response.data,
+        });
+      } catch (error: any) {
+        logger.error(
+          'Failed to get all players from admind:',
+          error.message
+        );
+        throw new GatrixError(
+          'Failed to retrieve all players from game server',
+          502
+        );
+      }
+    }
+  );
+
+  /**
+   * GET /all-characters
+   * Returns all characters from admind (one row per character).
+   */
+  static getAllCharacters = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const { page, limit, search, worldId, sortBy, sortDesc, isOnline, loginPlatform } = req.query;
+
+      const admindUrl = await getAdmindApiUrl(environmentId);
+
+      const queryParams = new URLSearchParams();
+      if (page) queryParams.append('page', String(page));
+      if (limit) queryParams.append('limit', String(limit));
+      if (search) queryParams.append('search', String(search));
+      if (worldId) queryParams.append('worldId', String(worldId));
+      if (sortBy) queryParams.append('sortBy', String(sortBy));
+      if (sortDesc !== undefined)
+        queryParams.append('sortDesc', String(sortDesc));
+      if (isOnline !== undefined && isOnline !== '')
+        queryParams.append('isOnline', String(isOnline));
+      if (loginPlatform)
+        queryParams.append('loginPlatform', String(loginPlatform));
+
+      const queryStr = queryParams.toString()
+        ? `?${queryParams.toString()}`
+        : '';
+
+      try {
+        const response = await axios.get(
+          `${admindUrl}/gatrix/v1/all-characters${queryStr}`,
+          {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 10000,
+          }
+        );
+
+        res.json({
+          success: true,
+          data: response.data,
+        });
+      } catch (error: any) {
+        logger.error(
+          'Failed to get all characters from admind:',
+          error.message
+        );
+        throw new GatrixError(
+          'Failed to retrieve all characters from game server',
           502
         );
       }

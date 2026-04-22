@@ -98,7 +98,7 @@ const InvalidInvitePage: React.FC = () => {
         </Button>
 
         <Button
-          variant="outlined"
+          variant="contained"
           size="large"
           startIcon={<RegisterIcon />}
           onClick={handleGoToRegister}

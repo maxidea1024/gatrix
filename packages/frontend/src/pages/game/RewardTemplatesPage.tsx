@@ -51,7 +51,7 @@ import ColumnSettingsDialog, {
 } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardTemplateFormDialog from '../../components/game/RewardTemplateFormDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
@@ -747,7 +747,7 @@ const RewardTemplatesPage: React.FC = () => {
             {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             size="small"
             startIcon={<DeleteIcon />}
@@ -897,7 +897,15 @@ const RewardTemplatesPage: React.FC = () => {
                           if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
-                                {formatDateTimeDetailed(template.createdAt)}
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    template.createdAt
+                                  )}
+                                >
+                                  <Typography variant="body2" component="span">
+                                    {formatRelativeTime(template.createdAt)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           }

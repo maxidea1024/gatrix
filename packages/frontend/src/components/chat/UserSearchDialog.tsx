@@ -486,7 +486,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                       if (isPendingInvited) {
                         return (
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             size="small"
                             disabled
                             startIcon={<PersonAddIcon />}
@@ -508,7 +508,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                       // 초대 가능한 경우
                       return (
                         <Button
-                          variant="outlined"
+                          variant="contained"
                           size="small"
                           startIcon={
                             isInviting ? (

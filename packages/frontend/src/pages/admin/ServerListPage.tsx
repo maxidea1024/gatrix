@@ -4240,7 +4240,7 @@ const ServerListPage: React.FC = () => {
                   {groupingLevels.length < allGroupingFields.length && (
                     <Button
                       size="small"
-                      variant="outlined"
+                      variant="contained"
                       onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
                       sx={{
                         height: 24,

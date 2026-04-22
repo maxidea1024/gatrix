@@ -360,7 +360,7 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
                             />
                           </Box>
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             size="small"
                             onClick={() => {
                               const newSet = new Set(expandedSegments);

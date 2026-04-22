@@ -239,7 +239,7 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
             {value.length > 0 && (
               <Button
                 fullWidth
-                variant="outlined"
+                variant="contained"
                 onClick={handleAddReward}
                 disabled={disabled}
               >

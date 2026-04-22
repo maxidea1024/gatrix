@@ -721,7 +721,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
             {t('settings.kv.resizeArray')}
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             size="small"
             onClick={handleOpenFill}
             disabled={items.length === 0}

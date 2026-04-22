@@ -369,7 +369,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={handleDeleteCancel} variant="outlined">
+          <Button onClick={handleDeleteCancel} variant="contained">
             {t('invitations.cancelButton')}
           </Button>
           <Button

@@ -523,7 +523,7 @@ const CouponUsagePage: React.FC = () => {
         actions={
           <>
             <Button
-              variant="outlined"
+              variant="contained"
               startIcon={<DownloadIcon />}
               onClick={(e) => setExportMenuAnchor(e.currentTarget)}
               disabled={exporting || records.length === 0}

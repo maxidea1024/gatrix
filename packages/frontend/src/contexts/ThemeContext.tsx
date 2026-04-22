@@ -213,6 +213,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         },
       },
       MuiButton: {
+        defaultProps: {
+          variant: 'contained',
+          disableElevation: true,
+        },
         styleOverrides: {
           root: {
             textTransform: 'none',

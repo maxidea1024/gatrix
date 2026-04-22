@@ -14,6 +14,10 @@ router.get('/ccu/history', PlayerConnectionsController.getCcuHistory);
 // Connected users
 router.get('/users', PlayerConnectionsController.getConnectedUsers);
 
+// All players (DB query via admind)
+router.get('/all-players', PlayerConnectionsController.getAllPlayers);
+router.get('/all-characters', PlayerConnectionsController.getAllCharacters);
+
 // Kick
 router.post('/kick', PlayerConnectionsController.kickPlayers);
 

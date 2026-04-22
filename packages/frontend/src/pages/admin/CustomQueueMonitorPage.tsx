@@ -246,7 +246,7 @@ const CustomQueueMonitorPage: React.FC = () => {
           큐 모니터 (커스텀)
         </Typography>
         <Button
-          variant="outlined"
+          variant="contained"
           startIcon={<RefreshIcon />}
           onClick={fetchQueues}
           disabled={loading}

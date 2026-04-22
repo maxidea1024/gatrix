@@ -1082,7 +1082,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 }}
               >
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   startIcon={<AddIcon />}
                   onClick={handleAddContextEntry}
@@ -1090,7 +1090,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   {t('playground.addContextField')}
                 </Button>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   startIcon={<ExtractIcon />}
                   onClick={handleExtractContextFields}

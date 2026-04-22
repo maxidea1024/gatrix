@@ -3056,7 +3056,7 @@ const FeatureFlagsPage: React.FC = () => {
             <Box>
               <Button
                 size="small"
-                variant="outlined"
+                variant="contained"
                 onClick={(e) => setEnvMenuAnchor(e.currentTarget)}
               >
                 {t('common.enable')} / {t('common.disable')}
@@ -3101,7 +3101,7 @@ const FeatureFlagsPage: React.FC = () => {
 
             <Button
               size="small"
-              variant="outlined"
+              variant="contained"
               startIcon={<ArchiveIcon />}
               onClick={handleBulkArchive}
             >
@@ -3110,7 +3110,7 @@ const FeatureFlagsPage: React.FC = () => {
 
             <Button
               size="small"
-              variant="outlined"
+              variant="contained"
               startIcon={<UnarchiveIcon />}
               onClick={handleBulkRevive}
             >
@@ -3121,7 +3121,7 @@ const FeatureFlagsPage: React.FC = () => {
             <Box>
               <Button
                 size="small"
-                variant="outlined"
+                variant="contained"
                 onClick={(e) => setStaleMenuAnchor(e.currentTarget)}
                 startIcon={<StaleIcon />}
               >
@@ -3159,7 +3159,7 @@ const FeatureFlagsPage: React.FC = () => {
 
             <Button
               size="small"
-              variant="outlined"
+              variant="contained"
               color="primary"
               startIcon={<JoystickIcon />}
               onClick={() => {
@@ -4168,7 +4168,7 @@ const FeatureFlagsPage: React.FC = () => {
               {t('featureFlags.importDragDrop')}
             </Typography>
             <Button
-              variant="outlined"
+              variant="contained"
               component="label"
               startIcon={<ImportIcon />}
             >

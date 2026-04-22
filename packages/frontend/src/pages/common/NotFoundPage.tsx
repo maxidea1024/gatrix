@@ -84,7 +84,7 @@ const NotFoundPage: React.FC = () => {
             </Button>
 
             <Button
-              variant="outlined"
+              variant="contained"
               startIcon={<ArrowBack />}
               onClick={handleGoBack}
               sx={{

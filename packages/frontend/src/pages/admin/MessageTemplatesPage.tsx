@@ -88,7 +88,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import {
   messageTemplateService,
   MessageTemplate,
@@ -973,9 +973,11 @@ const MessageTemplatesPage: React.FC = () => {
         return <TagChips tags={template.tags} />;
       case 'createdAt':
         return (
-          <Typography variant="body2">
-            {formatRelativeTime(template.createdAt)}
-          </Typography>
+          <Tooltip title={formatDateTimeDetailed(template.createdAt)}>
+            <Typography variant="body2" component="span">
+              {formatRelativeTime(template.createdAt)}
+            </Typography>
+          </Tooltip>
         );
       default:
         return null;
@@ -1149,7 +1151,7 @@ const MessageTemplatesPage: React.FC = () => {
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   onClick={() => handleBulkToggleAvailability(true)}
                   sx={{ minWidth: 'auto' }}
                 >
@@ -1157,7 +1159,7 @@ const MessageTemplatesPage: React.FC = () => {
                 </Button>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   onClick={() => handleBulkToggleAvailability(false)}
                   sx={{ minWidth: 'auto' }}
                 >
@@ -1165,7 +1167,7 @@ const MessageTemplatesPage: React.FC = () => {
                 </Button>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   color="error"
                   onClick={handleBulkDelete}
                   sx={{ minWidth: 'auto' }}

@@ -186,6 +186,10 @@ Resources:
               Value: 'false'
             - Name: GF_SECURITY_ALLOW_EMBEDDING
               Value: 'true'
+            - Name: GF_SERVER_ROOT_URL
+              Value: '%(protocol)s://%(domain)s:%(http_port)s/grafana/'
+            - Name: GF_SERVER_SERVE_FROM_SUB_PATH
+              Value: 'true'
             - Name: GF_SECURITY_CSRF_TRUSTED_ORIGINS
               Value: '*'
             - Name: GF_LIVE_ALLOWED_ORIGINS

@@ -795,7 +795,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                 sx={{ mx: 1, height: 24, alignSelf: 'center' }}
               />
               <Button
-                variant="outlined"
+                variant="contained"
                 size="small"
                 onClick={handleAddSequence}
               >

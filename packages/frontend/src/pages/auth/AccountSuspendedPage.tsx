@@ -150,7 +150,7 @@ const AccountSuspendedPage: React.FC = () => {
         {/* Action Buttons */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Button
-            variant="outlined"
+            variant="contained"
             size="large"
             startIcon={<ContactSupportIcon />}
             fullWidth

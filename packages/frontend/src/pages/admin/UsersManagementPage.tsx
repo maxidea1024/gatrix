@@ -1810,7 +1810,7 @@ const UsersManagementPage: React.FC = () => {
                 {t('users.addUser')}
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
                 startIcon={<SendIcon />}
                 onClick={() => setInvitationDialogOpen(true)}
                 disabled={!!currentInvitation}
@@ -2543,7 +2543,7 @@ const UsersManagementPage: React.FC = () => {
             onClick={() =>
               setConfirmDialog((prev) => ({ ...prev, open: false }))
             }
-            variant="outlined"
+            variant="contained"
             disabled={confirmDialogLoading}
           >
             {t('common.cancel')}
@@ -2668,7 +2668,7 @@ const UsersManagementPage: React.FC = () => {
               })
             }
             color="inherit"
-            variant="outlined"
+            variant="contained"
           >
             {t('common.cancel')}
           </Button>
@@ -2901,7 +2901,7 @@ const UsersManagementPage: React.FC = () => {
             <>
               <Button
                 onClick={handlePromoteCancel}
-                variant="outlined"
+                variant="contained"
                 disabled={promoteDialog.loading}
               >
                 {t('common.cancel')}
@@ -2919,7 +2919,7 @@ const UsersManagementPage: React.FC = () => {
             <>
               <Button
                 onClick={handlePromoteBackToEdit}
-                variant="outlined"
+                variant="contained"
                 disabled={promoteDialog.loading}
                 startIcon={<ArrowBackIcon />}
               >
@@ -3021,7 +3021,7 @@ const UsersManagementPage: React.FC = () => {
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                       size="small"
-                      variant="outlined"
+                      variant="contained"
                       onClick={() =>
                         handleVerifyUserEmail(editUserDialog.user!.id)
                       }
@@ -3829,7 +3829,7 @@ const UsersManagementPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkActionDialogOpen(false)}
-            variant="outlined"
+            variant="contained"
           >
             {t('common.cancel')}
           </Button>

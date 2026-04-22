@@ -693,7 +693,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
           {canManage && (
             <>
               <Button
-                variant="outlined"
+                variant="contained"
                 startIcon={<CopyIcon />}
                 onClick={() => setCopyDialogOpen(true)}
                 disabled={environments.length < 2}

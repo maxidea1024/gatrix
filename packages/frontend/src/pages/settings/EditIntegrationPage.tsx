@@ -869,7 +869,7 @@ export const EditIntegrationPage: React.FC = () => {
         {/* Action Buttons */}
         <Box display="flex" gap={2} mb={3}>
           <Button
-            variant="outlined"
+            variant="contained"
             startIcon={
               testing ? (
                 <CircularProgress size={16} color="inherit" />

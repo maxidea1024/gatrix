@@ -522,7 +522,7 @@ export const CreateIntegrationPage: React.FC = () => {
 
       {/* Navigation Buttons */}
       <Box display="flex" justifyContent="space-between" mt={3}>
-        <Button variant="outlined" onClick={handleBack}>
+        <Button variant="contained" onClick={handleBack}>
           {activeStep === 0 ? t('common.cancel') : t('common.back')}
         </Button>
         <Button

@@ -159,7 +159,7 @@ const DataManagementPage: React.FC = () => {
                 onChange={handleFileChange}
               />
               <label htmlFor="raised-button-file">
-                <Button variant="outlined" component="span" fullWidth>
+                <Button variant="contained" component="span" fullWidth>
                   {importFile
                     ? importFile.name
                     : t('Select Backup File (.zip)')}
