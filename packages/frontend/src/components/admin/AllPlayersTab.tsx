@@ -1009,7 +1009,10 @@ export default function AllPlayersTab({
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em',
                           bgcolor: (theme) =>
-                            alpha(theme.palette.primary.main, 0.04),
+                            theme.palette.mode === 'dark'
+                              ? '#1e1e2f'
+                              : '#f4f2ff',
+                          zIndex: 2,
                           py: 1,
                           px: 1.5,
                           whiteSpace: 'nowrap',
