@@ -7,8 +7,8 @@ import {
 } from '@mui/icons-material';
 import type { CcuData } from '../../services/playerConnectionService';
 
-// ─── Animated Counter Hook ───
-function useAnimatedNumber(target: number, duration = 800): number {
+// ─── Animated Number Hook (stock ticker tween) ───
+function useAnimatedNumber(target: number): number {
   const [display, setDisplay] = useState(target);
   const prevRef = useRef(target);
   const rafRef = useRef<number>(0);
@@ -20,29 +20,34 @@ function useAnimatedNumber(target: number, duration = 800): number {
 
     if (from === to) return;
 
+    const diff = Math.abs(to - from);
+    // Adaptive duration: small changes are gentle, big changes whiz
+    const duration = Math.min(800, Math.max(400, diff * 2));
     const startTime = performance.now();
-    const diff = to - from;
+    const delta = to - from;
 
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(from + diff * eased));
+      // Exponential ease-out — fast start, smooth landing
+      const eased = 1 - Math.pow(2, -10 * progress);
+      setDisplay(Math.round(from + delta * eased));
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(animate);
+      } else {
+        setDisplay(to);
       }
     };
 
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [target, duration]);
+  }, [target]);
 
   return display;
 }
 
-// ─── Trend indicator ───
+
 type Trend = 'up' | 'down' | 'flat';
 
 function getTrend(current: number, previous: number | undefined): Trend {
@@ -98,14 +103,13 @@ const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({
       viewBox={`0 0 ${W} ${H}`}
       style={{
         position: 'absolute',
-        bottom: '-30%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90vw',
-        maxWidth: 1200,
-        height: 'auto',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: '100%',
+        height: '30vh',
         pointerEvents: 'none',
-        opacity: 0.15,
+        opacity: 0.2,
       }}
       preserveAspectRatio="none"
     >
@@ -143,27 +147,30 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
 }) => {
   const totalCount = ccuData?.total ?? 0;
   const prevTotalCount = prevCcuData?.total;
-  const animatedTotal = useAnimatedNumber(totalCount, 1200);
+  const animatedTotal = useAnimatedNumber(totalCount);
   const totalTrend = getTrend(totalCount, prevTotalCount);
   const totalDelta =
     prevTotalCount !== undefined ? totalCount - prevTotalCount : 0;
+  const tickerDirection = totalDelta > 0 ? 'up' as const : totalDelta < 0 ? 'down' as const : 'none' as const;
 
-  // Pulse animation on total change
-  const [pulse, setPulse] = useState(false);
+  // Track value changes to trigger rumble
+  const [animKey, setAnimKey] = useState(0);
   useEffect(() => {
     if (prevTotalCount !== undefined && totalCount !== prevTotalCount) {
-      setPulse(true);
-      const t = setTimeout(() => setPulse(false), 1000);
-      return () => clearTimeout(t);
+      setAnimKey((k) => k + 1);
     }
   }, [totalCount, prevTotalCount]);
+
+  // Stable ref for onClose to avoid useEffect churn on parent re-renders
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   // Only close scoreboard if user actively exits fullscreen (not on page load)
   const wasFullscreenRef = useRef(!!document.fullscreenElement);
   useEffect(() => {
     const onFsChange = () => {
       if (!document.fullscreenElement && wasFullscreenRef.current) {
-        onClose();
+        onCloseRef.current();
       }
       wasFullscreenRef.current = !!document.fullscreenElement;
     };
@@ -175,19 +182,19 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         document.exitFullscreen?.().catch(() => {});
       }
     };
-  }, [onClose]);
+  }, []);
 
-  // ESC to close (also exits fullscreen via unmount cleanup above)
+  // ESC to close
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
+  }, []);
 
   // Current time
   const [now, setNow] = useState(new Date());
@@ -199,12 +206,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   // CCU history for sparkline
   const historyRef = useRef<number[]>([]);
   useEffect(() => {
-    if (ccuData?.total !== undefined) {
-      historyRef.current = [...historyRef.current, ccuData.total].slice(
-        -MAX_HISTORY
-      );
-    }
-  }, [ccuData?.total]);
+    historyRef.current = [...historyRef.current, totalCount].slice(-MAX_HISTORY);
+  }, [totalCount]);
 
   return (
     <Box
@@ -230,6 +233,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         },
       }}
     >
+      {/* Sparkline trend graph — anchored to bottom of viewport */}
+      <Sparkline data={historyRef.current} trend={totalTrend} />
+
       {/* Top bar */}
       <Box
         sx={{
@@ -322,65 +328,29 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           zIndex: 1,
         }}
       >
-        {/* Ambient glow behind total */}
-        <Box
-          sx={{
-            position: 'absolute',
-            width: 500,
-            height: 500,
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${
-              totalTrend === 'up'
-                ? 'rgba(0,230,118,0.08)'
-                : totalTrend === 'down'
-                  ? 'rgba(255,82,82,0.08)'
-                  : 'rgba(100,180,255,0.06)'
-            } 0%, transparent 70%)`,
-            filter: 'blur(40px)',
-            transition: 'background 1s ease',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Sparkline trend graph */}
-        <Sparkline data={historyRef.current} trend={totalTrend} />
-
         {/* Total CCU number */}
         <Box sx={{ position: 'relative', textAlign: 'center' }}>
-          {pulse && (
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: '-40px -80px',
-                borderRadius: 4,
-                border: `2px solid ${TREND_COLORS[totalTrend]}`,
-                opacity: 0,
-                animation: 'ripple 1s ease-out',
-                '@keyframes ripple': {
-                  '0%': {
-                    opacity: 0.6,
-                    transform: 'scale(0.95)',
-                  },
-                  '100%': {
-                    opacity: 0,
-                    transform: 'scale(1.05)',
-                  },
-                },
-                pointerEvents: 'none',
-              }}
-            />
-          )}
           <Typography
+            key={animKey}
             sx={{
               fontWeight: 900,
-              fontSize: 'clamp(6rem, 18vw, 15rem)',
+              fontSize: 'clamp(4.8rem, 14.4vw, 12rem)',
               lineHeight: 1,
               color: TREND_COLORS[totalTrend],
               fontFamily: '"Inter", "Roboto Mono", monospace',
               fontVariantNumeric: 'tabular-nums',
-              textShadow: `0 0 60px ${TREND_COLORS[totalTrend]}40, 0 0 120px ${TREND_COLORS[totalTrend]}20`,
-              transition: 'color 0.5s ease, text-shadow 0.5s ease',
+              transition: 'color 0.3s ease',
               position: 'relative',
+              animation: animKey > 0 ? 'rumble 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both' : 'none',
+              '@keyframes rumble': {
+                '0%': { transform: 'translate(0, 0)' },
+                '15%': { transform: 'translate(-2px, -2px)' },
+                '30%': { transform: 'translate(2px, 2px)' },
+                '45%': { transform: 'translate(-2px, 2px)' },
+                '60%': { transform: 'translate(2px, -2px)' },
+                '75%': { transform: 'translate(-1px, -1px)' },
+                '100%': { transform: 'translate(0, 0)' },
+              },
             }}
           >
             {animatedTotal === 0 ? '—' : animatedTotal.toLocaleString()}
@@ -405,37 +375,40 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           )}
         </Box>
 
-        {/* Delta & Trend — only show when there IS a change */}
-        {totalDelta !== 0 && (
-          <Box
+        {/* Delta & Trend — always reserve space, fade in/out */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1.5,
+            minHeight: 40,
+            opacity: totalDelta !== 0 ? 1 : 0,
+            transition: 'opacity 0.4s ease',
+          }}
+        >
+          {totalDelta > 0 ? (
+            <TrendingUpIcon
+              sx={{ color: TREND_COLORS.up, fontSize: 28 }}
+            />
+          ) : totalDelta < 0 ? (
+            <TrendingDownIcon
+              sx={{ color: TREND_COLORS.down, fontSize: 28 }}
+            />
+          ) : null}
+          <Typography
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              minHeight: 32,
+              color: TREND_COLORS[totalTrend],
+              fontWeight: 700,
+              fontSize: '1.5rem',
+              fontFamily: '"Inter", monospace',
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {totalTrend === 'up' ? (
-              <TrendingUpIcon sx={{ color: TREND_COLORS.up, fontSize: 28 }} />
-            ) : (
-              <TrendingDownIcon
-                sx={{ color: TREND_COLORS.down, fontSize: 28 }}
-              />
-            )}
-            <Typography
-              sx={{
-                color: TREND_COLORS[totalTrend],
-                fontWeight: 700,
-                fontSize: '1.5rem',
-                fontFamily: '"Inter", monospace',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {totalDelta > 0 ? '+' : ''}
-              {totalDelta.toLocaleString()}
-            </Typography>
-          </Box>
-        )}
+            {totalDelta > 0 ? '+' : ''}
+            {totalDelta.toLocaleString()}
+          </Typography>
+        </Box>
 
         {/* Bot count */}
         {(ccuData?.botTotal ?? 0) > 0 && (
