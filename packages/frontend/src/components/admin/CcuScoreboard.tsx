@@ -366,8 +366,26 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               position: 'relative',
             }}
           >
-            {animatedTotal.toLocaleString()}
+            {animatedTotal === 0 ? '—' : animatedTotal.toLocaleString()}
           </Typography>
+          {totalCount === 0 && (
+            <Typography
+              sx={{
+                color: 'rgba(255,255,255,0.3)',
+                fontSize: '1.2rem',
+                fontWeight: 500,
+                mt: 2,
+                letterSpacing: 1,
+                animation: 'fadeInOut 3s ease-in-out infinite',
+                '@keyframes fadeInOut': {
+                  '0%, 100%': { opacity: 0.3 },
+                  '50%': { opacity: 0.6 },
+                },
+              }}
+            >
+              ⛵ Waiting for adventurers…
+            </Typography>
+          )}
         </Box>
 
         {/* Delta & Trend — only show when there IS a change */}
