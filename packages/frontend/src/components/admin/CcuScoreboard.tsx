@@ -391,7 +391,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               fontWeight: 600,
               letterSpacing: 3,
               textTransform: 'uppercase',
-              mt: 1.5,
+              mt: 0.5,
             }}
           >
             {t('playerConnections.scoreboard.concurrentUsers')}
