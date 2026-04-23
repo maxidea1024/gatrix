@@ -61,7 +61,10 @@ const TREND_COLORS = {
 // ─── Sparkline ───
 const MAX_HISTORY = 60;
 
-const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({ data, trend }) => {
+const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({
+  data,
+  trend,
+}) => {
   if (data.length < 2) return null;
 
   const W = 800;
@@ -78,10 +81,17 @@ const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({ data, trend }) 
     return { x, y };
   });
 
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const linePath = points
+    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`)
+    .join(' ');
   const areaPath = `${linePath} L${points[points.length - 1].x},${H} L${points[0].x},${H} Z`;
 
-  const color = trend === 'up' ? TREND_COLORS.up : trend === 'down' ? TREND_COLORS.down : '#64b4ff';
+  const color =
+    trend === 'up'
+      ? TREND_COLORS.up
+      : trend === 'down'
+        ? TREND_COLORS.down
+        : '#64b4ff';
 
   return (
     <svg
@@ -106,7 +116,14 @@ const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({ data, trend }) 
         </linearGradient>
       </defs>
       <path d={areaPath} fill="url(#sparkFill)" />
-      <path d={linePath} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={linePath}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 };
@@ -117,7 +134,6 @@ interface CcuScoreboardProps {
   prevCcuData: CcuData | null;
   onClose: () => void;
 }
-
 
 // ─── Main Scoreboard Component ───
 const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
@@ -184,11 +200,11 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   const historyRef = useRef<number[]>([]);
   useEffect(() => {
     if (ccuData?.total !== undefined) {
-      historyRef.current = [...historyRef.current, ccuData.total].slice(-MAX_HISTORY);
+      historyRef.current = [...historyRef.current, ccuData.total].slice(
+        -MAX_HISTORY
+      );
     }
   }, [ccuData?.total]);
-
-
 
   return (
     <Box
@@ -267,7 +283,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             letterSpacing: 1,
           }}
         >
-          {now.toLocaleTimeString()}  (UTC {now.toISOString().slice(11, 19)})
+          {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
         </Typography>
 
         <Box
@@ -400,9 +416,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             }}
           >
             {totalTrend === 'up' ? (
-              <TrendingUpIcon
-                sx={{ color: TREND_COLORS.up, fontSize: 28 }}
-              />
+              <TrendingUpIcon sx={{ color: TREND_COLORS.up, fontSize: 28 }} />
             ) : (
               <TrendingDownIcon
                 sx={{ color: TREND_COLORS.down, fontSize: 28 }}
