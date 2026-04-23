@@ -185,17 +185,24 @@ class SDKManager {
       try {
         const http = require('http');
         hostIp = await new Promise((resolve) => {
-          const req = http.get('http://metadata.tencentyun.com/latest/meta-data/local-ipv4', { timeout: 1000 }, (res: any) => {
-            if (res.statusCode !== 200) {
-              resolve(undefined);
-              return;
+          const req = http.get(
+            'http://metadata.tencentyun.com/latest/meta-data/local-ipv4',
+            { timeout: 1000 },
+            (res: any) => {
+              if (res.statusCode !== 200) {
+                resolve(undefined);
+                return;
+              }
+              let data = '';
+              res.on('data', (c: any) => (data += c));
+              res.on('end', () => resolve(data.trim()));
             }
-            let data = '';
-            res.on('data', (c: any) => data += c);
-            res.on('end', () => resolve(data.trim()));
-          });
+          );
           req.on('error', () => resolve(undefined));
-          req.on('timeout', () => { req.destroy(); resolve(undefined); });
+          req.on('timeout', () => {
+            req.destroy();
+            resolve(undefined);
+          });
         });
         if (hostIp) {
           logger.info('Detected Host IP via cloud metadata', { hostIp });

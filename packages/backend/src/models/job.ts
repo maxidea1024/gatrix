@@ -303,7 +303,9 @@ export class JobModel {
         cronExpression: jobData.cronExpression || null,
         triggerAt: jobData.triggerAt || null,
         timezone: jobData.timezone || 'Asia/Seoul',
-        retryPolicy: jobData.retryPolicy ? safeJsonStringify(jobData.retryPolicy) : null,
+        retryPolicy: jobData.retryPolicy
+          ? safeJsonStringify(jobData.retryPolicy)
+          : null,
         environmentId: environmentId,
         createdBy: jobData.createdBy,
         updatedBy: jobData.updatedBy,
@@ -357,7 +359,9 @@ export class JobModel {
       if (jobData.timezone !== undefined)
         updateData.timezone = jobData.timezone;
       if (jobData.retryPolicy !== undefined)
-        updateData.retryPolicy = jobData.retryPolicy ? safeJsonStringify(jobData.retryPolicy) : null;
+        updateData.retryPolicy = jobData.retryPolicy
+          ? safeJsonStringify(jobData.retryPolicy)
+          : null;
       if (jobData.updatedBy !== undefined)
         updateData.updatedBy = jobData.updatedBy;
       if (jobData.lastExecutedAt !== undefined)

@@ -36,9 +36,11 @@ export class JobSchedulerService {
       if (job.retryPolicy) {
         let retryPolicy;
         if (typeof job.retryPolicy === 'string') {
-           try { retryPolicy = JSON.parse(job.retryPolicy); } catch(e) {}
+          try {
+            retryPolicy = JSON.parse(job.retryPolicy);
+          } catch (e) {}
         } else {
-           retryPolicy = job.retryPolicy;
+          retryPolicy = job.retryPolicy;
         }
 
         if (retryPolicy) {
@@ -55,15 +57,29 @@ export class JobSchedulerService {
           pattern: job.cronExpression,
           tz: job.timezone || 'Asia/Seoul',
         };
-        await queueService.addJob(this.QUEUE_NAME, bullJobName, payload, options);
-        logger.info(`Registered repeatable job for ${jobId} with cron ${job.cronExpression}`);
+        await queueService.addJob(
+          this.QUEUE_NAME,
+          bullJobName,
+          payload,
+          options
+        );
+        logger.info(
+          `Registered repeatable job for ${jobId} with cron ${job.cronExpression}`
+        );
       } else if (job.triggerAt) {
         const triggerDate = new Date(job.triggerAt);
         const delay = triggerDate.getTime() - Date.now();
         if (delay > 0) {
           options.delay = delay;
-          await queueService.addJob(this.QUEUE_NAME, bullJobName, payload, options);
-          logger.info(`Registered delayed job for ${jobId} to trigger in ${delay}ms`);
+          await queueService.addJob(
+            this.QUEUE_NAME,
+            bullJobName,
+            payload,
+            options
+          );
+          logger.info(
+            `Registered delayed job for ${jobId} to trigger in ${delay}ms`
+          );
         } else {
           logger.warn(`Job ${jobId} triggerAt is in the past. Not scheduling.`);
         }
@@ -80,8 +96,8 @@ export class JobSchedulerService {
     try {
       const bullJobName = `${this.JOB_TYPE_PREFIX}${jobId}`;
       const repeatables = await queueService.listRepeatable(this.QUEUE_NAME);
-      
-      const repeatableJob = repeatables.find(r => r.name === bullJobName);
+
+      const repeatableJob = repeatables.find((r) => r.name === bullJobName);
       if (repeatableJob) {
         await queueService.removeRepeatable(this.QUEUE_NAME, repeatableJob.key);
         logger.info(`Removed repeatable job for ${jobId}`);
@@ -91,7 +107,9 @@ export class JobSchedulerService {
       const queue = queueService.getQueue(this.QUEUE_NAME);
       if (queue) {
         const delayedJobs = await queue.getDelayed();
-        const jobToRemove = delayedJobs.find(j => j.opts.jobId === bullJobName);
+        const jobToRemove = delayedJobs.find(
+          (j) => j.opts.jobId === bullJobName
+        );
         if (jobToRemove) {
           await jobToRemove.remove();
           logger.info(`Removed delayed job for ${jobId}`);

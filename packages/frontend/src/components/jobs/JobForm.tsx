@@ -212,11 +212,13 @@ const JobForm: React.FC<JobFormProps> = ({
       isEnabled: formData.isEnabled,
       tagIds: formData.tagIds,
       jobDataMap: formData.jobDataMap,
-      cronExpression: formData.executionType === 'cron' ? formData.cronExpression : null,
-      triggerAt: formData.executionType === 'onetime' ? formData.triggerAt : null,
+      cronExpression:
+        formData.executionType === 'cron' ? formData.cronExpression : null,
+      triggerAt:
+        formData.executionType === 'onetime' ? formData.triggerAt : null,
       timezone: formData.timezone,
-      retryPolicy: formData.retryPolicyEnabled 
-        ? { maxRetries: formData.maxRetries, backoffMs: formData.backoffMs } 
+      retryPolicy: formData.retryPolicyEnabled
+        ? { maxRetries: formData.maxRetries, backoffMs: formData.backoffMs }
         : null,
     };
 
@@ -343,7 +345,11 @@ const JobForm: React.FC<JobFormProps> = ({
             {/* Scheduling & Retry Settings */}
             <Box>
               <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{ fontWeight: 'bold' }}
+              >
                 {t('jobs.scheduling')}
               </Typography>
               <Grid container spacing={2}>
@@ -353,11 +359,19 @@ const JobForm: React.FC<JobFormProps> = ({
                     <Select
                       value={formData.executionType}
                       label={t('jobs.executionType')}
-                      onChange={(e) => handleFieldChange('executionType', e.target.value)}
+                      onChange={(e) =>
+                        handleFieldChange('executionType', e.target.value)
+                      }
                     >
-                      <MenuItem value="manual">{t('jobs.executionTypeManual')}</MenuItem>
-                      <MenuItem value="cron">{t('jobs.executionTypeCron')}</MenuItem>
-                      <MenuItem value="onetime">{t('jobs.executionTypeOnetime')}</MenuItem>
+                      <MenuItem value="manual">
+                        {t('jobs.executionTypeManual')}
+                      </MenuItem>
+                      <MenuItem value="cron">
+                        {t('jobs.executionTypeCron')}
+                      </MenuItem>
+                      <MenuItem value="onetime">
+                        {t('jobs.executionTypeOnetime')}
+                      </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -370,7 +384,9 @@ const JobForm: React.FC<JobFormProps> = ({
                         size="small"
                         label={t('jobs.cronExpression')}
                         value={formData.cronExpression}
-                        onChange={(e) => handleFieldChange('cronExpression', e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange('cronExpression', e.target.value)
+                        }
                         helperText={t('jobs.cronHelperText')}
                         required
                       />
@@ -381,7 +397,9 @@ const JobForm: React.FC<JobFormProps> = ({
                         size="small"
                         label={t('jobs.timezone')}
                         value={formData.timezone}
-                        onChange={(e) => handleFieldChange('timezone', e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange('timezone', e.target.value)
+                        }
                       />
                     </Grid>
                   </>
@@ -405,14 +423,24 @@ const JobForm: React.FC<JobFormProps> = ({
                     control={
                       <Switch
                         checked={formData.retryPolicyEnabled}
-                        onChange={(e) => handleFieldChange('retryPolicyEnabled', e.target.checked)}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            'retryPolicyEnabled',
+                            e.target.checked
+                          )
+                        }
                         color="primary"
                         size="small"
                       />
                     }
                     label={t('jobs.retryPolicy')}
                   />
-                  <Typography variant="caption" color="text.secondary" display="block" sx={{ ml: 4, mt: -0.5 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    sx={{ ml: 4, mt: -0.5 }}
+                  >
                     {t('jobs.retryHelperText')}
                   </Typography>
                 </Grid>
@@ -426,7 +454,12 @@ const JobForm: React.FC<JobFormProps> = ({
                         type="number"
                         label={t('jobs.maxRetries')}
                         value={formData.maxRetries}
-                        onChange={(e) => handleFieldChange('maxRetries', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            'maxRetries',
+                            parseInt(e.target.value) || 0
+                          )
+                        }
                         inputProps={{ min: 1, max: 10 }}
                       />
                     </Grid>
@@ -437,7 +470,12 @@ const JobForm: React.FC<JobFormProps> = ({
                         type="number"
                         label={t('jobs.backoffMs')}
                         value={formData.backoffMs}
-                        onChange={(e) => handleFieldChange('backoffMs', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            'backoffMs',
+                            parseInt(e.target.value) || 0
+                          )
+                        }
                         inputProps={{ min: 100 }}
                       />
                     </Grid>
@@ -611,11 +649,19 @@ const JobForm: React.FC<JobFormProps> = ({
                 <Select
                   value={formData.executionType}
                   label={t('jobs.executionType')}
-                  onChange={(e) => handleFieldChange('executionType', e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange('executionType', e.target.value)
+                  }
                 >
-                  <MenuItem value="manual">{t('jobs.executionTypeManual')}</MenuItem>
-                  <MenuItem value="cron">{t('jobs.executionTypeCron')}</MenuItem>
-                  <MenuItem value="onetime">{t('jobs.executionTypeOnetime')}</MenuItem>
+                  <MenuItem value="manual">
+                    {t('jobs.executionTypeManual')}
+                  </MenuItem>
+                  <MenuItem value="cron">
+                    {t('jobs.executionTypeCron')}
+                  </MenuItem>
+                  <MenuItem value="onetime">
+                    {t('jobs.executionTypeOnetime')}
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -627,7 +673,9 @@ const JobForm: React.FC<JobFormProps> = ({
                     fullWidth
                     label={t('jobs.cronExpression')}
                     value={formData.cronExpression}
-                    onChange={(e) => handleFieldChange('cronExpression', e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange('cronExpression', e.target.value)
+                    }
                     helperText={t('jobs.cronHelperText')}
                     required
                   />
@@ -637,7 +685,9 @@ const JobForm: React.FC<JobFormProps> = ({
                     fullWidth
                     label={t('jobs.timezone')}
                     value={formData.timezone}
-                    onChange={(e) => handleFieldChange('timezone', e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange('timezone', e.target.value)
+                    }
                   />
                 </Grid>
               </>
@@ -660,13 +710,20 @@ const JobForm: React.FC<JobFormProps> = ({
                 control={
                   <Switch
                     checked={formData.retryPolicyEnabled}
-                    onChange={(e) => handleFieldChange('retryPolicyEnabled', e.target.checked)}
+                    onChange={(e) =>
+                      handleFieldChange('retryPolicyEnabled', e.target.checked)
+                    }
                     color="primary"
                   />
                 }
                 label={t('jobs.retryPolicy')}
               />
-              <Typography variant="caption" color="text.secondary" display="block" sx={{ ml: 4, mt: -1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ ml: 4, mt: -1 }}
+              >
                 {t('jobs.retryHelperText')}
               </Typography>
             </Grid>
@@ -679,7 +736,12 @@ const JobForm: React.FC<JobFormProps> = ({
                     type="number"
                     label={t('jobs.maxRetries')}
                     value={formData.maxRetries}
-                    onChange={(e) => handleFieldChange('maxRetries', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        'maxRetries',
+                        parseInt(e.target.value) || 0
+                      )
+                    }
                     inputProps={{ min: 1, max: 10 }}
                   />
                 </Grid>
@@ -689,7 +751,12 @@ const JobForm: React.FC<JobFormProps> = ({
                     type="number"
                     label={t('jobs.backoffMs')}
                     value={formData.backoffMs}
-                    onChange={(e) => handleFieldChange('backoffMs', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        'backoffMs',
+                        parseInt(e.target.value) || 0
+                      )
+                    }
                     inputProps={{ min: 100 }}
                   />
                 </Grid>

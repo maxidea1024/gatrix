@@ -6,7 +6,9 @@ import {
   TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import playerConnectionService, { type CcuData } from '../../services/playerConnectionService';
+import playerConnectionService, {
+  type CcuData,
+} from '../../services/playerConnectionService';
 
 // ─── Animated Number Hook (stock ticker tween) ───
 function useAnimatedNumber(target: number): number {
@@ -166,7 +168,10 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     let mounted = true;
     const fetchTotal = async () => {
       try {
-        const res = await playerConnectionService.getAllPlayers(projectApiPath, { limit: 1 });
+        const res = await playerConnectionService.getAllPlayers(
+          projectApiPath,
+          { limit: 1 }
+        );
         if (mounted) setTotalRegistered(res.total);
       } catch (err) {
         console.error('Failed to fetch total registered players:', err);

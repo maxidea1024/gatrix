@@ -1,7 +1,10 @@
 import { Job as BullJob } from 'bullmq';
 import { JobModel } from '../../models/job';
 import { JobTypeModel } from '../../models/job-type';
-import { JobExecutionModel, JobExecutionStatus } from '../../models/job-execution';
+import {
+  JobExecutionModel,
+  JobExecutionStatus,
+} from '../../models/job-execution';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('UserJobProcessor');
@@ -11,7 +14,9 @@ export async function processUserJob(job: BullJob): Promise<void> {
   const { jobId, environmentId } = job.data?.payload || {};
 
   if (!jobId || !environmentId) {
-    logger.error('Missing jobId or environmentId in scheduled job payload', { id: job.id });
+    logger.error('Missing jobId or environmentId in scheduled job payload', {
+      id: job.id,
+    });
     return;
   }
 
@@ -36,7 +41,7 @@ export async function processUserJob(job: BullJob): Promise<void> {
     const execution = await JobExecutionModel.create({
       jobId: jobId,
       status: JobExecutionStatus.PENDING,
-      triggeredBy: 'schedule'
+      triggeredBy: 'schedule',
     });
 
     // 3. Mark running
@@ -53,7 +58,10 @@ export async function processUserJob(job: BullJob): Promise<void> {
 
     // 4. Execute based on job type
     try {
-      const jobType = await JobTypeModel.findById(userJob.jobTypeId, environmentId);
+      const jobType = await JobTypeModel.findById(
+        userJob.jobTypeId,
+        environmentId
+      );
       const jobData = userJob.jobDataMap || {};
       let result: any = {};
 
@@ -106,7 +114,7 @@ export async function processUserJob(job: BullJob): Promise<void> {
         executionTimeMs,
         errorMessage: execError.message || 'Unknown execution error',
       });
-      
+
       logger.error(`Job ${jobId} execution failed:`, execError);
       throw execError; // Rethrow to let BullMQ handle retry policy
     }
