@@ -5,7 +5,8 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
-import type { CcuData } from '../../services/playerConnectionService';
+import { useTranslation } from 'react-i18next';
+import playerConnectionService, { type CcuData } from '../../services/playerConnectionService';
 
 // ─── Animated Number Hook (stock ticker tween) ───
 function useAnimatedNumber(target: number): number {
@@ -80,33 +81,24 @@ const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({
   const range = max - min || 1;
 
   const points = data.map((v, i) => {
-    const x = PAD + (i / (data.length - 1)) * (W - PAD * 2);
-    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
-    return { x, y };
+    const x = PAD + (i / (data.length - 1)) * (W - 2 * PAD);
+    const y = H - PAD - ((v - min) / range) * (H - 2 * PAD);
+    return [x, y];
   });
 
-  const linePath = points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`)
-    .join(' ');
-  const areaPath = `${linePath} L${points[points.length - 1].x},${H} L${points[0].x},${H} Z`;
-
-  const color =
-    trend === 'up'
-      ? TREND_COLORS.up
-      : trend === 'down'
-        ? TREND_COLORS.down
-        : '#64b4ff';
+  const linePath = `M ${points.map((p) => p.join(',')).join(' L ')}`;
+  const areaPath = `${linePath} L ${points[points.length - 1][0]},${H} L ${points[0][0]},${H} Z`;
+  const color = TREND_COLORS[trend];
 
   return (
     <svg
+      width="100%"
+      height="100%"
       viewBox={`0 0 ${W} ${H}`}
       style={{
         position: 'absolute',
         bottom: 0,
         left: 0,
-        right: 0,
-        width: '100%',
-        height: '30vh',
         pointerEvents: 'none',
         opacity: 0.2,
       }}
@@ -135,6 +127,7 @@ const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({
 interface CcuScoreboardProps {
   ccuData: CcuData | null;
   prevCcuData: CcuData | null;
+  projectApiPath: string;
   onClose: () => void;
 }
 
@@ -142,8 +135,10 @@ interface CcuScoreboardProps {
 const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   ccuData,
   prevCcuData,
+  projectApiPath,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const totalCount = ccuData?.total ?? 0;
   const prevTotalCount = prevCcuData?.total;
   const animatedTotal = useAnimatedNumber(totalCount);
@@ -164,6 +159,24 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
       setAnimKey((k) => k + 1);
     }
   }, [totalCount, prevTotalCount]);
+
+  // Fetch total registered accounts
+  const [totalRegistered, setTotalRegistered] = useState<number | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    const fetchTotal = async () => {
+      try {
+        const res = await playerConnectionService.getAllPlayers(projectApiPath, { limit: 1 });
+        if (mounted) setTotalRegistered(res.total);
+      } catch (err) {
+        console.error('Failed to fetch total registered players:', err);
+      }
+    };
+    fetchTotal();
+    return () => {
+      mounted = false;
+    };
+  }, [projectApiPath]);
 
   // Stable ref for onClose to avoid useEffect churn on parent re-renders
   const onCloseRef = useRef(onClose);
@@ -227,6 +240,11 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         flexDirection: 'column',
         overflow: 'hidden',
         cursor: 'default',
+        animation: 'scoreboardFadeIn 0.6s ease-out both',
+        '@keyframes scoreboardFadeIn': {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
         // Animated background grid
         '&::before': {
           content: '""',
@@ -278,7 +296,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               textTransform: 'uppercase',
             }}
           >
-            LIVE CCU MONITOR
+            {t('playerConnections.scoreboard.liveMonitor')}
           </Typography>
         </Box>
 
@@ -288,11 +306,11 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             left: '50%',
             transform: 'translateX(-50%)',
             color: 'rgba(255,255,255,0.6)',
-            fontFamily: '"Roboto Mono", monospace',
+            fontFamily: '"Inter", sans-serif',
             fontSize: '1.1rem',
-            fontWeight: 700,
+            fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
-            letterSpacing: 1,
+            letterSpacing: 1.5,
           }}
         >
           {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
@@ -334,13 +352,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           zIndex: 1,
         }}
       >
-        {/* Total CCU number */}
+        {/* Total CCU number — hero display */}
         <Box sx={{ position: 'relative', textAlign: 'center' }}>
           <Typography
             key={animKey}
             sx={{
               fontWeight: 900,
-              fontSize: 'clamp(4.8rem, 14.4vw, 12rem)',
+              fontSize: 'clamp(5.5rem, min(16vw, 28vh), 14rem)',
               lineHeight: 1,
               color: TREND_COLORS[totalTrend],
               fontFamily: '"Inter", "Roboto Mono", monospace',
@@ -362,15 +380,60 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               },
             }}
           >
-            {animatedTotal === 0 ? '—' : animatedTotal.toLocaleString()}
+            {animatedTotal === 0 ? '0' : animatedTotal.toLocaleString()}
           </Typography>
+
+          {/* CCU label */}
+          <Typography
+            sx={{
+              color: 'rgba(255,255,255,0.35)',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              letterSpacing: 3,
+              textTransform: 'uppercase',
+              mt: 1.5,
+            }}
+          >
+            {t('playerConnections.scoreboard.concurrentUsers')}
+          </Typography>
+
+          {/* Total registered accounts — subtle secondary metric */}
+          {totalRegistered !== null && (
+            <Box sx={{ mt: 3.5, textAlign: 'center' }}>
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.5)',
+                  fontFamily: '"Inter", "Roboto Mono", monospace',
+                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
+                {totalRegistered.toLocaleString()}
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.2)',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  letterSpacing: 2.5,
+                  textTransform: 'uppercase',
+                  mt: 0.5,
+                }}
+              >
+                {t('playerConnections.scoreboard.totalAccounts')}
+              </Typography>
+            </Box>
+          )}
+
           {totalCount === 0 && (
             <Typography
               sx={{
                 color: 'rgba(255,255,255,0.3)',
                 fontSize: '1.2rem',
                 fontWeight: 500,
-                mt: 2,
+                mt: 3,
                 letterSpacing: 1,
                 animation: 'fadeInOut 3s ease-in-out infinite',
                 '@keyframes fadeInOut': {
@@ -379,7 +442,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 },
               }}
             >
-              ⛵ Waiting for adventurers…
+              ⛵ {t('playerConnections.scoreboard.waitingForAdventurers')}
             </Typography>
           )}
         </Box>

@@ -132,6 +132,7 @@ services:
       VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-zh}
+      VITE_EDGE_URL: ${VITE_EDGE_URL:-}
     ports:
       - target: 80
         published: ${FRONTEND_PORT:-43000}
@@ -192,7 +193,7 @@ services:
       - target: 3410
         published: 3410
         protocol: tcp
-        mode: ingress
+        mode: host
     volumes:
       - edge_logs:/app/logs
     networks:
@@ -202,6 +203,8 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${EDGE_REPLICAS:-1}
+      placement:
+        max_replicas_per_node: 1
       resources:
         limits:
           memory: 256M

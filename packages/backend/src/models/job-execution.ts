@@ -35,6 +35,7 @@ export interface CreateJobExecutionData {
   scheduleId?: number;
   status?: JobExecutionStatus;
   retryAttempt?: number;
+  triggeredBy?: string;
 }
 
 export interface UpdateJobExecutionData {
@@ -128,6 +129,7 @@ export class JobExecutionModel {
         id,
         jobId: data.jobId,
         status: data.status || JobExecutionStatus.PENDING,
+        triggeredBy: data.triggeredBy || 'schedule',
       });
 
       const created = await this.findById(id);

@@ -28,6 +28,10 @@ export interface CreateJobData {
   createdBy: string;
   updatedBy: string;
   environmentId: string;
+  cronExpression?: string;
+  triggerAt?: Date;
+  timezone?: string;
+  retryPolicy?: any;
 }
 
 export interface UpdateJobData {
@@ -37,7 +41,12 @@ export interface UpdateJobData {
   isEnabled?: boolean;
   jobDataMap?: any;
   tagIds?: string[];
-  updatedBy: string;
+  updatedBy?: string;
+  cronExpression?: string | null;
+  triggerAt?: Date | null;
+  timezone?: string;
+  retryPolicy?: any | null;
+  lastExecutedAt?: Date;
 }
 
 // JSON parsing utility function
@@ -163,6 +172,12 @@ export class JobModel {
         memo: row.memo,
         jobTypeId: row.jobTypeId,
         jobDataMap: safeJsonParse(row.jobDataMap),
+        cronExpression: row.cronExpression,
+        triggerAt: row.triggerAt,
+        timezone: row.timezone,
+        retryPolicy: safeJsonParse(row.retryPolicy),
+        nextExecutionAt: row.nextExecutionAt,
+        lastExecutedAt: row.lastExecutedAt,
         isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
@@ -264,6 +279,7 @@ export class JobModel {
       return {
         ...job,
         jobDataMap: safeJsonParse(job.jobDataMap),
+        retryPolicy: safeJsonParse(job.retryPolicy),
         tags: tags,
       };
     } catch (error) {
@@ -284,6 +300,10 @@ export class JobModel {
         jobTypeId: jobData.jobTypeId,
         isEnabled: jobData.isEnabled,
         jobDataMap: safeJsonStringify(jobData.jobDataMap || {}),
+        cronExpression: jobData.cronExpression || null,
+        triggerAt: jobData.triggerAt || null,
+        timezone: jobData.timezone || 'Asia/Seoul',
+        retryPolicy: jobData.retryPolicy ? safeJsonStringify(jobData.retryPolicy) : null,
         environmentId: environmentId,
         createdBy: jobData.createdBy,
         updatedBy: jobData.updatedBy,
@@ -330,8 +350,18 @@ export class JobModel {
         updateData.isEnabled = jobData.isEnabled;
       if (jobData.jobDataMap !== undefined)
         updateData.jobDataMap = safeJsonStringify(jobData.jobDataMap);
+      if (jobData.cronExpression !== undefined)
+        updateData.cronExpression = jobData.cronExpression;
+      if (jobData.triggerAt !== undefined)
+        updateData.triggerAt = jobData.triggerAt;
+      if (jobData.timezone !== undefined)
+        updateData.timezone = jobData.timezone;
+      if (jobData.retryPolicy !== undefined)
+        updateData.retryPolicy = jobData.retryPolicy ? safeJsonStringify(jobData.retryPolicy) : null;
       if (jobData.updatedBy !== undefined)
         updateData.updatedBy = jobData.updatedBy;
+      if (jobData.lastExecutedAt !== undefined)
+        updateData.lastExecutedAt = jobData.lastExecutedAt;
 
       updateData.updatedAt = new Date();
 

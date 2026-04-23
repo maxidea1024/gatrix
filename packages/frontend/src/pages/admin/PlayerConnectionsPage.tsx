@@ -366,6 +366,7 @@ const PlayerConnectionsPage: React.FC = () => {
         <CcuScoreboard
           ccuData={ccuData}
           prevCcuData={prevCcuRef.current}
+          projectApiPath={projectApiPath}
           onClose={() => {
             setScoreboardOpen(false);
             sessionStorage.removeItem(SCOREBOARD_STORAGE_KEY);

@@ -927,7 +927,7 @@
         // Add click event listeners to notice items (Event Delegation)
         sidebar.querySelectorAll('.notice-item').forEach(function (item) {
           item.addEventListener('click', function () {
-            const noticeId = parseInt(this.getAttribute('data-notice-id'));
+            const noticeId = this.getAttribute('data-notice-id');
             selectNoticeById(noticeId);
           });
         });

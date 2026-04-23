@@ -85,6 +85,8 @@ export interface CloudMetadata {
   // Oracle Cloud specific
   compartmentId?: string;
   tenancyId?: string;
+  // Network specific
+  localIpv4?: string;
 }
 
 /**
@@ -333,11 +335,20 @@ async function detectTencentCloud(): Promise<CloudMetadata | null> {
     }
   );
 
+  // Get local IPv4
+  const localIpv4Response = await httpGet(
+    `${endpoint.base}/latest/meta-data/local-ipv4`,
+    {
+      timeout: endpoint.timeout,
+    }
+  );
+
   return {
     provider: 'tencentcloud',
     region: regionResponse,
     zone: zoneResponse || undefined,
     instanceId: instanceIdResponse || undefined,
+    localIpv4: localIpv4Response || undefined,
   };
 }
 

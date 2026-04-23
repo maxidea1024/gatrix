@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { JobModel, CreateJobData, UpdateJobData } from '../models/job';
 import { JobTypeModel } from '../models/job-type';
 import { JobExecutionModel, JobExecutionStatus } from '../models/job-execution';
+import { JobSchedulerService } from '../services/job-scheduler-service';
 import { createLogger } from '../config/logger';
 import {
   sendBadRequest,
@@ -142,6 +143,9 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const createdJob = await JobModel.create(jobData);
 
+    // Sync with scheduler
+    await JobSchedulerService.syncJob(createdJob.id, environmentId);
+
     return sendSuccessResponse(
       res,
       createdJob,
@@ -203,6 +207,9 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const updatedJob = await JobModel.update(jobId, updateData, environmentId);
 
+    // Sync with scheduler
+    await JobSchedulerService.syncJob(jobId, environmentId);
+
     return sendSuccessResponse(res, updatedJob, 'Job updated successfully');
   } catch (error) {
     return sendInternalError(
@@ -233,6 +240,9 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     await JobModel.delete(jobId, environmentId);
+
+    // Remove from scheduler
+    await JobSchedulerService.unsyncJob(jobId);
 
     return sendSuccessResponse(res, undefined, 'Job deleted successfully');
   } catch (error) {

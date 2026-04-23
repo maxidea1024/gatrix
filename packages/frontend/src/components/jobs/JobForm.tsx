@@ -35,6 +35,7 @@ import DynamicJobDataForm from './DynamicJobDataForm';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import TagSelector from '@/components/common/TagSelector';
+import LocalizedDateTimePicker from '@/components/common/LocalizedDateTimePicker';
 
 interface JobFormProps {
   job?: Job | null;
@@ -63,6 +64,13 @@ const JobForm: React.FC<JobFormProps> = ({
     isEnabled: true,
     tagIds: [] as number[],
     jobDataMap: {},
+    executionType: 'manual', // 'manual' | 'cron' | 'onetime'
+    cronExpression: '',
+    triggerAt: null as string | null,
+    timezone: 'Asia/Seoul',
+    retryPolicyEnabled: false,
+    maxRetries: 3,
+    backoffMs: 1000,
   });
 
   const [selectedJobType, setSelectedJobType] = useState<JobType | null>(null);
@@ -76,6 +84,20 @@ const JobForm: React.FC<JobFormProps> = ({
       const hasJobDataMap =
         job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
 
+      let executionType = 'manual';
+      let retryPolicyEnabled = false;
+      let maxRetries = 3;
+      let backoffMs = 1000;
+
+      if (job.cronExpression) executionType = 'cron';
+      else if (job.triggerAt) executionType = 'onetime';
+
+      if (job.retryPolicy) {
+        retryPolicyEnabled = true;
+        maxRetries = job.retryPolicy.maxRetries;
+        backoffMs = job.retryPolicy.backoffMs;
+      }
+
       const newFormData = {
         name: job.name,
         jobTypeId: job.jobTypeId.toString(),
@@ -83,6 +105,13 @@ const JobForm: React.FC<JobFormProps> = ({
         isEnabled: job.isEnabled ?? true,
         tagIds: job.tags?.map((tag) => tag.id) || [],
         jobDataMap: job.jobDataMap || {},
+        executionType,
+        cronExpression: job.cronExpression || '',
+        triggerAt: job.triggerAt || null,
+        timezone: job.timezone || 'Asia/Seoul',
+        retryPolicyEnabled,
+        maxRetries,
+        backoffMs,
       };
 
       setFormData(newFormData);
@@ -183,6 +212,12 @@ const JobForm: React.FC<JobFormProps> = ({
       isEnabled: formData.isEnabled,
       tagIds: formData.tagIds,
       jobDataMap: formData.jobDataMap,
+      cronExpression: formData.executionType === 'cron' ? formData.cronExpression : null,
+      triggerAt: formData.executionType === 'onetime' ? formData.triggerAt : null,
+      timezone: formData.timezone,
+      retryPolicy: formData.retryPolicyEnabled 
+        ? { maxRetries: formData.maxRetries, backoffMs: formData.backoffMs } 
+        : null,
     };
 
     onSubmit(submitData);
@@ -303,6 +338,112 @@ const JobForm: React.FC<JobFormProps> = ({
                 }}
                 label={t('common.tags')}
               />
+            </Box>
+
+            {/* Scheduling & Retry Settings */}
+            <Box>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                {t('jobs.scheduling')}
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>{t('jobs.executionType')}</InputLabel>
+                    <Select
+                      value={formData.executionType}
+                      label={t('jobs.executionType')}
+                      onChange={(e) => handleFieldChange('executionType', e.target.value)}
+                    >
+                      <MenuItem value="manual">{t('jobs.executionTypeManual')}</MenuItem>
+                      <MenuItem value="cron">{t('jobs.executionTypeCron')}</MenuItem>
+                      <MenuItem value="onetime">{t('jobs.executionTypeOnetime')}</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {formData.executionType === 'cron' && (
+                  <>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label={t('jobs.cronExpression')}
+                        value={formData.cronExpression}
+                        onChange={(e) => handleFieldChange('cronExpression', e.target.value)}
+                        helperText={t('jobs.cronHelperText')}
+                        required
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label={t('jobs.timezone')}
+                        value={formData.timezone}
+                        onChange={(e) => handleFieldChange('timezone', e.target.value)}
+                      />
+                    </Grid>
+                  </>
+                )}
+
+                {formData.executionType === 'onetime' && (
+                  <Grid size={{ xs: 12 }}>
+                    <LocalizedDateTimePicker
+                      label={t('jobs.triggerAt')}
+                      value={formData.triggerAt}
+                      onChange={(val) => handleFieldChange('triggerAt', val)}
+                      helperText={t('jobs.triggerAtHelperText')}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                )}
+
+                <Grid size={{ xs: 12 }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.retryPolicyEnabled}
+                        onChange={(e) => handleFieldChange('retryPolicyEnabled', e.target.checked)}
+                        color="primary"
+                        size="small"
+                      />
+                    }
+                    label={t('jobs.retryPolicy')}
+                  />
+                  <Typography variant="caption" color="text.secondary" display="block" sx={{ ml: 4, mt: -0.5 }}>
+                    {t('jobs.retryHelperText')}
+                  </Typography>
+                </Grid>
+
+                {formData.retryPolicyEnabled && (
+                  <>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        label={t('jobs.maxRetries')}
+                        value={formData.maxRetries}
+                        onChange={(e) => handleFieldChange('maxRetries', parseInt(e.target.value) || 0)}
+                        inputProps={{ min: 1, max: 10 }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        label={t('jobs.backoffMs')}
+                        value={formData.backoffMs}
+                        onChange={(e) => handleFieldChange('backoffMs', parseInt(e.target.value) || 0)}
+                        inputProps={{ min: 100 }}
+                      />
+                    </Grid>
+                  </>
+                )}
+              </Grid>
             </Box>
 
             {/* Job Data Configuration */}
@@ -455,6 +596,106 @@ const JobForm: React.FC<JobFormProps> = ({
             }}
             label={t('common.tags')}
           />
+        </Box>
+
+        {/* Scheduling & Retry Settings */}
+        <Box>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="h6" gutterBottom>
+            {t('jobs.scheduling')}
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12 }}>
+              <FormControl fullWidth>
+                <InputLabel>{t('jobs.executionType')}</InputLabel>
+                <Select
+                  value={formData.executionType}
+                  label={t('jobs.executionType')}
+                  onChange={(e) => handleFieldChange('executionType', e.target.value)}
+                >
+                  <MenuItem value="manual">{t('jobs.executionTypeManual')}</MenuItem>
+                  <MenuItem value="cron">{t('jobs.executionTypeCron')}</MenuItem>
+                  <MenuItem value="onetime">{t('jobs.executionTypeOnetime')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {formData.executionType === 'cron' && (
+              <>
+                <Grid size={{ xs: 12, sm: 8 }}>
+                  <TextField
+                    fullWidth
+                    label={t('jobs.cronExpression')}
+                    value={formData.cronExpression}
+                    onChange={(e) => handleFieldChange('cronExpression', e.target.value)}
+                    helperText={t('jobs.cronHelperText')}
+                    required
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <TextField
+                    fullWidth
+                    label={t('jobs.timezone')}
+                    value={formData.timezone}
+                    onChange={(e) => handleFieldChange('timezone', e.target.value)}
+                  />
+                </Grid>
+              </>
+            )}
+
+            {formData.executionType === 'onetime' && (
+              <Grid size={{ xs: 12 }}>
+                <LocalizedDateTimePicker
+                  label={t('jobs.triggerAt')}
+                  value={formData.triggerAt}
+                  onChange={(val) => handleFieldChange('triggerAt', val)}
+                  helperText={t('jobs.triggerAtHelperText')}
+                  fullWidth
+                />
+              </Grid>
+            )}
+
+            <Grid size={{ xs: 12 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.retryPolicyEnabled}
+                    onChange={(e) => handleFieldChange('retryPolicyEnabled', e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label={t('jobs.retryPolicy')}
+              />
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ ml: 4, mt: -1 }}>
+                {t('jobs.retryHelperText')}
+              </Typography>
+            </Grid>
+
+            {formData.retryPolicyEnabled && (
+              <>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label={t('jobs.maxRetries')}
+                    value={formData.maxRetries}
+                    onChange={(e) => handleFieldChange('maxRetries', parseInt(e.target.value) || 0)}
+                    inputProps={{ min: 1, max: 10 }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label={t('jobs.backoffMs')}
+                    value={formData.backoffMs}
+                    onChange={(e) => handleFieldChange('backoffMs', parseInt(e.target.value) || 0)}
+                    inputProps={{ min: 100 }}
+                  />
+                </Grid>
+              </>
+            )}
+          </Grid>
         </Box>
 
         {/* Job Data */}

@@ -305,6 +305,7 @@ export class QueueService {
       priority?: number;
       delay?: number;
       repeat?: any;
+      jobId?: string;
     } = {}
   ): Promise<Job<QueueJobData> | null> {
     const queue = this.queues.get(queueName);
@@ -324,6 +325,7 @@ export class QueueService {
         priority: options.priority || 0,
         delay: options.delay || 0,
         repeat: options.repeat,
+        jobId: options.jobId,
       });
 
       logger.debug(`Job added to queue ${queueName}:`, {
@@ -621,6 +623,13 @@ export class QueueService {
       const { getSchedulerHandlers } = await import('./scheduler-jobs');
       const handlers = getSchedulerHandlers();
       const handler = handlers[jobType];
+
+      // Handle user-defined jobs
+      if (jobType.startsWith('user-job:')) {
+        const { processUserJob } = await import('./jobs/user-job-processor');
+        await processUserJob(job);
+        return;
+      }
 
       if (handler) {
         await handler(job);

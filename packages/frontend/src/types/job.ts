@@ -44,6 +44,11 @@ export interface JobSchemaField {
   };
 }
 
+export interface RetryPolicy {
+  maxRetries: number;
+  backoffMs: number;
+}
+
 export interface Job {
   id: number;
   name: string;
@@ -63,6 +68,9 @@ export interface Job {
   jobTypeName?: string;
   jobTypeDisplayName?: string;
   cronExpression?: string;
+  triggerAt?: string;
+  timezone?: string;
+  retryPolicy?: RetryPolicy;
   lastExecutedAt?: string;
   nextExecutionAt?: string;
 }
@@ -74,6 +82,10 @@ export interface CreateJobData {
   memo?: string;
   isEnabled?: boolean;
   tagIds?: number[];
+  cronExpression?: string;
+  triggerAt?: string;
+  timezone?: string;
+  retryPolicy?: RetryPolicy;
 }
 
 export interface UpdateJobData {
@@ -83,6 +95,10 @@ export interface UpdateJobData {
   memo?: string;
   isEnabled?: boolean;
   tagIds?: number[];
+  cronExpression?: string | null;
+  triggerAt?: string | null;
+  timezone?: string;
+  retryPolicy?: RetryPolicy | null;
 }
 
 export enum JobExecutionStatus {
