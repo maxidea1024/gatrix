@@ -139,7 +139,10 @@ const PlayerConnectionsPage: React.FC = () => {
   } | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
-  const [scoreboardOpen, setScoreboardOpen] = useState(false);
+  const SCOREBOARD_STORAGE_KEY = 'playerConnections.scoreboardOpen';
+  const [scoreboardOpen, setScoreboardOpen] = useState(
+    () => sessionStorage.getItem(SCOREBOARD_STORAGE_KEY) === 'true'
+  );
 
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
@@ -363,7 +366,10 @@ const PlayerConnectionsPage: React.FC = () => {
         <CcuScoreboard
           ccuData={ccuData}
           prevCcuData={prevCcuRef.current}
-          onClose={() => setScoreboardOpen(false)}
+          onClose={() => {
+            setScoreboardOpen(false);
+            sessionStorage.removeItem(SCOREBOARD_STORAGE_KEY);
+          }}
         />
       )}
       <PageHeader
@@ -435,7 +441,10 @@ const PlayerConnectionsPage: React.FC = () => {
             <Tooltip title={t('playerConnections.scoreboard.title')}>
               <IconButton
                 size="small"
-                onClick={() => setScoreboardOpen(true)}
+                onClick={() => {
+                  setScoreboardOpen(true);
+                  sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
+                }}
                 sx={{
                   color: 'text.secondary',
                   bgcolor: 'action.hover',
