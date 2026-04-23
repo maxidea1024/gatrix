@@ -1336,7 +1336,7 @@ const PlayerConnectionsPage: React.FC = () => {
       <Dialog
         open={syncDialogOpen}
         onClose={() => !syncing && setSyncDialogOpen(false)}
-        maxWidth="md"
+        maxWidth={(syncPreviewData?.staleCount ?? 0) > 0 ? 'md' : 'sm'}
         fullWidth
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
