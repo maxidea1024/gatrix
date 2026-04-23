@@ -4,7 +4,6 @@ import {
   Close as CloseIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
-  TrendingFlat as TrendingFlatIcon,
 } from '@mui/icons-material';
 import type { CcuData } from '../../services/playerConnectionService';
 
@@ -174,10 +173,15 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
 
         <Typography
           sx={{
-            color: 'rgba(255,255,255,0.35)',
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            color: 'rgba(255,255,255,0.6)',
             fontFamily: '"Roboto Mono", monospace',
-            fontSize: '0.8rem',
+            fontSize: '1.1rem',
+            fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
+            letterSpacing: 1,
           }}
         >
           {now.toLocaleTimeString()}
@@ -239,19 +243,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           }}
         />
 
-        {/* Label */}
-        <Typography
-          sx={{
-            color: 'rgba(255,255,255,0.4)',
-            fontWeight: 600,
-            fontSize: '1rem',
-            letterSpacing: 3,
-            textTransform: 'uppercase',
-            position: 'relative',
-          }}
-        >
-          TOTAL CONCURRENT USERS
-        </Typography>
+
 
         {/* Total CCU number */}
         <Box sx={{ position: 'relative', textAlign: 'center' }}>
@@ -295,56 +287,39 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           </Typography>
         </Box>
 
-        {/* Delta & Trend */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            minHeight: 32,
-          }}
-        >
-          {totalDelta !== 0 ? (
-            <>
-              {totalTrend === 'up' ? (
-                <TrendingUpIcon
-                  sx={{ color: TREND_COLORS.up, fontSize: 28 }}
-                />
-              ) : (
-                <TrendingDownIcon
-                  sx={{ color: TREND_COLORS.down, fontSize: 28 }}
-                />
-              )}
-              <Typography
-                sx={{
-                  color: TREND_COLORS[totalTrend],
-                  fontWeight: 700,
-                  fontSize: '1.5rem',
-                  fontFamily: '"Inter", monospace',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {totalDelta > 0 ? '+' : ''}
-                {totalDelta.toLocaleString()}
-              </Typography>
-            </>
-          ) : (
-            <>
-              <TrendingFlatIcon
-                sx={{ color: TREND_COLORS.flat, fontSize: 24 }}
+        {/* Delta & Trend — only show when there IS a change */}
+        {totalDelta !== 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              minHeight: 32,
+            }}
+          >
+            {totalTrend === 'up' ? (
+              <TrendingUpIcon
+                sx={{ color: TREND_COLORS.up, fontSize: 28 }}
               />
-              <Typography
-                sx={{
-                  color: 'rgba(255,255,255,0.3)',
-                  fontWeight: 500,
-                  fontSize: '0.9rem',
-                }}
-              >
-                No change
-              </Typography>
-            </>
-          )}
-        </Box>
+            ) : (
+              <TrendingDownIcon
+                sx={{ color: TREND_COLORS.down, fontSize: 28 }}
+              />
+            )}
+            <Typography
+              sx={{
+                color: TREND_COLORS[totalTrend],
+                fontWeight: 700,
+                fontSize: '1.5rem',
+                fontFamily: '"Inter", monospace',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {totalDelta > 0 ? '+' : ''}
+              {totalDelta.toLocaleString()}
+            </Typography>
+          </Box>
+        )}
 
         {/* Bot count */}
         {(ccuData?.botTotal ?? 0) > 0 && (
