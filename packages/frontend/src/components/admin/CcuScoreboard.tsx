@@ -178,7 +178,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           'radial-gradient(ellipse at 20% 50%, #0d1b2a 0%, #0a0f1a 50%, #060a12 100%)',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'auto',
+        overflow: 'hidden',
         cursor: 'default',
         // Animated background grid
         '&::before': {
@@ -335,7 +335,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           <Typography
             sx={{
               fontWeight: 900,
-              fontSize: 'clamp(4rem, 12vw, 10rem)',
+              fontSize: 'clamp(6rem, 18vw, 15rem)',
               lineHeight: 1,
               color: TREND_COLORS[totalTrend],
               fontFamily: '"Inter", "Roboto Mono", monospace',
