@@ -269,11 +269,13 @@ const PlayerConnectionsPage: React.FC = () => {
     setSyncPreviewLoading(true);
     if (!projectApiPath) return;
     try {
-      const data = await playerConnectionService.previewSyncOnlineStatus(projectApiPath);
+      const data =
+        await playerConnectionService.previewSyncOnlineStatus(projectApiPath);
       setSyncPreviewData(data);
     } catch (err: any) {
       enqueueSnackbar(
-        err?.response?.data?.message || t('playerConnections.sync.previewFailed'),
+        err?.response?.data?.message ||
+          t('playerConnections.sync.previewFailed'),
         { variant: 'error' }
       );
       setSyncDialogOpen(false);
@@ -287,7 +289,8 @@ const PlayerConnectionsPage: React.FC = () => {
     if (!projectApiPath) return;
     setSyncing(true);
     try {
-      const result = await playerConnectionService.syncOnlineStatus(projectApiPath);
+      const result =
+        await playerConnectionService.syncOnlineStatus(projectApiPath);
       if (result.fixed > 0) {
         enqueueSnackbar(
           t('playerConnections.sync.fixed', {
@@ -408,7 +411,12 @@ const PlayerConnectionsPage: React.FC = () => {
               color="warning"
               startIcon={<SyncIcon />}
               onClick={handleOpenSyncDialog}
-              sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 600, whiteSpace: 'nowrap' }}
+              sx={{
+                borderRadius: 1.5,
+                textTransform: 'none',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
             >
               {t('playerConnections.sync.button')}
             </Button>
@@ -765,7 +773,6 @@ const PlayerConnectionsPage: React.FC = () => {
             </Grid>
           </Grid>
 
-
           {/* Per-world cards */}
           {ccuData?.worlds && ccuData.worlds.length > 0 && (
             <Box>
@@ -891,7 +898,13 @@ const PlayerConnectionsPage: React.FC = () => {
                           })}
                         />
                         <CardContent
-                          sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 }, position: 'relative', zIndex: 1 }}
+                          sx={{
+                            py: 1.5,
+                            px: 2,
+                            '&:last-child': { pb: 1.5 },
+                            position: 'relative',
+                            zIndex: 1,
+                          }}
                         >
                           <Typography
                             variant="caption"
@@ -909,7 +922,11 @@ const PlayerConnectionsPage: React.FC = () => {
                               gap: 0.5,
                             }}
                           >
-                            <Typography variant="h6" fontWeight={700} color="primary.main">
+                            <Typography
+                              variant="h6"
+                              fontWeight={700}
+                              color="primary.main"
+                            >
                               {w.count.toLocaleString()}
                             </Typography>
                             {prevCcuRef.current &&
@@ -1316,7 +1333,15 @@ const PlayerConnectionsPage: React.FC = () => {
           </Alert>
 
           {syncPreviewLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 6, gap: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                py: 6,
+                gap: 2,
+              }}
+            >
               <CircularProgress size={24} />
               <Typography variant="body2" color="text.secondary">
                 {t('playerConnections.sync.analyzing')}
@@ -1347,7 +1372,11 @@ const PlayerConnectionsPage: React.FC = () => {
                   <Typography variant="caption" color="text.secondary">
                     {t('playerConnections.sync.statActualOnline')}
                   </Typography>
-                  <Typography variant="h6" fontWeight={700} color="success.main">
+                  <Typography
+                    variant="h6"
+                    fontWeight={700}
+                    color="success.main"
+                  >
                     {syncPreviewData.totalActualOnline}
                   </Typography>
                 </Box>
@@ -1355,7 +1384,15 @@ const PlayerConnectionsPage: React.FC = () => {
                   <Typography variant="caption" color="text.secondary">
                     {t('playerConnections.sync.statStale')}
                   </Typography>
-                  <Typography variant="h6" fontWeight={700} color={syncPreviewData.staleCount > 0 ? 'warning.main' : 'text.primary'}>
+                  <Typography
+                    variant="h6"
+                    fontWeight={700}
+                    color={
+                      syncPreviewData.staleCount > 0
+                        ? 'warning.main'
+                        : 'text.primary'
+                    }
+                  >
                     {syncPreviewData.staleCount}
                   </Typography>
                 </Box>
@@ -1367,8 +1404,14 @@ const PlayerConnectionsPage: React.FC = () => {
                 </Alert>
               ) : (
                 <>
-                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                    {t('playerConnections.sync.staleListTitle', { count: syncPreviewData.staleCount })}
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={600}
+                    sx={{ mb: 1 }}
+                  >
+                    {t('playerConnections.sync.staleListTitle', {
+                      count: syncPreviewData.staleCount,
+                    })}
                   </Typography>
                   <TableContainer
                     sx={{
@@ -1382,38 +1425,153 @@ const PlayerConnectionsPage: React.FC = () => {
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>#</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colAccount')}</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colUserId')}</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colName')}</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colCharId')}</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colWorld')}</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colPlatform')}</TableCell>
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'background.paper' }}>{t('playerConnections.sync.colLastLogin')}</TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            #
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colAccount')}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colUserId')}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colName')}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colCharId')}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colWorld')}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colPlatform')}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'background.paper',
+                            }}
+                          >
+                            {t('playerConnections.sync.colLastLogin')}
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {syncPreviewData.staleUsers.map((u, idx) => (
                           <TableRow key={u.accountId} hover>
-                            <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{idx + 1}</TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>{u.accountId}</TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>{u.lastUserId || '-'}</TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem' }}>{u.name || '-'}</TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>{u.characterId || '-'}</TableCell>
+                            <TableCell
+                              sx={{
+                                fontSize: '0.75rem',
+                                color: 'text.secondary',
+                              }}
+                            >
+                              {idx + 1}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                fontSize: '0.75rem',
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              {u.accountId}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                fontSize: '0.75rem',
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              {u.lastUserId || '-'}
+                            </TableCell>
+                            <TableCell sx={{ fontSize: '0.75rem' }}>
+                              {u.name || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                fontSize: '0.75rem',
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              {u.characterId || '-'}
+                            </TableCell>
                             <TableCell sx={{ fontSize: '0.75rem' }}>
                               {u.worldId ? (
-                                <Chip label={u.worldId} size="small" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
-                              ) : '-'}
+                                <Chip
+                                  label={u.worldId}
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ fontSize: '0.7rem', height: 22 }}
+                                />
+                              ) : (
+                                '-'
+                              )}
                             </TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem' }}>{u.loginPlatform || '-'}</TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+                            <TableCell sx={{ fontSize: '0.75rem' }}>
+                              {u.loginPlatform || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                            >
                               {u.lastLoginTimeUtc ? (
-                                <Tooltip title={formatDateTimeDetailed(u.lastLoginTimeUtc)}>
-                                  <Typography variant="body2" component="span" sx={{ fontSize: '0.75rem' }}>
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    u.lastLoginTimeUtc
+                                  )}
+                                >
+                                  <Typography
+                                    variant="body2"
+                                    component="span"
+                                    sx={{ fontSize: '0.75rem' }}
+                                  >
                                     {formatRelativeTime(u.lastLoginTimeUtc)}
                                   </Typography>
                                 </Tooltip>
-                              ) : '-'}
+                              ) : (
+                                '-'
+                              )}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -1421,8 +1579,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     </Table>
                   </TableContainer>
                   {syncPreviewData.hasMore && (
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                      {t('playerConnections.sync.hasMore', { shown: 500, total: syncPreviewData.staleCount })}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 1, display: 'block' }}
+                    >
+                      {t('playerConnections.sync.hasMore', {
+                        shown: 500,
+                        total: syncPreviewData.staleCount,
+                      })}
                     </Typography>
                   )}
                 </>
@@ -1431,10 +1596,7 @@ const PlayerConnectionsPage: React.FC = () => {
           ) : null}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setSyncDialogOpen(false)}
-            disabled={syncing}
-          >
+          <Button onClick={() => setSyncDialogOpen(false)} disabled={syncing}>
             {t('common.cancel')}
           </Button>
           {syncPreviewData && syncPreviewData.staleCount > 0 && (
@@ -1443,12 +1605,20 @@ const PlayerConnectionsPage: React.FC = () => {
               color="warning"
               onClick={handleExecuteSync}
               disabled={syncing}
-              startIcon={syncing ? <CircularProgress size={16} color="inherit" /> : <SyncIcon />}
+              startIcon={
+                syncing ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : (
+                  <SyncIcon />
+                )
+              }
               sx={{ borderRadius: 2, fontWeight: 600 }}
             >
               {syncing
                 ? t('playerConnections.sync.syncing')
-                : t('playerConnections.sync.executeButton', { count: syncPreviewData.staleCount })}
+                : t('playerConnections.sync.executeButton', {
+                    count: syncPreviewData.staleCount,
+                  })}
             </Button>
           )}
         </DialogActions>

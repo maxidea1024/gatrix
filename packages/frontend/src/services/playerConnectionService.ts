@@ -228,9 +228,7 @@ const playerConnectionService = {
   /**
    * Preview sync online status: dry-run that returns stale users without fixing
    */
-  async previewSyncOnlineStatus(
-    projectApiPath: string
-  ): Promise<{
+  async previewSyncOnlineStatus(projectApiPath: string): Promise<{
     totalDbOnline: number;
     totalActualOnline: number;
     staleCount: number;
@@ -249,15 +247,21 @@ const playerConnectionService = {
     const res = await api.get(
       `${projectApiPath}/player-connections/sync-online-status/preview`
     );
-    return res.data || { totalDbOnline: 0, totalActualOnline: 0, staleCount: 0, staleUsers: [], hasMore: false };
+    return (
+      res.data || {
+        totalDbOnline: 0,
+        totalActualOnline: 0,
+        staleCount: 0,
+        staleUsers: [],
+        hasMore: false,
+      }
+    );
   },
 
   /**
    * Sync online status: cross-reference actual connected users with DB isOnline flags
    */
-  async syncOnlineStatus(
-    projectApiPath: string
-  ): Promise<{
+  async syncOnlineStatus(projectApiPath: string): Promise<{
     fixed: number;
     staleAccountIds: string[];
     totalDbOnline: number;
@@ -266,7 +270,14 @@ const playerConnectionService = {
     const res = await api.post(
       `${projectApiPath}/player-connections/sync-online-status`
     );
-    return res.data || { fixed: 0, staleAccountIds: [], totalDbOnline: 0, totalActualOnline: 0 };
+    return (
+      res.data || {
+        fixed: 0,
+        staleAccountIds: [],
+        totalDbOnline: 0,
+        totalActualOnline: 0,
+      }
+    );
   },
 };
 
