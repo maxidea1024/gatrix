@@ -33,6 +33,7 @@ import {
   TableBody,
   TableContainer,
   Tooltip,
+  IconButton,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -50,6 +51,7 @@ import {
   ArrowUpward as ArrowUpIcon,
   ArrowDownward as ArrowDownIcon,
   Sync as SyncIcon,
+  Fullscreen as FullscreenIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -68,6 +70,7 @@ import {
   formatRelativeTime,
   formatDateTimeDetailed,
 } from '../../utils/dateFormat';
+import CcuScoreboard from '../../components/admin/CcuScoreboard';
 
 const REFRESH_STORAGE_KEY = 'playerConnections.refreshInterval';
 const REFRESH_OPTIONS = [
@@ -136,6 +139,7 @@ const PlayerConnectionsPage: React.FC = () => {
   } | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
+  const [scoreboardOpen, setScoreboardOpen] = useState(false);
 
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
@@ -354,6 +358,14 @@ const PlayerConnectionsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Fullscreen CCU Scoreboard */}
+      {scoreboardOpen && (
+        <CcuScoreboard
+          ccuData={ccuData}
+          prevCcuData={prevCcuRef.current}
+          onClose={() => setScoreboardOpen(false)}
+        />
+      )}
       <PageHeader
         icon={<PeopleIcon />}
         title={t('playerConnections.title')}
@@ -420,6 +432,19 @@ const PlayerConnectionsPage: React.FC = () => {
             >
               {t('playerConnections.sync.button')}
             </Button>
+            <Tooltip title={t('playerConnections.scoreboard.title')}>
+              <IconButton
+                size="small"
+                onClick={() => setScoreboardOpen(true)}
+                sx={{
+                  color: 'text.secondary',
+                  bgcolor: 'action.hover',
+                  '&:hover': { bgcolor: 'action.selected' },
+                }}
+              >
+                <FullscreenIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         }
       />
