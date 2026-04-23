@@ -95,7 +95,7 @@ const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({
   return (
     <svg
       width="100%"
-      height="100%"
+      height="25%"
       viewBox={`0 0 ${W} ${H}`}
       style={{
         position: 'absolute',
