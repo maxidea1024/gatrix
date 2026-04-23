@@ -422,4 +422,63 @@ export class PlayerConnectionsController {
       });
     }
   );
+
+  /**
+   * GET /sync-online-status/preview
+   * Dry-run: returns stale entries that would be fixed, with user details.
+   */
+  static previewSyncOnlineStatus = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const admindUrl = await getAdmindApiUrl(environmentId);
+      const data = await admindRequest(
+        admindUrl,
+        'GET',
+        '/gatrix/v1/sync-online-status/preview'
+      );
+
+      res.json({
+        success: true,
+        data,
+      });
+    }
+  );
+
+  /**
+   * POST /sync-online-status
+   * Triggers admind to cross-reference actual connected users with DB isOnline flags
+   * and fix stale entries.
+   */
+  static syncOnlineStatus = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const admindUrl = await getAdmindApiUrl(environmentId);
+      const data = await admindRequest(
+        admindUrl,
+        'POST',
+        '/gatrix/v1/sync-online-status'
+      );
+
+      logger.info('Online status sync completed', {
+        environmentId,
+        user: req.user?.userId,
+        fixed: data.fixed,
+        totalDbOnline: data.totalDbOnline,
+        totalActualOnline: data.totalActualOnline,
+      });
+
+      res.json({
+        success: true,
+        data,
+      });
+    }
+  );
 }

@@ -68,7 +68,7 @@ import type {
 
 // ─── Group By Options ───
 const GROUP_BY_OPTIONS = [
-  { value: 'none', labelKey: 'playerConnections.groupBy.none' },
+  { value: '', labelKey: 'playerConnections.groupBy.none' },
   { value: 'worldId', labelKey: 'playerConnections.allPlayers.worldId' },
   {
     value: 'nationCmsId',
@@ -270,11 +270,11 @@ export default function AllCharactersTab({
 
   // Group by - from URL, fallback to localStorage
   const [groupBy, setGroupBy] = useState(() => {
-    return (
-      searchParams.get('group') ||
-      localStorage.getItem(GROUP_STORAGE_KEY) ||
-      'none'
-    );
+    const fromUrl = searchParams.get('group');
+    if (fromUrl && fromUrl !== 'none') return fromUrl;
+    const stored = localStorage.getItem(GROUP_STORAGE_KEY);
+    if (stored && stored !== 'none') return stored;
+    return '';
   });
 
   // Column settings (ColumnConfig[] pattern)
@@ -380,7 +380,7 @@ export default function AllCharactersTab({
         if (sortBy !== 'userId') next.set('sortBy', sortBy);
         if (!sortDesc) next.set('sortDesc', 'false');
         if (worldFilter !== 'all') next.set('world', worldFilter);
-        if (groupBy !== 'none') next.set('group', groupBy);
+        if (groupBy) next.set('group', groupBy);
         if (isOnlineFilter) next.set('online', isOnlineFilter);
         if (loginPlatformFilter) next.set('platform', loginPlatformFilter);
         return next;
@@ -605,7 +605,7 @@ export default function AllCharactersTab({
 
   // ── Grouped data ──
   const groupedData = useMemo(() => {
-    if (groupBy === 'none') return null;
+    if (!groupBy) return null;
     const groups: Record<string, AllPlayer[]> = {};
     for (const user of data.users) {
       let key = String((user as any)[groupBy] ?? '(empty)');
@@ -923,7 +923,7 @@ export default function AllCharactersTab({
           <Select
             labelId="allplayers-groupby-label"
             value={groupBy}
-            label={t('playerConnections.groupBy.label') + '  '}
+            label={'\u2003' + t('playerConnections.groupBy.label')}
             onChange={(e) => setGroupBy(e.target.value)}
             sx={{
               fontSize: '0.8125rem',

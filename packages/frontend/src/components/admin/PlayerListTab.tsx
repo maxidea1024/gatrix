@@ -747,7 +747,7 @@ const PlayerListTab: React.FC<Props> = ({
           <Select
             labelId="groupby-label"
             value={groupBy}
-            label={t('playerConnections.groupBy.label') + '  '}
+            label={'\u2003' + t('playerConnections.groupBy.label')}
             onChange={(e) => handleGroupByChange(e.target.value as string)}
             sx={{
               fontSize: '0.8125rem',

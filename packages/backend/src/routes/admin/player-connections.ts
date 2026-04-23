@@ -21,4 +21,14 @@ router.get('/all-characters', PlayerConnectionsController.getAllCharacters);
 // Kick
 router.post('/kick', PlayerConnectionsController.kickPlayers);
 
+// Sync online status (fix stale isOnline flags in DB)
+router.get(
+  '/sync-online-status/preview',
+  PlayerConnectionsController.previewSyncOnlineStatus
+);
+router.post(
+  '/sync-online-status',
+  PlayerConnectionsController.syncOnlineStatus
+);
+
 export default router;

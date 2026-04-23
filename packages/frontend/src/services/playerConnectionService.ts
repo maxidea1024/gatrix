@@ -224,6 +224,50 @@ const playerConnectionService = {
     );
     return res.data || { users: [], total: 0, page: 1, limit: 20 };
   },
+
+  /**
+   * Preview sync online status: dry-run that returns stale users without fixing
+   */
+  async previewSyncOnlineStatus(
+    projectApiPath: string
+  ): Promise<{
+    totalDbOnline: number;
+    totalActualOnline: number;
+    staleCount: number;
+    staleUsers: Array<{
+      accountId: string;
+      lastUserId: number;
+      name: string;
+      characterId: string;
+      worldId: string;
+      lastLoginTimeUtc: string | null;
+      loginPlatform: string;
+      clientVersion: string;
+    }>;
+    hasMore: boolean;
+  }> {
+    const res = await api.get(
+      `${projectApiPath}/player-connections/sync-online-status/preview`
+    );
+    return res.data || { totalDbOnline: 0, totalActualOnline: 0, staleCount: 0, staleUsers: [], hasMore: false };
+  },
+
+  /**
+   * Sync online status: cross-reference actual connected users with DB isOnline flags
+   */
+  async syncOnlineStatus(
+    projectApiPath: string
+  ): Promise<{
+    fixed: number;
+    staleAccountIds: string[];
+    totalDbOnline: number;
+    totalActualOnline: number;
+  }> {
+    const res = await api.post(
+      `${projectApiPath}/player-connections/sync-online-status`
+    );
+    return res.data || { fixed: 0, staleAccountIds: [], totalDbOnline: 0, totalActualOnline: 0 };
+  },
 };
 
 export default playerConnectionService;
