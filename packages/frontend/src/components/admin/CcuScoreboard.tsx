@@ -142,10 +142,31 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     }
   }, [totalCount, prevTotalCount]);
 
-  // ESC to close
+  // Browser fullscreen on mount, exit on unmount
+  useEffect(() => {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+
+    // If user exits fullscreen via browser (ESC hits browser first), close scoreboard
+    const onFsChange = () => {
+      if (!document.fullscreenElement) onClose();
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange);
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    };
+  }, [onClose]);
+
+  // ESC to close (also exits fullscreen via unmount cleanup above)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
