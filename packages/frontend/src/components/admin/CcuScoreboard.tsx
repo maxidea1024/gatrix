@@ -47,7 +47,6 @@ function useAnimatedNumber(target: number): number {
   return display;
 }
 
-
 type Trend = 'up' | 'down' | 'flat';
 
 function getTrend(current: number, previous: number | undefined): Trend {
@@ -151,7 +150,12 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   const totalTrend = getTrend(totalCount, prevTotalCount);
   const totalDelta =
     prevTotalCount !== undefined ? totalCount - prevTotalCount : 0;
-  const tickerDirection = totalDelta > 0 ? 'up' as const : totalDelta < 0 ? 'down' as const : 'none' as const;
+  const tickerDirection =
+    totalDelta > 0
+      ? ('up' as const)
+      : totalDelta < 0
+        ? ('down' as const)
+        : ('none' as const);
 
   // Track value changes to trigger rumble
   const [animKey, setAnimKey] = useState(0);
@@ -206,7 +210,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   // CCU history for sparkline
   const historyRef = useRef<number[]>([]);
   useEffect(() => {
-    historyRef.current = [...historyRef.current, totalCount].slice(-MAX_HISTORY);
+    historyRef.current = [...historyRef.current, totalCount].slice(
+      -MAX_HISTORY
+    );
   }, [totalCount]);
 
   return (
@@ -341,7 +347,10 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               fontVariantNumeric: 'tabular-nums',
               transition: 'color 0.3s ease',
               position: 'relative',
-              animation: animKey > 0 ? 'rumble 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both' : 'none',
+              animation:
+                animKey > 0
+                  ? 'rumble 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both'
+                  : 'none',
               '@keyframes rumble': {
                 '0%': { transform: 'translate(0, 0)' },
                 '15%': { transform: 'translate(-2px, -2px)' },
@@ -388,13 +397,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           }}
         >
           {totalDelta > 0 ? (
-            <TrendingUpIcon
-              sx={{ color: TREND_COLORS.up, fontSize: 28 }}
-            />
+            <TrendingUpIcon sx={{ color: TREND_COLORS.up, fontSize: 28 }} />
           ) : totalDelta < 0 ? (
-            <TrendingDownIcon
-              sx={{ color: TREND_COLORS.down, fontSize: 28 }}
-            />
+            <TrendingDownIcon sx={{ color: TREND_COLORS.down, fontSize: 28 }} />
           ) : null}
           <Typography
             sx={{
