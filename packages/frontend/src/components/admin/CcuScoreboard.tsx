@@ -58,6 +58,59 @@ const TREND_COLORS = {
   flat: 'rgba(255,255,255,0.5)',
 } as const;
 
+// ─── Sparkline ───
+const MAX_HISTORY = 60;
+
+const Sparkline: React.FC<{ data: number[]; trend: Trend }> = ({ data, trend }) => {
+  if (data.length < 2) return null;
+
+  const W = 800;
+  const H = 160;
+  const PAD = 4;
+
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+
+  const points = data.map((v, i) => {
+    const x = PAD + (i / (data.length - 1)) * (W - PAD * 2);
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return { x, y };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const areaPath = `${linePath} L${points[points.length - 1].x},${H} L${points[0].x},${H} Z`;
+
+  const color = trend === 'up' ? TREND_COLORS.up : trend === 'down' ? TREND_COLORS.down : '#64b4ff';
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      style={{
+        position: 'absolute',
+        bottom: '-30%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '90vw',
+        maxWidth: 1200,
+        height: 'auto',
+        pointerEvents: 'none',
+        opacity: 0.15,
+      }}
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.5" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill="url(#sparkFill)" />
+      <path d={linePath} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
 // ─── Props ───
 interface CcuScoreboardProps {
   ccuData: CcuData | null;
@@ -104,6 +157,14 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // CCU history for sparkline
+  const historyRef = useRef<number[]>([]);
+  useEffect(() => {
+    if (ccuData?.total !== undefined) {
+      historyRef.current = [...historyRef.current, ccuData.total].slice(-MAX_HISTORY);
+    }
+  }, [ccuData?.total]);
 
 
 
@@ -243,7 +304,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           }}
         />
 
-
+        {/* Sparkline trend graph */}
+        <Sparkline data={historyRef.current} trend={totalTrend} />
 
         {/* Total CCU number */}
         <Box sx={{ position: 'relative', textAlign: 'center' }}>
