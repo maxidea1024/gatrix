@@ -55,7 +55,7 @@ function getTrend(current: number, previous: number | undefined): Trend {
 const TREND_COLORS = {
   up: '#00e676',
   down: '#ff5252',
-  flat: 'rgba(255,255,255,0.5)',
+  flat: '#00e676',
 } as const;
 
 // ─── Sparkline ───
