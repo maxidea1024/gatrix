@@ -142,13 +142,14 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     }
   }, [totalCount, prevTotalCount]);
 
-  // Browser fullscreen on mount, exit on unmount
+  // Only close scoreboard if user actively exits fullscreen (not on page load)
+  const wasFullscreenRef = useRef(!!document.fullscreenElement);
   useEffect(() => {
-    document.documentElement.requestFullscreen?.().catch(() => {});
-
-    // If user exits fullscreen via browser (ESC hits browser first), close scoreboard
     const onFsChange = () => {
-      if (!document.fullscreenElement) onClose();
+      if (!document.fullscreenElement && wasFullscreenRef.current) {
+        onClose();
+      }
+      wasFullscreenRef.current = !!document.fullscreenElement;
     };
     document.addEventListener('fullscreenchange', onFsChange);
 
@@ -266,7 +267,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             letterSpacing: 1,
           }}
         >
-          {now.toLocaleTimeString()}
+          {now.toLocaleTimeString()}  (UTC {now.toISOString().slice(11, 19)})
         </Typography>
 
         <Box

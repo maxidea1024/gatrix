@@ -444,6 +444,7 @@ const PlayerConnectionsPage: React.FC = () => {
                 onClick={() => {
                   setScoreboardOpen(true);
                   sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
+                  document.documentElement.requestFullscreen?.().catch(() => {});
                 }}
                 sx={{
                   color: 'text.secondary',
