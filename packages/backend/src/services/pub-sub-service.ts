@@ -142,6 +142,10 @@ export class PubSubService extends EventEmitter {
           password: config.redis.password || undefined,
           lazyConnect: true,
           maxRetriesPerRequest: null,
+          // Disable CLIENT SETINFO commands (LIB-NAME, LIB-VER) sent on connect.
+          // Redis <7.2 and some managed providers (e.g. Tencent Cloud Redis) do not
+          // support this command, causing "-ERR invalid command" noise in logs.
+          disableClientInfo: true,
         });
         await this.sseSubscriber.connect();
 

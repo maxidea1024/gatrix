@@ -81,7 +81,6 @@ import serverLifecycleService, {
   ServerLifecycleEvent,
 } from '@/services/serverLifecycleService';
 import DashboardCcuChart from '@/components/admin/DashboardCcuChart';
-import { varsService } from '@/services/varsService';
 
 // Stats card component with modern design
 interface StatsCardProps {
@@ -358,18 +357,7 @@ const DashboardPage: React.FC = () => {
     detail: MaintenanceDetail | null;
   } | null>(null);
   const [maintenanceLoading, setMaintenanceLoading] = useState(false);
-  const [hasAdmindUrl, setHasAdmindUrl] = useState(false);
 
-  // Check if admindApiUrl is configured (for CCU chart)
-  useEffect(() => {
-    if (!hasAnyPermissions) return;
-    const projectApiPath = getProjectApiPath();
-    if (!projectApiPath) return;
-    varsService
-      .get(projectApiPath, 'admindApiUrl')
-      .then((val) => setHasAdmindUrl(!!val))
-      .catch(() => setHasAdmindUrl(false));
-  }, [hasAnyPermissions, getProjectApiPath]);
 
   // Map API response fields to local names
   const stats = {
@@ -1245,10 +1233,9 @@ const DashboardPage: React.FC = () => {
         </Box>
       )}
 
-      {/* CCU Chart Section - only when admindApiUrl is configured */}
+      {/* CCU Chart Section */}
       {hasAnyPermissions &&
-        hasPermission(P.MONITORING_READ) &&
-        hasAdmindUrl && (
+        hasPermission(P.MONITORING_READ) && (
           <Box sx={{ mb: 4 }}>
             <DashboardCcuChart projectApiPath={getProjectApiPath()} />
           </Box>

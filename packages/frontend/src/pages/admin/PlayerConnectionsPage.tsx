@@ -39,11 +39,9 @@ import {
   People as PeopleIcon,
   Refresh as RefreshIcon,
   ArrowDropDown as ArrowDropDownIcon,
-  Settings as SettingsIcon,
   Block as KickIcon,
   TrendingUp as TrendingUpIcon,
   Public as WorldIcon,
-  Warning as WarningIcon,
   SignalCellularAlt as CcuIcon,
   ErrorOutline as ErrorIcon,
   SmartToy as BotIcon,
@@ -55,9 +53,8 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
-import { varsService } from '../../services/varsService';
 import playerConnectionService from '../../services/playerConnectionService';
 import type { CcuData } from '../../services/playerConnectionService';
 import PageContentLoader from '../../components/common/PageContentLoader';
@@ -85,14 +82,11 @@ const REFRESH_OPTIONS = [
 const PlayerConnectionsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
   const { getProjectApiPath } = useOrgProject();
   const [searchParams, setSearchParams] = useSearchParams();
   const projectApiPath = getProjectApiPath();
 
   // State
-  const [admindApiUrl, setAdmindApiUrl] = useState<string | null>(null);
-  const [urlChecked, setUrlChecked] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const p = searchParams.get('tab');
     return p ? parseInt(p, 10) : 0;
@@ -167,21 +161,9 @@ const PlayerConnectionsPage: React.FC = () => {
     localStorage.setItem(REFRESH_STORAGE_KEY, val.toString());
   };
 
-  // Check admindApiUrl
-  useEffect(() => {
-    if (!projectApiPath) return;
-    varsService
-      .get(projectApiPath, 'admindApiUrl')
-      .then((val) => {
-        setAdmindApiUrl(val);
-        setUrlChecked(true);
-      })
-      .catch(() => setUrlChecked(true));
-  }, [projectApiPath]);
-
   // Load CCU
   const loadCcu = useCallback(async () => {
-    if (!projectApiPath || !admindApiUrl) return;
+    if (!projectApiPath) return;
     try {
       setCcuError(null);
       const data = await playerConnectionService.getCcu(projectApiPath);
@@ -204,22 +186,21 @@ const PlayerConnectionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectApiPath, admindApiUrl, t]);
+  }, [projectApiPath, t]);
 
   useEffect(() => {
-    if (admindApiUrl) loadCcu();
-    else setLoading(false);
-  }, [admindApiUrl, loadCcu]);
+    loadCcu();
+  }, [loadCcu]);
 
   // Auto-refresh (only for Overview and CCU Graph tabs, not Player List)
   useEffect(() => {
-    if (refreshInterval > 0 && admindApiUrl && activeTab < 2) {
+    if (refreshInterval > 0 && activeTab < 2) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [refreshInterval, loadCcu, admindApiUrl, activeTab]);
+  }, [refreshInterval, loadCcu, activeTab]);
 
   const handleTabChange = (_: React.SyntheticEvent, val: number) => {
     setActiveTab(val);
@@ -324,37 +305,6 @@ const PlayerConnectionsPage: React.FC = () => {
       setSyncing(false);
     }
   };
-
-  // No URL configured
-  if (urlChecked && !admindApiUrl) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <PageHeader
-          icon={<PeopleIcon />}
-          title={t('playerConnections.title')}
-          subtitle={t('playerConnections.subtitle')}
-        />
-        <Alert
-          severity="warning"
-          icon={<WarningIcon />}
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              variant="contained"
-              startIcon={<SettingsIcon />}
-              onClick={() => navigate('/settings/system?tab=0')}
-            >
-              {t('playerConnections.goToSettings')}
-            </Button>
-          }
-          sx={{ mt: 2, borderRadius: 2 }}
-        >
-          {t('playerConnections.noApiUrl')}
-        </Alert>
-      </Box>
-    );
-  }
 
   const activeRefreshLabel =
     REFRESH_OPTIONS.find((o) => o.value === refreshInterval)?.label || 'Off';

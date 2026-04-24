@@ -60,11 +60,9 @@ const SystemSettingsPage: React.FC = () => {
     initialTab >= 0 && initialTab <= 6 ? initialTab : 0
   );
 
-  // Network settings
+  // Network settings (admindUrl only — admindApiUrl removed, uses service discovery)
   const [admindUrl, setAdmindUrl] = useState('');
   const [savedAdmindUrl, setSavedAdmindUrl] = useState('');
-  const [admindApiUrl, setAdmindApiUrl] = useState('');
-  const [savedAdmindApiUrl, setSavedAdmindApiUrl] = useState('');
 
   // AI Chat settings
   const [aiSettings, setAiSettings] = useState<{
@@ -108,14 +106,9 @@ const SystemSettingsPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const [admind, admindApi] = await Promise.all([
-          varsService.get(projectApiPath, 'admindUrl'),
-          varsService.get(projectApiPath, 'admindApiUrl'),
-        ]);
+        const admind = await varsService.get(projectApiPath, 'admindUrl');
         setAdmindUrl(admind || '');
         setSavedAdmindUrl(admind || '');
-        setAdmindApiUrl(admindApi || '');
-        setSavedAdmindApiUrl(admindApi || '');
       } catch (e) {
         // ignore load errors
       }
@@ -229,37 +222,18 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) => setAdmindUrl(e.target.value)}
                   helperText={t('settings.network.admindUrlHelp')}
                 />
-                <TextField
-                  fullWidth
-                  label={t('settings.network.admindApiUrl')}
-                  placeholder="https://admind-api.yourdomain.com"
-                  value={admindApiUrl}
-                  onChange={(e) => setAdmindApiUrl(e.target.value)}
-                  helperText={t('settings.network.admindApiUrlHelp')}
-                />
                 {canManage && (
                   <Stack direction="row" spacing={1}>
                     <Button
                       variant="contained"
-                      disabled={
-                        admindUrl === savedAdmindUrl &&
-                        admindApiUrl === savedAdmindApiUrl
-                      }
+                      disabled={admindUrl === savedAdmindUrl}
                       onClick={async () => {
-                        await Promise.all([
-                          varsService.set(
-                            projectApiPath,
-                            'admindUrl',
-                            admindUrl || null
-                          ),
-                          varsService.set(
-                            projectApiPath,
-                            'admindApiUrl',
-                            admindApiUrl || null
-                          ),
-                        ]);
+                        await varsService.set(
+                          projectApiPath,
+                          'admindUrl',
+                          admindUrl || null
+                        );
                         setSavedAdmindUrl(admindUrl);
-                        setSavedAdmindApiUrl(admindApiUrl);
                         enqueueSnackbar(t('common.saved'), {
                           variant: 'success',
                         });

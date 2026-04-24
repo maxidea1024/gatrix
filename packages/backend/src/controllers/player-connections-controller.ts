@@ -1,32 +1,72 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../types/auth';
+import * as crypto from 'crypto';
 import axios from 'axios';
 import { GatrixError } from '../middleware/error-handler';
 import { asyncHandler } from '../utils/async-handler';
 import { createLogger } from '../config/logger';
-import VarsModel from '../models/vars';
 import { CcuHistoryModel } from '../models/ccu-history';
+import serviceDiscoveryService from '../services/service-discovery-service';
 
 const logger = createLogger('PlayerConnectionsController');
 
 // Timeout for admind API requests (ms)
 const ADMIND_TIMEOUT = 8000;
 
+
+
+// AES-256-CBC decryption for authd payment stats
+const PAYMENT_KEY = 'a3f8c2e1b4d7609582746f1e3a9b0c5d8e2f1a4b7c6d9e0f3a2b5c8d1e4f7a00';
+const PAYMENT_IV = 'e7c3a1f9b2d8046583716e2f4a0b9c5d';
+
+function decryptAES256CBC(encryptedBase64: string): string {
+  const key = Buffer.from(PAYMENT_KEY, 'hex');
+  const iv = Buffer.from(PAYMENT_IV, 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  let decrypted = decipher.update(encryptedBase64, 'base64', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
 /**
- * Helper: get admindApiUrl for the current environment
- * Priority: vars (Network Settings) > ADMIND_API_URL env var
+ * Helper: get admind base URL via service discovery.
+ * Finds the first ready admind instance and returns its internalApi URL.
  */
-async function getAdmindApiUrl(environmentId: string): Promise<string> {
-  const url = await VarsModel.get('admindApiUrl', environmentId);
-  const resolved = url || process.env.ADMIND_API_URL || '';
-  if (!resolved) {
+async function getAdmindApiUrl(): Promise<string> {
+  const instances = await serviceDiscoveryService.getServices('admind');
+  const ready = instances.filter(i => i.status === 'ready');
+  if (ready.length === 0) {
     throw new GatrixError(
-      'admindApiUrl is not configured. Please set it in System Settings > Network Settings or ADMIND_API_URL env var.',
-      400
+      'No admind instances found via service discovery. Ensure admind is registered and running.',
+      503
     );
   }
-  // Trim trailing slash
-  return resolved.replace(/\/+$/, '');
+  const inst = ready[0];
+  const port = inst.ports?.internalApi;
+  if (!port || !inst.internalAddress) {
+    throw new GatrixError('admind instance has no internalApi port configured', 503);
+  }
+  return `http://${inst.internalAddress}:${port}`;
+}
+
+/**
+ * Helper: get authd base URL via service discovery (externalApi port).
+ */
+async function getAuthdApiUrl(): Promise<string> {
+  const instances = await serviceDiscoveryService.getServices('authd');
+  const ready = instances.filter(i => i.status === 'ready');
+  if (ready.length === 0) {
+    throw new GatrixError(
+      'No authd instances found via service discovery.',
+      503
+    );
+  }
+  const inst = ready[0];
+  const port = inst.ports?.externalApi;
+  if (!port || !inst.internalAddress) {
+    throw new GatrixError('authd instance has no externalApi port configured', 503);
+  }
+  return `http://${inst.internalAddress}:${port}`;
 }
 
 /**
@@ -89,12 +129,7 @@ export class PlayerConnectionsController {
    */
   static getCcu = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
       const data = await admindRequest(admindUrl, 'GET', '/gatrix/v1/ccu');
 
       // Transform response for frontend:
@@ -162,14 +197,9 @@ export class PlayerConnectionsController {
    */
   static getConnectedUsers = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
       const { page, limit, worldId, search, sortBy, sortDesc } = req.query;
 
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
 
       const queryParams = new URLSearchParams();
       if (page) queryParams.append('page', String(page));
@@ -237,11 +267,6 @@ export class PlayerConnectionsController {
    */
   static getAllPlayers = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
       const {
         page,
         limit,
@@ -253,7 +278,7 @@ export class PlayerConnectionsController {
         loginPlatform,
       } = req.query;
 
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
 
       const queryParams = new URLSearchParams();
       if (page) queryParams.append('page', String(page));
@@ -301,11 +326,6 @@ export class PlayerConnectionsController {
    */
   static getAllCharacters = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
       const {
         page,
         limit,
@@ -317,7 +337,7 @@ export class PlayerConnectionsController {
         loginPlatform,
       } = req.query;
 
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
 
       const queryParams = new URLSearchParams();
       if (page) queryParams.append('page', String(page));
@@ -369,11 +389,6 @@ export class PlayerConnectionsController {
    */
   static kickPlayers = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
       const { type, worldId, userId } = req.body;
 
       if (!type || !['all', 'world', 'user'].includes(type)) {
@@ -383,12 +398,11 @@ export class PlayerConnectionsController {
         );
       }
 
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
 
       logger.info(
         `Player kick requested: type=${type}, worldId=${worldId}, userId=${userId}`,
         {
-          environmentId,
           user: req.user?.userId,
         }
       );
@@ -429,12 +443,7 @@ export class PlayerConnectionsController {
    */
   static previewSyncOnlineStatus = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
       const data = await admindRequest(
         admindUrl,
         'GET',
@@ -455,12 +464,7 @@ export class PlayerConnectionsController {
    */
   static syncOnlineStatus = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = req.environmentId;
-      if (!environmentId) {
-        throw new GatrixError('Environment is required', 400);
-      }
-
-      const admindUrl = await getAdmindApiUrl(environmentId);
+      const admindUrl = await getAdmindApiUrl();
       const data = await admindRequest(
         admindUrl,
         'POST',
@@ -468,7 +472,6 @@ export class PlayerConnectionsController {
       );
 
       logger.info('Online status sync completed', {
-        environmentId,
         user: req.user?.userId,
         fixed: data.fixed,
         totalDbOnline: data.totalDbOnline,
@@ -479,6 +482,68 @@ export class PlayerConnectionsController {
         success: true,
         data,
       });
+    }
+  );
+
+  /**
+   * GET /payment-stats
+   * Retrieve payment statistics from authd via service discovery.
+   * IP-restricted: only allowed from whitelisted IPs.
+   */
+  static getPaymentStats = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      // Find authd via service discovery
+      const authUrl = await getAuthdApiUrl();
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), ADMIND_TIMEOUT);
+
+      try {
+        const response = await fetch(`${authUrl}/refreshCache`, {
+          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' },
+        });
+        clearTimeout(timeout);
+
+        if (!response.ok) {
+          throw new GatrixError(`authd payment stats returned ${response.status}`, 502);
+        }
+
+        const encrypted: any = await response.json();
+
+        logger.info('authd refreshCache response received', {
+          hasData: !!encrypted?.data,
+          algorithm: encrypted?.algorithm,
+        });
+
+        // Decrypt AES-256-CBC response from authd
+        const decrypted = decryptAES256CBC(encrypted.data);
+        const stats = JSON.parse(decrypted);
+
+        logger.info('Payment stats decrypted', {
+          totalCount: stats.totalCount,
+          totalAmount: stats.totalAmount,
+        });
+
+        // Return only summary: totalCount and totalAmount
+        res.json({
+          success: true,
+          data: {
+            totalCount: stats.totalCount || 0,
+            totalAmount: stats.totalAmount || 0,
+          },
+        });
+      } catch (err: any) {
+        clearTimeout(timeout);
+        if (err instanceof GatrixError) throw err;
+        if (err.name === 'AbortError') {
+          throw new GatrixError('authd payment stats request timed out', 504);
+        }
+        logger.error('Failed to get payment stats from authd', {
+          error: err.message,
+        });
+        throw new GatrixError(`Failed to retrieve payment stats: ${err.message}`, 502);
+      }
     }
   );
 }

@@ -79,6 +79,10 @@ export class RedisManager {
       commandTimeout: config.redis.commandTimeout,
       keepAlive: config.redis.keepAlive,
       family: config.redis.family,
+      // Disable CLIENT SETINFO commands (LIB-NAME, LIB-VER) sent on connect.
+      // Redis <7.2 and some managed providers (e.g. Tencent Cloud Redis) do not
+      // support this command, causing "-ERR invalid command" noise in logs.
+      disableClientInfo: true,
     };
 
     this.redisClient = new Redis(redisOptions);

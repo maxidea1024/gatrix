@@ -107,6 +107,10 @@ export class EventListener {
         port: this.redisConfig.port,
         password: this.redisConfig.password,
         db: this.redisConfig.db || 0,
+        // Disable CLIENT SETINFO commands (LIB-NAME, LIB-VER) sent on connect.
+        // Redis <7.2 and some managed providers (e.g. Tencent Cloud Redis) do not
+        // support this command, causing "-ERR invalid command" noise in logs.
+        disableClientInfo: true,
         retryStrategy: (times) => {
           // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (max)
           const delay = Math.min(Math.pow(2, times - 1) * 1000, 30000);

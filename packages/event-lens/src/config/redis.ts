@@ -13,6 +13,10 @@ export function getRedisClient(): Redis {
       db: config.redis.db,
       maxRetriesPerRequest: null,
       enableReadyCheck: false,
+      // Disable CLIENT SETINFO commands (LIB-NAME, LIB-VER) sent on connect.
+      // Redis <7.2 and some managed providers (e.g. Tencent Cloud Redis) do not
+      // support this command, causing "-ERR invalid command" noise in logs.
+      disableClientInfo: true,
       retryStrategy(times) {
         const delay = Math.min(times * 50, 2000);
         return delay;

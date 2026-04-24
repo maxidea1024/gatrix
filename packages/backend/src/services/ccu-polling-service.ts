@@ -1,6 +1,6 @@
 import { createLogger } from '../config/logger';
 import { CcuHistoryModel } from '../models/ccu-history';
-import db from '../config/knex';
+import serviceDiscoveryService from '../services/service-discovery-service';
 
 const logger = createLogger('CcuPollingService');
 
@@ -12,6 +12,7 @@ const DEFAULT_RETENTION_DAYS = 14;
  *
  * Polls admind API for concurrent user counts and stores
  * the results in g_ccu_history for historical graphing.
+ * Uses service discovery to find admind instances.
  * Invoked by BullMQ scheduler job 'ccu:poll' (every minute).
  */
 export class CcuPollingService {
@@ -28,32 +29,40 @@ export class CcuPollingService {
   }
 
   /**
-   * Poll all environments that have admindApiUrl configured
+   * Poll all admind instances found via service discovery
    */
   async pollAll(): Promise<void> {
     try {
-      // Find all environments that have admindApiUrl set
-      const rows = await db('g_vars')
-        .select('environmentId', 'varValue')
-        .where('varKey', 'admindApiUrl')
-        .whereNotNull('varValue')
-        .where('varValue', '!=', '');
+      const instances = await serviceDiscoveryService.getServices('admind');
+      const ready = instances.filter(i => i.status === 'ready');
 
-      if (rows.length === 0) {
+      if (ready.length === 0) {
         logger.debug(
-          'No environments with admindApiUrl configured, skipping CCU poll'
+          'No admind instances found via service discovery, skipping CCU poll'
         );
         return;
       }
 
       const now = new Date();
 
-      for (const row of rows) {
+      for (const inst of ready) {
+        const port = inst.ports?.internalApi;
+        if (!port || !inst.internalAddress) {
+          logger.warn('admind instance missing internalApi port, skipping', {
+            instanceId: inst.instanceId,
+          });
+          continue;
+        }
+
+        const admindUrl = `http://${inst.internalAddress}:${port}`;
+        // Use environmentId from labels, fallback to 'default'
+        const environmentId = inst.labels?.environmentId || inst.labels?.env || 'default';
+
         try {
-          await this.pollEnvironment(row.environmentId, row.varValue, now);
+          await this.pollEnvironment(environmentId, admindUrl, now);
         } catch (err: any) {
           logger.warn(
-            `CCU poll failed for env ${row.environmentId}: ${err.message}`
+            `CCU poll failed for admind ${inst.instanceId}: ${err.message}`
           );
         }
       }

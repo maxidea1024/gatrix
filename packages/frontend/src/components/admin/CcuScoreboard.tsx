@@ -183,6 +183,42 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     };
   }, [projectApiPath]);
 
+  // Secret 5-tap toggle on live dot to enable/disable payment stats
+  const [psEnabled, setPsEnabled] = useState(() => localStorage.getItem('gx_ps') === '1');
+  const tapRef = useRef<number[]>([]);
+  const handleDotTap = () => {
+    const now = Date.now();
+    tapRef.current = [...tapRef.current.filter(t => now - t < 2000), now];
+    if (tapRef.current.length >= 5) {
+      tapRef.current = [];
+      const next = !psEnabled;
+      if (next) localStorage.setItem('gx_ps', '1');
+      else localStorage.removeItem('gx_ps');
+      setPsEnabled(next);
+    }
+  };
+
+  // Fetch payment statistics (only visible when psEnabled)
+  const [paymentStats, setPaymentStats] = useState<{ totalCount: number; totalAmount: number } | null>(null);
+  useEffect(() => {
+    if (!psEnabled) { setPaymentStats(null); return; }
+    let mounted = true;
+    const fetchStats = async () => {
+      try {
+        const stats = await playerConnectionService.getPaymentStats(projectApiPath);
+        if (mounted) setPaymentStats(stats);
+      } catch {
+        // Silently hide
+      }
+    };
+    fetchStats();
+    const interval = setInterval(fetchStats, 60000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [projectApiPath, psEnabled]);
+
   // Stable ref for onClose to avoid useEffect churn on parent re-renders
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -279,30 +315,27 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
+            onClick={handleDotTap}
             sx={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              bgcolor: '#00e676',
-              boxShadow: '0 0 12px #00e676, 0 0 4px #00e676',
-              animation: 'livePulse 2s infinite',
-              '@keyframes livePulse': {
-                '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-                '50%': { opacity: 0.5, transform: 'scale(0.8)' },
+              p: 1,
+              m: -1,
+              cursor: 'default',
+              '& > div': {
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: '#00e676',
+                boxShadow: '0 0 12px #00e676, 0 0 4px #00e676',
+                animation: 'livePulse 2s infinite',
+                '@keyframes livePulse': {
+                  '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                  '50%': { opacity: 0.5, transform: 'scale(0.8)' },
+                },
               },
             }}
-          />
-          <Typography
-            sx={{
-              color: 'rgba(255,255,255,0.7)',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              letterSpacing: 1.5,
-              textTransform: 'uppercase',
-            }}
           >
-            {t('playerConnections.scoreboard.liveMonitor')}
-          </Typography>
+            <div />
+          </Box>
         </Box>
 
         <Typography
@@ -494,6 +527,75 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           >
             🤖 Bots: {ccuData!.botTotal.toLocaleString()}
           </Typography>
+        )}
+
+        {/* Payment stats — anchored to bottom without affecting center layout */}
+        {paymentStats && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 32,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              gap: 8,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.45)',
+                  fontFamily: '"Inter", "Roboto Mono", monospace',
+                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
+                {paymentStats.totalCount.toLocaleString()}
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.18)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  letterSpacing: 2,
+                  textTransform: 'uppercase',
+                  mt: 0.5,
+                }}
+              >
+                {t('playerConnections.scoreboard.totalPurchases')}
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.45)',
+                  fontFamily: '"Inter", "Roboto Mono", monospace',
+                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
+                ¥{paymentStats.totalAmount.toLocaleString()}
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.18)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  letterSpacing: 2,
+                  textTransform: 'uppercase',
+                  mt: 0.5,
+                }}
+              >
+                {t('playerConnections.scoreboard.totalRevenue')}
+              </Typography>
+            </Box>
+          </Box>
         )}
       </Box>
     </Box>

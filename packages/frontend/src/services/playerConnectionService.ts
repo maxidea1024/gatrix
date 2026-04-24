@@ -279,6 +279,23 @@ const playerConnectionService = {
       }
     );
   },
+
+  /**
+   * Get payment statistics from authd (token-secured).
+   * Returns null if denied or unavailable.
+   */
+  async getPaymentStats(
+    projectApiPath: string
+  ): Promise<{ totalCount: number; totalAmount: number } | null> {
+    try {
+      const res = await api.get(
+        `${projectApiPath}/player-connections/payment-stats`
+      );
+      return res.data || null;
+    } catch {
+      return null;
+    }
+  },
 };
 
 export default playerConnectionService;

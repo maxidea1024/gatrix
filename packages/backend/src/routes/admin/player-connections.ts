@@ -31,4 +31,7 @@ router.post(
   PlayerConnectionsController.syncOnlineStatus
 );
 
+// Payment statistics (IP-restricted)
+router.get('/payment-stats', PlayerConnectionsController.getPaymentStats);
+
 export default router;

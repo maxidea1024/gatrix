@@ -166,6 +166,10 @@ class TokenMirrorService {
         password: config.redis.password || undefined,
         db: config.redis.db,
         lazyConnect: true,
+        // Disable CLIENT SETINFO commands (LIB-NAME, LIB-VER) sent on connect.
+        // Redis <7.2 and some managed providers (e.g. Tencent Cloud Redis) do not
+        // support this command, causing "-ERR invalid command" noise in logs.
+        disableClientInfo: true,
       });
 
       await this.subscriber.connect();
