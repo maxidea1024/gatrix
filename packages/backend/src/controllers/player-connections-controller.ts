@@ -13,10 +13,9 @@ const logger = createLogger('PlayerConnectionsController');
 // Timeout for admind API requests (ms)
 const ADMIND_TIMEOUT = 8000;
 
-
-
 // AES-256-CBC decryption for authd payment stats
-const PAYMENT_KEY = 'a3f8c2e1b4d7609582746f1e3a9b0c5d8e2f1a4b7c6d9e0f3a2b5c8d1e4f7a00';
+const PAYMENT_KEY =
+  'a3f8c2e1b4d7609582746f1e3a9b0c5d8e2f1a4b7c6d9e0f3a2b5c8d1e4f7a00';
 const PAYMENT_IV = 'e7c3a1f9b2d8046583716e2f4a0b9c5d';
 
 function decryptAES256CBC(encryptedBase64: string): string {
@@ -34,7 +33,7 @@ function decryptAES256CBC(encryptedBase64: string): string {
  */
 async function getAdmindApiUrl(): Promise<string> {
   const instances = await serviceDiscoveryService.getServices('admind');
-  const ready = instances.filter(i => i.status === 'ready');
+  const ready = instances.filter((i) => i.status === 'ready');
   if (ready.length === 0) {
     throw new GatrixError(
       'No admind instances found via service discovery. Ensure admind is registered and running.',
@@ -44,7 +43,10 @@ async function getAdmindApiUrl(): Promise<string> {
   const inst = ready[0];
   const port = inst.ports?.internalApi;
   if (!port || !inst.internalAddress) {
-    throw new GatrixError('admind instance has no internalApi port configured', 503);
+    throw new GatrixError(
+      'admind instance has no internalApi port configured',
+      503
+    );
   }
   return `http://${inst.internalAddress}:${port}`;
 }
@@ -54,7 +56,7 @@ async function getAdmindApiUrl(): Promise<string> {
  */
 async function getAuthdApiUrl(): Promise<string> {
   const instances = await serviceDiscoveryService.getServices('authd');
-  const ready = instances.filter(i => i.status === 'ready');
+  const ready = instances.filter((i) => i.status === 'ready');
   if (ready.length === 0) {
     throw new GatrixError(
       'No authd instances found via service discovery.',
@@ -64,7 +66,10 @@ async function getAuthdApiUrl(): Promise<string> {
   const inst = ready[0];
   const port = inst.ports?.externalApi;
   if (!port || !inst.internalAddress) {
-    throw new GatrixError('authd instance has no externalApi port configured', 503);
+    throw new GatrixError(
+      'authd instance has no externalApi port configured',
+      503
+    );
   }
   return `http://${inst.internalAddress}:${port}`;
 }
@@ -506,7 +511,10 @@ export class PlayerConnectionsController {
         clearTimeout(timeout);
 
         if (!response.ok) {
-          throw new GatrixError(`authd payment stats returned ${response.status}`, 502);
+          throw new GatrixError(
+            `authd payment stats returned ${response.status}`,
+            502
+          );
         }
 
         const encrypted: any = await response.json();
@@ -542,7 +550,10 @@ export class PlayerConnectionsController {
         logger.error('Failed to get payment stats from authd', {
           error: err.message,
         });
-        throw new GatrixError(`Failed to retrieve payment stats: ${err.message}`, 502);
+        throw new GatrixError(
+          `Failed to retrieve payment stats: ${err.message}`,
+          502
+        );
       }
     }
   );

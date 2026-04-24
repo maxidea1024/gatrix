@@ -34,7 +34,7 @@ export class CcuPollingService {
   async pollAll(): Promise<void> {
     try {
       const instances = await serviceDiscoveryService.getServices('admind');
-      const ready = instances.filter(i => i.status === 'ready');
+      const ready = instances.filter((i) => i.status === 'ready');
 
       if (ready.length === 0) {
         logger.debug(
@@ -56,7 +56,8 @@ export class CcuPollingService {
 
         const admindUrl = `http://${inst.internalAddress}:${port}`;
         // Use environmentId from labels, fallback to 'default'
-        const environmentId = inst.labels?.environmentId || inst.labels?.env || 'default';
+        const environmentId =
+          inst.labels?.environmentId || inst.labels?.env || 'default';
 
         try {
           await this.pollEnvironment(environmentId, admindUrl, now);

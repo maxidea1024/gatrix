@@ -184,11 +184,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   }, [projectApiPath]);
 
   // Secret 5-tap toggle on live dot to enable/disable payment stats
-  const [psEnabled, setPsEnabled] = useState(() => localStorage.getItem('gx_ps') === '1');
+  const [psEnabled, setPsEnabled] = useState(
+    () => localStorage.getItem('gx_ps') === '1'
+  );
   const tapRef = useRef<number[]>([]);
   const handleDotTap = () => {
     const now = Date.now();
-    tapRef.current = [...tapRef.current.filter(t => now - t < 2000), now];
+    tapRef.current = [...tapRef.current.filter((t) => now - t < 2000), now];
     if (tapRef.current.length >= 5) {
       tapRef.current = [];
       const next = !psEnabled;
@@ -199,13 +201,20 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   };
 
   // Fetch payment statistics (only visible when psEnabled)
-  const [paymentStats, setPaymentStats] = useState<{ totalCount: number; totalAmount: number } | null>(null);
+  const [paymentStats, setPaymentStats] = useState<{
+    totalCount: number;
+    totalAmount: number;
+  } | null>(null);
   useEffect(() => {
-    if (!psEnabled) { setPaymentStats(null); return; }
+    if (!psEnabled) {
+      setPaymentStats(null);
+      return;
+    }
     let mounted = true;
     const fetchStats = async () => {
       try {
-        const stats = await playerConnectionService.getPaymentStats(projectApiPath);
+        const stats =
+          await playerConnectionService.getPaymentStats(projectApiPath);
         if (mounted) setPaymentStats(stats);
       } catch {
         // Silently hide

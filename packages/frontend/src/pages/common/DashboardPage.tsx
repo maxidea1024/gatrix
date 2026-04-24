@@ -358,7 +358,6 @@ const DashboardPage: React.FC = () => {
   } | null>(null);
   const [maintenanceLoading, setMaintenanceLoading] = useState(false);
 
-
   // Map API response fields to local names
   const stats = {
     total: statsData?.totalUsers ?? 0,
@@ -1234,12 +1233,11 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* CCU Chart Section */}
-      {hasAnyPermissions &&
-        hasPermission(P.MONITORING_READ) && (
-          <Box sx={{ mb: 4 }}>
-            <DashboardCcuChart projectApiPath={getProjectApiPath()} />
-          </Box>
-        )}
+      {hasAnyPermissions && hasPermission(P.MONITORING_READ) && (
+        <Box sx={{ mb: 4 }}>
+          <DashboardCcuChart projectApiPath={getProjectApiPath()} />
+        </Box>
+      )}
 
       {/* Environment Data Overview */}
       {environmentsWithCounts.length > 0 && (
