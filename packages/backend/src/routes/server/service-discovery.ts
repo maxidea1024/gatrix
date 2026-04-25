@@ -369,12 +369,15 @@ router.post('/status', serverAuthBase, async (req: any, res: any) => {
       stats,
     };
 
-    // Add auto-register fields if provided
+    // Always pass registration fields when provided (for meta repair on incomplete registrations)
+    if (hostname) input.hostname = hostname;
+    if (internalAddress) input.internalAddress = internalAddress;
+    if (ports) input.ports = ports;
+    if (meta) input.meta = meta;
+
+    // Add auto-register flag if requested
     if (autoRegisterIfMissing) {
-      input.hostname = hostname;
-      input.internalAddress = internalAddress;
-      input.ports = ports;
-      input.meta = meta;
+      input.autoRegisterIfMissing = true;
     }
 
     await serviceDiscoveryService.updateStatus(input, autoRegisterIfMissing);

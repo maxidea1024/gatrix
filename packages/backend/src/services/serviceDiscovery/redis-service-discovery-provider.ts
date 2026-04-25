@@ -399,10 +399,43 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         return;
       }
 
-      // Update stat only (meta is immutable)
+      // Update stat (and repair meta if incomplete)
       const statValue = await this.client.get(statKey);
       const stat = statValue ? JSON.parse(statValue) : {};
       const meta = JSON.parse(metaValue);
+
+      // Repair meta when SDK-reported values differ from stored values.
+      // After Gatrix restart, meta keys may persist with stale or empty data.
+      // SDK heartbeats always include registrationBackup data, so we compare
+      // and update any fields that have drifted.
+      if (input.hostname || input.internalAddress || input.ports) {
+        let metaRepaired = false;
+
+        if (input.hostname && meta.hostname !== input.hostname) {
+          meta.hostname = input.hostname;
+          metaRepaired = true;
+        }
+        if (input.internalAddress && meta.internalAddress !== input.internalAddress) {
+          meta.internalAddress = input.internalAddress;
+          metaRepaired = true;
+        }
+        if (input.ports && JSON.stringify(meta.ports) !== JSON.stringify(input.ports)) {
+          meta.ports = input.ports;
+          metaRepaired = true;
+        }
+
+        if (metaRepaired) {
+          await this.client.set(metaKey, JSON.stringify(meta));
+          logger.info(
+            `Meta repaired for ${serviceType}:${input.instanceId}`,
+            {
+              hostname: meta.hostname,
+              internalAddress: meta.internalAddress,
+              ports: meta.ports,
+            }
+          );
+        }
+      }
 
       // Check if service is already in error or no-response state - ignore updateStatus calls
       if (stat.status === 'error' || stat.status === 'no-response') {
@@ -627,9 +660,17 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         return null; // Service not found
       }
 
-      // If stat key doesn't exist, service is not active (was cleaned up)
+      // If stat key doesn't exist, service heartbeat has expired.
+      // Return with 'no-response' status so it remains visible in the UI.
+      // The next SDK heartbeat will restore the stat key and status.
       if (!statValue) {
-        return null;
+        const meta = JSON.parse(metaValue);
+        return {
+          ...meta,
+          status: 'no-response',
+          updatedAt: new Date().toISOString(),
+          stats: {},
+        };
       }
 
       const meta = JSON.parse(metaValue);
@@ -672,11 +713,24 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             const statKey = this.getStatKey(serviceType, instanceId);
             const statValue = await this.client.get(statKey);
 
+            const trackedKey = `${serviceType}:${instanceId}`;
             if (statValue) {
               const stat = JSON.parse(statValue);
               const instance: ServiceInstance = { ...meta, ...stat };
-              const trackedKey = `${serviceType}:${instanceId}`;
               this.trackedServices.set(trackedKey, instance);
+            } else {
+              // Orphaned meta (stat expired while Gatrix was down).
+              // Track it so the service is visible; next heartbeat will restore stat.
+              const instance: ServiceInstance = {
+                ...meta,
+                status: 'no-response',
+                updatedAt: new Date().toISOString(),
+                stats: {},
+              };
+              this.trackedServices.set(trackedKey, instance);
+              logger.info(
+                `Orphaned service detected (stat expired): ${serviceType}:${instanceId} - tracking as no-response`
+              );
             }
           } catch (error) {
             logger.warn(

@@ -58,7 +58,7 @@ import TagSelector from '../common/TagSelector';
 interface ServiceNoticeFormDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
   notice?: ServiceNotice | null;
 }
 
@@ -110,7 +110,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [description, setDescription] = useState('');
   const [selectedTags, setSelectedTags] = useState<any[]>([]);
 
-  // Ref to track initial content after Quill normalization
+  // Counter to force RichTextEditor remount on every dialog open
+  // This ensures Quill always fires onChange with normalized HTML on mount
+  const [editorKey, setEditorKey] = useState(0);
+  // Ref to track initial content after Quill normalization for accurate isDirty comparison
   const initialContentRef = useRef<string | null>(null);
 
   // Debounced preview values to prevent flickering
@@ -457,7 +460,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setTabTitle(notice.tabTitle || '');
       setTitle(notice.title);
       setContent(notice.content);
-      // Reset initialContentRef - will be set on first RichTextEditor onChange
+      // Force RichTextEditor remount so Quill fires onChange with normalized HTML
+      setEditorKey((prev) => prev + 1);
       initialContentRef.current = null;
       setDescription(notice.description || '');
       setSelectedTags(notice.tags || []);
@@ -475,6 +479,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setTabTitle('');
       setTitle('');
       setContent('');
+      setEditorKey((prev) => prev + 1);
+      initialContentRef.current = null;
       setDescription('');
       setSelectedTags([]);
     }
@@ -533,7 +539,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       tabTitle: notice.tabTitle?.trim() || null,
       title: notice.title?.trim() || '',
       content:
-        initialContentRef.current?.trim() || notice.content?.trim() || '',
+        initialContentRef.current !== null
+          ? initialContentRef.current.trim()
+          : notice.content?.trim() || '',
       description: notice.description?.trim() || null,
       tags: (notice.tags || []).map((t: any) => t.id).sort(),
     };
@@ -675,7 +683,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         }
       }
 
-      onSuccess();
+      await onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error saving service notice:', error);
@@ -949,9 +957,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                   <span style={{ color: 'error.main' }}>*</span>
                 </Typography>
                 <RichTextEditor
+                  key={editorKey}
                   value={content}
                   onChange={(val) => {
-                    // Capture first content change as baseline for isDirty comparison
+                    // Capture the first onChange as Quill-normalized baseline for isDirty
                     if (notice && initialContentRef.current === null) {
                       initialContentRef.current = val;
                     }

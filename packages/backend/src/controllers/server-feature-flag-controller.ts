@@ -679,4 +679,71 @@ export default class ServerFeatureFlagController {
         .json({ success: false, error: 'Failed to store code references' });
     }
   }
+
+  /**
+   * Receive context field usage report from Edge/SDK
+   * POST /api/v1/server/features/context-field-usage
+   * Buffers field names used during flag evaluation
+   */
+  static async receiveContextFieldUsage(
+    req: SDKRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { fields } = req.body;
+      const environmentId = req.environmentId!;
+      const projectId = req.projectId || req.apiToken?.projectId;
+      const appName =
+        (req.headers['x-application-name'] as string) || req.body.appName;
+      const sdkVersion =
+        (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
+
+      if (!projectId) {
+        res
+          .status(400)
+          .json({ success: false, error: 'projectId is required (from token)' });
+        return;
+      }
+
+      if (!Array.isArray(fields) || fields.length === 0) {
+        res
+          .status(400)
+          .json({ success: false, error: 'fields must be a non-empty array' });
+        return;
+      }
+
+      const { contextFieldUsageService } =
+        await import('../services/context-field-usage-service');
+
+      // fields can be either string[] or { name: string, count: number }[]
+      const fieldNames: string[] = [];
+      const counts: Record<string, number> = {};
+
+      for (const field of fields) {
+        if (typeof field === 'string') {
+          fieldNames.push(field);
+        } else if (field && typeof field === 'object' && field.name) {
+          fieldNames.push(field.name);
+          if (field.count) counts[field.name] = field.count;
+        }
+      }
+
+      await contextFieldUsageService.reportContextFields({
+        projectId,
+        environmentId,
+        appName,
+        sdkVersion,
+        fieldNames,
+        counts: Object.keys(counts).length > 0 ? counts : undefined,
+      });
+
+      res.json({ success: true, buffered: true });
+    } catch (error: any) {
+      logger.error('Error receiving context field usage:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to process context field usage',
+      });
+    }
+  }
 }

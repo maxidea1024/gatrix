@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
@@ -31,6 +32,8 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -77,6 +80,7 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import SvgIcon from '@mui/material/SvgIcon';
 import PageHeader from '@/components/common/PageHeader';
+import DiscoveredContextFieldsTab from '../../components/features/DiscoveredContextFieldsTab';
 
 // Trim option value → localization key mapping
 const TRIM_LABEL_MAP: Record<string, string> = {
@@ -286,6 +290,21 @@ const FeatureContextFieldsPage: React.FC = () => {
   const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([P.FEATURES_UPDATE]);
   const { currentProjectId } = useOrgProject();
+
+  // Tab state from URL query param
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') === 'discovered' ? 1 : 0;
+  const setActiveTab = useCallback((index: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (index === 1) {
+        next.set('tab', 'discovered');
+      } else {
+        next.delete('tab');
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   // State
   const [allFields, setAllFields] = useState<FeatureContextField[]>([]);
@@ -774,7 +793,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         subtitle={t('featureFlags.contextFieldsDescription')}
         actions={
           <>
-            {canManage && (
+            {canManage && activeTab === 0 && (
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -787,67 +806,97 @@ const FeatureContextFieldsPage: React.FC = () => {
         }
       />
 
-      {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              flexWrap: 'nowrap',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'nowrap',
-                flexGrow: 1,
-                minWidth: 0,
-              }}
-            >
-              <SearchTextField
-                placeholder={t('common.search')}
-                value={searchTerm}
-                onChange={(value) => {
-                  setSearchTerm(value);
-                  setPage(0);
-                }}
-              />
+      {/* Tabs */}
+      <Tabs
+        value={activeTab}
+        onChange={(_, newValue) => setActiveTab(newValue)}
+        sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab label={t('contextFieldUsage.definedTab')} />
+        <Tab label={t('contextFieldUsage.discoveredTab')} />
+      </Tabs>
 
-              {/* Dynamic Filter Bar */}
-              <DynamicFilterBar
-                availableFilters={availableFilterDefinitions}
-                activeFilters={activeFilters}
-                onFilterAdd={handleFilterAdd}
-                onFilterRemove={handleFilterRemove}
-                onFilterChange={handleFilterChange}
-                onRefresh={loadFields}
-                refreshDisabled={loading}
-                noWrap={true}
-                afterFilterAddActions={
-                  <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <ViewColumnIcon />
-                    </IconButton>
-                  </Tooltip>
-                }
-              />
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      {/* Discovered Tab */}
+      {activeTab === 1 && (
+        <DiscoveredContextFieldsTab
+          definedFieldNames={new Set(allFields.map((f) => f.fieldName))}
+          onPromote={(fieldName, inferredType) => {
+            // Switch to Defined tab and open create dialog pre-filled
+            setActiveTab(0);
+            handleCreate();
+            // Pre-fill the field name after dialog opens
+            setTimeout(() => {
+              setEditingField((prev) => ({
+                ...prev,
+                fieldName,
+                fieldType: inferredType as any,
+              }));
+            }, 100);
+          }}
+        />
+      )}
+
+      {/* Defined Tab Content */}
+      {activeTab === 0 && (<>
+
+      {/* Search and Filters */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          flexWrap: 'nowrap',
+          justifyContent: 'space-between',
+          mb: 1,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            flexWrap: 'nowrap',
+            flexGrow: 1,
+            minWidth: 0,
+          }}
+        >
+          <SearchTextField
+            placeholder={t('common.search')}
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value);
+              setPage(0);
+            }}
+          />
+
+          {/* Dynamic Filter Bar */}
+          <DynamicFilterBar
+            availableFilters={availableFilterDefinitions}
+            activeFilters={activeFilters}
+            onFilterAdd={handleFilterAdd}
+            onFilterRemove={handleFilterRemove}
+            onFilterChange={handleFilterChange}
+            onRefresh={loadFields}
+            refreshDisabled={loading}
+            noWrap={true}
+            afterFilterAddActions={
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
+            }
+          />
+        </Box>
+      </Box>
 
       {/* Table */}
       <PageContentLoader loading={loading}>
@@ -1813,6 +1862,9 @@ const FeatureContextFieldsPage: React.FC = () => {
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
+
+      {/* End of Defined tab */}
+      </>)}
     </Box>
   );
 };

@@ -8,6 +8,7 @@ import networkTrafficRouter from './network-traffic';
 import flagTypesRouter from './flag-types';
 import segmentsRouter from './segments';
 import contextFieldsRouter from './context-fields';
+import contextFieldUsageRouter from './context-field-usage';
 import codeReferencesRouter from './code-references';
 import playgroundRouter from './playground';
 import importExportRouter from './import-export';
@@ -20,6 +21,7 @@ router.use('/network', networkTrafficRouter);
 router.use('/types', flagTypesRouter);
 router.use('/segments', segmentsRouter);
 router.use('/context-fields', contextFieldsRouter);
+router.use('/context-field-usage', contextFieldUsageRouter);
 router.use('/code-references', codeReferencesRouter);
 
 // Root-level routes that must be registered BEFORE /:flagName catch-all

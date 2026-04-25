@@ -1321,7 +1321,10 @@ const ServiceNoticesPage: React.FC = () => {
       {/* Form Drawer */}
       <ServiceNoticeFormDialog
         open={formDrawerOpen}
-        onClose={() => setFormDrawerOpen(false)}
+        onClose={() => {
+          setFormDrawerOpen(false);
+          setEditingNotice(null);
+        }}
         onSuccess={loadNotices}
         notice={editingNotice}
       />

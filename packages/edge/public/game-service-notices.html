@@ -638,6 +638,7 @@
       let readNotices = new Set();
       let noticeContentCache = {}; // Cache for notice content by ID
       let currentEnvironment = null; // Store environment for API calls
+      let currentFetchGeneration = 0; // Increments on each notice selection to prevent race conditions
 
       // Initialize
       document.addEventListener('DOMContentLoaded', function () {
@@ -773,8 +774,6 @@
       // Load notices from Edge API
       function loadNotices() {
         const sidebar = document.getElementById('sidebar');
-        const loadStartTime = Date.now();
-        const MIN_LOADING_TIME = 2000; // Minimum 2 seconds loading time
 
         // Build query string with parameters
         const urlParams = getUrlParams();
@@ -805,19 +804,6 @@
           queryString += '&subchannel=' + encodeURIComponent(urlParams.subchannel);
         }
 
-        // Helper function to ensure minimum loading time
-        function ensureMinLoadingTime() {
-          return new Promise(function (resolve) {
-            const elapsed = Date.now() - loadStartTime;
-            const remaining = MIN_LOADING_TIME - elapsed;
-            if (remaining > 0) {
-              setTimeout(resolve, remaining);
-            } else {
-              resolve();
-            }
-          });
-        }
-
         fetch(apiUrl + queryString)
           .then(function (response) {
             if (!response.ok) {
@@ -844,19 +830,12 @@
               document.getElementById('content').innerHTML = '<div class="empty">📭</div>';
             }
 
-            // Wait for minimum loading time before hiding overlay
-            return ensureMinLoadingTime();
-          })
-          .then(function () {
             hideLoadingOverlay();
           })
           .catch(function (error) {
             console.error('Error loading notices:', error);
             sidebar.innerHTML = '<div class="error">⚠️</div>';
-            // Still wait for minimum loading time on error
-            ensureMinLoadingTime().then(function () {
-              hideLoadingOverlay();
-            });
+            hideLoadingOverlay();
           });
       }
 
@@ -942,6 +921,9 @@
 
         selectedNotice = notice;
 
+        // Increment generation to invalidate any in-flight fetch from a previous selection
+        var fetchGeneration = ++currentFetchGeneration;
+
         // Mark as read
         const wasUnread = !readNotices.has(notice.id);
         if (wasUnread) {
@@ -972,7 +954,7 @@
           return;
         }
 
-        // Show header immediately, only show spinner in body area (prevents flicker)
+        // Show header immediately, body area empty (spinner shown after delay)
         const content = document.getElementById('content');
         const updatedDate = formatDateTime(notice.updatedAt);
 
@@ -983,10 +965,17 @@
         html += '<span>' + updatedDate + '</span>';
         html += '</div>';
         html += '</div>';
-        html += '<div class="content-body">';
-        html += '<div class="content-loading"><div class="content-spinner"></div></div>';
-        html += '</div>';
+        html += '<div class="content-body"></div>';
         content.innerHTML = html;
+
+        // Only show spinner if loading takes longer than 1.5 seconds
+        var spinnerTimer = setTimeout(function () {
+          if (fetchGeneration !== currentFetchGeneration) return;
+          var bodyEl = content.querySelector('.content-body');
+          if (bodyEl && !bodyEl.hasChildNodes()) {
+            bodyEl.innerHTML = '<div class="content-loading"><div class="content-spinner"></div></div>';
+          }
+        }, 1500);
 
         // Fetch notice detail from API
         const apiUrl =
@@ -996,9 +985,6 @@
           '/service-notices/' +
           noticeId;
 
-        const loadStartTime = Date.now();
-        const MIN_CONTENT_LOADING_TIME = 1250; // 1.25 seconds
-
         fetch(apiUrl)
           .then(function (response) {
             if (!response.ok) {
@@ -1007,20 +993,10 @@
             return response.json();
           })
           .then(function (data) {
-            // Ensure minimum loading time
-            const elapsed = Date.now() - loadStartTime;
-            const remaining = MIN_CONTENT_LOADING_TIME - elapsed;
+            clearTimeout(spinnerTimer);
+            // Abort if another notice was selected while we were loading
+            if (fetchGeneration !== currentFetchGeneration) return;
 
-            if (remaining > 0) {
-              return new Promise(function (resolve) {
-                setTimeout(function () {
-                  resolve(data);
-                }, remaining);
-              });
-            }
-            return data;
-          })
-          .then(function (data) {
             if (data.success && data.data) {
               // Cache the content
               noticeContentCache[noticeId] = data.data.content;
@@ -1032,6 +1008,10 @@
             }
           })
           .catch(function (error) {
+            clearTimeout(spinnerTimer);
+            // Abort if another notice was selected while we were loading
+            if (fetchGeneration !== currentFetchGeneration) return;
+
             console.error('Error loading notice:', error);
             // Only update body, keep header
             const bodyEl = content.querySelector('.content-body');

@@ -179,5 +179,17 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
       await ccuPollingService.pollAll();
       logger.info('ccu:poll completed', { jobId: job.id });
     },
+
+    'context-field-usage:flush': async (job) => {
+      const { processContextFieldUsageFlushJob } =
+        await import('./context-field-usage-service');
+      const result = await processContextFieldUsageFlushJob();
+      if (result.flushed > 0 || result.errors > 0) {
+        logger.info('context-field-usage:flush completed', {
+          jobId: job.id,
+          ...result,
+        });
+      }
+    },
   };
 }
