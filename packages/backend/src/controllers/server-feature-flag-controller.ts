@@ -701,7 +701,10 @@ export default class ServerFeatureFlagController {
       if (!projectId) {
         res
           .status(400)
-          .json({ success: false, error: 'projectId is required (from token)' });
+          .json({
+            success: false,
+            error: 'projectId is required (from token)',
+          });
         return;
       }
 

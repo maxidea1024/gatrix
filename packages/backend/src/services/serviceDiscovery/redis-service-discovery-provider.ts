@@ -374,10 +374,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           const instance: ServiceInstance = { ...meta, ...stat };
           await this.publishEvent({ type: 'put', instance });
 
-          logger.info(
-            `Meta recovered for ${serviceType}:${input.instanceId}`,
-            { labels: input.labels }
-          );
+          logger.info(`Meta recovered for ${serviceType}:${input.instanceId}`, {
+            labels: input.labels,
+          });
           return;
         } else {
           throw new GatrixError(
@@ -415,25 +414,28 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           meta.hostname = input.hostname;
           metaRepaired = true;
         }
-        if (input.internalAddress && meta.internalAddress !== input.internalAddress) {
+        if (
+          input.internalAddress &&
+          meta.internalAddress !== input.internalAddress
+        ) {
           meta.internalAddress = input.internalAddress;
           metaRepaired = true;
         }
-        if (input.ports && JSON.stringify(meta.ports) !== JSON.stringify(input.ports)) {
+        if (
+          input.ports &&
+          JSON.stringify(meta.ports) !== JSON.stringify(input.ports)
+        ) {
           meta.ports = input.ports;
           metaRepaired = true;
         }
 
         if (metaRepaired) {
           await this.client.set(metaKey, JSON.stringify(meta), 'EX', META_TTL);
-          logger.info(
-            `Meta repaired for ${serviceType}:${input.instanceId}`,
-            {
-              hostname: meta.hostname,
-              internalAddress: meta.internalAddress,
-              ports: meta.ports,
-            }
-          );
+          logger.info(`Meta repaired for ${serviceType}:${input.instanceId}`, {
+            hostname: meta.hostname,
+            internalAddress: meta.internalAddress,
+            ports: meta.ports,
+          });
         }
       }
 

@@ -182,14 +182,17 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
       const appNameFilter = activeFilters.find((f) => f.key === 'appName');
       const envFilter = activeFilters.find((f) => f.key === 'environmentId');
 
-      const fields = await contextFieldUsageService.getDiscoveredFields(projectApiPath!, {
-        search: debouncedSearchTerm || undefined,
-        appName: (appNameFilter?.value as string) || undefined,
-        environmentId: (envFilter?.value as string) || undefined,
-        includeIgnored:
-          (statusFilter?.value as string) === 'ignored' ||
-          (statusFilter?.value as string) === 'all',
-      });
+      const fields = await contextFieldUsageService.getDiscoveredFields(
+        projectApiPath!,
+        {
+          search: debouncedSearchTerm || undefined,
+          appName: (appNameFilter?.value as string) || undefined,
+          environmentId: (envFilter?.value as string) || undefined,
+          includeIgnored:
+            (statusFilter?.value as string) === 'ignored' ||
+            (statusFilter?.value as string) === 'all',
+        }
+      );
 
       // Client-side filter for ignored
       let filtered = fields;
@@ -221,7 +224,9 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
   useEffect(() => {
     const loadAppNames = async () => {
       try {
-        const names = await contextFieldUsageService.getAppNames(projectApiPath!);
+        const names = await contextFieldUsageService.getAppNames(
+          projectApiPath!
+        );
         setAppNames(names);
       } catch {
         // ignore
@@ -229,8 +234,6 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
     };
     loadAppNames();
   }, []);
-
-
 
   // Sort
   const handleSort = (column: string) => {
@@ -258,7 +261,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
           cmp = a.accessCount - b.accessCount;
           break;
         case 'lastSeen':
-          cmp = new Date(a.lastSeenAt).getTime() - new Date(b.lastSeenAt).getTime();
+          cmp =
+            new Date(a.lastSeenAt).getTime() - new Date(b.lastSeenAt).getTime();
           break;
         default:
           cmp = 0;
@@ -353,7 +357,11 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
     setEditDescription(field.description || '');
     // Convert string[] tags to Tag[] for TagSelector
     setEditTagSelection(
-      (field.tags || []).map((name) => ({ id: 0 as any, name, color: '#888888' }))
+      (field.tags || []).map((name) => ({
+        id: 0 as any,
+        name,
+        color: '#888888',
+      }))
     );
     setEditDrawerOpen(true);
     handleMenuClose();
@@ -363,10 +371,14 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
     if (!editingField) return;
     try {
       const tagNames = editTagSelection.map((t) => t.name);
-      await contextFieldUsageService.updateFieldMeta(projectApiPath!, editingField.id, {
-        description: editDescription,
-        tags: tagNames,
-      });
+      await contextFieldUsageService.updateFieldMeta(
+        projectApiPath!,
+        editingField.id,
+        {
+          description: editDescription,
+          tags: tagNames,
+        }
+      );
       enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
       setEditDrawerOpen(false);
       loadFields();
@@ -379,9 +391,13 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
 
   const handleToggleIgnore = async (field: ContextFieldUsageRecord) => {
     try {
-      await contextFieldUsageService.updateFieldMeta(projectApiPath!, field.id, {
-        isIgnored: !field.isIgnored,
-      });
+      await contextFieldUsageService.updateFieldMeta(
+        projectApiPath!,
+        field.id,
+        {
+          isIgnored: !field.isIgnored,
+        }
+      );
       enqueueSnackbar(
         field.isIgnored
           ? t('contextFieldUsage.unignored')
@@ -406,7 +422,10 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
   const handleDeleteConfirm = async () => {
     if (!deletingField) return;
     try {
-      await contextFieldUsageService.deleteField(projectApiPath!, deletingField.id);
+      await contextFieldUsageService.deleteField(
+        projectApiPath!,
+        deletingField.id
+      );
       enqueueSnackbar(t('common.deletedSuccessfully'), { variant: 'success' });
       loadFields();
     } catch (error) {
@@ -439,7 +458,6 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
   const formatNumber = (n: number) => {
     return n.toLocaleString();
   };
-
 
   return (
     <Box>
@@ -503,343 +521,390 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
 
       {/* Table */}
       <PageContentLoader loading={loading}>
-      {allFields.length === 0 ? (
-        <EmptyPagePlaceholder
-          message={t('contextFieldUsage.emptyTitle')}
-          subtitle={t('contextFieldUsage.emptyDescription')}
-        />
-      ) : (
-        <Card variant="outlined">
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            <TableContainer
-              sx={{
-                maxHeight: 'calc(100vh - 380px)',
-                position: 'relative',
-              }}
-            >
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    {visibleColumns.includes('fieldName') && (
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <TableSortLabel
-                          active={sortBy === 'fieldName'}
-                          direction={sortBy === 'fieldName' ? (sortDesc ? 'desc' : 'asc') : 'asc'}
-                          onClick={() => handleSort('fieldName')}
-                        >
-                          {t('featureFlags.fieldName')}
-                        </TableSortLabel>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes('appNames') && (
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <TableSortLabel
-                          active={sortBy === 'appNames'}
-                          direction={sortBy === 'appNames' ? (sortDesc ? 'desc' : 'asc') : 'asc'}
-                          onClick={() => handleSort('appNames')}
-                        >
-                          {t('contextFieldUsage.appName')}
-                        </TableSortLabel>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes('accessCount') && (
-                      <TableCell
-                        align="right"
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <TableSortLabel
-                          active={sortBy === 'accessCount'}
-                          direction={sortBy === 'accessCount' ? (sortDesc ? 'desc' : 'asc') : 'asc'}
-                          onClick={() => handleSort('accessCount')}
-                        >
-                          {t('contextFieldUsage.accessCount')}
-                        </TableSortLabel>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes('lastSeen') && (
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <TableSortLabel
-                          active={sortBy === 'lastSeen'}
-                          direction={sortBy === 'lastSeen' ? (sortDesc ? 'desc' : 'asc') : 'asc'}
-                          onClick={() => handleSort('lastSeen')}
-                        >
-                          {t('contextFieldUsage.lastSeen')}
-                        </TableSortLabel>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes('tags') && (
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('featureFlags.tags')}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes('description') && (
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('featureFlags.description')}
-                      </TableCell>
-                    )}
-                    {canManage && (
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
-                          zIndex: 2,
-                          py: 1,
-                          px: 1.5,
-                          width: 48,
-                        }}
-                      />
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedFields.map((field) => (
-                    <TableRow
-                      key={field.id}
-                      hover
-                      sx={{
-                        opacity: field.isIgnored ? 0.5 : 1,
-                        cursor: 'pointer',
-                        '&:last-child td': { borderBottom: 0 },
-                      }}
-                      onClick={() => handleEdit(field)}
-                    >
+        {allFields.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('contextFieldUsage.emptyTitle')}
+            subtitle={t('contextFieldUsage.emptyDescription')}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer
+                sx={{
+                  maxHeight: 'calc(100vh - 380px)',
+                  position: 'relative',
+                }}
+              >
+                <Table size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
                       {visibleColumns.includes('fieldName') && (
-                        <TableCell sx={{ py: 0.75, px: 1.5 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <TableCell
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <TableSortLabel
+                            active={sortBy === 'fieldName'}
+                            direction={
+                              sortBy === 'fieldName'
+                                ? sortDesc
+                                  ? 'desc'
+                                  : 'asc'
+                                : 'asc'
+                            }
+                            onClick={() => handleSort('fieldName')}
+                          >
+                            {t('featureFlags.fieldName')}
+                          </TableSortLabel>
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('appNames') && (
+                        <TableCell
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <TableSortLabel
+                            active={sortBy === 'appNames'}
+                            direction={
+                              sortBy === 'appNames'
+                                ? sortDesc
+                                  ? 'desc'
+                                  : 'asc'
+                                : 'asc'
+                            }
+                            onClick={() => handleSort('appNames')}
+                          >
+                            {t('contextFieldUsage.appName')}
+                          </TableSortLabel>
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('accessCount') && (
+                        <TableCell
+                          align="right"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <TableSortLabel
+                            active={sortBy === 'accessCount'}
+                            direction={
+                              sortBy === 'accessCount'
+                                ? sortDesc
+                                  ? 'desc'
+                                  : 'asc'
+                                : 'asc'
+                            }
+                            onClick={() => handleSort('accessCount')}
+                          >
+                            {t('contextFieldUsage.accessCount')}
+                          </TableSortLabel>
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('lastSeen') && (
+                        <TableCell
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <TableSortLabel
+                            active={sortBy === 'lastSeen'}
+                            direction={
+                              sortBy === 'lastSeen'
+                                ? sortDesc
+                                  ? 'desc'
+                                  : 'asc'
+                                : 'asc'
+                            }
+                            onClick={() => handleSort('lastSeen')}
+                          >
+                            {t('contextFieldUsage.lastSeen')}
+                          </TableSortLabel>
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('tags') && (
+                        <TableCell
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('featureFlags.tags')}
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('description') && (
+                        <TableCell
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('featureFlags.description')}
+                        </TableCell>
+                      )}
+                      {canManage && (
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#1e1e2f'
+                                : '#f4f2ff',
+                            zIndex: 2,
+                            py: 1,
+                            px: 1.5,
+                            width: 48,
+                          }}
+                        />
+                      )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedFields.map((field) => (
+                      <TableRow
+                        key={field.id}
+                        hover
+                        sx={{
+                          opacity: field.isIgnored ? 0.5 : 1,
+                          cursor: 'pointer',
+                          '&:last-child td': { borderBottom: 0 },
+                        }}
+                        onClick={() => handleEdit(field)}
+                      >
+                        {visibleColumns.includes('fieldName') && (
+                          <TableCell sx={{ py: 0.75, px: 1.5 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {field.fieldName}
+                              </Typography>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyToClipboard(field.fieldName).then(
+                                    (ok) => {
+                                      if (ok) {
+                                        enqueueSnackbar(
+                                          t('common.copiedToClipboard'),
+                                          { variant: 'success' }
+                                        );
+                                      }
+                                    }
+                                  );
+                                }}
+                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                              >
+                                <CopyIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                              {field.isIgnored && (
+                                <Chip
+                                  label={t('contextFieldUsage.status.ignored')}
+                                  size="small"
+                                  color="default"
+                                  variant="outlined"
+                                />
+                              )}
+                            </Box>
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('appNames') && (
+                          <TableCell sx={{ py: 0.75, px: 1.5 }}>
+                            {field.appName ? (
+                              <Chip
+                                label={field.appName}
+                                size="small"
+                                variant="outlined"
+                              />
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                —
+                              </Typography>
+                            )}
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('accessCount') && (
+                          <TableCell align="right" sx={{ py: 0.75, px: 1.5 }}>
                             <Typography
                               variant="body2"
-                              sx={{ fontFamily: 'monospace', fontWeight: 500 }}
+                              sx={{ fontFamily: 'monospace' }}
                             >
-                              {field.fieldName}
+                              {formatNumber(field.accessCount)}
                             </Typography>
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('lastSeen') && (
+                          <TableCell sx={{ py: 0.75, px: 1.5 }}>
+                            <Tooltip
+                              title={formatDateTimeDetailed(field.lastSeenAt)}
+                            >
+                              <span>
+                                {formatRelativeTime(field.lastSeenAt)}
+                              </span>
+                            </Tooltip>
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('tags') && (
+                          <TableCell sx={{ py: 0.75, px: 1.5 }}>
+                            {field.tags && field.tags.length > 0 ? (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  gap: 0.5,
+                                  flexWrap: 'wrap',
+                                }}
+                              >
+                                {field.tags.map((tag) => (
+                                  <Chip
+                                    key={tag}
+                                    label={tag}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ fontSize: '0.75rem' }}
+                                  />
+                                ))}
+                              </Box>
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                —
+                              </Typography>
+                            )}
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('description') && (
+                          <TableCell sx={{ py: 0.75, px: 1.5 }}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                maxWidth: 250,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {field.description || '—'}
+                            </Typography>
+                          </TableCell>
+                        )}
+                        {canManage && (
+                          <TableCell align="center" sx={{ py: 0.75, px: 1.5 }}>
                             <IconButton
                               size="small"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                copyToClipboard(field.fieldName).then(
-                                  (ok) => {
-                                    if (ok) {
-                                      enqueueSnackbar(
-                                        t('common.copiedToClipboard'),
-                                        { variant: 'success' }
-                                      );
-                                    }
-                                  }
-                                );
+                                handleMenuOpen(e, field);
                               }}
-                              sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
                             >
-                              <CopyIcon sx={{ fontSize: 14 }} />
+                              <MoreVertIcon fontSize="small" />
                             </IconButton>
-                            {field.isIgnored && (
-                              <Chip
-                                label={t('contextFieldUsage.status.ignored')}
-                                size="small"
-                                color="default"
-                                variant="outlined"
-                              />
-                            )}
-                          </Box>
-                        </TableCell>
-                      )}
-                      {visibleColumns.includes('appNames') && (
-                        <TableCell sx={{ py: 0.75, px: 1.5 }}>
-                          {field.appName ? (
-                            <Chip
-                              label={field.appName}
-                              size="small"
-                              variant="outlined"
-                            />
-                          ) : (
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                            >
-                              —
-                            </Typography>
-                          )}
-                        </TableCell>
-                      )}
-                      {visibleColumns.includes('accessCount') && (
-                        <TableCell align="right" sx={{ py: 0.75, px: 1.5 }}>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                            {formatNumber(field.accessCount)}
-                          </Typography>
-                        </TableCell>
-                      )}
-                      {visibleColumns.includes('lastSeen') && (
-                        <TableCell sx={{ py: 0.75, px: 1.5 }}>
-                          <Tooltip
-                            title={formatDateTimeDetailed(field.lastSeenAt)}
-                          >
-                            <span>
-                              {formatRelativeTime(field.lastSeenAt)}
-                            </span>
-                          </Tooltip>
-                        </TableCell>
-                      )}
-                      {visibleColumns.includes('tags') && (
-                        <TableCell sx={{ py: 0.75, px: 1.5 }}>
-                          {field.tags && field.tags.length > 0 ? (
-                            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                              {field.tags.map((tag) => (
-                                <Chip
-                                  key={tag}
-                                  label={tag}
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.75rem' }}
-                                />
-                              ))}
-                            </Box>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              —
-                            </Typography>
-                          )}
-                        </TableCell>
-                      )}
-                      {visibleColumns.includes('description') && (
-                        <TableCell sx={{ py: 0.75, px: 1.5 }}>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              maxWidth: 250,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {field.description || '—'}
-                          </Typography>
-                        </TableCell>
-                      )}
-                      {canManage && (
-                        <TableCell align="center" sx={{ py: 0.75, px: 1.5 }}>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleMenuOpen(e, field);
-                            }}
-                          >
-                            <MoreVertIcon fontSize="small" />
-                          </IconButton>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-            <SimplePagination
-              count={allFields.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={(_event: unknown, newPage: number) => setPage(newPage)}
-              onRowsPerPageChange={(event: any) => {
-                setRowsPerPage(Number(event.target.value));
-                setPage(0);
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
+              <SimplePagination
+                count={allFields.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_event: unknown, newPage: number) =>
+                  setPage(newPage)
+                }
+                onRowsPerPageChange={(event: any) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Context Menu */}
@@ -894,7 +959,9 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
         open={editDrawerOpen}
         onClose={() => setEditDrawerOpen(false)}
         title={editingField?.fieldName || ''}
-        subtitle={t('contextFieldUsage.discoveredFieldSubtitle', { defaultValue: t('contextFieldUsage.fieldInfo') })}
+        subtitle={t('contextFieldUsage.discoveredFieldSubtitle', {
+          defaultValue: t('contextFieldUsage.fieldInfo'),
+        })}
         storageKey="discoveredFieldDrawerWidth"
         defaultWidth={480}
       >
@@ -918,9 +985,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                 fontWeight={600}
                 sx={{ fontFamily: 'monospace' }}
               >
-                {editingField
-                  ? formatNumber(editingField.accessCount)
-                  : ''}
+                {editingField ? formatNumber(editingField.accessCount) : ''}
               </Typography>
 
               <Typography variant="body2" color="text.secondary">
@@ -1032,7 +1097,9 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
         onClose={() => setDeleteConfirmOpen(false)}
         onConfirm={handleDeleteConfirm}
         title={t('common.confirmDelete')}
-        message={t('contextFieldUsage.deleteConfirmMessage', { name: deletingField?.fieldName || '' })}
+        message={t('contextFieldUsage.deleteConfirmMessage', {
+          name: deletingField?.fieldName || '',
+        })}
       />
 
       {/* Column Settings */}

@@ -60,21 +60,36 @@ export async function performEvaluation(
     // Collect context field usage (fire-and-forget, non-blocking)
     try {
       const fieldNames: string[] = [];
-      const systemFields = ['userId', 'sessionId', 'appName', 'appVersion', 'remoteAddress', 'currentTime'];
-      
+      const systemFields = [
+        'userId',
+        'sessionId',
+        'appName',
+        'appVersion',
+        'remoteAddress',
+        'currentTime',
+      ];
+
       // Extract all keys from context
       if (context && typeof context === 'object') {
         for (const key of Object.keys(context)) {
-          if (key !== 'properties' && (context as any)[key] !== undefined && (context as any)[key] !== null) {
+          if (
+            key !== 'properties' &&
+            (context as any)[key] !== undefined &&
+            (context as any)[key] !== null
+          ) {
             fieldNames.push(key);
           }
         }
       }
-      
+
       // Custom properties explicitly in 'properties'
       if (context.properties && typeof context.properties === 'object') {
         for (const key of Object.keys(context.properties)) {
-          if (!fieldNames.includes(key) && context.properties[key] !== undefined && context.properties[key] !== null) {
+          if (
+            !fieldNames.includes(key) &&
+            context.properties[key] !== undefined &&
+            context.properties[key] !== null
+          ) {
             fieldNames.push(key);
           }
         }

@@ -476,15 +476,71 @@ router.post(
 
       // Create default context fields (same as seed-context-fields.ts)
       const defaultContextFields = [
-        { fieldName: 'userId', fieldType: 'string', description: 'Unique user identifier', stickiness: true, sortOrder: 1, tags: ['identity'] },
-        { fieldName: 'sessionId', fieldType: 'string', description: 'Session identifier', stickiness: true, sortOrder: 2, tags: ['identity'] },
-        { fieldName: 'appVersion', fieldType: 'semver', description: 'Application version', sortOrder: 50, tags: ['system'] },
-        { fieldName: 'environment', fieldType: 'string', description: 'Deployment environment', sortOrder: 10, tags: ['system'] },
-        { fieldName: 'country', fieldType: 'string', description: 'Country code', sortOrder: 13, tags: ['geo'] },
-        { fieldName: 'currentTime', fieldType: 'date', description: 'Current timestamp', sortOrder: 90, tags: ['system'] },
-        { fieldName: 'remoteAddress', fieldType: 'string', description: 'Remote IP address', sortOrder: 92, tags: ['system'] },
-        { fieldName: 'appName', fieldType: 'string', description: 'Application name', sortOrder: 5, tags: ['system'] },
-        { fieldName: 'userAgent', fieldType: 'string', description: 'User agent string', sortOrder: 93, tags: ['system'] },
+        {
+          fieldName: 'userId',
+          fieldType: 'string',
+          description: 'Unique user identifier',
+          stickiness: true,
+          sortOrder: 1,
+          tags: ['identity'],
+        },
+        {
+          fieldName: 'sessionId',
+          fieldType: 'string',
+          description: 'Session identifier',
+          stickiness: true,
+          sortOrder: 2,
+          tags: ['identity'],
+        },
+        {
+          fieldName: 'appVersion',
+          fieldType: 'semver',
+          description: 'Application version',
+          sortOrder: 50,
+          tags: ['system'],
+        },
+        {
+          fieldName: 'environment',
+          fieldType: 'string',
+          description: 'Deployment environment',
+          sortOrder: 10,
+          tags: ['system'],
+        },
+        {
+          fieldName: 'country',
+          fieldType: 'string',
+          description: 'Country code',
+          sortOrder: 13,
+          tags: ['geo'],
+        },
+        {
+          fieldName: 'currentTime',
+          fieldType: 'date',
+          description: 'Current timestamp',
+          sortOrder: 90,
+          tags: ['system'],
+        },
+        {
+          fieldName: 'remoteAddress',
+          fieldType: 'string',
+          description: 'Remote IP address',
+          sortOrder: 92,
+          tags: ['system'],
+        },
+        {
+          fieldName: 'appName',
+          fieldType: 'string',
+          description: 'Application name',
+          sortOrder: 5,
+          tags: ['system'],
+        },
+        {
+          fieldName: 'userAgent',
+          fieldType: 'string',
+          description: 'User agent string',
+          sortOrder: 93,
+          tags: ['system'],
+        },
       ];
 
       for (const field of defaultContextFields) {

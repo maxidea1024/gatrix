@@ -40,8 +40,7 @@ class ContextFieldUsageService {
     if (params.environmentId)
       queryParams.set('environmentId', params.environmentId);
     if (params.appName) queryParams.set('appName', params.appName);
-    if (params.includeIgnored)
-      queryParams.set('includeIgnored', 'true');
+    if (params.includeIgnored) queryParams.set('includeIgnored', 'true');
 
     const qs = queryParams.toString();
     const url = `${this.basePath(projectApiPath)}${qs ? `?${qs}` : ''}`;

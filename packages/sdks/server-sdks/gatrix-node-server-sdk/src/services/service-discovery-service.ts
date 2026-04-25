@@ -6,10 +6,7 @@
 import * as os from 'os';
 import { Logger } from '../utils/logger';
 import { ApiClient } from '../client/api-client';
-import {
-  ServiceDiscoveryErrorCode,
-  isGatrixSDKError,
-} from '../utils/errors';
+import { ServiceDiscoveryErrorCode, isGatrixSDKError } from '../utils/errors';
 import {
   ServiceInstance,
   GetServicesParams,
@@ -386,7 +383,9 @@ export class ServiceDiscoveryService {
 
     if (!response.success) {
       // Check backend error code in response body
-      if (response.error?.code === ServiceDiscoveryErrorCode.SERVICE_NOT_FOUND) {
+      if (
+        response.error?.code === ServiceDiscoveryErrorCode.SERVICE_NOT_FOUND
+      ) {
         return await this.handleServiceNotFound(input);
       }
 

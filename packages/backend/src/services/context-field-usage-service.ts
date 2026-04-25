@@ -44,7 +44,9 @@ export class ContextFieldUsageService {
    * Report context field usage (called from eval endpoints / Edge flush)
    * Buffers in Redis using HINCRBY for efficient counting
    */
-  async reportContextFields(input: ReportContextFieldUsageInput): Promise<void> {
+  async reportContextFields(
+    input: ReportContextFieldUsageInput
+  ): Promise<void> {
     try {
       const client = redisClient.getClient();
       const safeAppName = input.appName || '__none__';
@@ -303,7 +305,11 @@ export class ContextFieldUsageService {
     return rows.map((r: any) => ({
       ...r,
       isIgnored: Boolean(r.isIgnored),
-      tags: r.tags ? (typeof r.tags === 'string' ? JSON.parse(r.tags) : r.tags) : [],
+      tags: r.tags
+        ? typeof r.tags === 'string'
+          ? JSON.parse(r.tags)
+          : r.tags
+        : [],
     }));
   }
 
@@ -345,7 +351,8 @@ export class ContextFieldUsageService {
   ): Promise<void> {
     const updateData: any = {};
 
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.description !== undefined)
+      updateData.description = data.description;
     if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
     if (data.isIgnored !== undefined) updateData.isIgnored = data.isIgnored;
 
@@ -380,14 +387,24 @@ export class ContextFieldUsageService {
     // Heuristic inference from field name
     const lowerName = fieldName.toLowerCase();
     if (lowerName.includes('version')) return 'semver';
-    if (lowerName.includes('date') || lowerName.includes('time') || lowerName.includes('timestamp')) return 'date';
-    if (lowerName.includes('count') || lowerName.includes('age') || lowerName.includes('level')) return 'number';
     if (
-      lowerName.includes('country') ||
-      lowerName === 'country'
-    ) return 'country';
-    if (lowerName.includes('countrycode3') || lowerName === 'countrycode3') return 'countryCode3';
-    if (lowerName.includes('language') || lowerName.includes('lang')) return 'languageCode';
+      lowerName.includes('date') ||
+      lowerName.includes('time') ||
+      lowerName.includes('timestamp')
+    )
+      return 'date';
+    if (
+      lowerName.includes('count') ||
+      lowerName.includes('age') ||
+      lowerName.includes('level')
+    )
+      return 'number';
+    if (lowerName.includes('country') || lowerName === 'country')
+      return 'country';
+    if (lowerName.includes('countrycode3') || lowerName === 'countrycode3')
+      return 'countryCode3';
+    if (lowerName.includes('language') || lowerName.includes('lang'))
+      return 'languageCode';
     if (lowerName.includes('locale')) return 'localeCode';
     if (lowerName.includes('timezone') || lowerName === 'tz') return 'timezone';
     if (
@@ -395,7 +412,8 @@ export class ContextFieldUsageService {
       lowerName.startsWith('has') ||
       lowerName.startsWith('enable') ||
       lowerName.startsWith('allow')
-    ) return 'boolean';
+    )
+      return 'boolean';
 
     // Default
     return 'string';

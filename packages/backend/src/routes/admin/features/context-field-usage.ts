@@ -16,9 +16,7 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const projectId = req.projectId;
     if (!projectId) {
-      res
-        .status(400)
-        .json({ success: false, error: 'projectId is required' });
+      res.status(400).json({ success: false, error: 'projectId is required' });
       return;
     }
 
@@ -44,9 +42,7 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const projectId = req.projectId;
     if (!projectId) {
-      res
-        .status(400)
-        .json({ success: false, error: 'projectId is required' });
+      res.status(400).json({ success: false, error: 'projectId is required' });
       return;
     }
 
@@ -61,9 +57,7 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const projectId = req.projectId;
     if (!projectId) {
-      res
-        .status(400)
-        .json({ success: false, error: 'projectId is required' });
+      res.status(400).json({ success: false, error: 'projectId is required' });
       return;
     }
 
@@ -109,9 +103,7 @@ router.get(
     // Get the field record to get fieldName
     const projectId = req.projectId;
     if (!projectId) {
-      res
-        .status(400)
-        .json({ success: false, error: 'projectId is required' });
+      res.status(400).json({ success: false, error: 'projectId is required' });
       return;
     }
 
