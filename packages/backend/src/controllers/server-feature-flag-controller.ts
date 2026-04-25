@@ -699,12 +699,10 @@ export default class ServerFeatureFlagController {
         (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       if (!projectId) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            error: 'projectId is required (from token)',
-          });
+        res.status(400).json({
+          success: false,
+          error: 'projectId is required (from token)',
+        });
         return;
       }
 

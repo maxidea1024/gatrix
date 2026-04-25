@@ -443,7 +443,6 @@ const PlayerConnectionsPage: React.FC = () => {
         <Tab label={t('playerConnections.tabs.allCharacters')} />
       </Tabs>
 
-
       {/* Tab 0: Overview */}
       {activeTab === 0 && (
         <PageContentLoader loading={loading}>
