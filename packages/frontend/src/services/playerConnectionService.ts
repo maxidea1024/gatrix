@@ -10,6 +10,7 @@ export interface CcuData {
     count: number;
     botCount: number;
   }>;
+  admindUrl?: string;
 }
 
 export interface CcuHistoryRecord {

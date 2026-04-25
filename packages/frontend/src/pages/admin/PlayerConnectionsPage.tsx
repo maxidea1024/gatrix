@@ -329,6 +329,20 @@ const PlayerConnectionsPage: React.FC = () => {
         subtitle={t('playerConnections.subtitle')}
         actions={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {ccuData?.admindUrl && (
+              <>
+                <Chip
+                  label={ccuData.admindUrl}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    color: 'text.secondary',
+                    borderColor: 'divider',
+                  }}
+                />
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+              </>
+            )}
             {activeTab < 2 && (
               <>
                 <ButtonGroup
@@ -428,6 +442,7 @@ const PlayerConnectionsPage: React.FC = () => {
         <Tab label={t('playerConnections.tabs.allPlayers')} />
         <Tab label={t('playerConnections.tabs.allCharacters')} />
       </Tabs>
+
 
       {/* Tab 0: Overview */}
       {activeTab === 0 && (
