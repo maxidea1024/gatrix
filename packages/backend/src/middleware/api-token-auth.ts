@@ -569,7 +569,7 @@ export const setSDKEnvironment = async (
 
     req.environmentId = env.id;
     req.environmentModel = env;
-    req.projectId = token?.projectId;
+    req.projectId = token?.projectId || (env as any).projectId;
 
     // Access check (skip for unsecured/bypass tokens)
     if (!req.isUnsecuredToken && !req.isEdgeBypassToken && token) {

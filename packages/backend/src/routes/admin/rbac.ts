@@ -474,6 +474,37 @@ router.post(
       }
       logger.info(`Default environments created for project ${project.id}`);
 
+      // Create default context fields (same as seed-context-fields.ts)
+      const defaultContextFields = [
+        { fieldName: 'userId', fieldType: 'string', description: 'Unique user identifier', stickiness: true, sortOrder: 1, tags: ['identity'] },
+        { fieldName: 'sessionId', fieldType: 'string', description: 'Session identifier', stickiness: true, sortOrder: 2, tags: ['identity'] },
+        { fieldName: 'appVersion', fieldType: 'semver', description: 'Application version', sortOrder: 50, tags: ['system'] },
+        { fieldName: 'environment', fieldType: 'string', description: 'Deployment environment', sortOrder: 10, tags: ['system'] },
+        { fieldName: 'country', fieldType: 'string', description: 'Country code', sortOrder: 13, tags: ['geo'] },
+        { fieldName: 'currentTime', fieldType: 'date', description: 'Current timestamp', sortOrder: 90, tags: ['system'] },
+        { fieldName: 'remoteAddress', fieldType: 'string', description: 'Remote IP address', sortOrder: 92, tags: ['system'] },
+        { fieldName: 'appName', fieldType: 'string', description: 'Application name', sortOrder: 5, tags: ['system'] },
+        { fieldName: 'userAgent', fieldType: 'string', description: 'User agent string', sortOrder: 93, tags: ['system'] },
+      ];
+
+      for (const field of defaultContextFields) {
+        await db('g_feature_context_fields').insert({
+          id: generateULID(),
+          projectId: project.id,
+          fieldName: field.fieldName,
+          fieldType: field.fieldType,
+          description: field.description,
+          stickiness: field.stickiness || false,
+          sortOrder: field.sortOrder,
+          tags: JSON.stringify(field.tags),
+          isEnabled: true,
+          createdBy: req.user.id,
+          createdAt: db.raw('UTC_TIMESTAMP()'),
+          updatedAt: db.raw('UTC_TIMESTAMP()'),
+        });
+      }
+      logger.info(`Default context fields created for project ${project.id}`);
+
       res.status(201).json({ success: true, data: project });
     } catch (error) {
       logger.error('Error creating project:', error);

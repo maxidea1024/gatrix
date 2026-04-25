@@ -333,4 +333,11 @@ router.post(
   ImpactMetricsController.receiveMetrics as any
 );
 
+// Context field usage report from Edge/SDK
+router.post(
+  '/features/context-field-usage',
+  serverSDKAuth as any,
+  ServerFeatureFlagController.receiveContextFieldUsage as any
+);
+
 export default router;

@@ -200,6 +200,15 @@ router.post('/register', serverAuthBase, async (req: any, res: any) => {
       externalAddress = externalAddress.substring(7);
     }
 
+    // Inject environmentId (ULID) from API token into labels.
+    // This enables project-scoped environment filtering in service discovery queries.
+    // Game servers register with human-readable labels.environment (e.g., 'production'),
+    // but environmentId is a globally unique ULID that prevents cross-project collisions.
+    const environmentId = req.environmentId || null;
+    if (environmentId && !labels.environmentId) {
+      labels.environmentId = environmentId;
+    }
+
     // Create service instance (full snapshot)
     const now = new Date().toISOString();
     const instance = {
@@ -232,8 +241,8 @@ router.post('/register', serverAuthBase, async (req: any, res: any) => {
       targetChannels: ['service', 'admin'],
     });
 
-    // Retrieve orgId/projectId/environmentId for SDK channel subscription
-    const environmentId = req.environmentId || null;
+    // Retrieve orgId/projectId for SDK channel subscription
+    // (environmentId already resolved above)
     const projectId = req.apiToken?.projectId || null;
     let orgId = null;
     if (projectId) {
@@ -369,12 +378,15 @@ router.post('/status', serverAuthBase, async (req: any, res: any) => {
       stats,
     };
 
-    // Add auto-register fields if provided
+    // Always pass registration fields when provided (for meta repair on incomplete registrations)
+    if (hostname) input.hostname = hostname;
+    if (internalAddress) input.internalAddress = internalAddress;
+    if (ports) input.ports = ports;
+    if (meta) input.meta = meta;
+
+    // Add auto-register flag if requested
     if (autoRegisterIfMissing) {
-      input.hostname = hostname;
-      input.internalAddress = internalAddress;
-      input.ports = ports;
-      input.meta = meta;
+      input.autoRegisterIfMissing = true;
     }
 
     await serviceDiscoveryService.updateStatus(input, autoRegisterIfMissing);
@@ -399,9 +411,13 @@ router.post('/status', serverAuthBase, async (req: any, res: any) => {
   } catch (error: any) {
     logger.error('Failed to update service status:', error);
 
-    res.status(500).json({
+    const statusCode = error.statusCode || 500;
+    res.status(statusCode).json({
       success: false,
-      error: { message: error.message || 'Failed to update service status' },
+      error: {
+        code: error.code || 'INTERNAL_SERVER_ERROR',
+        message: error.message || 'Failed to update service status',
+      },
     });
   }
 });

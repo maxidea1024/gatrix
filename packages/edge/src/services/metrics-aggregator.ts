@@ -32,6 +32,11 @@ interface ServerUnknownBuffer {
   sdkVersion?: string;
 }
 
+interface ContextFieldUsageBuffer {
+  fields: Map<string, number>;
+  sdkVersion?: string;
+}
+
 /**
  * MetricsAggregator - Buffers and aggregates metrics from SDKs before flushing to backend.
  * Reduces backend load by collapsing high-frequency requests from multiple SDK instances.
@@ -41,6 +46,7 @@ class MetricsAggregator {
   private clientBuffers: Map<string, ClientMetricBucket> = new Map();
   private serverBuffers: Map<string, ServerMetricBuffer> = new Map();
   private serverUnknownBuffers: Map<string, ServerUnknownBuffer> = new Map();
+  private contextFieldBuffers: Map<string, ContextFieldUsageBuffer> = new Map();
 
   private flushTimer: NodeJS.Timeout | null = null;
   private readonly FLUSH_INTERVAL_MS = 30_000; // 30 seconds
@@ -190,6 +196,37 @@ class MetricsAggregator {
   }
 
   /**
+   * Add context field usage to buffer (called from evaluation helper)
+   */
+  addContextFieldUsage(
+    environmentId: string,
+    appName: string,
+    fieldNames: string[],
+    sdkVersion?: string
+  ): void {
+    if (!fieldNames || fieldNames.length === 0) return;
+
+    const key = `${environmentId}:${appName}`;
+    let buffer = this.contextFieldBuffers.get(key);
+
+    if (!buffer) {
+      buffer = {
+        fields: new Map(),
+        sdkVersion,
+      };
+      this.contextFieldBuffers.set(key, buffer);
+    }
+
+    if (sdkVersion) {
+      buffer.sdkVersion = sdkVersion;
+    }
+
+    for (const name of fieldNames) {
+      buffer.fields.set(name, (buffer.fields.get(name) || 0) + 1);
+    }
+  }
+
+  /**
    * Start periodic flush timer
    */
   private startFlushTimer(): void {
@@ -205,11 +242,13 @@ class MetricsAggregator {
     const clientJobs = Array.from(this.clientBuffers.entries());
     const serverJobs = Array.from(this.serverBuffers.entries());
     const unknownJobs = Array.from(this.serverUnknownBuffers.entries());
+    const ctxFieldJobs = Array.from(this.contextFieldBuffers.entries());
 
     if (
       clientJobs.length === 0 &&
       serverJobs.length === 0 &&
-      unknownJobs.length === 0
+      unknownJobs.length === 0 &&
+      ctxFieldJobs.length === 0
     ) {
       return;
     }
@@ -217,9 +256,10 @@ class MetricsAggregator {
     this.clientBuffers.clear();
     this.serverBuffers.clear();
     this.serverUnknownBuffers.clear();
+    this.contextFieldBuffers.clear();
 
     logger.debug(
-      `Flushing aggregated metrics to backend: ${clientJobs.length} client, ${serverJobs.length} server, ${unknownJobs.length} unknown groups`
+      `Flushing aggregated metrics to backend: ${clientJobs.length} client, ${serverJobs.length} server, ${unknownJobs.length} unknown, ${ctxFieldJobs.length} ctxField groups`
     );
 
     // Process Client Metrics
@@ -321,10 +361,45 @@ class MetricsAggregator {
       );
     });
 
+    // Process Context Field Usage
+    const ctxFieldPromises = ctxFieldJobs.map(async ([key, buffer]) => {
+      const [environmentId, appName] = key.split(':');
+      const fields = Array.from(buffer.fields.entries()).map(
+        ([name, count]) => ({ name, count })
+      );
+      try {
+        await axios.post(
+          `${config.gatrixUrl}/api/v1/server/features/context-field-usage`,
+          {
+            fields,
+            appName,
+            sdkVersion: buffer.sdkVersion,
+          },
+          {
+            headers: {
+              'x-api-token': config.apiToken,
+              'x-application-name': appName,
+              'x-environment-id': environmentId,
+              ...(buffer.sdkVersion && {
+                'x-sdk-version': buffer.sdkVersion,
+              }),
+            },
+            timeout: 10_000,
+          }
+        );
+      } catch (error: any) {
+        logger.error(
+          `Failed to flush context field usage for ${key}:`,
+          error.message
+        );
+      }
+    });
+
     await Promise.allSettled([
       ...clientPromises,
       ...serverPromises,
       ...unknownPromises,
+      ...ctxFieldPromises,
     ]);
   }
 

@@ -6,8 +6,18 @@
 
 import Redis from 'ioredis';
 import { createLogger } from '../../config/logger';
+import { GatrixError } from '../../middleware/error-handler';
 
 const logger = createLogger('RedisServiceDiscoveryProvider');
+
+/** Meta key TTL in seconds (1 day). Renewed on every heartbeat. */
+const META_TTL = 86400;
+
+/** Error codes for service discovery operations */
+export const ServiceDiscoveryErrorCode = {
+  SERVICE_NOT_FOUND: 'SERVICE_NOT_FOUND',
+  SERVICE_META_RECOVERY_FAILED: 'SERVICE_META_RECOVERY_FAILED',
+} as const;
 import config from '../../config';
 import {
   IServiceDiscoveryProvider,
@@ -102,8 +112,8 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         stats: instance.stats || {},
       };
 
-      // Store meta without TTL (permanent until explicitly deleted)
-      await this.client.set(metaKey, JSON.stringify(meta));
+      // Store meta with 1-day TTL (renewed on every heartbeat)
+      await this.client.set(metaKey, JSON.stringify(meta), 'EX', META_TTL);
 
       // Store stat with TTL (auto-cleanup on heartbeat timeout)
       await this.client.set(statKey, JSON.stringify(stat), 'EX', ttlSeconds);
@@ -322,20 +332,14 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       const metaValue = await this.client.get(metaKey);
 
       if (!metaValue) {
-        if (autoRegisterIfMissing) {
-          // Auto-register: create new instance with provided data
-          if (!input.hostname || !input.internalAddress || !input.ports) {
-            throw new Error(
-              `Auto-register requires hostname, internalAddress, and ports fields`
-            );
-          }
-
+        // Meta missing — recover from SDK backup data if available
+        if (input.hostname && input.internalAddress && input.ports) {
           const now = new Date().toISOString();
           const meta = {
             instanceId: input.instanceId,
             labels: input.labels,
             hostname: input.hostname,
-            externalAddress: '', // Will be set by controller from req.ip
+            externalAddress: '',
             internalAddress: input.internalAddress,
             ports: input.ports,
             createdAt: now,
@@ -348,10 +352,10 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             stats: input.stats || {},
           };
 
-          // Store meta without TTL (permanent)
-          await this.client.set(metaKey, JSON.stringify(meta));
+          // Store meta with 1-day TTL
+          await this.client.set(metaKey, JSON.stringify(meta), 'EX', META_TTL);
 
-          // Store stat with TTL
+          // Store stat with heartbeat TTL
           const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
           await this.client.set(
             statKey,
@@ -366,26 +370,22 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             input.instanceId
           );
 
-          // Publish event (merge meta + stat for compatibility)
+          // Publish event
           const instance: ServiceInstance = { ...meta, ...stat };
-          await this.publishEvent({
-            type: 'put',
-            instance,
-          });
+          await this.publishEvent({ type: 'put', instance });
 
           logger.info(
-            `Service auto-registered: ${serviceType}:${input.instanceId}`,
-            {
-              labels: input.labels,
-            }
+            `Meta recovered for ${serviceType}:${input.instanceId}`,
+            { labels: input.labels }
           );
           return;
         } else {
-          const error: any = new Error(
-            `Service ${serviceType}:${input.instanceId} not found`
+          throw new GatrixError(
+            `Service ${serviceType}:${input.instanceId} not found`,
+            404,
+            true,
+            ServiceDiscoveryErrorCode.SERVICE_NOT_FOUND
           );
-          error.status = 404;
-          throw error;
         }
       }
 
@@ -399,10 +399,43 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         return;
       }
 
-      // Update stat only (meta is immutable)
+      // Update stat (and repair meta if incomplete)
       const statValue = await this.client.get(statKey);
       const stat = statValue ? JSON.parse(statValue) : {};
       const meta = JSON.parse(metaValue);
+
+      // Repair meta when SDK-reported values differ from stored values.
+      // After Gatrix restart, meta keys may persist with stale or empty data.
+      // SDK heartbeats always include registrationBackup data, so we compare
+      // and update any fields that have drifted.
+      if (input.hostname || input.internalAddress || input.ports) {
+        let metaRepaired = false;
+
+        if (input.hostname && meta.hostname !== input.hostname) {
+          meta.hostname = input.hostname;
+          metaRepaired = true;
+        }
+        if (input.internalAddress && meta.internalAddress !== input.internalAddress) {
+          meta.internalAddress = input.internalAddress;
+          metaRepaired = true;
+        }
+        if (input.ports && JSON.stringify(meta.ports) !== JSON.stringify(input.ports)) {
+          meta.ports = input.ports;
+          metaRepaired = true;
+        }
+
+        if (metaRepaired) {
+          await this.client.set(metaKey, JSON.stringify(meta), 'EX', META_TTL);
+          logger.info(
+            `Meta repaired for ${serviceType}:${input.instanceId}`,
+            {
+              hostname: meta.hostname,
+              internalAddress: meta.internalAddress,
+              ports: meta.ports,
+            }
+          );
+        }
+      }
 
       // Check if service is already in error or no-response state - ignore updateStatus calls
       if (stat.status === 'error' || stat.status === 'no-response') {
@@ -425,6 +458,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       }
 
       stat.updatedAt = new Date().toISOString();
+
+      // Renew meta TTL on every heartbeat (keeps meta alive as long as service is active)
+      await this.client.expire(metaKey, META_TTL);
 
       // Use configured TTL based on status
       const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
@@ -627,7 +663,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         return null; // Service not found
       }
 
-      // If stat key doesn't exist, service is not active (was cleaned up)
+      // If stat key doesn't exist, service is not active.
+      // The watch() initial scan creates temporary stat keys for orphaned metas,
+      // so this case means the service has been fully cleaned up.
       if (!statValue) {
         return null;
       }
@@ -672,11 +710,37 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             const statKey = this.getStatKey(serviceType, instanceId);
             const statValue = await this.client.get(statKey);
 
+            const trackedKey = `${serviceType}:${instanceId}`;
             if (statValue) {
               const stat = JSON.parse(statValue);
               const instance: ServiceInstance = { ...meta, ...stat };
-              const trackedKey = `${serviceType}:${instanceId}`;
               this.trackedServices.set(trackedKey, instance);
+            } else {
+              // Orphaned meta (stat expired while Gatrix was down).
+              // Create a temporary stat key (60s) so the normal keyspace expiration
+              // flow handles cleanup if no heartbeat arrives.
+              // NX = only set if not exists (avoid overwriting a real stat from a concurrent heartbeat).
+              // IMPORTANT: Use 'heartbeat' status, NOT 'no-response'.
+              // The guard at updateStatus line ~441 blocks heartbeats when stat.status is 'no-response',
+              // which would prevent live game servers from restoring their service for 60s.
+              // 'heartbeat' is safe: readers normalize it to 'ready', and the guard does not block it.
+              const tempStat = {
+                status: 'heartbeat',
+                updatedAt: new Date().toISOString(),
+                stats: {},
+              };
+              await this.client.set(
+                statKey,
+                JSON.stringify(tempStat),
+                'EX',
+                60,
+                'NX'
+              );
+              const instance: ServiceInstance = { ...meta, ...tempStat };
+              this.trackedServices.set(trackedKey, instance);
+              logger.info(
+                `Orphaned service detected (stat expired): ${serviceType}:${instanceId} - created temp stat (60s TTL)`
+              );
             }
           } catch (error) {
             logger.warn(
@@ -970,47 +1034,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           }
         }
 
-        // 2. Clean up terminated meta keys (meta without stat)
-        const metaKeys = await this.scanKeys(`services:${serviceType}:meta:*`);
-        for (const metaKey of metaKeys) {
-          const parts = metaKey.split(':');
-          if (parts.length === 4) {
-            const instanceId = parts[3];
-            const statKey = this.getStatKey(serviceType, instanceId);
-
-            // Check if stat key exists
-            const statExists = await this.client.exists(statKey);
-            if (!statExists) {
-              // Stat key doesn't exist, so this is a terminated service
-              try {
-                const metaValue = await this.client.get(metaKey);
-                if (metaValue) {
-                  const instance: ServiceInstance = JSON.parse(metaValue);
-                  instance.status = 'terminated';
-                  instance.updatedAt = new Date().toISOString();
-
-                  // Delete the meta key
-                  await this.client.del(metaKey);
-                  totalDeletedCount++;
-                  logger.info(
-                    `🗑️ Deleted terminated service: ${serviceType}:${instanceId}`
-                  );
-
-                  // Publish delete event
-                  await this.publishEvent({
-                    type: 'delete',
-                    instance,
-                  });
-                }
-              } catch (error) {
-                logger.error(
-                  `Failed to cleanup terminated service ${serviceType}:${instanceId}:`,
-                  error
-                );
-              }
-            }
-          }
-        }
+        // Note: Meta keys now have 1-day TTL, so orphaned meta keys auto-expire.
+        // No manual meta cleanup needed — this prevents accidental deletion of
+        // meta for services that are still alive but just missed a heartbeat cycle.
       } catch (error) {
         logger.error(
           `Failed to cleanup inactive services for ${serviceType}:`,

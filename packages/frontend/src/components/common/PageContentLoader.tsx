@@ -53,8 +53,13 @@ const PageContentLoader: React.FC<PageContentLoaderProps> = ({
           sx={{
             display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            minHeight: 0,
             py: 8,
             ...((sx as object) || {}),
+            // Force centering overrides after spread to prevent parent sx from breaking alignment
+            flexDirection: 'row',
           }}
         >
           <CircularProgress size={28} />

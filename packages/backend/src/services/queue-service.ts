@@ -192,6 +192,26 @@ export class QueueService {
         } else {
           logger.info('Repeatable job already exists: ccu:poll');
         }
+
+        // Register context field usage flush job (every minute)
+        const ctxFieldUsageFlushExists = repeatables.some(
+          (r) => r.name === 'context-field-usage:flush'
+        );
+        if (!ctxFieldUsageFlushExists) {
+          await this.addJob(
+            'scheduler',
+            'context-field-usage:flush',
+            {},
+            { repeat: { pattern: '* * * * *' } }
+          );
+          logger.info(
+            'Registered repeatable job: context-field-usage:flush (every minute)'
+          );
+        } else {
+          logger.info(
+            'Repeatable job already exists: context-field-usage:flush'
+          );
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }

@@ -405,7 +405,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             key={animKey}
             sx={{
               fontWeight: 900,
-              fontSize: 'clamp(5.5rem, min(16vw, 28vh), 14rem)',
+              fontSize: 'clamp(8.25rem, min(24vw, 42vh), 21rem)',
               lineHeight: 1,
               color: TREND_COLORS[totalTrend],
               fontFamily: '"Inter", "Roboto Mono", monospace',

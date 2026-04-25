@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { sdkManager } from '../services/sdk-manager';
+import { metricsAggregator } from '../services/metrics-aggregator';
 import { EvaluationUtils } from '@gatrix/evaluator';
 
 import { createLogger } from '../config/logger';
@@ -54,6 +55,42 @@ export async function performEvaluation(
     // Default context values
     if (!context.appName) {
       context.appName = applicationName;
+    }
+
+    // Collect context field usage (fire-and-forget, non-blocking)
+    try {
+      const fieldNames: string[] = [];
+      const systemFields = ['userId', 'sessionId', 'appName', 'appVersion', 'remoteAddress', 'currentTime'];
+      
+      // Extract all keys from context
+      if (context && typeof context === 'object') {
+        for (const key of Object.keys(context)) {
+          if (key !== 'properties' && (context as any)[key] !== undefined && (context as any)[key] !== null) {
+            fieldNames.push(key);
+          }
+        }
+      }
+      
+      // Custom properties explicitly in 'properties'
+      if (context.properties && typeof context.properties === 'object') {
+        for (const key of Object.keys(context.properties)) {
+          if (!fieldNames.includes(key) && context.properties[key] !== undefined && context.properties[key] !== null) {
+            fieldNames.push(key);
+          }
+        }
+      }
+      if (fieldNames.length > 0) {
+        const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
+        metricsAggregator.addContextFieldUsage(
+          environmentId,
+          applicationName || 'unknown',
+          fieldNames,
+          sdkVersion
+        );
+      }
+    } catch (ctxErr) {
+      // Non-critical, don't block evaluation
+      logger.debug('Failed to collect context field usage', { error: ctxErr });
     }
 
     // 2. Evaluate flags
