@@ -450,20 +450,19 @@ export interface RegisterServiceInput {
  * Update service status input (partial merge)
  * Only sends changed fields. Stats are merged, not replaced.
  *
- * Auto-register fields (only used when autoRegisterIfMissing=true and instance doesn't exist):
- * - hostname, internalAddress, ports are required for auto-register
- * - meta is optional
+ * Registration backup fields (hostname, internalAddress, ports, meta) are always
+ * sent by the SDK so the backend can recover meta if it was lost due to TTL expiry.
  */
 export interface UpdateServiceStatusInput {
   status?: ServiceStatus; // Optional: Update status
   stats?: Record<string, any>; // Optional: Merge stats
-  autoRegisterIfMissing?: boolean; // Optional: Auto-register if not found (default: true)
+  autoRegisterIfMissing?: boolean; // Deprecated: meta recovery is now automatic
 
-  // Auto-register fields (only used when autoRegisterIfMissing=true)
-  hostname?: string; // Required for auto-register
-  internalAddress?: string; // Required for auto-register
-  ports?: ServicePorts; // Required for auto-register
-  meta?: Record<string, any>; // Optional: static metadata (only set during auto-register)
+  // Registration backup fields (always sent for meta recovery)
+  hostname?: string;
+  internalAddress?: string;
+  ports?: ServicePorts;
+  meta?: Record<string, any>;
 }
 
 /**

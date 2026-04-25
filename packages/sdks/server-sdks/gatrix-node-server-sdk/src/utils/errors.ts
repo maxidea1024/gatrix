@@ -51,6 +51,15 @@ export enum CouponRedeemErrorCode {
   INVALID_USER = 'COUPON_INVALID_USER',
 }
 
+/**
+ * Service discovery error codes
+ * These codes match backend ServiceDiscoveryErrorCode for easy identification
+ */
+export enum ServiceDiscoveryErrorCode {
+  SERVICE_NOT_FOUND = 'SERVICE_NOT_FOUND',
+  SERVICE_META_RECOVERY_FAILED = 'SERVICE_META_RECOVERY_FAILED',
+}
+
 export class GatrixSDKError extends Error {
   public readonly code: ErrorCode;
   public readonly statusCode?: number;

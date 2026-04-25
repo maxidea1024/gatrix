@@ -7,6 +7,10 @@ import * as os from 'os';
 import { Logger } from '../utils/logger';
 import { ApiClient } from '../client/api-client';
 import {
+  ServiceDiscoveryErrorCode,
+  isGatrixSDKError,
+} from '../utils/errors';
+import {
   ServiceInstance,
   GetServicesParams,
   RegisterServiceInput,
@@ -352,13 +356,13 @@ export class ServiceDiscoveryService {
       stats: input.stats,
     };
 
-    // Add auto-register fields if provided
-    if (input.autoRegisterIfMissing) {
-      payload.hostname = input.hostname;
-      payload.internalAddress = input.internalAddress;
-      payload.ports = input.ports;
-      payload.meta = input.meta;
-      payload.autoRegisterIfMissing = true;
+    // Always include registration backup data so the backend can recover
+    // meta if it was lost (e.g. TTL expired after prolonged Gatrix downtime).
+    if (this.registrationBackup) {
+      payload.hostname = this.registrationBackup.hostname;
+      payload.internalAddress = this.registrationBackup.internalAddress;
+      payload.ports = this.registrationBackup.ports;
+      payload.meta = this.registrationBackup.meta;
     }
 
     let response;
@@ -368,10 +372,12 @@ export class ServiceDiscoveryService {
         payload
       );
     } catch (error: any) {
-      // Handle thrown errors from ApiClient (e.g. 404, 500)
-      const errorMessage = error.message || String(error);
+      // Check error code from GatrixSDKError (wraps backend response)
+      const backendCode = isGatrixSDKError(error)
+        ? error.details?.error?.code
+        : undefined;
 
-      if (errorMessage.includes('not found')) {
+      if (backendCode === ServiceDiscoveryErrorCode.SERVICE_NOT_FOUND) {
         return await this.handleServiceNotFound(input);
       }
 
@@ -379,15 +385,14 @@ export class ServiceDiscoveryService {
     }
 
     if (!response.success) {
-      const errorMessage =
-        response.error?.message || 'Failed to update service status';
-
-      // Check if error is "Service not found" and we have backup data
-      if (errorMessage.includes('not found')) {
+      // Check backend error code in response body
+      if (response.error?.code === ServiceDiscoveryErrorCode.SERVICE_NOT_FOUND) {
         return await this.handleServiceNotFound(input);
       }
 
-      throw new Error(errorMessage);
+      throw new Error(
+        response.error?.message || 'Failed to update service status'
+      );
     }
 
     this.logger.debug('Service status updated via API', {
@@ -582,15 +587,10 @@ export class ServiceDiscoveryService {
 
         this.isUpdating = true;
 
-        // Include registration backup data for auto-register if service is missing from etcd
-        // Use 'heartbeat' status to distinguish from actual status changes
+        // Backup data (hostname, internalAddress, ports, meta) is automatically
+        // included by updateStatus from registrationBackup for meta recovery.
         await this.updateStatus({
           status: 'heartbeat',
-          autoRegisterIfMissing: true,
-          hostname: this.registrationBackup?.hostname,
-          internalAddress: this.registrationBackup?.internalAddress,
-          ports: this.registrationBackup?.ports,
-          meta: this.registrationBackup?.meta,
         });
 
         this.logger.debug('Heartbeat sent', {

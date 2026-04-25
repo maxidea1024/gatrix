@@ -34,6 +34,8 @@ export {
   CouponRedeemError,
   CouponRedeemErrorCode,
   isCouponRedeemError,
+  // Service discovery errors
+  ServiceDiscoveryErrorCode,
 } from './utils/errors';
 
 // Export logger
