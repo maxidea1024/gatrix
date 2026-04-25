@@ -159,7 +159,7 @@ router.get('/account-whitelists', serverSDKAuth, getAccountWhitelistsHandler);
  *
  * Note: externalAddress is auto-detected from req.ip
  */
-router.post('/register', serverAuthBase, async (req: any, res: any) => {
+router.post('/register', serverSDKAuth, async (req: any, res: any) => {
   try {
     const {
       instanceId: providedInstanceId,
@@ -337,7 +337,7 @@ router.post('/unregister', serverAuthBase, async (req: any, res: any) => {
  *
  * Note: meta is not included - it's immutable after registration
  */
-router.post('/status', serverAuthBase, async (req: any, res: any) => {
+router.post('/status', serverSDKAuth, async (req: any, res: any) => {
   try {
     const {
       instanceId,
