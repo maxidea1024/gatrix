@@ -359,14 +359,11 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
           await this.saveMirrorToRedis(newInstance);
 
-          logger.info(
-            `Meta recovered for ${serviceType}:${input.instanceId}`,
-            {
-              hostname: newInstance.hostname,
-              internalAddress: newInstance.internalAddress,
-              ports: newInstance.ports,
-            }
-          );
+          logger.info(`Meta recovered for ${serviceType}:${input.instanceId}`, {
+            hostname: newInstance.hostname,
+            internalAddress: newInstance.internalAddress,
+            ports: newInstance.ports,
+          });
           return;
         } else {
           const error: any = new Error(
@@ -411,13 +408,22 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       if (input.hostname && instance.hostname !== input.hostname) {
         instance.hostname = input.hostname;
       }
-      if (input.internalAddress && instance.internalAddress !== input.internalAddress) {
+      if (
+        input.internalAddress &&
+        instance.internalAddress !== input.internalAddress
+      ) {
         instance.internalAddress = input.internalAddress;
       }
-      if (input.ports && JSON.stringify(instance.ports) !== JSON.stringify(input.ports)) {
+      if (
+        input.ports &&
+        JSON.stringify(instance.ports) !== JSON.stringify(input.ports)
+      ) {
         instance.ports = input.ports;
       }
-      if (input.meta && JSON.stringify(instance.meta) !== JSON.stringify(input.meta)) {
+      if (
+        input.meta &&
+        JSON.stringify(instance.meta) !== JSON.stringify(input.meta)
+      ) {
         instance.meta = { ...instance.meta, ...input.meta };
       }
 
