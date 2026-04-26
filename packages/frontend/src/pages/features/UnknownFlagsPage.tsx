@@ -60,6 +60,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import SearchTextField from '@/components/common/SearchTextField';
+import SimplePagination from '../../components/common/SimplePagination';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -74,6 +75,10 @@ const UnknownFlagsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   // Menu state
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -430,6 +435,17 @@ const UnknownFlagsPage: React.FC = () => {
     sdkVersionFilter,
   ]);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearchTerm, statusFilter, environmentFilter, projectFilter, organisationFilter, appNameFilter, sdkVersionFilter]);
+
+  // Client-side pagination
+  const paginatedFlags = useMemo(() => {
+    const start = page * rowsPerPage;
+    return filteredFlags.slice(start, start + rowsPerPage);
+  }, [filteredFlags, page, rowsPerPage]);
+
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
     flag: UnknownFlag
@@ -623,178 +639,192 @@ const UnknownFlagsPage: React.FC = () => {
         {filteredFlags.length === 0 ? (
           <EmptyPagePlaceholder message={t('featureFlags.noUnknownFlags')} />
         ) : (
-          <Card>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {visibleColumns.map((col) => (
-                      <TableCell
-                        key={col.id}
-                        align={
-                          col.id === 'accessCount' || col.id === 'status'
-                            ? 'center'
-                            : 'left'
-                        }
-                      >
-                        {t(col.labelKey)}
-                      </TableCell>
-                    ))}
-                    <TableCell align="center">{t('common.actions')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredFlags.map((flag) => (
-                    <TableRow key={flag.id} hover>
-                      {visibleColumns.map((col) => {
-                        switch (col.id) {
-                          case 'flagName':
-                            return (
-                              <TableCell key={col.id}>
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                  }}
-                                >
-                                  <UnknownIcon
-                                    fontSize="small"
-                                    color="warning"
-                                  />
-                                  <Typography
-                                    fontWeight={500}
-                                    sx={{ fontFamily: 'monospace' }}
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {visibleColumns.map((col) => (
+                        <TableCell
+                          key={col.id}
+                          align={
+                            col.id === 'accessCount' || col.id === 'status'
+                              ? 'center'
+                              : 'left'
+                          }
+                        >
+                          {t(col.labelKey)}
+                        </TableCell>
+                      ))}
+                      <TableCell align="center">{t('common.actions')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedFlags.map((flag) => (
+                      <TableRow key={flag.id} hover>
+                        {visibleColumns.map((col) => {
+                          switch (col.id) {
+                            case 'flagName':
+                              return (
+                                <TableCell key={col.id}>
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1,
+                                    }}
                                   >
-                                    {flag.flagName}
-                                  </Typography>
-                                  <Tooltip title={t('common.copy')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() =>
-                                        handleCopyFlagName(flag.flagName)
-                                      }
-                                      sx={{
-                                        opacity: 0.6,
-                                        '&:hover': { opacity: 1 },
-                                      }}
+                                    <UnknownIcon
+                                      fontSize="small"
+                                      color="warning"
+                                    />
+                                    <Typography
+                                      fontWeight={500}
+                                      sx={{ fontFamily: 'monospace' }}
                                     >
-                                      <CopyIcon sx={{ fontSize: 14 }} />
-                                    </IconButton>
+                                      {flag.flagName}
+                                    </Typography>
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                          handleCopyFlagName(flag.flagName)
+                                        }
+                                        sx={{
+                                          opacity: 0.6,
+                                          '&:hover': { opacity: 1 },
+                                        }}
+                                      >
+                                        <CopyIcon sx={{ fontSize: 14 }} />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'environment':
+                              return (
+                                <TableCell key={col.id}>
+                                  <Tooltip title={flag.environmentId}>
+                                    <Chip
+                                      label={
+                                        flag.environmentName || flag.environmentId
+                                      }
+                                      size="small"
+                                      sx={{ borderRadius: '16px' }}
+                                    />
                                   </Tooltip>
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'environment':
-                            return (
-                              <TableCell key={col.id}>
-                                <Tooltip title={flag.environmentId}>
-                                  <Chip
-                                    label={
-                                      flag.environmentName || flag.environmentId
-                                    }
-                                    size="small"
-                                    sx={{ borderRadius: '16px' }}
-                                  />
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'project':
-                            return (
-                              <TableCell key={col.id}>
-                                <Typography variant="body2">
-                                  {flag.projectName || '-'}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'organisation':
-                            return (
-                              <TableCell key={col.id}>
-                                <Typography variant="body2">
-                                  {flag.orgName || '-'}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'appName':
-                            return (
-                              <TableCell key={col.id}>
-                                {flag.appName ? (
-                                  <Chip
-                                    label={flag.appName}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{ borderRadius: '16px' }}
-                                  />
-                                ) : (
+                                </TableCell>
+                              );
+                            case 'project':
+                              return (
+                                <TableCell key={col.id}>
+                                  <Typography variant="body2">
+                                    {flag.projectName || '-'}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'organisation':
+                              return (
+                                <TableCell key={col.id}>
+                                  <Typography variant="body2">
+                                    {flag.orgName || '-'}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'appName':
+                              return (
+                                <TableCell key={col.id}>
+                                  {flag.appName ? (
+                                    <Chip
+                                      label={flag.appName}
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ borderRadius: '16px' }}
+                                    />
+                                  ) : (
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      -
+                                    </Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'sdkVersion':
+                              return (
+                                <TableCell key={col.id}>
                                   <Typography
                                     variant="body2"
                                     color="text.secondary"
                                   >
-                                    -
+                                    {flag.sdkVersion || '-'}
                                   </Typography>
-                                )}
-                              </TableCell>
-                            );
-                          case 'sdkVersion':
-                            return (
-                              <TableCell key={col.id}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {flag.sdkVersion || '-'}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'accessCount':
-                            return (
-                              <TableCell key={col.id} align="center">
-                                <Typography variant="body2">
-                                  {flag.accessCount.toLocaleString()}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'lastReportedAt':
-                            return (
-                              <TableCell key={col.id}>
-                                <RelativeTime date={flag.lastReportedAt} />
-                              </TableCell>
-                            );
-                          case 'status':
-                            return (
-                              <TableCell key={col.id} align="center">
-                                {flag.isResolved ? (
-                                  <Chip
-                                    label={t('featureFlags.resolved')}
-                                    size="small"
-                                    color="success"
-                                  />
-                                ) : (
-                                  <Chip
-                                    label={t('featureFlags.unresolved')}
-                                    size="small"
-                                    color="warning"
-                                  />
-                                )}
-                              </TableCell>
-                            );
-                          default:
-                            return <TableCell key={col.id}>-</TableCell>;
-                        }
-                      })}
-                      <TableCell align="center">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleMenuOpen(e, flag)}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                                </TableCell>
+                              );
+                            case 'accessCount':
+                              return (
+                                <TableCell key={col.id} align="center">
+                                  <Typography variant="body2">
+                                    {flag.accessCount.toLocaleString()}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'lastReportedAt':
+                              return (
+                                <TableCell key={col.id}>
+                                  <RelativeTime date={flag.lastReportedAt} />
+                                </TableCell>
+                              );
+                            case 'status':
+                              return (
+                                <TableCell key={col.id} align="center">
+                                  {flag.isResolved ? (
+                                    <Chip
+                                      label={t('featureFlags.resolved')}
+                                      size="small"
+                                      color="success"
+                                    />
+                                  ) : (
+                                    <Chip
+                                      label={t('featureFlags.unresolved')}
+                                      size="small"
+                                      color="warning"
+                                    />
+                                  )}
+                                </TableCell>
+                              );
+                            default:
+                              return <TableCell key={col.id}>-</TableCell>;
+                          }
+                        })}
+                        <TableCell align="center">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleMenuOpen(e, flag)}
+                          >
+                            <MoreVertIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Pagination */}
+              <SimplePagination
+                page={page}
+                rowsPerPage={rowsPerPage}
+                count={filteredFlags.length}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </CardContent>
           </Card>
         )}
       </PageContentLoader>
