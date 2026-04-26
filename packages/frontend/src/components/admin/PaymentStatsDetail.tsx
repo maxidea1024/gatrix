@@ -341,7 +341,8 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
         position: 'absolute',
         inset: 0,
         zIndex: 2,
-        background: 'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
+        background:
+          'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -377,7 +378,8 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           inset: 0,
           zIndex: 1,
           pointerEvents: 'none',
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.65) 100%)',
+          background:
+            'linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.65) 100%)',
         }}
       />
       {/* Content overlay */}

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import {
   Box,
   Tabs,
@@ -152,7 +158,9 @@ const PlayerConnectionsPage: React.FC = () => {
   const [ddayDate, setDdayDate] = useState<string>(
     () => localStorage.getItem(COUNTDOWN_DDAY_KEY) || ''
   );
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
@@ -385,33 +393,51 @@ const PlayerConnectionsPage: React.FC = () => {
           { key: '1w', ms: 7 * 24 * 60 * 60 * 1000 },
         ] as const;
 
-        const isCustomMode = ddayDate && !PRESETS.some(p => {
-          const expected = Date.now() + p.ms;
-          const actual = new Date(ddayDate).getTime();
-          return Math.abs(expected - actual) < 120_000; // within 2 min tolerance
-        });
+        const isCustomMode =
+          ddayDate &&
+          !PRESETS.some((p) => {
+            const expected = Date.now() + p.ms;
+            const actual = new Date(ddayDate).getTime();
+            return Math.abs(expected - actual) < 120_000; // within 2 min tolerance
+          });
 
         const handlePreset = (ms: number) => {
           const target = new Date(Date.now() + ms);
           setDdayDate(target.toISOString());
         };
 
-        const ddayIsFuture = ddayDate && new Date(ddayDate).getTime() > Date.now();
+        const ddayIsFuture =
+          ddayDate && new Date(ddayDate).getTime() > Date.now();
 
         // Compute remaining time display
-        const remainingLabel = ddayDate ? (() => {
-          const diff = new Date(ddayDate).getTime() - Date.now();
-          if (diff <= 0) return null;
-          const totalSec = Math.floor(diff / 1000);
-          const d = Math.floor(totalSec / 86400);
-          const h = Math.floor((totalSec % 86400) / 3600);
-          const m = Math.floor((totalSec % 3600) / 60);
-          const parts: string[] = [];
-          if (d > 0) parts.push(t('playerConnections.countdown.remainDays', { count: d }));
-          if (h > 0) parts.push(t('playerConnections.countdown.remainHours', { count: h }));
-          if (m > 0 || parts.length === 0) parts.push(t('playerConnections.countdown.remainMinutes', { count: m }));
-          return t('playerConnections.countdown.remainPrefix') + ' ' + parts.join(' ');
-        })() : null;
+        const remainingLabel = ddayDate
+          ? (() => {
+              const diff = new Date(ddayDate).getTime() - Date.now();
+              if (diff <= 0) return null;
+              const totalSec = Math.floor(diff / 1000);
+              const d = Math.floor(totalSec / 86400);
+              const h = Math.floor((totalSec % 86400) / 3600);
+              const m = Math.floor((totalSec % 3600) / 60);
+              const parts: string[] = [];
+              if (d > 0)
+                parts.push(
+                  t('playerConnections.countdown.remainDays', { count: d })
+                );
+              if (h > 0)
+                parts.push(
+                  t('playerConnections.countdown.remainHours', { count: h })
+                );
+              if (m > 0 || parts.length === 0)
+                parts.push(
+                  t('playerConnections.countdown.remainMinutes', { count: m })
+                );
+              return (
+                t('playerConnections.countdown.remainPrefix') +
+                ' ' +
+                parts.join(' ')
+              );
+            })()
+          : null;
 
         return (
           <Dialog
@@ -428,8 +454,22 @@ const PlayerConnectionsPage: React.FC = () => {
                   <Chip
                     key={p.key}
                     label={t(`playerConnections.countdown.preset${p.key}`)}
-                    variant={ddayDate && Math.abs(new Date(ddayDate).getTime() - (Date.now() + p.ms)) < 120_000 ? 'filled' : 'outlined'}
-                    color={ddayDate && Math.abs(new Date(ddayDate).getTime() - (Date.now() + p.ms)) < 120_000 ? 'primary' : 'default'}
+                    variant={
+                      ddayDate &&
+                      Math.abs(
+                        new Date(ddayDate).getTime() - (Date.now() + p.ms)
+                      ) < 120_000
+                        ? 'filled'
+                        : 'outlined'
+                    }
+                    color={
+                      ddayDate &&
+                      Math.abs(
+                        new Date(ddayDate).getTime() - (Date.now() + p.ms)
+                      ) < 120_000
+                        ? 'primary'
+                        : 'default'
+                    }
                     onClick={() => handlePreset(p.ms)}
                     sx={{ fontWeight: 600, cursor: 'pointer' }}
                   />
@@ -457,31 +497,42 @@ const PlayerConnectionsPage: React.FC = () => {
               )}
 
               {/* Status chip */}
-              {ddayDate && (() => {
-                if (!ddayIsFuture) {
-                  return (
-                    <Chip
-                      icon={<ErrorIcon />}
-                      label={t('playerConnections.countdown.pastDateError')}
-                      color="error"
-                      variant="outlined"
-                      sx={{ mt: 2, width: '100%', justifyContent: 'flex-start', py: 0.5 }}
-                    />
-                  );
-                }
-                if (remainingLabel) {
-                  return (
-                    <Chip
-                      icon={<TimerIcon />}
-                      label={remainingLabel}
-                      color="primary"
-                      variant="outlined"
-                      sx={{ mt: 2, width: '100%', justifyContent: 'flex-start', py: 0.5 }}
-                    />
-                  );
-                }
-                return null;
-              })()}
+              {ddayDate &&
+                (() => {
+                  if (!ddayIsFuture) {
+                    return (
+                      <Chip
+                        icon={<ErrorIcon />}
+                        label={t('playerConnections.countdown.pastDateError')}
+                        color="error"
+                        variant="outlined"
+                        sx={{
+                          mt: 2,
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          py: 0.5,
+                        }}
+                      />
+                    );
+                  }
+                  if (remainingLabel) {
+                    return (
+                      <Chip
+                        icon={<TimerIcon />}
+                        label={remainingLabel}
+                        color="primary"
+                        variant="outlined"
+                        sx={{
+                          mt: 2,
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          py: 0.5,
+                        }}
+                      />
+                    );
+                  }
+                  return null;
+                })()}
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setDdayDialogOpen(false)}>
@@ -600,8 +651,12 @@ const PlayerConnectionsPage: React.FC = () => {
                     .catch(() => {});
                 }}
               >
-                <ListItemIcon><FullscreenIcon fontSize="small" /></ListItemIcon>
-                <ListItemText>{t('playerConnections.scoreboard.dropdown.ccuCounter')}</ListItemText>
+                <ListItemIcon>
+                  <FullscreenIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('playerConnections.scoreboard.dropdown.ccuCounter')}
+                </ListItemText>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -609,8 +664,12 @@ const PlayerConnectionsPage: React.FC = () => {
                   setDdayDialogOpen(true);
                 }}
               >
-                <ListItemIcon><TimerIcon fontSize="small" /></ListItemIcon>
-                <ListItemText>{t('playerConnections.scoreboard.dropdown.countdown')}</ListItemText>
+                <ListItemIcon>
+                  <TimerIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('playerConnections.scoreboard.dropdown.countdown')}
+                </ListItemText>
               </MenuItem>
               <Divider />
               <MenuItem
@@ -619,8 +678,12 @@ const PlayerConnectionsPage: React.FC = () => {
                   handleOpenSyncDialog();
                 }}
               >
-                <ListItemIcon><SyncIcon fontSize="small" /></ListItemIcon>
-                <ListItemText>{t('playerConnections.sync.button')}</ListItemText>
+                <ListItemIcon>
+                  <SyncIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('playerConnections.sync.button')}
+                </ListItemText>
               </MenuItem>
             </Menu>
           </Box>

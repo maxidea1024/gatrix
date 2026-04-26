@@ -295,7 +295,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 2147483647,
-        background: 'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
+        background:
+          'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -337,7 +338,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           inset: 0,
           zIndex: 1,
           pointerEvents: 'none',
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.22) 100%)',
+          background:
+            'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.22) 100%)',
         }}
       />
       {/* Vignette */}
@@ -347,7 +349,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           inset: 0,
           zIndex: 1,
           pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 75% 65% at center, transparent 40%, rgba(0,0,0,0.25) 100%)',
+          background:
+            'radial-gradient(ellipse 75% 65% at center, transparent 40%, rgba(0,0,0,0.25) 100%)',
         }}
       />
 
@@ -487,7 +490,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 '75%': { transform: 'translate(-1px, -1px)' },
                 '100%': { transform: 'translate(0, 0)' },
               },
-              textShadow: '0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
+              textShadow:
+                '0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
             }}
           >
             {animatedTotal === 0 ? '0' : animatedTotal.toLocaleString()}

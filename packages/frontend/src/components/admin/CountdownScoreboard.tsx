@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
-import { Close as CloseIcon, SkipNext as SkipNextIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  SkipNext as SkipNextIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import OceanBackground from './OceanBackground';
 
@@ -24,7 +27,8 @@ interface TimeLeft {
 function computeTimeLeft(target: Date): TimeLeft {
   const now = Date.now();
   const total = target.getTime() - now;
-  if (total <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
+  if (total <= 0)
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
 
   const seconds = Math.floor((total / 1000) % 60);
   const minutes = Math.floor((total / 1000 / 60) % 60);
@@ -53,7 +57,8 @@ const DigitCell: React.FC<{ value: string; prevValue: string }> = ({
         backdropFilter: 'blur(8px)',
         borderRadius: '12px',
         border: '1px solid rgba(255,255,255,0.12)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
+        boxShadow:
+          '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
         mx: '3px',
         position: 'relative',
         overflow: 'hidden',
@@ -66,7 +71,8 @@ const DigitCell: React.FC<{ value: string; prevValue: string }> = ({
           fontSize: 'clamp(2rem, 5.5vw, 6.5rem)',
           lineHeight: 1,
           color: '#fff',
-          textShadow: '0 2px 12px rgba(0,0,0,0.5), 0 0 40px rgba(255,255,255,0.1)',
+          textShadow:
+            '0 2px 12px rgba(0,0,0,0.5), 0 0 40px rgba(255,255,255,0.1)',
           fontVariantNumeric: 'tabular-nums',
           animation: changed ? 'digitFlip 0.4s ease-out' : 'none',
           '@keyframes digitFlip': {
@@ -164,7 +170,9 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => computeTimeLeft(ddayTarget));
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
+    computeTimeLeft(ddayTarget)
+  );
   const prevTimeRef = useRef<TimeLeft>(timeLeft);
   const completeCalledRef = useRef(false);
 
@@ -215,7 +223,11 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
   const wasFullscreenRef = useRef(!!document.fullscreenElement);
   useEffect(() => {
     const onFsChange = () => {
-      if (!document.fullscreenElement && wasFullscreenRef.current && !skipCalledRef.current) {
+      if (
+        !document.fullscreenElement &&
+        wasFullscreenRef.current &&
+        !skipCalledRef.current
+      ) {
         onCloseRef.current();
       }
       wasFullscreenRef.current = !!document.fullscreenElement;
@@ -347,7 +359,8 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
               fontWeight: 800,
               mt: 3,
               letterSpacing: 4,
-              textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,200,100,0.5)',
+              textShadow:
+                '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,200,100,0.5)',
               animation: 'completePulse 0.8s ease-in-out infinite',
               '@keyframes completePulse': {
                 '0%, 100%': { opacity: 1, transform: 'scale(1)' },
