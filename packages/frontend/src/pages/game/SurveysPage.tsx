@@ -486,8 +486,7 @@ const SurveysPage: React.FC = () => {
       />
 
       {/* Filter Panel */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -544,8 +543,7 @@ const SurveysPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (

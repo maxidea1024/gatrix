@@ -1904,8 +1904,7 @@ const FeatureFlagsPage: React.FC = () => {
       />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1997,8 +1996,7 @@ const FeatureFlagsPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Table / Compact View */}
       <PageContentLoader loading={loading && isInitialLoad}>

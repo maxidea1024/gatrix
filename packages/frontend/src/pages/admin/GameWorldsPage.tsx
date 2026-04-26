@@ -1891,8 +1891,7 @@ const GameWorldsPage: React.FC = () => {
       />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1954,8 +1953,7 @@ const GameWorldsPage: React.FC = () => {
               </Box>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Game Worlds Table */}
       <PageContentLoader loading={loading}>

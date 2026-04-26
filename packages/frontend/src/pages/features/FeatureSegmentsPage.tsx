@@ -602,8 +602,7 @@ const FeatureSegmentsPage: React.FC = () => {
       />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -660,8 +659,7 @@ const FeatureSegmentsPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Table */}
       <PageContentLoader loading={loading}>

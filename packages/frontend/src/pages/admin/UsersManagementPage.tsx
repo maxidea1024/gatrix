@@ -1823,8 +1823,7 @@ const UsersManagementPage: React.FC = () => {
       />
 
       {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1876,8 +1875,7 @@ const UsersManagementPage: React.FC = () => {
               </Tooltip>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* 일괄 작업 툴바 - 목록 위로 이동 */}
       {selectedUsers.size > 0 && (

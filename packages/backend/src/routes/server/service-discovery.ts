@@ -6,6 +6,7 @@
 
 import express from 'express';
 import knex from '../../config/knex';
+import { Environment } from '../../models/environment';
 import { serverSDKAuth, serverAuthBase } from '../../middleware/api-token-auth';
 import serviceDiscoveryService from '../../services/service-discovery-service';
 import { IpWhitelistModel } from '../../models/ip-whitelist';
@@ -204,8 +205,28 @@ router.post('/register', serverAuthBase, async (req: any, res: any) => {
     // This enables project-scoped environment filtering in service discovery queries.
     // Game servers register with human-readable labels.environment (e.g., 'production'),
     // but environmentId is a globally unique ULID that prevents cross-project collisions.
-    const environmentId =
+    let environmentId =
       req.environmentId || req.apiToken?.environmentId || null;
+
+    // Unsecured tokens provide environment name (e.g., 'development') instead of ULID.
+    // Resolve to actual ULID via DB lookup for consistent service discovery filtering.
+    if (environmentId && req.isUnsecuredToken && !/^[0-9A-Z]{26}$/.test(environmentId)) {
+      const env = await Environment.getByFullPath(
+        req.unsecuredOrgId,
+        req.unsecuredProjectId,
+        environmentId
+      );
+      if (env) {
+        environmentId = env.id as string;
+      } else {
+        logger.warn('Could not resolve unsecured environment name to ULID', {
+          envName: environmentId,
+          org: req.unsecuredOrgId,
+          project: req.unsecuredProjectId,
+        });
+      }
+    }
+
     if (environmentId && !labels.environmentId) {
       labels.environmentId = environmentId;
     }

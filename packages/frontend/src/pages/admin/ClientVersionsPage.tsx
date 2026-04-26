@@ -1791,8 +1791,7 @@ const ClientVersionsPage: React.FC = () => {
       />
 
       {/* Filter */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1842,8 +1841,7 @@ const ClientVersionsPage: React.FC = () => {
               </Tooltip>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Bulk actions toolbar */}
       {selectedIds.length > 0 && (

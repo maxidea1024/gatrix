@@ -2106,8 +2106,7 @@ const ApiTokensPage: React.FC = () => {
         )}
 
         {/* Filter and Column Settings */}
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
+        <Box sx={{ mb: 2 }}>
             <Box
               sx={{
                 display: 'flex',
@@ -2141,8 +2140,7 @@ const ApiTokensPage: React.FC = () => {
                 </IconButton>
               </Tooltip>
             </Box>
-          </CardContent>
-        </Card>
+        </Box>
 
         {/* Tokens Table */}
         <PageContentLoader loading={loading}>

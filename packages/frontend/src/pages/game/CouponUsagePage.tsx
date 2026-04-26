@@ -545,8 +545,7 @@ const CouponUsagePage: React.FC = () => {
       />
 
       {/* Search & Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -602,8 +601,7 @@ const CouponUsagePage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* List */}
       <PageContentLoader loading={loading}>

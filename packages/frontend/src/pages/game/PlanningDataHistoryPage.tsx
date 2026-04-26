@@ -208,8 +208,7 @@ const PlanningDataHistoryPage: React.FC = () => {
       />
 
       {/* Search Bar */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -297,8 +296,7 @@ const PlanningDataHistoryPage: React.FC = () => {
               </Tooltip>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Content */}
       <PageContentLoader loading={loading}>

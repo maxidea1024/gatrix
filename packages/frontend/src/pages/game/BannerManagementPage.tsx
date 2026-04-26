@@ -486,8 +486,7 @@ const BannerManagementPage: React.FC = () => {
       />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -542,8 +541,7 @@ const BannerManagementPage: React.FC = () => {
               </Tooltip>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (

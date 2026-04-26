@@ -566,8 +566,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       />
 
       {/* Search and Filters Card */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -624,8 +623,7 @@ const IngamePopupNoticesPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (

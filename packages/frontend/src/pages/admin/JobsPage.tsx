@@ -524,8 +524,7 @@ const JobsPage: React.FC = () => {
       />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -587,8 +586,7 @@ const JobsPage: React.FC = () => {
               </Box>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Jobs Table */}
       <PageContentLoader loading={loading}>

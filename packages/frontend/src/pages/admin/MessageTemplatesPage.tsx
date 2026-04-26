@@ -1054,8 +1054,7 @@ const MessageTemplatesPage: React.FC = () => {
       />
 
       {/* Filter */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1116,8 +1115,7 @@ const MessageTemplatesPage: React.FC = () => {
               </Box>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* 일괄 작업 툴바 */}
       {selectedIds.length > 0 && (

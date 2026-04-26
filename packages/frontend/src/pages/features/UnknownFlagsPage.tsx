@@ -564,8 +564,7 @@ const UnknownFlagsPage: React.FC = () => {
       </Box>
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -617,8 +616,7 @@ const UnknownFlagsPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Content */}
       <PageContentLoader loading={loading}>

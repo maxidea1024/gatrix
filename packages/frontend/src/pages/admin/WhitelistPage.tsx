@@ -597,7 +597,7 @@ const WhitelistPage: React.FC = () => {
               sx={{
                 display: 'flex',
                 gap: 2,
-                mb: 3,
+                mb: 2,
                 alignItems: 'center',
               }}
             >

@@ -853,7 +853,7 @@ const FeatureContextFieldsPage: React.FC = () => {
               gap: 2,
               flexWrap: 'nowrap',
               justifyContent: 'space-between',
-              mb: 1,
+              mb: 2,
             }}
           >
             <Box

@@ -1145,7 +1145,7 @@ const ServerLifecyclePage: React.FC = () => {
           gap: 2,
           alignItems: 'center',
           flexWrap: 'nowrap',
-          mb: 3,
+          mb: 2,
         }}
       >
         <Box

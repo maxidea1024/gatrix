@@ -752,8 +752,7 @@ const ServiceNoticesPage: React.FC = () => {
       />
 
       {/* Search and Filters Card */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -810,8 +809,7 @@ const ServiceNoticesPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Bulk Actions */}
       {canManage && selectedIds.length > 0 && (

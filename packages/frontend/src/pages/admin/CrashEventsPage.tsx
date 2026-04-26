@@ -1121,8 +1121,7 @@ const CrashEventsPage: React.FC = () => {
       />
 
       {/* Search & Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1204,8 +1203,7 @@ const CrashEventsPage: React.FC = () => {
               </IconButton>
             </Tooltip>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Table */}
       <PageContentLoader loading={loading && events.length === 0}>

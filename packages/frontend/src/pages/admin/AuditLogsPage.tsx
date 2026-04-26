@@ -672,8 +672,7 @@ const AuditLogsPage: React.FC = () => {
       />
 
       {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -740,8 +739,7 @@ const AuditLogsPage: React.FC = () => {
               </IconButton>
             </Tooltip>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {/* Audit Logs Table */}
 

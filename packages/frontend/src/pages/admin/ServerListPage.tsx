@@ -575,7 +575,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         case 'group':
           return service.labels.group || 'unknown';
         case 'environment':
-          return service.labels.environmentId || 'unknown';
+          return service.labels.environmentId || service.labels.environment || 'unknown';
         case 'cloudProvider':
           return service.labels.cloudProvider || 'unknown';
         case 'cloudRegion':
@@ -1785,7 +1785,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                             {service.internalAddress}
                           </TableCell>
                         </TableRow>
-                        {service.labels.environmentId && (
+                        {(service.labels.environmentId || service.labels.environment) && (
                           <TableRow hover>
                             <TableCell
                               sx={{
@@ -1798,7 +1798,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                             </TableCell>
                             <TableCell sx={{ fontSize: '0.75rem' }}>
                               <Chip
-                                label={service.labels.environmentId}
+                                label={service.labels.environmentId || service.labels.environment}
                                 size="small"
                                 variant="outlined"
                                 color="secondary"
@@ -3121,7 +3121,7 @@ const ServerListPage: React.FC = () => {
         service: s.labels.service,
         instanceId: s.instanceId,
         group: s.labels.group,
-        env: s.labels.environmentId,
+        env: s.labels.environmentId || s.labels.environment,
         hostname: s.hostname,
         internalIp: s.internalAddress,
         healthPort: healthPort,
@@ -3453,7 +3453,7 @@ const ServerListPage: React.FC = () => {
   const uniqueEnvs = useMemo(
     () =>
       [
-        ...new Set(services.map((s) => s.labels.environmentId).filter(Boolean)),
+        ...new Set(services.map((s) => s.labels.environmentId || s.labels.environment).filter(Boolean)),
       ].sort() as string[],
     [services]
   );
@@ -3702,7 +3702,7 @@ const ServerListPage: React.FC = () => {
       if (
         filter.key === 'env' &&
         filter.value &&
-        service.labels.environmentId !== filter.value
+        (service.labels.environmentId || service.labels.environment) !== filter.value
       ) {
         return false;
       }
@@ -4577,9 +4577,9 @@ const ServerListPage: React.FC = () => {
                       case 'environment':
                         return (
                           <TableCell key={column.id}>
-                            {service.labels.environmentId ? (
+                            {(service.labels.environmentId || service.labels.environment) ? (
                               <Chip
-                                label={service.labels.environmentId}
+                                label={service.labels.environmentId || service.labels.environment}
                                 size="small"
                                 variant="outlined"
                                 color="secondary"
@@ -5668,6 +5668,7 @@ const ServerListPage: React.FC = () => {
                   key !== 'service' &&
                   key !== 'group' &&
                   key !== 'environment' &&
+                  key !== 'environmentId' &&
                   key !== 'region'
               );
               const ports = Object.entries(service.ports || {});
@@ -5747,9 +5748,9 @@ const ServerListPage: React.FC = () => {
                           }}
                         />
                       )}
-                      {service.labels.environmentId && (
+                      {(service.labels.environmentId || service.labels.environment) && (
                         <Chip
-                          label={service.labels.environmentId}
+                          label={service.labels.environmentId || service.labels.environment}
                           size="small"
                           variant="outlined"
                           color="secondary"

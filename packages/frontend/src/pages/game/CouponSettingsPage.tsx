@@ -1445,8 +1445,7 @@ const CouponSettingsPage: React.FC = () => {
       />
 
       {/* Search & Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ mb: 2 }}>
           <Box
             sx={{
               display: 'flex',
@@ -1502,8 +1501,7 @@ const CouponSettingsPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </CardContent>
-      </Card>
+      </Box>
 
       {selectedIds.length > 0 && (
         <Typography variant="body2" sx={{ px: 2, pb: 1 }}>

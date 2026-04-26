@@ -223,7 +223,7 @@ export const formatRelativeTime = (
 
     // Handle future dates: show "in X minutes" / "X분 후" format
     if (d.isAfter(now)) {
-      return d.to(now);
+      return now.to(d);
     }
 
     const diffSeconds = now.diff(d, 'second');
