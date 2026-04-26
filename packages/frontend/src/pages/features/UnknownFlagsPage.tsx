@@ -438,7 +438,15 @@ const UnknownFlagsPage: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [debouncedSearchTerm, statusFilter, environmentFilter, projectFilter, organisationFilter, appNameFilter, sdkVersionFilter]);
+  }, [
+    debouncedSearchTerm,
+    statusFilter,
+    environmentFilter,
+    projectFilter,
+    organisationFilter,
+    appNameFilter,
+    sdkVersionFilter,
+  ]);
 
   // Client-side pagination
   const paginatedFlags = useMemo(() => {
@@ -657,7 +665,9 @@ const UnknownFlagsPage: React.FC = () => {
                           {t(col.labelKey)}
                         </TableCell>
                       ))}
-                      <TableCell align="center">{t('common.actions')}</TableCell>
+                      <TableCell align="center">
+                        {t('common.actions')}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -708,7 +718,8 @@ const UnknownFlagsPage: React.FC = () => {
                                   <Tooltip title={flag.environmentId}>
                                     <Chip
                                       label={
-                                        flag.environmentName || flag.environmentId
+                                        flag.environmentName ||
+                                        flag.environmentId
                                       }
                                       size="small"
                                       sx={{ borderRadius: '16px' }}
