@@ -156,7 +156,9 @@ const PlayerConnectionsPage: React.FC = () => {
   const [countdownOpen, setCountdownOpen] = useState(false);
   const [ddayDialogOpen, setDdayDialogOpen] = useState(false);
   const [ddayDate, setDdayDate] = useState<string>('');
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';

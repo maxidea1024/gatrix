@@ -362,7 +362,8 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          🎯 {ddayTarget.toLocaleString()} (UTC {ddayTarget.toISOString().slice(0, 16).replace('T', ' ')})
+          🎯 {ddayTarget.toLocaleString()} (UTC{' '}
+          {ddayTarget.toISOString().slice(0, 16).replace('T', ' ')})
         </Typography>
 
         {/* "Completed" flash when reaching zero */}
