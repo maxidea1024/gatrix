@@ -8,6 +8,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import playerConnectionService, {
   type CcuData,
+  type LoginQueueData,
 } from '../../services/playerConnectionService';
 
 import PaymentStatsDetail from './PaymentStatsDetail';
@@ -193,6 +194,30 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     };
   }, [projectApiPath]);
 
+  // Fetch login queue data
+  const [loginQueueData, setLoginQueueData] = useState<LoginQueueData | null>(
+    null
+  );
+  useEffect(() => {
+    if (!projectApiPath) return;
+    let mounted = true;
+    const fetchQueue = async () => {
+      try {
+        const data =
+          await playerConnectionService.getLoginQueue(projectApiPath);
+        if (mounted) setLoginQueueData(data);
+      } catch {
+        // non-critical
+      }
+    };
+    fetchQueue();
+    const interval = setInterval(fetchQueue, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [projectApiPath]);
+
   // Secret 5-tap toggle on live dot to enable/disable payment stats
   const [psEnabled, setPsEnabled] = useState(
     () => localStorage.getItem('gx_ps') === '1'
@@ -295,8 +320,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 2147483647,
-        background:
-          'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
+        background: 'linear-gradient(180deg, #0a0e17 0%, #111827 40%, #0d1117 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -312,29 +336,80 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             }),
       }}
     >
-      {/* Daytime ocean background image */}
-      <Box
-        component="img"
-        src="/images/countdown_ocean_bg.png"
-        alt=""
-        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-          (e.target as HTMLImageElement).style.display = 'none';
-        }}
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center center',
-          zIndex: 0,
-          animation: 'bgSlowZoom 120s ease-in-out infinite alternate',
-          '@keyframes bgSlowZoom': {
-            '0%': { transform: 'scale(1)' },
-            '100%': { transform: 'scale(1.06)' },
-          },
-        }}
-      />
+      {/* Configurable background (YouTube video or image) */}
+      {(() => {
+        const bgType = localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
+        const bgUrl = localStorage.getItem('gx_scoreboard_bg_url') || '';
+
+        if (bgType === 'image' && bgUrl) {
+          // Static image background with object-fit: cover
+          return (
+            <Box
+              component="img"
+              src={bgUrl}
+              alt=""
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center center',
+                zIndex: 0,
+              }}
+            />
+          );
+        }
+
+        // YouTube video background (default)
+        // Extract video ID from URL or use raw ID
+        let videoId = bgUrl || 'QI3lHS55OaU';
+        const ytMatch = videoId.match(
+          /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+        );
+        if (ytMatch) videoId = ytMatch[1];
+        // Strip any remaining query params from bare ID
+        videoId = videoId.replace(/[?&].*$/, '').slice(0, 11);
+
+        return (
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+              opacity: 0,
+              animation: 'ytFadeIn 0.8s ease-out 3.5s forwards',
+              '@keyframes ytFadeIn': {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
+              },
+            }}
+          >
+            <Box
+              component="iframe"
+              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0`}
+              allow="autoplay; encrypted-media"
+              frameBorder="0"
+              tabIndex={-1}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'max(177.78vh, 100vw)',
+                height: 'max(56.25vw, 100vh)',
+                border: 'none',
+                pointerEvents: 'none',
+              }}
+            />
+          </Box>
+        );
+      })()}
       {/* Dark overlay for text readability */}
       <Box
         sx={{
@@ -376,9 +451,11 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         />
       )}
       {/* Sparkline trend graph — anchored to bottom of viewport */}
-      <Sparkline data={historyRef.current} trend={totalTrend} />
+      {!showDetail && <Sparkline data={historyRef.current} trend={totalTrend} />}
 
-      {/* Top bar */}
+      {/* Top bar + main content — hidden when payment detail is shown */}
+      {!showDetail && (
+      <>
       <Box
         sx={{
           display: 'flex',
@@ -476,7 +553,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               fontWeight: 900,
               fontSize: 'clamp(6.6rem, min(19.2vw, 33.6vh), 16.8rem)',
               lineHeight: 1,
-              color: TREND_COLORS[totalTrend],
+              color: '#fff',
               fontFamily: '"Inter", "Roboto Mono", monospace',
               fontVariantNumeric: 'tabular-nums',
               transition: 'color 0.3s ease',
@@ -608,6 +685,26 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               ⛵ {t('playerConnections.scoreboard.waitingForAdventurers')}
             </Typography>
           )}
+
+          {/* Login queue counter */}
+          {loginQueueData && loginQueueData.total > 0 && (
+            <Typography
+              sx={{
+                color: 'rgba(255,200,50,0.8)',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                mt: 2,
+                letterSpacing: 1,
+                textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              ⏳ {t('playerConnections.queue.total')}:{' '}
+              {loginQueueData.total.toLocaleString()}
+            </Typography>
+          )}
         </Box>
 
         {/* Delta & Trend — always reserve space, fade in/out */}
@@ -709,6 +806,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           </Box>
         )}
       </Box>
+      </>
+      )}
       {/* Payment Stats Detail View overlay */}
       {showDetail && paymentStats && (
         <PaymentStatsDetail

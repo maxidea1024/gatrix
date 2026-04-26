@@ -208,6 +208,29 @@ export class PlayerConnectionsController {
   );
 
   /**
+   * GET /login-queue
+   * Proxy login queue (waiting count) from admind Gatrix REST API
+   */
+  static getLoginQueue = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const admindUrl = await getAdmindApiUrl(req.environmentId);
+      const data = await admindRequest(
+        admindUrl,
+        'GET',
+        '/gatrix/v1/login-queue'
+      );
+
+      res.json({
+        success: true,
+        data: {
+          total: data.total || 0,
+          world: data.world || {},
+        },
+      });
+    }
+  );
+
+  /**
    * GET /ccu/history?from=...&to=...&worldId=...
    * Query CCU history from the local database for graphing
    */

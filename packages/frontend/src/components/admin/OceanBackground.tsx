@@ -719,60 +719,7 @@ const OceanBackground: React.FC = () => {
       ctx.restore();
     }
 
-    function drawCompass(
-      ctx: CanvasRenderingContext2D,
-      cw: number,
-      ch: number
-    ) {
-      const cx = cw * 0.92;
-      const cy = ch * 0.88;
-      const r = Math.min(cw, ch) * 0.05;
-      ctx.save();
-      ctx.globalAlpha = 0.055;
-      ctx.translate(cx, cy);
-      ctx.rotate(time * 0.025);
 
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.strokeStyle = '#c8b496';
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(200,180,150,0.5)';
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 0.06, 0, Math.PI * 2);
-      ctx.fillStyle = '#dcc8a0';
-      ctx.fill();
-
-      for (let i = 0; i < 4; i++) {
-        ctx.save();
-        ctx.rotate((Math.PI / 2) * i);
-        ctx.beginPath();
-        ctx.moveTo(0, -r * 0.15);
-        ctx.lineTo(r * 0.08, -r * 0.55);
-        ctx.lineTo(0, -r * 0.95);
-        ctx.lineTo(-r * 0.08, -r * 0.55);
-        ctx.closePath();
-        ctx.fillStyle = i === 0 ? '#e6be78' : 'rgba(200,190,170,0.7)';
-        ctx.fill();
-        ctx.restore();
-      }
-      for (let i = 0; i < 8; i++) {
-        ctx.save();
-        ctx.rotate((Math.PI / 4) * i);
-        ctx.beginPath();
-        ctx.moveTo(0, -r * 0.85);
-        ctx.lineTo(0, -r * 0.95);
-        ctx.strokeStyle = 'rgba(200,180,150,0.6)';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-        ctx.restore();
-      }
-      ctx.restore();
-    }
 
     function draw() {
       if (!visible) {
@@ -794,7 +741,6 @@ const OceanBackground: React.FC = () => {
       drawSeagulls(ctx!, cw, ch);
       drawShootingStars(ctx!, cw, ch);
       drawWindParticles(ctx!, cw, ch);
-      drawCompass(ctx!, cw, ch);
 
       rafRef.current = requestAnimationFrame(draw);
     }

@@ -85,6 +85,11 @@ export interface AllPlayersResponse {
   limit: number;
 }
 
+export interface LoginQueueData {
+  total: number;
+  world: Record<string, number>;
+}
+
 // Service
 const playerConnectionService = {
   /**
@@ -93,6 +98,16 @@ const playerConnectionService = {
   async getCcu(projectApiPath: string): Promise<CcuData> {
     const res = await api.get(`${projectApiPath}/player-connections/ccu`);
     return res.data || { total: 0, worlds: [] };
+  },
+
+  /**
+   * Get login queue (waiting count) from admind API
+   */
+  async getLoginQueue(projectApiPath: string): Promise<LoginQueueData> {
+    const res = await api.get(
+      `${projectApiPath}/player-connections/login-queue`
+    );
+    return res.data || { total: 0, world: {} };
   },
 
   /**

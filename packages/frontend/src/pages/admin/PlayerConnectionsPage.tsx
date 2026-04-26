@@ -40,6 +40,9 @@ import {
   TableContainer,
   Tooltip,
   IconButton,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -58,6 +61,8 @@ import {
   Fullscreen as FullscreenIcon,
   MoreVert as MoreVertIcon,
   Timer as TimerIcon,
+  HourglassEmpty as QueueIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -66,7 +71,10 @@ import { useSnackbar } from 'notistack';
 import { useSearchParams } from 'react-router-dom';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
 import playerConnectionService from '../../services/playerConnectionService';
-import type { CcuData } from '../../services/playerConnectionService';
+import type {
+  CcuData,
+  LoginQueueData,
+} from '../../services/playerConnectionService';
 import PageContentLoader from '../../components/common/PageContentLoader';
 import PageHeader from '../../components/common/PageHeader';
 import CcuGraphTab from '../../components/admin/CcuGraphTab';
@@ -107,6 +115,9 @@ const PlayerConnectionsPage: React.FC = () => {
   const [ccuData, setCcuData] = useState<CcuData | null>(null);
   const [ccuError, setCcuError] = useState<string | null>(null);
   const prevCcuRef = useRef<CcuData | null>(null);
+  const [loginQueueData, setLoginQueueData] = useState<LoginQueueData | null>(
+    null
+  );
   const [refreshInterval, setRefreshInterval] = useState(() => {
     const saved = localStorage.getItem(REFRESH_STORAGE_KEY);
     return saved !== null ? parseInt(saved, 10) : 30000;
@@ -160,6 +171,17 @@ const PlayerConnectionsPage: React.FC = () => {
     null
   );
 
+  // Scoreboard background settings
+  const BG_TYPE_KEY = 'gx_scoreboard_bg_type';
+  const BG_URL_KEY = 'gx_scoreboard_bg_url';
+  const [bgSettingsOpen, setBgSettingsOpen] = useState(false);
+  const [bgType, setBgType] = useState<'youtube' | 'image'>(
+    () => (localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') || 'youtube'
+  );
+  const [bgUrl, setBgUrl] = useState(
+    () => localStorage.getItem(BG_URL_KEY) || ''
+  );
+
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
   const [worldSortBy, setWorldSortBy] = useState<'name' | 'count'>(() => {
@@ -183,12 +205,28 @@ const PlayerConnectionsPage: React.FC = () => {
     localStorage.setItem(REFRESH_STORAGE_KEY, val.toString());
   };
 
+  // Load login queue
+  const loadLoginQueue = useCallback(async () => {
+    if (!projectApiPath) return;
+    try {
+      const data =
+        await playerConnectionService.getLoginQueue(projectApiPath);
+      setLoginQueueData(data);
+    } catch {
+      // Non-critical: silently ignore queue load failures
+      setLoginQueueData(null);
+    }
+  }, [projectApiPath]);
+
   // Load CCU
   const loadCcu = useCallback(async () => {
     if (!projectApiPath) return;
     try {
       setCcuError(null);
-      const data = await playerConnectionService.getCcu(projectApiPath);
+      const [data] = await Promise.all([
+        playerConnectionService.getCcu(projectApiPath),
+        loadLoginQueue(),
+      ]);
       setCcuData((prev) => {
         if (prev) prevCcuRef.current = prev;
         return data;
@@ -208,7 +246,7 @@ const PlayerConnectionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectApiPath, t]);
+  }, [projectApiPath, t, loadLoginQueue]);
 
   useEffect(() => {
     loadCcu();
@@ -400,7 +438,6 @@ const PlayerConnectionsPage: React.FC = () => {
       {/* D-Day Setting Dialog */}
       {(() => {
         const PRESETS = [
-          { key: '1m', ms: 60 * 1000 },
           { key: '5m', ms: 5 * 60 * 1000 },
           { key: '30m', ms: 30 * 60 * 1000 },
           { key: '1h', ms: 60 * 60 * 1000 },
@@ -409,7 +446,7 @@ const PlayerConnectionsPage: React.FC = () => {
         ] as const;
 
         const isCustomMode =
-          ddayDate &&
+          !ddayDate ||
           !PRESETS.some((p) => {
             const expected = Date.now() + p.ms;
             const actual = new Date(ddayDate).getTime();
@@ -572,6 +609,174 @@ const PlayerConnectionsPage: React.FC = () => {
           </Dialog>
         );
       })()}
+
+      {/* Scoreboard Background Settings Dialog */}
+      <Dialog
+        open={bgSettingsOpen}
+        onClose={() => setBgSettingsOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{t('playerConnections.scoreboard.bgSettings.title')}</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <FormControl component="fieldset" sx={{ mt: 1 }}>
+            <RadioGroup
+              row
+              value={bgType}
+              onChange={(e) => setBgType(e.target.value as 'youtube' | 'image')}
+            >
+              <FormControlLabel
+                value="youtube"
+                control={<Radio />}
+                label={t('playerConnections.scoreboard.bgSettings.youtube')}
+              />
+              <FormControlLabel
+                value="image"
+                control={<Radio />}
+                label={t('playerConnections.scoreboard.bgSettings.image')}
+              />
+            </RadioGroup>
+          </FormControl>
+
+          {/* Presets */}
+          {(() => {
+            const BG_PRESETS: { label: string; type: 'youtube' | 'image'; url: string; emoji: string }[] = [
+              { label: 'Calm Sunset', type: 'youtube', url: 'aSk-D86aOtc', emoji: '🌅' },
+              { label: '범선 석양', type: 'image', url: '/images/bg_galleon_sunset.png', emoji: '🖼️' },
+              { label: '해전', type: 'image', url: '/images/bg_naval_battle.png', emoji: '⚔️' },
+              { label: '무역항', type: 'image', url: '/images/bg_trading_port.png', emoji: '🏛️' },
+            ];
+            return (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.5 }}>
+                {BG_PRESETS.map((p) => {
+                  const isActive = bgType === p.type && bgUrl === p.url;
+                  return (
+                    <Chip
+                      key={p.url}
+                      label={`${p.emoji} ${p.label}`}
+                      variant={isActive ? 'filled' : 'outlined'}
+                      color={isActive ? 'primary' : 'default'}
+                      onClick={() => { setBgType(p.type); setBgUrl(p.url); }}
+                      sx={{ fontWeight: 600, cursor: 'pointer' }}
+                    />
+                  );
+                })}
+              </Box>
+            );
+          })()}
+
+          <TextField
+            fullWidth
+            size="small"
+            label={
+              bgType === 'youtube'
+                ? t('playerConnections.scoreboard.bgSettings.youtubeUrl')
+                : t('playerConnections.scoreboard.bgSettings.imageUrl')
+            }
+            value={bgUrl}
+            onChange={(e) => setBgUrl(e.target.value)}
+            placeholder={
+              bgType === 'youtube'
+                ? 'https://www.youtube.com/watch?v=... or VIDEO_ID'
+                : '/images/my-bg.png or https://...'
+            }
+            helperText={
+              bgType === 'youtube'
+                ? t('playerConnections.scoreboard.bgSettings.youtubeHelp')
+                : t('playerConnections.scoreboard.bgSettings.imageHelp')
+            }
+            sx={{ mt: 2 }}
+          />
+
+          {/* Preview */}
+          {bgUrl.trim() && (
+            <Box sx={{ mt: 2 }}>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', fontWeight: 600, mb: 1, display: 'block' }}
+              >
+                {t('playerConnections.scoreboard.bgSettings.preview')}
+              </Typography>
+              <Box
+                sx={{
+                  position: 'relative',
+                  width: '100%',
+                  pt: '56.25%', // 16:9 aspect ratio
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: '#000',
+                }}
+              >
+                {bgType === 'youtube' ? (() => {
+                  let vid = bgUrl.trim();
+                  const m = vid.match(
+                    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                  );
+                  if (m) vid = m[1];
+                  vid = vid.replace(/[?&].*$/, '').slice(0, 11);
+                  return (
+                    <Box
+                      component="iframe"
+                      src={`https://www.youtube.com/embed/${vid}?autoplay=0&mute=1&controls=1&modestbranding=1`}
+                      allow="encrypted-media"
+                      frameBorder="0"
+                      sx={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                      }}
+                    />
+                  );
+                })() : (
+                  <Box
+                    component="img"
+                    src={bgUrl.trim()}
+                    alt="preview"
+                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBgSettingsOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            disabled={
+              bgType === ((localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') || 'youtube') &&
+              bgUrl === (localStorage.getItem(BG_URL_KEY) || '')
+            }
+            onClick={() => {
+              localStorage.setItem(BG_TYPE_KEY, bgType);
+              if (bgUrl.trim()) {
+                localStorage.setItem(BG_URL_KEY, bgUrl.trim());
+              } else {
+                localStorage.removeItem(BG_URL_KEY);
+              }
+              setBgSettingsOpen(false);
+              enqueueSnackbar(t('common.saved'), { variant: 'success' });
+            }}
+          >
+            {t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <PageHeader
         icon={<PeopleIcon />}
         title={t('playerConnections.title')}
@@ -672,6 +877,20 @@ const PlayerConnectionsPage: React.FC = () => {
                   {t('playerConnections.scoreboard.dropdown.ccuCounter')}
                 </ListItemText>
               </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setMoreMenuAnchor(null);
+                  setBgSettingsOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('playerConnections.scoreboard.dropdown.bgSettings')}
+                </ListItemText>
+              </MenuItem>
+              <Divider />
               <MenuItem
                 onClick={() => {
                   setMoreMenuAnchor(null);
@@ -1054,6 +1273,149 @@ const PlayerConnectionsPage: React.FC = () => {
             </Grid>
           </Grid>
 
+          {/* Login Queue cards */}
+          {loginQueueData && loginQueueData.total > 0 && (
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card
+                  sx={(theme) => ({
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  })}
+                >
+                  <Box
+                    sx={(theme) => ({
+                      position: 'absolute',
+                      top: -20,
+                      right: -20,
+                      width: 100,
+                      height: 100,
+                      borderRadius: '50%',
+                      bgcolor: alpha(theme.palette.warning.main, 0.1),
+                    })}
+                  />
+                  <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontWeight={500}
+                          gutterBottom
+                        >
+                          {t('playerConnections.queue.total')}
+                        </Typography>
+                        <Typography
+                          variant="h4"
+                          fontWeight={700}
+                          color="warning.main"
+                        >
+                          {loginQueueData.total.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <Avatar
+                        sx={(theme) => ({
+                          bgcolor: alpha(theme.palette.warning.main, 0.15),
+                          color: 'warning.main',
+                          width: 48,
+                          height: 48,
+                        })}
+                      >
+                        <QueueIcon />
+                      </Avatar>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card
+                  sx={(theme) => ({
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  })}
+                >
+                  <Box
+                    sx={(theme) => ({
+                      position: 'absolute',
+                      top: -20,
+                      right: -20,
+                      width: 100,
+                      height: 100,
+                      borderRadius: '50%',
+                      bgcolor: alpha(theme.palette.warning.main, 0.1),
+                    })}
+                  />
+                  <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontWeight={500}
+                          gutterBottom
+                        >
+                          {t('playerConnections.queue.peakWorld')}
+                        </Typography>
+                        {(() => {
+                          const worldEntries = Object.entries(
+                            loginQueueData.world
+                          );
+                          if (worldEntries.length === 0) return <Typography variant="h5" fontWeight={700} color="warning.main">-</Typography>;
+                          const [topWorldId, topCount] = worldEntries.sort(
+                            (a, b) => b[1] - a[1]
+                          )[0];
+                          return (
+                            <>
+                              <Typography
+                                variant="h5"
+                                fontWeight={700}
+                                color="warning.main"
+                                noWrap
+                              >
+                                {topWorldId}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {topCount.toLocaleString()}{' '}
+                                {t('playerConnections.queue.waiting')}
+                              </Typography>
+                            </>
+                          );
+                        })()}
+                      </Box>
+                      <Avatar
+                        sx={(theme) => ({
+                          bgcolor: alpha(theme.palette.warning.main, 0.15),
+                          color: 'warning.main',
+                          width: 48,
+                          height: 48,
+                        })}
+                      >
+                        <TrendingUpIcon />
+                      </Avatar>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
+
           {/* Per-world cards */}
           {ccuData?.worlds && ccuData.worlds.length > 0 && (
             <Box>
@@ -1275,6 +1637,25 @@ const PlayerConnectionsPage: React.FC = () => {
                               />
                               {(w.botCount || 0).toLocaleString()}
                             </Typography>
+                            {loginQueueData &&
+                              loginQueueData.world[w.worldId] > 0 && (
+                                <Typography
+                                  variant="caption"
+                                  color="warning.main"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  <QueueIcon
+                                    sx={{
+                                      fontSize: 11,
+                                      mr: 0.25,
+                                      verticalAlign: 'middle',
+                                    }}
+                                  />
+                                  {loginQueueData.world[
+                                    w.worldId
+                                  ].toLocaleString()}
+                                </Typography>
+                              )}
                           </Box>
                         </CardContent>
                       </Card>

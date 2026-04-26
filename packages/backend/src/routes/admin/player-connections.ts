@@ -11,6 +11,9 @@ router.use(authenticate as any);
 router.get('/ccu', PlayerConnectionsController.getCcu);
 router.get('/ccu/history', PlayerConnectionsController.getCcuHistory);
 
+// Login queue (waiting count)
+router.get('/login-queue', PlayerConnectionsController.getLoginQueue);
+
 // Connected users
 router.get('/users', PlayerConnectionsController.getConnectedUsers);
 
