@@ -28,16 +28,39 @@ const OceanBackground: React.FC = () => {
     let time = 0;
 
     // ── Star data ──
-    interface Star { x: number; y: number; r: number; a: number; sp: number; ph: number; }
+    interface Star {
+      x: number;
+      y: number;
+      r: number;
+      a: number;
+      sp: number;
+      ph: number;
+    }
     let stars: Star[] = [];
 
     // ── Wind particles (sea spray / mist) ──
-    interface Particle { x: number; y: number; vx: number; vy: number; a: number; life: number; maxLife: number; }
+    interface Particle {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      a: number;
+      life: number;
+      maxLife: number;
+    }
     let particles: Particle[] = [];
     const MAX_PARTICLES = 40;
 
     // ── Shooting stars ──
-    interface ShootingStar { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; len: number; }
+    interface ShootingStar {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+      maxLife: number;
+      len: number;
+    }
     let shootingStars: ShootingStar[] = [];
     let shootingStarTimer = 300 + Math.random() * 500;
 
@@ -84,7 +107,9 @@ const OceanBackground: React.FC = () => {
     window.addEventListener('resize', resize);
 
     let visible = true;
-    const onVis = () => { visible = !document.hidden; };
+    const onVis = () => {
+      visible = !document.hidden;
+    };
     document.addEventListener('visibilitychange', onVis);
 
     // ── Drawing functions ──
@@ -101,7 +126,11 @@ const OceanBackground: React.FC = () => {
       ctx.fillRect(0, 0, cw, ch);
     }
 
-    function drawHorizonGlow(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+    function drawHorizonGlow(
+      ctx: CanvasRenderingContext2D,
+      cw: number,
+      ch: number
+    ) {
       const horizonY = ch * 0.69;
 
       // Warm amber glow on the distant horizon — "new lands await"
@@ -114,8 +143,12 @@ const OceanBackground: React.FC = () => {
       const breathe = 0.6 + 0.4 * Math.sin(time * 0.15);
 
       const g = ctx.createRadialGradient(
-        gx, horizonY, 0,
-        gx, horizonY, glowW * 0.5
+        gx,
+        horizonY,
+        0,
+        gx,
+        horizonY,
+        glowW * 0.5
       );
       g.addColorStop(0, `rgba(200,140,60,${(0.045 * breathe).toFixed(4)})`);
       g.addColorStop(0.3, `rgba(180,100,40,${(0.025 * breathe).toFixed(4)})`);
@@ -126,8 +159,12 @@ const OceanBackground: React.FC = () => {
 
       // Second smaller glow — port lights in the distance
       const g2 = ctx.createRadialGradient(
-        cw * 0.15, horizonY, 0,
-        cw * 0.15, horizonY, cw * 0.12
+        cw * 0.15,
+        horizonY,
+        0,
+        cw * 0.15,
+        horizonY,
+        cw * 0.12
       );
       g2.addColorStop(0, `rgba(220,180,100,${(0.02 * breathe).toFixed(4)})`);
       g2.addColorStop(0.5, `rgba(180,120,60,${(0.008 * breathe).toFixed(4)})`);
@@ -167,8 +204,10 @@ const OceanBackground: React.FC = () => {
             ctx.lineWidth = 0.3;
             const len = s.r * 4;
             ctx.beginPath();
-            ctx.moveTo(s.x - len, s.y); ctx.lineTo(s.x + len, s.y);
-            ctx.moveTo(s.x, s.y - len); ctx.lineTo(s.x, s.y + len);
+            ctx.moveTo(s.x - len, s.y);
+            ctx.lineTo(s.x + len, s.y);
+            ctx.moveTo(s.x, s.y - len);
+            ctx.lineTo(s.x, s.y + len);
             ctx.stroke();
             ctx.restore();
           }
@@ -226,8 +265,12 @@ const OceanBackground: React.FC = () => {
 
       // Core highlight — off-center
       const hlg = ctx.createRadialGradient(
-        mx - mr * 0.2, my - mr * 0.15, mr * 0.05,
-        mx + mr * 0.1, my + mr * 0.05, mr
+        mx - mr * 0.2,
+        my - mr * 0.15,
+        mr * 0.05,
+        mx + mr * 0.1,
+        my + mr * 0.05,
+        mr
       );
       hlg.addColorStop(0, 'rgba(255,255,255,0.35)');
       hlg.addColorStop(0.3, 'rgba(240,245,255,0.2)');
@@ -279,7 +322,7 @@ const OceanBackground: React.FC = () => {
 
       for (const c of clouds) {
         const drift = time * c.speed * cw * 0.5;
-        const cx = mx + drift % (cw * 0.5) - cw * 0.25;
+        const cx = mx + (drift % (cw * 0.5)) - cw * 0.25;
         const cy = my + c.yOff;
         const w = cw * c.width;
 
@@ -315,8 +358,8 @@ const OceanBackground: React.FC = () => {
       const waves = [
         { yOff: 0, amp: 3.0, freq: 0.006, speed: 0.45, alpha: 0.04 },
         { yOff: 10, amp: 2.2, freq: 0.009, speed: 0.35, alpha: 0.03 },
-        { yOff: 22, amp: 1.6, freq: 0.013, speed: 0.50, alpha: 0.025 },
-        { yOff: 38, amp: 1.2, freq: 0.017, speed: 0.40, alpha: 0.02 },
+        { yOff: 22, amp: 1.6, freq: 0.013, speed: 0.5, alpha: 0.025 },
+        { yOff: 38, amp: 1.2, freq: 0.017, speed: 0.4, alpha: 0.02 },
         { yOff: 58, amp: 0.8, freq: 0.022, speed: 0.55, alpha: 0.015 },
       ];
 
@@ -324,7 +367,8 @@ const OceanBackground: React.FC = () => {
         ctx.beginPath();
         for (let x = 0; x <= cw; x += 2) {
           const y =
-            horizonY + wc.yOff +
+            horizonY +
+            wc.yOff +
             Math.sin(x * wc.freq + time * wc.speed) * wc.amp +
             Math.sin(x * wc.freq * 0.5 + time * wc.speed * 1.3) * wc.amp * 0.4;
           if (x === 0) ctx.moveTo(x, y);
@@ -338,7 +382,11 @@ const OceanBackground: React.FC = () => {
       ctx.restore();
     }
 
-    function drawMoonReflection(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+    function drawMoonReflection(
+      ctx: CanvasRenderingContext2D,
+      cw: number,
+      ch: number
+    ) {
       const mx = cw * 0.82;
       const horizonY = ch * 0.69;
       const oceanH = ch - horizonY;
@@ -365,8 +413,10 @@ const OceanBackground: React.FC = () => {
         const alpha = baseAlpha * shimmer;
 
         const rg = ctx.createLinearGradient(
-          centerX - spread, segY,
-          centerX + spread, segY
+          centerX - spread,
+          segY,
+          centerX + spread,
+          segY
         );
         rg.addColorStop(0, 'rgba(140,180,220,0)');
         rg.addColorStop(0.25, `rgba(160,195,230,${(alpha * 0.4).toFixed(4)})`);
@@ -388,11 +438,13 @@ const OceanBackground: React.FC = () => {
         const sparkleCount = 2 + Math.floor(t * 2);
         for (let j = 0; j < sparkleCount; j++) {
           const phase = i * 3.7 + j * 2.1;
-          const sparkleAlpha = (0.04 + 0.03 * (1 - t)) *
-            Math.max(0, Math.sin(time * 1.2 + phase));
+          const sparkleAlpha =
+            (0.04 + 0.03 * (1 - t)) * Math.max(0, Math.sin(time * 1.2 + phase));
           if (sparkleAlpha < 0.005) continue;
 
-          const sx = mx + (Math.sin(phase * 1.3) * pathSpread) +
+          const sx =
+            mx +
+            Math.sin(phase * 1.3) * pathSpread +
             Math.sin(time * 0.6 + phase) * 3;
           const sy = rowY + Math.sin(time * 0.8 + phase * 0.7) * 2;
 
@@ -409,7 +461,7 @@ const OceanBackground: React.FC = () => {
 
     function drawShip(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
       const horizonY = ch * 0.69;
-      const shipX = cw * 0.30 + Math.sin(time * 0.06) * cw * 0.008;
+      const shipX = cw * 0.3 + Math.sin(time * 0.06) * cw * 0.008;
       const bobY = Math.sin(time * 0.5) * 1.5;
       const tilt = Math.sin(time * 0.4) * 0.015; // gentle rocking
       const s = Math.min(cw, ch) * 0.001;
@@ -508,15 +560,22 @@ const OceanBackground: React.FC = () => {
       ctx.lineWidth = 0.5;
       // Shrouds
       ctx.beginPath();
-      ctx.moveTo(-15, 3); ctx.lineTo(0, -55);
-      ctx.moveTo(15, 3); ctx.lineTo(0, -55);
-      ctx.moveTo(30, 3); ctx.lineTo(20, -40);
+      ctx.moveTo(-15, 3);
+      ctx.lineTo(0, -55);
+      ctx.moveTo(15, 3);
+      ctx.lineTo(0, -55);
+      ctx.moveTo(30, 3);
+      ctx.lineTo(20, -40);
       ctx.stroke();
 
       ctx.restore();
     }
 
-    function drawWindParticles(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+    function drawWindParticles(
+      ctx: CanvasRenderingContext2D,
+      cw: number,
+      ch: number
+    ) {
       // Spawn new particles
       if (particles.length < MAX_PARTICLES && Math.random() < 0.15) {
         spawnParticle(cw, ch);
@@ -525,7 +584,7 @@ const OceanBackground: React.FC = () => {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
 
-      particles = particles.filter(p => {
+      particles = particles.filter((p) => {
         p.x += p.vx;
         p.y += p.vy;
         p.life++;
@@ -552,7 +611,11 @@ const OceanBackground: React.FC = () => {
       ctx.restore();
     }
 
-    function drawCompass(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+    function drawCompass(
+      ctx: CanvasRenderingContext2D,
+      cw: number,
+      ch: number
+    ) {
       const cx = cw * 0.92;
       const cy = ch * 0.88;
       const r = Math.min(cw, ch) * 0.05;
@@ -593,9 +656,10 @@ const OceanBackground: React.FC = () => {
         ctx.lineTo(0, -r * 0.95);
         ctx.lineTo(-r * 0.08, -r * 0.55);
         ctx.closePath();
-        ctx.fillStyle = i === 0
-          ? 'rgba(230,190,120,1)'    // North — golden
-          : 'rgba(200,190,170,0.7)';
+        ctx.fillStyle =
+          i === 0
+            ? 'rgba(230,190,120,1)' // North — golden
+            : 'rgba(200,190,170,0.7)';
         ctx.fill();
 
         ctx.restore();
@@ -617,23 +681,50 @@ const OceanBackground: React.FC = () => {
       ctx.restore();
     }
 
-    function drawSeagulls(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+    function drawSeagulls(
+      ctx: CanvasRenderingContext2D,
+      cw: number,
+      ch: number
+    ) {
       const horizonY = ch * 0.69;
       ctx.save();
-      ctx.globalAlpha = 0.10;
+      ctx.globalAlpha = 0.1;
       ctx.strokeStyle = '#a0b8d0';
       ctx.lineWidth = 0.8;
 
       // 3 seagulls at different positions/speeds
       const gulls = [
-        { baseX: 0.35, baseY: -0.08, speed: 0.04, wingSpeed: 2.5, size: 1.0, phase: 0 },
-        { baseX: 0.42, baseY: -0.12, speed: 0.03, wingSpeed: 3.0, size: 0.7, phase: 2 },
-        { baseX: 0.48, baseY: -0.06, speed: 0.05, wingSpeed: 2.2, size: 0.85, phase: 4 },
+        {
+          baseX: 0.35,
+          baseY: -0.08,
+          speed: 0.04,
+          wingSpeed: 2.5,
+          size: 1.0,
+          phase: 0,
+        },
+        {
+          baseX: 0.42,
+          baseY: -0.12,
+          speed: 0.03,
+          wingSpeed: 3.0,
+          size: 0.7,
+          phase: 2,
+        },
+        {
+          baseX: 0.48,
+          baseY: -0.06,
+          speed: 0.05,
+          wingSpeed: 2.2,
+          size: 0.85,
+          phase: 4,
+        },
       ];
 
       for (const g of gulls) {
         // Move slowly across the screen, loop around
-        const rawX = (g.baseX * cw + time * g.speed * cw * 0.1 + g.phase * cw * 0.1) % (cw * 1.3);
+        const rawX =
+          (g.baseX * cw + time * g.speed * cw * 0.1 + g.phase * cw * 0.1) %
+          (cw * 1.3);
         const gx = rawX - cw * 0.15;
         const gy = horizonY + g.baseY * ch + Math.sin(time * 0.5 + g.phase) * 3;
         const wingFlap = Math.sin(time * g.wingSpeed + g.phase) * 5 * g.size;
@@ -642,16 +733,30 @@ const OceanBackground: React.FC = () => {
         ctx.beginPath();
         // Left wing
         ctx.moveTo(gx - span, gy + wingFlap);
-        ctx.quadraticCurveTo(gx - span * 0.4, gy - Math.abs(wingFlap) * 0.3, gx, gy);
+        ctx.quadraticCurveTo(
+          gx - span * 0.4,
+          gy - Math.abs(wingFlap) * 0.3,
+          gx,
+          gy
+        );
         // Right wing
-        ctx.quadraticCurveTo(gx + span * 0.4, gy - Math.abs(wingFlap) * 0.3, gx + span, gy + wingFlap);
+        ctx.quadraticCurveTo(
+          gx + span * 0.4,
+          gy - Math.abs(wingFlap) * 0.3,
+          gx + span,
+          gy + wingFlap
+        );
         ctx.stroke();
       }
 
       ctx.restore();
     }
 
-    function drawShootingStars(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+    function drawShootingStars(
+      ctx: CanvasRenderingContext2D,
+      cw: number,
+      ch: number
+    ) {
       const skyH = ch * 0.65;
 
       // Spawn timer
@@ -662,7 +767,8 @@ const OceanBackground: React.FC = () => {
         const angle = 0.3 + Math.random() * 0.4; // downward-right
         const speed = 3 + Math.random() * 3;
         shootingStars.push({
-          x: startX, y: startY,
+          x: startX,
+          y: startY,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           life: 0,
@@ -675,16 +781,15 @@ const OceanBackground: React.FC = () => {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
 
-      shootingStars = shootingStars.filter(ss => {
+      shootingStars = shootingStars.filter((ss) => {
         ss.x += ss.vx;
         ss.y += ss.vy;
         ss.life++;
         if (ss.life > ss.maxLife) return false;
 
         const progress = ss.life / ss.maxLife;
-        const alpha = progress < 0.2
-          ? progress / 0.2
-          : 1 - (progress - 0.2) / 0.8;
+        const alpha =
+          progress < 0.2 ? progress / 0.2 : 1 - (progress - 0.2) / 0.8;
 
         // Tail
         const tailX = ss.x - ss.vx * (ss.len / Math.hypot(ss.vx, ss.vy));

@@ -285,15 +285,10 @@ const playerConnectionService = {
    * Get payment statistics from authd (token-secured).
    * Returns null if denied or unavailable.
    */
-  async getPaymentStats(
-    projectApiPath: string
-  ): Promise<{
+  async getPaymentStats(projectApiPath: string): Promise<{
     totalCount: number;
     totalAmount: number;
-    products: Record<
-      string,
-      { name: string; count: number; amount: number }
-    >;
+    products: Record<string, { name: string; count: number; amount: number }>;
     daily: Record<
       string,
       {

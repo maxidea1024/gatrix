@@ -39,22 +39,22 @@ interface ShootingStar {
 // ─── Constants ───
 
 const STAR_COLORS = [
-  'rgba(255,255,255,',    // white
-  'rgba(200,220,255,',    // blue-white
-  'rgba(255,240,220,',    // warm white
-  'rgba(180,200,255,',    // cool blue
-  'rgba(255,220,180,',    // pale gold
+  'rgba(255,255,255,', // white
+  'rgba(200,220,255,', // blue-white
+  'rgba(255,240,220,', // warm white
+  'rgba(180,200,255,', // cool blue
+  'rgba(255,220,180,', // pale gold
 ];
 
 const NEBULA_COLORS: [number, number, number][] = [
-  [107, 47, 160],   // purple
-  [26, 107, 107],   // teal
-  [30, 58, 107],    // navy
-  [107, 26, 58],    // crimson
-  [40, 80, 140],    // deep blue
-  [80, 40, 120],    // violet
-  [20, 90, 90],     // dark cyan
-  [60, 20, 80],     // deep purple
+  [107, 47, 160], // purple
+  [26, 107, 107], // teal
+  [30, 58, 107], // navy
+  [107, 26, 58], // crimson
+  [40, 80, 140], // deep blue
+  [80, 40, 120], // violet
+  [20, 90, 90], // dark cyan
+  [60, 20, 80], // deep purple
 ];
 
 // ─── Helpers ───
@@ -114,7 +114,8 @@ function createNebulae(w: number, h: number): Nebula[] {
   // More nebulae on wider screens to fill edges
   const baseCount = 6 + Math.floor(Math.random() * 3);
   const aspect = w / h;
-  const count = aspect > 2 ? baseCount + 3 : aspect > 1.5 ? baseCount + 1 : baseCount;
+  const count =
+    aspect > 2 ? baseCount + 3 : aspect > 1.5 ? baseCount + 1 : baseCount;
   const dim = Math.max(w, h); // use max dimension so nebulae scale to ultra-wide
 
   return Array.from({ length: count }, () => ({
@@ -285,10 +286,7 @@ const CosmicBackground: React.FC = () => {
       ctx.restore();
     }
 
-    function drawStarLayer(
-      ctx: CanvasRenderingContext2D,
-      stars: Star[]
-    ) {
+    function drawStarLayer(ctx: CanvasRenderingContext2D, stars: Star[]) {
       const cw = ctx.canvas.width;
       const ch = ctx.canvas.height;
 
@@ -344,12 +342,17 @@ const CosmicBackground: React.FC = () => {
               ? (1 - progress) / 0.3
               : 1;
 
-        const tailX = ss.x - (ss.vx / Math.sqrt(ss.vx * ss.vx + ss.vy * ss.vy)) * ss.length;
-        const tailY = ss.y - (ss.vy / Math.sqrt(ss.vx * ss.vx + ss.vy * ss.vy)) * ss.length;
+        const tailX =
+          ss.x - (ss.vx / Math.sqrt(ss.vx * ss.vx + ss.vy * ss.vy)) * ss.length;
+        const tailY =
+          ss.y - (ss.vy / Math.sqrt(ss.vx * ss.vx + ss.vy * ss.vy)) * ss.length;
 
         const gradient = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
         gradient.addColorStop(0, `rgba(255,255,255,0)`);
-        gradient.addColorStop(1, `rgba(255,255,255,${(alpha * 0.8).toFixed(3)})`);
+        gradient.addColorStop(
+          1,
+          `rgba(255,255,255,${(alpha * 0.8).toFixed(3)})`
+        );
 
         ctx.save();
         ctx.globalCompositeOperation = 'screen';

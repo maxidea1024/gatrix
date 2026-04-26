@@ -174,7 +174,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
       try {
         const [playersRes, charsRes] = await Promise.all([
           playerConnectionService.getAllPlayers(projectApiPath, { limit: 1 }),
-          playerConnectionService.getAllCharacters(projectApiPath, { limit: 1 }),
+          playerConnectionService.getAllCharacters(projectApiPath, {
+            limit: 1,
+          }),
         ]);
         if (mounted) {
           setTotalRegistered(playersRes.total);
@@ -208,7 +210,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   };
 
   // Fetch payment statistics (only visible when psEnabled)
-  type PaymentStatsData = Awaited<ReturnType<typeof playerConnectionService.getPaymentStats>>;
+  type PaymentStatsData = Awaited<
+    ReturnType<typeof playerConnectionService.getPaymentStats>
+  >;
   const [paymentStats, setPaymentStats] = useState<PaymentStatsData>(null);
   const [showDetail, setShowDetail] = useState(false);
   useEffect(() => {
@@ -443,7 +447,14 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
 
           {/* Total registered accounts & characters — subtle secondary metrics */}
           {(totalRegistered !== null || totalCharacters !== null) && (
-            <Box sx={{ mt: 3.5, display: 'flex', gap: 6, justifyContent: 'center' }}>
+            <Box
+              sx={{
+                mt: 3.5,
+                display: 'flex',
+                gap: 6,
+                justifyContent: 'center',
+              }}
+            >
               {totalRegistered !== null && (
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography
@@ -599,7 +610,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                   lineHeight: 1,
                 }}
               >
-                ¥{paymentStats.totalAmount.toLocaleString()} (₩{Math.round(paymentStats.totalAmount * 216.48).toLocaleString()})
+                ¥{paymentStats.totalAmount.toLocaleString()} (₩
+                {Math.round(paymentStats.totalAmount * 216.48).toLocaleString()}
+                )
               </Typography>
               <Typography
                 sx={{

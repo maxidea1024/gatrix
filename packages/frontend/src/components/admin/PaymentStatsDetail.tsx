@@ -4,7 +4,6 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import OceanBackground from './OceanBackground';
 
-
 // ─── Types ───
 
 interface ProductData {
@@ -130,9 +129,7 @@ const SortHeader: React.FC<{
       sx={{
         ...headerCellSx,
         textAlign: align,
-        color: isActive
-          ? 'rgba(255,255,255,0.9)'
-          : 'rgba(255,255,255,0.6)',
+        color: isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)',
       }}
     >
       {label}
@@ -295,7 +292,8 @@ const ProductTable: React.FC<{
                     fontWeight: 600,
                   }}
                 >
-                  ¥{product.amount.toLocaleString(undefined, {
+                  ¥
+                  {product.amount.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -317,7 +315,10 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
 }) => {
   const { t } = useTranslation();
   const dailyDates = useMemo(
-    () => Object.keys(stats.daily || {}).sort().reverse(),
+    () =>
+      Object.keys(stats.daily || {})
+        .sort()
+        .reverse(),
     [stats.daily]
   );
 
@@ -384,7 +385,10 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
             onClick={onBack}
             sx={{
               color: 'rgba(255,255,255,0.6)',
-              '&:hover': { color: '#fff', background: 'rgba(255,255,255,0.08)' },
+              '&:hover': {
+                color: '#fff',
+                background: 'rgba(255,255,255,0.08)',
+              },
             }}
           >
             <ArrowBackIcon />
@@ -483,7 +487,8 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 lineHeight: 1,
               }}
             >
-              ¥{stats.totalAmount.toLocaleString(undefined, {
+              ¥
+              {stats.totalAmount.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -638,8 +643,10 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
-                      {t(`${prefix}quantity`)}: {daily.totalCount.toLocaleString()} |{' '}
-                      {t(`${prefix}amount`)}: ¥{daily.totalAmount.toLocaleString(undefined, {
+                      {t(`${prefix}quantity`)}:{' '}
+                      {daily.totalCount.toLocaleString()} |{' '}
+                      {t(`${prefix}amount`)}: ¥
+                      {daily.totalAmount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
