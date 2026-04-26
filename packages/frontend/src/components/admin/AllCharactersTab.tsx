@@ -197,7 +197,7 @@ const COL_STORAGE_KEY = 'allCharacters.columns';
 const GROUP_STORAGE_KEY = 'allCharacters.groupBy';
 const PAGE_SIZE_STORAGE_KEY = 'allCharacters.pageSize';
 const DEFAULT_PAGE_SIZE = 50;
-const VALID_PAGE_SIZES = [20, 50, 100, 200, 500];
+const VALID_PAGE_SIZES = [10, 20, 50, 100, 200, 500];
 
 interface AllCharactersTabProps {
   projectApiPath: string;
@@ -228,9 +228,6 @@ export default function AllCharactersTab({
     return isNaN(p) ? 0 : p;
   });
   const [rowsPerPage, setRowsPerPage] = useState(() => {
-    // URL takes priority, then localStorage
-    const urlSize = parseInt(searchParams.get('size') || '', 10);
-    if (!isNaN(urlSize) && VALID_PAGE_SIZES.includes(urlSize)) return urlSize;
     const saved = parseInt(
       localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '',
       10
@@ -353,7 +350,6 @@ export default function AllCharactersTab({
   const AP_PARAM_KEYS = [
     'q',
     'page',
-    'size',
     'sortBy',
     'sortDesc',
     'world',
@@ -375,8 +371,6 @@ export default function AllCharactersTab({
         // Set non-default values
         if (debouncedSearch) next.set('q', debouncedSearch);
         if (page > 0) next.set('page', String(page));
-        if (rowsPerPage !== DEFAULT_PAGE_SIZE)
-          next.set('size', String(rowsPerPage));
         if (sortBy !== 'userId') next.set('sortBy', sortBy);
         if (!sortDesc) next.set('sortDesc', 'false');
         if (worldFilter !== 'all') next.set('world', worldFilter);
@@ -390,7 +384,6 @@ export default function AllCharactersTab({
   }, [
     debouncedSearch,
     page,
-    rowsPerPage,
     sortBy,
     sortDesc,
     worldFilter,

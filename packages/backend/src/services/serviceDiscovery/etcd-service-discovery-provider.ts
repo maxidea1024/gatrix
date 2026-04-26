@@ -312,6 +312,62 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           await this.saveMirrorToRedis(newInstance);
 
           return;
+        } else if (input.hostname && input.internalAddress && input.ports) {
+          // Meta recovery from SDK backup data (same as Redis provider behavior).
+          // SDK heartbeats always include registrationBackup, so use it to recover
+          // when the service key is missing (e.g., backend restarted, lease expired).
+          const now = new Date().toISOString();
+
+          // Try Redis mirror first for richer metadata
+          const mirrorData = await this.getMirrorFromRedis(
+            serviceType,
+            input.instanceId
+          );
+
+          const newInstance: ServiceInstance = mirrorData
+            ? {
+                ...mirrorData,
+                labels: input.labels,
+                hostname: input.hostname,
+                internalAddress: input.internalAddress,
+                ports: input.ports,
+                status: input.status || 'ready',
+                updatedAt: now,
+                stats: input.stats || mirrorData.stats || {},
+                meta: input.meta || mirrorData.meta || {},
+              }
+            : {
+                instanceId: input.instanceId,
+                labels: input.labels,
+                hostname: input.hostname,
+                externalAddress: '',
+                internalAddress: input.internalAddress,
+                ports: input.ports,
+                status: input.status || 'ready',
+                createdAt: now,
+                updatedAt: now,
+                stats: input.stats || {},
+                meta: input.meta || {},
+              };
+
+          const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+          lease = this.client.lease(heartbeatTTL + 60, {
+            autoKeepAlive: false,
+          });
+          await lease.put(key).value(JSON.stringify(newInstance));
+          this.leases.set(leaseKey, lease);
+
+          await this.saveMirrorToRedis(newInstance);
+
+          logger.info(
+            `Meta recovered for ${serviceType}:${input.instanceId}`,
+            {
+              hostname: newInstance.hostname,
+              internalAddress: newInstance.internalAddress,
+              ports: newInstance.ports,
+            }
+          );
+          return;
         } else {
           const error: any = new Error(
             `Service ${serviceType}:${input.instanceId} not found`
@@ -346,6 +402,23 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       if (input.stats !== undefined) {
         // Merge stats (not replace)
         instance.stats = { ...instance.stats, ...input.stats };
+      }
+
+      // Repair meta when SDK-reported values differ from stored values.
+      // After backend restart, etcd keys may persist with stale or empty data.
+      // SDK heartbeats always include registrationBackup data, so we compare
+      // and update any fields that have drifted.
+      if (input.hostname && instance.hostname !== input.hostname) {
+        instance.hostname = input.hostname;
+      }
+      if (input.internalAddress && instance.internalAddress !== input.internalAddress) {
+        instance.internalAddress = input.internalAddress;
+      }
+      if (input.ports && JSON.stringify(instance.ports) !== JSON.stringify(input.ports)) {
+        instance.ports = input.ports;
+      }
+      if (input.meta && JSON.stringify(instance.meta) !== JSON.stringify(input.meta)) {
+        instance.meta = { ...instance.meta, ...input.meta };
       }
 
       instance.updatedAt = new Date().toISOString();

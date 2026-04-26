@@ -207,6 +207,8 @@ const PlayerConnectionsPage: React.FC = () => {
     const params = new URLSearchParams(searchParams);
     if (val > 0) params.set('tab', String(val));
     else params.delete('tab');
+    // Clean up tab-specific params to prevent cross-contamination between tabs
+    params.delete('size');
     setSearchParams(params, { replace: true });
   };
 
