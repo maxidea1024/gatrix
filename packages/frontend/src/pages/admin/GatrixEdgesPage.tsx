@@ -50,6 +50,7 @@ import { RelativeTime } from '../../components/common/RelativeTime';
 import { useDebounce } from '../../hooks/useDebounce';
 import SearchTextField from '../../components/common/SearchTextField';
 import PageContentLoader from '../../components/common/PageContentLoader';
+import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
@@ -1046,8 +1047,7 @@ const GatrixEdgesPage: React.FC = () => {
               theme.palette.mode === 'dark'
                 ? 'rgba(255,255,255,0.02)'
                 : 'rgba(0,0,0,0.02)',
-            borderRadius: 0,
-            border: `1px solid ${theme.palette.divider} `,
+            borderRadius: 1,
           }}
         >
           <Typography
@@ -1193,7 +1193,6 @@ const GatrixEdgesPage: React.FC = () => {
               sx={{
                 minWidth: 180,
                 textAlign: 'center',
-                border: `2px solid ${theme.palette.primary.main} `,
                 boxShadow: theme.shadows[2],
                 // Ensure card sits on top of the line
                 zIndex: 1,
@@ -1215,7 +1214,7 @@ const GatrixEdgesPage: React.FC = () => {
                       width: 48,
                       height: 48,
                       bgcolor: 'primary.main',
-                      borderRadius: 0,
+                      borderRadius: 2,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1286,10 +1285,12 @@ const GatrixEdgesPage: React.FC = () => {
             )}
 
             {services.length === 0 && !initialLoading && (
-              <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="text.secondary">
-                  {t('gatrixEdges.noEdges')}
-                </Typography>
+              <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
+                <EmptyPlaceholder
+                  message={t('gatrixEdges.noEdges')}
+                  description={t('gatrixEdges.noEdgesDescription')}
+                  minHeight={200}
+                />
               </Box>
             )}
           </Box>
