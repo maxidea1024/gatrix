@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -11,7 +11,6 @@ import playerConnectionService, {
 } from '../../services/playerConnectionService';
 
 import PaymentStatsDetail from './PaymentStatsDetail';
-import OceanBackground from './OceanBackground';
 
 // ─── Animated Number Hook (stock ticker tween) ───
 function useAnimatedNumber(target: number): number {
@@ -133,6 +132,7 @@ interface CcuScoreboardProps {
   ccuData: CcuData | null;
   prevCcuData: CcuData | null;
   projectApiPath: string;
+  flashIn?: boolean;
   onClose: () => void;
 }
 
@@ -141,6 +141,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   ccuData,
   prevCcuData,
   projectApiPath,
+  flashIn = false,
   onClose,
 }) => {
   const { t } = useTranslation();
@@ -294,7 +295,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 2147483647,
-        background: '#060a14',
+        background: 'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -306,8 +307,67 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         },
       }}
     >
-      {/* Night ocean background */}
-      <OceanBackground />
+      {/* Daytime ocean background image */}
+      <Box
+        component="img"
+        src="/images/countdown_ocean_bg.png"
+        alt=""
+        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center center',
+          zIndex: 0,
+          animation: 'bgSlowZoom 120s ease-in-out infinite alternate',
+          '@keyframes bgSlowZoom': {
+            '0%': { transform: 'scale(1)' },
+            '100%': { transform: 'scale(1.06)' },
+          },
+        }}
+      />
+      {/* Dark overlay for text readability */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.22) 100%)',
+        }}
+      />
+      {/* Vignette */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 75% 65% at center, transparent 40%, rgba(0,0,0,0.25) 100%)',
+        }}
+      />
+
+      {/* Flash-in overlay (white → transparent) when transitioning from countdown */}
+      {flashIn && (
+        <Box
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            bgcolor: '#fff',
+            zIndex: 2147483647,
+            pointerEvents: 'none',
+            animation: 'flashOut 1.5s ease-out forwards',
+            '@keyframes flashOut': {
+              '0%': { opacity: 1 },
+              '100%': { opacity: 0 },
+            },
+          }}
+        />
+      )}
       {/* Sparkline trend graph — anchored to bottom of viewport */}
       <Sparkline data={historyRef.current} trend={totalTrend} />
 
@@ -353,12 +413,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             position: 'absolute',
             left: '50%',
             transform: 'translateX(-50%)',
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgba(255,255,255,0.85)',
             fontFamily: '"Inter", sans-serif',
             fontSize: '1.1rem',
             fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: 1.5,
+            textShadow: '0 1px 6px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.4)',
           }}
         >
           {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
@@ -426,6 +487,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 '75%': { transform: 'translate(-1px, -1px)' },
                 '100%': { transform: 'translate(0, 0)' },
               },
+              textShadow: '0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
             }}
           >
             {animatedTotal === 0 ? '0' : animatedTotal.toLocaleString()}
@@ -434,12 +496,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           {/* CCU label */}
           <Typography
             sx={{
-              color: 'rgba(255,255,255,0.35)',
+              color: 'rgba(255,255,255,0.6)',
               fontSize: '0.9rem',
               fontWeight: 600,
               letterSpacing: 3,
               textTransform: 'uppercase',
               mt: 0.5,
+              textShadow: '0 1px 6px rgba(0,0,0,0.8)',
             }}
           >
             {t('playerConnections.scoreboard.concurrentUsers')}
@@ -459,24 +522,26 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography
                     sx={{
-                      color: 'rgba(255,255,255,0.5)',
+                      color: 'rgba(255,255,255,0.7)',
                       fontFamily: '"Inter", "Roboto Mono", monospace',
                       fontVariantNumeric: 'tabular-nums',
                       fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
                       fontWeight: 700,
                       lineHeight: 1,
+                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
                     }}
                   >
                     {totalRegistered.toLocaleString()}
                   </Typography>
                   <Typography
                     sx={{
-                      color: 'rgba(255,255,255,0.2)',
+                      color: 'rgba(255,255,255,0.4)',
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       letterSpacing: 2.5,
                       textTransform: 'uppercase',
                       mt: 0.5,
+                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
                     }}
                   >
                     {t('playerConnections.scoreboard.totalAccounts')}
@@ -487,24 +552,26 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography
                     sx={{
-                      color: 'rgba(255,255,255,0.5)',
+                      color: 'rgba(255,255,255,0.7)',
                       fontFamily: '"Inter", "Roboto Mono", monospace',
                       fontVariantNumeric: 'tabular-nums',
                       fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
                       fontWeight: 700,
                       lineHeight: 1,
+                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
                     }}
                   >
                     {totalCharacters.toLocaleString()}
                   </Typography>
                   <Typography
                     sx={{
-                      color: 'rgba(255,255,255,0.2)',
+                      color: 'rgba(255,255,255,0.4)',
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       letterSpacing: 2.5,
                       textTransform: 'uppercase',
                       mt: 0.5,
+                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
                     }}
                   >
                     {t('playerConnections.scoreboard.totalCharacters')}
@@ -517,11 +584,12 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           {totalCount === 0 && (
             <Typography
               sx={{
-                color: 'rgba(255,255,255,0.3)',
+                color: 'rgba(255,255,255,0.5)',
                 fontSize: '1.2rem',
                 fontWeight: 500,
                 mt: 3,
                 letterSpacing: 1,
+                textShadow: '0 1px 6px rgba(0,0,0,0.7)',
                 animation: 'fadeInOut 3s ease-in-out infinite',
                 '@keyframes fadeInOut': {
                   '0%, 100%': { opacity: 0.3 },
@@ -569,9 +637,10 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         {(ccuData?.botTotal ?? 0) > 0 && (
           <Typography
             sx={{
-              color: 'rgba(255,255,255,0.25)',
+              color: 'rgba(255,255,255,0.4)',
               fontSize: '0.8rem',
               fontWeight: 500,
+              textShadow: '0 1px 6px rgba(0,0,0,0.7)',
             }}
           >
             🤖 Bots: {ccuData!.botTotal.toLocaleString()}
@@ -602,12 +671,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             <Box sx={{ textAlign: 'center' }}>
               <Typography
                 sx={{
-                  color: 'rgba(255,255,255,0.45)',
+                  color: 'rgba(255,255,255,0.65)',
                   fontFamily: '"Inter", "Roboto Mono", monospace',
                   fontVariantNumeric: 'tabular-nums',
                   fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
                   fontWeight: 700,
                   lineHeight: 1,
+                  textShadow: '0 1px 8px rgba(0,0,0,0.7)',
                 }}
               >
                 ¥{paymentStats.totalAmount.toLocaleString()} (₩
@@ -616,12 +686,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               </Typography>
               <Typography
                 sx={{
-                  color: 'rgba(255,255,255,0.18)',
+                  color: 'rgba(255,255,255,0.35)',
                   fontSize: '0.7rem',
                   fontWeight: 600,
                   letterSpacing: 2,
                   textTransform: 'uppercase',
                   mt: 0.5,
+                  textShadow: '0 1px 6px rgba(0,0,0,0.7)',
                 }}
               >
                 {t('playerConnections.scoreboard.totalRevenue')}

@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import OceanBackground from './OceanBackground';
 
 // ─── Types ───
 
@@ -90,15 +89,16 @@ function sortProducts(
 const cellSx = {
   px: 2,
   py: 1.2,
-  borderBottom: '1px solid rgba(255,255,255,0.06)',
+  borderBottom: '1px solid rgba(255,255,255,0.1)',
   fontFamily: '"Inter", "Roboto Mono", monospace',
   fontVariantNumeric: 'tabular-nums' as const,
   fontSize: '0.85rem',
+  textShadow: '0 1px 4px rgba(0,0,0,0.6)',
 };
 
 const headerCellSx = {
   ...cellSx,
-  color: 'rgba(255,255,255,0.6)',
+  color: 'rgba(255,255,255,0.8)',
   fontWeight: 700,
   fontSize: '0.75rem',
   letterSpacing: 0.5,
@@ -107,7 +107,7 @@ const headerCellSx = {
   userSelect: 'none' as const,
   whiteSpace: 'nowrap' as const,
   transition: 'background 0.15s ease',
-  '&:hover': { background: 'rgba(255,255,255,0.04)' },
+  '&:hover': { background: 'rgba(255,255,255,0.08)' },
 };
 
 // ─── Sort Header Component ───
@@ -341,7 +341,7 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
         position: 'absolute',
         inset: 0,
         zIndex: 2,
-        background: '#060a14',
+        background: 'linear-gradient(180deg, #1a5276 0%, #2e86c1 30%, #85c1e9 60%, #1b4f72 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -352,8 +352,34 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
         },
       }}
     >
-      {/* Night ocean background */}
-      <OceanBackground />
+      {/* Daytime ocean background image */}
+      <Box
+        component="img"
+        src="/images/countdown_ocean_bg.png"
+        alt=""
+        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center center',
+          zIndex: 0,
+        }}
+      />
+      {/* Dark overlay for readability */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.65) 100%)',
+        }}
+      />
       {/* Content overlay */}
       <Box
         sx={{
@@ -396,10 +422,11 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           <Typography
             variant="h5"
             sx={{
-              color: 'rgba(255,255,255,0.9)',
+              color: 'rgba(255,255,255,0.95)',
               fontWeight: 700,
               fontFamily: '"Inter", sans-serif',
               letterSpacing: 0.5,
+              textShadow: '0 1px 6px rgba(0,0,0,0.7)',
             }}
           >
             💰 {t(`${prefix}title`)}
@@ -420,22 +447,24 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           {/* Total transactions */}
           <Box
             sx={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: 2,
               px: 3,
               py: 2,
               minWidth: 200,
+              backdropFilter: 'blur(8px)',
             }}
           >
             <Typography
               sx={{
-                color: 'rgba(255,255,255,0.4)',
+                color: 'rgba(255,255,255,0.6)',
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 letterSpacing: 1,
                 textTransform: 'uppercase',
                 mb: 0.5,
+                textShadow: '0 1px 4px rgba(0,0,0,0.6)',
               }}
             >
               {t('playerConnections.scoreboard.totalPurchases')}
@@ -448,6 +477,7 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 fontFamily: '"Inter", "Roboto Mono", monospace',
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
+                textShadow: '0 1px 8px rgba(0,0,0,0.6)',
               }}
             >
               {stats.totalCount.toLocaleString()}
@@ -457,12 +487,13 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           {/* Total revenue */}
           <Box
             sx={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: 2,
               px: 3,
               py: 2,
               minWidth: 200,
+              backdropFilter: 'blur(8px)',
             }}
           >
             <Typography
@@ -495,11 +526,12 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
             </Typography>
             <Typography
               sx={{
-                color: 'rgba(255,255,255,0.3)',
+                color: 'rgba(255,255,255,0.5)',
                 fontSize: '0.8rem',
                 mt: 0.5,
                 fontFamily: '"Inter", monospace',
                 fontVariantNumeric: 'tabular-nums',
+                textShadow: '0 1px 4px rgba(0,0,0,0.6)',
               }}
             >
               ≈ ₩{totalAmountKrw.toLocaleString()}
@@ -511,10 +543,11 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
             sx={{
               display: 'flex',
               alignItems: 'center',
-              color: 'rgba(255,255,255,0.25)',
+              color: 'rgba(255,255,255,0.45)',
               fontSize: '0.75rem',
               ml: 'auto',
               fontFamily: '"Inter", sans-serif',
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
             }}
           >
             ⚠️ {t(`${prefix}exchangeRate`)}
@@ -536,10 +569,11 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           </Typography>
           <Box
             sx={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(0,0,0,0.25)',
+              border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: 2,
               overflow: 'hidden',
+              backdropFilter: 'blur(8px)',
             }}
           >
             <ProductTable
@@ -553,11 +587,12 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
         <Box sx={{ px: 4, pb: 4 }}>
           <Typography
             sx={{
-              color: 'rgba(255,255,255,0.7)',
+              color: 'rgba(255,255,255,0.9)',
               fontSize: '1rem',
               fontWeight: 700,
               mb: 1.5,
               fontFamily: '"Inter", sans-serif',
+              textShadow: '0 1px 6px rgba(0,0,0,0.7)',
             }}
           >
             📊 {t(`${prefix}dailySales`)}
@@ -565,19 +600,21 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           {dailyDates.length === 0 ? (
             <Box
               sx={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(0,0,0,0.25)',
+                border: '1px solid rgba(255,255,255,0.12)',
                 borderRadius: 2,
                 px: 3,
                 py: 4,
                 textAlign: 'center',
+                backdropFilter: 'blur(8px)',
               }}
             >
               <Typography
                 sx={{
-                  color: 'rgba(255,255,255,0.3)',
+                  color: 'rgba(255,255,255,0.5)',
                   fontSize: '0.9rem',
                   fontFamily: '"Inter", sans-serif',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)',
                 }}
               >
                 {t(`${prefix}noSales`)}
@@ -592,10 +629,11 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                   key={dateStr}
                   sx={{
                     mb: 1.5,
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: 'rgba(0,0,0,0.25)',
+                    border: '1px solid rgba(255,255,255,0.12)',
                     borderRadius: 2,
                     overflow: 'hidden',
+                    backdropFilter: 'blur(8px)',
                   }}
                 >
                   {/* Date header — clickable */}

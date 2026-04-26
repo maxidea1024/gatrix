@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Box,
   Tabs,
@@ -50,7 +50,11 @@ import {
   ArrowDownward as ArrowDownIcon,
   Sync as SyncIcon,
   Fullscreen as FullscreenIcon,
+  MoreVert as MoreVertIcon,
+  Timer as TimerIcon,
 } from '@mui/icons-material';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useSearchParams } from 'react-router-dom';
@@ -68,6 +72,8 @@ import {
   formatDateTimeDetailed,
 } from '../../utils/dateFormat';
 import CcuScoreboard from '../../components/admin/CcuScoreboard';
+import CountdownScoreboard from '../../components/admin/CountdownScoreboard';
+import LocalizedDateTimePicker from '../../components/common/LocalizedDateTimePicker';
 
 const REFRESH_STORAGE_KEY = 'playerConnections.refreshInterval';
 const REFRESH_OPTIONS = [
@@ -137,6 +143,16 @@ const PlayerConnectionsPage: React.FC = () => {
   const [scoreboardOpen, setScoreboardOpen] = useState(
     () => sessionStorage.getItem(SCOREBOARD_STORAGE_KEY) === 'true'
   );
+  const [flashIn, setFlashIn] = useState(false);
+
+  // Countdown state
+  const COUNTDOWN_DDAY_KEY = 'gx_countdown_dday';
+  const [countdownOpen, setCountdownOpen] = useState(false);
+  const [ddayDialogOpen, setDdayDialogOpen] = useState(false);
+  const [ddayDate, setDdayDate] = useState<string>(
+    () => localStorage.getItem(COUNTDOWN_DDAY_KEY) || ''
+  );
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
 
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
@@ -319,12 +335,178 @@ const PlayerConnectionsPage: React.FC = () => {
           ccuData={ccuData}
           prevCcuData={prevCcuRef.current}
           projectApiPath={projectApiPath}
+          flashIn={flashIn}
           onClose={() => {
             setScoreboardOpen(false);
+            setFlashIn(false);
             sessionStorage.removeItem(SCOREBOARD_STORAGE_KEY);
           }}
         />
       )}
+
+      {/* Fullscreen Countdown */}
+      {countdownOpen && ddayDate && (
+        <CountdownScoreboard
+          ddayTarget={new Date(ddayDate)}
+          onCountdownComplete={() => {
+            // Mount CCU behind countdown first, then remove countdown next frame
+            setFlashIn(true);
+            setScoreboardOpen(true);
+            sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
+            requestAnimationFrame(() => {
+              setCountdownOpen(false);
+            });
+          }}
+          onSkipToCcu={() => {
+            localStorage.removeItem(COUNTDOWN_DDAY_KEY);
+            // Mount CCU behind countdown first, then remove countdown next frame
+            setFlashIn(true);
+            setScoreboardOpen(true);
+            sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
+            requestAnimationFrame(() => {
+              setDdayDate('');
+              setCountdownOpen(false);
+            });
+          }}
+          onClose={() => {
+            setCountdownOpen(false);
+          }}
+        />
+      )}
+
+      {/* D-Day Setting Dialog */}
+      {(() => {
+        const PRESETS = [
+          { key: '1m', ms: 60 * 1000 },
+          { key: '5m', ms: 5 * 60 * 1000 },
+          { key: '30m', ms: 30 * 60 * 1000 },
+          { key: '1h', ms: 60 * 60 * 1000 },
+          { key: '1d', ms: 24 * 60 * 60 * 1000 },
+          { key: '1w', ms: 7 * 24 * 60 * 60 * 1000 },
+        ] as const;
+
+        const isCustomMode = ddayDate && !PRESETS.some(p => {
+          const expected = Date.now() + p.ms;
+          const actual = new Date(ddayDate).getTime();
+          return Math.abs(expected - actual) < 120_000; // within 2 min tolerance
+        });
+
+        const handlePreset = (ms: number) => {
+          const target = new Date(Date.now() + ms);
+          setDdayDate(target.toISOString());
+        };
+
+        const ddayIsFuture = ddayDate && new Date(ddayDate).getTime() > Date.now();
+
+        // Compute remaining time display
+        const remainingLabel = ddayDate ? (() => {
+          const diff = new Date(ddayDate).getTime() - Date.now();
+          if (diff <= 0) return null;
+          const totalSec = Math.floor(diff / 1000);
+          const d = Math.floor(totalSec / 86400);
+          const h = Math.floor((totalSec % 86400) / 3600);
+          const m = Math.floor((totalSec % 3600) / 60);
+          const parts: string[] = [];
+          if (d > 0) parts.push(t('playerConnections.countdown.remainDays', { count: d }));
+          if (h > 0) parts.push(t('playerConnections.countdown.remainHours', { count: h }));
+          if (m > 0 || parts.length === 0) parts.push(t('playerConnections.countdown.remainMinutes', { count: m }));
+          return t('playerConnections.countdown.remainPrefix') + ' ' + parts.join(' ');
+        })() : null;
+
+        return (
+          <Dialog
+            open={ddayDialogOpen}
+            onClose={() => setDdayDialogOpen(false)}
+            maxWidth="xs"
+            fullWidth
+          >
+            <DialogTitle>{t('playerConnections.countdown.title')}</DialogTitle>
+            <DialogContent sx={{ pt: 2 }}>
+              {/* Preset chips */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                {PRESETS.map((p) => (
+                  <Chip
+                    key={p.key}
+                    label={t(`playerConnections.countdown.preset${p.key}`)}
+                    variant={ddayDate && Math.abs(new Date(ddayDate).getTime() - (Date.now() + p.ms)) < 120_000 ? 'filled' : 'outlined'}
+                    color={ddayDate && Math.abs(new Date(ddayDate).getTime() - (Date.now() + p.ms)) < 120_000 ? 'primary' : 'default'}
+                    onClick={() => handlePreset(p.ms)}
+                    sx={{ fontWeight: 600, cursor: 'pointer' }}
+                  />
+                ))}
+                <Chip
+                  label={t('playerConnections.countdown.presetCustom')}
+                  variant={isCustomMode ? 'filled' : 'outlined'}
+                  color={isCustomMode ? 'primary' : 'default'}
+                  onClick={() => setDdayDate('')}
+                  sx={{ fontWeight: 600, cursor: 'pointer' }}
+                />
+              </Box>
+
+              {/* Custom DateTimePicker — shown when no preset matches or explicitly custom */}
+              {(!ddayDate || isCustomMode) && (
+                <Box sx={{ mt: 2 }}>
+                  <LocalizedDateTimePicker
+                    label={t('playerConnections.countdown.ddayLabel')}
+                    value={ddayDate || null}
+                    onChange={(iso) => setDdayDate(iso)}
+                    helperText={t('playerConnections.countdown.ddayHelp')}
+                    size="medium"
+                  />
+                </Box>
+              )}
+
+              {/* Status chip */}
+              {ddayDate && (() => {
+                if (!ddayIsFuture) {
+                  return (
+                    <Chip
+                      icon={<ErrorIcon />}
+                      label={t('playerConnections.countdown.pastDateError')}
+                      color="error"
+                      variant="outlined"
+                      sx={{ mt: 2, width: '100%', justifyContent: 'flex-start', py: 0.5 }}
+                    />
+                  );
+                }
+                if (remainingLabel) {
+                  return (
+                    <Chip
+                      icon={<TimerIcon />}
+                      label={remainingLabel}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ mt: 2, width: '100%', justifyContent: 'flex-start', py: 0.5 }}
+                    />
+                  );
+                }
+                return null;
+              })()}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDdayDialogOpen(false)}>
+                {t('playerConnections.countdown.cancel')}
+              </Button>
+              <Button
+                variant="contained"
+                disabled={!ddayIsFuture}
+                onClick={() => {
+                  if (ddayDate) {
+                    localStorage.setItem(COUNTDOWN_DDAY_KEY, ddayDate);
+                    setDdayDialogOpen(false);
+                    setCountdownOpen(true);
+                    document.documentElement
+                      .requestFullscreen?.()
+                      .catch(() => {});
+                  }
+                }}
+              >
+                {t('playerConnections.countdown.start')}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        );
+      })()}
       <PageHeader
         icon={<PeopleIcon />}
         title={t('playerConnections.title')}
@@ -390,40 +572,57 @@ const PlayerConnectionsPage: React.FC = () => {
                 </Menu>
               </>
             )}
-            <Button
-              variant="contained"
+            <IconButton
               size="small"
-              color="warning"
-              startIcon={<SyncIcon />}
-              onClick={handleOpenSyncDialog}
+              onClick={(e) => setMoreMenuAnchor(e.currentTarget)}
               sx={{
-                borderRadius: 1.5,
-                textTransform: 'none',
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
+                color: 'text.secondary',
+                bgcolor: 'action.hover',
+                '&:hover': { bgcolor: 'action.selected' },
               }}
             >
-              {t('playerConnections.sync.button')}
-            </Button>
-            <Tooltip title={t('playerConnections.scoreboard.title')}>
-              <IconButton
-                size="small"
+              <MoreVertIcon fontSize="small" />
+            </IconButton>
+            <Menu
+              anchorEl={moreMenuAnchor}
+              open={Boolean(moreMenuAnchor)}
+              onClose={() => setMoreMenuAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem
                 onClick={() => {
+                  setMoreMenuAnchor(null);
                   setScoreboardOpen(true);
                   sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
                   document.documentElement
                     .requestFullscreen?.()
                     .catch(() => {});
                 }}
-                sx={{
-                  color: 'text.secondary',
-                  bgcolor: 'action.hover',
-                  '&:hover': { bgcolor: 'action.selected' },
+              >
+                <ListItemIcon><FullscreenIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('playerConnections.scoreboard.dropdown.ccuCounter')}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setMoreMenuAnchor(null);
+                  setDdayDialogOpen(true);
                 }}
               >
-                <FullscreenIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+                <ListItemIcon><TimerIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('playerConnections.scoreboard.dropdown.countdown')}</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setMoreMenuAnchor(null);
+                  handleOpenSyncDialog();
+                }}
+              >
+                <ListItemIcon><SyncIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('playerConnections.sync.button')}</ListItemText>
+              </MenuItem>
+            </Menu>
           </Box>
         }
       />
