@@ -585,12 +585,14 @@ export class PlayerConnectionsController {
           totalAmount: stats.totalAmount,
         });
 
-        // Return only summary: totalCount and totalAmount
+        // Return full data: summary + products + daily breakdown
         res.json({
           success: true,
           data: {
             totalCount: stats.totalCount || 0,
             totalAmount: stats.totalAmount || 0,
+            products: stats.products || {},
+            daily: stats.daily || {},
           },
         });
       } catch (err: any) {

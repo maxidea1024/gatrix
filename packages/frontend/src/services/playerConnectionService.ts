@@ -287,7 +287,25 @@ const playerConnectionService = {
    */
   async getPaymentStats(
     projectApiPath: string
-  ): Promise<{ totalCount: number; totalAmount: number } | null> {
+  ): Promise<{
+    totalCount: number;
+    totalAmount: number;
+    products: Record<
+      string,
+      { name: string; count: number; amount: number }
+    >;
+    daily: Record<
+      string,
+      {
+        totalCount: number;
+        totalAmount: number;
+        products: Record<
+          string,
+          { name: string; count: number; amount: number }
+        >;
+      }
+    >;
+  } | null> {
     try {
       const res = await api.get(
         `${projectApiPath}/player-connections/payment-stats`

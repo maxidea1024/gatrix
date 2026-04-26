@@ -10,6 +10,9 @@ import playerConnectionService, {
   type CcuData,
 } from '../../services/playerConnectionService';
 
+import PaymentStatsDetail from './PaymentStatsDetail';
+import OceanBackground from './OceanBackground';
+
 // ─── Animated Number Hook (stock ticker tween) ───
 function useAnimatedNumber(target: number): number {
   const [display, setDisplay] = useState(target);
@@ -162,22 +165,26 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     }
   }, [totalCount, prevTotalCount]);
 
-  // Fetch total registered accounts
+  // Fetch total registered accounts and characters
   const [totalRegistered, setTotalRegistered] = useState<number | null>(null);
+  const [totalCharacters, setTotalCharacters] = useState<number | null>(null);
   useEffect(() => {
     let mounted = true;
-    const fetchTotal = async () => {
+    const fetchTotals = async () => {
       try {
-        const res = await playerConnectionService.getAllPlayers(
-          projectApiPath,
-          { limit: 1 }
-        );
-        if (mounted) setTotalRegistered(res.total);
+        const [playersRes, charsRes] = await Promise.all([
+          playerConnectionService.getAllPlayers(projectApiPath, { limit: 1 }),
+          playerConnectionService.getAllCharacters(projectApiPath, { limit: 1 }),
+        ]);
+        if (mounted) {
+          setTotalRegistered(playersRes.total);
+          setTotalCharacters(charsRes.total);
+        }
       } catch (err) {
-        console.error('Failed to fetch total registered players:', err);
+        console.error('Failed to fetch total counts:', err);
       }
     };
-    fetchTotal();
+    fetchTotals();
     return () => {
       mounted = false;
     };
@@ -201,10 +208,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   };
 
   // Fetch payment statistics (only visible when psEnabled)
-  const [paymentStats, setPaymentStats] = useState<{
-    totalCount: number;
-    totalAmount: number;
-  } | null>(null);
+  type PaymentStatsData = Awaited<ReturnType<typeof playerConnectionService.getPaymentStats>>;
+  const [paymentStats, setPaymentStats] = useState<PaymentStatsData>(null);
+  const [showDetail, setShowDetail] = useState(false);
   useEffect(() => {
     if (!psEnabled) {
       setPaymentStats(null);
@@ -284,8 +290,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 2147483647,
-        background:
-          'radial-gradient(ellipse at 20% 50%, #0d1b2a 0%, #0a0f1a 50%, #060a12 100%)',
+        background: '#060a14',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -295,18 +300,10 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           '0%': { opacity: 0 },
           '100%': { opacity: 1 },
         },
-        // Animated background grid
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-          pointerEvents: 'none',
-        },
       }}
     >
+      {/* Night ocean background */}
+      <OceanBackground />
       {/* Sparkline trend graph — anchored to bottom of viewport */}
       <Sparkline data={historyRef.current} trend={totalTrend} />
 
@@ -405,7 +402,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             key={animKey}
             sx={{
               fontWeight: 900,
-              fontSize: 'clamp(8.25rem, min(24vw, 42vh), 21rem)',
+              fontSize: 'clamp(6.6rem, min(19.2vw, 33.6vh), 16.8rem)',
               lineHeight: 1,
               color: TREND_COLORS[totalTrend],
               fontFamily: '"Inter", "Roboto Mono", monospace',
@@ -444,33 +441,65 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             {t('playerConnections.scoreboard.concurrentUsers')}
           </Typography>
 
-          {/* Total registered accounts — subtle secondary metric */}
-          {totalRegistered !== null && (
-            <Box sx={{ mt: 3.5, textAlign: 'center' }}>
-              <Typography
-                sx={{
-                  color: 'rgba(255,255,255,0.5)',
-                  fontFamily: '"Inter", "Roboto Mono", monospace',
-                  fontVariantNumeric: 'tabular-nums',
-                  fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                {totalRegistered.toLocaleString()}
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'rgba(255,255,255,0.2)',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  letterSpacing: 2.5,
-                  textTransform: 'uppercase',
-                  mt: 0.5,
-                }}
-              >
-                {t('playerConnections.scoreboard.totalAccounts')}
-              </Typography>
+          {/* Total registered accounts & characters — subtle secondary metrics */}
+          {(totalRegistered !== null || totalCharacters !== null) && (
+            <Box sx={{ mt: 3.5, display: 'flex', gap: 6, justifyContent: 'center' }}>
+              {totalRegistered !== null && (
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.5)',
+                      fontFamily: '"Inter", "Roboto Mono", monospace',
+                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {totalRegistered.toLocaleString()}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.2)',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: 2.5,
+                      textTransform: 'uppercase',
+                      mt: 0.5,
+                    }}
+                  >
+                    {t('playerConnections.scoreboard.totalAccounts')}
+                  </Typography>
+                </Box>
+              )}
+              {totalCharacters !== null && (
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.5)',
+                      fontFamily: '"Inter", "Roboto Mono", monospace',
+                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {totalCharacters.toLocaleString()}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.2)',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: 2.5,
+                      textTransform: 'uppercase',
+                      mt: 0.5,
+                    }}
+                  >
+                    {t('playerConnections.scoreboard.totalCharacters')}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           )}
 
@@ -541,6 +570,9 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         {/* Payment stats — anchored to bottom without affecting center layout */}
         {paymentStats && (
           <Box
+            onClick={() => {
+              setShowDetail(true);
+            }}
             sx={{
               position: 'absolute',
               bottom: 32,
@@ -550,6 +582,10 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               gap: 8,
               justifyContent: 'center',
               alignItems: 'center',
+              cursor: 'pointer',
+              py: 1.5,
+              transition: 'opacity 0.2s ease',
+              '&:hover': { opacity: 0.8 },
             }}
           >
             <Box sx={{ textAlign: 'center' }}>
@@ -563,33 +599,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                   lineHeight: 1,
                 }}
               >
-                {paymentStats.totalCount.toLocaleString()}
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'rgba(255,255,255,0.18)',
-                  fontSize: '0.7rem',
-                  fontWeight: 600,
-                  letterSpacing: 2,
-                  textTransform: 'uppercase',
-                  mt: 0.5,
-                }}
-              >
-                {t('playerConnections.scoreboard.totalPurchases')}
-              </Typography>
-            </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
-                sx={{
-                  color: 'rgba(255,255,255,0.45)',
-                  fontFamily: '"Inter", "Roboto Mono", monospace',
-                  fontVariantNumeric: 'tabular-nums',
-                  fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                ¥{paymentStats.totalAmount.toLocaleString()}
+                ¥{paymentStats.totalAmount.toLocaleString()} (₩{Math.round(paymentStats.totalAmount * 216.48).toLocaleString()})
               </Typography>
               <Typography
                 sx={{
@@ -607,6 +617,13 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           </Box>
         )}
       </Box>
+      {/* Payment Stats Detail View overlay */}
+      {showDetail && paymentStats && (
+        <PaymentStatsDetail
+          stats={paymentStats}
+          onBack={() => setShowDetail(false)}
+        />
+      )}
     </Box>
   );
 };
