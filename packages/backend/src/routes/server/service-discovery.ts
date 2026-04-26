@@ -204,7 +204,8 @@ router.post('/register', serverAuthBase, async (req: any, res: any) => {
     // This enables project-scoped environment filtering in service discovery queries.
     // Game servers register with human-readable labels.environment (e.g., 'production'),
     // but environmentId is a globally unique ULID that prevents cross-project collisions.
-    const environmentId = req.environmentId || req.apiToken?.environmentId || null;
+    const environmentId =
+      req.environmentId || req.apiToken?.environmentId || null;
     if (environmentId && !labels.environmentId) {
       labels.environmentId = environmentId;
     }
