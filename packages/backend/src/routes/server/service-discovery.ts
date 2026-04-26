@@ -159,7 +159,7 @@ router.get('/account-whitelists', serverSDKAuth, getAccountWhitelistsHandler);
  *
  * Note: externalAddress is auto-detected from req.ip
  */
-router.post('/register', serverSDKAuth, async (req: any, res: any) => {
+router.post('/register', serverAuthBase, async (req: any, res: any) => {
   try {
     const {
       instanceId: providedInstanceId,
@@ -204,7 +204,7 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
     // This enables project-scoped environment filtering in service discovery queries.
     // Game servers register with human-readable labels.environment (e.g., 'production'),
     // but environmentId is a globally unique ULID that prevents cross-project collisions.
-    const environmentId = req.environmentId || null;
+    const environmentId = req.environmentId || req.apiToken?.environmentId || null;
     if (environmentId && !labels.environmentId) {
       labels.environmentId = environmentId;
     }
@@ -337,7 +337,7 @@ router.post('/unregister', serverAuthBase, async (req: any, res: any) => {
  *
  * Note: meta is not included - it's immutable after registration
  */
-router.post('/status', serverSDKAuth, async (req: any, res: any) => {
+router.post('/status', serverAuthBase, async (req: any, res: any) => {
   try {
     const {
       instanceId,
