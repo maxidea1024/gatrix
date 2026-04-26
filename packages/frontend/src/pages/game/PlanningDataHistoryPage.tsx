@@ -209,93 +209,91 @@ const PlanningDataHistoryPage: React.FC = () => {
 
       {/* Search Bar */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               gap: 2,
+              alignItems: 'center',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
+              flex: 1,
             }}
           >
+            <SearchTextField
+              placeholder={
+                t('planningData.history.searchPlaceholder') ||
+                t('common.search')
+              }
+              value={searchTerm}
+              onChange={(value) => {
+                setSearchTerm(value);
+                setPage(0);
+              }}
+            />
+
             <Box
               sx={{
                 display: 'flex',
-                gap: 2,
                 alignItems: 'center',
-                flexWrap: 'wrap',
-                flex: 1,
+                gap: 0,
+                borderRadius: 1,
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                overflow: 'hidden',
               }}
             >
-              <SearchTextField
-                placeholder={
-                  t('planningData.history.searchPlaceholder') ||
-                  t('common.search')
-                }
-                value={searchTerm}
-                onChange={(value) => {
-                  setSearchTerm(value);
-                  setPage(0);
-                }}
-              />
-
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 0,
-                  borderRadius: 1,
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  overflow: 'hidden',
+                  gap: 0.75,
+                  px: 1.5,
+                  py: 0.5,
                 }}
               >
                 <Box
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.75,
-                    px: 1.5,
-                    py: 0.5,
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: 'primary.main',
                   }}
+                />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ whiteSpace: 'nowrap' }}
                 >
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'primary.main',
-                    }}
-                  />
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ whiteSpace: 'nowrap' }}
-                  >
-                    {t('planningData.history.totalRecords')}{' '}
-                    <strong style={{ color: 'inherit' }}>
-                      {history.length}
-                    </strong>
-                  </Typography>
-                </Box>
+                  {t('planningData.history.totalRecords')}{' '}
+                  <strong style={{ color: 'inherit' }}>{history.length}</strong>
+                </Typography>
               </Box>
             </Box>
-
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Tooltip title={t('common.refresh')}>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={handleRefresh}
-                    disabled={loading}
-                  >
-                    <RefreshIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
           </Box>
+
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                >
+                  <RefreshIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        </Box>
       </Box>
 
       {/* Content */}

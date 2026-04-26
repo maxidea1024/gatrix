@@ -1055,66 +1055,66 @@ const MessageTemplatesPage: React.FC = () => {
 
       {/* Filter */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
               gap: 2,
               alignItems: 'center',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
+              flex: 1,
             }}
           >
+            {/* Search 컨트롤을 맨 앞으로 이동하고 개선 */}
+            <SearchTextField
+              placeholder={t('messageTemplates.searchPlaceholderDetailed')}
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+
+            {/* Dynamic Filter Bar */}
             <Box
               sx={{
                 display: 'flex',
-                gap: 2,
-                alignItems: 'center',
                 flexWrap: 'wrap',
-                flex: 1,
+                gap: 1,
+                alignItems: 'center',
               }}
             >
-              {/* Search 컨트롤을 맨 앞으로 이동하고 개선 */}
-              <SearchTextField
-                placeholder={t('messageTemplates.searchPlaceholderDetailed')}
-                value={searchQuery}
-                onChange={setSearchQuery}
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
               />
 
-              {/* Dynamic Filter Bar */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  alignItems: 'center',
-                }}
-              >
-                <DynamicFilterBar
-                  availableFilters={availableFilterDefinitions}
-                  activeFilters={activeFilters}
-                  onFilterAdd={handleFilterAdd}
-                  onFilterRemove={handleFilterRemove}
-                  onFilterChange={handleDynamicFilterChange}
-                  onOperatorChange={handleOperatorChange}
-                />
-
-                {/* Column Settings Button */}
-                <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  >
-                    <ViewColumnIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
+        </Box>
       </Box>
 
       {/* 일괄 작업 툴바 */}

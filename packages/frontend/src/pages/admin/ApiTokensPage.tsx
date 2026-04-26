@@ -2107,39 +2107,39 @@ const ApiTokensPage: React.FC = () => {
 
         {/* Filter and Column Settings */}
         <Box sx={{ mb: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'wrap',
-              }}
-            >
-              {/* Search */}
-              <SearchTextField
-                placeholder={t('apiTokens.searchPlaceholder')}
-                value={searchTerm}
-                onChange={setSearchTerm}
-              />
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            {/* Search */}
+            <SearchTextField
+              placeholder={t('apiTokens.searchPlaceholder')}
+              value={searchTerm}
+              onChange={setSearchTerm}
+            />
 
-              {/* Column Settings Button */}
-              <Tooltip title={t('common.columnSettings')}>
-                <IconButton
-                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                  sx={{
-                    ml: 1,
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}
-                >
-                  <ViewColumnIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            {/* Column Settings Button */}
+            <Tooltip title={t('common.columnSettings')}>
+              <IconButton
+                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                sx={{
+                  ml: 1,
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
 
         {/* Tokens Table */}

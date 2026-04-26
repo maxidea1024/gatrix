@@ -673,72 +673,72 @@ const AuditLogsPage: React.FC = () => {
 
       {/* Filters */}
       <Box sx={{ mb: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'center',
-              flexWrap: 'wrap',
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Date Range Picker */}
+          <DateRangePicker
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            onChange={(from, to, preset) => {
+              setDateFrom(from);
+              setDateTo(to);
+              setDateRangePreset(preset);
             }}
-          >
-            {/* Date Range Picker */}
-            <DateRangePicker
-              dateFrom={dateFrom}
-              dateTo={dateTo}
-              onChange={(from, to, preset) => {
-                setDateFrom(from);
-                setDateTo(to);
-                setDateRangePreset(preset);
+            preset={dateRangePreset}
+            availablePresets={[
+              'today',
+              'yesterday',
+              'last7d',
+              'last30d',
+              'last3m',
+              'last6m',
+              'last12m',
+              'custom',
+            ]}
+            size="small"
+          />
+
+          {/* Search */}
+          <SearchTextField
+            placeholder={t('auditLogs.searchUserPlaceholder')}
+            value={userFilter}
+            onChange={(value) => {
+              setUserFilter(value);
+              handleFilterChange('user', value);
+            }}
+          />
+
+          {/* Dynamic Filters */}
+          <DynamicFilterBar
+            availableFilters={availableFilters}
+            activeFilters={activeFilters}
+            onFilterAdd={handleFilterAdd}
+            onFilterRemove={handleFilterRemove}
+            onFilterChange={handleDynamicFilterChange}
+            onOperatorChange={handleOperatorChange}
+          />
+
+          {/* Column Settings Button */}
+          <Tooltip title={t('users.columnSettings')}>
+            <IconButton
+              onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
               }}
-              preset={dateRangePreset}
-              availablePresets={[
-                'today',
-                'yesterday',
-                'last7d',
-                'last30d',
-                'last3m',
-                'last6m',
-                'last12m',
-                'custom',
-              ]}
-              size="small"
-            />
-
-            {/* Search */}
-            <SearchTextField
-              placeholder={t('auditLogs.searchUserPlaceholder')}
-              value={userFilter}
-              onChange={(value) => {
-                setUserFilter(value);
-                handleFilterChange('user', value);
-              }}
-            />
-
-            {/* Dynamic Filters */}
-            <DynamicFilterBar
-              availableFilters={availableFilters}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-            />
-
-            {/* Column Settings Button */}
-            <Tooltip title={t('users.columnSettings')}>
-              <IconButton
-                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
-              >
-                <ViewColumnIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+            >
+              <ViewColumnIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Audit Logs Table */}

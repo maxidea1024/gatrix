@@ -1905,97 +1905,97 @@ const FeatureFlagsPage: React.FC = () => {
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'nowrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               gap: 2,
+              alignItems: 'center',
               flexWrap: 'nowrap',
-              justifyContent: 'space-between',
+              flexGrow: 1,
+              minWidth: 0,
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'nowrap',
-                flexGrow: 1,
-                minWidth: 0,
+            <SearchTextField
+              placeholder={t('featureFlags.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(val) => {
+                setSearchTerm(val);
+                setPage(0);
               }}
-            >
-              <SearchTextField
-                placeholder={t('featureFlags.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(val) => {
-                  setSearchTerm(val);
-                  setPage(0);
-                }}
-              />
+            />
 
-              {/* Dynamic Filter Bar */}
-              <DynamicFilterBar
-                availableFilters={availableFilterDefinitions}
-                activeFilters={activeFilters}
-                onFilterAdd={handleFilterAdd}
-                onFilterRemove={handleFilterRemove}
-                onFilterChange={handleFilterChange}
-                onOperatorChange={handleOperatorChange}
-                onRefresh={loadFlags}
-                refreshDisabled={loading}
-                noWrap={true}
-                afterFilterAddActions={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    {!compactView && (
-                      <Tooltip
-                        title={t('common.columnSettings')}
-                        disableFocusListener
-                      >
-                        <IconButton
-                          onClick={(e) =>
-                            setColumnSettingsAnchor(e.currentTarget)
-                          }
-                          sx={{
-                            bgcolor: 'background.paper',
-                            border: 1,
-                            borderColor: 'divider',
-                            '&:hover': { bgcolor: 'action.hover' },
-                          }}
-                        >
-                          <ViewColumnIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
+            {/* Dynamic Filter Bar */}
+            <DynamicFilterBar
+              availableFilters={availableFilterDefinitions}
+              activeFilters={activeFilters}
+              onFilterAdd={handleFilterAdd}
+              onFilterRemove={handleFilterRemove}
+              onFilterChange={handleFilterChange}
+              onOperatorChange={handleOperatorChange}
+              onRefresh={loadFlags}
+              refreshDisabled={loading}
+              noWrap={true}
+              afterFilterAddActions={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {!compactView && (
                     <Tooltip
-                      title={t('featureFlags.compactView')}
+                      title={t('common.columnSettings')}
                       disableFocusListener
                     >
                       <IconButton
-                        onClick={handleCompactViewToggle}
+                        onClick={(e) =>
+                          setColumnSettingsAnchor(e.currentTarget)
+                        }
                         sx={{
-                          bgcolor: compactView
-                            ? 'primary.main'
-                            : 'background.paper',
-                          color: compactView
-                            ? 'primary.contrastText'
-                            : 'text.primary',
+                          bgcolor: 'background.paper',
                           border: 1,
-                          borderColor: compactView ? 'primary.main' : 'divider',
-                          '&:hover': {
-                            bgcolor: compactView
-                              ? 'primary.dark'
-                              : 'action.hover',
-                          },
+                          borderColor: 'divider',
+                          '&:hover': { bgcolor: 'action.hover' },
                         }}
                       >
-                        <ViewListIcon />
+                        <ViewColumnIcon />
                       </IconButton>
                     </Tooltip>
-                  </Box>
-                }
-              />
-            </Box>
+                  )}
+                  <Tooltip
+                    title={t('featureFlags.compactView')}
+                    disableFocusListener
+                  >
+                    <IconButton
+                      onClick={handleCompactViewToggle}
+                      sx={{
+                        bgcolor: compactView
+                          ? 'primary.main'
+                          : 'background.paper',
+                        color: compactView
+                          ? 'primary.contrastText'
+                          : 'text.primary',
+                        border: 1,
+                        borderColor: compactView ? 'primary.main' : 'divider',
+                        '&:hover': {
+                          bgcolor: compactView
+                            ? 'primary.dark'
+                            : 'action.hover',
+                        },
+                      }}
+                    >
+                      <ViewListIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              }
+            />
           </Box>
+        </Box>
       </Box>
 
       {/* Table / Compact View */}

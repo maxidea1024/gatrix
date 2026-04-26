@@ -1122,87 +1122,87 @@ const CrashEventsPage: React.FC = () => {
 
       {/* Search & Filters */}
       <Box sx={{ mb: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'center',
-              flexWrap: 'wrap',
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Date Range Picker */}
+          <DateRangePicker
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            onChange={(from, to, preset) => {
+              setDateFrom(from);
+              setDateTo(to);
+              setDateRangePreset(preset);
             }}
-          >
-            {/* Date Range Picker */}
-            <DateRangePicker
-              dateFrom={dateFrom}
-              dateTo={dateTo}
-              onChange={(from, to, preset) => {
-                setDateFrom(from);
-                setDateTo(to);
-                setDateRangePreset(preset);
+            preset={dateRangePreset}
+            availablePresets={[
+              'today',
+              'yesterday',
+              'last7d',
+              'last30d',
+              'custom',
+            ]}
+            size="small"
+          />
+
+          {/* Search */}
+          <SearchTextField
+            placeholder={t('crashes.searchPlaceholder')}
+            value={searchTerm}
+            onChange={setSearchTerm}
+          />
+
+          {/* Dynamic Filter Bar */}
+          <DynamicFilterBar
+            availableFilters={availableFilterDefinitions}
+            activeFilters={activeFilters}
+            onFilterAdd={handleFilterAdd}
+            onFilterRemove={handleFilterRemove}
+            onFilterChange={handleDynamicFilterChange}
+            onOperatorChange={handleOperatorChange}
+          />
+
+          {/* Copy Current View Button */}
+          <Tooltip title={t('crashes.copyCurrentView')}>
+            <IconButton
+              onClick={handleCopyCurrentView}
+              sx={{
+                ml: 1,
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
               }}
-              preset={dateRangePreset}
-              availablePresets={[
-                'today',
-                'yesterday',
-                'last7d',
-                'last30d',
-                'custom',
-              ]}
-              size="small"
-            />
+            >
+              <LinkIcon />
+            </IconButton>
+          </Tooltip>
 
-            {/* Search */}
-            <SearchTextField
-              placeholder={t('crashes.searchPlaceholder')}
-              value={searchTerm}
-              onChange={setSearchTerm}
-            />
-
-            {/* Dynamic Filter Bar */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-            />
-
-            {/* Copy Current View Button */}
-            <Tooltip title={t('crashes.copyCurrentView')}>
-              <IconButton
-                onClick={handleCopyCurrentView}
-                sx={{
-                  ml: 1,
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <LinkIcon />
-              </IconButton>
-            </Tooltip>
-
-            {/* Column Settings Button */}
-            <Tooltip title={t('crashes.columnSettings')}>
-              <IconButton
-                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                sx={{
-                  ml: 1,
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <ViewColumnIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          {/* Column Settings Button */}
+          <Tooltip title={t('crashes.columnSettings')}>
+            <IconButton
+              onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+              sx={{
+                ml: 1,
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              <ViewColumnIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Table */}

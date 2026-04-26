@@ -487,60 +487,60 @@ const BannerManagementPage: React.FC = () => {
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               gap: 2,
+              alignItems: 'center',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
+              flex: 1,
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                flex: 1,
+            <SearchTextField
+              placeholder={t('banners.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(value) => {
+                setSearchTerm(value);
+                setPage(0);
               }}
-            >
-              <SearchTextField
-                placeholder={t('banners.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(value) => {
-                  setSearchTerm(value);
-                  setPage(0);
+            />
+            <Tooltip title={t('common.columnSettings')}>
+              <IconButton
+                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                sx={{
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': { bgcolor: 'action.hover' },
                 }}
-              />
-              <Tooltip title={t('common.columnSettings')}>
-                <IconButton
-                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': { bgcolor: 'action.hover' },
-                  }}
-                >
-                  <ViewColumnIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Tooltip title={t('common.refresh')}>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={loadBanners}
-                    disabled={loading}
-                  >
-                    <RefreshIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
+              >
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={loadBanners}
+                  disabled={loading}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        </Box>
       </Box>
 
       {/* Bulk Actions */}

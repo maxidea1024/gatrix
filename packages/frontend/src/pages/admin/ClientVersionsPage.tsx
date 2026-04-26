@@ -1792,55 +1792,55 @@ const ClientVersionsPage: React.FC = () => {
 
       {/* Filter */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <SearchTextField
+            placeholder={t('common.search')}
+            value={searchTerm}
+            onChange={(value) => setSearchTerm(value)}
+          />
+          {/* Dynamic Filter Bar */}
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
-              alignItems: 'center',
               flexWrap: 'wrap',
+              gap: 1,
+              alignItems: 'center',
             }}
           >
-            <SearchTextField
-              placeholder={t('common.search')}
-              value={searchTerm}
-              onChange={(value) => setSearchTerm(value)}
+            <DynamicFilterBar
+              availableFilters={availableFilterDefinitions}
+              activeFilters={activeFilters}
+              onFilterAdd={handleFilterAdd}
+              onFilterRemove={handleFilterRemove}
+              onFilterChange={handleDynamicFilterChange}
+              onOperatorChange={handleOperatorChange}
             />
-            {/* Dynamic Filter Bar */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 1,
-                alignItems: 'center',
-              }}
-            >
-              <DynamicFilterBar
-                availableFilters={availableFilterDefinitions}
-                activeFilters={activeFilters}
-                onFilterAdd={handleFilterAdd}
-                onFilterRemove={handleFilterRemove}
-                onFilterChange={handleDynamicFilterChange}
-                onOperatorChange={handleOperatorChange}
-              />
 
-              {/* Column Settings Button */}
-              <Tooltip title={t('users.columnSettings')}>
-                <IconButton
-                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}
-                >
-                  <ViewColumnIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            {/* Column Settings Button */}
+            <Tooltip title={t('users.columnSettings')}>
+              <IconButton
+                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                sx={{
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
+        </Box>
       </Box>
 
       {/* Bulk actions toolbar */}

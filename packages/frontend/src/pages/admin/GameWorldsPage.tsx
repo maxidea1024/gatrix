@@ -1892,67 +1892,67 @@ const GameWorldsPage: React.FC = () => {
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               gap: 2,
+              alignItems: 'center',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
+              flexGrow: 1,
             }}
           >
+            <SearchTextField
+              placeholder={t('gameWorlds.searchPlaceholder')}
+              value={search}
+              onChange={setSearch}
+            />
+
+            {/* Dynamic Filter Bar */}
             <Box
               sx={{
                 display: 'flex',
-                gap: 2,
-                alignItems: 'center',
                 flexWrap: 'wrap',
-                flexGrow: 1,
+                gap: 1,
+                alignItems: 'center',
               }}
             >
-              <SearchTextField
-                placeholder={t('gameWorlds.searchPlaceholder')}
-                value={search}
-                onChange={setSearch}
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
               />
 
-              {/* Dynamic Filter Bar */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  alignItems: 'center',
-                }}
-              >
-                <DynamicFilterBar
-                  availableFilters={availableFilterDefinitions}
-                  activeFilters={activeFilters}
-                  onFilterAdd={handleFilterAdd}
-                  onFilterRemove={handleFilterRemove}
-                  onFilterChange={handleDynamicFilterChange}
-                  onOperatorChange={handleOperatorChange}
-                />
-
-                {/* Column Settings Button */}
-                <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <ViewColumnIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
+        </Box>
       </Box>
 
       {/* Game Worlds Table */}

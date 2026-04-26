@@ -997,232 +997,230 @@ const StoreProductsPage: React.FC = () => {
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               gap: 2,
+              alignItems: 'center',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
+              flex: 1,
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                flex: 1,
+            <SearchTextField
+              placeholder={t('storeProducts.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(value) => {
+                setSearchTerm(value);
+                setPage(0);
               }}
-            >
-              <SearchTextField
-                placeholder={t('storeProducts.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(value) => {
-                  setSearchTerm(value);
-                  setPage(0);
-                }}
-              />
+            />
 
-              <DynamicFilterBar
-                availableFilters={availableFilterDefinitions}
-                activeFilters={activeFilters}
-                onFilterAdd={handleFilterAdd}
-                onFilterRemove={handleFilterRemove}
-                onFilterChange={handleDynamicFilterChange}
-                onOperatorChange={handleOperatorChange}
-                afterFilterAddActions={
+            <DynamicFilterBar
+              availableFilters={availableFilterDefinitions}
+              activeFilters={activeFilters}
+              onFilterAdd={handleFilterAdd}
+              onFilterRemove={handleFilterRemove}
+              onFilterChange={handleDynamicFilterChange}
+              onOperatorChange={handleOperatorChange}
+              afterFilterAddActions={
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Tooltip title={t('common.columnSettings')}>
+                    <IconButton
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <ViewColumnIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 1,
-                      flexShrink: 0,
+                      gap: 0,
+                      ml: 1,
+                      borderRadius: 1,
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      overflow: 'hidden',
                     }}
                   >
-                    <Tooltip title={t('common.columnSettings')}>
-                      <IconButton
-                        onClick={(e) =>
-                          setColumnSettingsAnchor(e.currentTarget)
-                        }
-                        sx={{
-                          bgcolor: 'background.paper',
-                          border: 1,
-                          borderColor: 'divider',
-                          '&:hover': {
-                            bgcolor: 'action.hover',
-                          },
-                        }}
-                      >
-                        <ViewColumnIcon />
-                      </IconButton>
-                    </Tooltip>
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 0,
-                        ml: 1,
-                        borderRadius: 1,
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        overflow: 'hidden',
+                        gap: 0.75,
+                        px: 1.5,
+                        py: 0.5,
                       }}
                     >
                       <Box
                         sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.75,
-                          px: 1.5,
-                          py: 0.5,
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: 'primary.main',
                         }}
-                      >
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: 'primary.main',
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ whiteSpace: 'nowrap' }}
-                        >
-                          {t('storeProducts.statsTotal')}{' '}
-                          <strong style={{ color: 'inherit' }}>
-                            {productStats.total}
-                          </strong>
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
                       />
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.75,
-                          px: 1.5,
-                          py: 0.5,
-                        }}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ whiteSpace: 'nowrap' }}
                       >
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: 'success.main',
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ whiteSpace: 'nowrap' }}
-                        >
-                          {t('storeProducts.statsActive')}{' '}
-                          <strong style={{ color: 'inherit' }}>
-                            {productStats.active}
-                          </strong>
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
-                      />
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.75,
-                          px: 1.5,
-                          py: 0.5,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: 'text.disabled',
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ whiteSpace: 'nowrap' }}
-                        >
-                          {t('storeProducts.statsInactive')}{' '}
-                          <strong style={{ color: 'inherit' }}>
-                            {productStats.inactive}
-                          </strong>
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
-                      />
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.75,
-                          px: 1.5,
-                          py: 0.5,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: 'warning.main',
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ whiteSpace: 'nowrap' }}
-                        >
-                          {t('storeProducts.statsOverridden', '오버라이드')}{' '}
-                          <strong style={{ color: 'inherit' }}>
-                            {productStats.overridden}
-                          </strong>
-                        </Typography>
-                      </Box>
+                        {t('storeProducts.statsTotal')}{' '}
+                        <strong style={{ color: 'inherit' }}>
+                          {productStats.total}
+                        </strong>
+                      </Typography>
                     </Box>
-
-                    {/* Divider and Batch Process Button */}
-                    <Divider orientation="vertical" flexItem sx={{ mx: 1.5 }} />
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<BatchProcessIcon />}
-                      onClick={() => setBatchProcessDialogOpen(true)}
-                      sx={{ whiteSpace: 'nowrap' }}
+                    <Box
+                      sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                        px: 1.5,
+                        py: 0.5,
+                      }}
                     >
-                      {t('storeProducts.batchProcess')}
-                    </Button>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: 'success.main',
+                        }}
+                      />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {t('storeProducts.statsActive')}{' '}
+                        <strong style={{ color: 'inherit' }}>
+                          {productStats.active}
+                        </strong>
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                        px: 1.5,
+                        py: 0.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: 'text.disabled',
+                        }}
+                      />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {t('storeProducts.statsInactive')}{' '}
+                        <strong style={{ color: 'inherit' }}>
+                          {productStats.inactive}
+                        </strong>
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                        px: 1.5,
+                        py: 0.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: 'warning.main',
+                        }}
+                      />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {t('storeProducts.statsOverridden', '오버라이드')}{' '}
+                        <strong style={{ color: 'inherit' }}>
+                          {productStats.overridden}
+                        </strong>
+                      </Typography>
+                    </Box>
                   </Box>
-                }
-              />
-            </Box>
 
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Tooltip title={t('common.refresh')}>
-                <span>
-                  <IconButton
+                  {/* Divider and Batch Process Button */}
+                  <Divider orientation="vertical" flexItem sx={{ mx: 1.5 }} />
+                  <Button
+                    variant="contained"
                     size="small"
-                    onClick={loadProducts}
-                    disabled={loading}
+                    startIcon={<BatchProcessIcon />}
+                    onClick={() => setBatchProcessDialogOpen(true)}
+                    sx={{ whiteSpace: 'nowrap' }}
                   >
-                    <RefreshIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
+                    {t('storeProducts.batchProcess')}
+                  </Button>
+                </Box>
+              }
+            />
           </Box>
+
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={loadProducts}
+                  disabled={loading}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        </Box>
       </Box>
 
       {/* Bulk Actions */}

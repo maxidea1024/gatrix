@@ -210,7 +210,11 @@ router.post('/register', serverAuthBase, async (req: any, res: any) => {
 
     // Unsecured tokens provide environment name (e.g., 'development') instead of ULID.
     // Resolve to actual ULID via DB lookup for consistent service discovery filtering.
-    if (environmentId && req.isUnsecuredToken && !/^[0-9A-Z]{26}$/.test(environmentId)) {
+    if (
+      environmentId &&
+      req.isUnsecuredToken &&
+      !/^[0-9A-Z]{26}$/.test(environmentId)
+    ) {
       const env = await Environment.getByFullPath(
         req.unsecuredOrgId,
         req.unsecuredProjectId,

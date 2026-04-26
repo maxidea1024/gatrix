@@ -603,62 +603,62 @@ const FeatureSegmentsPage: React.FC = () => {
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'nowrap',
+            justifyContent: 'space-between',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               gap: 2,
+              alignItems: 'center',
               flexWrap: 'nowrap',
-              justifyContent: 'space-between',
+              flexGrow: 1,
+              minWidth: 0,
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'nowrap',
-                flexGrow: 1,
-                minWidth: 0,
+            <SearchTextField
+              placeholder={t('common.search')}
+              value={searchTerm}
+              onChange={(value) => {
+                setSearchTerm(value);
+                setPage(0);
               }}
-            >
-              <SearchTextField
-                placeholder={t('common.search')}
-                value={searchTerm}
-                onChange={(value) => {
-                  setSearchTerm(value);
-                  setPage(0);
-                }}
-              />
+            />
 
-              {/* Dynamic Filter Bar */}
-              <DynamicFilterBar
-                availableFilters={availableFilterDefinitions}
-                activeFilters={activeFilters}
-                onFilterAdd={handleFilterAdd}
-                onFilterRemove={handleFilterRemove}
-                onFilterChange={handleFilterChange}
-                onRefresh={loadSegments}
-                refreshDisabled={loading}
-                noWrap={true}
-                afterFilterAddActions={
-                  <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <ViewColumnIcon />
-                    </IconButton>
-                  </Tooltip>
-                }
-              />
-            </Box>
+            {/* Dynamic Filter Bar */}
+            <DynamicFilterBar
+              availableFilters={availableFilterDefinitions}
+              activeFilters={activeFilters}
+              onFilterAdd={handleFilterAdd}
+              onFilterRemove={handleFilterRemove}
+              onFilterChange={handleFilterChange}
+              onRefresh={loadSegments}
+              refreshDisabled={loading}
+              noWrap={true}
+              afterFilterAddActions={
+                <Tooltip title={t('common.columnSettings')}>
+                  <IconButton
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
+                  >
+                    <ViewColumnIcon />
+                  </IconButton>
+                </Tooltip>
+              }
+            />
           </Box>
+        </Box>
       </Box>
 
       {/* Table */}
