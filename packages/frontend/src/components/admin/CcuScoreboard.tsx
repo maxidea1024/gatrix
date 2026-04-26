@@ -301,11 +301,15 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         flexDirection: 'column',
         overflow: 'hidden',
         cursor: 'default',
-        animation: 'scoreboardFadeIn 0.6s ease-out both',
-        '@keyframes scoreboardFadeIn': {
-          '0%': { opacity: 0 },
-          '100%': { opacity: 1 },
-        },
+        ...(flashIn
+          ? {} // Skip fade-in; the white flash overlay handles the transition
+          : {
+              animation: 'scoreboardFadeIn 0.6s ease-out both',
+              '@keyframes scoreboardFadeIn': {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
+              },
+            }),
       }}
     >
       {/* Daytime ocean background image */}

@@ -150,17 +150,13 @@ const PlayerConnectionsPage: React.FC = () => {
     () => sessionStorage.getItem(SCOREBOARD_STORAGE_KEY) === 'true'
   );
   const [flashIn, setFlashIn] = useState(false);
+  const [transitionOverlay, setTransitionOverlay] = useState(false);
 
   // Countdown state
-  const COUNTDOWN_DDAY_KEY = 'gx_countdown_dday';
   const [countdownOpen, setCountdownOpen] = useState(false);
   const [ddayDialogOpen, setDdayDialogOpen] = useState(false);
-  const [ddayDate, setDdayDate] = useState<string>(
-    () => localStorage.getItem(COUNTDOWN_DDAY_KEY) || ''
-  );
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(
-    null
-  );
+  const [ddayDate, setDdayDate] = useState<string>('');
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
 
   // World card sort (persisted)
   const SORT_STORAGE_KEY = 'playerConnections.worldSort';
@@ -357,27 +353,44 @@ const PlayerConnectionsPage: React.FC = () => {
         <CountdownScoreboard
           ddayTarget={new Date(ddayDate)}
           onCountdownComplete={() => {
-            // Mount CCU behind countdown first, then remove countdown next frame
+            // Show page-level overlay immediately to cover the gap
+            setTransitionOverlay(true);
             setFlashIn(true);
             setScoreboardOpen(true);
             sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
             requestAnimationFrame(() => {
               setCountdownOpen(false);
+              // Remove overlay after CCU has rendered
+              setTimeout(() => setTransitionOverlay(false), 500);
             });
           }}
           onSkipToCcu={() => {
-            localStorage.removeItem(COUNTDOWN_DDAY_KEY);
-            // Mount CCU behind countdown first, then remove countdown next frame
+            // Show page-level overlay immediately to cover the gap
+            setTransitionOverlay(true);
             setFlashIn(true);
             setScoreboardOpen(true);
             sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
             requestAnimationFrame(() => {
               setDdayDate('');
               setCountdownOpen(false);
+              setTimeout(() => setTransitionOverlay(false), 500);
             });
           }}
           onClose={() => {
             setCountdownOpen(false);
+          }}
+        />
+      )}
+
+      {/* Page-level transition overlay to cover countdown→CCU gap */}
+      {transitionOverlay && (
+        <Box
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2147483647,
+            bgcolor: '#fff',
+            pointerEvents: 'none',
           }}
         />
       )}
@@ -543,7 +556,6 @@ const PlayerConnectionsPage: React.FC = () => {
                 disabled={!ddayIsFuture}
                 onClick={() => {
                   if (ddayDate) {
-                    localStorage.setItem(COUNTDOWN_DDAY_KEY, ddayDate);
                     setDdayDialogOpen(false);
                     setCountdownOpen(true);
                     document.documentElement
@@ -661,6 +673,7 @@ const PlayerConnectionsPage: React.FC = () => {
               <MenuItem
                 onClick={() => {
                   setMoreMenuAnchor(null);
+                  setDdayDate('');
                   setDdayDialogOpen(true);
                 }}
               >

@@ -350,6 +350,21 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
           />
         </Box>
 
+        {/* Target date display */}
+        <Typography
+          sx={{
+            color: 'rgba(255,255,255,0.8)',
+            fontSize: 'clamp(0.7rem, 1vw, 0.9rem)',
+            fontWeight: 600,
+            mt: 4,
+            letterSpacing: 1,
+            textShadow: '0 1px 6px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.4)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          🎯 {ddayTarget.toLocaleString()} (UTC {ddayTarget.toISOString().slice(0, 16).replace('T', ' ')})
+        </Typography>
+
         {/* "Completed" flash when reaching zero */}
         {timeLeft.total <= 0 && (
           <Typography
