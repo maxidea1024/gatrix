@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -346,6 +346,18 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     };
   }, []);
 
+  // Read background config once (stable across re-renders)
+  const bgConfig = useMemo(() => {
+    const type = localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
+    const url = localStorage.getItem('gx_scoreboard_bg_url') || '';
+    let slideshowImages: string[] = [];
+    try {
+      slideshowImages = JSON.parse(localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]');
+    } catch { /* empty */ }
+    const slideshowInterval = Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
+    return { type, url, slideshowImages, slideshowInterval };
+  }, []);
+
   return (
     <Box
       sx={{
@@ -369,31 +381,18 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             }),
       }}
     >
+      {/* Slideshow background — rendered outside IIFE for stable state */}
+      {bgConfig.type === 'slideshow' && bgConfig.slideshowImages.length > 0 && (
+        <SlideshowBackground
+          images={bgConfig.slideshowImages}
+          interval={bgConfig.slideshowInterval * 1000}
+        />
+      )}
       {/* Configurable background (YouTube video or image) */}
-      {(() => {
-        const bgType =
-          localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
-        const bgUrl = localStorage.getItem('gx_scoreboard_bg_url') || '';
+      {bgConfig.type !== 'slideshow' && (() => {
+        const bgUrl = bgConfig.url;
 
-        if (bgType === 'slideshow') {
-          let imgs: string[] = [];
-          try {
-            imgs = JSON.parse(
-              localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]'
-            );
-          } catch {
-            /* empty */
-          }
-          const interval =
-            Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
-          if (imgs.length > 0) {
-            return (
-              <SlideshowBackground images={imgs} interval={interval * 1000} />
-            );
-          }
-        }
-
-        if (bgType === 'image' && bgUrl) {
+        if (bgConfig.type === 'image' && bgUrl) {
           // Static image background with object-fit: cover
           return (
             <Box

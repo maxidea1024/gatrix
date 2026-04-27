@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -261,6 +261,17 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
 
   const prev = prevTimeRef.current;
 
+  // Read background config once (stable across re-renders)
+  const bgConfig = useMemo(() => {
+    const type = localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
+    let slideshowImages: string[] = [];
+    try {
+      slideshowImages = JSON.parse(localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]');
+    } catch { /* empty */ }
+    const slideshowInterval = Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
+    return { type, slideshowImages, slideshowInterval };
+  }, []);
+
   return (
     <Box
       sx={{
@@ -280,28 +291,14 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
       }}
     >
       {/* Background — slideshow or default ocean */}
-      {(() => {
-        const bgType =
-          localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
-        if (bgType === 'slideshow') {
-          let imgs: string[] = [];
-          try {
-            imgs = JSON.parse(
-              localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]'
-            );
-          } catch {
-            /* empty */
-          }
-          const interval =
-            Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
-          if (imgs.length > 0) {
-            return (
-              <SlideshowBackground images={imgs} interval={interval * 1000} />
-            );
-          }
-        }
-        return <OceanBackground />;
-      })()}
+      {bgConfig.type === 'slideshow' && bgConfig.slideshowImages.length > 0 ? (
+        <SlideshowBackground
+          images={bgConfig.slideshowImages}
+          interval={bgConfig.slideshowInterval * 1000}
+        />
+      ) : (
+        <OceanBackground />
+      )}
 
       {/* Top bar */}
       <Box
