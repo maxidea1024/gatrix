@@ -241,6 +241,23 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
     };
   }, []);
 
+  // Cursor activity tracker — controls show/hide 2s after last mouse move
+  const [cursorActive, setCursorActive] = useState(true);
+  const cursorTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    const onMove = () => {
+      setCursorActive(true);
+      clearTimeout(cursorTimerRef.current);
+      cursorTimerRef.current = setTimeout(() => setCursorActive(false), 2000);
+    };
+    cursorTimerRef.current = setTimeout(() => setCursorActive(false), 2000);
+    window.addEventListener('mousemove', onMove);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      clearTimeout(cursorTimerRef.current);
+    };
+  }, []);
+
   const prev = prevTimeRef.current;
 
   return (
@@ -282,17 +299,17 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
           sx={{
             display: 'flex',
             gap: 0.5,
-            opacity: 0.12,
-            transition: 'opacity 0.3s ease',
-            '&:hover': { opacity: 0.7 },
+            opacity: cursorActive ? 0.8 : 0,
+            transition: 'opacity 0.4s ease',
           }}
         >
           <IconButton
             onClick={onClose}
             size="small"
             sx={{
-              color: 'rgba(255,255,255,0.9)',
-              textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+              color: '#fff',
+              bgcolor: 'rgba(255,255,255,0.25)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' },
             }}
           >
             <CloseIcon fontSize="small" />
@@ -389,16 +406,15 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
         )}
       </Box>
 
-      {/* Skip to CCU button — bottom right, subtle */}
+      {/* Skip to CCU button — bottom right */}
       <Box
         sx={{
           position: 'absolute',
           bottom: 24,
-          right: 24,
+          right: 32,
           zIndex: 10,
-          opacity: 0.12,
-          transition: 'opacity 0.3s ease',
-          '&:hover': { opacity: 0.7 },
+          opacity: cursorActive ? 0.8 : 0,
+          transition: 'opacity 0.4s ease',
         }}
       >
         <IconButton
@@ -408,8 +424,9 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
           }}
           size="small"
           sx={{
-            color: 'rgba(255,255,255,0.9)',
-            textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+            color: '#fff',
+            bgcolor: 'rgba(255,255,255,0.25)',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' },
           }}
         >
           <SkipNextIcon fontSize="medium" />

@@ -4,6 +4,7 @@ import {
   Close as CloseIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
+  ShowChart as ShowChartIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import playerConnectionService, {
@@ -314,6 +315,36 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     );
   }, [totalCount]);
 
+  // Sparkline visibility toggle (default: hidden)
+  const [sparklineVisible, setSparklineVisible] = useState(
+    () => localStorage.getItem('gx_scoreboard_sparkline') === '1'
+  );
+  const handleToggleSparkline = () => {
+    setSparklineVisible((prev) => {
+      const next = !prev;
+      if (next) localStorage.setItem('gx_scoreboard_sparkline', '1');
+      else localStorage.removeItem('gx_scoreboard_sparkline');
+      return next;
+    });
+  };
+
+  // Cursor activity tracker — controls show/hide 2s after last mouse move
+  const [cursorActive, setCursorActive] = useState(true);
+  const cursorTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    const onMove = () => {
+      setCursorActive(true);
+      clearTimeout(cursorTimerRef.current);
+      cursorTimerRef.current = setTimeout(() => setCursorActive(false), 2000);
+    };
+    cursorTimerRef.current = setTimeout(() => setCursorActive(false), 2000);
+    window.addEventListener('mousemove', onMove);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      clearTimeout(cursorTimerRef.current);
+    };
+  }, []);
+
   return (
     <Box
       sx={{
@@ -453,7 +484,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         />
       )}
       {/* Sparkline trend graph — anchored to bottom of viewport */}
-      {!showDetail && (
+      {!showDetail && sparklineVisible && (
         <Sparkline data={historyRef.current} trend={totalTrend} />
       )}
 
@@ -518,16 +549,17 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               sx={{
                 display: 'flex',
                 gap: 0.5,
-                opacity: 0.08,
-                transition: 'opacity 0.3s ease',
-                '&:hover': { opacity: 0.6 },
+                opacity: cursorActive ? 0.8 : 0,
+                transition: 'opacity 0.4s ease',
               }}
             >
               <IconButton
                 onClick={onClose}
                 size="small"
                 sx={{
-                  color: 'rgba(255,255,255,0.8)',
+                  color: '#fff',
+                  bgcolor: 'rgba(255,255,255,0.25)',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' },
                 }}
               >
                 <CloseIcon fontSize="small" />
@@ -816,6 +848,33 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             )}
           </Box>
         </>
+      )}
+      {/* Sparkline toggle button — bottom right */}
+      {!showDetail && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 24,
+            right: 32,
+            zIndex: 10,
+            opacity: cursorActive ? 0.8 : 0,
+            transition: 'opacity 0.4s ease',
+          }}
+        >
+          <IconButton
+            onClick={handleToggleSparkline}
+            size="small"
+            sx={{
+              color: sparklineVisible
+                ? '#fff'
+                : 'rgba(255,255,255,0.6)',
+              bgcolor: 'rgba(255,255,255,0.25)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' },
+            }}
+          >
+            <ShowChartIcon fontSize="small" />
+          </IconButton>
+        </Box>
       )}
       {/* Payment Stats Detail View overlay */}
       {showDetail && paymentStats && (

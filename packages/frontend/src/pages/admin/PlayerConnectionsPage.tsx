@@ -655,6 +655,12 @@ const PlayerConnectionsPage: React.FC = () => {
                 emoji: '🌅',
               },
               {
+                label: 'Galaxy',
+                type: 'youtube',
+                url: 'TNMOlAGvQZc',
+                emoji: '🌌',
+              },
+              {
                 label: '범선 석양',
                 type: 'image',
                 url: '/images/bg_galleon_sunset.png',
@@ -706,7 +712,17 @@ const PlayerConnectionsPage: React.FC = () => {
                 : t('playerConnections.scoreboard.bgSettings.imageUrl')
             }
             value={bgUrl}
-            onChange={(e) => setBgUrl(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setBgUrl(val);
+              // Auto-detect type from URL pattern
+              const trimmed = val.trim();
+              if (/(?:youtube\.com\/|youtu\.be\/|^[a-zA-Z0-9_-]{11}$)/.test(trimmed)) {
+                setBgType('youtube');
+              } else if (/\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmed) || /^\/(images|assets|static)\//.test(trimmed)) {
+                setBgType('image');
+              }
+            }}
             placeholder={
               bgType === 'youtube'
                 ? 'https://www.youtube.com/watch?v=... or VIDEO_ID'
