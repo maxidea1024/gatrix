@@ -719,8 +719,6 @@ const OceanBackground: React.FC = () => {
       ctx.restore();
     }
 
-
-
     function draw() {
       if (!visible) {
         rafRef.current = requestAnimationFrame(draw);

@@ -320,7 +320,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 2147483647,
-        background: 'linear-gradient(180deg, #0a0e17 0%, #111827 40%, #0d1117 100%)',
+        background:
+          'linear-gradient(180deg, #0a0e17 0%, #111827 40%, #0d1117 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -338,7 +339,8 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     >
       {/* Configurable background (YouTube video or image) */}
       {(() => {
-        const bgType = localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
+        const bgType =
+          localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
         const bgUrl = localStorage.getItem('gx_scoreboard_bg_url') || '';
 
         if (bgType === 'image' && bgUrl) {
@@ -451,362 +453,369 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         />
       )}
       {/* Sparkline trend graph — anchored to bottom of viewport */}
-      {!showDetail && <Sparkline data={historyRef.current} trend={totalTrend} />}
+      {!showDetail && (
+        <Sparkline data={historyRef.current} trend={totalTrend} />
+      )}
 
       {/* Top bar + main content — hidden when payment detail is shown */}
       {!showDetail && (
-      <>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          px: 4,
-          py: 2,
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <>
           <Box
-            onClick={handleDotTap}
             sx={{
-              p: 1,
-              m: -1,
-              cursor: 'default',
-              '& > div': {
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                bgcolor: '#00e676',
-                boxShadow: '0 0 12px #00e676, 0 0 4px #00e676',
-                animation: 'livePulse 2s infinite',
-                '@keyframes livePulse': {
-                  '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-                  '50%': { opacity: 0.5, transform: 'scale(0.8)' },
-                },
-              },
-            }}
-          >
-            <div />
-          </Box>
-        </Box>
-
-        <Typography
-          sx={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            color: 'rgba(255,255,255,0.85)',
-            fontFamily: '"Inter", sans-serif',
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: 1.5,
-            textShadow: '0 1px 6px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.4)',
-          }}
-        >
-          {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
-        </Typography>
-
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 0.5,
-            opacity: 0.08,
-            transition: 'opacity 0.3s ease',
-            '&:hover': { opacity: 0.6 },
-          }}
-        >
-          <IconButton
-            onClick={onClose}
-            size="small"
-            sx={{
-              color: 'rgba(255,255,255,0.8)',
-            }}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
-      </Box>
-
-      {/* Main content */}
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 2,
-          px: 4,
-          pb: 4,
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        {/* Total CCU number — hero display */}
-        <Box sx={{ position: 'relative', textAlign: 'center' }}>
-          <Typography
-            key={animKey}
-            sx={{
-              fontWeight: 900,
-              fontSize: 'clamp(6.6rem, min(19.2vw, 33.6vh), 16.8rem)',
-              lineHeight: 1,
-              color: '#fff',
-              fontFamily: '"Inter", "Roboto Mono", monospace',
-              fontVariantNumeric: 'tabular-nums',
-              transition: 'color 0.3s ease',
-              position: 'relative',
-              animation:
-                animKey > 0
-                  ? 'rumble 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both'
-                  : 'none',
-              '@keyframes rumble': {
-                '0%': { transform: 'translate(0, 0)' },
-                '15%': { transform: 'translate(-2px, -2px)' },
-                '30%': { transform: 'translate(2px, 2px)' },
-                '45%': { transform: 'translate(-2px, 2px)' },
-                '60%': { transform: 'translate(2px, -2px)' },
-                '75%': { transform: 'translate(-1px, -1px)' },
-                '100%': { transform: 'translate(0, 0)' },
-              },
-              textShadow:
-                '0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
-            }}
-          >
-            {animatedTotal === 0 ? '0' : animatedTotal.toLocaleString()}
-          </Typography>
-
-          {/* CCU label */}
-          <Typography
-            sx={{
-              color: 'rgba(255,255,255,0.6)',
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              letterSpacing: 3,
-              textTransform: 'uppercase',
-              mt: 0.5,
-              textShadow: '0 1px 6px rgba(0,0,0,0.8)',
-            }}
-          >
-            {t('playerConnections.scoreboard.concurrentUsers')}
-          </Typography>
-
-          {/* Total registered accounts & characters — subtle secondary metrics */}
-          {(totalRegistered !== null || totalCharacters !== null) && (
-            <Box
-              sx={{
-                mt: 3.5,
-                display: 'flex',
-                gap: 6,
-                justifyContent: 'center',
-              }}
-            >
-              {totalRegistered !== null && (
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography
-                    sx={{
-                      color: 'rgba(255,255,255,0.7)',
-                      fontFamily: '"Inter", "Roboto Mono", monospace',
-                      fontVariantNumeric: 'tabular-nums',
-                      fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
-                    }}
-                  >
-                    {totalRegistered.toLocaleString()}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: 'rgba(255,255,255,0.4)',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      letterSpacing: 2.5,
-                      textTransform: 'uppercase',
-                      mt: 0.5,
-                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-                    }}
-                  >
-                    {t('playerConnections.scoreboard.totalAccounts')}
-                  </Typography>
-                </Box>
-              )}
-              {totalCharacters !== null && (
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography
-                    sx={{
-                      color: 'rgba(255,255,255,0.7)',
-                      fontFamily: '"Inter", "Roboto Mono", monospace',
-                      fontVariantNumeric: 'tabular-nums',
-                      fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
-                    }}
-                  >
-                    {totalCharacters.toLocaleString()}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: 'rgba(255,255,255,0.4)',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      letterSpacing: 2.5,
-                      textTransform: 'uppercase',
-                      mt: 0.5,
-                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-                    }}
-                  >
-                    {t('playerConnections.scoreboard.totalCharacters')}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          )}
-
-          {totalCount === 0 && (
-            <Typography
-              sx={{
-                color: 'rgba(255,255,255,0.5)',
-                fontSize: '1.2rem',
-                fontWeight: 500,
-                mt: 3,
-                letterSpacing: 1,
-                textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-                animation: 'fadeInOut 3s ease-in-out infinite',
-                '@keyframes fadeInOut': {
-                  '0%, 100%': { opacity: 0.3 },
-                  '50%': { opacity: 0.6 },
-                },
-              }}
-            >
-              ⛵ {t('playerConnections.scoreboard.waitingForAdventurers')}
-            </Typography>
-          )}
-
-          {/* Login queue counter */}
-          {loginQueueData && loginQueueData.total > 0 && (
-            <Typography
-              sx={{
-                color: 'rgba(255,200,50,0.8)',
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                mt: 2,
-                letterSpacing: 1,
-                textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-              }}
-            >
-              ⏳ {t('playerConnections.queue.total')}:{' '}
-              {loginQueueData.total.toLocaleString()}
-            </Typography>
-          )}
-        </Box>
-
-        {/* Delta & Trend — always reserve space, fade in/out */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 1.5,
-            minHeight: 40,
-            opacity: totalDelta !== 0 ? 1 : 0,
-            transition: 'opacity 0.4s ease',
-          }}
-        >
-          {totalDelta > 0 ? (
-            <TrendingUpIcon sx={{ color: TREND_COLORS.up, fontSize: 28 }} />
-          ) : totalDelta < 0 ? (
-            <TrendingDownIcon sx={{ color: TREND_COLORS.down, fontSize: 28 }} />
-          ) : null}
-          <Typography
-            sx={{
-              color: TREND_COLORS[totalTrend],
-              fontWeight: 700,
-              fontSize: '1.5rem',
-              fontFamily: '"Inter", monospace',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {totalDelta > 0 ? '+' : ''}
-            {totalDelta.toLocaleString()}
-          </Typography>
-        </Box>
-
-        {/* Bot count */}
-        {(ccuData?.botTotal ?? 0) > 0 && (
-          <Typography
-            sx={{
-              color: 'rgba(255,255,255,0.4)',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-            }}
-          >
-            🤖 Bots: {ccuData!.botTotal.toLocaleString()}
-          </Typography>
-        )}
-
-        {/* Payment stats — anchored to bottom without affecting center layout */}
-        {paymentStats && (
-          <Box
-            onClick={() => {
-              setShowDetail(true);
-            }}
-            sx={{
-              position: 'absolute',
-              bottom: 32,
-              left: 0,
-              right: 0,
               display: 'flex',
-              gap: 8,
-              justifyContent: 'center',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              cursor: 'pointer',
-              py: 1.5,
-              transition: 'opacity 0.2s ease',
-              '&:hover': { opacity: 0.8 },
+              px: 4,
+              py: 2,
+              position: 'relative',
+              zIndex: 1,
             }}
           >
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box
+                onClick={handleDotTap}
                 sx={{
-                  color: 'rgba(255,255,255,0.65)',
-                  fontFamily: '"Inter", "Roboto Mono", monospace',
-                  fontVariantNumeric: 'tabular-nums',
-                  fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                  p: 1,
+                  m: -1,
+                  cursor: 'default',
+                  '& > div': {
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: '#00e676',
+                    boxShadow: '0 0 12px #00e676, 0 0 4px #00e676',
+                    animation: 'livePulse 2s infinite',
+                    '@keyframes livePulse': {
+                      '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                      '50%': { opacity: 0.5, transform: 'scale(0.8)' },
+                    },
+                  },
                 }}
               >
-                ¥{paymentStats.totalAmount.toLocaleString()} (₩
-                {Math.round(paymentStats.totalAmount * 216.48).toLocaleString()}
-                )
+                <div />
+              </Box>
+            </Box>
+
+            <Typography
+              sx={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                color: 'rgba(255,255,255,0.85)',
+                fontFamily: '"Inter", sans-serif',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: 1.5,
+                textShadow:
+                  '0 1px 6px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.4)',
+              }}
+            >
+              {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
+            </Typography>
+
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 0.5,
+                opacity: 0.08,
+                transition: 'opacity 0.3s ease',
+                '&:hover': { opacity: 0.6 },
+              }}
+            >
+              <IconButton
+                onClick={onClose}
+                size="small"
+                sx={{
+                  color: 'rgba(255,255,255,0.8)',
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+
+          {/* Main content */}
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 2,
+              px: 4,
+              pb: 4,
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            {/* Total CCU number — hero display */}
+            <Box sx={{ position: 'relative', textAlign: 'center' }}>
+              <Typography
+                key={animKey}
+                sx={{
+                  fontWeight: 900,
+                  fontSize: 'clamp(6.6rem, min(19.2vw, 33.6vh), 16.8rem)',
+                  lineHeight: 1,
+                  color: '#fff',
+                  fontFamily: '"Inter", "Roboto Mono", monospace',
+                  fontVariantNumeric: 'tabular-nums',
+                  transition: 'color 0.3s ease',
+                  position: 'relative',
+                  animation:
+                    animKey > 0
+                      ? 'rumble 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both'
+                      : 'none',
+                  '@keyframes rumble': {
+                    '0%': { transform: 'translate(0, 0)' },
+                    '15%': { transform: 'translate(-2px, -2px)' },
+                    '30%': { transform: 'translate(2px, 2px)' },
+                    '45%': { transform: 'translate(-2px, 2px)' },
+                    '60%': { transform: 'translate(2px, -2px)' },
+                    '75%': { transform: 'translate(-1px, -1px)' },
+                    '100%': { transform: 'translate(0, 0)' },
+                  },
+                  textShadow:
+                    '0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
+                }}
+              >
+                {animatedTotal === 0 ? '0' : animatedTotal.toLocaleString()}
               </Typography>
+
+              {/* CCU label */}
               <Typography
                 sx={{
-                  color: 'rgba(255,255,255,0.35)',
-                  fontSize: '0.7rem',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '0.9rem',
                   fontWeight: 600,
-                  letterSpacing: 2,
+                  letterSpacing: 3,
                   textTransform: 'uppercase',
                   mt: 0.5,
+                  textShadow: '0 1px 6px rgba(0,0,0,0.8)',
+                }}
+              >
+                {t('playerConnections.scoreboard.concurrentUsers')}
+              </Typography>
+
+              {/* Total registered accounts & characters — subtle secondary metrics */}
+              {(totalRegistered !== null || totalCharacters !== null) && (
+                <Box
+                  sx={{
+                    mt: 3.5,
+                    display: 'flex',
+                    gap: 6,
+                    justifyContent: 'center',
+                  }}
+                >
+                  {totalRegistered !== null && (
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography
+                        sx={{
+                          color: 'rgba(255,255,255,0.7)',
+                          fontFamily: '"Inter", "Roboto Mono", monospace',
+                          fontVariantNumeric: 'tabular-nums',
+                          fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                          fontWeight: 700,
+                          lineHeight: 1,
+                          textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                        }}
+                      >
+                        {totalRegistered.toLocaleString()}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: 'rgba(255,255,255,0.4)',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          letterSpacing: 2.5,
+                          textTransform: 'uppercase',
+                          mt: 0.5,
+                          textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                        }}
+                      >
+                        {t('playerConnections.scoreboard.totalAccounts')}
+                      </Typography>
+                    </Box>
+                  )}
+                  {totalCharacters !== null && (
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography
+                        sx={{
+                          color: 'rgba(255,255,255,0.7)',
+                          fontFamily: '"Inter", "Roboto Mono", monospace',
+                          fontVariantNumeric: 'tabular-nums',
+                          fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                          fontWeight: 700,
+                          lineHeight: 1,
+                          textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                        }}
+                      >
+                        {totalCharacters.toLocaleString()}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: 'rgba(255,255,255,0.4)',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          letterSpacing: 2.5,
+                          textTransform: 'uppercase',
+                          mt: 0.5,
+                          textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                        }}
+                      >
+                        {t('playerConnections.scoreboard.totalCharacters')}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              )}
+
+              {totalCount === 0 && (
+                <Typography
+                  sx={{
+                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: '1.2rem',
+                    fontWeight: 500,
+                    mt: 3,
+                    letterSpacing: 1,
+                    textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                    animation: 'fadeInOut 3s ease-in-out infinite',
+                    '@keyframes fadeInOut': {
+                      '0%, 100%': { opacity: 0.3 },
+                      '50%': { opacity: 0.6 },
+                    },
+                  }}
+                >
+                  ⛵ {t('playerConnections.scoreboard.waitingForAdventurers')}
+                </Typography>
+              )}
+
+              {/* Login queue counter */}
+              {loginQueueData && loginQueueData.total > 0 && (
+                <Typography
+                  sx={{
+                    color: 'rgba(255,200,50,0.8)',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    mt: 2,
+                    letterSpacing: 1,
+                    textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  ⏳ {t('playerConnections.queue.total')}:{' '}
+                  {loginQueueData.total.toLocaleString()}
+                </Typography>
+              )}
+            </Box>
+
+            {/* Delta & Trend — always reserve space, fade in/out */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1.5,
+                minHeight: 40,
+                opacity: totalDelta !== 0 ? 1 : 0,
+                transition: 'opacity 0.4s ease',
+              }}
+            >
+              {totalDelta > 0 ? (
+                <TrendingUpIcon sx={{ color: TREND_COLORS.up, fontSize: 28 }} />
+              ) : totalDelta < 0 ? (
+                <TrendingDownIcon
+                  sx={{ color: TREND_COLORS.down, fontSize: 28 }}
+                />
+              ) : null}
+              <Typography
+                sx={{
+                  color: TREND_COLORS[totalTrend],
+                  fontWeight: 700,
+                  fontSize: '1.5rem',
+                  fontFamily: '"Inter", monospace',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {totalDelta > 0 ? '+' : ''}
+                {totalDelta.toLocaleString()}
+              </Typography>
+            </Box>
+
+            {/* Bot count */}
+            {(ccuData?.botTotal ?? 0) > 0 && (
+              <Typography
+                sx={{
+                  color: 'rgba(255,255,255,0.4)',
+                  fontSize: '0.8rem',
+                  fontWeight: 500,
                   textShadow: '0 1px 6px rgba(0,0,0,0.7)',
                 }}
               >
-                {t('playerConnections.scoreboard.totalRevenue')}
+                🤖 Bots: {ccuData!.botTotal.toLocaleString()}
               </Typography>
-            </Box>
+            )}
+
+            {/* Payment stats — anchored to bottom without affecting center layout */}
+            {paymentStats && (
+              <Box
+                onClick={() => {
+                  setShowDetail(true);
+                }}
+                sx={{
+                  position: 'absolute',
+                  bottom: 32,
+                  left: 0,
+                  right: 0,
+                  display: 'flex',
+                  gap: 8,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  py: 1.5,
+                  transition: 'opacity 0.2s ease',
+                  '&:hover': { opacity: 0.8 },
+                }}
+              >
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.65)',
+                      fontFamily: '"Inter", "Roboto Mono", monospace',
+                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    ¥{paymentStats.totalAmount.toLocaleString()} (₩
+                    {Math.round(
+                      paymentStats.totalAmount * 216.48
+                    ).toLocaleString()}
+                    )
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.35)',
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      letterSpacing: 2,
+                      textTransform: 'uppercase',
+                      mt: 0.5,
+                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    {t('playerConnections.scoreboard.totalRevenue')}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
-      </>
+        </>
       )}
       {/* Payment Stats Detail View overlay */}
       {showDetail && paymentStats && (

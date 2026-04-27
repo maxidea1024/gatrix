@@ -176,7 +176,8 @@ const PlayerConnectionsPage: React.FC = () => {
   const BG_URL_KEY = 'gx_scoreboard_bg_url';
   const [bgSettingsOpen, setBgSettingsOpen] = useState(false);
   const [bgType, setBgType] = useState<'youtube' | 'image'>(
-    () => (localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') || 'youtube'
+    () =>
+      (localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') || 'youtube'
   );
   const [bgUrl, setBgUrl] = useState(
     () => localStorage.getItem(BG_URL_KEY) || ''
@@ -209,8 +210,7 @@ const PlayerConnectionsPage: React.FC = () => {
   const loadLoginQueue = useCallback(async () => {
     if (!projectApiPath) return;
     try {
-      const data =
-        await playerConnectionService.getLoginQueue(projectApiPath);
+      const data = await playerConnectionService.getLoginQueue(projectApiPath);
       setLoginQueueData(data);
     } catch {
       // Non-critical: silently ignore queue load failures
@@ -617,7 +617,9 @@ const PlayerConnectionsPage: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>{t('playerConnections.scoreboard.bgSettings.title')}</DialogTitle>
+        <DialogTitle>
+          {t('playerConnections.scoreboard.bgSettings.title')}
+        </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <FormControl component="fieldset" sx={{ mt: 1 }}>
             <RadioGroup
@@ -640,14 +642,41 @@ const PlayerConnectionsPage: React.FC = () => {
 
           {/* Presets */}
           {(() => {
-            const BG_PRESETS: { label: string; type: 'youtube' | 'image'; url: string; emoji: string }[] = [
-              { label: 'Calm Sunset', type: 'youtube', url: 'aSk-D86aOtc', emoji: '🌅' },
-              { label: '범선 석양', type: 'image', url: '/images/bg_galleon_sunset.png', emoji: '🖼️' },
-              { label: '해전', type: 'image', url: '/images/bg_naval_battle.png', emoji: '⚔️' },
-              { label: '무역항', type: 'image', url: '/images/bg_trading_port.png', emoji: '🏛️' },
+            const BG_PRESETS: {
+              label: string;
+              type: 'youtube' | 'image';
+              url: string;
+              emoji: string;
+            }[] = [
+              {
+                label: 'Calm Sunset',
+                type: 'youtube',
+                url: 'aSk-D86aOtc',
+                emoji: '🌅',
+              },
+              {
+                label: '범선 석양',
+                type: 'image',
+                url: '/images/bg_galleon_sunset.png',
+                emoji: '🖼️',
+              },
+              {
+                label: '해전',
+                type: 'image',
+                url: '/images/bg_naval_battle.png',
+                emoji: '⚔️',
+              },
+              {
+                label: '무역항',
+                type: 'image',
+                url: '/images/bg_trading_port.png',
+                emoji: '🏛️',
+              },
             ];
             return (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.5 }}>
+              <Box
+                sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.5 }}
+              >
                 {BG_PRESETS.map((p) => {
                   const isActive = bgType === p.type && bgUrl === p.url;
                   return (
@@ -656,7 +685,10 @@ const PlayerConnectionsPage: React.FC = () => {
                       label={`${p.emoji} ${p.label}`}
                       variant={isActive ? 'filled' : 'outlined'}
                       color={isActive ? 'primary' : 'default'}
-                      onClick={() => { setBgType(p.type); setBgUrl(p.url); }}
+                      onClick={() => {
+                        setBgType(p.type);
+                        setBgUrl(p.url);
+                      }}
                       sx={{ fontWeight: 600, cursor: 'pointer' }}
                     />
                   );
@@ -693,7 +725,12 @@ const PlayerConnectionsPage: React.FC = () => {
             <Box sx={{ mt: 2 }}>
               <Typography
                 variant="caption"
-                sx={{ color: 'text.secondary', fontWeight: 600, mb: 1, display: 'block' }}
+                sx={{
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                  mb: 1,
+                  display: 'block',
+                }}
               >
                 {t('playerConnections.scoreboard.bgSettings.preview')}
               </Typography>
@@ -709,29 +746,31 @@ const PlayerConnectionsPage: React.FC = () => {
                   bgcolor: '#000',
                 }}
               >
-                {bgType === 'youtube' ? (() => {
-                  let vid = bgUrl.trim();
-                  const m = vid.match(
-                    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-                  );
-                  if (m) vid = m[1];
-                  vid = vid.replace(/[?&].*$/, '').slice(0, 11);
-                  return (
-                    <Box
-                      component="iframe"
-                      src={`https://www.youtube.com/embed/${vid}?autoplay=0&mute=1&controls=1&modestbranding=1`}
-                      allow="encrypted-media"
-                      frameBorder="0"
-                      sx={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                      }}
-                    />
-                  );
-                })() : (
+                {bgType === 'youtube' ? (
+                  (() => {
+                    let vid = bgUrl.trim();
+                    const m = vid.match(
+                      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                    );
+                    if (m) vid = m[1];
+                    vid = vid.replace(/[?&].*$/, '').slice(0, 11);
+                    return (
+                      <Box
+                        component="iframe"
+                        src={`https://www.youtube.com/embed/${vid}?autoplay=0&mute=1&controls=1&modestbranding=1`}
+                        allow="encrypted-media"
+                        frameBorder="0"
+                        sx={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          border: 'none',
+                        }}
+                      />
+                    );
+                  })()
+                ) : (
                   <Box
                     component="img"
                     src={bgUrl.trim()}
@@ -759,7 +798,9 @@ const PlayerConnectionsPage: React.FC = () => {
           <Button
             variant="contained"
             disabled={
-              bgType === ((localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') || 'youtube') &&
+              bgType ===
+                ((localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') ||
+                  'youtube') &&
               bgUrl === (localStorage.getItem(BG_URL_KEY) || '')
             }
             onClick={() => {
@@ -1374,7 +1415,16 @@ const PlayerConnectionsPage: React.FC = () => {
                           const worldEntries = Object.entries(
                             loginQueueData.world
                           );
-                          if (worldEntries.length === 0) return <Typography variant="h5" fontWeight={700} color="warning.main">-</Typography>;
+                          if (worldEntries.length === 0)
+                            return (
+                              <Typography
+                                variant="h5"
+                                fontWeight={700}
+                                color="warning.main"
+                              >
+                                -
+                              </Typography>
+                            );
                           const [topWorldId, topCount] = worldEntries.sort(
                             (a, b) => b[1] - a[1]
                           )[0];
