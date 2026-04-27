@@ -229,7 +229,10 @@ const ProductTable: React.FC<{
               sx={{
                 ...cellSx,
                 textAlign: 'center',
-                color: 'rgba(255,255,255,0.3)',
+                color: 'rgba(255,255,255,0.5)',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                fontFamily: '"Inter", sans-serif',
                 py: 3,
               }}
             >
@@ -359,7 +362,7 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
           zIndex: 0,
           pointerEvents: 'none',
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.65) 100%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.26) 0%, rgba(0,0,0,0.23) 40%, rgba(0,0,0,0.29) 100%)',
         }}
       />
       {/* Content overlay */}
@@ -595,6 +598,7 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 sx={{
                   color: 'rgba(255,255,255,0.5)',
                   fontSize: '0.9rem',
+                  fontWeight: 700,
                   fontFamily: '"Inter", sans-serif',
                   textShadow: '0 1px 4px rgba(0,0,0,0.6)',
                 }}

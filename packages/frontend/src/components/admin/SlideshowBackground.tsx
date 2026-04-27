@@ -59,70 +59,118 @@ const SlideshowBackground = ({
     return arr;
   }, [images]);
 
+  // Compute initial portrait side ONCE so sideA and lastPortraitSideRef agree
+  const initialSide = useMemo<'left' | 'right'>(
+    () => (Math.random() > 0.5 ? 'left' : 'right'),
+    []
+  );
   // Two explicit layers with their own pinned image source AND portrait side
   const [layerA, setLayerA] = useState(shuffled[0] || '');
   const [layerB, setLayerB] = useState('');
-  const [sideA, setSideA] = useState<'left' | 'right'>(
-    Math.random() > 0.5 ? 'left' : 'right'
-  );
+  const [sideA, setSideA] = useState<'left' | 'right'>(initialSide);
   const [sideB, setSideB] = useState<'left' | 'right'>('right');
+  // Which layer is the "current" (fully visible) one — controls opacity
   const [topLayer, setTopLayer] = useState<'A' | 'B'>('A');
   const [fading, setFading] = useState(false);
+  // Which layer is visually in front (higher z-index) — controls stacking
+  // Set at the START of a transition; the incoming layer goes to front.
+  const [frontLayer, setFrontLayer] = useState<'A' | 'B'>('B');
   const idxRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  // Refs to keep advance callback stable (avoids interval reset on every transition)
+  const topLayerRef = useRef<'A' | 'B'>('A');
+  const fadingRef = useRef(false);
+  // Track last portrait side so consecutive portraits always alternate
+  const lastPortraitSideRef = useRef<'left' | 'right'>(
+    isPortrait(shuffled[0] || '') ? initialSide : 'left'
+  );
 
-  // Preload the next image
-  const preloadNext = useCallback(() => {
-    if (shuffled.length < 2) return;
-    const nextIdx = (idxRef.current + 1) % shuffled.length;
-    const img = new Image();
-    img.src = shuffled[nextIdx];
-  }, [shuffled]);
-
-  // Advance to next image
+  // Advance to next image — stable callback, reads mutable refs instead of state
   const advance = useCallback(() => {
     if (shuffled.length < 2) return;
+    // Guard: if a crossfade is already in progress, skip this tick
+    if (fadingRef.current) return;
+
     const nextIdx = (idxRef.current + 1) % shuffled.length;
     const nextSrc = shuffled[nextIdx];
-    idxRef.current = nextIdx;
 
-    const newSide: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right';
-
-    // Set the BACK layer to the next image with its own side, then crossfade
-    if (topLayer === 'A') {
-      setLayerB(nextSrc);
-      setSideB(newSide);
-      requestAnimationFrame(() => {
-        setFading(true);
-        setTimeout(() => {
-          setTopLayer('B');
-          setFading(false);
-        }, CROSSFADE_MS);
-      });
+    // If next image is portrait, force opposite side from last portrait
+    let newSide: 'left' | 'right';
+    if (isPortrait(nextSrc)) {
+      newSide = lastPortraitSideRef.current === 'left' ? 'right' : 'left';
+      lastPortraitSideRef.current = newSide;
     } else {
-      setLayerA(nextSrc);
-      setSideA(newSide);
-      requestAnimationFrame(() => {
-        setFading(true);
-        setTimeout(() => {
-          setTopLayer('A');
-          setFading(false);
-        }, CROSSFADE_MS);
-      });
+      newSide = Math.random() > 0.5 ? 'left' : 'right';
     }
 
-    // Preload the one after
-    const afterIdx = (nextIdx + 1) % shuffled.length;
-    const preImg = new Image();
-    preImg.src = shuffled[afterIdx];
-  }, [shuffled, topLayer]);
+    // Lock fading immediately to prevent double-advance
+    fadingRef.current = true;
+    idxRef.current = nextIdx;
+
+    // Ensure image is fully loaded before starting the crossfade
+    let fired = false;
+    const doTransition = () => {
+      if (fired) return;
+      fired = true;
+
+      if (topLayerRef.current === 'A') {
+        setFrontLayer('B');
+        setLayerB(nextSrc);
+        setSideB(newSide);
+        requestAnimationFrame(() => {
+          setFading(true);
+          setTimeout(() => {
+            topLayerRef.current = 'B';
+            setTopLayer('B');
+            fadingRef.current = false;
+            setFading(false);
+          }, CROSSFADE_MS);
+        });
+      } else {
+        setFrontLayer('A');
+        setLayerA(nextSrc);
+        setSideA(newSide);
+        requestAnimationFrame(() => {
+          setFading(true);
+          setTimeout(() => {
+            topLayerRef.current = 'A';
+            setTopLayer('A');
+            fadingRef.current = false;
+            setFading(false);
+          }, CROSSFADE_MS);
+        });
+      }
+
+      // Preload 2 images ahead
+      for (let offset = 1; offset <= 2; offset++) {
+        const aheadIdx = (nextIdx + offset) % shuffled.length;
+        const img = new Image();
+        img.src = shuffled[aheadIdx];
+      }
+    };
+
+    const preload = new Image();
+    preload.src = nextSrc;
+    if (preload.complete) {
+      doTransition();
+    } else {
+      preload.onload = doTransition;
+      preload.onerror = doTransition;
+      setTimeout(doTransition, 3000);
+    }
+  }, [shuffled]);
 
   useEffect(() => {
     if (shuffled.length < 2) return;
-    preloadNext();
+    // Eagerly preload the first few images
+    for (let i = 1; i <= Math.min(3, shuffled.length - 1); i++) {
+      const img = new Image();
+      img.src = shuffled[i];
+    }
+
     timerRef.current = setInterval(advance, interval);
     return () => clearInterval(timerRef.current);
-  }, [advance, interval, shuffled.length, preloadNext]);
+  }, [advance, interval, shuffled.length]);
 
   if (shuffled.length === 0) return null;
 
@@ -143,18 +191,12 @@ const SlideshowBackground = ({
             inset: 0,
             zIndex: zIdx,
             opacity,
-            transition: fading
-              ? `opacity ${CROSSFADE_MS}ms ease-in-out`
-              : 'none',
-            background: [
-              'radial-gradient(ellipse 80% 60% at 50% 110%, rgba(60,35,80,0.95) 0%, transparent 70%)',
-              'radial-gradient(ellipse 70% 50% at 85% 15%, rgba(80,45,30,0.7) 0%, transparent 60%)',
-              'radial-gradient(ellipse 70% 50% at 15% 25%, rgba(20,50,90,0.7) 0%, transparent 60%)',
-              'linear-gradient(150deg, #10182c 0%, #1e1428 25%, #24182a 50%, #14203a 75%, #0c1220 100%)',
-            ].join(', '),
+            transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
+            background: 'linear-gradient(180deg, #0f1628 0%, #1a1e3a 20%, #2a2040 45%, #1e1832 70%, #12101e 100%)',
           }}
         >
           <Box
+            key={src}
             component="img"
             src={src}
             alt=""
@@ -167,6 +209,23 @@ const SlideshowBackground = ({
               objectFit: 'contain',
               objectPosition: 'bottom',
               filter: 'drop-shadow(0 0 40px rgba(0,0,0,0.8))',
+              animation: `portraitReveal ${CROSSFADE_MS * 1.2}ms cubic-bezier(0.22, 1, 0.36, 1) both`,
+              '@keyframes portraitReveal': {
+                '0%': {
+                  transform: 'scale(0.96) translateY(2%)',
+                  filter:
+                    'drop-shadow(0 0 40px rgba(0,0,0,0.8)) brightness(1.4)',
+                },
+                '60%': {
+                  transform: 'scale(1.0) translateY(0%)',
+                  filter:
+                    'drop-shadow(0 0 60px rgba(200,180,255,0.3)) brightness(1.08)',
+                },
+                '100%': {
+                  transform: 'scale(1.0) translateY(0%)',
+                  filter: 'drop-shadow(0 0 40px rgba(0,0,0,0.8)) brightness(1)',
+                },
+              },
             }}
           />
         </Box>
@@ -188,17 +247,18 @@ const SlideshowBackground = ({
           objectPosition: 'center center',
           zIndex: zIdx,
           opacity,
-          transition: fading ? `opacity ${CROSSFADE_MS}ms ease-in-out` : 'none',
+          transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
         }}
       />
     );
   };
 
-  // The top layer is fully visible; the back layer fades in on top during transition
+  // Opacity: topLayer is always visible; the other is visible only during fading
   const aOpacity = topLayer === 'A' ? 1 : fading ? 1 : 0;
   const bOpacity = topLayer === 'B' ? 1 : fading ? 1 : 0;
-  const aZ = topLayer === 'A' ? 0 : 1;
-  const bZ = topLayer === 'B' ? 0 : 1;
+  // Z-index: frontLayer is always on top — set at transition START, never flipped at END
+  const aZ = frontLayer === 'A' ? 1 : 0;
+  const bZ = frontLayer === 'B' ? 1 : 0;
 
   return (
     <>

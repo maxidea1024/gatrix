@@ -71,7 +71,16 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
-  const [timeRange, setTimeRange] = useState('24h');
+  const [timeRange, setTimeRangeRaw] = useState(
+    () => localStorage.getItem('ccu-time-range') || '24h'
+  );
+  const setTimeRange = useCallback((v: string) => {
+    setTimeRangeRaw(v);
+    localStorage.setItem('ccu-time-range', v);
+  }, []);
+  const [showLegend] = useState(
+    () => localStorage.getItem('ccu-show-legend') !== 'false'
+  );
 
   const getDateRange = useCallback(() => {
     const opt = TIME_RANGES.find((r) => r.value === timeRange);
@@ -167,7 +176,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true,
+          display: showLegend,
           position: 'top' as const,
           labels: {
             boxWidth: 12,
@@ -199,7 +208,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
         intersect: false,
       },
     }),
-    []
+    [showLegend]
   );
 
   return (

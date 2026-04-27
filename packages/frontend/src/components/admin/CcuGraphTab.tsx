@@ -15,11 +15,15 @@ import {
   TableRow,
   alpha,
   useTheme,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   People as PeopleIcon,
   SmartToy as BotIcon,
   Groups as AllIcon,
+  Visibility as LegendOnIcon,
+  VisibilityOff as LegendOffIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -288,12 +292,27 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
-  const [timeRange, setTimeRange] = useState(
-    () => searchParams.get('range') || '24h'
+  const [timeRange, setTimeRangeRaw] = useState(
+    () => searchParams.get('range') || localStorage.getItem('ccu-time-range') || '24h'
   );
-  const [displayMode, setDisplayMode] = useState<'all' | 'users' | 'bots'>(
-    'all'
+  const setTimeRange = useCallback((v: string) => {
+    setTimeRangeRaw(v);
+    localStorage.setItem('ccu-time-range', v);
+  }, []);
+  const [displayMode, setDisplayModeRaw] = useState<'all' | 'users' | 'bots'>(
+    () => (localStorage.getItem('ccu-display-mode') as 'all' | 'users' | 'bots') || 'all'
   );
+  const setDisplayMode = useCallback((v: 'all' | 'users' | 'bots') => {
+    setDisplayModeRaw(v);
+    localStorage.setItem('ccu-display-mode', v);
+  }, []);
+  const [showLegend, setShowLegendRaw] = useState(
+    () => localStorage.getItem('ccu-show-legend') !== 'false'
+  );
+  const setShowLegend = useCallback((v: boolean) => {
+    setShowLegendRaw(v);
+    localStorage.setItem('ccu-show-legend', String(v));
+  }, []);
 
   const getDateRange = useCallback(() => {
     const opt = TIME_RANGES.find((r) => r.value === timeRange);
@@ -437,7 +456,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: true, position: 'top' as const },
+        legend: { display: showLegend, position: 'top' as const },
         tooltip: { mode: 'index' as const, intersect: false },
       },
       scales: {
@@ -458,7 +477,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
         intersect: false,
       },
     }),
-    []
+    [showLegend]
   );
 
   return (
@@ -501,6 +520,11 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
             onClick={() => setDisplayMode('bots')}
             sx={{ borderRadius: 1.5 }}
           />
+          <Tooltip title={showLegend ? t('playerConnections.ccuGraph.hideLegend') : t('playerConnections.ccuGraph.showLegend')}>
+            <IconButton size="small" onClick={() => setShowLegend(!showLegend)} sx={{ ml: 0.5 }}>
+              {showLegend ? <LegendOnIcon fontSize="small" /> : <LegendOffIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
         </Stack>
         <ToggleButtonGroup
           value={timeRange}
