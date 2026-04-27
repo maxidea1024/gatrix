@@ -49,12 +49,13 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
     return arr;
   }, [images]);
 
-  // Two explicit layers with their own pinned image source
+  // Two explicit layers with their own pinned image source AND portrait side
   const [layerA, setLayerA] = useState(shuffled[0] || '');
   const [layerB, setLayerB] = useState('');
+  const [sideA, setSideA] = useState<'left' | 'right'>(Math.random() > 0.5 ? 'left' : 'right');
+  const [sideB, setSideB] = useState<'left' | 'right'>('right');
   const [topLayer, setTopLayer] = useState<'A' | 'B'>('A');
   const [fading, setFading] = useState(false);
-  const [portraitSide, setPortraitSide] = useState<'left' | 'right'>('right');
   const idxRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -73,13 +74,12 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
     const nextSrc = shuffled[nextIdx];
     idxRef.current = nextIdx;
 
-    // Randomize portrait side
-    setPortraitSide(Math.random() > 0.5 ? 'left' : 'right');
+    const newSide: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right';
 
-    // Set the BACK layer to the next image, then crossfade
+    // Set the BACK layer to the next image with its own side, then crossfade
     if (topLayer === 'A') {
       setLayerB(nextSrc);
-      // Small delay to let browser paint the new src before fading
+      setSideB(newSide);
       requestAnimationFrame(() => {
         setFading(true);
         setTimeout(() => {
@@ -89,6 +89,7 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
       });
     } else {
       setLayerA(nextSrc);
+      setSideA(newSide);
       requestAnimationFrame(() => {
         setFading(true);
         setTimeout(() => {
@@ -113,7 +114,7 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
 
   if (shuffled.length === 0) return null;
 
-  const renderLayer = (src: string, opacity: number, zIdx: number) => {
+  const renderLayer = (src: string, opacity: number, zIdx: number, side: 'left' | 'right') => {
     if (!src) return null;
     const portrait = isPortrait(src);
 
@@ -128,7 +129,7 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
             transition: fading ? `opacity ${CROSSFADE_MS}ms ease-in-out` : 'none',
             display: 'flex',
             alignItems: 'flex-end',
-            justifyContent: portraitSide === 'left' ? 'flex-start' : 'flex-end',
+            justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
             background: 'linear-gradient(180deg, #080c18 0%, #0d1520 100%)',
           }}
         >
@@ -171,8 +172,6 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
   };
 
   // The top layer is fully visible; the back layer fades in on top during transition
-  // When topLayer=A: A is z0 (visible), B fades in on z1
-  // When topLayer=B: B is z0 (visible), A fades in on z1
   const aOpacity = topLayer === 'A' ? 1 : fading ? 1 : 0;
   const bOpacity = topLayer === 'B' ? 1 : fading ? 1 : 0;
   const aZ = topLayer === 'A' ? 0 : 1;
@@ -180,10 +179,11 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
 
   return (
     <>
-      {renderLayer(layerA, aOpacity, aZ)}
-      {renderLayer(layerB, bOpacity, bZ)}
+      {renderLayer(layerA, aOpacity, aZ, sideA)}
+      {renderLayer(layerB, bOpacity, bZ, sideB)}
     </>
   );
 };
 
 export default SlideshowBackground;
+
