@@ -1,24 +1,23 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
 
 /** All available slideshow images — auto-discovered at build time */
-export const SLIDESHOW_LANDSCAPES = Array.from({ length: 26 }, (_, i) => {
-  const n = String(i + 1).padStart(2, '0');
-  // landscape 10, 12, 14, 15, 19 are jpg, rest png
-  const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
-  return `/images/slideshow/uwo_landscape_${n}.${ext}`;
-});
+export const SLIDESHOW_LANDSCAPES = Array.from(
+  { length: 26 },
+  (_, i) => {
+    const n = String(i + 1).padStart(2, '0');
+    // landscape 10, 12, 14, 15, 19 are jpg, rest png
+    const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
+    return `/images/slideshow/uwo_landscape_${n}.${ext}`;
+  }
+);
 
 export const SLIDESHOW_PORTRAITS = Array.from(
   { length: 24 },
-  (_, i) =>
-    `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
+  (_, i) => `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
 );
 
-export const ALL_SLIDESHOW_IMAGES = [
-  ...SLIDESHOW_LANDSCAPES,
-  ...SLIDESHOW_PORTRAITS,
-];
+export const ALL_SLIDESHOW_IMAGES = [...SLIDESHOW_LANDSCAPES, ...SLIDESHOW_PORTRAITS];
 
 /** Check if a path is a portrait image */
 const isPortrait = (src: string) => src.includes('portrait');
@@ -39,12 +38,19 @@ interface SlideshowBackgroundProps {
  * - Landscape images fill the screen with object-fit: cover
  * - Portrait images appear on a random side (left/right) with a dark BG
  */
-const SlideshowBackground = ({
-  images,
-  interval,
-}: SlideshowBackgroundProps) => {
+const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => {
+  // Shuffle images once on mount so portraits/landscapes are interspersed
+  const shuffled = useMemo(() => {
+    const arr = [...images];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [images]);
+
   // Two explicit layers with their own pinned image source
-  const [layerA, setLayerA] = useState(images[0] || '');
+  const [layerA, setLayerA] = useState(shuffled[0] || '');
   const [layerB, setLayerB] = useState('');
   const [topLayer, setTopLayer] = useState<'A' | 'B'>('A');
   const [fading, setFading] = useState(false);
@@ -54,17 +60,17 @@ const SlideshowBackground = ({
 
   // Preload the next image
   const preloadNext = useCallback(() => {
-    if (images.length < 2) return;
-    const nextIdx = (idxRef.current + 1) % images.length;
+    if (shuffled.length < 2) return;
+    const nextIdx = (idxRef.current + 1) % shuffled.length;
     const img = new Image();
-    img.src = images[nextIdx];
-  }, [images]);
+    img.src = shuffled[nextIdx];
+  }, [shuffled]);
 
   // Advance to next image
   const advance = useCallback(() => {
-    if (images.length < 2) return;
-    const nextIdx = (idxRef.current + 1) % images.length;
-    const nextSrc = images[nextIdx];
+    if (shuffled.length < 2) return;
+    const nextIdx = (idxRef.current + 1) % shuffled.length;
+    const nextSrc = shuffled[nextIdx];
     idxRef.current = nextIdx;
 
     // Randomize portrait side
@@ -93,19 +99,19 @@ const SlideshowBackground = ({
     }
 
     // Preload the one after
-    const afterIdx = (nextIdx + 1) % images.length;
+    const afterIdx = (nextIdx + 1) % shuffled.length;
     const preImg = new Image();
-    preImg.src = images[afterIdx];
-  }, [images, topLayer]);
+    preImg.src = shuffled[afterIdx];
+  }, [shuffled, topLayer]);
 
   useEffect(() => {
-    if (images.length < 2) return;
+    if (shuffled.length < 2) return;
     preloadNext();
     timerRef.current = setInterval(advance, interval);
     return () => clearInterval(timerRef.current);
-  }, [advance, interval, images.length, preloadNext]);
+  }, [advance, interval, shuffled.length, preloadNext]);
 
-  if (images.length === 0) return null;
+  if (shuffled.length === 0) return null;
 
   const renderLayer = (src: string, opacity: number, zIdx: number) => {
     if (!src) return null;
@@ -119,9 +125,7 @@ const SlideshowBackground = ({
             inset: 0,
             zIndex: zIdx,
             opacity,
-            transition: fading
-              ? `opacity ${CROSSFADE_MS}ms ease-in-out`
-              : 'none',
+            transition: fading ? `opacity ${CROSSFADE_MS}ms ease-in-out` : 'none',
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: portraitSide === 'left' ? 'flex-start' : 'flex-end',
