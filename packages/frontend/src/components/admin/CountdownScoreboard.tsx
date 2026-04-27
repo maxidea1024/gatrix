@@ -266,9 +266,14 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
     const type = localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
     let slideshowImages: string[] = [];
     try {
-      slideshowImages = JSON.parse(localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]');
-    } catch { /* empty */ }
-    const slideshowInterval = Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
+      slideshowImages = JSON.parse(
+        localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]'
+      );
+    } catch {
+      /* empty */
+    }
+    const slideshowInterval =
+      Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
     return { type, slideshowImages, slideshowInterval };
   }, []);
 

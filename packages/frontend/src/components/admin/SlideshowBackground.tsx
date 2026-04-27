@@ -2,22 +2,23 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Box from '@mui/material/Box';
 
 /** All available slideshow images — auto-discovered at build time */
-export const SLIDESHOW_LANDSCAPES = Array.from(
-  { length: 26 },
-  (_, i) => {
-    const n = String(i + 1).padStart(2, '0');
-    // landscape 10, 12, 14, 15, 19 are jpg, rest png
-    const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
-    return `/images/slideshow/uwo_landscape_${n}.${ext}`;
-  }
-);
+export const SLIDESHOW_LANDSCAPES = Array.from({ length: 26 }, (_, i) => {
+  const n = String(i + 1).padStart(2, '0');
+  // landscape 10, 12, 14, 15, 19 are jpg, rest png
+  const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
+  return `/images/slideshow/uwo_landscape_${n}.${ext}`;
+});
 
 export const SLIDESHOW_PORTRAITS = Array.from(
   { length: 24 },
-  (_, i) => `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
+  (_, i) =>
+    `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
 );
 
-export const ALL_SLIDESHOW_IMAGES = [...SLIDESHOW_LANDSCAPES, ...SLIDESHOW_PORTRAITS];
+export const ALL_SLIDESHOW_IMAGES = [
+  ...SLIDESHOW_LANDSCAPES,
+  ...SLIDESHOW_PORTRAITS,
+];
 
 /** Check if a path is a portrait image */
 const isPortrait = (src: string) => src.includes('portrait');
@@ -38,7 +39,10 @@ interface SlideshowBackgroundProps {
  * - Landscape images fill the screen with object-fit: cover
  * - Portrait images appear on a random side (left/right) with a dark BG
  */
-const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => {
+const SlideshowBackground = ({
+  images,
+  interval,
+}: SlideshowBackgroundProps) => {
   // Two explicit layers with their own pinned image source
   const [layerA, setLayerA] = useState(images[0] || '');
   const [layerB, setLayerB] = useState('');
@@ -115,7 +119,9 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
             inset: 0,
             zIndex: zIdx,
             opacity,
-            transition: fading ? `opacity ${CROSSFADE_MS}ms ease-in-out` : 'none',
+            transition: fading
+              ? `opacity ${CROSSFADE_MS}ms ease-in-out`
+              : 'none',
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: portraitSide === 'left' ? 'flex-start' : 'flex-end',

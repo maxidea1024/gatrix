@@ -186,7 +186,10 @@ const PlayerConnectionsPage: React.FC = () => {
   const [bgSettingsOpen, setBgSettingsOpen] = useState(false);
   const [bgType, setBgType] = useState<'youtube' | 'image' | 'slideshow'>(
     () =>
-      (localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image' | 'slideshow') || 'youtube'
+      (localStorage.getItem(BG_TYPE_KEY) as
+        | 'youtube'
+        | 'image'
+        | 'slideshow') || 'youtube'
   );
   const [bgUrl, setBgUrl] = useState(
     () => localStorage.getItem(BG_URL_KEY) || ''
@@ -194,7 +197,9 @@ const PlayerConnectionsPage: React.FC = () => {
   const [slideshowImages, setSlideshowImages] = useState<string[]>(() => {
     try {
       return JSON.parse(localStorage.getItem(BG_SLIDESHOW_KEY) || '[]');
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
   const [slideshowInterval, setSlideshowInterval] = useState(
     () => Number(localStorage.getItem(BG_INTERVAL_KEY)) || 20
@@ -642,7 +647,9 @@ const PlayerConnectionsPage: React.FC = () => {
             <RadioGroup
               row
               value={bgType}
-              onChange={(e) => setBgType(e.target.value as 'youtube' | 'image' | 'slideshow')}
+              onChange={(e) =>
+                setBgType(e.target.value as 'youtube' | 'image' | 'slideshow')
+              }
             >
               <FormControlLabel
                 value="youtube"
@@ -777,7 +784,8 @@ const PlayerConnectionsPage: React.FC = () => {
             <Box sx={{ mt: 2 }}>
               {/* Interval slider */}
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                {t('playerConnections.scoreboard.bgSettings.slideshowInterval')}: {slideshowInterval}s
+                {t('playerConnections.scoreboard.bgSettings.slideshowInterval')}
+                : {slideshowInterval}s
               </Typography>
               <Slider
                 value={slideshowInterval}
@@ -801,25 +809,57 @@ const PlayerConnectionsPage: React.FC = () => {
                   variant="outlined"
                   onClick={() => setSlideshowImages([...ALL_SLIDESHOW_IMAGES])}
                 >
-                  {t('playerConnections.scoreboard.bgSettings.slideshowSelectAll')}
+                  {t(
+                    'playerConnections.scoreboard.bgSettings.slideshowSelectAll'
+                  )}
                 </Button>
                 <Button
                   size="small"
                   variant="outlined"
                   onClick={() => setSlideshowImages([])}
                 >
-                  {t('playerConnections.scoreboard.bgSettings.slideshowDeselectAll')}
+                  {t(
+                    'playerConnections.scoreboard.bgSettings.slideshowDeselectAll'
+                  )}
                 </Button>
-                <Typography variant="caption" sx={{ ml: 'auto', alignSelf: 'center', color: 'text.secondary' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    ml: 'auto',
+                    alignSelf: 'center',
+                    color: 'text.secondary',
+                  }}
+                >
                   {slideshowImages.length} / {ALL_SLIDESHOW_IMAGES.length}
                 </Typography>
               </Box>
 
               {/* Landscape images */}
-              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mt: 1 }}>
-                🌊 {t('playerConnections.scoreboard.bgSettings.slideshowLandscapes')} ({SLIDESHOW_LANDSCAPES.length})
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  color: 'text.secondary',
+                  display: 'block',
+                  mt: 1,
+                }}
+              >
+                🌊{' '}
+                {t(
+                  'playerConnections.scoreboard.bgSettings.slideshowLandscapes'
+                )}{' '}
+                ({SLIDESHOW_LANDSCAPES.length})
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 0.5,
+                  mt: 0.5,
+                  maxHeight: 200,
+                  overflowY: 'auto',
+                }}
+              >
                 {SLIDESHOW_LANDSCAPES.map((img) => {
                   const checked = slideshowImages.includes(img);
                   return (
@@ -827,7 +867,9 @@ const PlayerConnectionsPage: React.FC = () => {
                       key={img}
                       onClick={() => {
                         setSlideshowImages((prev) =>
-                          checked ? prev.filter((x) => x !== img) : [...prev, img]
+                          checked
+                            ? prev.filter((x) => x !== img)
+                            : [...prev, img]
                         );
                       }}
                       sx={{
@@ -848,15 +890,36 @@ const PlayerConnectionsPage: React.FC = () => {
                         component="img"
                         src={img}
                         alt=""
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
                       />
                       {checked && (
-                        <Box sx={{
-                          position: 'absolute', top: 0, right: 0,
-                          bgcolor: 'primary.main', borderRadius: '0 0 0 4px',
-                          width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                          <Typography sx={{ fontSize: 10, color: '#fff', fontWeight: 700 }}>✓</Typography>
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            bgcolor: 'primary.main',
+                            borderRadius: '0 0 0 4px',
+                            width: 16,
+                            height: 16,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: 10,
+                              color: '#fff',
+                              fontWeight: 700,
+                            }}
+                          >
+                            ✓
+                          </Typography>
                         </Box>
                       )}
                     </Box>
@@ -865,10 +928,31 @@ const PlayerConnectionsPage: React.FC = () => {
               </Box>
 
               {/* Portrait images */}
-              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mt: 1.5 }}>
-                👤 {t('playerConnections.scoreboard.bgSettings.slideshowPortraits')} ({SLIDESHOW_PORTRAITS.length})
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  color: 'text.secondary',
+                  display: 'block',
+                  mt: 1.5,
+                }}
+              >
+                👤{' '}
+                {t(
+                  'playerConnections.scoreboard.bgSettings.slideshowPortraits'
+                )}{' '}
+                ({SLIDESHOW_PORTRAITS.length})
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 0.5,
+                  mt: 0.5,
+                  maxHeight: 200,
+                  overflowY: 'auto',
+                }}
+              >
                 {SLIDESHOW_PORTRAITS.map((img) => {
                   const checked = slideshowImages.includes(img);
                   return (
@@ -876,7 +960,9 @@ const PlayerConnectionsPage: React.FC = () => {
                       key={img}
                       onClick={() => {
                         setSlideshowImages((prev) =>
-                          checked ? prev.filter((x) => x !== img) : [...prev, img]
+                          checked
+                            ? prev.filter((x) => x !== img)
+                            : [...prev, img]
                         );
                       }}
                       sx={{
@@ -897,15 +983,36 @@ const PlayerConnectionsPage: React.FC = () => {
                         component="img"
                         src={img}
                         alt=""
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
                       />
                       {checked && (
-                        <Box sx={{
-                          position: 'absolute', top: 0, right: 0,
-                          bgcolor: 'primary.main', borderRadius: '0 0 0 4px',
-                          width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                          <Typography sx={{ fontSize: 10, color: '#fff', fontWeight: 700 }}>✓</Typography>
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            bgcolor: 'primary.main',
+                            borderRadius: '0 0 0 4px',
+                            width: 16,
+                            height: 16,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: 10,
+                              color: '#fff',
+                              fontWeight: 700,
+                            }}
+                          >
+                            ✓
+                          </Typography>
                         </Box>
                       )}
                     </Box>
@@ -1010,7 +1117,9 @@ const PlayerConnectionsPage: React.FC = () => {
                         component="img"
                         src={bgUrl.trim()}
                         alt="preview"
-                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                        onError={(
+                          e: React.SyntheticEvent<HTMLImageElement>
+                        ) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}
                         sx={{
@@ -1035,15 +1144,19 @@ const PlayerConnectionsPage: React.FC = () => {
           <Button
             variant="contained"
             disabled={
-              bgType === 'slideshow'
-                ? slideshowImages.length === 0
-                : false
+              bgType === 'slideshow' ? slideshowImages.length === 0 : false
             }
             onClick={() => {
               localStorage.setItem(BG_TYPE_KEY, bgType);
               if (bgType === 'slideshow') {
-                localStorage.setItem(BG_SLIDESHOW_KEY, JSON.stringify(slideshowImages));
-                localStorage.setItem(BG_INTERVAL_KEY, String(slideshowInterval));
+                localStorage.setItem(
+                  BG_SLIDESHOW_KEY,
+                  JSON.stringify(slideshowImages)
+                );
+                localStorage.setItem(
+                  BG_INTERVAL_KEY,
+                  String(slideshowInterval)
+                );
               } else {
                 if (bgUrl.trim()) {
                   localStorage.setItem(BG_URL_KEY, bgUrl.trim());
