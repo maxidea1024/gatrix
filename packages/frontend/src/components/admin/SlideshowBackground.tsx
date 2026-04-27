@@ -156,7 +156,7 @@ const SlideshowBackground = ({
             sx={{
               position: 'absolute',
               bottom: 0,
-              [side]: '-8%',
+              [side]: '-3%',
               height: '95%',
               maxWidth: '50%',
               objectFit: 'contain',
