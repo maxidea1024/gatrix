@@ -50,6 +50,7 @@ import {
   SLIDESHOW_LANDSCAPES,
   SLIDESHOW_PORTRAITS,
   ALL_SLIDESHOW_IMAGES,
+  toThumb,
 } from '../../components/admin/SlideshowBackground';
 import {
   People as PeopleIcon,
@@ -888,7 +889,7 @@ const PlayerConnectionsPage: React.FC = () => {
                     >
                       <Box
                         component="img"
-                        src={img}
+                        src={toThumb(img)}
                         alt=""
                         sx={{
                           width: '100%',
@@ -981,7 +982,7 @@ const PlayerConnectionsPage: React.FC = () => {
                     >
                       <Box
                         component="img"
-                        src={img}
+                        src={toThumb(img)}
                         alt=""
                         sx={{
                           width: '100%',

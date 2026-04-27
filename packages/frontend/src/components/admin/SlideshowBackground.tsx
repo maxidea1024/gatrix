@@ -22,6 +22,10 @@ export const ALL_SLIDESHOW_IMAGES = [
   ...SLIDESHOW_PORTRAITS,
 ];
 
+/** Convert a full-res CDN URL to its 200px thumbnail URL */
+export const toThumb = (url: string): string =>
+  url.replace('/slideshow/', '/slideshow/thumbs/');
+
 /** Check if a path is a portrait image */
 const isPortrait = (src: string) => src.includes('portrait');
 
@@ -142,9 +146,6 @@ const SlideshowBackground = ({
             transition: fading
               ? `opacity ${CROSSFADE_MS}ms ease-in-out`
               : 'none',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
             background: 'linear-gradient(180deg, #080c18 0%, #0d1520 100%)',
           }}
         >
@@ -153,12 +154,14 @@ const SlideshowBackground = ({
             src={src}
             alt=""
             sx={{
+              position: 'absolute',
+              bottom: 0,
+              [side]: '-8%',
               height: '95%',
-              maxWidth: '60%',
+              maxWidth: '50%',
               objectFit: 'contain',
               objectPosition: 'bottom',
               filter: 'drop-shadow(0 0 40px rgba(0,0,0,0.8))',
-              mx: -10,
             }}
           />
         </Box>
