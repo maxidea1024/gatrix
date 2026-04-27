@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -352,9 +358,14 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
     const url = localStorage.getItem('gx_scoreboard_bg_url') || '';
     let slideshowImages: string[] = [];
     try {
-      slideshowImages = JSON.parse(localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]');
-    } catch { /* empty */ }
-    const slideshowInterval = Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
+      slideshowImages = JSON.parse(
+        localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]'
+      );
+    } catch {
+      /* empty */
+    }
+    const slideshowInterval =
+      Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
     return { type, url, slideshowImages, slideshowInterval };
   }, []);
 
@@ -389,78 +400,79 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         />
       )}
       {/* Configurable background (YouTube video or image) */}
-      {bgConfig.type !== 'slideshow' && (() => {
-        const bgUrl = bgConfig.url;
+      {bgConfig.type !== 'slideshow' &&
+        (() => {
+          const bgUrl = bgConfig.url;
 
-        if (bgConfig.type === 'image' && bgUrl) {
-          // Static image background with object-fit: cover
+          if (bgConfig.type === 'image' && bgUrl) {
+            // Static image background with object-fit: cover
+            return (
+              <Box
+                component="img"
+                src={bgUrl}
+                alt=""
+                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center center',
+                  zIndex: 0,
+                }}
+              />
+            );
+          }
+
+          // YouTube video background (default)
+          // Extract video ID from URL or use raw ID
+          let videoId = bgUrl || 'QI3lHS55OaU';
+          const ytMatch = videoId.match(
+            /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+          );
+          if (ytMatch) videoId = ytMatch[1];
+          // Strip any remaining query params from bare ID
+          videoId = videoId.replace(/[?&].*$/, '').slice(0, 11);
+
           return (
             <Box
-              component="img"
-              src={bgUrl}
-              alt=""
-              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
               sx={{
                 position: 'absolute',
                 inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center center',
                 zIndex: 0,
-              }}
-            />
-          );
-        }
-
-        // YouTube video background (default)
-        // Extract video ID from URL or use raw ID
-        let videoId = bgUrl || 'QI3lHS55OaU';
-        const ytMatch = videoId.match(
-          /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-        );
-        if (ytMatch) videoId = ytMatch[1];
-        // Strip any remaining query params from bare ID
-        videoId = videoId.replace(/[?&].*$/, '').slice(0, 11);
-
-        return (
-          <Box
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 0,
-              overflow: 'hidden',
-              pointerEvents: 'none',
-              opacity: 0,
-              animation: 'ytFadeIn 0.8s ease-out 3.5s forwards',
-              '@keyframes ytFadeIn': {
-                '0%': { opacity: 0 },
-                '100%': { opacity: 1 },
-              },
-            }}
-          >
-            <Box
-              component="iframe"
-              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0`}
-              allow="autoplay; encrypted-media"
-              frameBorder="0"
-              tabIndex={-1}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 'max(177.78vh, 100vw)',
-                height: 'max(56.25vw, 100vh)',
-                border: 'none',
+                overflow: 'hidden',
                 pointerEvents: 'none',
+                opacity: 0,
+                animation: 'ytFadeIn 0.8s ease-out 3.5s forwards',
+                '@keyframes ytFadeIn': {
+                  '0%': { opacity: 0 },
+                  '100%': { opacity: 1 },
+                },
               }}
-            />
-          </Box>
-        );
-      })()}
+            >
+              <Box
+                component="iframe"
+                src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0`}
+                allow="autoplay; encrypted-media"
+                frameBorder="0"
+                tabIndex={-1}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 'max(177.78vh, 100vw)',
+                  height: 'max(56.25vw, 100vh)',
+                  border: 'none',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Box>
+          );
+        })()}
       {/* Dark overlay for text readability */}
       <Box
         sx={{

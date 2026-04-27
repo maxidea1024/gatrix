@@ -2,22 +2,23 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
 
 /** All available slideshow images — auto-discovered at build time */
-export const SLIDESHOW_LANDSCAPES = Array.from(
-  { length: 26 },
-  (_, i) => {
-    const n = String(i + 1).padStart(2, '0');
-    // landscape 10, 12, 14, 15, 19 are jpg, rest png
-    const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
-    return `/images/slideshow/uwo_landscape_${n}.${ext}`;
-  }
-);
+export const SLIDESHOW_LANDSCAPES = Array.from({ length: 26 }, (_, i) => {
+  const n = String(i + 1).padStart(2, '0');
+  // landscape 10, 12, 14, 15, 19 are jpg, rest png
+  const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
+  return `/images/slideshow/uwo_landscape_${n}.${ext}`;
+});
 
 export const SLIDESHOW_PORTRAITS = Array.from(
   { length: 24 },
-  (_, i) => `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
+  (_, i) =>
+    `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
 );
 
-export const ALL_SLIDESHOW_IMAGES = [...SLIDESHOW_LANDSCAPES, ...SLIDESHOW_PORTRAITS];
+export const ALL_SLIDESHOW_IMAGES = [
+  ...SLIDESHOW_LANDSCAPES,
+  ...SLIDESHOW_PORTRAITS,
+];
 
 /** Check if a path is a portrait image */
 const isPortrait = (src: string) => src.includes('portrait');
@@ -38,7 +39,10 @@ interface SlideshowBackgroundProps {
  * - Landscape images fill the screen with object-fit: cover
  * - Portrait images appear on a random side (left/right) with a dark BG
  */
-const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => {
+const SlideshowBackground = ({
+  images,
+  interval,
+}: SlideshowBackgroundProps) => {
   // Shuffle images once on mount so portraits/landscapes are interspersed
   const shuffled = useMemo(() => {
     const arr = [...images];
@@ -52,7 +56,9 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
   // Two explicit layers with their own pinned image source AND portrait side
   const [layerA, setLayerA] = useState(shuffled[0] || '');
   const [layerB, setLayerB] = useState('');
-  const [sideA, setSideA] = useState<'left' | 'right'>(Math.random() > 0.5 ? 'left' : 'right');
+  const [sideA, setSideA] = useState<'left' | 'right'>(
+    Math.random() > 0.5 ? 'left' : 'right'
+  );
   const [sideB, setSideB] = useState<'left' | 'right'>('right');
   const [topLayer, setTopLayer] = useState<'A' | 'B'>('A');
   const [fading, setFading] = useState(false);
@@ -114,7 +120,12 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
 
   if (shuffled.length === 0) return null;
 
-  const renderLayer = (src: string, opacity: number, zIdx: number, side: 'left' | 'right') => {
+  const renderLayer = (
+    src: string,
+    opacity: number,
+    zIdx: number,
+    side: 'left' | 'right'
+  ) => {
     if (!src) return null;
     const portrait = isPortrait(src);
 
@@ -126,7 +137,9 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
             inset: 0,
             zIndex: zIdx,
             opacity,
-            transition: fading ? `opacity ${CROSSFADE_MS}ms ease-in-out` : 'none',
+            transition: fading
+              ? `opacity ${CROSSFADE_MS}ms ease-in-out`
+              : 'none',
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
@@ -186,4 +199,3 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
 };
 
 export default SlideshowBackground;
-
