@@ -43,7 +43,14 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Slider,
+  Checkbox,
 } from '@mui/material';
+import {
+  SLIDESHOW_LANDSCAPES,
+  SLIDESHOW_PORTRAITS,
+  ALL_SLIDESHOW_IMAGES,
+} from '../../components/admin/SlideshowBackground';
 import {
   People as PeopleIcon,
   Refresh as RefreshIcon,
@@ -174,13 +181,23 @@ const PlayerConnectionsPage: React.FC = () => {
   // Scoreboard background settings
   const BG_TYPE_KEY = 'gx_scoreboard_bg_type';
   const BG_URL_KEY = 'gx_scoreboard_bg_url';
+  const BG_SLIDESHOW_KEY = 'gx_scoreboard_bg_slideshow';
+  const BG_INTERVAL_KEY = 'gx_scoreboard_bg_interval';
   const [bgSettingsOpen, setBgSettingsOpen] = useState(false);
-  const [bgType, setBgType] = useState<'youtube' | 'image'>(
+  const [bgType, setBgType] = useState<'youtube' | 'image' | 'slideshow'>(
     () =>
-      (localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') || 'youtube'
+      (localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image' | 'slideshow') || 'youtube'
   );
   const [bgUrl, setBgUrl] = useState(
     () => localStorage.getItem(BG_URL_KEY) || ''
+  );
+  const [slideshowImages, setSlideshowImages] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(BG_SLIDESHOW_KEY) || '[]');
+    } catch { return []; }
+  });
+  const [slideshowInterval, setSlideshowInterval] = useState(
+    () => Number(localStorage.getItem(BG_INTERVAL_KEY)) || 20
   );
 
   // World card sort (persisted)
@@ -625,7 +642,7 @@ const PlayerConnectionsPage: React.FC = () => {
             <RadioGroup
               row
               value={bgType}
-              onChange={(e) => setBgType(e.target.value as 'youtube' | 'image')}
+              onChange={(e) => setBgType(e.target.value as 'youtube' | 'image' | 'slideshow')}
             >
               <FormControlLabel
                 value="youtube"
@@ -636,6 +653,11 @@ const PlayerConnectionsPage: React.FC = () => {
                 value="image"
                 control={<Radio />}
                 label={t('playerConnections.scoreboard.bgSettings.image')}
+              />
+              <FormControlLabel
+                value="slideshow"
+                control={<Radio />}
+                label={t('playerConnections.scoreboard.bgSettings.slideshow')}
               />
             </RadioGroup>
           </FormControl>
@@ -751,115 +773,259 @@ const PlayerConnectionsPage: React.FC = () => {
             );
           })()}
 
-          <TextField
-            fullWidth
-            size="small"
-            label={
-              bgType === 'youtube'
-                ? t('playerConnections.scoreboard.bgSettings.youtubeUrl')
-                : t('playerConnections.scoreboard.bgSettings.imageUrl')
-            }
-            value={bgUrl}
-            onChange={(e) => {
-              const val = e.target.value;
-              setBgUrl(val);
-              // Auto-detect type from URL pattern
-              const trimmed = val.trim();
-              if (
-                /(?:youtube\.com\/|youtu\.be\/|^[a-zA-Z0-9_-]{11}$)/.test(
-                  trimmed
-                )
-              ) {
-                setBgType('youtube');
-              } else if (
-                /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmed) ||
-                /^\/(images|assets|static)\//.test(trimmed)
-              ) {
-                setBgType('image');
-              }
-            }}
-            placeholder={
-              bgType === 'youtube'
-                ? 'https://www.youtube.com/watch?v=... or VIDEO_ID'
-                : '/images/my-bg.png or https://...'
-            }
-            helperText={
-              bgType === 'youtube'
-                ? t('playerConnections.scoreboard.bgSettings.youtubeHelp')
-                : t('playerConnections.scoreboard.bgSettings.imageHelp')
-            }
-            sx={{ mt: 2 }}
-          />
-
-          {/* Preview */}
-          {bgUrl.trim() && (
+          {bgType === 'slideshow' ? (
             <Box sx={{ mt: 2 }}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontWeight: 600,
-                  mb: 1,
-                  display: 'block',
-                }}
-              >
-                {t('playerConnections.scoreboard.bgSettings.preview')}
+              {/* Interval slider */}
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                {t('playerConnections.scoreboard.bgSettings.slideshowInterval')}: {slideshowInterval}s
               </Typography>
-              <Box
-                sx={{
-                  position: 'relative',
-                  width: '100%',
-                  pt: '56.25%', // 16:9 aspect ratio
-                  borderRadius: 1,
-                  overflow: 'hidden',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: '#000',
-                }}
-              >
-                {bgType === 'youtube' ? (
-                  (() => {
-                    let vid = bgUrl.trim();
-                    const m = vid.match(
-                      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-                    );
-                    if (m) vid = m[1];
-                    vid = vid.replace(/[?&].*$/, '').slice(0, 11);
-                    return (
+              <Slider
+                value={slideshowInterval}
+                onChange={(_, v) => setSlideshowInterval(v as number)}
+                min={5}
+                max={120}
+                step={5}
+                marks={[
+                  { value: 5, label: '5s' },
+                  { value: 30, label: '30s' },
+                  { value: 60, label: '1m' },
+                  { value: 120, label: '2m' },
+                ]}
+                sx={{ mx: 1, mb: 2 }}
+              />
+
+              {/* Select all / deselect all */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setSlideshowImages([...ALL_SLIDESHOW_IMAGES])}
+                >
+                  {t('playerConnections.scoreboard.bgSettings.slideshowSelectAll')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setSlideshowImages([])}
+                >
+                  {t('playerConnections.scoreboard.bgSettings.slideshowDeselectAll')}
+                </Button>
+                <Typography variant="caption" sx={{ ml: 'auto', alignSelf: 'center', color: 'text.secondary' }}>
+                  {slideshowImages.length} / {ALL_SLIDESHOW_IMAGES.length}
+                </Typography>
+              </Box>
+
+              {/* Landscape images */}
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mt: 1 }}>
+                🌊 {t('playerConnections.scoreboard.bgSettings.slideshowLandscapes')} ({SLIDESHOW_LANDSCAPES.length})
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
+                {SLIDESHOW_LANDSCAPES.map((img) => {
+                  const checked = slideshowImages.includes(img);
+                  return (
+                    <Box
+                      key={img}
+                      onClick={() => {
+                        setSlideshowImages((prev) =>
+                          checked ? prev.filter((x) => x !== img) : [...prev, img]
+                        );
+                      }}
+                      sx={{
+                        width: 80,
+                        height: 50,
+                        borderRadius: 0.5,
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        border: checked ? '2px solid' : '2px solid transparent',
+                        borderColor: checked ? 'primary.main' : 'transparent',
+                        opacity: checked ? 1 : 0.5,
+                        transition: 'all 0.2s',
+                        '&:hover': { opacity: 1 },
+                      }}
+                    >
                       <Box
-                        component="iframe"
-                        src={`https://www.youtube.com/embed/${vid}?autoplay=0&mute=1&controls=1&modestbranding=1`}
-                        allow="encrypted-media"
-                        frameBorder="0"
+                        component="img"
+                        src={img}
+                        alt=""
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      {checked && (
+                        <Box sx={{
+                          position: 'absolute', top: 0, right: 0,
+                          bgcolor: 'primary.main', borderRadius: '0 0 0 4px',
+                          width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <Typography sx={{ fontSize: 10, color: '#fff', fontWeight: 700 }}>✓</Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                })}
+              </Box>
+
+              {/* Portrait images */}
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mt: 1.5 }}>
+                👤 {t('playerConnections.scoreboard.bgSettings.slideshowPortraits')} ({SLIDESHOW_PORTRAITS.length})
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
+                {SLIDESHOW_PORTRAITS.map((img) => {
+                  const checked = slideshowImages.includes(img);
+                  return (
+                    <Box
+                      key={img}
+                      onClick={() => {
+                        setSlideshowImages((prev) =>
+                          checked ? prev.filter((x) => x !== img) : [...prev, img]
+                        );
+                      }}
+                      sx={{
+                        width: 50,
+                        height: 70,
+                        borderRadius: 0.5,
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        border: checked ? '2px solid' : '2px solid transparent',
+                        borderColor: checked ? 'primary.main' : 'transparent',
+                        opacity: checked ? 1 : 0.5,
+                        transition: 'all 0.2s',
+                        '&:hover': { opacity: 1 },
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={img}
+                        alt=""
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      {checked && (
+                        <Box sx={{
+                          position: 'absolute', top: 0, right: 0,
+                          bgcolor: 'primary.main', borderRadius: '0 0 0 4px',
+                          width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <Typography sx={{ fontSize: 10, color: '#fff', fontWeight: 700 }}>✓</Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Box>
+          ) : (
+            <>
+              <TextField
+                fullWidth
+                size="small"
+                label={
+                  bgType === 'youtube'
+                    ? t('playerConnections.scoreboard.bgSettings.youtubeUrl')
+                    : t('playerConnections.scoreboard.bgSettings.imageUrl')
+                }
+                value={bgUrl}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setBgUrl(val);
+                  // Auto-detect type from URL pattern
+                  const trimmed = val.trim();
+                  if (
+                    /(?:youtube\.com\/|youtu\.be\/|^[a-zA-Z0-9_-]{11}$)/.test(
+                      trimmed
+                    )
+                  ) {
+                    setBgType('youtube');
+                  } else if (
+                    /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmed) ||
+                    /^\/(images|assets|static)\//.test(trimmed)
+                  ) {
+                    setBgType('image');
+                  }
+                }}
+                placeholder={
+                  bgType === 'youtube'
+                    ? 'https://www.youtube.com/watch?v=... or VIDEO_ID'
+                    : '/images/my-bg.png or https://...'
+                }
+                helperText={
+                  bgType === 'youtube'
+                    ? t('playerConnections.scoreboard.bgSettings.youtubeHelp')
+                    : t('playerConnections.scoreboard.bgSettings.imageHelp')
+                }
+                sx={{ mt: 2 }}
+              />
+
+              {/* Preview */}
+              {bgUrl.trim() && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                      mb: 1,
+                      display: 'block',
+                    }}
+                  >
+                    {t('playerConnections.scoreboard.bgSettings.preview')}
+                  </Typography>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: '100%',
+                      pt: '56.25%', // 16:9 aspect ratio
+                      borderRadius: 1,
+                      overflow: 'hidden',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      bgcolor: '#000',
+                    }}
+                  >
+                    {bgType === 'youtube' ? (
+                      (() => {
+                        let vid = bgUrl.trim();
+                        const m = vid.match(
+                          /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                        );
+                        if (m) vid = m[1];
+                        vid = vid.replace(/[?&].*$/, '').slice(0, 11);
+                        return (
+                          <Box
+                            component="iframe"
+                            src={`https://www.youtube.com/embed/${vid}?autoplay=0&mute=1&controls=1&modestbranding=1`}
+                            allow="encrypted-media"
+                            frameBorder="0"
+                            sx={{
+                              position: 'absolute',
+                              inset: 0,
+                              width: '100%',
+                              height: '100%',
+                              border: 'none',
+                            }}
+                          />
+                        );
+                      })()
+                    ) : (
+                      <Box
+                        component="img"
+                        src={bgUrl.trim()}
+                        alt="preview"
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                         sx={{
                           position: 'absolute',
                           inset: 0,
                           width: '100%',
                           height: '100%',
-                          border: 'none',
+                          objectFit: 'cover',
                         }}
                       />
-                    );
-                  })()
-                ) : (
-                  <Box
-                    component="img"
-                    src={bgUrl.trim()}
-                    alt="preview"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                    sx={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                )}
-              </Box>
-            </Box>
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </>
           )}
         </DialogContent>
         <DialogActions>
@@ -869,17 +1035,21 @@ const PlayerConnectionsPage: React.FC = () => {
           <Button
             variant="contained"
             disabled={
-              bgType ===
-                ((localStorage.getItem(BG_TYPE_KEY) as 'youtube' | 'image') ||
-                  'youtube') &&
-              bgUrl === (localStorage.getItem(BG_URL_KEY) || '')
+              bgType === 'slideshow'
+                ? slideshowImages.length === 0
+                : false
             }
             onClick={() => {
               localStorage.setItem(BG_TYPE_KEY, bgType);
-              if (bgUrl.trim()) {
-                localStorage.setItem(BG_URL_KEY, bgUrl.trim());
+              if (bgType === 'slideshow') {
+                localStorage.setItem(BG_SLIDESHOW_KEY, JSON.stringify(slideshowImages));
+                localStorage.setItem(BG_INTERVAL_KEY, String(slideshowInterval));
               } else {
-                localStorage.removeItem(BG_URL_KEY);
+                if (bgUrl.trim()) {
+                  localStorage.setItem(BG_URL_KEY, bgUrl.trim());
+                } else {
+                  localStorage.removeItem(BG_URL_KEY);
+                }
               }
               setBgSettingsOpen(false);
               enqueueSnackbar(t('common.saved'), { variant: 'success' });

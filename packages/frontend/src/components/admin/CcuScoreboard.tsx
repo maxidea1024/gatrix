@@ -7,6 +7,7 @@ import {
   ShowChart as ShowChartIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import SlideshowBackground from './SlideshowBackground';
 import playerConnectionService, {
   type CcuData,
   type LoginQueueData,
@@ -373,6 +374,17 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         const bgType =
           localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
         const bgUrl = localStorage.getItem('gx_scoreboard_bg_url') || '';
+
+        if (bgType === 'slideshow') {
+          let imgs: string[] = [];
+          try {
+            imgs = JSON.parse(localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]');
+          } catch { /* empty */ }
+          const interval = Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
+          if (imgs.length > 0) {
+            return <SlideshowBackground images={imgs} interval={interval * 1000} />;
+          }
+        }
 
         if (bgType === 'image' && bgUrl) {
           // Static image background with object-fit: cover
