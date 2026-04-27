@@ -156,7 +156,7 @@ const SlideshowBackground = ({
               objectFit: 'contain',
               objectPosition: 'bottom',
               filter: 'drop-shadow(0 0 40px rgba(0,0,0,0.8))',
-              mx: -4,
+              mx: -10,
             }}
           />
         </Box>
