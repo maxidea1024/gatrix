@@ -293,14 +293,19 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
   const [timeRange, setTimeRangeRaw] = useState(
-    () => searchParams.get('range') || localStorage.getItem('ccu-time-range') || '24h'
+    () =>
+      searchParams.get('range') ||
+      localStorage.getItem('ccu-time-range') ||
+      '24h'
   );
   const setTimeRange = useCallback((v: string) => {
     setTimeRangeRaw(v);
     localStorage.setItem('ccu-time-range', v);
   }, []);
   const [displayMode, setDisplayModeRaw] = useState<'all' | 'users' | 'bots'>(
-    () => (localStorage.getItem('ccu-display-mode') as 'all' | 'users' | 'bots') || 'all'
+    () =>
+      (localStorage.getItem('ccu-display-mode') as 'all' | 'users' | 'bots') ||
+      'all'
   );
   const setDisplayMode = useCallback((v: 'all' | 'users' | 'bots') => {
     setDisplayModeRaw(v);
@@ -520,9 +525,23 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
             onClick={() => setDisplayMode('bots')}
             sx={{ borderRadius: 1.5 }}
           />
-          <Tooltip title={showLegend ? t('playerConnections.ccuGraph.hideLegend') : t('playerConnections.ccuGraph.showLegend')}>
-            <IconButton size="small" onClick={() => setShowLegend(!showLegend)} sx={{ ml: 0.5 }}>
-              {showLegend ? <LegendOnIcon fontSize="small" /> : <LegendOffIcon fontSize="small" />}
+          <Tooltip
+            title={
+              showLegend
+                ? t('playerConnections.ccuGraph.hideLegend')
+                : t('playerConnections.ccuGraph.showLegend')
+            }
+          >
+            <IconButton
+              size="small"
+              onClick={() => setShowLegend(!showLegend)}
+              sx={{ ml: 0.5 }}
+            >
+              {showLegend ? (
+                <LegendOnIcon fontSize="small" />
+              ) : (
+                <LegendOffIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
         </Stack>

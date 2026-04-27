@@ -192,7 +192,8 @@ const SlideshowBackground = ({
             zIndex: zIdx,
             opacity,
             transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
-            background: 'linear-gradient(180deg, #0f1628 0%, #1a1e3a 20%, #2a2040 45%, #1e1832 70%, #12101e 100%)',
+            background:
+              'linear-gradient(180deg, #0f1628 0%, #1a1e3a 20%, #2a2040 45%, #1e1832 70%, #12101e 100%)',
           }}
         >
           <Box
