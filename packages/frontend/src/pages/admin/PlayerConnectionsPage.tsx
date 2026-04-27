@@ -649,34 +649,70 @@ const PlayerConnectionsPage: React.FC = () => {
               emoji: string;
             }[] = [
               {
-                label: 'Calm Sunset',
+                label: t('playerConnections.scoreboard.bgPreset.calmSunset'),
                 type: 'youtube',
                 url: 'aSk-D86aOtc',
                 emoji: '🌅',
               },
               {
-                label: 'Galaxy',
+                label: t('playerConnections.scoreboard.bgPreset.galaxy'),
                 type: 'youtube',
                 url: 'TNMOlAGvQZc',
                 emoji: '🌌',
               },
               {
-                label: '범선 석양',
+                label: t('playerConnections.scoreboard.bgPreset.galleonSunset'),
                 type: 'image',
                 url: '/images/bg_galleon_sunset.png',
                 emoji: '🖼️',
               },
               {
-                label: '해전',
+                label: t('playerConnections.scoreboard.bgPreset.navalBattle'),
                 type: 'image',
                 url: '/images/bg_naval_battle.png',
                 emoji: '⚔️',
               },
               {
-                label: '무역항',
+                label: t('playerConnections.scoreboard.bgPreset.tradingPort'),
                 type: 'image',
                 url: '/images/bg_trading_port.png',
                 emoji: '🏛️',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.voyageHorizon'),
+                type: 'image',
+                url: '/images/bg_voyage_horizon.png',
+                emoji: '⛵',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.tradeFleet'),
+                type: 'image',
+                url: '/images/bg_trade_fleet.png',
+                emoji: '🚢',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.dawnHarbor'),
+                type: 'image',
+                url: '/images/bg_dawn_harbor.png',
+                emoji: '🌄',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.pirateBattle'),
+                type: 'image',
+                url: '/images/bg_pirate_battle.png',
+                emoji: '🏴‍☠️',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.seagullVoyage'),
+                type: 'image',
+                url: '/images/bg_seagull_voyage.png',
+                emoji: '🕊️',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.stormPassage'),
+                type: 'image',
+                url: '/images/bg_storm_passage.png',
+                emoji: '⛈️',
               },
             ];
             return (

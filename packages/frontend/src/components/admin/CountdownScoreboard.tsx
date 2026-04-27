@@ -269,7 +269,7 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        cursor: 'default',
+        cursor: cursorActive ? 'default' : 'none',
         background: '#060a14',
         animation: 'countdownFadeIn 0.8s ease-out both',
         '@keyframes countdownFadeIn': {

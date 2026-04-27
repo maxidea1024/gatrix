@@ -356,7 +356,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        cursor: 'default',
+        cursor: cursorActive ? 'default' : 'none',
         ...(flashIn
           ? {} // Skip fade-in; the white flash overlay handles the transition
           : {
