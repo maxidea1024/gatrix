@@ -281,15 +281,23 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
     >
       {/* Background — slideshow or default ocean */}
       {(() => {
-        const bgType = localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
+        const bgType =
+          localStorage.getItem('gx_scoreboard_bg_type') || 'youtube';
         if (bgType === 'slideshow') {
           let imgs: string[] = [];
           try {
-            imgs = JSON.parse(localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]');
-          } catch { /* empty */ }
-          const interval = Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
+            imgs = JSON.parse(
+              localStorage.getItem('gx_scoreboard_bg_slideshow') || '[]'
+            );
+          } catch {
+            /* empty */
+          }
+          const interval =
+            Number(localStorage.getItem('gx_scoreboard_bg_interval')) || 20;
           if (imgs.length > 0) {
-            return <SlideshowBackground images={imgs} interval={interval * 1000} />;
+            return (
+              <SlideshowBackground images={imgs} interval={interval * 1000} />
+            );
           }
         }
         return <OceanBackground />;

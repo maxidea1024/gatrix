@@ -2,22 +2,23 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Box from '@mui/material/Box';
 
 /** All available slideshow images — auto-discovered at build time */
-export const SLIDESHOW_LANDSCAPES = Array.from(
-  { length: 26 },
-  (_, i) => {
-    const n = String(i + 1).padStart(2, '0');
-    // landscape 10, 12, 14, 15, 19 are jpg, rest png
-    const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
-    return `/images/slideshow/uwo_landscape_${n}.${ext}`;
-  }
-);
+export const SLIDESHOW_LANDSCAPES = Array.from({ length: 26 }, (_, i) => {
+  const n = String(i + 1).padStart(2, '0');
+  // landscape 10, 12, 14, 15, 19 are jpg, rest png
+  const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
+  return `/images/slideshow/uwo_landscape_${n}.${ext}`;
+});
 
 export const SLIDESHOW_PORTRAITS = Array.from(
   { length: 24 },
-  (_, i) => `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
+  (_, i) =>
+    `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
 );
 
-export const ALL_SLIDESHOW_IMAGES = [...SLIDESHOW_LANDSCAPES, ...SLIDESHOW_PORTRAITS];
+export const ALL_SLIDESHOW_IMAGES = [
+  ...SLIDESHOW_LANDSCAPES,
+  ...SLIDESHOW_PORTRAITS,
+];
 
 /** Check if a path is a portrait image */
 const isPortrait = (src: string) => src.includes('portrait');
@@ -34,7 +35,10 @@ interface SlideshowBackgroundProps {
  * - Landscape images fill the screen with object-fit: cover
  * - Portrait images appear on a random side (left/right) with a dark blurred BG
  */
-const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => {
+const SlideshowBackground = ({
+  images,
+  interval,
+}: SlideshowBackgroundProps) => {
   const [activeIdx, setActiveIdx] = useState(0);
   const [showNext, setShowNext] = useState(false);
   const nextIdx = (activeIdx + 1) % images.length;
@@ -69,7 +73,12 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
 
   if (images.length === 0) return null;
 
-  const renderImage = (src: string, opacity: number, zIdx: number, side?: 'left' | 'right') => {
+  const renderImage = (
+    src: string,
+    opacity: number,
+    zIdx: number,
+    side?: 'left' | 'right'
+  ) => {
     const portrait = isPortrait(src);
 
     if (portrait) {
@@ -84,7 +93,8 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
             transition: 'opacity 1.5s ease-in-out',
             display: 'flex',
             alignItems: 'flex-end',
-            justifyContent: (side || portraitSide) === 'left' ? 'flex-start' : 'flex-end',
+            justifyContent:
+              (side || portraitSide) === 'left' ? 'flex-start' : 'flex-end',
             // Dark background behind portrait
             background: 'linear-gradient(180deg, #080c18 0%, #0d1520 100%)',
           }}
@@ -133,7 +143,8 @@ const SlideshowBackground = ({ images, interval }: SlideshowBackgroundProps) => 
       {/* Active layer (always visible) */}
       {renderImage(images[activeIdx], 1, 0, portraitSide)}
       {/* Next layer (fades in on top during transition) */}
-      {images.length > 1 && renderImage(images[nextIdx], showNext ? 1 : 0, 1, portraitSide)}
+      {images.length > 1 &&
+        renderImage(images[nextIdx], showNext ? 1 : 0, 1, portraitSide)}
     </>
   );
 };
