@@ -14,8 +14,7 @@ export const SLIDESHOW_LANDSCAPES = Array.from({ length: 26 }, (_, i) => {
 
 export const SLIDESHOW_PORTRAITS = Array.from(
   { length: 24 },
-  (_, i) =>
-    `${CDN_BASE}/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
+  (_, i) => `${CDN_BASE}/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
 );
 
 export const ALL_SLIDESHOW_IMAGES = [
