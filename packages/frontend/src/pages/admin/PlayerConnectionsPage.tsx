@@ -717,9 +717,16 @@ const PlayerConnectionsPage: React.FC = () => {
               setBgUrl(val);
               // Auto-detect type from URL pattern
               const trimmed = val.trim();
-              if (/(?:youtube\.com\/|youtu\.be\/|^[a-zA-Z0-9_-]{11}$)/.test(trimmed)) {
+              if (
+                /(?:youtube\.com\/|youtu\.be\/|^[a-zA-Z0-9_-]{11}$)/.test(
+                  trimmed
+                )
+              ) {
                 setBgType('youtube');
-              } else if (/\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmed) || /^\/(images|assets|static)\//.test(trimmed)) {
+              } else if (
+                /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmed) ||
+                /^\/(images|assets|static)\//.test(trimmed)
+              ) {
                 setBgType('image');
               }
             }}

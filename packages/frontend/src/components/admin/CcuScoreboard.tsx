@@ -865,9 +865,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
             onClick={handleToggleSparkline}
             size="small"
             sx={{
-              color: sparklineVisible
-                ? '#fff'
-                : 'rgba(255,255,255,0.6)',
+              color: sparklineVisible ? '#fff' : 'rgba(255,255,255,0.6)',
               bgcolor: 'rgba(255,255,255,0.25)',
               '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' },
             }}
