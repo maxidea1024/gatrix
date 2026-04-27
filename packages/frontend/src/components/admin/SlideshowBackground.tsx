@@ -146,7 +146,12 @@ const SlideshowBackground = ({
             transition: fading
               ? `opacity ${CROSSFADE_MS}ms ease-in-out`
               : 'none',
-            background: 'linear-gradient(180deg, #080c18 0%, #0d1520 100%)',
+            background: [
+              'radial-gradient(ellipse at 50% 120%, rgba(26,22,40,0.9) 0%, transparent 60%)',
+              'radial-gradient(ellipse at 80% 20%, rgba(42,28,20,0.5) 0%, transparent 50%)',
+              'radial-gradient(ellipse at 20% 30%, rgba(18,28,45,0.6) 0%, transparent 50%)',
+              'linear-gradient(160deg, #0c1220 0%, #16141e 30%, #1a1520 50%, #121828 70%, #0a0e18 100%)',
+            ].join(', '),
           }}
         >
           <Box
