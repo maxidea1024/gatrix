@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
 
-/** All available slideshow images — auto-discovered at build time */
+/** CDN base URL for slideshow assets (CloudFront → S3) */
+const CDN_BASE = 'https://d4oe5k889c0fy.cloudfront.net/slideshow';
+
+/** All available slideshow images — served via CloudFront CDN */
 export const SLIDESHOW_LANDSCAPES = Array.from({ length: 26 }, (_, i) => {
   const n = String(i + 1).padStart(2, '0');
   // landscape 10, 12, 14, 15, 19 are jpg, rest png
   const ext = [10, 12, 14, 15, 19].includes(i + 1) ? 'jpg' : 'png';
-  return `/images/slideshow/uwo_landscape_${n}.${ext}`;
+  return `${CDN_BASE}/uwo_landscape_${n}.${ext}`;
 });
 
 export const SLIDESHOW_PORTRAITS = Array.from(
   { length: 24 },
   (_, i) =>
-    `/images/slideshow/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
+    `${CDN_BASE}/uwo_portrait_${String(i + 1).padStart(2, '0')}.png`
 );
 
 export const ALL_SLIDESHOW_IMAGES = [
