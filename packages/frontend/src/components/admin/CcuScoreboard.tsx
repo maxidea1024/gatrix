@@ -451,7 +451,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           zIndex: 1,
           pointerEvents: 'none',
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.22) 100%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.5) 100%)',
         }}
       />
       {/* Vignette */}
@@ -462,7 +462,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
           zIndex: 1,
           pointerEvents: 'none',
           background:
-            'radial-gradient(ellipse 75% 65% at center, transparent 40%, rgba(0,0,0,0.25) 100%)',
+            'radial-gradient(ellipse 75% 65% at center, transparent 30%, rgba(0,0,0,0.4) 100%)',
         }}
       />
 
@@ -539,7 +539,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: 1.5,
                 textShadow:
-                  '0 1px 6px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.4)',
+                  '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
               }}
             >
               {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
@@ -609,7 +609,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                     '100%': { transform: 'translate(0, 0)' },
                   },
                   textShadow:
-                    '0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
+                    '0 4px 16px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.5), 0 0 120px rgba(0,0,0,0.3)',
                 }}
               >
                 {animatedTotal === 0 ? '0' : animatedTotal.toLocaleString()}
@@ -624,7 +624,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                   letterSpacing: 3,
                   textTransform: 'uppercase',
                   mt: 0.5,
-                  textShadow: '0 1px 6px rgba(0,0,0,0.8)',
+                  textShadow: '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
                 }}
               >
                 {t('playerConnections.scoreboard.concurrentUsers')}
@@ -650,7 +650,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                           fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
                           fontWeight: 700,
                           lineHeight: 1,
-                          textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                          textShadow: '0 2px 10px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.4)',
                         }}
                       >
                         {totalRegistered.toLocaleString()}
@@ -663,7 +663,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                           letterSpacing: 2.5,
                           textTransform: 'uppercase',
                           mt: 0.5,
-                          textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                          textShadow: '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
                         }}
                       >
                         {t('playerConnections.scoreboard.totalAccounts')}
@@ -711,7 +711,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                     fontWeight: 500,
                     mt: 3,
                     letterSpacing: 1,
-                    textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                    textShadow: '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
                     animation: 'fadeInOut 3s ease-in-out infinite',
                     '@keyframes fadeInOut': {
                       '0%, 100%': { opacity: 0.3 },
@@ -821,7 +821,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                       fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
                       fontWeight: 700,
                       lineHeight: 1,
-                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                      textShadow: '0 2px 10px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.4)',
                     }}
                   >
                     ¥{paymentStats.totalAmount.toLocaleString()} (₩
@@ -838,7 +838,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                       letterSpacing: 2,
                       textTransform: 'uppercase',
                       mt: 0.5,
-                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                      textShadow: '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
                     }}
                   >
                     {t('playerConnections.scoreboard.totalRevenue')}
