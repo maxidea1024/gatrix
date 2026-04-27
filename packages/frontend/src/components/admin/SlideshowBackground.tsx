@@ -147,10 +147,10 @@ const SlideshowBackground = ({
               ? `opacity ${CROSSFADE_MS}ms ease-in-out`
               : 'none',
             background: [
-              'radial-gradient(ellipse at 50% 120%, rgba(26,22,40,0.9) 0%, transparent 60%)',
-              'radial-gradient(ellipse at 80% 20%, rgba(42,28,20,0.5) 0%, transparent 50%)',
-              'radial-gradient(ellipse at 20% 30%, rgba(18,28,45,0.6) 0%, transparent 50%)',
-              'linear-gradient(160deg, #0c1220 0%, #16141e 30%, #1a1520 50%, #121828 70%, #0a0e18 100%)',
+              'radial-gradient(ellipse 80% 60% at 50% 110%, rgba(60,35,80,0.95) 0%, transparent 70%)',
+              'radial-gradient(ellipse 70% 50% at 85% 15%, rgba(80,45,30,0.7) 0%, transparent 60%)',
+              'radial-gradient(ellipse 70% 50% at 15% 25%, rgba(20,50,90,0.7) 0%, transparent 60%)',
+              'linear-gradient(150deg, #10182c 0%, #1e1428 25%, #24182a 50%, #14203a 75%, #0c1220 100%)',
             ].join(', '),
           }}
         >
