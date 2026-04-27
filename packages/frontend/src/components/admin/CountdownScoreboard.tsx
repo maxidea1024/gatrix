@@ -7,7 +7,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import OceanBackground from './OceanBackground';
 
-
 // ─── Types ───
 interface CountdownScoreboardProps {
   ddayTarget: Date;
@@ -260,7 +259,6 @@ const CountdownScoreboard: React.FC<CountdownScoreboardProps> = ({
   }, []);
 
   const prev = prevTimeRef.current;
-
 
   return (
     <Box
