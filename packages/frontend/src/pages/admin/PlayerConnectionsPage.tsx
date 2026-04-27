@@ -714,6 +714,18 @@ const PlayerConnectionsPage: React.FC = () => {
                 url: '/images/bg_storm_passage.png',
                 emoji: '⛈️',
               },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.goldenTrade'),
+                type: 'image',
+                url: '/images/bg_golden_trade.png',
+                emoji: '💰',
+              },
+              {
+                label: t('playerConnections.scoreboard.bgPreset.spiceRoute'),
+                type: 'image',
+                url: '/images/bg_spice_route.png',
+                emoji: '🏝️',
+              },
             ];
             return (
               <Box
