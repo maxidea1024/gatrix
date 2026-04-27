@@ -164,6 +164,17 @@ import { useDebounce } from '../../hooks/useDebounce';
 import ImportDialog from '../../components/common/ImportDialog';
 import ClientStatusIcon from '../../components/common/ClientStatusIcon';
 
+/** Truncate a string in the middle with "…" if it exceeds maxLen. */
+const truncateMiddle = (
+  str: string,
+  maxLen = 45,
+  headLen = 20,
+  tailLen = 15
+): string => {
+  if (!str || str.length <= maxLen) return str;
+  return `${str.slice(0, headLen)}…${str.slice(-tailLen)}`;
+};
+
 // Convert HSV to RGB
 const hsvToRgb = (
   h: number,
@@ -1572,12 +1583,18 @@ const ClientVersionsPage: React.FC = () => {
         case 'gameServerAddress':
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
-              >
-                {clientVersion.gameServerAddress}
-              </Typography>
+              <Tooltip title={clientVersion.gameServerAddress} arrow>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.75rem',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {truncateMiddle(clientVersion.gameServerAddress)}
+                </Typography>
+              </Tooltip>
               <Tooltip title={t('common.copy')}>
                 <IconButton
                   size="small"
@@ -1604,12 +1621,18 @@ const ClientVersionsPage: React.FC = () => {
         case 'patchAddress':
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
-              >
-                {clientVersion.patchAddress}
-              </Typography>
+              <Tooltip title={clientVersion.patchAddress} arrow>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.75rem',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {truncateMiddle(clientVersion.patchAddress)}
+                </Typography>
+              </Tooltip>
               <Tooltip title={t('common.copy')}>
                 <IconButton
                   size="small"
