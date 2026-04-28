@@ -116,11 +116,7 @@ export class CouponGenerationJob {
         if (remaining <= 0) break;
 
         // Process in batches of BATCH_SIZE
-        for (
-          let i = 0;
-          i < remaining;
-          i += this.BATCH_SIZE
-        ) {
+        for (let i = 0; i < remaining; i += this.BATCH_SIZE) {
           const batchSize = Math.min(this.BATCH_SIZE, remaining - i);
 
           // Step 1: Generate candidate codes with local dedup
@@ -173,11 +169,7 @@ export class CouponGenerationJob {
           if (freshCodes.length > 0) {
             // Insert in sub-batches to keep placeholder count reasonable
             const INSERT_SUB_BATCH = 500;
-            for (
-              let s = 0;
-              s < freshCodes.length;
-              s += INSERT_SUB_BATCH
-            ) {
+            for (let s = 0; s < freshCodes.length; s += INSERT_SUB_BATCH) {
               const subBatch = freshCodes.slice(s, s + INSERT_SUB_BATCH);
               const rows = subBatch.map((code) => [
                 ulid(),
@@ -185,17 +177,14 @@ export class CouponGenerationJob {
                 code,
                 environmentId,
               ]);
-              const placeholders = rows
-                .map(() => '(?, ?, ?, ?)')
-                .join(',');
+              const placeholders = rows.map(() => '(?, ?, ?, ?)').join(',');
 
               const [result] = await pool.execute(
                 `INSERT IGNORE INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
                 rows.flat() as string[]
               );
 
-              const inserted =
-                (result as any)?.affectedRows ?? subBatch.length;
+              const inserted = (result as any)?.affectedRows ?? subBatch.length;
               totalGenerated += inserted;
             }
           }
