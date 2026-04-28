@@ -3,24 +3,42 @@
  * Generates coupon codes based on specified pattern
  */
 
+import crypto from 'crypto';
+
 export type CodePattern =
   | 'ALPHANUMERIC_8'
   | 'ALPHANUMERIC_16'
   | 'ALPHANUMERIC_16_HYPHEN';
 
+const CHARSET =
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const CHARSET_LEN = CHARSET.length; // 62
+
 /**
- * Generate a random alphanumeric string
+ * Generate a cryptographically secure random alphanumeric string.
+ * Uses crypto.randomBytes() for uniform distribution over the 62-char charset.
+ * Rejection sampling ensures no modulo bias.
+ *
  * @param length - Length of the string to generate
  * @returns Random alphanumeric string
  */
 function generateRandomAlphanumeric(length: number): string {
-  const chars =
-    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  const result: string[] = [];
+  // 256 % 62 = 8, so values >= 248 are rejected to avoid modulo bias
+  const maxValid = 256 - (256 % CHARSET_LEN); // 248
+
+  while (result.length < length) {
+    // Request extra bytes to account for rejections (~3.1% rejection rate)
+    const needed = length - result.length;
+    const bytes = crypto.randomBytes(needed + 4);
+    for (let i = 0; i < bytes.length && result.length < length; i++) {
+      if (bytes[i] < maxValid) {
+        result.push(CHARSET[bytes[i] % CHARSET_LEN]);
+      }
+    }
   }
-  return result;
+
+  return result.join('');
 }
 
 /**

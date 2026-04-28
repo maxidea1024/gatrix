@@ -1002,14 +1002,19 @@ export class CouponSettingsService {
   }
 
   /**
-   * Generate coupon codes synchronously (for small quantities)
+   * Generate coupon codes synchronously (for small quantities < 10,000).
+   *
+   * Deduplication strategy (3 layers):
+   * 1. In-memory Set prevents duplicates within this generation run
+   * 2. Batch SELECT before INSERT filters codes already in DB
+   * 3. INSERT IGNORE as final safety net against race conditions
    */
   private static async generateCouponCodesSynchronous(
     settingId: string,
     quantity: number
   ): Promise<void> {
-    const BATCH_SIZE = 1000;
-    const DUPLICATE_CHECK_BATCH = 100;
+    const INSERT_BATCH_SIZE = 500;
+    const MAX_GLOBAL_RETRIES = 5;
     const localSet = new Set<string>();
 
     // Get codePattern and environment from settings
@@ -1025,62 +1030,113 @@ export class CouponSettingsService {
       throw new GatrixError('Setting not found or missing environment', 404);
     }
 
-    const codes: Array<{
-      id: string;
-      settingId: string;
-      code: string;
-      environmentId: string;
-    }> = [];
+    let totalInserted = 0;
 
-    // Generate all codes
-    for (let i = 0; i < quantity; i++) {
-      let code: string = '';
-      let found = false;
+    for (let retry = 0; retry < MAX_GLOBAL_RETRIES; retry++) {
+      const remaining = quantity - totalInserted;
+      if (remaining <= 0) break;
 
-      // Try to find a unique code
-      for (let attempt = 0; attempt < 10; attempt++) {
-        code = generateCouponCode(codePattern);
-        if (localSet.has(code)) continue;
+      // Step 1: Generate candidate codes (with local dedup)
+      const candidates: string[] = [];
+      let genAttempts = 0;
+      const maxGenAttempts = remaining * 20; // generous upper bound
 
-        // Check database for duplicates in batches
-        if (i % DUPLICATE_CHECK_BATCH === 0) {
-          const dup = await db('g_coupons')
-            .where('code', code)
-            .select(db.raw('1 as ok'))
-            .first();
-          if (!dup) {
-            found = true;
-            break;
-          }
-        } else {
-          found = true;
-          break;
+      while (candidates.length < remaining && genAttempts < maxGenAttempts) {
+        genAttempts++;
+        const code = generateCouponCode(codePattern);
+        if (!localSet.has(code)) {
+          localSet.add(code);
+          candidates.push(code);
         }
       }
 
-      if (!found) {
-        logger.warn('Failed to generate unique code after 10 attempts', {
+      if (candidates.length === 0) {
+        logger.error('Failed to generate any unique codes', {
           settingId,
-          attempt: i,
+          retry,
+          localSetSize: localSet.size,
         });
-        continue;
+        break;
       }
 
-      localSet.add(code);
-      codes.push({ id: ulid(), settingId, code, environmentId });
+      // Step 2: Batch-check DB for existing codes and filter them out
+      const freshCodes: string[] = [];
+      for (let i = 0; i < candidates.length; i += INSERT_BATCH_SIZE) {
+        const chunk = candidates.slice(i, i + INSERT_BATCH_SIZE);
+        const existing = await db('g_coupons')
+          .whereIn('code', chunk)
+          .select('code');
+        const existingSet = new Set(existing.map((r: any) => r.code));
+
+        for (const code of chunk) {
+          if (!existingSet.has(code)) {
+            freshCodes.push(code);
+          }
+        }
+      }
+
+      // Step 3: Insert in batches using INSERT IGNORE for race condition safety
+      for (let i = 0; i < freshCodes.length; i += INSERT_BATCH_SIZE) {
+        const batch = freshCodes.slice(i, i + INSERT_BATCH_SIZE);
+        const rows = batch.map((code) => ({
+          id: ulid(),
+          settingId,
+          code,
+          environmentId,
+        }));
+
+        try {
+          // Use raw INSERT IGNORE to handle any last-microsecond race conditions
+          const columns = '(id, settingId, code, environmentId)';
+          const placeholders = rows.map(() => '(?, ?, ?, ?)').join(', ');
+          const values = rows.flatMap((r) => [
+            r.id,
+            r.settingId,
+            r.code,
+            r.environmentId,
+          ]);
+
+          const result = await db.raw(
+            `INSERT IGNORE INTO g_coupons ${columns} VALUES ${placeholders}`,
+            values
+          );
+
+          // MySQL returns affectedRows for INSERT IGNORE
+          const inserted = result[0]?.affectedRows ?? batch.length;
+          totalInserted += inserted;
+        } catch (insertError) {
+          logger.error('Batch insert failed', {
+            settingId,
+            batchSize: batch.length,
+            error: insertError,
+          });
+          throw insertError;
+        }
+      }
+
+      if (totalInserted >= quantity) break;
+
+      logger.info('Retrying coupon generation for shortfall', {
+        settingId,
+        retry: retry + 1,
+        totalInserted,
+        target: quantity,
+      });
     }
 
-    // Insert codes in batches
-    if (codes.length > 0) {
-      for (let i = 0; i < codes.length; i += BATCH_SIZE) {
-        const batch = codes.slice(i, i + BATCH_SIZE);
-        await db('g_coupons').insert(batch);
-      }
-
-      // Update issuedCount cache
+    // Update issuedCount cache
+    if (totalInserted > 0) {
       await db('g_coupon_settings')
         .where('id', settingId)
-        .update({ issuedCount: codes.length });
+        .update({ issuedCount: totalInserted });
+    }
+
+    if (totalInserted < quantity) {
+      logger.error('Could not generate all requested codes', {
+        settingId,
+        requested: quantity,
+        generated: totalInserted,
+      });
     }
   }
 

@@ -30,8 +30,7 @@ export interface CouponGenerationJobData {
  * - Use batch INSERT with 2000 codes per batch for better throughput
  */
 export class CouponGenerationJob {
-  private static readonly BATCH_SIZE = 2000; // Insert 2000 codes per batch (6000 placeholders)
-  private static readonly DUPLICATE_CHECK_BATCH = 500; // Check duplicates once per 500 codes
+  private static readonly BATCH_SIZE = 2000;
   private static readonly PROGRESS_UPDATE_INTERVAL = 10000; // Update progress every 10,000 codes
 
   static async process(job: Job<any>): Promise<void> {
@@ -99,10 +98,11 @@ export class CouponGenerationJob {
         throw new Error('Setting not found or missing environment');
       }
 
-      // Generate and insert codes in streaming batches
+      // Generate and insert codes in streaming batches with full dedup
       const localSet = new Set<string>();
       let totalGenerated = 0;
       let lastProgressUpdate = 0;
+      const MAX_GLOBAL_RETRIES = 5;
 
       logger.info('Starting streaming batch generation', {
         settingId,
@@ -111,65 +111,104 @@ export class CouponGenerationJob {
         environmentId,
       });
 
-      for (let i = 0; i < quantity; i += this.BATCH_SIZE) {
-        const batchCodes: Array<[string, string, string, string]> = [];
-        const batchSize = Math.min(this.BATCH_SIZE, quantity - i);
+      for (let retry = 0; retry < MAX_GLOBAL_RETRIES; retry++) {
+        const remaining = quantity - totalGenerated;
+        if (remaining <= 0) break;
 
-        // Generate codes for this batch
-        for (let j = 0; j < batchSize; j++) {
-          let code: string;
-          let found = false;
+        // Process in batches of BATCH_SIZE
+        for (
+          let i = 0;
+          i < remaining;
+          i += this.BATCH_SIZE
+        ) {
+          const batchSize = Math.min(this.BATCH_SIZE, remaining - i);
 
-          // Try to find a unique code
-          for (let attempt = 0; attempt < 10; attempt++) {
-            code = generateCouponCode(codePattern);
-            if (localSet.has(code)) continue;
+          // Step 1: Generate candidate codes with local dedup
+          const candidates: string[] = [];
+          let genAttempts = 0;
+          const maxGenAttempts = batchSize * 20;
 
-            // Check database for duplicates less frequently
-            if ((i + j) % this.DUPLICATE_CHECK_BATCH === 0) {
-              const [dup] = await pool.execute<RowDataPacket[]>(
-                'SELECT 1 as ok FROM g_coupons WHERE code = ? LIMIT 1',
-                [code]
-              );
-              if (dup.length === 0) {
-                found = true;
-                break;
-              }
-            } else {
-              found = true;
-              break;
+          while (
+            candidates.length < batchSize &&
+            genAttempts < maxGenAttempts
+          ) {
+            genAttempts++;
+            const code = generateCouponCode(codePattern);
+            if (!localSet.has(code)) {
+              localSet.add(code);
+              candidates.push(code);
             }
           }
 
-          if (!found) {
-            logger.warn('Failed to generate unique code after 10 attempts', {
+          if (candidates.length === 0) {
+            logger.error('Failed to generate any unique codes for batch', {
               jobId,
               settingId,
-              codeIndex: i + j,
+              localSetSize: localSet.size,
             });
-            continue;
+            break;
           }
 
-          localSet.add(code!);
-          batchCodes.push([ulid(), settingId, code!, environmentId]);
-        }
+          // Step 2: Batch-check DB for existing codes and filter them out
+          const freshCodes: string[] = [];
+          const DB_CHECK_CHUNK = 500;
+          for (let c = 0; c < candidates.length; c += DB_CHECK_CHUNK) {
+            const chunk = candidates.slice(c, c + DB_CHECK_CHUNK);
+            const placeholdersCheck = chunk.map(() => '?').join(',');
+            const [existing] = await pool.execute<RowDataPacket[]>(
+              `SELECT code FROM g_coupons WHERE code IN (${placeholdersCheck})`,
+              chunk
+            );
+            const existingSet = new Set(
+              existing.map((r: RowDataPacket) => r.code)
+            );
+            for (const code of chunk) {
+              if (!existingSet.has(code)) {
+                freshCodes.push(code);
+              }
+            }
+          }
 
-        // Insert batch immediately (streaming approach)
-        if (batchCodes.length > 0) {
-          const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
-          await pool.execute(
-            `INSERT INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
-            batchCodes.flat() as string[]
-          );
+          // Step 3: Insert using INSERT IGNORE for race condition safety
+          if (freshCodes.length > 0) {
+            // Insert in sub-batches to keep placeholder count reasonable
+            const INSERT_SUB_BATCH = 500;
+            for (
+              let s = 0;
+              s < freshCodes.length;
+              s += INSERT_SUB_BATCH
+            ) {
+              const subBatch = freshCodes.slice(s, s + INSERT_SUB_BATCH);
+              const rows = subBatch.map((code) => [
+                ulid(),
+                settingId,
+                code,
+                environmentId,
+              ]);
+              const placeholders = rows
+                .map(() => '(?, ?, ?, ?)')
+                .join(',');
 
-          totalGenerated += batchCodes.length;
+              const [result] = await pool.execute(
+                `INSERT IGNORE INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
+                rows.flat() as string[]
+              );
 
-          // Update progress less frequently
+              const inserted =
+                (result as any)?.affectedRows ?? subBatch.length;
+              totalGenerated += inserted;
+            }
+          }
+
+          // Update progress periodically
           if (
             totalGenerated - lastProgressUpdate >=
             this.PROGRESS_UPDATE_INTERVAL
           ) {
-            const progress = Math.round((totalGenerated / quantity) * 100);
+            const progress = Math.min(
+              99,
+              Math.round((totalGenerated / quantity) * 100)
+            );
             await pool.execute(
               'UPDATE g_coupon_settings SET generatedCount = ? WHERE id = ?',
               [totalGenerated, settingId]
@@ -184,7 +223,19 @@ export class CouponGenerationJob {
             });
             lastProgressUpdate = totalGenerated;
           }
+
+          if (totalGenerated >= quantity) break;
         }
+
+        if (totalGenerated >= quantity) break;
+
+        logger.info('Retrying coupon generation for shortfall', {
+          jobId,
+          settingId,
+          retry: retry + 1,
+          totalGenerated,
+          target: quantity,
+        });
       }
 
       // Final progress update - set both generatedCount and totalCount to actual generated count
