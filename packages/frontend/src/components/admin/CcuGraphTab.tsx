@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   ToggleButton,
@@ -332,22 +338,28 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const hasLoadedRef = useRef(false);
   const prevGetDateRangeRef = useRef(getDateRange);
 
-  const loadHistory = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true);
-    try {
-      const { from, to } = getDateRange();
-      const data = await playerConnectionService.getCcuHistory(projectApiPath, {
-        from: from.toISOString(),
-        to: to.toISOString(),
-      });
-      setRecords(data);
-      hasLoadedRef.current = true;
-    } catch (err) {
-      console.error('CCU history load failed:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectApiPath, getDateRange]);
+  const loadHistory = useCallback(
+    async (showLoading = true) => {
+      if (showLoading) setLoading(true);
+      try {
+        const { from, to } = getDateRange();
+        const data = await playerConnectionService.getCcuHistory(
+          projectApiPath,
+          {
+            from: from.toISOString(),
+            to: to.toISOString(),
+          }
+        );
+        setRecords(data);
+        hasLoadedRef.current = true;
+      } catch (err) {
+        console.error('CCU history load failed:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [projectApiPath, getDateRange]
+  );
 
   // Initial load or time range change — show loading skeleton
   useEffect(() => {

@@ -2074,7 +2074,10 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 1: CCU Graph */}
       {activeTab === 1 && projectApiPath && (
-        <CcuGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
+        <CcuGraphTab
+          projectApiPath={projectApiPath}
+          refreshKey={dataRefreshKey}
+        />
       )}
 
       {/* Tab 2: Player List */}
