@@ -188,6 +188,8 @@ const playerConnectionService = {
       sortDesc?: boolean;
       isOnline?: string;
       loginPlatform?: string;
+      multiSearchField?: string;
+      multiSearchValues?: string;
     }
   ): Promise<AllPlayersResponse> {
     const searchParams = new URLSearchParams();
@@ -202,6 +204,10 @@ const playerConnectionService = {
       searchParams.set('isOnline', params.isOnline);
     if (params.loginPlatform)
       searchParams.set('loginPlatform', params.loginPlatform);
+    if (params.multiSearchField)
+      searchParams.set('multiSearchField', params.multiSearchField);
+    if (params.multiSearchValues)
+      searchParams.set('multiSearchValues', params.multiSearchValues);
 
     const res = await api.get(
       `${projectApiPath}/player-connections/all-players?${searchParams}`
@@ -220,6 +226,8 @@ const playerConnectionService = {
       sortDesc?: boolean;
       isOnline?: string;
       loginPlatform?: string;
+      multiSearchField?: string;
+      multiSearchValues?: string;
     }
   ): Promise<AllPlayersResponse> {
     const searchParams = new URLSearchParams();
@@ -234,6 +242,10 @@ const playerConnectionService = {
       searchParams.set('isOnline', params.isOnline);
     if (params.loginPlatform)
       searchParams.set('loginPlatform', params.loginPlatform);
+    if (params.multiSearchField)
+      searchParams.set('multiSearchField', params.multiSearchField);
+    if (params.multiSearchValues)
+      searchParams.set('multiSearchValues', params.multiSearchValues);
 
     const res = await api.get(
       `${projectApiPath}/player-connections/all-characters?${searchParams}`

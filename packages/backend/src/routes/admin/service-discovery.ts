@@ -14,6 +14,62 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('serviceDiscovery');
 
+/**
+ * Get ordered list of addresses to try for a service.
+ * Tries internalAddress first, falls back to externalAddress on connection failure.
+ */
+function getServiceAddresses(service: { internalAddress?: string; externalAddress?: string }): string[] {
+  const addresses: string[] = [];
+  if (service.internalAddress) addresses.push(service.internalAddress);
+  if (service.externalAddress && service.externalAddress !== service.internalAddress) {
+    addresses.push(service.externalAddress);
+  }
+  if (addresses.length === 0 && service.externalAddress) {
+    addresses.push(service.externalAddress);
+  }
+  return addresses;
+}
+
+/**
+ * Proxy a GET/POST request to a service with address fallback.
+ * If the primary address fails with ECONNREFUSED, retries with the next address.
+ */
+async function proxyServiceRequest(
+  service: { internalAddress?: string; externalAddress?: string },
+  port: number,
+  path: string,
+  options: { method?: 'get' | 'post'; timeout?: number; data?: any } = {}
+): Promise<{ response: any; address: string; latency: number }> {
+  const axios = (await import('axios')).default;
+  const addresses = getServiceAddresses(service);
+  const method = options.method || 'get';
+  const timeout = options.timeout || 5000;
+
+  let lastError: any;
+  for (const address of addresses) {
+    const url = `http://${address}:${port}${path}`;
+    const startTime = Date.now();
+    try {
+      const response = method === 'post'
+        ? await axios.post(url, options.data || {}, { timeout })
+        : await axios.get(url, { timeout });
+      return { response, address, latency: Date.now() - startTime };
+    } catch (err: any) {
+      lastError = err;
+      lastError._latency = Date.now() - startTime;
+      lastError._url = url;
+      // Only retry with next address on connection-level failures
+      if (err.code === 'ECONNREFUSED' || err.code === 'EHOSTUNREACH' || err.code === 'ENETUNREACH') {
+        logger.warn(`Connection failed to ${url}, trying next address...`, { code: err.code });
+        continue;
+      }
+      // For other errors (timeout, HTTP errors), don't retry
+      break;
+    }
+  }
+  throw lastError;
+}
+
 const router = express.Router();
 
 /**
@@ -269,23 +325,13 @@ router.post(
         });
       }
 
-      // Determine which address to use (prefer internal for server-to-server communication)
-      const address = service.internalAddress || service.externalAddress;
-      const healthUrl = `http://${address}:${webPort}/health`;
-
-      logger.info(
-        `Health checking service: ${type}:${instanceId} at ${healthUrl}`
-      );
-
-      // Make HTTP request to the service's health endpoint
-      const axios = (await import('axios')).default;
-      const startTime = Date.now();
+      logger.info(`Health checking service: ${type}:${instanceId}`);
 
       try {
-        const response = await axios.get(healthUrl, {
-          timeout: 5000, // 5 second timeout
-        });
-        const latency = Date.now() - startTime;
+        const { response, latency, address } = await proxyServiceRequest(
+          service, webPort, '/health'
+        );
+        const healthUrl = `http://${address}:${webPort}/health`;
 
         res.json({
           success: true,
@@ -298,7 +344,7 @@ router.post(
           },
         });
       } catch (healthError: any) {
-        const latency = Date.now() - startTime;
+        const latency = healthError._latency || 0;
         const status = healthError.response?.status || 0;
         const message =
           healthError.code === 'ECONNREFUSED'
@@ -315,7 +361,7 @@ router.post(
             status,
             latency,
             error: message,
-            url: healthUrl,
+            url: healthError._url || '',
           },
         });
       }
@@ -347,7 +393,6 @@ router.get(
         });
       }
 
-      // Get the service instance to find its web port and address
       const services = await serviceDiscoveryService.getServices(type);
       const service = services.find((s) => s.instanceId === instanceId);
 
@@ -358,7 +403,6 @@ router.get(
         });
       }
 
-      // Check if service has an API port
       const webPort =
         service.ports?.internalApi ||
         service.ports?.externalApi ||
@@ -372,22 +416,13 @@ router.get(
         });
       }
 
-      // Determine which address to use
-      const address = service.internalAddress || service.externalAddress;
-      const cacheUrl = `http://${address}:${webPort}/internal/cache/summary`;
-
-      logger.info(
-        `Fetching cache summary from: ${type}:${instanceId} at ${cacheUrl}`
-      );
-
-      const axios = (await import('axios')).default;
-      const startTime = Date.now();
+      logger.info(`Fetching cache summary from: ${type}:${instanceId}`);
 
       try {
-        const response = await axios.get(cacheUrl, {
-          timeout: 5000,
-        });
-        const latency = Date.now() - startTime;
+        const { response, latency, address } = await proxyServiceRequest(
+          service, webPort, '/internal/cache/summary'
+        );
+        const cacheUrl = `http://${address}:${webPort}/internal/cache/summary`;
 
         res.json({
           success: true,
@@ -398,7 +433,7 @@ router.get(
           },
         });
       } catch (cacheError: any) {
-        const latency = Date.now() - startTime;
+        const latency = cacheError._latency || 0;
         const status = cacheError.response?.status || 0;
         const message =
           cacheError.code === 'ECONNREFUSED'
@@ -415,7 +450,7 @@ router.get(
             error: message,
             httpStatus: status,
             latency,
-            url: cacheUrl,
+            url: cacheError._url || '',
           },
         });
       }
@@ -445,7 +480,6 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
       });
     }
 
-    // Get the service instance to find its web port and address
     const services = await serviceDiscoveryService.getServices(type);
     const service = services.find((s) => s.instanceId === instanceId);
 
@@ -456,7 +490,6 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
       });
     }
 
-    // Check if service has an API port
     const webPort =
       service.ports?.internalApi ||
       service.ports?.externalApi ||
@@ -470,22 +503,13 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
       });
     }
 
-    // Determine which address to use
-    const address = service.internalAddress || service.externalAddress;
-    const cacheUrl = `http://${address}:${webPort}/internal/cache`;
-
-    logger.info(
-      `Fetching cache status from: ${type}:${instanceId} at ${cacheUrl}`
-    );
-
-    const axios = (await import('axios')).default;
-    const startTime = Date.now();
+    logger.info(`Fetching cache status from: ${type}:${instanceId}`);
 
     try {
-      const response = await axios.get(cacheUrl, {
-        timeout: 5000,
-      });
-      const latency = Date.now() - startTime;
+      const { response, latency, address } = await proxyServiceRequest(
+        service, webPort, '/internal/cache'
+      );
+      const cacheUrl = `http://${address}:${webPort}/internal/cache`;
 
       res.json({
         success: true,
@@ -496,7 +520,7 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
         },
       });
     } catch (cacheError: any) {
-      const latency = Date.now() - startTime;
+      const latency = cacheError._latency || 0;
       const status = cacheError.response?.status || 0;
       const message =
         cacheError.code === 'ECONNREFUSED'
@@ -513,7 +537,7 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
           error: message,
           httpStatus: status,
           latency,
-          url: cacheUrl,
+          url: cacheError._url || '',
         },
       });
     }
@@ -567,19 +591,13 @@ router.post(
         });
       }
 
-      const address = service.internalAddress || service.externalAddress;
-      const refreshUrl = `http://${address}:${webPort}/internal/cache/refresh`;
-
-      logger.info(
-        `Force cache refresh on: ${type}:${instanceId} at ${refreshUrl}`
-      );
-
-      const axios = (await import('axios')).default;
-      const startTime = Date.now();
+      logger.info(`Force cache refresh on: ${type}:${instanceId}`);
 
       try {
-        const response = await axios.post(refreshUrl, {}, { timeout: 15000 });
-        const latency = Date.now() - startTime;
+        const { response, latency } = await proxyServiceRequest(
+          service, webPort, '/internal/cache/refresh',
+          { method: 'post', timeout: 15000 }
+        );
 
         res.json({
           success: true,
@@ -589,7 +607,7 @@ router.post(
           },
         });
       } catch (refreshError: any) {
-        const latency = Date.now() - startTime;
+        const latency = refreshError._latency || 0;
         const message =
           refreshError.code === 'ECONNREFUSED'
             ? 'Connection refused'
@@ -655,15 +673,10 @@ router.get(
         });
       }
 
-      const address = service.internalAddress || service.externalAddress;
-      const statsUrl = `http://${address}:${webPort}/internal/stats/requests`;
-
-      const axios = (await import('axios')).default;
-      const startTime = Date.now();
-
       try {
-        const response = await axios.get(statsUrl, { timeout: 5000 });
-        const latency = Date.now() - startTime;
+        const { response, latency } = await proxyServiceRequest(
+          service, webPort, '/internal/stats/requests'
+        );
 
         res.json({
           success: true,
@@ -671,7 +684,7 @@ router.get(
           latency,
         });
       } catch (statsError: any) {
-        const latency = Date.now() - startTime;
+        const latency = statsError._latency || 0;
         const message =
           statsError.code === 'ECONNREFUSED'
             ? 'Connection refused'
@@ -736,22 +749,28 @@ router.post(
         });
       }
 
-      const address = service.internalAddress || service.externalAddress;
-      const resetUrl = `http://${address}:${webPort}/internal/stats/requests/reset`;
-
-      const axios = (await import('axios')).default;
-      const response = await axios.post(resetUrl, {}, { timeout: 5000 });
-
-      res.json(response.data);
-    } catch (error: any) {
+      try {
+        const { response } = await proxyServiceRequest(
+          service, webPort, '/internal/stats/requests/reset',
+          { method: 'post' }
+        );
+        res.json(response.data);
+      } catch (error: any) {
+        logger.error('Error resetting request stats:', error);
+        const message =
+          error.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : error.message || 'Failed to reset request stats';
+        res.status(500).json({
+          success: false,
+          error: { message },
+        });
+      }
+    } catch (error) {
       logger.error('Error resetting request stats:', error);
-      const message =
-        error.code === 'ECONNREFUSED'
-          ? 'Connection refused'
-          : error.message || 'Failed to reset request stats';
       res.status(500).json({
         success: false,
-        error: { message },
+        error: { message: 'Failed to reset request stats' },
       });
     }
   }
@@ -805,26 +824,28 @@ router.post(
         });
       }
 
-      const address = service.internalAddress || service.externalAddress;
-      const rateLimitUrl = `http://${address}:${webPort}/internal/stats/rate-limit`;
-
-      const axios = (await import('axios')).default;
-      const response = await axios.post(
-        rateLimitUrl,
-        { limit },
-        { timeout: 5000 }
-      );
-
-      res.json(response.data);
-    } catch (error: any) {
+      try {
+        const { response } = await proxyServiceRequest(
+          service, webPort, '/internal/stats/rate-limit',
+          { method: 'post', data: { limit } }
+        );
+        res.json(response.data);
+      } catch (error: any) {
+        logger.error('Error setting rate limit:', error);
+        const message =
+          error.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : error.message || 'Failed to set rate limit';
+        res.status(500).json({
+          success: false,
+          error: { message },
+        });
+      }
+    } catch (error) {
       logger.error('Error setting rate limit:', error);
-      const message =
-        error.code === 'ECONNREFUSED'
-          ? 'Connection refused'
-          : error.message || 'Failed to set rate limit';
       res.status(500).json({
         success: false,
-        error: { message },
+        error: { message: 'Failed to set rate limit' },
       });
     }
   }
@@ -871,15 +892,10 @@ router.get(
         });
       }
 
-      const address = service.internalAddress || service.externalAddress;
-      const statsUrl = `http://${address}:${webPort}/internal/stats/streaming`;
-
-      const axios = (await import('axios')).default;
-      const startTime = Date.now();
-
       try {
-        const response = await axios.get(statsUrl, { timeout: 5000 });
-        const latency = Date.now() - startTime;
+        const { response, latency } = await proxyServiceRequest(
+          service, webPort, '/internal/stats/streaming'
+        );
 
         res.json({
           success: true,
@@ -887,7 +903,7 @@ router.get(
           latency,
         });
       } catch (statsError: any) {
-        const latency = Date.now() - startTime;
+        const latency = statsError._latency || 0;
         const message =
           statsError.code === 'ECONNREFUSED'
             ? 'Connection refused'

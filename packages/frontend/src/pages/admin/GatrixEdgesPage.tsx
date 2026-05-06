@@ -601,7 +601,6 @@ const GatrixEdgesPage: React.FC = () => {
                   sx={{
                     fontFamily: 'monospace',
                     fontSize: '0.75rem',
-                    borderRadius: 0,
                   }}
                 />
               ))}

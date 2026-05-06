@@ -254,6 +254,7 @@ const PlayerConnectionsPage: React.FC = () => {
         if (prev) prevCcuRef.current = prev;
         return data;
       });
+      setDataRefreshKey((k) => k + 1);
     } catch (err: any) {
       const status = err?.response?.status || err?.status;
       if (status === 502 || status === 504) {
@@ -379,7 +380,6 @@ const PlayerConnectionsPage: React.FC = () => {
         });
       }
       setSyncDialogOpen(false);
-      setDataRefreshKey((k) => k + 1);
       loadCcu();
     } catch (err: any) {
       enqueueSnackbar(
@@ -2074,7 +2074,7 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 1: CCU Graph */}
       {activeTab === 1 && projectApiPath && (
-        <CcuGraphTab projectApiPath={projectApiPath} />
+        <CcuGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
       )}
 
       {/* Tab 2: Player List */}
@@ -2084,6 +2084,8 @@ const PlayerConnectionsPage: React.FC = () => {
           projectApiPath={projectApiPath}
           worlds={ccuData?.worlds || []}
           onKickUser={openKickForUser}
+          totalOnline={ccuData?.total}
+          botTotal={ccuData?.botTotal}
         />
       )}
 

@@ -11,6 +11,7 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
   ShowChart as ShowChartIcon,
+  ReceiptLong as ReceiptLongIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import SlideshowBackground from './SlideshowBackground';
@@ -20,6 +21,18 @@ import playerConnectionService, {
 } from '../../services/playerConnectionService';
 
 import PaymentStatsDetail from './PaymentStatsDetail';
+
+// ─── Helpers ───
+
+/** Format large numbers with K/M suffix for compact display */
+function formatCompactNumber(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return n.toLocaleString();
+}
+
+const REVENUE_MODE_KEY = 'gx_scoreboard_revenue_mode';
+type RevenueDisplayMode = 'total' | 'daily';
 
 // ─── Animated Number Hook (stock ticker tween) ───
 function useAnimatedNumber(target: number): number {
@@ -249,6 +262,18 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
   >;
   const [paymentStats, setPaymentStats] = useState<PaymentStatsData>(null);
   const [showDetail, setShowDetail] = useState(false);
+
+  // Revenue display mode: 'total' (default) or 'daily' — toggles on click, persisted
+  const [revenueMode, setRevenueMode] = useState<RevenueDisplayMode>(
+    () => (localStorage.getItem(REVENUE_MODE_KEY) as RevenueDisplayMode) || 'total'
+  );
+  const handleToggleRevenueMode = useCallback(() => {
+    setRevenueMode((prev) => {
+      const next: RevenueDisplayMode = prev === 'total' ? 'daily' : 'total';
+      localStorage.setItem(REVENUE_MODE_KEY, next);
+      return next;
+    });
+  }, []);
   useEffect(() => {
     if (!psEnabled) {
       setPaymentStats(null);
@@ -568,8 +593,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                 fontWeight: 600,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: 1.5,
-                textShadow:
-                  '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.3)',
+                textShadow: '0 1px 4px rgba(0,0,0,0.8)',
               }}
             >
               {now.toLocaleTimeString()} (UTC {now.toISOString().slice(11, 19)})
@@ -621,7 +645,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                   fontSize: 'clamp(6.6rem, min(19.2vw, 33.6vh), 16.8rem)',
                   lineHeight: 1,
                   color: '#fff',
-                  fontFamily: '"Inter", "Roboto Mono", monospace',
+                  fontFamily: '"Inter", sans-serif',
                   fontVariantNumeric: 'tabular-nums',
                   transition: 'color 0.3s ease',
                   position: 'relative',
@@ -654,87 +678,79 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                   letterSpacing: 3,
                   textTransform: 'uppercase',
                   mt: 0.5,
-                  textShadow:
-                    '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                 }}
               >
                 {t('playerConnections.scoreboard.concurrentUsers')}
               </Typography>
 
               {/* Total registered accounts & characters — subtle secondary metrics */}
-              {(totalRegistered !== null || totalCharacters !== null) && (
-                <Box
-                  sx={{
-                    mt: 3.5,
-                    display: 'flex',
-                    gap: 6,
-                    justifyContent: 'center',
-                  }}
-                >
-                  {totalRegistered !== null && (
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography
-                        sx={{
-                          color: 'rgba(255,255,255,0.7)',
-                          fontFamily: '"Inter", "Roboto Mono", monospace',
-                          fontVariantNumeric: 'tabular-nums',
-                          fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
-                          fontWeight: 700,
-                          lineHeight: 1,
-                          textShadow:
-                            '0 2px 10px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.4)',
-                        }}
-                      >
-                        {totalRegistered.toLocaleString()}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          color: 'rgba(255,255,255,0.4)',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          letterSpacing: 2.5,
-                          textTransform: 'uppercase',
-                          mt: 0.5,
-                          textShadow:
-                            '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
-                        }}
-                      >
-                        {t('playerConnections.scoreboard.totalAccounts')}
-                      </Typography>
-                    </Box>
-                  )}
-                  {totalCharacters !== null && (
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography
-                        sx={{
-                          color: 'rgba(255,255,255,0.7)',
-                          fontFamily: '"Inter", "Roboto Mono", monospace',
-                          fontVariantNumeric: 'tabular-nums',
-                          fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
-                          fontWeight: 700,
-                          lineHeight: 1,
-                          textShadow: '0 1px 8px rgba(0,0,0,0.7)',
-                        }}
-                      >
-                        {totalCharacters.toLocaleString()}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          color: 'rgba(255,255,255,0.4)',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          letterSpacing: 2.5,
-                          textTransform: 'uppercase',
-                          mt: 0.5,
-                          textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-                        }}
-                      >
-                        {t('playerConnections.scoreboard.totalCharacters')}
-                      </Typography>
-                    </Box>
-                  )}
+              <Box
+                sx={{
+                  mt: 3.5,
+                  display: 'flex',
+                  gap: 6,
+                  justifyContent: 'center',
+                  visibility: (totalRegistered !== null || totalCharacters !== null) ? 'visible' : 'hidden',
+                }}
+              >
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.7)',
+                      fontFamily: '"Inter", sans-serif',
+                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    {totalRegistered !== null ? formatCompactNumber(totalRegistered) : '—'}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.4)',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: 2.5,
+                      textTransform: 'uppercase',
+                      mt: 0.5,
+                      textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    {t('playerConnections.scoreboard.totalAccounts')}
+                  </Typography>
                 </Box>
-              )}
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.7)',
+                      fontFamily: '"Inter", sans-serif',
+                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 'clamp(1.4rem, min(3.5vw, 6vh), 2.4rem)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    {totalCharacters !== null ? formatCompactNumber(totalCharacters) : '—'}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.4)',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: 2.5,
+                      textTransform: 'uppercase',
+                      mt: 0.5,
+                      textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    {t('playerConnections.scoreboard.totalCharacters')}
+                  </Typography>
+                </Box>
+              </Box>
 
               {totalCount === 0 && (
                 <Typography
@@ -744,8 +760,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                     fontWeight: 500,
                     mt: 3,
                     letterSpacing: 1,
-                    textShadow:
-                      '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
+                    textShadow: '0 1px 3px rgba(0,0,0,0.7)',
                     animation: 'fadeInOut 3s ease-in-out infinite',
                     '@keyframes fadeInOut': {
                       '0%, 100%': { opacity: 0.3 },
@@ -802,7 +817,7 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
                   color: TREND_COLORS[totalTrend],
                   fontWeight: 700,
                   fontSize: '1.5rem',
-                  fontFamily: '"Inter", monospace',
+                  fontFamily: '"Inter", sans-serif',
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
@@ -811,80 +826,135 @@ const CcuScoreboard: React.FC<CcuScoreboardProps> = ({
               </Typography>
             </Box>
 
-            {/* Bot count */}
-            {(ccuData?.botTotal ?? 0) > 0 && (
-              <Typography
-                sx={{
-                  color: 'rgba(255,255,255,0.4)',
-                  fontSize: '0.8rem',
-                  fontWeight: 500,
-                  textShadow: '0 1px 6px rgba(0,0,0,0.7)',
-                }}
-              >
-                🤖 Bots: {ccuData!.botTotal.toLocaleString()}
-              </Typography>
-            )}
+            {/* Bot count — always reserve space to prevent layout shift */}
+            <Typography
+              sx={{
+                color: 'rgba(255,255,255,0.4)',
+                fontSize: '0.8rem',
+                fontWeight: 500,
+                textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+                minHeight: '1.2em',
+                visibility: (ccuData?.botTotal ?? 0) > 0 ? 'visible' : 'hidden',
+              }}
+            >
+              🤖 Bots: {(ccuData?.botTotal ?? 0).toLocaleString()}
+            </Typography>
 
-            {/* Payment stats — anchored to bottom without affecting center layout */}
-            {paymentStats && (
-              <Box
-                onClick={() => {
-                  setShowDetail(true);
-                }}
-                sx={{
-                  position: 'absolute',
-                  bottom: 32,
-                  left: 0,
-                  right: 0,
-                  display: 'flex',
-                  gap: 8,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  py: 1.5,
-                  transition: 'opacity 0.2s ease',
-                  '&:hover': { opacity: 0.8 },
-                }}
-              >
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography
+            {/* Payment stats — anchored to bottom, toggles between total/daily on click */}
+            {paymentStats && (() => {
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const todayData = paymentStats.daily?.[todayStr];
+              const isDaily = revenueMode === 'daily';
+              const displayAmount = isDaily ? (todayData?.totalAmount ?? 0) : paymentStats.totalAmount;
+              const displayCount = isDaily ? (todayData?.totalCount ?? 0) : paymentStats.totalCount;
+              const label = isDaily
+                ? t('playerConnections.scoreboard.dailyRevenue')
+                : t('playerConnections.scoreboard.totalRevenue');
+
+              return (
+                <Box
+                  onClick={handleToggleRevenueMode}
+                  sx={{
+                    position: 'absolute',
+                    bottom: 56,
+                    left: 0,
+                    right: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    py: 1.5,
+                    transition: 'opacity 0.2s ease',
+                    '&:hover': { opacity: 0.8 },
+                  }}
+                >
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography
+                      sx={{
+                        color: 'rgba(255,255,255,0.65)',
+                        fontFamily: '"Inter", sans-serif',
+                        fontVariantNumeric: 'tabular-nums',
+                        fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        textShadow: '0 1px 4px rgba(0,0,0,0.7)',
+                      }}
+                    >
+                      ¥{displayAmount.toLocaleString()} (₩
+                      {Math.round(displayAmount * 216.48).toLocaleString()})
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center', mt: 0.5 }}>
+                      <Typography
+                        sx={{
+                          color: 'rgba(255,255,255,0.35)',
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          letterSpacing: 2,
+                          textTransform: 'uppercase',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: 'rgba(255,255,255,0.35)',
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          letterSpacing: 1,
+                          textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+                        }}
+                      >
+                        · {displayCount.toLocaleString()} {t('playerConnections.scoreboard.detail.transactions')}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* Detail view button — centered below revenue, visible on cursor activity */}
+                  <Box
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      setShowDetail(true);
+                    }}
                     sx={{
-                      color: 'rgba(255,255,255,0.65)',
-                      fontFamily: '"Inter", "Roboto Mono", monospace',
-                      fontVariantNumeric: 'tabular-nums',
-                      fontSize: 'clamp(1.2rem, min(2.5vw, 4vh), 1.8rem)',
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      textShadow:
-                        '0 2px 10px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.4)',
+                      mt: 1.5,
+                      opacity: cursorActive ? 0.7 : 0,
+                      transition: 'opacity 0.4s ease',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 2,
+                      py: 0.75,
+                      borderRadius: 1.5,
+                      '&:hover': {
+                        opacity: '1 !important',
+                        bgcolor: 'rgba(255,255,255,0.08)',
+                      },
                     }}
                   >
-                    ¥{paymentStats.totalAmount.toLocaleString()} (₩
-                    {Math.round(
-                      paymentStats.totalAmount * 216.48
-                    ).toLocaleString()}
-                    )
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: 'rgba(255,255,255,0.35)',
-                      fontSize: '0.7rem',
-                      fontWeight: 600,
-                      letterSpacing: 2,
-                      textTransform: 'uppercase',
-                      mt: 0.5,
-                      textShadow:
-                        '0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5)',
-                    }}
-                  >
-                    {t('playerConnections.scoreboard.totalRevenue')}
-                  </Typography>
+                    <ReceiptLongIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.5)' }} />
+                    <Typography
+                      sx={{
+                        color: 'rgba(255,255,255,0.5)',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        letterSpacing: 1.5,
+                        textTransform: 'uppercase',
+                        textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+                      }}
+                    >
+                      Detail
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              );
+            })()}
           </Box>
         </>
       )}
+
       {/* Sparkline toggle button — bottom right */}
       {!showDetail && (
         <Box

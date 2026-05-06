@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Table,
@@ -12,6 +12,7 @@ import {
   Typography,
   Card,
   Alert,
+  LinearProgress,
   TableSortLabel,
   Chip,
   Select,
@@ -42,11 +43,14 @@ import {
   MoreVert as MoreVertIcon,
   Info as InfoIcon,
   Close as CloseIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 import {
   formatRelativeTime,
   formatDateTimeDetailed,
+  formatDateTime,
 } from '../../utils/dateFormat';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -173,12 +177,16 @@ interface Props {
   projectApiPath: string;
   worlds: Array<{ worldId: string; name: string; count: number }>;
   onKickUser: (userId: string) => void;
+  totalOnline?: number;
+  botTotal?: number;
 }
 
 const PlayerListTab: React.FC<Props> = ({
   projectApiPath,
   worlds,
   onKickUser,
+  totalOnline,
+  botTotal,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -299,6 +307,13 @@ const PlayerListTab: React.FC<Props> = ({
   // Detail dialog
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailUser, setDetailUser] = useState<ConnectedUser | null>(null);
+
+  // Export state
+  const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportProcessedCount, setExportProcessedCount] = useState(0);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const exportAbortRef = useRef<AbortController | null>(null);
 
   const handleRowMenuOpen = (
     e: React.MouseEvent<HTMLElement>,
@@ -446,6 +461,119 @@ const PlayerListTab: React.FC<Props> = ({
     }
     setPage(0);
   };
+  // ── Export handler (chunked 500 per API call) ──
+  const EXPORT_CHUNK_SIZE = 500;
+
+  const handleExport = useCallback(
+    async (format: 'csv' | 'xlsx') => {
+      setExportMenuAnchor(null);
+      setExporting(true);
+      setExportProgress(0);
+      setExportProcessedCount(0);
+      exportAbortRef.current = new AbortController();
+
+      try {
+        const allUsers: ConnectedUser[] = [];
+        let currentPage = 1;
+        let hasMore = true;
+
+        while (hasMore && !exportAbortRef.current?.signal.aborted) {
+          const result = await playerConnectionService.getConnectedUsers(
+            projectApiPath,
+            {
+              page: currentPage,
+              limit: EXPORT_CHUNK_SIZE,
+              worldId: getFilterValue('worldId'),
+              search,
+              sortBy,
+              sortDesc,
+            }
+          );
+
+          allUsers.push(...result.users);
+          const fetchedTotal = result.total || 0;
+
+          setExportProcessedCount(allUsers.length);
+          setExportProgress(
+            fetchedTotal > 0
+              ? Math.min(100, Math.round((allUsers.length / fetchedTotal) * 100))
+              : 100
+          );
+
+          hasMore = allUsers.length < fetchedTotal;
+          currentPage++;
+        }
+
+        if (exportAbortRef.current?.signal.aborted) {
+          return;
+        }
+
+        if (allUsers.length === 0) {
+          enqueueSnackbar(t('playerConnections.players.noUsers'), {
+            variant: 'warning',
+          });
+          return;
+        }
+
+        // Build export columns (English headers)
+        const exportColumns: ExportColumn[] = [
+          { key: 'userId', header: 'User ID' },
+          { key: 'accountId', header: 'Account ID' },
+          { key: 'characterId', header: 'Character ID' },
+          { key: 'userName', header: 'User Name' },
+          { key: 'worldId', header: 'World ID' },
+          { key: 'worldName', header: 'World Name' },
+          { key: 'level', header: 'Level' },
+          { key: 'connectedAt', header: 'Connected At' },
+          { key: 'isBot', header: 'Is Bot' },
+          { key: 'ip', header: 'IP' },
+          { key: 'nationCmsId', header: 'Nation CMS ID' },
+          { key: 'storeCode', header: 'Store Code' },
+          { key: 'appVersion', header: 'App Version' },
+          { key: 'deviceType', header: 'Device Type' },
+        ];
+
+        const exportData = allUsers.map((user) => ({
+          ...user,
+          isBot: user.isBot
+            ? t('playerConnections.players.botLabel')
+            : t('playerConnections.players.playerLabel'),
+          connectedAt: user.connectedAt
+            ? formatDateTime(user.connectedAt)
+            : '-',
+        }));
+
+        exportToFile(exportData, exportColumns, 'online-players', format);
+
+        enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+      } catch (error: any) {
+        if (error.message === 'Export cancelled') return;
+        console.error('Export error:', error);
+        enqueueSnackbar(
+          error?.response?.data?.message || error.message || t('common.exportFailed'),
+          { variant: 'error' }
+        );
+      } finally {
+        setExporting(false);
+        exportAbortRef.current = null;
+      }
+    },
+    [
+      projectApiPath,
+      search,
+      activeFilters,
+      sortBy,
+      sortDesc,
+      t,
+      enqueueSnackbar,
+    ]
+  ); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCancelExport = useCallback(() => {
+    exportAbortRef.current?.abort();
+    setExporting(false);
+  }, []);
+
   const handleCopy = (text: string) => {
     copyToClipboardWithNotification(
       text,
@@ -647,11 +775,17 @@ const PlayerListTab: React.FC<Props> = ({
   // Render table rows (reusable for flat and grouped modes)
   const renderTableRows = (userList: ConnectedUser[]) =>
     userList.map((user, idx) => (
-      <TableRow key={user.userId || idx} hover>
+      <TableRow
+        key={user.userId || idx}
+        hover
+        sx={{ '&:last-child td': { borderBottom: 0 } }}
+      >
         {visibleColumns.map((col) => (
-          <TableCell key={col.id}>{renderCell(user, col.id)}</TableCell>
+          <TableCell key={col.id} sx={{ py: 0.75, px: 1.5 }}>
+            {renderCell(user, col.id)}
+          </TableCell>
         ))}
-        <TableCell align="center">
+        <TableCell align="center" sx={{ py: 0.75, px: 1.5 }}>
           <IconButton size="small" onClick={(e) => handleRowMenuOpen(e, user)}>
             <MoreVertIcon fontSize="small" />
           </IconButton>
@@ -780,6 +914,39 @@ const PlayerListTab: React.FC<Props> = ({
           </IconButton>
         </Tooltip>
         <Box sx={{ flex: 1 }} />
+
+        {/* Total online counter */}
+        {totalOnline !== undefined && (
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              mr: 0.5,
+            }}
+          >
+            {totalOnline.toLocaleString()}
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '0.75rem',
+                color: 'text.disabled',
+                fontWeight: 400,
+              }}
+            >
+              ({t('playerConnections.players.playerLabel')}{' '}
+              {((totalOnline ?? 0) - (botTotal ?? 0)).toLocaleString()}
+              {' · '}
+              {t('playerConnections.players.botLabel')}{' '}
+              {(botTotal ?? 0).toLocaleString()})
+            </Typography>
+          </Typography>
+        )}
+
         <Tooltip title={t('common.refresh')}>
           <IconButton
             onClick={loadUsers}
@@ -790,6 +957,26 @@ const PlayerListTab: React.FC<Props> = ({
             <RefreshIcon />
           </IconButton>
         </Tooltip>
+        <Tooltip title={t('common.export')}>
+          <span>
+            <IconButton
+              size="small"
+              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+              disabled={exporting || total === 0}
+              sx={{ color: 'text.secondary' }}
+            >
+              <DownloadIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Menu
+          anchorEl={exportMenuAnchor}
+          open={Boolean(exportMenuAnchor)}
+          onClose={() => setExportMenuAnchor(null)}
+        >
+          <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+          <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+        </Menu>
       </Box>
 
       {/* Active groupBy indicator */}
@@ -1044,6 +1231,36 @@ const PlayerListTab: React.FC<Props> = ({
         onColumnsChange={handleColumnsChange}
         onReset={() => handleColumnsChange(DEFAULT_COLUMNS)}
       />
+
+      {/* Export Progress Dialog */}
+      <Dialog
+        open={exporting}
+        maxWidth="xs"
+        fullWidth
+        onClose={() => {}}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          {t('common.exporting')}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 1 }}>
+            <LinearProgress
+              variant="determinate"
+              value={exportProgress}
+              sx={{ height: 8, borderRadius: 4 }}
+            />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {exportProcessedCount.toLocaleString()} / {total.toLocaleString()}
+            {' '}({exportProgress}%)
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelExport} size="small">
+            {t('common.cancel')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

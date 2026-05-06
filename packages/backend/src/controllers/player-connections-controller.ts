@@ -356,6 +356,8 @@ export class PlayerConnectionsController {
         sortDesc,
         isOnline,
         loginPlatform,
+        multiSearchField,
+        multiSearchValues,
       } = req.query;
 
       const admindUrl = await getAdmindApiUrl(req.environmentId);
@@ -372,6 +374,10 @@ export class PlayerConnectionsController {
         queryParams.append('isOnline', String(isOnline));
       if (loginPlatform)
         queryParams.append('loginPlatform', String(loginPlatform));
+      if (multiSearchField)
+        queryParams.append('multiSearchField', String(multiSearchField));
+      if (multiSearchValues)
+        queryParams.append('multiSearchValues', String(multiSearchValues));
 
       const queryStr = queryParams.toString()
         ? `?${queryParams.toString()}`
@@ -415,6 +421,8 @@ export class PlayerConnectionsController {
         sortDesc,
         isOnline,
         loginPlatform,
+        multiSearchField,
+        multiSearchValues,
       } = req.query;
 
       const admindUrl = await getAdmindApiUrl(req.environmentId);
@@ -431,6 +439,10 @@ export class PlayerConnectionsController {
         queryParams.append('isOnline', String(isOnline));
       if (loginPlatform)
         queryParams.append('loginPlatform', String(loginPlatform));
+      if (multiSearchField)
+        queryParams.append('multiSearchField', String(multiSearchField));
+      if (multiSearchValues)
+        queryParams.append('multiSearchValues', String(multiSearchValues));
 
       const queryStr = queryParams.toString()
         ? `?${queryParams.toString()}`

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   ToggleButton,
@@ -285,9 +285,10 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
 
 interface Props {
   projectApiPath: string;
+  refreshKey?: number;
 }
 
-const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
+const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -327,8 +328,12 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
     return { from, to };
   }, [timeRange]);
 
-  const loadHistory = useCallback(async () => {
-    setLoading(true);
+  // Track whether we've done the initial load (to avoid showing loading skeleton on refreshes)
+  const hasLoadedRef = useRef(false);
+  const prevGetDateRangeRef = useRef(getDateRange);
+
+  const loadHistory = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const { from, to } = getDateRange();
       const data = await playerConnectionService.getCcuHistory(projectApiPath, {
@@ -336,6 +341,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
         to: to.toISOString(),
       });
       setRecords(data);
+      hasLoadedRef.current = true;
     } catch (err) {
       console.error('CCU history load failed:', err);
     } finally {
@@ -343,9 +349,22 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath }) => {
     }
   }, [projectApiPath, getDateRange]);
 
+  // Initial load or time range change — show loading skeleton
   useEffect(() => {
-    loadHistory();
+    // Show loading skeleton only if time range changed or it's the first load
+    const rangeChanged = prevGetDateRangeRef.current !== getDateRange;
+    prevGetDateRangeRef.current = getDateRange;
+    loadHistory(!hasLoadedRef.current || rangeChanged);
   }, [loadHistory]);
+
+  // Periodic refresh via refreshKey — update data silently without resetting chart
+  const prevRefreshKeyRef = useRef(refreshKey);
+  useEffect(() => {
+    if (prevRefreshKeyRef.current !== refreshKey && hasLoadedRef.current) {
+      prevRefreshKeyRef.current = refreshKey;
+      loadHistory(false);
+    }
+  }, [refreshKey, loadHistory]);
 
   // Persist range to URL
   useEffect(() => {

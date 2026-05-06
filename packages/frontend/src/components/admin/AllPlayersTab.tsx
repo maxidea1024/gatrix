@@ -31,6 +31,9 @@ import {
   DialogActions,
   Button,
   alpha,
+  LinearProgress,
+  Popover,
+  TextField,
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
@@ -41,6 +44,8 @@ import {
   MoreVert as MoreVertIcon,
   Info as InfoIcon,
   Close as CloseIcon,
+  Download as DownloadIcon,
+  ManageSearch as ManageSearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -59,7 +64,9 @@ import { useDebounce } from '../../hooks/useDebounce';
 import {
   formatRelativeTime,
   formatDateTimeDetailed,
+  formatDateTime,
 } from '../../utils/dateFormat';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import playerConnectionService from '../../services/playerConnectionService';
 import type {
   AllPlayer,
@@ -307,6 +314,71 @@ export default function AllPlayersTab({
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailUser, setDetailUser] = useState<AllPlayer | null>(null);
 
+  // Export state
+  const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportProcessedCount, setExportProcessedCount] = useState(0);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const exportAbortRef = useRef<AbortController | null>(null);
+
+  // Multi-search state
+  const MULTI_SEARCH_FIELDS = [
+    { value: 'accountId', labelKey: 'playerConnections.multiSearch.fieldAccountId' },
+    { value: 'userId', labelKey: 'playerConnections.multiSearch.fieldUserId' },
+    { value: 'name', labelKey: 'playerConnections.multiSearch.fieldName' },
+    { value: 'characterId', labelKey: 'playerConnections.multiSearch.fieldCharacterId' },
+  ];
+  const [multiSearchAnchor, setMultiSearchAnchor] = useState<null | HTMLElement>(null);
+  const [multiSearchField, setMultiSearchField] = useState('accountId');
+  const [multiSearchInput, setMultiSearchInput] = useState('');
+  const [activeMultiSearch, setActiveMultiSearch] = useState<{
+    field: string;
+    values: string[];
+  } | null>(null);
+
+  const handleMultiSearchApply = () => {
+    const values = multiSearchInput
+      .split(/[,\n\r]+/)
+      .map((v) => v.trim())
+      .filter((v) => v);
+    if (values.length === 0) return;
+    setActiveMultiSearch({ field: multiSearchField, values });
+    setMultiSearchAnchor(null);
+    setPage(0);
+  };
+
+  const handleMultiSearchClear = () => {
+    setActiveMultiSearch(null);
+    setMultiSearchInput('');
+    setMultiSearchAnchor(null);
+    setPage(0);
+  };
+
+  // Multi-search textarea size (resizable, persisted)
+  const MULTI_SEARCH_SIZE_KEY = 'allPlayers_multiSearchSize';
+  const [multiSearchTextareaSize, setMultiSearchTextareaSize] = useState(() => {
+    try {
+      const saved = localStorage.getItem(MULTI_SEARCH_SIZE_KEY);
+      if (saved) return JSON.parse(saved) as { width: number; height: number };
+    } catch { /* ignore */ }
+    return { width: 360, height: 160 };
+  });
+  const multiSearchTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Persist textarea size on mouseup (after user resizes)
+  useEffect(() => {
+    const handleMouseUp = () => {
+      const el = multiSearchTextareaRef.current;
+      if (el && el.offsetHeight > 0 && el.offsetWidth > 0) {
+        const size = { width: el.offsetWidth, height: el.offsetHeight };
+        setMultiSearchTextareaSize(size);
+        localStorage.setItem(MULTI_SEARCH_SIZE_KEY, JSON.stringify(size));
+      }
+    };
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => document.removeEventListener('mouseup', handleMouseUp);
+  }, []);
+
   // ── Fetch ──
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -316,12 +388,14 @@ export default function AllPlayersTab({
         {
           page: page + 1, // API is 1-indexed
           limit: rowsPerPage,
-          search: debouncedSearch || undefined,
+          search: activeMultiSearch ? undefined : (debouncedSearch || undefined),
           worldId: worldFilter !== 'all' ? worldFilter : undefined,
           isOnline: isOnlineFilter || undefined,
           loginPlatform: loginPlatformFilter || undefined,
           sortBy,
           sortDesc,
+          multiSearchField: activeMultiSearch?.field,
+          multiSearchValues: activeMultiSearch?.values.join(','),
         }
       );
       setData(result);
@@ -344,6 +418,7 @@ export default function AllPlayersTab({
     loginPlatformFilter,
     sortBy,
     sortDesc,
+    activeMultiSearch,
   ]);
 
   // ── Sync state to URL query params ──
@@ -590,6 +665,125 @@ export default function AllPlayersTab({
     }
     return String(value);
   };
+
+  // ── Export handler (chunked 500 per API call) ──
+  const EXPORT_CHUNK_SIZE = 500;
+
+  const handleExport = useCallback(
+    async (format: 'csv' | 'xlsx') => {
+      setExportMenuAnchor(null);
+      setExporting(true);
+      setExportProgress(0);
+      setExportProcessedCount(0);
+      exportAbortRef.current = new AbortController();
+
+      try {
+        const allUsers: AllPlayer[] = [];
+        let currentPage = 1;
+        let hasMore = true;
+
+        while (hasMore && !exportAbortRef.current?.signal.aborted) {
+          const result = await playerConnectionService.getAllPlayers(
+            projectApiPath,
+            {
+              page: currentPage,
+              limit: EXPORT_CHUNK_SIZE,
+              search: activeMultiSearch ? undefined : (debouncedSearch || undefined),
+              worldId: worldFilter !== 'all' ? worldFilter : undefined,
+              isOnline: isOnlineFilter || undefined,
+              loginPlatform: loginPlatformFilter || undefined,
+              sortBy,
+              sortDesc,
+              multiSearchField: activeMultiSearch?.field,
+              multiSearchValues: activeMultiSearch?.values.join(','),
+            }
+          );
+
+          allUsers.push(...result.users);
+          const total = result.total || 0;
+
+          setExportProcessedCount(allUsers.length);
+          setExportProgress(
+            total > 0 ? Math.min(100, Math.round((allUsers.length / total) * 100)) : 100
+          );
+
+          hasMore = allUsers.length < total;
+          currentPage++;
+        }
+
+        if (exportAbortRef.current?.signal.aborted) {
+          return;
+        }
+
+        if (allUsers.length === 0) {
+          enqueueSnackbar(t('playerConnections.allPlayers.noUsers'), {
+            variant: 'warning',
+          });
+          return;
+        }
+
+        // Build export columns (English headers)
+        const exportColumns: ExportColumn[] = [
+          { key: 'accountId', header: 'Account ID' },
+          { key: 'userId', header: 'User ID' },
+          { key: 'name', header: 'Character Name' },
+          { key: 'characterId', header: 'Character ID' },
+          { key: 'worldId', header: 'World ID' },
+          { key: 'nationCmsId', header: 'Nation CMS ID' },
+          { key: 'isOnline', header: 'Online Status' },
+          { key: 'lastLoginTimeUtc', header: 'Last Login' },
+          { key: 'createTimeUtc', header: 'Created At' },
+          { key: 'loginPlatform', header: 'Platform' },
+          { key: 'clientVersion', header: 'Client Version' },
+          { key: 'accessLevel', header: 'Access Level' },
+        ];
+
+        const exportData = allUsers.map((user) => ({
+          ...user,
+          isOnline: user.isOnline
+            ? t('playerConnections.allPlayers.online')
+            : t('playerConnections.allPlayers.offline'),
+          lastLoginTimeUtc: user.lastLoginTimeUtc
+            ? formatDateTime(user.lastLoginTimeUtc)
+            : '-',
+          createTimeUtc: user.createTimeUtc
+            ? formatDateTime(user.createTimeUtc)
+            : '-',
+        }));
+
+        exportToFile(exportData, exportColumns, 'all-players', format);
+
+        enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+      } catch (error: any) {
+        if (error.message === 'Export cancelled') return;
+        console.error('Export error:', error);
+        enqueueSnackbar(
+          error?.response?.data?.message || error.message || t('common.exportFailed'),
+          { variant: 'error' }
+        );
+      } finally {
+        setExporting(false);
+        exportAbortRef.current = null;
+      }
+    },
+    [
+      projectApiPath,
+      debouncedSearch,
+      worldFilter,
+      isOnlineFilter,
+      loginPlatformFilter,
+      sortBy,
+      sortDesc,
+      activeMultiSearch,
+      t,
+      enqueueSnackbar,
+    ]
+  );
+
+  const handleCancelExport = useCallback(() => {
+    exportAbortRef.current?.abort();
+    setExporting(false);
+  }, []);
 
   // ── Group By ──
   useEffect(() => {
@@ -892,7 +1086,100 @@ export default function AllPlayersTab({
           value={searchTerm}
           onChange={handleSearchChange}
           sx={{ minWidth: 250 }}
+          disabled={!!activeMultiSearch}
         />
+
+        {/* Multi-search button */}
+        <Tooltip title={t('playerConnections.multiSearch.title')}>
+          <IconButton
+            size="small"
+            onClick={(e) => setMultiSearchAnchor(e.currentTarget)}
+            color={activeMultiSearch ? 'primary' : 'default'}
+          >
+            <ManageSearchIcon />
+          </IconButton>
+        </Tooltip>
+
+        {/* Active multi-search chip */}
+        {activeMultiSearch && (
+          <Chip
+            label={t('playerConnections.multiSearch.activeLabel', {
+              field: t(
+                MULTI_SEARCH_FIELDS.find((f) => f.value === activeMultiSearch.field)?.labelKey || ''
+              ),
+              count: activeMultiSearch.values.length,
+            })}
+            size="small"
+            color="primary"
+            onDelete={handleMultiSearchClear}
+            sx={{ fontWeight: 500 }}
+          />
+        )}
+
+        {/* Multi-search popover */}
+        <Popover
+          open={Boolean(multiSearchAnchor)}
+          anchorEl={multiSearchAnchor}
+          onClose={() => setMultiSearchAnchor(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        >
+          <Box sx={{ p: 2, minWidth: 400 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+              {t('playerConnections.multiSearch.title')}
+            </Typography>
+            <FormControl size="small" fullWidth sx={{ mb: 1.5 }}>
+              <InputLabel>{t('playerConnections.multiSearch.field')}</InputLabel>
+              <Select
+                value={multiSearchField}
+                label={t('playerConnections.multiSearch.field')}
+                onChange={(e) => setMultiSearchField(e.target.value)}
+              >
+                {MULTI_SEARCH_FIELDS.map((f) => (
+                  <MenuItem key={f.value} value={f.value}>
+                    {t(f.labelKey)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              multiline
+              fullWidth
+              size="small"
+              placeholder={t('playerConnections.multiSearch.placeholder')}
+              value={multiSearchInput}
+              onChange={(e) => setMultiSearchInput(e.target.value)}
+              inputRef={multiSearchTextareaRef}
+              inputProps={{
+                style: {
+                  width: multiSearchTextareaSize.width,
+                  height: multiSearchTextareaSize.height,
+                  resize: 'both',
+                  overflow: 'auto',
+                  fontSize: '0.85rem',
+                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                  fontWeight: 500,
+                },
+              }}
+              sx={{ mb: 1.5 }}
+            />
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+              {activeMultiSearch && (
+                <Button size="small" onClick={handleMultiSearchClear}>
+                  {t('playerConnections.multiSearch.clear')}
+                </Button>
+              )}
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleMultiSearchApply}
+                disabled={!multiSearchInput.trim()}
+              >
+                {t('playerConnections.multiSearch.search')}
+              </Button>
+            </Box>
+          </Box>
+        </Popover>
 
         <DynamicFilterBar
           availableFilters={availableFilters}
@@ -965,6 +1252,25 @@ export default function AllPlayersTab({
             </IconButton>
           </span>
         </Tooltip>
+        <Tooltip title={t('common.export')}>
+          <span>
+            <IconButton
+              size="small"
+              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+              disabled={exporting || data.total === 0}
+            >
+              <DownloadIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Menu
+          anchorEl={exportMenuAnchor}
+          open={Boolean(exportMenuAnchor)}
+          onClose={() => setExportMenuAnchor(null)}
+        >
+          <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+          <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+        </Menu>
       </Box>
 
       {/* Table content — hide everything until first fetch completes */}
@@ -1250,6 +1556,36 @@ export default function AllPlayersTab({
         }}
         onReset={handleResetColumns}
       />
+
+      {/* Export Progress Dialog */}
+      <Dialog
+        open={exporting}
+        maxWidth="xs"
+        fullWidth
+        onClose={() => {}}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          {t('common.exporting')}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 1 }}>
+            <LinearProgress
+              variant="determinate"
+              value={exportProgress}
+              sx={{ height: 8, borderRadius: 4 }}
+            />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {exportProcessedCount.toLocaleString()} / {data.total.toLocaleString()}
+            {' '}({exportProgress}%)
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelExport} size="small">
+            {t('common.cancel')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

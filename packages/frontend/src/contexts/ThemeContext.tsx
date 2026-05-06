@@ -367,7 +367,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       },
       MuiChip: {
         styleOverrides: {
-          root: {},
+          root: {
+            borderRadius: 6,
+          },
         },
       },
       MuiTableBody: {
