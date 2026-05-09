@@ -21,6 +21,10 @@ router.get(
   '/cms/tables/:tableName/history/:version/data',
   RippleCmsController.getCmsTableVersionData
 );
+router.get(
+  '/cms/tables/:tableName/history/:version/diff',
+  RippleCmsController.getCmsTableVersionDiff
+);
 router.post('/cms/upload', RippleCmsController.uploadCmsTable);
 router.post('/cms/rollback', RippleCmsController.rollbackCmsTable);
 router.get('/cms/refresh-history', RippleCmsController.getCmsRefreshHistory);

@@ -241,6 +241,31 @@ export class RippleCmsController {
     }
   );
 
+  /** GET /cms/tables/:tableName/history/:version/diff — Get pre-computed diff patch for a specific version */
+  static getCmsTableVersionDiff = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { tableName, version } = req.params;
+      const binaryCode = req.query.binaryCode || '';
+      const qs = binaryCode ? `?binaryCode=${binaryCode}` : '';
+
+      const admindUrl = await getAdmindApiUrl(req.environmentId);
+      const url = `${admindUrl}/gatrix/v1/cms/tables/${encodeURIComponent(tableName)}/history/${version}/diff${qs}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new GatrixError(
+          `Admind API returned HTTP ${response.status}: ${text}`,
+          response.status === 404 ? 404 : 502
+        );
+      }
+      const text = await response.text();
+      res.type('text/plain').send(text);
+    }
+  );
+
   /** POST /cms/upload — Upload CMS table data */
   static uploadCmsTable = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {

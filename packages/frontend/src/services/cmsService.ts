@@ -210,6 +210,30 @@ const cmsService = {
     );
     return res.data;
   },
+
+  /**
+   * Get pre-computed unified diff patch for a specific history version
+   * Returns the patch text string, or null if not available
+   */
+  async getTableVersionDiff(
+    projectApiPath: string,
+    tableName: string,
+    version: number,
+    binaryCode?: string
+  ): Promise<string | null> {
+    try {
+      const params = new URLSearchParams();
+      if (binaryCode) params.set('binaryCode', binaryCode);
+      const qs = params.toString() ? `?${params}` : '';
+      const res = await api.get(
+        `${projectApiPath}/ripple-cms/cms/tables/${encodeURIComponent(tableName)}/history/${version}/diff${qs}`,
+        { responseType: 'text', transformResponse: [(data: any) => data] }
+      );
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
 };
 
 export default cmsService;
