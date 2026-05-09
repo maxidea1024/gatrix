@@ -24,9 +24,9 @@ async function getAdmindApiUrl(environmentId?: string): Promise<string> {
     if (envFiltered.length > 0) {
       ready = envFiltered;
     } else {
-      logger.warn(
-        'No admind instances found for environment, using first available',
-        { environmentId }
+      throw new GatrixError(
+        `No admind instance registered for this environment.`,
+        404
       );
     }
   }

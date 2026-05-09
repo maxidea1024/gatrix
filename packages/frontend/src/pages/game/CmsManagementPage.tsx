@@ -62,6 +62,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useSearchParams } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
 import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
@@ -199,6 +200,7 @@ const CmsManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { getProjectApiPath } = useOrgProject();
+  const { currentEnvironmentId } = useEnvironment();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [searchParams, setSearchParams] = useSearchParams();
@@ -325,9 +327,18 @@ const CmsManagementPage: React.FC = () => {
     }
   }, [getProjectApiPath]);
 
+  // Re-fetch when environment changes (including hard refresh)
   useEffect(() => {
+    // Reset all detail state when environment changes
+    setDetailTableName(null);
+    setHistoryData(null);
+    setViewingVersion(null);
+    setDiffPatchText('');
+    setViewingData(null);
+    setTables([]);
+    setLoading(true);
     fetchTables();
-  }, [fetchTables]);
+  }, [fetchTables, currentEnvironmentId]);
 
   // Pagination handlers
   const handleChangePage = (_: unknown, newPage: number) => {
