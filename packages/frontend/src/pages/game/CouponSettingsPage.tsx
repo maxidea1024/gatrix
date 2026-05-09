@@ -1881,6 +1881,7 @@ const CouponSettingsPage: React.FC = () => {
                               let denominator: number | string;
                               let percentage: number = 0;
                               let tooltipText = '';
+                              let isUnlimitedSpecial = false;
 
                               if (it.type === 'SPECIAL') {
                                 denominator =
@@ -1892,6 +1893,7 @@ const CouponSettingsPage: React.FC = () => {
                                   );
                                   tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
                                 } else {
+                                  isUnlimitedSpecial = true;
                                   tooltipText = `${numerator.toLocaleString()} / ${denominator}`;
                                 }
                               } else {
@@ -1904,6 +1906,26 @@ const CouponSettingsPage: React.FC = () => {
                                   );
                                 }
                                 tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
+                              }
+
+                              if (isUnlimitedSpecial) {
+                                return (
+                                  <TableCell
+                                    key="usageRate"
+                                    align="center"
+                                    sx={{ py: 1, px: 2 }}
+                                  >
+                                    <Tooltip title={tooltipText}>
+                                      <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{ cursor: 'help', fontWeight: 'medium' }}
+                                      >
+                                        {numerator.toLocaleString()} / {denominator}
+                                      </Typography>
+                                    </Tooltip>
+                                  </TableCell>
+                                );
                               }
 
                               // Determine color based on percentage
