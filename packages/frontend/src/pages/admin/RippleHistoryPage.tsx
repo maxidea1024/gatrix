@@ -37,6 +37,7 @@ import { useSnackbar } from 'notistack';
 
 import { useSearchParams } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
 import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
@@ -615,11 +616,13 @@ const RippleHistoryPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { getProjectApiPath } = useOrgProject();
+  const { currentEnvironmentId } = useEnvironment();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<RippleHistoryEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [noAdmind, setNoAdmind] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
 
@@ -643,18 +646,26 @@ const RippleHistoryPage: React.FC = () => {
       );
       setHistory(result.items || []);
       setError(null);
+      setNoAdmind(false);
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || err.message || 'Failed to fetch history'
-      );
+      const errorCode = err.error?.code || err.code;
+      if (errorCode === 'SERVICE_NOT_FOUND') {
+        setNoAdmind(true);
+        setError(null);
+      } else {
+        setNoAdmind(false);
+        setError(err.error?.message || err.message || 'Failed to fetch history');
+      }
     } finally {
       setLoading(false);
     }
   }, [getProjectApiPath]);
 
   useEffect(() => {
+    setHistory([]);
+    setLoading(true);
     fetchHistory();
-  }, [fetchHistory]);
+  }, [fetchHistory, currentEnvironmentId]);
 
   const handleReset = async () => {
     setResetting(true);
@@ -716,30 +727,38 @@ const RippleHistoryPage: React.FC = () => {
         title={t('ripple.history.title')}
         subtitle={t('ripple.history.subtitle')}
         actions={
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              startIcon={<DeleteSweepIcon />}
-              onClick={() => setResetDialogOpen(true)}
-              disabled={!history.length}
-            >
-              {t('ripple.history.reset')}
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={fetchHistory}
-            >
-              {t('common.refresh')}
-            </Button>
-          </Box>
+          !loading && !noAdmind ? (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                startIcon={<DeleteSweepIcon />}
+                onClick={() => setResetDialogOpen(true)}
+                disabled={!history.length}
+              >
+                {t('ripple.history.reset')}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<RefreshIcon />}
+                onClick={fetchHistory}
+              >
+                {t('common.refresh')}
+              </Button>
+            </Box>
+          ) : undefined
         }
       />
 
       <PageContentLoader loading={loading}>
-        {error ? (
+        {noAdmind ? (
+          <EmptyPlaceholder
+            message={t('ripple.noAdmind.title')}
+            description={t('ripple.noAdmind.description')}
+            minHeight={300}
+          />
+        ) : error ? (
           <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
             {error}
           </Alert>

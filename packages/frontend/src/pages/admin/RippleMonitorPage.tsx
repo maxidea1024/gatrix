@@ -47,6 +47,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useSearchParams } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
 import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
@@ -77,11 +78,13 @@ const RippleMonitorPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { getProjectApiPath } = useOrgProject();
+  const { currentEnvironmentId } = useEnvironment();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<RippleStatusResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [noAdmind, setNoAdmind] = useState(false);
   const [refreshing, setRefreshing] = useState<string | null>(null);
 
   // Pagination
@@ -145,6 +148,7 @@ const RippleMonitorPage: React.FC = () => {
       const statusResult = await rippleService.getStatus(projectApiPath);
       setData(statusResult);
       setError(null);
+      setNoAdmind(false);
 
       // Also pre-fetch global history to populate overview columns
       const historyResult = await rippleService.getHistory(
@@ -161,7 +165,14 @@ const RippleMonitorPage: React.FC = () => {
       }
       setHistoryMap(newMap);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch');
+      const errorCode = err.error?.code || err.code;
+      if (errorCode === 'SERVICE_NOT_FOUND') {
+        setNoAdmind(true);
+        setError(null);
+      } else {
+        setNoAdmind(false);
+        setError(err.error?.message || err.message || 'Failed to fetch');
+      }
     } finally {
       setLoading(false);
     }
@@ -199,10 +210,13 @@ const RippleMonitorPage: React.FC = () => {
     [getProjectApiPath]
   );
 
-  // Initial load
+  // Initial load + environment change
   useEffect(() => {
+    setData(null);
+    setHistoryMap({});
+    setLoading(true);
     fetchStatus();
-  }, [fetchStatus]);
+  }, [fetchStatus, currentEnvironmentId]);
 
   // Auto-refresh
   useEffect(() => {
@@ -336,87 +350,97 @@ const RippleMonitorPage: React.FC = () => {
         title={t('ripple.title')}
         subtitle={t('ripple.subtitle')}
         actions={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {data?.admindUrl && (
-              <>
-                <Chip
-                  label={data.admindUrl}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    color: 'text.secondary',
-                    borderColor: 'divider',
-                  }}
-                />
-                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-              </>
-            )}
-            <Button
-              variant="contained"
-              color="warning"
-              size="small"
-              startIcon={<AutorenewRounded />}
-              onClick={() => setConfirmRefreshOpen(true)}
-              disabled={!!refreshing}
-            >
-              {refreshing === '**'
-                ? t('ripple.processing')
-                : t('ripple.refreshAll')}
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<PlayArrowIcon />}
-              onClick={() => setRefreshDialogOpen(true)}
-            >
-              {t('ripple.refreshPattern')}
-            </Button>
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-            <ButtonGroup
-              variant="contained"
-              size="small"
-              sx={{ borderRadius: 1.5, overflow: 'hidden' }}
-            >
-              <Button startIcon={<RefreshIcon />} onClick={fetchStatus}>
-                {t('common.refresh')}
+          !loading && !noAdmind ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {data?.admindUrl && (
+                <>
+                  <Chip
+                    label={data.admindUrl}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      color: 'text.secondary',
+                      borderColor: 'divider',
+                    }}
+                  />
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                </>
+              )}
+              <Button
+                variant="contained"
+                color="warning"
+                size="small"
+                startIcon={<AutorenewRounded />}
+                onClick={() => setConfirmRefreshOpen(true)}
+                disabled={!!refreshing}
+              >
+                {refreshing === '**'
+                  ? t('ripple.processing')
+                  : t('ripple.refreshAll')}
               </Button>
               <Button
+                variant="contained"
                 size="small"
-                onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
-                sx={{
-                  minWidth: 'auto',
-                  px: 1,
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                }}
+                startIcon={<PlayArrowIcon />}
+                onClick={() => setRefreshDialogOpen(true)}
               >
-                {activeRefreshLabel}
-                <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
+                {t('ripple.refreshPattern')}
               </Button>
-            </ButtonGroup>
-            <Menu
-              anchorEl={refreshMenuAnchor}
-              open={Boolean(refreshMenuAnchor)}
-              onClose={() => setRefreshMenuAnchor(null)}
-            >
-              {REFRESH_OPTIONS.map((opt) => (
-                <MenuItem
-                  key={opt.value}
-                  selected={refreshInterval === opt.value}
-                  onClick={() => {
-                    handleSetRefreshInterval(opt.value);
-                    setRefreshMenuAnchor(null);
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+              <ButtonGroup
+                variant="contained"
+                size="small"
+                sx={{ borderRadius: 1.5, overflow: 'hidden' }}
+              >
+                <Button startIcon={<RefreshIcon />} onClick={fetchStatus}>
+                  {t('common.refresh')}
+                </Button>
+                <Button
+                  size="small"
+                  onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+                  sx={{
+                    minWidth: 'auto',
+                    px: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
                   }}
                 >
-                  {opt.label}
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+                  {activeRefreshLabel}
+                  <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
+                </Button>
+              </ButtonGroup>
+              <Menu
+                anchorEl={refreshMenuAnchor}
+                open={Boolean(refreshMenuAnchor)}
+                onClose={() => setRefreshMenuAnchor(null)}
+              >
+                {REFRESH_OPTIONS.map((opt) => (
+                  <MenuItem
+                    key={opt.value}
+                    selected={refreshInterval === opt.value}
+                    onClick={() => {
+                      handleSetRefreshInterval(opt.value);
+                      setRefreshMenuAnchor(null);
+                    }}
+                  >
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          ) : undefined
         }
       />
 
       <PageContentLoader loading={loading}>
+        {noAdmind ? (
+          <EmptyPlaceholder
+            message={t('ripple.noAdmind.title')}
+            description={t('ripple.noAdmind.description')}
+            minHeight={300}
+          />
+        ) : (
+        <>
         {error && (
           <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
             {error}
@@ -1306,6 +1330,8 @@ const RippleMonitorPage: React.FC = () => {
               rowsPerPageOptions={PAGE_SIZE_OPTIONS}
             />
           </Paper>
+        )}
+        </>
         )}
       </PageContentLoader>
 

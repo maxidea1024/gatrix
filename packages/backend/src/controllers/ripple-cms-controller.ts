@@ -5,6 +5,7 @@ import { GatrixError } from '../middleware/error-handler';
 import { asyncHandler } from '../utils/async-handler';
 import { createLogger } from '../config/logger';
 import serviceDiscoveryService from '../services/service-discovery-service';
+import { ErrorCodes } from '@gatrix/shared';
 
 const logger = createLogger('RippleCmsController');
 
@@ -26,7 +27,9 @@ async function getAdmindApiUrl(environmentId?: string): Promise<string> {
     } else {
       throw new GatrixError(
         `No admind instance registered for this environment.`,
-        404
+        503,
+        true,
+        ErrorCodes.SERVICE_NOT_FOUND
       );
     }
   }
@@ -34,7 +37,9 @@ async function getAdmindApiUrl(environmentId?: string): Promise<string> {
   if (ready.length === 0) {
     throw new GatrixError(
       'No admind instances found via service discovery.',
-      503
+      503,
+      true,
+      ErrorCodes.SERVICE_NOT_FOUND
     );
   }
   const inst = ready[0];

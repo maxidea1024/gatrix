@@ -208,6 +208,7 @@ const CmsManagementPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [tables, setTables] = useState<CmsTable[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [noAdmind, setNoAdmind] = useState(false);
   const [admindUrl, setAdmindUrl] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [reloadFilter, setReloadFilter] = useState<'all' | 'hot' | 'restart'>(
@@ -320,8 +321,17 @@ const CmsManagementPage: React.FC = () => {
       setTables(result?.tables || []);
       setAdmindUrl(result?.admindUrl || null);
       setError(null);
+      setNoAdmind(false);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Failed to load');
+      const errorCode = err.error?.code || err.code;
+      if (errorCode === 'SERVICE_NOT_FOUND') {
+        setNoAdmind(true);
+        setError(null);
+      } else {
+        setNoAdmind(false);
+        const msg = err.error?.message || err.message || 'Failed to load';
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -942,40 +952,50 @@ const CmsManagementPage: React.FC = () => {
         title={t('cms.title')}
         subtitle={t('cms.subtitle')}
         actions={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {admindUrl && (
-              <>
-                <Chip
-                  label={admindUrl}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    color: 'text.secondary',
-                    borderColor: 'divider',
-                  }}
-                />
-                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-              </>
-            )}
-            <Button
-              variant="contained"
-              startIcon={<UploadIcon />}
-              onClick={() => setUploadOpen(true)}
-            >
-              {t('cms.upload.execute')}
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={fetchTables}
-            >
-              {t('common.refresh')}
-            </Button>
-          </Box>
+          !loading && !noAdmind ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {admindUrl && (
+                <>
+                  <Chip
+                    label={admindUrl}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      color: 'text.secondary',
+                      borderColor: 'divider',
+                    }}
+                  />
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                </>
+              )}
+              <Button
+                variant="contained"
+                startIcon={<UploadIcon />}
+                onClick={() => setUploadOpen(true)}
+              >
+                {t('cms.upload.execute')}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<RefreshIcon />}
+                onClick={fetchTables}
+              >
+                {t('common.refresh')}
+              </Button>
+            </Box>
+          ) : undefined
         }
       />
 
       <PageContentLoader loading={loading}>
+        {noAdmind ? (
+          <EmptyPlaceholder
+            message={t('cms.noAdmind.title')}
+            description={t('cms.noAdmind.description')}
+            minHeight={300}
+          />
+        ) : (
+        <>
         {error && (
           <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
             {error}
@@ -1402,6 +1422,8 @@ const CmsManagementPage: React.FC = () => {
               rowsPerPageOptions={PAGE_SIZE_OPTIONS}
             />
           </Paper>
+        )}
+        </>
         )}
       </PageContentLoader>
 
