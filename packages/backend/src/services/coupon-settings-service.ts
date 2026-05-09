@@ -696,13 +696,18 @@ export class CouponSettingsService {
   }
 
   /**
-   * Get coupon usage records for export with pagination (chunked)
-   * Returns records in chunks for streaming/pagination
+   * Get coupon usage records for export with cursor-based pagination (chunked)
+   * Uses cursor (cursorUsedAt + cursorId) instead of offset to prevent
+   * row skipping when data changes between chunk fetches.
    */
   static async getUsageForExportChunked(
-    query: CouponUsageQuery & { offset?: number; limit?: number } = {}
+    query: CouponUsageQuery & {
+      offset?: number;
+      limit?: number;
+      cursorUsedAt?: string;
+      cursorId?: string;
+    } = {}
   ) {
-    const offset = query.offset || 0;
     const limit = Math.min(query.limit || 1000, 10000);
 
     const buildQuery = () => {
@@ -733,7 +738,7 @@ export class CouponSettingsService {
     const countResult = await buildQuery().count('* as total').first();
     const total = Number(countResult?.total || 0);
 
-    const rows = await buildQuery()
+    const dataQuery = buildQuery()
       .select([
         'cu.id',
         'cu.userId',
@@ -751,15 +756,32 @@ export class CouponSettingsService {
         'cs.expiresAt as couponExpiresAt',
       ])
       .orderBy('cu.usedAt', 'desc')
-      .limit(limit)
-      .offset(offset);
+      .orderBy('cu.id', 'desc')
+      .limit(limit);
+
+    // Cursor-based: fetch rows after the cursor position
+    if (query.cursorUsedAt && query.cursorId) {
+      dataQuery.where(function () {
+        this.where('cu.usedAt', '<', query.cursorUsedAt!)
+          .orWhere(function () {
+            this.where('cu.usedAt', '=', query.cursorUsedAt!)
+              .andWhere('cu.id', '<', query.cursorId!);
+          });
+      });
+    }
+
+    const rows = await dataQuery;
+
+    // Build next cursor from last row
+    const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
 
     return {
       records: rows,
       total,
-      offset,
       limit,
-      hasMore: offset + limit < total,
+      hasMore: rows.length === limit,
+      nextCursorUsedAt: lastRow?.usedAt || null,
+      nextCursorId: lastRow?.id || null,
     };
   }
 
@@ -769,18 +791,22 @@ export class CouponSettingsService {
   static async getIssuedCodesStats(
     settingId: string
   ): Promise<{ issued: number; used: number; unused: number }> {
-    const row = await db('g_coupon_settings')
-      .where('id', settingId)
-      .whereNot('status', 'DELETED')
-      .select('issuedCount', 'usedCount')
-      .first();
+    // Query actual counts from g_coupons for accuracy
+    const rows = await db('g_coupons')
+      .where('settingId', settingId)
+      .select('status')
+      .count('* as cnt')
+      .groupBy('status');
 
-    if (!row) {
-      throw new GatrixError('Coupon setting not found', 404);
+    let issued = 0;
+    let used = 0;
+    for (const row of rows) {
+      const cnt = Number(row.cnt || 0);
+      issued += cnt;
+      if (row.status === 'USED') {
+        used = cnt;
+      }
     }
-
-    const issued = Number(row.issuedCount || 0);
-    const used = Number(row.usedCount || 0);
     const unused = issued - used;
 
     logger.debug(
@@ -792,31 +818,62 @@ export class CouponSettingsService {
 
   /**
    * Get all issued coupon codes for export (with optional search filter)
-   * Returns codes in chunks for streaming/pagination
+   * Uses cursor-based pagination (cursorCreatedAt + cursorId) to prevent
+   * row skipping when new codes are generated between chunk fetches.
    */
   static async getIssuedCodesForExport(
     settingId: string,
-    query: { search?: string; offset?: number; limit?: number } = {}
+    query: {
+      search?: string;
+      status?: string;
+      offset?: number;
+      limit?: number;
+      cursorCreatedAt?: string;
+      cursorId?: string;
+    } = {}
   ) {
-    const offset = query.offset || 0;
     const limit = Math.min(query.limit || 1000, 10000);
 
     const buildQuery = () => {
       const q = db('g_coupons').where('settingId', settingId);
       if (query.search) q.where('code', 'like', `%${query.search}%`);
+      if (query.status) q.where('status', query.status);
       return q;
     };
 
     const countResult = await buildQuery().count('* as total').first();
     const total = Number(countResult?.total || 0);
 
-    const codes = await buildQuery()
+    const dataQuery = buildQuery()
       .select('id', 'settingId', 'code', 'status', 'createdAt', 'usedAt')
       .orderBy('createdAt', 'desc')
-      .limit(limit)
-      .offset(offset);
+      .orderBy('id', 'desc')
+      .limit(limit);
 
-    return { codes, total, offset, limit, hasMore: offset + limit < total };
+    // Cursor-based: fetch rows after the cursor position
+    if (query.cursorCreatedAt && query.cursorId) {
+      dataQuery.where(function () {
+        this.where('createdAt', '<', query.cursorCreatedAt!)
+          .orWhere(function () {
+            this.where('createdAt', '=', query.cursorCreatedAt!)
+              .andWhere('id', '<', query.cursorId!);
+          });
+      });
+    }
+
+    const codes = await dataQuery;
+
+    // Build next cursor from last row
+    const lastRow = codes.length > 0 ? codes[codes.length - 1] : null;
+
+    return {
+      codes,
+      total,
+      limit,
+      hasMore: codes.length === limit,
+      nextCursorCreatedAt: lastRow?.createdAt || null,
+      nextCursorId: lastRow?.id || null,
+    };
   }
 
   /**
@@ -824,16 +881,26 @@ export class CouponSettingsService {
    */
   static async getIssuedCodes(
     settingId: string,
-    query: { page?: number; limit?: number; search?: string }
+    query: { page?: number; limit?: number; search?: string; status?: string; sortBy?: string; sortOrder?: string }
   ) {
     const startTime = Date.now();
     const page = query.page || 1;
     const limit = query.limit || 20;
     const offset = (page - 1) * limit;
 
+    // Validate sort column to prevent SQL injection
+    const allowedSortColumns: Record<string, string> = {
+      code: 'code',
+      status: 'status',
+      createdAt: 'createdAt',
+      usedAt: 'usedAt',
+    };
+    const sortCol = allowedSortColumns[query.sortBy || ''] || 'usedAt';
+    const sortDir = query.sortOrder === 'asc' ? 'asc' : 'desc';
+
     let total: number;
-    if (!query.search) {
-      // Use cached count from g_coupon_settings if no search filter
+    if (!query.search && !query.status) {
+      // Use cached count from g_coupon_settings if no search/status filter
       const setting = await db('g_coupon_settings')
         .where('id', settingId)
         .whereNot('status', 'DELETED')
@@ -849,23 +916,27 @@ export class CouponSettingsService {
         `Cache hit: total=${total}, time=${Date.now() - startTime}ms`
       );
     } else {
-      const countResult = await db('g_coupons')
-        .where('settingId', settingId)
-        .where('code', 'like', `%${query.search}%`)
-        .count('* as total')
-        .first();
+      const countQuery = db('g_coupons')
+        .where('settingId', settingId);
+      if (query.search) countQuery.where('code', 'like', `%${query.search}%`);
+      if (query.status) countQuery.where('status', query.status);
+      const countResult = await countQuery.count('* as total').first();
       total = Number(countResult?.total || 0);
     }
 
     const codesQuery = db('g_coupons')
       .where('settingId', settingId)
       .select('id', 'settingId', 'code', 'status', 'createdAt', 'usedAt')
-      .orderBy('createdAt', 'desc')
+      .orderBy(sortCol, sortDir)
+      .orderBy('id', sortDir)
       .limit(limit)
       .offset(offset);
 
     if (query.search) {
       codesQuery.where('code', 'like', `%${query.search}%`);
+    }
+    if (query.status) {
+      codesQuery.where('status', query.status);
     }
 
     const codes = await codesQuery;

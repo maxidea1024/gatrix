@@ -60,6 +60,7 @@ import rbacRoutes from './rbac';
 import aiChatRoutes from './ai-chat';
 import globalNetworkTrafficRoutes from './global-network-traffic';
 import ImpactMetricsController from '../../controllers/impact-metrics-controller';
+import rippleCmsRoutes from './ripple-cms';
 
 const router = express.Router();
 
@@ -448,6 +449,13 @@ projectRouter.use(
   '/player-connections',
   requireEnvPermission([P.MAINTENANCE_READ, P.MAINTENANCE_UPDATE]) as any,
   playerConnectionRoutes
+);
+
+// Ripple Monitoring & CMS Data Management
+projectRouter.use(
+  '/ripple-cms',
+  requireEnvPermission([P.RIPPLE_READ, P.RIPPLE_UPDATE, P.CMS_DATA_READ, P.CMS_DATA_UPDATE]) as any,
+  rippleCmsRoutes
 );
 
 router.use('/orgs/:orgId/projects/:projectId', projectRouter);

@@ -323,6 +323,33 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
+  // CMS 데이터 관리 (독립 카테고리)
+  {
+    id: 'cms-management',
+    text: 'sidebar.cmsManagement',
+    icon: 'Storage',
+    children: [
+      {
+        text: 'sidebar.rippleMonitor',
+        icon: 'Ripple',
+        path: '/admin/ripple-monitor',
+        requiredPermission: P.RIPPLE_READ,
+      },
+      {
+        text: 'sidebar.rippleHistory',
+        icon: 'History',
+        path: '/admin/ripple-history',
+        requiredPermission: P.RIPPLE_READ,
+      },
+      {
+        text: 'sidebar.cmsDataManagement',
+        icon: 'TableChart',
+        path: '/admin/cms-data',
+        requiredPermission: P.CMS_DATA_READ,
+      },
+    ],
+  },
+
   // Feature Flags
   {
     id: 'feature-flags',

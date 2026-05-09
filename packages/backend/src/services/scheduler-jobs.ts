@@ -180,6 +180,14 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
       logger.info('ccu:poll completed', { jobId: job.id });
     },
 
+    'subscriber:poll': async (job) => {
+      const { subscriberPollingService } = await import(
+        './subscriber-polling-service'
+      );
+      await subscriberPollingService.pollAll();
+      logger.info('subscriber:poll completed', { jobId: job.id });
+    },
+
     'context-field-usage:flush': async (job) => {
       const { processContextFieldUsageFlushJob } =
         await import('./context-field-usage-service');

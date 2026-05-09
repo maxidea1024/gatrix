@@ -98,6 +98,8 @@ export const RESOURCES = {
   SERVERS: 'servers',
   MESSAGE_TEMPLATES: 'message_templates',
   VARS: 'vars',
+  RIPPLE: 'ripple',
+  CMS_DATA: 'cms_data',
 } as const;
 
 export type Resource = (typeof RESOURCES)[keyof typeof RESOURCES];
@@ -167,6 +169,8 @@ export const RESOURCE_SCOPES: Record<Resource, Scope> = {
   [RESOURCES.SERVERS]: SCOPES.ENV,
   [RESOURCES.MESSAGE_TEMPLATES]: SCOPES.ENV,
   [RESOURCES.VARS]: SCOPES.ENV,
+  [RESOURCES.RIPPLE]: SCOPES.ENV,
+  [RESOURCES.CMS_DATA]: SCOPES.ENV,
 };
 
 // ==================== Available Actions per Resource ====================
@@ -389,6 +393,8 @@ export const RESOURCE_ACTIONS: Record<Resource, readonly Action[]> = {
     ACTIONS.UPDATE,
     ACTIONS.DELETE,
   ],
+  [RESOURCES.RIPPLE]: [ACTIONS.READ, ACTIONS.UPDATE],
+  [RESOURCES.CMS_DATA]: [ACTIONS.READ, ACTIONS.UPDATE],
 };
 
 // ==================== Permission Constants (P) ====================
@@ -666,6 +672,14 @@ export const P = {
   VARS_READ: perm(RESOURCES.VARS, ACTIONS.READ),
   VARS_UPDATE: perm(RESOURCES.VARS, ACTIONS.UPDATE),
   VARS_DELETE: perm(RESOURCES.VARS, ACTIONS.DELETE),
+
+  // Env - Ripple
+  RIPPLE_READ: perm(RESOURCES.RIPPLE, ACTIONS.READ),
+  RIPPLE_UPDATE: perm(RESOURCES.RIPPLE, ACTIONS.UPDATE),
+
+  // Env - CMS Data
+  CMS_DATA_READ: perm(RESOURCES.CMS_DATA, ACTIONS.READ),
+  CMS_DATA_UPDATE: perm(RESOURCES.CMS_DATA, ACTIONS.UPDATE),
 } as const;
 
 export type PermissionKey = keyof typeof P;

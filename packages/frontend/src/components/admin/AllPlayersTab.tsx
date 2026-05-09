@@ -1124,7 +1124,7 @@ export default function AllPlayersTab({
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         >
-          <Box sx={{ p: 2, minWidth: 400 }}>
+          <Box sx={{ p: 2, width: multiSearchTextareaSize.width + 32 }}>
             <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
               {t('playerConnections.multiSearch.title')}
             </Typography>
@@ -1152,9 +1152,8 @@ export default function AllPlayersTab({
               inputRef={multiSearchTextareaRef}
               inputProps={{
                 style: {
-                  width: multiSearchTextareaSize.width,
                   height: multiSearchTextareaSize.height,
-                  resize: 'both',
+                  resize: 'vertical',
                   overflow: 'auto',
                   fontSize: '0.85rem',
                   fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",

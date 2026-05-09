@@ -193,6 +193,24 @@ export class QueueService {
           logger.info('Repeatable job already exists: ccu:poll');
         }
 
+        // Register subscriber polling job (every 10 minutes)
+        const subscriberPollExists = repeatables.some(
+          (r) => r.name === 'subscriber:poll'
+        );
+        if (!subscriberPollExists) {
+          await this.addJob(
+            'scheduler',
+            'subscriber:poll',
+            {},
+            { repeat: { every: 600000 } }
+          );
+          logger.info(
+            'Registered repeatable job: subscriber:poll (every 10 minutes)'
+          );
+        } else {
+          logger.info('Repeatable job already exists: subscriber:poll');
+        }
+
         // Register context field usage flush job (every minute)
         const ctxFieldUsageFlushExists = repeatables.some(
           (r) => r.name === 'context-field-usage:flush'

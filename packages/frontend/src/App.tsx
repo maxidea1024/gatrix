@@ -9,6 +9,7 @@ import {
 import { CssBaseline, Box, GlobalStyles, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { SnackbarProvider, closeSnackbar } from 'notistack';
+import Lottie from 'lottie-react';
 
 // MUI Date Pickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -227,6 +228,15 @@ const PlanningDataPage = React.lazy(
 const PlanningDataHistoryPage = React.lazy(
   () => import('./pages/game/PlanningDataHistoryPage')
 );
+const RippleMonitorPage = React.lazy(
+  () => import('./pages/admin/RippleMonitorPage')
+);
+const RippleHistoryPage = React.lazy(
+  () => import('./pages/admin/RippleHistoryPage')
+);
+const CmsManagementPage = React.lazy(
+  () => import('./pages/game/CmsManagementPage')
+);
 const FeatureFlagsPage = React.lazy(
   () => import('./pages/features/FeatureFlagsPage')
 );
@@ -254,6 +264,26 @@ const ReleaseFlowTemplatesPage = React.lazy(
 const ImpactMetricsPage = React.lazy(
   () => import('./pages/features/ImpactMetricsPage')
 );
+
+// Lottie Loading Animation Component
+const LottieLoader: React.FC = () => {
+  const [animData, setAnimData] = React.useState<object | null>(null);
+  React.useEffect(() => {
+    fetch('/animations/loading-dots.json')
+      .then((r) => r.json())
+      .then(setAnimData)
+      .catch(() => {});
+  }, []);
+  if (!animData) return null;
+  return (
+    <Lottie
+      animationData={animData}
+      loop
+      autoplay
+      style={{ width: 120, height: 120 }}
+    />
+  );
+};
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -401,38 +431,7 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
           overflow: 'hidden',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            height: '60px',
-          }}
-        >
-          {[0, 1, 2].map((index) => (
-            <Box
-              key={index}
-              sx={{
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                backgroundColor: 'primary.main',
-                animation: 'dotWave 1.4s infinite ease-in-out',
-                animationDelay: `${index * 0.15}s`,
-                '@keyframes dotWave': {
-                  '0%, 60%, 100%': {
-                    transform: 'translateY(0) scale(1)',
-                    opacity: 0.4,
-                  },
-                  '30%': {
-                    transform: 'translateY(-20px) scale(1.2)',
-                    opacity: 1,
-                  },
-                },
-              }}
-            />
-          ))}
-        </Box>
+        <LottieLoader />
       </Box>
     );
   }
@@ -842,6 +841,18 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="environments"
                                           element={<WorkspaceTabbedPage />}
+                                        />
+                                        <Route
+                                          path="ripple-monitor"
+                                          element={<RippleMonitorPage />}
+                                        />
+                                        <Route
+                                          path="ripple-history"
+                                          element={<RippleHistoryPage />}
+                                        />
+                                        <Route
+                                          path="cms-data"
+                                          element={<CmsManagementPage />}
                                         />
                                       </Routes>
                                     </EnvironmentAwareLayout>

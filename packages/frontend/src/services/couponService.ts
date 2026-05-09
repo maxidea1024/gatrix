@@ -118,6 +118,9 @@ export interface IssuedCodesResponse {
   total: number;
   page?: number;
   limit?: number;
+  hasMore?: boolean;
+  nextCursorCreatedAt?: string | null;
+  nextCursorId?: string | null;
 }
 
 export interface IssuedCodesStats {
@@ -216,13 +219,16 @@ export const couponService = {
       subChannel?: string;
       gameWorldId?: string;
       characterId?: string;
+      cursorUsedAt?: string;
+      cursorId?: string;
     }
   ): Promise<{
     records: any[];
     total: number;
-    offset: number;
     limit: number;
     hasMore: boolean;
+    nextCursorUsedAt?: string | null;
+    nextCursorId?: string | null;
   }> {
     const res = await api.get(
       `${projectApiPath}/coupon-settings/usage/export-chunked`,
@@ -267,7 +273,14 @@ export const couponService = {
   async getIssuedCodesForExport(
     projectApiPath: string,
     settingId: string,
-    params?: { offset?: number; limit?: number; search?: string }
+    params?: {
+      offset?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      cursorCreatedAt?: string;
+      cursorId?: string;
+    }
   ): Promise<IssuedCodesResponse> {
     const res = await api.get(
       `${projectApiPath}/coupon-settings/${settingId}/issued-codes-export`,
@@ -276,13 +289,13 @@ export const couponService = {
       }
     );
     console.log('[couponService] getIssuedCodesForExport response:', res);
-    // API service already unwraps response.data, so res = { success: true, data: { codes, total, offset, limit, hasMore } }
+    // API service already unwraps response.data, so res = { success: true, data: { codes, total, limit, hasMore, nextCursor* } }
     return res.data;
   },
   async getIssuedCodes(
     projectApiPath: string,
     settingId: string,
-    params?: { page?: number; limit?: number; search?: string }
+    params?: { page?: number; limit?: number; search?: string; status?: string; sortBy?: string; sortOrder?: string }
   ): Promise<IssuedCodesResponse> {
     const res = await api.get(
       `${projectApiPath}/coupon-settings/${settingId}/issued-codes`,

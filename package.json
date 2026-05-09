@@ -171,6 +171,7 @@
   },
   "packageManager": "yarn@4.13.0",
   "resolutions": {
-    "@types/express-serve-static-core": "4.19.8"
+    "@types/express-serve-static-core": "4.19.8",
+    "debug": "4.3.4"
   }
 }

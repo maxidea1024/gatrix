@@ -62,7 +62,9 @@ import {
   Workspaces as WorkspacesIcon,
   Shield as ShieldIcon,
   Groups as GroupIcon,
+  TableChart as TableChartIcon,
 } from '@mui/icons-material';
+import RippleIcon from '@/components/icons/RippleIcon';
 
 // Icon name to component mapping
 const ICON_MAP: Record<string, React.ReactElement> = {
@@ -123,6 +125,8 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Workspaces: <WorkspacesIcon />,
   Shield: <ShieldIcon />,
   Group: <GroupIcon />,
+  TableChart: <TableChartIcon />,
+  Ripple: <RippleIcon />,
 };
 
 /**

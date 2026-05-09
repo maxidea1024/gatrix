@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
-  ToggleButton,
-  ToggleButtonGroup,
   Card,
   Chip,
   Stack,
@@ -19,14 +17,12 @@ import {
   Tooltip,
 } from '@mui/material';
 import {
-  People as PeopleIcon,
-  SmartToy as BotIcon,
-  Groups as AllIcon,
+  People as AllIcon,
+  PersonAdd as NewIcon,
   Visibility as LegendOnIcon,
   VisibilityOff as LegendOffIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -40,10 +36,12 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import playerConnectionService from '../../services/playerConnectionService';
-import type { CcuHistoryRecord } from '../../services/playerConnectionService';
+import type { CharacterHistoryRecord } from '../../services/playerConnectionService';
 import PageContentLoader from '../common/PageContentLoader';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import { crosshairPlugin } from '../../utils/chartCrosshairPlugin';
+import DateRangePicker, { DateRangePreset } from '../common/DateRangePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 ChartJS.register(
   CategoryScale,
@@ -57,13 +55,7 @@ ChartJS.register(
   crosshairPlugin
 );
 
-const TIME_RANGES = [
-  { value: '1h', label: '1H', hours: 1 },
-  { value: '6h', label: '6H', hours: 6 },
-  { value: '24h', label: '24H', hours: 24 },
-  { value: '7d', label: '7D', hours: 168 },
-  { value: '14d', label: '14D', hours: 336 },
-];
+
 
 const WORLD_COLORS = [
   { border: '#2196f3', bg: 'rgba(33,150,243,0.1)' },
@@ -76,15 +68,15 @@ const WORLD_COLORS = [
   { border: '#607d8b', bg: 'rgba(96,125,139,0.1)' },
 ];
 
-// --- CcuHistoryTable: 10-minute bucket aggregation ---
+// --- History Table ---
 interface BucketRow {
-  time: string; // e.g. "04/21 10:30"
-  total: number;
-  bots: number;
-  worlds: { name: string; count: number; bots: number }[];
+  time: string;
+  totalCharacters: number;
+  newCharacters: number;
+  worlds: { name: string; total: number; newCount: number }[];
 }
 
-const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
+const CharacterHistoryTable: React.FC<{ records: CharacterHistoryRecord[] }> = ({
   records,
 }) => {
   const { t } = useTranslation();
@@ -93,16 +85,13 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
   const buckets = useMemo(() => {
     if (records.length === 0) return [];
 
-    // Only use total records (worldId === null)
     const totalRecords = records.filter((r) => r.worldId === null);
     const worldRecords = records.filter((r) => r.worldId !== null);
 
-    // Group totals into 10-minute buckets
     const bucketMap = new Map<string, BucketRow>();
 
     totalRecords.forEach((r) => {
       const d = new Date(r.recordedAt);
-      // Round down to 10-min bucket
       const mins = Math.floor(d.getMinutes() / 10) * 10;
       d.setMinutes(mins, 0, 0);
       const key = d.toISOString();
@@ -111,19 +100,17 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
       if (!bucketMap.has(key)) {
         bucketMap.set(key, {
           time: label,
-          total: r.playerCount,
-          bots: r.botCount || 0,
+          totalCharacters: r.totalCharacters,
+          newCharacters: r.newCharacters,
           worlds: [],
         });
       } else {
-        // Keep the latest value in the bucket
         const existing = bucketMap.get(key)!;
-        existing.total = Math.max(existing.total, r.playerCount);
-        existing.bots = Math.max(existing.bots, r.botCount || 0);
+        existing.totalCharacters = Math.max(existing.totalCharacters, r.totalCharacters);
+        existing.newCharacters = Math.max(existing.newCharacters, r.newCharacters);
       }
     });
 
-    // Attach per-world data to each bucket
     worldRecords.forEach((r) => {
       const d = new Date(r.recordedAt);
       const mins = Math.floor(d.getMinutes() / 10) * 10;
@@ -136,24 +123,22 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
         (w) => w.name === (r.worldName || r.worldId)
       );
       if (existingWorld) {
-        existingWorld.count = Math.max(existingWorld.count, r.playerCount);
-        existingWorld.bots = Math.max(existingWorld.bots, r.botCount || 0);
+        existingWorld.total = Math.max(existingWorld.total, r.totalCharacters);
+        existingWorld.newCount = Math.max(existingWorld.newCount, r.newCharacters);
       } else {
         bucket.worlds.push({
           name: r.worldName || r.worldId || '?',
-          count: r.playerCount,
-          bots: r.botCount || 0,
+          total: r.totalCharacters,
+          newCount: r.newCharacters,
         });
       }
     });
 
-    // Sort descending (most recent first)
     return Array.from(bucketMap.values()).sort((a, b) =>
       b.time > a.time ? 1 : -1
     );
   }, [records]);
 
-  // Collect all unique world names
   const worldNames = useMemo(() => {
     const names = new Set<string>();
     buckets.forEach((b) => b.worlds.forEach((w) => names.add(w.name)));
@@ -176,10 +161,10 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
         }}
       >
         <Typography variant="subtitle2" fontWeight={600}>
-          {t('playerConnections.ccuGraph.historyTable')}
+          {t('playerConnections.character.historyTable')}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {t('playerConnections.ccuGraph.historyTableDesc', {
+          {t('playerConnections.character.historyTableDesc', {
             count: buckets.length,
           })}
         </Typography>
@@ -196,7 +181,7 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
                   bgcolor: 'background.paper',
                 }}
               >
-                {t('playerConnections.ccuGraph.colTime')}
+                {t('playerConnections.character.colTime')}
               </TableCell>
               <TableCell
                 align="right"
@@ -207,7 +192,7 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
                   bgcolor: 'background.paper',
                 }}
               >
-                {t('playerConnections.ccuGraph.colTotal')}
+                {t('playerConnections.character.colTotalCharacters')}
               </TableCell>
               {worldNames.map((name) => (
                 <TableCell
@@ -257,7 +242,7 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
                     color: 'primary.main',
                   }}
                 >
-                  {row.total.toLocaleString()}
+                  {row.totalCharacters.toLocaleString()}
                 </TableCell>
                 {worldNames.map((name) => {
                   const w = row.worlds.find((x) => x.name === name);
@@ -269,10 +254,10 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
                         fontSize: '0.75rem',
                         py: 0.75,
                         color:
-                          w && w.count > 0 ? 'text.primary' : 'text.disabled',
+                          w && w.total > 0 ? 'text.primary' : 'text.disabled',
                       }}
                     >
-                      {w ? w.count.toLocaleString() : '-'}
+                      {w ? w.total.toLocaleString() : '-'}
                     </TableCell>
                   );
                 })}
@@ -290,76 +275,79 @@ interface Props {
   refreshKey?: number;
 }
 
-const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
+const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
-  const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
-  const [timeRange, setTimeRangeRaw] = useState(
+  const [records, setRecords] = useState<CharacterHistoryRecord[]>([]);
+
+  const [displayMode, setDisplayModeRaw] = useState<'total' | 'new'>(
     () =>
-      searchParams.get('range') ||
-      localStorage.getItem('ccu-time-range') ||
-      '24h'
+      (localStorage.getItem('character-display-mode') as 'total' | 'new') ||
+      'total'
   );
-  const setTimeRange = useCallback((v: string) => {
-    setTimeRangeRaw(v);
-    localStorage.setItem('ccu-time-range', v);
-  }, []);
-  const [displayMode, setDisplayModeRaw] = useState<'all' | 'users' | 'bots'>(
-    () =>
-      (localStorage.getItem('ccu-display-mode') as 'all' | 'users' | 'bots') ||
-      'all'
-  );
-  const setDisplayMode = useCallback((v: 'all' | 'users' | 'bots') => {
+  const setDisplayMode = useCallback((v: 'total' | 'new') => {
     setDisplayModeRaw(v);
-    localStorage.setItem('ccu-display-mode', v);
+    localStorage.setItem('character-display-mode', v);
   }, []);
+
   const [showLegend, setShowLegendRaw] = useState(
-    () => localStorage.getItem('ccu-show-legend') !== 'false'
+    () => localStorage.getItem('character-show-legend') !== 'false'
   );
   const setShowLegend = useCallback((v: boolean) => {
     setShowLegendRaw(v);
-    localStorage.setItem('ccu-show-legend', String(v));
+    localStorage.setItem('character-show-legend', String(v));
   }, []);
 
-  const getDateRange = useCallback(() => {
-    const opt = TIME_RANGES.find((r) => r.value === timeRange);
-    const hours = opt?.hours || 24;
-    const to = new Date();
-    const from = new Date(to.getTime() - hours * 3600000);
-    return { from, to };
-  }, [timeRange]);
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
+    () => dayjs().subtract(7, 'day').startOf('day')
+  );
+  const [dateTo, setDateTo] = useState<Dayjs | null>(() => dayjs().endOf('day'));
+  const [datePreset, setDatePreset] = useState<DateRangePreset>('last7d');
 
-  // Track whether we've done the initial load (to avoid showing loading skeleton on refreshes)
+  const handleDateChange = useCallback(
+    (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => {
+      setDateFrom(from);
+      setDateTo(to);
+      setDatePreset(preset);
+    },
+    []
+  );
+
+  const getDateRange = useCallback(() => {
+    const to = dateTo ? dateTo.toDate() : new Date();
+    const from = dateFrom ? dateFrom.toDate() : new Date(to.getTime() - 7 * 24 * 3600000);
+    return { from, to };
+  }, [dateFrom, dateTo]);
+
   const hasLoadedRef = useRef(false);
   const prevGetDateRangeRef = useRef(getDateRange);
 
-  const loadHistory = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true);
-    try {
-      const { from, to } = getDateRange();
-      const data = await playerConnectionService.getCcuHistory(projectApiPath, {
-        from: from.toISOString(),
-        to: to.toISOString(),
-      });
-      setRecords(data);
-      hasLoadedRef.current = true;
-    } catch (err) {
-      console.error('CCU history load failed:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectApiPath, getDateRange]);
+  const loadHistory = useCallback(
+    async (showLoading = true) => {
+      if (showLoading) setLoading(true);
+      try {
+        const { from, to } = getDateRange();
+        const data = await playerConnectionService.getCharacterHistory(
+          projectApiPath,
+          { from: from.toISOString(), to: to.toISOString() }
+        );
+        setRecords(data);
+        hasLoadedRef.current = true;
+      } catch (err) {
+        console.error('Character history load failed:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [projectApiPath, getDateRange]
+  );
 
-  // Initial load or time range change — show loading skeleton
   useEffect(() => {
-    // Show loading skeleton only if time range changed or it's the first load
     const rangeChanged = prevGetDateRangeRef.current !== getDateRange;
     prevGetDateRangeRef.current = getDateRange;
     loadHistory(!hasLoadedRef.current || rangeChanged);
   }, [loadHistory]);
 
-  // Periodic refresh via refreshKey — update data silently without resetting chart
   const prevRefreshKeyRef = useRef(refreshKey);
   useEffect(() => {
     if (prevRefreshKeyRef.current !== refreshKey && hasLoadedRef.current) {
@@ -368,28 +356,20 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     }
   }, [refreshKey, loadHistory]);
 
-  // Persist range to URL
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (timeRange !== '24h') params.set('range', timeRange);
-    else params.delete('range');
-    params.set('tab', '1');
-    setSearchParams(params, { replace: true });
-  }, [timeRange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Build chart data
+
+  // Build chart data — like CCU with per-world breakdown
   const chartData = useMemo(() => {
     if (records.length === 0) return { labels: [], datasets: [] };
 
     // Group by worldId
-    const groups = new Map<string, CcuHistoryRecord[]>();
+    const groups = new Map<string, CharacterHistoryRecord[]>();
     records.forEach((r) => {
       const key = r.worldId ?? '__total__';
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(r);
     });
 
-    // Use total's timestamps as labels
     const totalRecords = groups.get('__total__') || [];
     const labels = totalRecords.map((r) => {
       const d = new Date(r.recordedAt);
@@ -398,43 +378,25 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
 
     const datasets: any[] = [];
 
-    // Total line (always first, bold)
+    // Total line
     if (totalRecords.length > 0) {
-      if (displayMode === 'all' || displayMode === 'users') {
-        datasets.push({
-          label:
-            displayMode === 'users'
-              ? t('playerConnections.ccu.total') + ' (Users)'
-              : t('playerConnections.ccu.total'),
-          data: totalRecords.map((r) => r.playerCount),
-          borderColor: '#1976d2',
-          backgroundColor: 'rgba(25,118,210,0.15)',
-          borderWidth: 3,
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          spanGaps: true,
-        });
-      }
-      if (displayMode === 'all' || displayMode === 'bots') {
-        datasets.push({
-          label:
-            displayMode === 'bots'
-              ? t('playerConnections.ccu.total') + ' (Bots)'
-              : t('playerConnections.ccu.botTotal'),
-          data: totalRecords.map((r) => r.botCount || 0),
-          borderColor: '#9c27b0',
-          backgroundColor: 'rgba(156,39,176,0.10)',
-          borderWidth: 2,
-          tension: 0.3,
-          fill: displayMode === 'bots',
-          borderDash: displayMode === 'all' ? [5, 3] : undefined,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          spanGaps: true,
-        });
-      }
+      const isTotal = displayMode === 'total';
+      datasets.push({
+        label: isTotal
+          ? t('playerConnections.character.totalCharacters')
+          : t('playerConnections.character.newCharacters'),
+        data: totalRecords.map((r) =>
+          isTotal ? r.totalCharacters : r.newCharacters
+        ),
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,0.15)',
+        borderWidth: 3,
+        tension: 0.3,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        spanGaps: true,
+      });
     }
 
     // Per-world lines
@@ -442,35 +404,19 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     groups.forEach((recs, key) => {
       if (key === '__total__') return;
       const c = WORLD_COLORS[colorIdx % WORLD_COLORS.length];
-      if (displayMode === 'all' || displayMode === 'users') {
-        datasets.push({
-          label:
-            (recs[0]?.worldName || key) + (displayMode === 'all' ? '' : ''),
-          data: recs.map((r) => r.playerCount),
-          borderColor: c.border,
-          backgroundColor: c.bg,
-          borderWidth: 1.5,
-          tension: 0.3,
-          fill: false,
-          pointRadius: 0,
-          pointHoverRadius: 3,
-          spanGaps: true,
-        });
-      }
-      if (displayMode === 'bots') {
-        datasets.push({
-          label: (recs[0]?.worldName || key) + ' (Bot)',
-          data: recs.map((r) => r.botCount || 0),
-          borderColor: c.border,
-          backgroundColor: c.bg,
-          borderWidth: 1.5,
-          tension: 0.3,
-          fill: false,
-          pointRadius: 0,
-          pointHoverRadius: 3,
-          spanGaps: true,
-        });
-      }
+      const isTotal = displayMode === 'total';
+      datasets.push({
+        label: recs[0]?.worldName || key,
+        data: recs.map((r) => (isTotal ? r.totalCharacters : r.newCharacters)),
+        borderColor: c.border,
+        backgroundColor: c.bg,
+        borderWidth: 1.5,
+        tension: 0.3,
+        fill: false,
+        pointRadius: 0,
+        pointHoverRadius: 3,
+        spanGaps: true,
+      });
       colorIdx++;
     });
 
@@ -483,7 +429,16 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: showLegend, position: 'top' as const },
-        tooltip: { mode: 'index' as const, intersect: false },
+        tooltip: {
+          mode: 'index' as const,
+          intersect: false,
+          callbacks: {
+            label: (ctx: any) => {
+              const val = ctx.parsed.y;
+              return `${ctx.dataset.label}: ${val != null ? val.toLocaleString() : '-'}`;
+            },
+          },
+        },
       },
       scales: {
         x: {
@@ -495,7 +450,14 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             maxTicksLimit: 16,
           },
         },
-        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: {
+            callback: (value: any) =>
+              typeof value === 'number' ? value.toLocaleString() : value,
+          },
+        },
       },
       interaction: {
         mode: 'nearest' as const,
@@ -521,36 +483,27 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
         <Stack direction="row" spacing={0.5}>
           <Chip
             icon={<AllIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.ccuGraph.all')}
+            label={t('playerConnections.character.totalCharacters')}
             size="small"
-            variant={displayMode === 'all' ? 'filled' : 'outlined'}
-            color={displayMode === 'all' ? 'primary' : 'default'}
-            onClick={() => setDisplayMode('all')}
+            variant={displayMode === 'total' ? 'filled' : 'outlined'}
+            color={displayMode === 'total' ? 'primary' : 'default'}
+            onClick={() => setDisplayMode('total')}
             sx={{ borderRadius: 1.5 }}
           />
           <Chip
-            icon={<PeopleIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.ccuGraph.usersOnly')}
+            icon={<NewIcon sx={{ fontSize: 16 }} />}
+            label={t('playerConnections.character.newCharacters')}
             size="small"
-            variant={displayMode === 'users' ? 'filled' : 'outlined'}
-            color={displayMode === 'users' ? 'primary' : 'default'}
-            onClick={() => setDisplayMode('users')}
-            sx={{ borderRadius: 1.5 }}
-          />
-          <Chip
-            icon={<BotIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.ccuGraph.botsOnly')}
-            size="small"
-            variant={displayMode === 'bots' ? 'filled' : 'outlined'}
-            color={displayMode === 'bots' ? 'secondary' : 'default'}
-            onClick={() => setDisplayMode('bots')}
+            variant={displayMode === 'new' ? 'filled' : 'outlined'}
+            color={displayMode === 'new' ? 'success' : 'default'}
+            onClick={() => setDisplayMode('new')}
             sx={{ borderRadius: 1.5 }}
           />
           <Tooltip
             title={
               showLegend
-                ? t('playerConnections.ccuGraph.hideLegend')
-                : t('playerConnections.ccuGraph.showLegend')
+                ? t('playerConnections.character.hideLegend')
+                : t('playerConnections.character.showLegend')
             }
           >
             <IconButton
@@ -566,40 +519,32 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             </IconButton>
           </Tooltip>
         </Stack>
-        <ToggleButtonGroup
-          value={timeRange}
-          exclusive
-          onChange={(_, v) => v && setTimeRange(v)}
+        <DateRangePicker
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          onChange={handleDateChange}
+          preset={datePreset}
+          availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'last3m', 'last6m', 'custom']}
           size="small"
-        >
-          {TIME_RANGES.map((r) => (
-            <ToggleButton
-              key={r.value}
-              value={r.value}
-              sx={{ px: 1.5, py: 0.5, textTransform: 'none' }}
-            >
-              {r.label}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        />
       </Box>
 
       <PageContentLoader loading={loading}>
         {chartData.datasets.length === 0 ? (
           <EmptyPlaceholder
-            message={t('playerConnections.ccuGraph.noData')}
+            message={t('playerConnections.character.noData')}
             minHeight={300}
           />
         ) : (
           <>
             <Card variant="outlined" sx={{ p: 2 }}>
               <Box sx={{ height: 400 }}>
-                <Line data={chartData} options={chartOptions} />
+                <Line data={chartData} options={chartOptions as any} />
               </Box>
             </Card>
 
-            {/* Time-based CCU list (10-minute buckets) */}
-            <CcuHistoryTable records={records} />
+            {/* History table */}
+            <CharacterHistoryTable records={records} />
           </>
         )}
       </PageContentLoader>
@@ -607,4 +552,4 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   );
 };
 
-export default CcuGraphTab;
+export default CharacterGraphTab;

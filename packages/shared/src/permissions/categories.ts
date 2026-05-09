@@ -136,6 +136,8 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
       RESOURCES.MESSAGE_TEMPLATES,
       RESOURCES.VARS,
       RESOURCES.PLANNING_DATA,
+      RESOURCES.RIPPLE,
+      RESOURCES.CMS_DATA,
     ],
   },
 

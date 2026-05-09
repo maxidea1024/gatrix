@@ -181,12 +181,15 @@ const CouponSettingsPage: React.FC = () => {
   const [codesSetting, setCodesSetting] = useState<CouponSetting | null>(null);
   const [codesSearch, setCodesSearch] = useState('');
   const debouncedCodesSearch = useDebounce(codesSearch, 500);
+  const [codesStatusFilter, setCodesStatusFilter] = useState<'ALL' | 'USED' | 'ISSUED'>('ALL');
   const [codesLoading, setCodesLoading] = useState(false);
   const [codesStatsLoading, setCodesStatsLoading] = useState(false);
   const [codesItems, setCodesItems] = useState<IssuedCouponCode[]>([]);
   const [codesTotal, setCodesTotal] = useState(0);
   const [codesPage, setCodesPage] = useState(0);
   const [codesRowsPerPage, setCodesRowsPerPage] = useState(20);
+  const [codesOrderBy, setCodesOrderBy] = useState<string>('usedAt');
+  const [codesOrder, setCodesOrder] = useState<'asc' | 'desc'>('desc');
   const [codesExportMenuAnchor, setCodesExportMenuAnchor] =
     useState<null | HTMLElement>(null);
   const [codesStats, setCodesStats] = useState<{
@@ -201,6 +204,7 @@ const CouponSettingsPage: React.FC = () => {
   const [exportSuccess, setExportSuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx' | null>(null);
   const exportAbortControllerRef = useRef<AbortController | null>(null);
+  const codesRequestIdRef = useRef(0);
 
   const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
     null
@@ -235,7 +239,7 @@ const CouponSettingsPage: React.FC = () => {
 
   // Export all issued codes to CSV/XLSX (chunked for large datasets)
   const handleExportIssuedCodes = useCallback(
-    async (format: 'csv' | 'xlsx') => {
+    async (format: 'csv' | 'xlsx', useFilter: boolean = false) => {
       if (!codesSetting) {
         enqueueSnackbar(t('coupons.couponSettings.noDataToExport'), {
           variant: 'warning',
@@ -267,10 +271,12 @@ const CouponSettingsPage: React.FC = () => {
           .slice(0, 19);
         const allCodes: IssuedCouponCode[] = [];
         const chunkSize = 1000;
-        let offset = 0;
         let hasMore = true;
+        let cursorCreatedAt: string | undefined;
+        let cursorId: string | undefined;
 
-        // Fetch all codes in chunks
+        // Fetch all codes in chunks using cursor-based pagination
+        // (prevents row skipping when new codes are generated between chunks)
         while (hasMore && !exportAbortControllerRef.current?.signal.aborted) {
           // Check if export was cancelled
           if (exportAbortControllerRef.current?.signal.aborted) {
@@ -282,14 +288,17 @@ const CouponSettingsPage: React.FC = () => {
               projectApiPath,
               codesSetting.id,
               {
-                offset,
                 limit: chunkSize,
-                search: debouncedCodesSearch || undefined,
+                search: useFilter ? (debouncedCodesSearch || undefined) : undefined,
+                status: useFilter && codesStatusFilter !== 'ALL' ? codesStatusFilter : undefined,
+                cursorCreatedAt,
+                cursorId,
               }
             );
             allCodes.push(...(res.codes || []));
-            hasMore = (res as any).hasMore || false;
-            offset += chunkSize;
+            hasMore = res.hasMore || false;
+            cursorCreatedAt = res.nextCursorCreatedAt || undefined;
+            cursorId = res.nextCursorId || undefined;
 
             // Update progress only for large datasets
             if (shouldShowProgress) {
@@ -423,6 +432,7 @@ const CouponSettingsPage: React.FC = () => {
     [
       codesSetting,
       debouncedCodesSearch,
+      codesStatusFilter,
       codesStats?.issued || 0,
       t,
       enqueueSnackbar,
@@ -433,6 +443,10 @@ const CouponSettingsPage: React.FC = () => {
     setCodesSetting(it);
     setOpenCodes(true);
     setCodesPage(0);
+    setCodesStatusFilter('ALL');
+    setCodesSearch('');
+    setCodesOrderBy('usedAt');
+    setCodesOrder('desc');
   };
 
   // form dialog state
@@ -960,6 +974,7 @@ const CouponSettingsPage: React.FC = () => {
 
   const loadCodes = useCallback(async () => {
     if (!codesSetting) return;
+    const requestId = ++codesRequestIdRef.current;
     setCodesLoading(true);
     try {
       const res = await couponService.getIssuedCodes(
@@ -969,65 +984,54 @@ const CouponSettingsPage: React.FC = () => {
           page: codesPage + 1,
           limit: codesRowsPerPage,
           search: debouncedCodesSearch || undefined,
+          status: codesStatusFilter === 'ALL' ? undefined : codesStatusFilter,
+          sortBy: codesOrderBy,
+          sortOrder: codesOrder,
         }
       );
+      // Discard stale response: a newer request has been issued
+      if (requestId !== codesRequestIdRef.current) return;
       const data: any = (res as any).data ? (res as any).data : res;
       setCodesItems(data.codes || []);
       setCodesTotal(data.total || 0);
     } finally {
-      setCodesLoading(false);
+      if (requestId === codesRequestIdRef.current) {
+        setCodesLoading(false);
+      }
     }
-  }, [codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch]);
+  }, [codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch, codesStatusFilter, codesOrderBy, codesOrder]);
 
   // Load stats only once when drawer opens, not on every page change
   const loadCodesStats = useCallback(async () => {
-    if (!codesSetting) {
-      console.log('[loadCodesStats] codesSetting is null, skipping');
-      return;
-    }
-    console.log('[loadCodesStats] Loading stats for:', codesSetting.id);
+    if (!codesSetting) return;
     setCodesStatsLoading(true);
     try {
       const stats = await couponService.getIssuedCodesStats(
         projectApiPath,
         codesSetting.id
       );
-      console.log('[loadCodesStats] Loaded stats:', stats);
       setCodesStats(stats);
     } catch (error) {
       console.error('[loadCodesStats] Failed to load codes stats', error);
-      // Set default stats on error
       setCodesStats({ issued: 0, used: 0, unused: 0 });
     } finally {
       setCodesStatsLoading(false);
     }
   }, [codesSetting]);
 
-  // Load codes and stats when drawer opens
+  // Load stats only when drawer opens (not on filter/page changes)
   useEffect(() => {
     if (openCodes && codesSetting) {
-      console.log(
-        '[CouponSettingsPage] Loading codes and stats for:',
-        codesSetting.id
-      );
-      loadCodes();
       loadCodesStats();
     }
-  }, [openCodes, codesSetting, loadCodes, loadCodesStats]);
+  }, [openCodes, codesSetting, loadCodesStats]);
 
-  // Load codes when pagination or search changes (but not stats)
+  // Load codes when drawer opens, or pagination/search/filter changes
   useEffect(() => {
     if (openCodes && codesSetting) {
       loadCodes();
     }
-  }, [
-    openCodes,
-    codesSetting,
-    codesPage,
-    codesRowsPerPage,
-    debouncedCodesSearch,
-    loadCodes,
-  ]);
+  }, [openCodes, codesSetting, loadCodes]);
 
   const handleSave = async (skipCr: boolean = false) => {
     // Basic validation
@@ -2904,53 +2908,125 @@ const CouponSettingsPage: React.FC = () => {
       >
         <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
           <Stack spacing={2}>
-            {/* Statistics Cards */}
+            {/* Statistics Cards – clickable status filter toggles */}
             <Stack direction="row" spacing={2}>
-              <Card sx={{ flex: 1 }}>
-                <CardContent
-                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
-                >
+              <Card
+                sx={{
+                  flex: 1,
+                  cursor: 'pointer',
+                  border: 2,
+                  borderRadius: 2,
+                  ...(codesStatusFilter === 'ALL'
+                    ? {
+                        borderColor: 'transparent',
+                        background: 'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)',
+                        boxShadow: '0 4px 14px rgba(92,107,192,0.4)',
+                        transform: 'scale(1.02)',
+                      }
+                    : {
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        boxShadow: 1,
+                      }),
+                  transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': codesStatusFilter !== 'ALL' ? {
+                    borderColor: 'primary.light',
+                    transform: 'translateY(-2px)',
+                    boxShadow: 3,
+                  } : {},
+                }}
+                onClick={() => { setCodesStatusFilter('ALL'); setCodesPage(0); }}
+              >
+                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <ListIcon sx={{ color: 'text.secondary' }} />
+                    <ListIcon sx={{ color: codesStatusFilter === 'ALL' ? '#fff' : 'text.secondary', fontSize: 28 }} />
                     <Box>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: codesStatusFilter === 'ALL' ? 'rgba(255,255,255,0.85)' : 'text.secondary', fontWeight: 600 }}>
                         {t('coupons.couponSettings.statistics.total')}
                       </Typography>
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ color: codesStatusFilter === 'ALL' ? '#fff' : 'text.primary', fontWeight: 700 }}>
                         {(codesStats?.issued || 0).toLocaleString()}
                       </Typography>
                     </Box>
                   </Stack>
                 </CardContent>
               </Card>
-              <Card sx={{ flex: 1 }}>
-                <CardContent
-                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
-                >
+              <Card
+                sx={{
+                  flex: 1,
+                  cursor: 'pointer',
+                  border: 2,
+                  borderRadius: 2,
+                  ...(codesStatusFilter === 'USED'
+                    ? {
+                        borderColor: 'transparent',
+                        background: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
+                        boxShadow: '0 4px 14px rgba(102,187,106,0.4)',
+                        transform: 'scale(1.02)',
+                      }
+                    : {
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        boxShadow: 1,
+                      }),
+                  transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': codesStatusFilter !== 'USED' ? {
+                    borderColor: 'success.light',
+                    transform: 'translateY(-2px)',
+                    boxShadow: 3,
+                  } : {},
+                }}
+                onClick={() => { setCodesStatusFilter('USED'); setCodesPage(0); }}
+              >
+                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <CheckCircleIcon sx={{ color: 'success.main' }} />
+                    <CheckCircleIcon sx={{ color: codesStatusFilter === 'USED' ? '#fff' : 'success.main', fontSize: 28 }} />
                     <Box>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: codesStatusFilter === 'USED' ? 'rgba(255,255,255,0.85)' : 'text.secondary', fontWeight: 600 }}>
                         {t('coupons.couponSettings.statistics.used')}
                       </Typography>
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ color: codesStatusFilter === 'USED' ? '#fff' : 'text.primary', fontWeight: 700 }}>
                         {(codesStats?.used || 0).toLocaleString()}
                       </Typography>
                     </Box>
                   </Stack>
                 </CardContent>
               </Card>
-              <Card sx={{ flex: 1 }}>
-                <CardContent
-                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
-                >
+              <Card
+                sx={{
+                  flex: 1,
+                  cursor: 'pointer',
+                  border: 2,
+                  borderRadius: 2,
+                  ...(codesStatusFilter === 'ISSUED'
+                    ? {
+                        borderColor: 'transparent',
+                        background: 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
+                        boxShadow: '0 4px 14px rgba(255,167,38,0.4)',
+                        transform: 'scale(1.02)',
+                      }
+                    : {
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        boxShadow: 1,
+                      }),
+                  transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': codesStatusFilter !== 'ISSUED' ? {
+                    borderColor: 'warning.light',
+                    transform: 'translateY(-2px)',
+                    boxShadow: 3,
+                  } : {},
+                }}
+                onClick={() => { setCodesStatusFilter('ISSUED'); setCodesPage(0); }}
+              >
+                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <HourglassEmptyIcon sx={{ color: 'warning.main' }} />
+                    <HourglassEmptyIcon sx={{ color: codesStatusFilter === 'ISSUED' ? '#fff' : 'warning.main', fontSize: 28 }} />
                     <Box>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: codesStatusFilter === 'ISSUED' ? 'rgba(255,255,255,0.85)' : 'text.secondary', fontWeight: 600 }}>
                         {t('coupons.couponSettings.statistics.unused')}
                       </Typography>
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ color: codesStatusFilter === 'ISSUED' ? '#fff' : 'text.primary', fontWeight: 700 }}>
                         {(codesStats?.unused || 0).toLocaleString()}
                       </Typography>
                     </Box>
@@ -3000,185 +3076,248 @@ const CouponSettingsPage: React.FC = () => {
                   horizontal: 'right',
                 }}
               >
+                {(codesStatusFilter !== 'ALL' || debouncedCodesSearch) && (
+                  <Box>
+                    <MenuItem disabled sx={{ fontWeight: 600, fontSize: '0.75rem', opacity: '1 !important', minHeight: 32 }}>
+                      {t('coupons.couponSettings.exportFiltered', '필터링된 데이터')}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleExportIssuedCodes('csv', true)}
+                      disabled={exportingCodes}
+                    >
+                      <TableChartIcon sx={{ mr: 1 }} />
+                      CSV ({t('coupons.couponSettings.exportFilterApplied', '필터 적용')})
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleExportIssuedCodes('xlsx', true)}
+                      disabled={exportingCodes}
+                    >
+                      <ExcelIcon sx={{ mr: 1 }} />
+                      Excel ({t('coupons.couponSettings.exportFilterApplied', '필터 적용')})
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem disabled sx={{ fontWeight: 600, fontSize: '0.75rem', opacity: '1 !important', minHeight: 32 }}>
+                      {t('coupons.couponSettings.exportAll', '전체 데이터')}
+                    </MenuItem>
+                  </Box>
+                )}
                 <MenuItem
-                  onClick={() => handleExportIssuedCodes('csv')}
+                  onClick={() => handleExportIssuedCodes('csv', false)}
                   disabled={exportingCodes}
                 >
                   <TableChartIcon sx={{ mr: 1 }} />
-                  CSV
+                  CSV{(codesStatusFilter !== 'ALL' || debouncedCodesSearch) ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})` : ''}
                 </MenuItem>
                 <MenuItem
-                  onClick={() => handleExportIssuedCodes('xlsx')}
+                  onClick={() => handleExportIssuedCodes('xlsx', false)}
                   disabled={exportingCodes}
                 >
                   <ExcelIcon sx={{ mr: 1 }} />
-                  Excel (XLSX)
+                  Excel{(codesStatusFilter !== 'ALL' || debouncedCodesSearch) ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})` : ''}
                 </MenuItem>
               </Menu>
             </Stack>
 
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow sx={{ height: 48 }}>
-                    <TableCell sx={{ py: 1, px: 2 }}>
-                      {t('coupons.issuedCodes.code')}
-                    </TableCell>
-                    <TableCell sx={{ py: 1, px: 2 }}>
-                      {t('coupons.issuedCodes.status')}
-                    </TableCell>
-                    <TableCell sx={{ py: 1, px: 2 }}>
-                      {t('coupons.issuedCodes.issuedAt')}
-                    </TableCell>
-                    <TableCell sx={{ py: 1, px: 2 }}>
-                      {t('coupons.issuedCodes.usedAt')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {codesLoading ? (
-                    <TableRow hover>
-                      <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
-                        <Typography color="text.secondary">
-                          {t('common.loading')}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : codesItems.length === 0 ? (
-                    <TableRow hover>
-                      <TableCell colSpan={4} sx={{ p: 0 }}>
-                        {codesSetting?.generationStatus === 'FAILED' ? (
-                          <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
-                            <Typography
-                              variant="h6"
-                              color="error"
-                              sx={{
-                                mb: 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 1,
+            {codesLoading ? (
+              <Box sx={{ py: 6, textAlign: 'center' }}>
+                <Typography color="text.secondary">
+                  {t('common.loading')}
+                </Typography>
+              </Box>
+            ) : codesItems.length === 0 ? (
+              codesSetting?.generationStatus === 'FAILED' ? (
+                <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
+                  <Typography
+                    variant="h6"
+                    color="error"
+                    sx={{
+                      mb: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    ⚠️ {t('coupons.couponSettings.generationFailed')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('coupons.couponSettings.generationFailedDescription')}
+                  </Typography>
+                </Box>
+              ) : codesSetting?.generationStatus === 'IN_PROGRESS' ||
+                codesSetting?.generationStatus === 'PENDING' ? (
+                <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
+                  <Typography
+                    variant="body1"
+                    color="warning.main"
+                    sx={{
+                      mb: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    <HourglassEmptyIcon fontSize="small" />
+                    {t('coupons.couponSettings.generatingInBackground')}
+                  </Typography>
+                </Box>
+              ) : (
+                <EmptyPagePlaceholder message={t('common.noData')} />
+              )
+            ) : (
+              <Card variant="outlined">
+                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow sx={{ height: 48 }}>
+                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'code' ? codesOrder : false}>
+                            <TableSortLabel
+                              active={codesOrderBy === 'code'}
+                              direction={codesOrderBy === 'code' ? codesOrder : 'asc'}
+                              onClick={() => {
+                                const isAsc = codesOrderBy === 'code' && codesOrder === 'asc';
+                                setCodesOrder(isAsc ? 'desc' : 'asc');
+                                setCodesOrderBy('code');
+                                setCodesPage(0);
                               }}
                             >
-                              ⚠️ {t('coupons.couponSettings.generationFailed')}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {t(
-                                'coupons.couponSettings.generationFailedDescription'
-                              )}
-                            </Typography>
-                          </Box>
-                        ) : codesSetting?.generationStatus === 'IN_PROGRESS' ||
-                          codesSetting?.generationStatus === 'PENDING' ? (
-                          <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
-                            <Typography
-                              variant="body1"
-                              color="warning.main"
-                              sx={{
-                                mb: 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 1,
+                              {t('coupons.issuedCodes.code')}
+                            </TableSortLabel>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'status' ? codesOrder : false}>
+                            <TableSortLabel
+                              active={codesOrderBy === 'status'}
+                              direction={codesOrderBy === 'status' ? codesOrder : 'asc'}
+                              onClick={() => {
+                                const isAsc = codesOrderBy === 'status' && codesOrder === 'asc';
+                                setCodesOrder(isAsc ? 'desc' : 'asc');
+                                setCodesOrderBy('status');
+                                setCodesPage(0);
                               }}
                             >
-                              <HourglassEmptyIcon fontSize="small" />
-                              {t(
-                                'coupons.couponSettings.generatingInBackground'
-                              )}
-                            </Typography>
-                          </Box>
-                        ) : (
-                          <EmptyPagePlaceholder message={t('common.noData')} />
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    codesItems.map((c) => (
-                      <TableRow key={c.id} hover sx={{ height: 48 }}>
-                        <TableCell sx={{ py: 1, px: 2 }}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              sx={{ fontFamily: 'monospace' }}
+                              {t('coupons.issuedCodes.status')}
+                            </TableSortLabel>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'createdAt' ? codesOrder : false}>
+                            <TableSortLabel
+                              active={codesOrderBy === 'createdAt'}
+                              direction={codesOrderBy === 'createdAt' ? codesOrder : 'asc'}
+                              onClick={() => {
+                                const isAsc = codesOrderBy === 'createdAt' && codesOrder === 'asc';
+                                setCodesOrder(isAsc ? 'desc' : 'asc');
+                                setCodesOrderBy('createdAt');
+                                setCodesPage(0);
+                              }}
                             >
-                              {c.code}
-                            </Typography>
-                            <Tooltip
-                              title={t('coupons.couponSettings.copyCode')}
+                              {t('coupons.issuedCodes.issuedAt')}
+                            </TableSortLabel>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'usedAt' ? codesOrder : false}>
+                            <TableSortLabel
+                              active={codesOrderBy === 'usedAt'}
+                              direction={codesOrderBy === 'usedAt' ? codesOrder : 'asc'}
+                              onClick={() => {
+                                const isAsc = codesOrderBy === 'usedAt' && codesOrder === 'asc';
+                                setCodesOrder(isAsc ? 'desc' : 'asc');
+                                setCodesOrderBy('usedAt');
+                                setCodesPage(0);
+                              }}
                             >
-                              <IconButton
+                              {t('coupons.issuedCodes.usedAt')}
+                            </TableSortLabel>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {codesItems.map((c) => (
+                          <TableRow key={c.id} hover sx={{ height: 48 }}>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  sx={{ fontFamily: 'monospace' }}
+                                >
+                                  {c.code}
+                                </Typography>
+                                <Tooltip
+                                  title={t('coupons.couponSettings.copyCode')}
+                                >
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleCopyCode(c.code)}
+                                  >
+                                    <ContentCopyIcon fontSize="inherit" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Chip
                                 size="small"
-                                onClick={() => handleCopyCode(c.code)}
-                              >
-                                <ContentCopyIcon fontSize="inherit" />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </TableCell>
-                        <TableCell sx={{ py: 1, px: 2 }}>
-                          <Chip
-                            size="small"
-                            color={
-                              c.status === 'USED'
-                                ? 'success'
-                                : c.status === 'REVOKED'
-                                  ? 'warning'
-                                  : 'default'
-                            }
-                            label={
-                              c.status === 'USED'
-                                ? t('coupons.issuedCodes.statusUsed')
-                                : c.status === 'REVOKED'
-                                  ? t('coupons.issuedCodes.statusRevoked')
-                                  : t('coupons.issuedCodes.statusIssued')
-                            }
-                          />
-                        </TableCell>
-                        <TableCell sx={{ py: 1, px: 2 }}>
-                          <Tooltip title={formatDateTimeDetailed(c.createdAt)}>
-                            <Typography
-                              variant="caption"
-                              sx={{ cursor: 'help' }}
-                            >
-                              {formatRelativeTime(
-                                c.createdAt,
-                                undefined,
-                                language
+                                color={
+                                  c.status === 'USED'
+                                    ? 'success'
+                                    : c.status === 'REVOKED'
+                                      ? 'warning'
+                                      : 'default'
+                                }
+                                label={
+                                  c.status === 'USED'
+                                    ? t('coupons.issuedCodes.statusUsed')
+                                    : c.status === 'REVOKED'
+                                      ? t('coupons.issuedCodes.statusRevoked')
+                                      : t('coupons.issuedCodes.statusIssued')
+                                }
+                              />
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Tooltip title={formatDateTimeDetailed(c.createdAt)}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ cursor: 'help' }}
+                                >
+                                  {formatRelativeTime(
+                                    c.createdAt,
+                                    undefined,
+                                    language
+                                  )}
+                                </Typography>
+                              </Tooltip>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              {c.usedAt ? (
+                                <Tooltip title={formatDateTimeDetailed(c.usedAt)}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ cursor: 'help' }}
+                                  >
+                                    {formatRelativeTime(
+                                      c.usedAt,
+                                      undefined,
+                                      language
+                                    )}
+                                  </Typography>
+                                </Tooltip>
+                              ) : (
+                                <Typography variant="caption">-</Typography>
                               )}
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell sx={{ py: 1, px: 2 }}>
-                          {c.usedAt ? (
-                            <Tooltip title={formatDateTimeDetailed(c.usedAt)}>
-                              <Typography
-                                variant="caption"
-                                sx={{ cursor: 'help' }}
-                              >
-                                {formatRelativeTime(
-                                  c.usedAt,
-                                  undefined,
-                                  language
-                                )}
-                              </Typography>
-                            </Tooltip>
-                          ) : (
-                            <Typography variant="caption">-</Typography>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            )}
           </Stack>
         </Box>
         <Box

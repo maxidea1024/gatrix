@@ -86,6 +86,8 @@ import type {
 import PageContentLoader from '../../components/common/PageContentLoader';
 import PageHeader from '../../components/common/PageHeader';
 import CcuGraphTab from '../../components/admin/CcuGraphTab';
+import SubscriberGraphTab from '../../components/admin/SubscriberGraphTab';
+import CharacterGraphTab from '../../components/admin/CharacterGraphTab';
 import PlayerListTab from '../../components/admin/PlayerListTab';
 import AllPlayersTab from '../../components/admin/AllPlayersTab';
 import AllCharactersTab from '../../components/admin/AllCharactersTab';
@@ -96,6 +98,10 @@ import {
 import CcuScoreboard from '../../components/admin/CcuScoreboard';
 import CountdownScoreboard from '../../components/admin/CountdownScoreboard';
 import LocalizedDateTimePicker from '../../components/common/LocalizedDateTimePicker';
+import type {
+  SubscriberLatest,
+  CharacterLatest,
+} from '../../services/playerConnectionService';
 
 const REFRESH_STORAGE_KEY = 'playerConnections.refreshInterval';
 const REFRESH_OPTIONS = [
@@ -164,6 +170,8 @@ const PlayerConnectionsPage: React.FC = () => {
   } | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
+  const [subscriberLatest, setSubscriberLatest] = useState<SubscriberLatest | null>(null);
+  const [characterLatest, setCharacterLatest] = useState<CharacterLatest | null>(null);
   const SCOREBOARD_STORAGE_KEY = 'playerConnections.scoreboardOpen';
   const [scoreboardOpen, setScoreboardOpen] = useState(
     () => sessionStorage.getItem(SCOREBOARD_STORAGE_KEY) === 'true'
@@ -255,6 +263,9 @@ const PlayerConnectionsPage: React.FC = () => {
         return data;
       });
       setDataRefreshKey((k) => k + 1);
+      // Load subscriber/character latest stats (non-blocking)
+      playerConnectionService.getSubscriberLatest(projectApiPath).then(setSubscriberLatest).catch(() => {});
+      playerConnectionService.getCharacterLatest(projectApiPath).then(setCharacterLatest).catch(() => {});
     } catch (err: any) {
       const status = err?.response?.status || err?.status;
       if (status === 502 || status === 504) {
@@ -278,7 +289,7 @@ const PlayerConnectionsPage: React.FC = () => {
 
   // Auto-refresh (only for Overview and CCU Graph tabs, not Player List)
   useEffect(() => {
-    if (refreshInterval > 0 && activeTab < 2) {
+    if (refreshInterval > 0 && activeTab < 4) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
     return () => {
@@ -1193,7 +1204,7 @@ const PlayerConnectionsPage: React.FC = () => {
                 <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
               </>
             )}
-            {activeTab < 2 && (
+            {activeTab < 4 && (
               <>
                 <ButtonGroup
                   variant="contained"
@@ -1332,6 +1343,8 @@ const PlayerConnectionsPage: React.FC = () => {
       >
         <Tab label={t('playerConnections.tabs.overview')} />
         <Tab label={t('playerConnections.tabs.ccuGraph')} />
+        <Tab label={t('playerConnections.tabs.playerGraph')} />
+        <Tab label={t('playerConnections.tabs.characterGraph')} />
         <Tab label={t('playerConnections.tabs.players')} />
         <Tab label={t('playerConnections.tabs.allPlayers')} />
         <Tab label={t('playerConnections.tabs.allCharacters')} />
@@ -1662,6 +1675,246 @@ const PlayerConnectionsPage: React.FC = () => {
                       })}
                     >
                       <KickIcon />
+                    </Avatar>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Subscriber/Character stat cards */}
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                sx={(theme) => ({
+                  height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                })}
+              >
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.info.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.overview.totalPlayers')}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color="info.main"
+                      >
+                        {subscriberLatest?.totalPlayers?.toLocaleString() ?? '-'}
+                      </Typography>
+                    </Box>
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.info.main, 0.15),
+                        color: 'info.main',
+                        width: 48,
+                        height: 48,
+                      })}
+                    >
+                      <PeopleIcon />
+                    </Avatar>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                sx={(theme) => ({
+                  height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                })}
+              >
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.success.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.overview.todayNewPlayers')}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color="success.main"
+                      >
+                        {subscriberLatest?.newPlayers != null
+                          ? `+${subscriberLatest.newPlayers.toLocaleString()}`
+                          : '-'}
+                      </Typography>
+                    </Box>
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.success.main, 0.15),
+                        color: 'success.main',
+                        width: 48,
+                        height: 48,
+                      })}
+                    >
+                      <TrendingUpIcon />
+                    </Avatar>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                sx={(theme) => ({
+                  height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                })}
+              >
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.secondary.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.overview.totalCharacters')}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color="secondary.main"
+                      >
+                        {characterLatest?.totalCharacters?.toLocaleString() ?? '-'}
+                      </Typography>
+                    </Box>
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.secondary.main, 0.15),
+                        color: 'secondary.main',
+                        width: 48,
+                        height: 48,
+                      })}
+                    >
+                      <WorldIcon />
+                    </Avatar>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                sx={(theme) => ({
+                  height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                })}
+              >
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.success.main, 0.1),
+                  })}
+                />
+                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={500}
+                        gutterBottom
+                      >
+                        {t('playerConnections.overview.todayNewCharacters')}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color="success.main"
+                      >
+                        {characterLatest?.newCharacters != null
+                          ? `+${characterLatest.newCharacters.toLocaleString()}`
+                          : '-'}
+                      </Typography>
+                    </Box>
+                    <Avatar
+                      sx={(theme) => ({
+                        bgcolor: alpha(theme.palette.success.main, 0.15),
+                        color: 'success.main',
+                        width: 48,
+                        height: 48,
+                      })}
+                    >
+                      <TrendingUpIcon />
                     </Avatar>
                   </Box>
                 </CardContent>
@@ -2077,8 +2330,18 @@ const PlayerConnectionsPage: React.FC = () => {
         <CcuGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
       )}
 
-      {/* Tab 2: Player List */}
+      {/* Tab 2: Subscriber (Player) Graph */}
       {activeTab === 2 && projectApiPath && (
+        <SubscriberGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
+      )}
+
+      {/* Tab 3: Character Graph */}
+      {activeTab === 3 && projectApiPath && (
+        <CharacterGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
+      )}
+
+      {/* Tab 4: Player List */}
+      {activeTab === 4 && projectApiPath && (
         <PlayerListTab
           key={`playerlist-${dataRefreshKey}`}
           projectApiPath={projectApiPath}
@@ -2089,8 +2352,8 @@ const PlayerConnectionsPage: React.FC = () => {
         />
       )}
 
-      {/* Tab 3: All Players (DB) */}
-      {activeTab === 3 && projectApiPath && (
+      {/* Tab 5: All Players (DB) */}
+      {activeTab === 5 && projectApiPath && (
         <AllPlayersTab
           key={`allplayers-${dataRefreshKey}`}
           projectApiPath={projectApiPath}
@@ -2098,8 +2361,8 @@ const PlayerConnectionsPage: React.FC = () => {
         />
       )}
 
-      {/* Tab 4: All Characters (DB) */}
-      {activeTab === 4 && projectApiPath && (
+      {/* Tab 6: All Characters (DB) */}
+      {activeTab === 6 && projectApiPath && (
         <AllCharactersTab
           key={`allchars-${dataRefreshKey}`}
           projectApiPath={projectApiPath}

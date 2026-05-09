@@ -11,6 +11,14 @@ router.use(authenticate as any);
 router.get('/ccu', PlayerConnectionsController.getCcu);
 router.get('/ccu/history', PlayerConnectionsController.getCcuHistory);
 
+// Subscriber endpoints
+router.get('/subscriber/history', PlayerConnectionsController.getSubscriberHistory);
+router.get('/subscriber/latest', PlayerConnectionsController.getSubscriberLatest);
+
+// Character endpoints
+router.get('/character/history', PlayerConnectionsController.getCharacterHistory);
+router.get('/character/latest', PlayerConnectionsController.getCharacterLatest);
+
 // Login queue (waiting count)
 router.get('/login-queue', PlayerConnectionsController.getLoginQueue);
 

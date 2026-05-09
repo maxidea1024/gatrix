@@ -6,7 +6,6 @@ import {
   Typography,
   ToggleButton,
   ToggleButtonGroup,
-  Skeleton,
   IconButton,
   Tooltip,
   useTheme,
@@ -265,11 +264,33 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
         </Box>
 
         {loading ? (
-          <Skeleton
-            variant="rectangular"
-            height={210}
-            sx={{ borderRadius: 1 }}
-          />
+          <Box sx={{ height: 280, position: 'relative', overflow: 'hidden', borderRadius: 1 }}>
+            {/* Animated shimmer skeleton */}
+            <Box sx={{
+              position: 'absolute', inset: 0,
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)'
+                : 'linear-gradient(90deg, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.03) 75%)',
+              backgroundSize: '200% 100%',
+              animation: 'ccuShimmer 1.5s infinite ease-in-out',
+              '@keyframes ccuShimmer': {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' },
+              },
+              borderRadius: 1,
+            }} />
+            {/* Faint chart-like placeholder lines */}
+            <Box sx={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', p: 2, gap: 0.5 }}>
+              {[60, 40, 70, 35, 55, 45].map((w, i) => (
+                <Box key={i} sx={{
+                  height: 2,
+                  width: `${w}%`,
+                  borderRadius: 1,
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                }} />
+              ))}
+            </Box>
+          </Box>
         ) : chartData.datasets.length === 0 ? (
           <Box
             sx={{
@@ -288,7 +309,14 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ height: 280 }}>
+          <Box sx={{
+            height: 280,
+            animation: 'ccuReveal 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+            '@keyframes ccuReveal': {
+              from: { opacity: 0, transform: 'translateY(12px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+          }}>
             <Line data={chartData} options={chartOptions} />
           </Box>
         )}

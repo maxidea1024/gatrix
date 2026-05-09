@@ -6,6 +6,8 @@ import { GatrixError } from '../middleware/error-handler';
 import { asyncHandler } from '../utils/async-handler';
 import { createLogger } from '../config/logger';
 import { CcuHistoryModel } from '../models/ccu-history';
+import { SubscriberHistoryModel } from '../models/subscriber-history';
+import { CharacterHistoryModel } from '../models/character-history';
 import serviceDiscoveryService from '../services/service-discovery-service';
 
 const logger = createLogger('PlayerConnectionsController');
@@ -257,11 +259,26 @@ export class PlayerConnectionsController {
         );
       }
 
+      // Determine downsampling interval based on requested time range
+      // Goal: keep data points under ~350 per series for chart performance
+      const rangeHours =
+        (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60);
+      let intervalSeconds: number | undefined;
+      if (rangeHours > 24 * 7) {
+        intervalSeconds = 3600; // 60-min buckets for >7D  → max ~336 points
+      } else if (rangeHours > 24) {
+        intervalSeconds = 1800; // 30-min buckets for >24H → max ~336 points
+      } else if (rangeHours > 6) {
+        intervalSeconds = 300; // 5-min buckets  for >6H  → max ~288 points
+      }
+      // ≤6H: no downsampling (raw 1-min data, max ~360 points)
+
       const records = await CcuHistoryModel.getHistory(
         environmentId,
         fromDate,
         toDate,
-        worldId === 'null' ? null : (worldId as string | undefined)
+        worldId === 'null' ? null : (worldId as string | undefined),
+        intervalSeconds
       );
 
       res.json({
@@ -644,6 +661,166 @@ export class PlayerConnectionsController {
           502
         );
       }
+    }
+  );
+
+  /**
+   * GET /subscriber/history?from=...&to=...
+   * Query subscriber history from the local database for graphing
+   */
+  static getSubscriberHistory = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const { from, to } = req.query;
+
+      // Default: last 24 hours
+      const now = new Date();
+      const fromDate = from
+        ? new Date(from as string)
+        : new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const toDate = to ? new Date(to as string) : now;
+
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        throw new GatrixError(
+          'Invalid date format for from/to parameters',
+          400
+        );
+      }
+
+      // Determine downsampling interval based on requested time range
+      const rangeHours =
+        (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60);
+      let intervalSeconds: number | undefined;
+      if (rangeHours > 24 * 30) {
+        intervalSeconds = 3600; // 60-min buckets for >30D
+      } else if (rangeHours > 24 * 7) {
+        intervalSeconds = 1800; // 30-min buckets for >7D
+      } else if (rangeHours > 24) {
+        intervalSeconds = 1200; // 20-min buckets for >24H
+      }
+      // ≤24H: no downsampling (raw 10-min data)
+
+      const records = await SubscriberHistoryModel.getHistory(
+        environmentId,
+        fromDate,
+        toDate,
+        intervalSeconds
+      );
+
+      res.json({
+        success: true,
+        data: { records },
+      });
+    }
+  );
+
+  /**
+   * GET /subscriber/latest
+   * Returns the latest subscriber statistics for overview cards
+   */
+  static getSubscriberLatest = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const latest = await SubscriberHistoryModel.getLatest(environmentId);
+
+      res.json({
+        success: true,
+        data: latest
+          ? {
+              totalPlayers: latest.totalPlayers,
+              newPlayers: latest.newPlayers,
+              recordedAt: latest.recordedAt,
+            }
+          : null,
+      });
+    }
+  );
+
+  /**
+   * GET /character/history?from=...&to=...&worldId=...
+   * Query character history from the local database for graphing
+   */
+  static getCharacterHistory = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const { from, to, worldId } = req.query;
+
+      // Default: last 24 hours
+      const now = new Date();
+      const fromDate = from
+        ? new Date(from as string)
+        : new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const toDate = to ? new Date(to as string) : now;
+
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        throw new GatrixError(
+          'Invalid date format for from/to parameters',
+          400
+        );
+      }
+
+      // Determine downsampling interval based on requested time range
+      const rangeHours =
+        (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60);
+      let intervalSeconds: number | undefined;
+      if (rangeHours > 24 * 30) {
+        intervalSeconds = 3600;
+      } else if (rangeHours > 24 * 7) {
+        intervalSeconds = 1800;
+      } else if (rangeHours > 24) {
+        intervalSeconds = 1200;
+      }
+
+      const records = await CharacterHistoryModel.getHistory(
+        environmentId,
+        fromDate,
+        toDate,
+        worldId === 'null' ? null : (worldId as string | undefined),
+        intervalSeconds
+      );
+
+      res.json({
+        success: true,
+        data: { records },
+      });
+    }
+  );
+
+  /**
+   * GET /character/latest
+   * Returns the latest character statistics for overview cards
+   */
+  static getCharacterLatest = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const latest = await CharacterHistoryModel.getLatest(environmentId);
+
+      res.json({
+        success: true,
+        data: latest
+          ? {
+              totalCharacters: latest.totalCharacters,
+              newCharacters: latest.newCharacters,
+              recordedAt: latest.recordedAt,
+            }
+          : null,
+      });
     }
   );
 }

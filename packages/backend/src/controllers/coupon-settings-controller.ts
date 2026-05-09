@@ -352,16 +352,19 @@ export class CouponSettingsController {
     }
   );
 
-  // Get issued codes for export (chunked)
+  // Get issued codes for export (cursor-based chunked)
   static getIssuedCodesForExport = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { id } = req.params;
       if (!id) throw new GatrixError('id is required', 400);
-      const { offset, limit, search } = req.query;
+      const { offset, limit, search, status, cursorCreatedAt, cursorId } = req.query;
       const data = await CouponSettingsService.getIssuedCodesForExport(id, {
         offset: offset ? parseInt(offset as string) : undefined,
         limit: limit ? parseInt(limit as string) : undefined,
         search: search as string,
+        status: status as string,
+        cursorCreatedAt: cursorCreatedAt as string,
+        cursorId: cursorId as string,
       });
       res.json({ success: true, data });
     }
@@ -372,11 +375,14 @@ export class CouponSettingsController {
     async (req: AuthenticatedRequest, res: Response) => {
       const { id } = req.params;
       if (!id) throw new GatrixError('id is required', 400);
-      const { page, limit, search } = req.query;
+      const { page, limit, search, status, sortBy, sortOrder } = req.query;
       const data = await CouponSettingsService.getIssuedCodes(id, {
         page: page ? parseInt(page as string) : undefined,
         limit: limit ? parseInt(limit as string) : undefined,
         search: search as string,
+        status: status as string,
+        sortBy: sortBy as string,
+        sortOrder: sortOrder as string,
       });
       res.json({ success: true, data });
     }
@@ -413,7 +419,7 @@ export class CouponSettingsController {
     }
   );
 
-  // Get coupon usage records for export (chunked)
+  // Get coupon usage records for export (cursor-based chunked)
   static getUsageForExport = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const {
@@ -424,6 +430,8 @@ export class CouponSettingsController {
         platform,
         gameWorldId,
         characterId,
+        cursorUsedAt,
+        cursorId,
       } = req.query;
       const data = await CouponSettingsService.getUsageForExportChunked({
         offset: offset ? parseInt(offset as string) : undefined,
@@ -433,6 +441,8 @@ export class CouponSettingsController {
         platform: platform as string,
         gameWorldId: gameWorldId as string,
         characterId: characterId as string,
+        cursorUsedAt: cursorUsedAt as string,
+        cursorId: cursorId as string,
       } as any);
       res.json({ success: true, data });
     }

@@ -90,6 +90,36 @@ export interface LoginQueueData {
   world: Record<string, number>;
 }
 
+export interface SubscriberHistoryRecord {
+  id?: string;
+  environmentId: string;
+  totalPlayers: number;
+  newPlayers: number;
+  recordedAt: string;
+}
+
+export interface SubscriberLatest {
+  totalPlayers: number;
+  newPlayers: number;
+  recordedAt: string;
+}
+
+export interface CharacterHistoryRecord {
+  id?: string;
+  environmentId: string;
+  worldId: string | null;
+  worldName: string | null;
+  totalCharacters: number;
+  newCharacters: number;
+  recordedAt: string;
+}
+
+export interface CharacterLatest {
+  totalCharacters: number;
+  newCharacters: number;
+  recordedAt: string;
+}
+
 // Service
 const playerConnectionService = {
   /**
@@ -331,6 +361,75 @@ const playerConnectionService = {
     try {
       const res = await api.get(
         `${projectApiPath}/player-connections/payment-stats`
+      );
+      return res.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Get subscriber history from database for graphing
+   */
+  async getSubscriberHistory(
+    projectApiPath: string,
+    params: { from: string; to: string }
+  ): Promise<SubscriberHistoryRecord[]> {
+    const searchParams = new URLSearchParams({
+      from: params.from,
+      to: params.to,
+    });
+    const res = await api.get(
+      `${projectApiPath}/player-connections/subscriber/history?${searchParams}`
+    );
+    return res.data?.records || [];
+  },
+
+  /**
+   * Get latest subscriber statistics for overview cards
+   */
+  async getSubscriberLatest(
+    projectApiPath: string
+  ): Promise<SubscriberLatest | null> {
+    try {
+      const res = await api.get(
+        `${projectApiPath}/player-connections/subscriber/latest`
+      );
+      return res.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Get character history from database for graphing
+   */
+  async getCharacterHistory(
+    projectApiPath: string,
+    params: { from: string; to: string; worldId?: string }
+  ): Promise<CharacterHistoryRecord[]> {
+    const searchParams = new URLSearchParams({
+      from: params.from,
+      to: params.to,
+    });
+    if (params.worldId !== undefined) {
+      searchParams.set('worldId', params.worldId);
+    }
+    const res = await api.get(
+      `${projectApiPath}/player-connections/character/history?${searchParams}`
+    );
+    return res.data?.records || [];
+  },
+
+  /**
+   * Get latest character statistics for overview cards
+   */
+  async getCharacterLatest(
+    projectApiPath: string
+  ): Promise<CharacterLatest | null> {
+    try {
+      const res = await api.get(
+        `${projectApiPath}/player-connections/character/latest`
       );
       return res.data || null;
     } catch {
