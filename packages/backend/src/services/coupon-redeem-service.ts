@@ -3,6 +3,9 @@ import { Knex } from 'knex';
 import { GatrixError } from '../middleware/error-handler';
 import { ulid } from 'ulid';
 import { createLogger } from '../config/logger';
+import redisClient from '../config/redis';
+import { queueService } from './queue-service';
+import { CouponRedeemJobPayload } from './jobs/coupon-redeem-job';
 
 const logger = createLogger('CouponRedeemService');
 
@@ -176,213 +179,179 @@ export class CouponRedeemService {
     // Check targeting conditions BEFORE locking
     await this.validateTargeting(db, setting.id, request, setting);
 
-    // --- PHASE 2: Transactional logic with minimal lock duration ---
-    return await db.transaction(async (trx) => {
-      // Re-fetch to acquire lock
-      if (isSpecialCoupon) {
-        setting = await trx('g_coupon_settings')
-          .where('id', setting.id)
-          .forUpdate()
-          .first();
+    // --- PHASE 2: Extreme Redis Optimization (Zero DB Lock) ---
+    const redis = redisClient.getClient();
+    const useId = ulid();
+    const usedAtISO = now.toISOString();
+    const usedAtMySQL = now.toISOString().slice(0, 19).replace('T', ' ');
 
-        if (!setting || setting.status !== 'ACTIVE') {
-          throw new GatrixError(
-            'Coupon is not active',
-            422,
-            true,
-            CouponErrorCode.NOT_ACTIVE
-          );
-        }
+    let sequence = 1;
 
-        // For SPECIAL coupons, check maxTotalUses under lock
-        if (setting.maxTotalUses && setting.maxTotalUses > 0) {
-          const totalUsedCount = Number(setting.usedCount || 0);
-          if (totalUsedCount >= setting.maxTotalUses) {
-            throw new GatrixError(
-              'Coupon has reached its maximum usage limit',
-              409,
-              true,
-              CouponErrorCode.ALREADY_USED
-            );
-          }
-        }
+    // 1. Atomic Check for NORMAL Coupons (SETNX Lock)
+    if (!isSpecialCoupon && coupon) {
+      const lockKey = `coupon:redeemed:${environmentId}:${code}`;
+      const acquired = await redis.setnx(lockKey, useId);
+      
+      if (acquired) {
+        // Expire the lock after 90 days to prevent infinite memory growth
+        await redis.expire(lockKey, 60 * 60 * 24 * 90);
       } else {
-        coupon = await trx('g_coupons')
-          .where('id', couponId)
-          .forUpdate()
-          .first();
-
-        if (!coupon || coupon.status === 'USED') {
-          throw new GatrixError(
-            'Coupon has already been used',
-            409,
-            true,
-            CouponErrorCode.ALREADY_USED
-          );
-        }
-
-        // We don't necessarily need to lock g_coupon_settings for NORMAL coupons 
-        // to prevent global bottlenecks, but we re-read to get latest usedCount
-        setting = await trx('g_coupon_settings')
-          .where('id', setting.id)
-          .first();
-          
-        if (!setting || setting.status !== 'ACTIVE') {
-          throw new GatrixError(
-            'Coupon is not active',
-            422,
-            true,
-            CouponErrorCode.NOT_ACTIVE
-          );
-        }
+        throw new GatrixError(
+          'Coupon has already been used',
+          409,
+          true,
+          CouponErrorCode.ALREADY_USED
+        );
       }
+    }
 
-      // Check per-user/character limit based on usageLimitType under transaction
-      const usageLimitType = setting.usageLimitType || 'USER';
-      const usageQuery = trx('g_coupon_uses').where('settingId', setting.id);
-
+    // 2. Atomic Check for User/Character Limits
+    const usageLimitType = setting.usageLimitType || 'USER';
+    const limitTargetId = usageLimitType === 'CHARACTER' && request.characterId ? request.characterId : request.userId;
+    const usageKey = `coupon:usage:${environmentId}:${setting.id}:${limitTargetId}`;
+    
+    // Increment the usage count atomically
+    sequence = await redis.incr(usageKey);
+    
+    // Lazy Loading: If sequence is 1, it might be a cache miss. Verify with DB to prevent abuse.
+    if (sequence === 1) {
+      const usageQuery = db('g_coupon_uses').where('settingId', setting.id);
       if (usageLimitType === 'CHARACTER' && request.characterId) {
         usageQuery.where('characterId', request.characterId);
       } else {
         usageQuery.where('userId', request.userId);
       }
-
       const usageResult = await usageQuery.count('* as count').first();
-      const userUsedCount = Number(usageResult?.count || 0);
+      const dbUsedCount = Number(usageResult?.count || 0);
+      
+      if (dbUsedCount > 0) {
+        // Correct the Redis counter (dbUsedCount + 1 since they are using it now)
+        sequence = dbUsedCount + 1;
+        await redis.set(usageKey, sequence);
+      }
+    }
 
-      if (userUsedCount >= setting.perUserLimit) {
+    // Check if the sequence exceeds the perUserLimit
+    if (sequence > setting.perUserLimit) {
+      // Rollback the increment since they exceeded the limit
+      await redis.decr(usageKey);
+      
+      // Also rollback the code lock if it was a NORMAL coupon
+      if (!isSpecialCoupon && coupon) {
+        await redis.del(`coupon:redeemed:${environmentId}:${code}`);
+      }
+
+      throw new GatrixError(
+        'User has reached the usage limit for this coupon',
+        409,
+        true,
+        CouponErrorCode.USER_LIMIT_EXCEEDED
+      );
+    }
+
+    // 3. Optional: Global limit check for SPECIAL coupons (Best effort)
+    if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
+      const globalUsageKey = `coupon:global_usage:${environmentId}:${setting.id}`;
+      let globalCount = await redis.incr(globalUsageKey);
+      
+      if (globalCount === 1) {
+        // Lazy load global count
+        const dbSetting = await db('g_coupon_settings').where('id', setting.id).select('usedCount').first();
+        if (dbSetting && Number(dbSetting.usedCount || 0) > 0) {
+          globalCount = Number(dbSetting.usedCount || 0) + 1;
+          await redis.set(globalUsageKey, globalCount);
+        }
+      }
+
+      if (globalCount > setting.maxTotalUses) {
+        await redis.decr(globalUsageKey);
+        await redis.decr(usageKey);
         throw new GatrixError(
-          'User has reached the usage limit for this coupon',
+          'Coupon has reached its maximum usage limit',
           409,
           true,
-          CouponErrorCode.USER_LIMIT_EXCEEDED
+          CouponErrorCode.ALREADY_USED
         );
       }
+    }
 
-      const usedAtISO = now.toISOString();
-      const usedAtMySQL = now.toISOString().slice(0, 19).replace('T', ' ');
+    // 4. Dispatch Async Job to BullMQ for DB Persistence
+    const payload: CouponRedeemJobPayload = {
+      useId,
+      environmentId,
+      settingId: setting.id,
+      code,
+      couponId: couponId || null,
+      settingType: setting.type as 'NORMAL' | 'SPECIAL',
+      sequence,
+      usedAtMySQL,
+      userId: request.userId,
+      characterId: request.characterId || null,
+      userName: sanitizedUserName,
+      worldId: request.worldId || null,
+      platform: request.platform || null,
+      channel: request.channel || null,
+      subchannel: request.subChannel || null,
+    };
 
-      // Update coupon status to USED (only for NORMAL coupons)
-      if (!isSpecialCoupon && couponId) {
-        await trx('g_coupons')
-          .where('id', couponId)
-          .update({ status: 'USED', usedAt: usedAtMySQL });
-      }
+    await queueService.addJob('coupon-redeem', 'redeem', payload, {
+      jobId: useId, // Idempotency
+    });
 
-      // Record usage
-      const sequence = userUsedCount + 1;
-      const useId = ulid();
+    logger.info('Coupon redeemed successfully (Async queued)', {
+      code,
+      userId: request.userId,
+      settingId: setting.id,
+      sequence,
+      environmentId,
+      isSpecialCoupon,
+    });
 
-      await trx('g_coupon_uses').insert({
-        id: useId,
-        settingId: setting.id,
-        issuedCouponId: couponId, // null for SPECIAL coupons
-        userId: request.userId,
-        characterId: request.characterId || null,
-        userName: sanitizedUserName,
-        sequence,
-        usedAt: usedAtMySQL,
-        gameWorldId: request.worldId || null,
-        platform: request.platform || null,
-        channel: request.channel || null,
-        subchannel: request.subChannel || null,
-      });
+    // 5. Build response without waiting for DB Write
+    let reward: any[] = [];
 
-      // Update usedCount cache
-      await trx('g_coupon_settings')
-        .where('id', setting.id)
-        .increment('usedCount', 1);
+    if (setting.rewardTemplateId) {
+      const template = await db('g_reward_templates')
+        .where('id', setting.rewardTemplateId)
+        .where('environmentId', environmentId)
+        .select('rewardItems')
+        .first();
 
-      // Check if all coupons are now used and auto-disable if needed
-      let shouldAutoDisable = false;
-      if (
-        setting.type === 'SPECIAL' &&
-        setting.maxTotalUses &&
-        setting.maxTotalUses > 0
-      ) {
-        const newUsedCount = (setting.usedCount || 0) + 1;
-        if (newUsedCount >= setting.maxTotalUses) {
-          shouldAutoDisable = true;
-        }
-      } else if (setting.type === 'NORMAL') {
-        const newUsedCount = (setting.usedCount || 0) + 1;
-        const totalIssued = setting.generatedCount || setting.issuedCount || 0;
-        if (totalIssued > 0 && newUsedCount >= totalIssued) {
-          shouldAutoDisable = true;
-        }
-      }
-
-      if (shouldAutoDisable) {
-        await trx('g_coupon_settings').where('id', setting.id).update({
-          status: 'DISABLED',
-          disabledBy: 'system',
-          disabledAt: trx.fn.now(),
-          disabledReason: 'All coupons have been used',
-        });
-        logger.info('Coupon setting auto-disabled (all used)', {
-          settingId: setting.id,
-          type: setting.type,
-          usedCount: (setting.usedCount || 0) + 1,
-          maxTotalUses: setting.maxTotalUses,
-          generatedCount: setting.generatedCount,
-        });
-      }
-
-      logger.info('Coupon redeemed successfully', {
-        code,
-        userId: request.userId,
-        settingId: setting.id,
-        sequence,
-        environmentId,
-        isSpecialCoupon,
-      });
-
-      // Build response
-      let reward: any[] = [];
-
-      if (setting.rewardTemplateId) {
-        const template = await trx('g_reward_templates')
-          .where('id', setting.rewardTemplateId)
-          .where('environmentId', environmentId)
-          .select('rewardItems')
-          .first();
-
-        if (template) {
-          const rewardItems =
-            typeof template.rewardItems === 'string'
-              ? JSON.parse(template.rewardItems)
-              : template.rewardItems;
-          if (Array.isArray(rewardItems)) {
-            reward = rewardItems.map((item: any) => ({
-              type: parseInt(item.rewardType || item.type || 0),
-              id: parseInt(item.itemId || item.id || 0),
-              quantity: parseInt(item.quantity || 0),
-            }));
-          }
-        }
-      } else if (setting.rewardData) {
-        const rewardData =
-          typeof setting.rewardData === 'string'
-            ? JSON.parse(setting.rewardData)
-            : setting.rewardData;
-        if (Array.isArray(rewardData)) {
-          reward = rewardData.map((item: any) => ({
+      if (template) {
+        const rewardItems =
+          typeof template.rewardItems === 'string'
+            ? JSON.parse(template.rewardItems)
+            : template.rewardItems;
+        if (Array.isArray(rewardItems)) {
+          reward = rewardItems.map((item: any) => ({
             type: parseInt(item.rewardType || item.type || 0),
             id: parseInt(item.itemId || item.id || 0),
             quantity: parseInt(item.quantity || 0),
           }));
         }
       }
+    } else if (setting.rewardData) {
+      const rewardData =
+        typeof setting.rewardData === 'string'
+          ? JSON.parse(setting.rewardData)
+          : setting.rewardData;
+      if (Array.isArray(rewardData)) {
+        reward = rewardData.map((item: any) => ({
+          type: parseInt(item.rewardType || item.type || 0),
+          id: parseInt(item.itemId || item.id || 0),
+          quantity: parseInt(item.quantity || 0),
+        }));
+      }
+    }
 
-      return {
-        reward,
-        userUsedCount: sequence,
-        sequence,
-        usedAt: usedAtISO,
-        rewardMailTitle: setting.rewardEmailTitle || null,
-        rewardMailContent: setting.rewardEmailBody || null,
-      };
-    });
+    return {
+      reward,
+      userUsedCount: sequence,
+      sequence,
+      usedAt: usedAtISO,
+      rewardMailTitle: setting.rewardEmailTitle || null,
+      rewardMailContent: setting.rewardEmailBody || null,
+    };
   }
 
   /**
