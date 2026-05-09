@@ -341,8 +341,7 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
               fontFamily: 'monospace',
               fontSize: '0.8rem',
               fontWeight: group.maxDelayMs > 3000 ? 700 : 400,
-              color:
-                group.maxDelayMs > 3000 ? 'warning.main' : 'text.primary',
+              color: group.maxDelayMs > 3000 ? 'warning.main' : 'text.primary',
             }}
           >
             {group.maxDelayMs > 0
