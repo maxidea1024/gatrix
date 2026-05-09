@@ -74,13 +74,16 @@ import cmsService, {
   CmsTable,
   CmsTableHistoryResponse,
 } from '@/services/cmsService';
-import rippleService, {
-  RippleHistoryEvent,
-} from '@/services/rippleService';
+import rippleService, { RippleHistoryEvent } from '@/services/rippleService';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 /** Compute unified diff in a Web Worker to avoid blocking the UI thread */
-const computeDiffInWorker = (oldStr: string, newStr: string, oldTitle: string, newTitle: string): Promise<string> => {
+const computeDiffInWorker = (
+  oldStr: string,
+  newStr: string,
+  oldTitle: string,
+  newTitle: string
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const workerCode = `
       importScripts('https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js');
@@ -91,47 +94,85 @@ const computeDiffInWorker = (oldStr: string, newStr: string, oldTitle: string, n
     `;
     const blob = new Blob([workerCode], { type: 'application/javascript' });
     const worker = new Worker(URL.createObjectURL(blob));
-    worker.onmessage = (e) => { resolve(e.data); worker.terminate(); };
-    worker.onerror = (e) => { reject(e); worker.terminate(); };
+    worker.onmessage = (e) => {
+      resolve(e.data);
+      worker.terminate();
+    };
+    worker.onerror = (e) => {
+      reject(e);
+      worker.terminate();
+    };
     worker.postMessage({ oldStr, newStr, oldTitle, newTitle });
   });
 };
 
 /** Lightweight unified-diff renderer — accepts pre-computed patch text */
-const LightDiff: React.FC<{ patchText: string; dark?: boolean; noDiffMessage?: string }> = React.memo(
-  ({ patchText, dark, noDiffMessage }) => {
-    if (!patchText || patchText.trim().length === 0) {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 6, color: 'text.disabled' }}>
-          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            {noDiffMessage || 'No diff available'}
-          </Typography>
-        </Box>
-      );
-    }
-
-    const html = React.useMemo(() => {
-      const lines = patchText.split('\n').slice(4); // skip header
-      return lines.map((line) => {
-        const escaped = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        let bg = 'transparent', fg = dark ? '#e0e0e0' : '#24292f';
-        if (line.startsWith('+')) { bg = dark ? '#1b2e1b' : '#e6ffec'; fg = dark ? '#a5d6a7' : '#1a7f37'; }
-        else if (line.startsWith('-')) { bg = dark ? '#2e1b1b' : '#ffebe9'; fg = dark ? '#ef9a9a' : '#cf222e'; }
-        else if (line.startsWith('@@')) { bg = dark ? '#1e1e35' : '#f0f0ff'; fg = dark ? '#888' : '#6e7781'; }
-        return `<span style="display:block;padding:0 12px;background:${bg};color:${fg};min-height:1.6em">${escaped || ' '}</span>`;
-      }).join('');
-    }, [patchText, dark]);
-
+const LightDiff: React.FC<{
+  patchText: string;
+  dark?: boolean;
+  noDiffMessage?: string;
+}> = React.memo(({ patchText, dark, noDiffMessage }) => {
+  if (!patchText || patchText.trim().length === 0) {
     return (
-      <pre style={{
-        margin: 0, fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: 1.6, whiteSpace: 'pre',
-        overflow: 'auto', maxHeight: 'calc(100vh - 420px)',
-        background: dark ? '#1a1a2e' : '#fafafa', color: dark ? '#e0e0e0' : '#24292f',
-        borderRadius: 6,
-      }} dangerouslySetInnerHTML={{ __html: html }} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          py: 6,
+          color: 'text.disabled',
+        }}
+      >
+        <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+          {noDiffMessage || 'No diff available'}
+        </Typography>
+      </Box>
     );
   }
-);
+
+  const html = React.useMemo(() => {
+    const lines = patchText.split('\n').slice(4); // skip header
+    return lines
+      .map((line) => {
+        const escaped = line
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        let bg = 'transparent',
+          fg = dark ? '#e0e0e0' : '#24292f';
+        if (line.startsWith('+')) {
+          bg = dark ? '#1b2e1b' : '#e6ffec';
+          fg = dark ? '#a5d6a7' : '#1a7f37';
+        } else if (line.startsWith('-')) {
+          bg = dark ? '#2e1b1b' : '#ffebe9';
+          fg = dark ? '#ef9a9a' : '#cf222e';
+        } else if (line.startsWith('@@')) {
+          bg = dark ? '#1e1e35' : '#f0f0ff';
+          fg = dark ? '#888' : '#6e7781';
+        }
+        return `<span style="display:block;padding:0 12px;background:${bg};color:${fg};min-height:1.6em">${escaped || ' '}</span>`;
+      })
+      .join('');
+  }, [patchText, dark]);
+
+  return (
+    <pre
+      style={{
+        margin: 0,
+        fontFamily: 'monospace',
+        fontSize: '0.75rem',
+        lineHeight: 1.6,
+        whiteSpace: 'pre',
+        overflow: 'auto',
+        maxHeight: 'calc(100vh - 420px)',
+        background: dark ? '#1a1a2e' : '#fafafa',
+        color: dark ? '#e0e0e0' : '#24292f',
+        borderRadius: 6,
+      }}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+});
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -145,7 +186,13 @@ const RELOAD_FILTER_KEY = 'cmsManagement.reloadFilter';
 const LS_PAGE_SIZE_KEY = 'cmsManagement.pageSize';
 const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100];
 
-type SortField = 'tableName' | 'binaryCode' | 'version' | 'dataSize' | 'uploadedAt' | 'reloadability';
+type SortField =
+  | 'tableName'
+  | 'binaryCode'
+  | 'version'
+  | 'dataSize'
+  | 'uploadedAt'
+  | 'reloadability';
 type SortOrder = 'asc' | 'desc';
 
 const CmsManagementPage: React.FC = () => {
@@ -202,7 +249,9 @@ const CmsManagementPage: React.FC = () => {
   const [editorSaving, setEditorSaving] = useState(false);
   const [editorLoading, setEditorLoading] = useState(false);
   const [editorJsonValid, setEditorJsonValid] = useState(true);
-  const [editorCurrentTable, setEditorCurrentTable] = useState<CmsTable | null>(null);
+  const [editorCurrentTable, setEditorCurrentTable] = useState<CmsTable | null>(
+    null
+  );
   const [saveMenuOpen, setSaveMenuOpen] = useState(false);
   const saveMenuRef = React.useRef<HTMLDivElement>(null);
 
@@ -224,7 +273,9 @@ const CmsManagementPage: React.FC = () => {
   const versionDataCache = useRef<Map<string, any>>(new Map());
 
   // Tab 2: Propagation
-  const [propagationData, setPropagationData] = useState<RippleHistoryEvent[]>([]);
+  const [propagationData, setPropagationData] = useState<RippleHistoryEvent[]>(
+    []
+  );
   const [propagationLoading, setPropagationLoading] = useState(false);
   const [propagationLoaded, setPropagationLoaded] = useState(false);
 
@@ -248,7 +299,9 @@ const CmsManagementPage: React.FC = () => {
 
   // Ripple tracking dialog
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
-  const [trackingRequestId, setTrackingRequestId] = useState<string | null>(null);
+  const [trackingRequestId, setTrackingRequestId] = useState<string | null>(
+    null
+  );
   const [trackingPattern, setTrackingPattern] = useState<string | null>(null);
   const [trackingMatchedKeys, setTrackingMatchedKeys] = useState<string[]>([]);
 
@@ -266,9 +319,7 @@ const CmsManagementPage: React.FC = () => {
       setAdmindUrl(result?.admindUrl || null);
       setError(null);
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || err.message || 'Failed to load'
-      );
+      setError(err.response?.data?.message || err.message || 'Failed to load');
     } finally {
       setLoading(false);
     }
@@ -328,7 +379,11 @@ const CmsManagementPage: React.FC = () => {
     if (sortField === 'uploadedAt') {
       aVal = aVal ? new Date(aVal).getTime() : 0;
       bVal = bVal ? new Date(bVal).getTime() : 0;
-    } else if (sortField === 'tableName' || sortField === 'reloadability' || sortField === 'binaryCode') {
+    } else if (
+      sortField === 'tableName' ||
+      sortField === 'reloadability' ||
+      sortField === 'binaryCode'
+    ) {
       aVal = aVal?.toString().toLowerCase() || '';
       bVal = bVal?.toString().toLowerCase() || '';
     }
@@ -379,10 +434,9 @@ const CmsManagementPage: React.FC = () => {
       );
 
       if (result.status === 'skipped') {
-        enqueueSnackbar(
-          t('cms.upload.skipped', { reason: result.reason }),
-          { variant: 'info' }
-        );
+        enqueueSnackbar(t('cms.upload.skipped', { reason: result.reason }), {
+          variant: 'info',
+        });
       } else {
         enqueueSnackbar(
           t('cms.upload.success', {
@@ -400,9 +454,7 @@ const CmsManagementPage: React.FC = () => {
       fetchTables();
     } catch (err: any) {
       enqueueSnackbar(
-        err.response?.data?.message ||
-          err.message ||
-          t('cms.upload.failed'),
+        err.response?.data?.message || err.message || t('cms.upload.failed'),
         { variant: 'error' }
       );
     } finally {
@@ -412,7 +464,7 @@ const CmsManagementPage: React.FC = () => {
 
   // ── Detail Drawer ──
   const openDetail = async (tableName: string) => {
-    const tableInfo = tables.find(t2 => t2.tableName === tableName) || null;
+    const tableInfo = tables.find((t2) => t2.tableName === tableName) || null;
     setDetailTableName(tableName);
     setEditorCurrentTable(tableInfo);
     setDetailOpen(true);
@@ -453,7 +505,11 @@ const CmsManagementPage: React.FC = () => {
     setHistoryLoading(true);
     try {
       const projectApiPath = getProjectApiPath();
-      const result = await cmsService.getTableHistory(projectApiPath, detailTableName, 30);
+      const result = await cmsService.getTableHistory(
+        projectApiPath,
+        detailTableName,
+        30
+      );
       setHistoryData(result);
       setHistoryLoaded(true);
     } catch {
@@ -468,12 +524,17 @@ const CmsManagementPage: React.FC = () => {
     setPropagationLoading(true);
     try {
       const projectApiPath = getProjectApiPath();
-      const result = await rippleService.getHistory(projectApiPath, undefined, 200, 'cms/reload');
+      const result = await rippleService.getHistory(
+        projectApiPath,
+        undefined,
+        200,
+        'cms/reload'
+      );
       const allItems = result.items || [];
       // Filter: only events related to this table (exact match, wildcard, or no tableName)
-      const filtered = allItems.filter(evt => {
+      const filtered = allItems.filter((evt) => {
         if (!evt.tableName || evt.tableName === '*') return true;
-        const tables = evt.tableName.split(',').map(t => t.trim());
+        const tables = evt.tableName.split(',').map((t) => t.trim());
         return tables.includes(detailTableName);
       });
       setPropagationData(filtered);
@@ -492,13 +553,20 @@ const CmsManagementPage: React.FC = () => {
   };
 
   // ── Fetch version data (with cache) ──
-  const fetchVersionData = async (tableName: string, version: number): Promise<any> => {
+  const fetchVersionData = async (
+    tableName: string,
+    version: number
+  ): Promise<any> => {
     const cacheKey = `${tableName}:${version}`;
     if (versionDataCache.current.has(cacheKey)) {
       return versionDataCache.current.get(cacheKey);
     }
     const projectApiPath = getProjectApiPath();
-    const result = await cmsService.getTableVersionData(projectApiPath, tableName, version);
+    const result = await cmsService.getTableVersionData(
+      projectApiPath,
+      tableName,
+      version
+    );
     versionDataCache.current.set(cacheKey, result.data);
     return result.data;
   };
@@ -517,7 +585,9 @@ const CmsManagementPage: React.FC = () => {
       setViewingData(data);
     } catch (err: any) {
       enqueueSnackbar(
-        err.response?.data?.message || err.message || t('cms.history.dataLoadFailed'),
+        err.response?.data?.message ||
+          err.message ||
+          t('cms.history.dataLoadFailed'),
         { variant: 'error' }
       );
       setViewingVersion(null);
@@ -544,7 +614,9 @@ const CmsManagementPage: React.FC = () => {
       setViewingData(data);
     } catch (err: any) {
       enqueueSnackbar(
-        err.response?.data?.message || err.message || t('cms.history.dataLoadFailed'),
+        err.response?.data?.message ||
+          err.message ||
+          t('cms.history.dataLoadFailed'),
         { variant: 'error' }
       );
       setViewingVersion(null);
@@ -565,7 +637,11 @@ const CmsManagementPage: React.FC = () => {
     try {
       // 1. Try pre-computed diff from server (instant)
       const projectApiPath = getProjectApiPath();
-      const serverPatch = await cmsService.getTableVersionDiff(projectApiPath, detailTableName, version);
+      const serverPatch = await cmsService.getTableVersionDiff(
+        projectApiPath,
+        detailTableName,
+        version
+      );
       if (serverPatch) {
         setDiffPatchText(serverPatch);
         return;
@@ -577,11 +653,18 @@ const CmsManagementPage: React.FC = () => {
       ]);
       const oldStr = JSON.stringify(oldData, null, 2);
       const newStr = JSON.stringify(newData, null, 2);
-      const patch = await computeDiffInWorker(oldStr, newStr, `v${prevVersion}`, `v${version}`);
+      const patch = await computeDiffInWorker(
+        oldStr,
+        newStr,
+        `v${prevVersion}`,
+        `v${version}`
+      );
       setDiffPatchText(patch);
     } catch (err: any) {
       enqueueSnackbar(
-        err.response?.data?.message || err.message || 'Failed to load diff data',
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to load diff data',
         { variant: 'error' }
       );
       setViewMode('data');
@@ -613,14 +696,27 @@ const CmsManagementPage: React.FC = () => {
         { refresh: withRefresh }
       );
       if (result.status === 'skipped') {
-        enqueueSnackbar(t('cms.upload.skipped', { reason: result.reason }), { variant: 'info' });
+        enqueueSnackbar(t('cms.upload.skipped', { reason: result.reason }), {
+          variant: 'info',
+        });
       } else {
         enqueueSnackbar(
-          t('cms.upload.success', { tableName: result.tableName, version: result.version }),
+          t('cms.upload.success', {
+            tableName: result.tableName,
+            version: result.version,
+          }),
           { variant: 'success' }
         );
         // Update local table info
-        setEditorCurrentTable(prev => prev ? { ...prev, version: result.version, contentHash: result.contentHash } : prev);
+        setEditorCurrentTable((prev) =>
+          prev
+            ? {
+                ...prev,
+                version: result.version,
+                contentHash: result.contentHash,
+              }
+            : prev
+        );
         setHistoryLoaded(false); // Force reload history
         fetchTables();
 
@@ -655,7 +751,9 @@ const CmsManagementPage: React.FC = () => {
         false,
         { tableName: detailTableName }
       );
-      enqueueSnackbar(t('cms.refreshTable.success', { key: detailTableName }), { variant: 'success' });
+      enqueueSnackbar(t('cms.refreshTable.success', { key: detailTableName }), {
+        variant: 'success',
+      });
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
@@ -666,7 +764,9 @@ const CmsManagementPage: React.FC = () => {
       setTimeout(() => fetchTables(), 2000);
     } catch (err: any) {
       enqueueSnackbar(
-        err.response?.data?.message || err.message || t('cms.refreshTable.failed'),
+        err.response?.data?.message ||
+          err.message ||
+          t('cms.refreshTable.failed'),
         { variant: 'error' }
       );
     }
@@ -684,7 +784,10 @@ const CmsManagementPage: React.FC = () => {
         false,
         { tableName: tableNameList }
       );
-      enqueueSnackbar(t('cms.refreshTable.success', { key: `${selectedTables.size} tables` }), { variant: 'success' });
+      enqueueSnackbar(
+        t('cms.refreshTable.success', { key: `${selectedTables.size} tables` }),
+        { variant: 'success' }
+      );
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
@@ -699,19 +802,26 @@ const CmsManagementPage: React.FC = () => {
 
   // ── Refresh All Unsynced ──
   const handleRefreshAllUnsynced = async () => {
-    const unsyncedTables = tables.filter((tbl) => tbl.runtime && !tbl.runtime.synced);
+    const unsyncedTables = tables.filter(
+      (tbl) => tbl.runtime && !tbl.runtime.synced
+    );
     if (unsyncedTables.length === 0) return;
-    
+
     try {
       const projectApiPath = getProjectApiPath();
-      const tableNameList = unsyncedTables.map(t => t.tableName).join(',');
+      const tableNameList = unsyncedTables.map((t) => t.tableName).join(',');
       const result = await rippleService.triggerRefresh(
         projectApiPath,
         'cms/reload',
         false,
         { tableName: tableNameList }
       );
-      enqueueSnackbar(t('cms.refreshTable.success', { key: `${unsyncedTables.length} tables` }), { variant: 'success' });
+      enqueueSnackbar(
+        t('cms.refreshTable.success', {
+          key: `${unsyncedTables.length} tables`,
+        }),
+        { variant: 'success' }
+      );
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
@@ -753,9 +863,7 @@ const CmsManagementPage: React.FC = () => {
       fetchTables();
     } catch (err: any) {
       enqueueSnackbar(
-        err.response?.data?.message ||
-          err.message ||
-          t('cms.rollback.failed'),
+        err.response?.data?.message || err.message || t('cms.rollback.failed'),
         { variant: 'error' }
       );
     } finally {
@@ -870,7 +978,9 @@ const CmsManagementPage: React.FC = () => {
             onChange={setSearchFilter}
             placeholder={t('cms.searchPlaceholder')}
           />
-          <Box sx={{ display: 'flex', gap: 1, ml: 'auto', alignItems: 'center' }}>
+          <Box
+            sx={{ display: 'flex', gap: 1, ml: 'auto', alignItems: 'center' }}
+          >
             <Chip
               size="small"
               icon={<StorageIcon sx={{ fontSize: 14 }} />}
@@ -905,14 +1015,21 @@ const CmsManagementPage: React.FC = () => {
                 color="error"
                 startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
                 onClick={handleRefreshAllUnsynced}
-                sx={{ fontWeight: 600, borderRadius: 8, px: 2, height: 24, fontSize: '0.8125rem', textTransform: 'none', boxShadow: 'none' }}
+                sx={{
+                  fontWeight: 600,
+                  borderRadius: 8,
+                  px: 2,
+                  height: 24,
+                  fontSize: '0.8125rem',
+                  textTransform: 'none',
+                  boxShadow: 'none',
+                }}
               >
                 {t('cms.unsyncedCount', { count: unsyncedCount })}
               </Button>
             )}
           </Box>
         </Box>
-
 
         {/* Selection Toolbar */}
         {selectedTables.size > 0 && (
@@ -926,7 +1043,10 @@ const CmsManagementPage: React.FC = () => {
               alignItems: 'center',
               gap: 2,
               borderColor: 'primary.main',
-              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(144,202,249,0.08)' : 'rgba(25,118,210,0.04)',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(144,202,249,0.08)'
+                  : 'rgba(25,118,210,0.04)',
             }}
           >
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -968,11 +1088,21 @@ const CmsManagementPage: React.FC = () => {
                     <TableCell padding="checkbox" sx={{ width: 42 }}>
                       <Checkbox
                         size="small"
-                        indeterminate={selectedTables.size > 0 && selectedTables.size < paginatedTables.length}
-                        checked={paginatedTables.length > 0 && paginatedTables.every(t2 => selectedTables.has(t2.tableName))}
+                        indeterminate={
+                          selectedTables.size > 0 &&
+                          selectedTables.size < paginatedTables.length
+                        }
+                        checked={
+                          paginatedTables.length > 0 &&
+                          paginatedTables.every((t2) =>
+                            selectedTables.has(t2.tableName)
+                          )
+                        }
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setSelectedTables(new Set(paginatedTables.map(t2 => t2.tableName)));
+                            setSelectedTables(
+                              new Set(paginatedTables.map((t2) => t2.tableName))
+                            );
                           } else {
                             setSelectedTables(new Set());
                           }
@@ -982,7 +1112,9 @@ const CmsManagementPage: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700 }}>
                       <TableSortLabel
                         active={sortField === 'tableName'}
-                        direction={sortField === 'tableName' ? sortOrder : 'asc'}
+                        direction={
+                          sortField === 'tableName' ? sortOrder : 'asc'
+                        }
                         onClick={() => handleSort('tableName')}
                       >
                         {t('cms.tableName')}
@@ -991,7 +1123,9 @@ const CmsManagementPage: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700 }}>
                       <TableSortLabel
                         active={sortField === 'binaryCode'}
-                        direction={sortField === 'binaryCode' ? sortOrder : 'asc'}
+                        direction={
+                          sortField === 'binaryCode' ? sortOrder : 'asc'
+                        }
                         onClick={() => handleSort('binaryCode')}
                       >
                         {t('cms.binaryCode')}
@@ -1012,13 +1146,17 @@ const CmsManagementPage: React.FC = () => {
                     <TableCell align="center" sx={{ fontWeight: 700 }}>
                       <TableSortLabel
                         active={sortField === 'reloadability'}
-                        direction={sortField === 'reloadability' ? sortOrder : 'asc'}
+                        direction={
+                          sortField === 'reloadability' ? sortOrder : 'asc'
+                        }
                         onClick={() => handleSort('reloadability')}
                       >
                         {t('cms.reload')}
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Sync</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 700 }}>
+                      Sync
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>
                       <TableSortLabel
                         active={sortField === 'dataSize'}
@@ -1031,7 +1169,9 @@ const CmsManagementPage: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700 }}>
                       <TableSortLabel
                         active={sortField === 'uploadedAt'}
-                        direction={sortField === 'uploadedAt' ? sortOrder : 'asc'}
+                        direction={
+                          sortField === 'uploadedAt' ? sortOrder : 'asc'
+                        }
                         onClick={() => handleSort('uploadedAt')}
                       >
                         {t('cms.uploadedAt')}
@@ -1043,8 +1183,10 @@ const CmsManagementPage: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700 }}>
                       {t('cms.comment')}
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 700, width: 48 }} align="center">
-                    </TableCell>
+                    <TableCell
+                      sx={{ fontWeight: 700, width: 48 }}
+                      align="center"
+                    ></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1059,7 +1201,7 @@ const CmsManagementPage: React.FC = () => {
                           size="small"
                           checked={selectedTables.has(table.tableName)}
                           onChange={(e) => {
-                            setSelectedTables(prev => {
+                            setSelectedTables((prev) => {
                               const next = new Set(prev);
                               if (e.target.checked) next.add(table.tableName);
                               else next.delete(table.tableName);
@@ -1085,25 +1227,55 @@ const CmsManagementPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         {table.binaryCode ? (
-                          <Chip label={table.binaryCode} size="small" color="secondary" sx={{ fontSize: '0.65rem', height: 18 }} />
+                          <Chip
+                            label={table.binaryCode}
+                            size="small"
+                            color="secondary"
+                            sx={{ fontSize: '0.65rem', height: 18 }}
+                          />
                         ) : (
-                          <Typography variant="caption" color="text.disabled">—</Typography>
+                          <Typography variant="caption" color="text.disabled">
+                            —
+                          </Typography>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Chip label={`v${table.version}`} size="small" variant="filled" color="info" sx={{ fontFamily: 'monospace', fontWeight: 700 }} />
+                        <Chip
+                          label={`v${table.version}`}
+                          size="small"
+                          variant="filled"
+                          color="info"
+                          sx={{ fontFamily: 'monospace', fontWeight: 700 }}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontFamily: 'monospace' }}
+                        >
                           {table.contentHash?.slice(0, 8)}..
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
                         <Chip
-                          icon={table.reloadability === 'hot' ? <CheckCircleIcon /> : <WarningIcon />}
-                          label={table.reloadability === 'hot' ? t('cms.reloadHot') : t('cms.reloadRestart')}
+                          icon={
+                            table.reloadability === 'hot' ? (
+                              <CheckCircleIcon />
+                            ) : (
+                              <WarningIcon />
+                            )
+                          }
+                          label={
+                            table.reloadability === 'hot'
+                              ? t('cms.reloadHot')
+                              : t('cms.reloadRestart')
+                          }
                           size="small"
-                          color={table.reloadability === 'hot' ? 'success' : 'warning'}
+                          color={
+                            table.reloadability === 'hot'
+                              ? 'success'
+                              : 'warning'
+                          }
                           variant="outlined"
                           sx={{ fontSize: '0.7rem' }}
                         />
@@ -1111,45 +1283,97 @@ const CmsManagementPage: React.FC = () => {
                       <TableCell align="center">
                         {table.runtime ? (
                           table.runtime.synced ? (
-                            <Chip label={t('cms.synced')} size="small" color="default" sx={{ fontSize: '0.68rem', height: 22, color: 'text.secondary' }} />
+                            <Chip
+                              label={t('cms.synced')}
+                              size="small"
+                              color="default"
+                              sx={{
+                                fontSize: '0.68rem',
+                                height: 22,
+                                color: 'text.secondary',
+                              }}
+                            />
                           ) : (
-                            <Tooltip title={t('cms.serverVsDb', { server: table.runtime.loadedVersion, db: table.version })}>
+                            <Tooltip
+                              title={t('cms.serverVsDb', {
+                                server: table.runtime.loadedVersion,
+                                db: table.version,
+                              })}
+                            >
                               <Button
                                 size="small"
                                 variant="contained"
                                 color="error"
-                                startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
-                                onClick={(e) => { e.stopPropagation(); setRefreshConfirmTableName(table.tableName); setRefreshConfirmOpen(true); }}
-                                sx={{ fontSize: '0.68rem', textTransform: 'none', minWidth: 0, px: 1, py: 0.25 }}
+                                startIcon={
+                                  <RefreshIcon sx={{ fontSize: 14 }} />
+                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRefreshConfirmTableName(table.tableName);
+                                  setRefreshConfirmOpen(true);
+                                }}
+                                sx={{
+                                  fontSize: '0.68rem',
+                                  textTransform: 'none',
+                                  minWidth: 0,
+                                  px: 1,
+                                  py: 0.25,
+                                }}
                               >
                                 {t('cms.detail.refresh')}
                               </Button>
                             </Tooltip>
                           )
                         ) : (
-                          <Typography variant="caption" color="text.disabled">—</Typography>
+                          <Typography variant="caption" color="text.disabled">
+                            —
+                          </Typography>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant="caption">{formatBytes(table.dataSize)}</Typography>
+                        <Typography variant="caption">
+                          {formatBytes(table.dataSize)}
+                        </Typography>
                       </TableCell>
                       <TableCell>
-                        <Tooltip title={new Date(table.uploadedAt).toLocaleString('ko-KR')}>
+                        <Tooltip
+                          title={new Date(table.uploadedAt).toLocaleString(
+                            'ko-KR'
+                          )}
+                        >
                           <Typography variant="caption" sx={{ cursor: 'help' }}>
                             {formatRelativeTime(table.uploadedAt)}
                           </Typography>
                         </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="caption">{table.uploadedBy || '—'}</Typography>
+                        <Typography variant="caption">
+                          {table.uploadedBy || '—'}
+                        </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="caption" color="text.secondary" sx={{ maxWidth: 150, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            maxWidth: 150,
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           {table.comment || '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align="center" sx={{ px: 0 }}>
-                        <IconButton size="small" onClick={(e) => { setRowMenuAnchor(e.currentTarget); setRowMenuTable(table); }}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            setRowMenuAnchor(e.currentTarget);
+                            setRowMenuTable(table);
+                          }}
+                        >
                           <MoreVertIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
@@ -1243,7 +1467,11 @@ const CmsManagementPage: React.FC = () => {
               </Button>
               {uploadData && (
                 <Typography variant="caption" sx={{ ml: 1 }}>
-                  ({t('cms.upload.fileLoaded', { size: formatBytes(uploadData.length) })})
+                  (
+                  {t('cms.upload.fileLoaded', {
+                    size: formatBytes(uploadData.length),
+                  })}
+                  )
                 </Typography>
               )}
             </Box>
@@ -1298,15 +1526,39 @@ const CmsManagementPage: React.FC = () => {
       {/* Detail Drawer (3-tab: Editor, History, Propagation) */}
       <ResizableDrawer
         open={detailOpen}
-        onClose={() => { setDetailOpen(false); setViewingVersion(null); setViewingData(null); }}
+        onClose={() => {
+          setDetailOpen(false);
+          setViewingVersion(null);
+          setViewingData(null);
+        }}
         title={detailTableName}
-        subtitle={editorCurrentTable ? `v${editorCurrentTable.version} · ${formatBytes(editorCurrentTable.dataSize)}` : undefined}
+        subtitle={
+          editorCurrentTable
+            ? `v${editorCurrentTable.version} · ${formatBytes(editorCurrentTable.dataSize)}`
+            : undefined
+        }
         storageKey="cmsDetail.drawer.width"
         defaultWidth={640}
         minWidth={480}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-          <Tabs value={detailTab} onChange={handleDetailTabChange} sx={{ borderBottom: 1, borderColor: 'divider', flexShrink: 0, px: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
+          <Tabs
+            value={detailTab}
+            onChange={handleDetailTabChange}
+            sx={{
+              borderBottom: 1,
+              borderColor: 'divider',
+              flexShrink: 0,
+              px: 2,
+            }}
+          >
             <Tab label={t('cms.detail.tabEdit')} />
             <Tab label={t('cms.detail.tabHistory')} />
             <Tab label={t('cms.detail.tabRipple')} />
@@ -1314,28 +1566,81 @@ const CmsManagementPage: React.FC = () => {
 
           {/* ── Tab 0: Editor ── */}
           {detailTab === 0 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, p: 2, gap: 1.5 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                minHeight: 0,
+                p: 2,
+                gap: 1.5,
+              }}
+            >
               {editorCurrentTable && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                  <Chip label={`v${editorCurrentTable.version}`} size="small" variant="filled" color="info" sx={{ fontFamily: 'monospace', fontWeight: 700 }} />
-                  <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'text.disabled' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Chip
+                    label={`v${editorCurrentTable.version}`}
+                    size="small"
+                    variant="filled"
+                    color="info"
+                    sx={{ fontFamily: 'monospace', fontWeight: 700 }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{ fontFamily: 'monospace', color: 'text.disabled' }}
+                  >
                     {editorCurrentTable.contentHash?.slice(0, 12)}
                   </Typography>
                   {editorData !== editorOriginalData ? (
-                    <Chip label={t('cms.detail.modified')} size="small" color="warning" sx={{ fontSize: '0.65rem', height: 18 }} />
+                    <Chip
+                      label={t('cms.detail.modified')}
+                      size="small"
+                      color="warning"
+                      sx={{ fontSize: '0.65rem', height: 18 }}
+                    />
                   ) : (
-                    <Chip label={t('cms.detail.same')} size="small" color="default" sx={{ fontSize: '0.65rem', height: 18 }} />
+                    <Chip
+                      label={t('cms.detail.same')}
+                      size="small"
+                      color="default"
+                      sx={{ fontSize: '0.65rem', height: 18 }}
+                    />
                   )}
                   <Box sx={{ ml: 'auto' }} />
                   <Tooltip title={t('cms.detail.forceRefreshTooltip')}>
-                    <Button size="small" variant="contained" color="warning" startIcon={<RefreshIcon />} onClick={() => { setRefreshConfirmTableName(detailTableName); setRefreshConfirmOpen(true); }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="warning"
+                      startIcon={<RefreshIcon />}
+                      onClick={() => {
+                        setRefreshConfirmTableName(detailTableName);
+                        setRefreshConfirmOpen(true);
+                      }}
+                    >
                       {t('cms.detail.refresh')}
                     </Button>
                   </Tooltip>
                 </Box>
               )}
               {editorLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}><CircularProgress /></Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flex: 1,
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
               ) : (
                 <Box sx={{ flex: 1, minHeight: 0 }}>
                   <JsonEditor
@@ -1343,7 +1648,13 @@ const CmsManagementPage: React.FC = () => {
                     onChange={setEditorData}
                     height="100%"
                     onValidation={(isValid) => setEditorJsonValid(isValid)}
-                    helperText={!editorJsonValid ? t('cms.detail.jsonSyntaxError') : editorData !== editorOriginalData ? t('cms.detail.hasChanges') : t('cms.detail.currentData')}
+                    helperText={
+                      !editorJsonValid
+                        ? t('cms.detail.jsonSyntaxError')
+                        : editorData !== editorOriginalData
+                          ? t('cms.detail.hasChanges')
+                          : t('cms.detail.currentData')
+                    }
                   />
                 </Box>
               )}
@@ -1359,28 +1670,76 @@ const CmsManagementPage: React.FC = () => {
                 placeholder={t('cms.detail.commentPlaceholder')}
                 helperText={t('cms.detail.commentHelper')}
               />
-              <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, justifyContent: 'flex-end' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  flexShrink: 0,
+                  justifyContent: 'flex-end',
+                }}
+              >
                 <ButtonGroup variant="contained" ref={saveMenuRef}>
-                  <Button startIcon={editorSaving ? <CircularProgress size={16} /> : <SaveIcon />} onClick={() => handleSave(false)} disabled={editorSaving || !editorData.trim() || !editorComment.trim() || editorData === editorOriginalData || !editorJsonValid}>
+                  <Button
+                    startIcon={
+                      editorSaving ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <SaveIcon />
+                      )
+                    }
+                    onClick={() => handleSave(false)}
+                    disabled={
+                      editorSaving ||
+                      !editorData.trim() ||
+                      !editorComment.trim() ||
+                      editorData === editorOriginalData ||
+                      !editorJsonValid
+                    }
+                  >
                     {t('cms.detail.save')}
                   </Button>
-                  <Button size="small" onClick={() => setSaveMenuOpen(prev => !prev)} disabled={editorSaving || !editorComment.trim() || editorData === editorOriginalData || !editorJsonValid}>
+                  <Button
+                    size="small"
+                    onClick={() => setSaveMenuOpen((prev) => !prev)}
+                    disabled={
+                      editorSaving ||
+                      !editorComment.trim() ||
+                      editorData === editorOriginalData ||
+                      !editorJsonValid
+                    }
+                  >
                     <ArrowDropDownIcon />
                   </Button>
                 </ButtonGroup>
-                <Popper open={saveMenuOpen} anchorEl={saveMenuRef.current} placement="top-end" transition sx={{ zIndex: 1300 }}>
+                <Popper
+                  open={saveMenuOpen}
+                  anchorEl={saveMenuRef.current}
+                  placement="top-end"
+                  transition
+                  sx={{ zIndex: 1300 }}
+                >
                   {({ TransitionProps }) => (
                     <Grow {...TransitionProps}>
                       <Paper elevation={8}>
-                        <ClickAwayListener onClickAway={() => setSaveMenuOpen(false)}>
+                        <ClickAwayListener
+                          onClickAway={() => setSaveMenuOpen(false)}
+                        >
                           <MenuList>
                             <MenuItem onClick={() => handleSave(false)}>
-                              <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
-                              <ListItemText>{t('cms.detail.saveOnly')}</ListItemText>
+                              <ListItemIcon>
+                                <SaveIcon fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText>
+                                {t('cms.detail.saveOnly')}
+                              </ListItemText>
                             </MenuItem>
                             <MenuItem onClick={() => handleSave(true)}>
-                              <ListItemIcon><RefreshIcon fontSize="small" color="primary" /></ListItemIcon>
-                              <ListItemText>{t('cms.detail.saveAndRefresh')}</ListItemText>
+                              <ListItemIcon>
+                                <RefreshIcon fontSize="small" color="primary" />
+                              </ListItemIcon>
+                              <ListItemText>
+                                {t('cms.detail.saveAndRefresh')}
+                              </ListItemText>
                             </MenuItem>
                           </MenuList>
                         </ClickAwayListener>
@@ -1394,91 +1753,316 @@ const CmsManagementPage: React.FC = () => {
 
           {/* ── Tab 1: History (Timeline) ── */}
           {detailTab === 1 && (
-            <Box sx={{ p: 2, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: (viewingVersion != null && viewMode === 'data') ? 'hidden' : 'auto' }}>
+            <Box
+              sx={{
+                p: 2,
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow:
+                  viewingVersion != null && viewMode === 'data'
+                    ? 'hidden'
+                    : 'auto',
+              }}
+            >
               {historyLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                  <CircularProgress />
+                </Box>
               ) : historyData?.history?.length ? (
                 <>
                   {/* ── Active (current) version ── */}
                   {(() => {
                     const active = historyData.history[0];
                     const isViewing = viewingVersion === active.version;
-                    const prevVersion = historyData.history.length > 1 ? historyData.history[1].version : undefined;
+                    const prevVersion =
+                      historyData.history.length > 1
+                        ? historyData.history[1].version
+                        : undefined;
                     return (
                       <>
                         <Box
-                          onClick={() => toggleHistoryEntry(active.version, prevVersion)}
+                          onClick={() =>
+                            toggleHistoryEntry(active.version, prevVersion)
+                          }
                           sx={{
-                            border: '1px solid', borderColor: isDark ? 'success.dark' : 'success.light',
-                            borderRadius: isViewing ? '8px 8px 0 0' : 2, cursor: 'pointer',
-                            bgcolor: isDark ? 'rgba(76,175,80,0.06)' : 'rgba(76,175,80,0.03)',
+                            border: '1px solid',
+                            borderColor: isDark
+                              ? 'success.dark'
+                              : 'success.light',
+                            borderRadius: isViewing ? '8px 8px 0 0' : 2,
+                            cursor: 'pointer',
+                            bgcolor: isDark
+                              ? 'rgba(76,175,80,0.06)'
+                              : 'rgba(76,175,80,0.03)',
                             transition: 'background-color 0.15s',
-                            '&:hover': { bgcolor: isDark ? 'rgba(76,175,80,0.1)' : 'rgba(76,175,80,0.06)' },
-                            ...(isViewing && { bgcolor: isDark ? 'rgba(25,118,210,0.08)' : 'rgba(25,118,210,0.04)', borderColor: 'primary.main' }),
+                            '&:hover': {
+                              bgcolor: isDark
+                                ? 'rgba(76,175,80,0.1)'
+                                : 'rgba(76,175,80,0.06)',
+                            },
+                            ...(isViewing && {
+                              bgcolor: isDark
+                                ? 'rgba(25,118,210,0.08)'
+                                : 'rgba(25,118,210,0.04)',
+                              borderColor: 'primary.main',
+                            }),
                           }}
                         >
-                          <Box sx={{ display: 'flex', alignItems: 'center', py: 1.25, px: 2 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              py: 1.25,
+                              px: 2,
+                            }}
+                          >
                             <Box sx={{ flex: 1, minWidth: 0 }}>
-                              <Typography variant="body2" sx={{
-                                fontWeight: 500, fontSize: '0.82rem', lineHeight: 1.4, mb: 0.5,
-                                color: active.comment ? 'text.primary' : 'text.disabled',
-                                ...(!(active.comment) && { fontStyle: 'italic', fontWeight: 400 }),
-                              }}>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '0.82rem',
+                                  lineHeight: 1.4,
+                                  mb: 0.5,
+                                  color: active.comment
+                                    ? 'text.primary'
+                                    : 'text.disabled',
+                                  ...(!active.comment && {
+                                    fontStyle: 'italic',
+                                    fontWeight: 400,
+                                  }),
+                                }}
+                              >
                                 {active.comment || t('cms.history.noComment')}
                               </Typography>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.72rem' }}>{active.uploadedBy || '—'}</Typography>
-                                <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.7rem' }}>pushed</Typography>
-                                <Tooltip title={new Date(active.uploadedAt).toLocaleString('ko-KR')}>
-                                  <Typography variant="caption" sx={{ color: 'text.disabled', cursor: 'help', fontSize: '0.7rem' }}>{formatRelativeTime(active.uploadedAt)}</Typography>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.75,
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    fontWeight: 600,
+                                    color: 'text.secondary',
+                                    fontSize: '0.72rem',
+                                  }}
+                                >
+                                  {active.uploadedBy || '—'}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: 'text.disabled',
+                                    fontSize: '0.7rem',
+                                  }}
+                                >
+                                  pushed
+                                </Typography>
+                                <Tooltip
+                                  title={new Date(
+                                    active.uploadedAt
+                                  ).toLocaleString('ko-KR')}
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: 'text.disabled',
+                                      cursor: 'help',
+                                      fontSize: '0.7rem',
+                                    }}
+                                  >
+                                    {formatRelativeTime(active.uploadedAt)}
+                                  </Typography>
                                 </Tooltip>
                               </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0, pl: 1 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                flexShrink: 0,
+                                pl: 1,
+                              }}
+                            >
                               <Tooltip title={active.contentHash || ''}>
-                                <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5, px: 1, py: 0.25, bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' }}>
-                                  <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.7rem', color: 'primary.main', userSelect: 'all' }}>{active.contentHash?.slice(0, 7)}</Typography>
+                                <Box
+                                  sx={{
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 1.5,
+                                    px: 1,
+                                    py: 0.25,
+                                    bgcolor: isDark
+                                      ? 'rgba(255,255,255,0.04)'
+                                      : 'rgba(0,0,0,0.03)',
+                                  }}
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      fontFamily: 'monospace',
+                                      fontWeight: 600,
+                                      fontSize: '0.7rem',
+                                      color: 'primary.main',
+                                      userSelect: 'all',
+                                    }}
+                                  >
+                                    {active.contentHash?.slice(0, 7)}
+                                  </Typography>
                                 </Box>
                               </Tooltip>
-                              <Chip label={`v${active.version}`} size="small" variant="filled" color="success" sx={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '0.7rem', height: 22, minWidth: 36 }} />
+                              <Chip
+                                label={`v${active.version}`}
+                                size="small"
+                                variant="filled"
+                                color="success"
+                                sx={{
+                                  fontWeight: 700,
+                                  fontFamily: 'monospace',
+                                  fontSize: '0.7rem',
+                                  height: 22,
+                                  minWidth: 36,
+                                }}
+                              />
                             </Box>
                           </Box>
                         </Box>
                         {/* Expanded panel for active entry */}
                         {isViewing && (
-                          <Box sx={{
-                            ...(viewMode === 'data' ? { flex: 1, minHeight: 0 } : {}),
-                            display: 'flex', flexDirection: 'column',
-                            border: '1px solid', borderColor: 'primary.main', borderTop: 'none',
-                            borderRadius: '0 0 8px 8px',
-                            bgcolor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.02)',
-                            px: 2, py: 1.5, mb: 2,
-                          }}>
+                          <Box
+                            sx={{
+                              ...(viewMode === 'data'
+                                ? { flex: 1, minHeight: 0 }
+                                : {}),
+                              display: 'flex',
+                              flexDirection: 'column',
+                              border: '1px solid',
+                              borderColor: 'primary.main',
+                              borderTop: 'none',
+                              borderRadius: '0 0 8px 8px',
+                              bgcolor: isDark
+                                ? 'rgba(0,0,0,0.15)'
+                                : 'rgba(0,0,0,0.02)',
+                              px: 2,
+                              py: 1.5,
+                              mb: 2,
+                            }}
+                          >
                             {historyData.history.length > 0 && (
-                              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <ButtonGroup size="small" variant="outlined" sx={{ height: 26 }}>
-                                  <Button variant={viewMode === 'data' ? 'contained' : 'outlined'} onClick={() => setViewMode('data')} sx={{ fontSize: '0.7rem', px: 1.5, textTransform: 'none' }}>Data</Button>
-                                  <Button variant={viewMode === 'diff' ? 'contained' : 'outlined'} onClick={() => prevVersion != null ? switchToDiff(active.version, prevVersion) : setViewMode('diff')} startIcon={<CompareArrowsIcon sx={{ fontSize: '14px !important' }} />} sx={{ fontSize: '0.7rem', px: 1.5, textTransform: 'none' }}>Diff</Button>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  mb: 1,
+                                }}
+                              >
+                                <ButtonGroup
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ height: 26 }}
+                                >
+                                  <Button
+                                    variant={
+                                      viewMode === 'data'
+                                        ? 'contained'
+                                        : 'outlined'
+                                    }
+                                    onClick={() => setViewMode('data')}
+                                    sx={{
+                                      fontSize: '0.7rem',
+                                      px: 1.5,
+                                      textTransform: 'none',
+                                    }}
+                                  >
+                                    Data
+                                  </Button>
+                                  <Button
+                                    variant={
+                                      viewMode === 'diff'
+                                        ? 'contained'
+                                        : 'outlined'
+                                    }
+                                    onClick={() =>
+                                      prevVersion != null
+                                        ? switchToDiff(
+                                            active.version,
+                                            prevVersion
+                                          )
+                                        : setViewMode('diff')
+                                    }
+                                    startIcon={
+                                      <CompareArrowsIcon
+                                        sx={{ fontSize: '14px !important' }}
+                                      />
+                                    }
+                                    sx={{
+                                      fontSize: '0.7rem',
+                                      px: 1.5,
+                                      textTransform: 'none',
+                                    }}
+                                  >
+                                    Diff
+                                  </Button>
                                 </ButtonGroup>
                                 {viewMode === 'diff' && prevVersion != null && (
-                                  <Typography variant="caption" sx={{ ml: 1, color: 'text.disabled', fontSize: '0.68rem' }}>v{prevVersion} → v{active.version}</Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      ml: 1,
+                                      color: 'text.disabled',
+                                      fontSize: '0.68rem',
+                                    }}
+                                  >
+                                    v{prevVersion} → v{active.version}
+                                  </Typography>
                                 )}
                               </Box>
                             )}
-                            {viewMode === 'data' && (
-                              viewingDataLoading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}><CircularProgress size={24} /></Box>
+                            {viewMode === 'data' &&
+                              (viewingDataLoading ? (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    py: 2,
+                                  }}
+                                >
+                                  <CircularProgress size={24} />
+                                </Box>
                               ) : viewingData ? (
-                                <JsonEditor value={JSON.stringify(viewingData, null, 2)} onChange={() => {}} readOnly height="100%" />
-                              ) : null
-                            )}
-                            {viewMode === 'diff' && (
-                              diffLoading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}><CircularProgress size={24} /></Box>
+                                <JsonEditor
+                                  value={JSON.stringify(viewingData, null, 2)}
+                                  onChange={() => {}}
+                                  readOnly
+                                  height="100%"
+                                />
+                              ) : null)}
+                            {viewMode === 'diff' &&
+                              (diffLoading ? (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    py: 3,
+                                  }}
+                                >
+                                  <CircularProgress size={24} />
+                                </Box>
                               ) : (
-                                <LightDiff patchText={diffPatchText} dark={isDark} noDiffMessage={t('cms.history.noDiffAvailable')} />
-                              )
-                            )}
+                                <LightDiff
+                                  patchText={diffPatchText}
+                                  dark={isDark}
+                                  noDiffMessage={t(
+                                    'cms.history.noDiffAvailable'
+                                  )}
+                                />
+                              ))}
                           </Box>
                         )}
                       </>
@@ -1488,174 +2072,384 @@ const CmsManagementPage: React.FC = () => {
                   {/* ── Past versions ── */}
                   {historyData.history.length > 1 && (
                     <>
-                      <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.7rem', mb: 0.75, display: 'block', fontWeight: 600 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.disabled',
+                          fontSize: '0.7rem',
+                          mb: 0.75,
+                          display: 'block',
+                          fontWeight: 600,
+                        }}
+                      >
                         {t('cms.history.previousVersions')}
                       </Typography>
-                      <Box sx={{
-                        border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden',
-                        ...((viewingVersion != null && viewingVersion !== historyData.history[0].version) ? { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' } : {}),
-                      }}>
+                      <Box
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          ...(viewingVersion != null &&
+                          viewingVersion !== historyData.history[0].version
+                            ? {
+                                flex: 1,
+                                minHeight: 0,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                overflow: 'hidden',
+                              }
+                            : {}),
+                        }}
+                      >
                         {historyData.history.slice(1).map((entry, idx) => {
                           const realIdx = idx + 1;
-                          const isLast = realIdx === historyData.history.length - 1;
+                          const isLast =
+                            realIdx === historyData.history.length - 1;
                           const isViewing = viewingVersion === entry.version;
-                          const prevVersion = !isLast ? historyData.history[realIdx + 1]?.version : undefined;
+                          const prevVersion = !isLast
+                            ? historyData.history[realIdx + 1]?.version
+                            : undefined;
                           return (
                             <React.Fragment key={entry.version}>
-                        {/* ── Commit-style row ── */}
-                        <Box
-                          onClick={() => toggleHistoryEntry(entry.version, prevVersion)}
-                          sx={{
-                            display: 'flex', alignItems: 'stretch', cursor: 'pointer',
-                            borderBottom: isLast && !isViewing ? 'none' : '1px solid',
-                            borderColor: 'divider',
-                            transition: 'background-color 0.15s',
-                            '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.015)' },
-                            ...(isViewing && { bgcolor: isDark ? 'rgba(25,118,210,0.06)' : 'rgba(25,118,210,0.04)' }),
-                          }}
-                        >
-                          {/* Main content area */}
-                          <Box sx={{ flex: 1, minWidth: 0, py: 1.25, px: 2 }}>
-                            {/* Row 1: Commit message (primary) */}
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontWeight: 500, fontSize: '0.82rem', lineHeight: 1.4,
-                                color: 'text.primary', mb: 0.5,
-                                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden', textOverflow: 'ellipsis',
-                                ...(!(entry.comment) && { color: 'text.disabled', fontStyle: 'italic', fontWeight: 400 }),
-                              }}
-                            >
-                              {entry.comment || t('cms.history.noComment')}
-                            </Typography>
-
-                            {/* Row 2: Metadata line */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
-                              <Typography variant="caption" sx={{
-                                fontWeight: 600, color: 'text.secondary', fontSize: '0.72rem',
-                              }}>
-                                {entry.uploadedBy || '—'}
-                              </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.7rem' }}>
-                                pushed
-                              </Typography>
-                              <Tooltip title={new Date(entry.uploadedAt).toLocaleString('ko-KR')}>
-                                <Typography variant="caption" sx={{ color: 'text.disabled', cursor: 'help', fontSize: '0.7rem' }}>
-                                  {formatRelativeTime(entry.uploadedAt)}
-                                </Typography>
-                              </Tooltip>
-                            </Box>
-                          </Box>
-
-                          {/* Right: version badge + hash + actions */}
-                          <Box sx={{
-                            display: 'flex', alignItems: 'center', gap: 1, pr: 1.5, pl: 1, flexShrink: 0,
-                          }}>
-                            {/* Hash badge (like GitHub commit SHA) */}
-                            <Tooltip title={entry.contentHash || ''}>
-                              <Box sx={{
-                                display: 'flex', alignItems: 'center',
-                                border: '1px solid', borderColor: 'divider', borderRadius: 1.5,
-                                px: 1, py: 0.25,
-                                bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                              }}>
-                                <Typography variant="caption" sx={{
-                                  fontFamily: 'monospace', fontWeight: 600, fontSize: '0.7rem',
-                                  color: 'primary.main', userSelect: 'all',
-                                }}>
-                                  {entry.contentHash?.slice(0, 7)}
-                                </Typography>
-                              </Box>
-                            </Tooltip>
-
-                            {/* Version */}
-                            <Chip
-                              label={`v${entry.version}`}
-                              size="small"
-                              variant={entry.isActive ? 'filled' : 'outlined'}
-                              color={entry.isActive ? 'success' : 'default'}
-                              sx={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '0.7rem', height: 22, minWidth: 36 }}
-                            />
-
-                            {/* Rollback action */}
-                            {!entry.isActive && (
-                              <Tooltip title={t('cms.history.rollbackToVersion', { version: entry.version })}>
-                                <IconButton
-                                  size="small" color="warning"
-                                  onClick={(e) => { e.stopPropagation(); confirmRollback(detailTableName, entry.version); }}
-                                  sx={{ p: 0.5 }}
+                              {/* ── Commit-style row ── */}
+                              <Box
+                                onClick={() =>
+                                  toggleHistoryEntry(entry.version, prevVersion)
+                                }
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'stretch',
+                                  cursor: 'pointer',
+                                  borderBottom:
+                                    isLast && !isViewing ? 'none' : '1px solid',
+                                  borderColor: 'divider',
+                                  transition: 'background-color 0.15s',
+                                  '&:hover': {
+                                    bgcolor: isDark
+                                      ? 'rgba(255,255,255,0.025)'
+                                      : 'rgba(0,0,0,0.015)',
+                                  },
+                                  ...(isViewing && {
+                                    bgcolor: isDark
+                                      ? 'rgba(25,118,210,0.06)'
+                                      : 'rgba(25,118,210,0.04)',
+                                  }),
+                                }}
+                              >
+                                {/* Main content area */}
+                                <Box
+                                  sx={{ flex: 1, minWidth: 0, py: 1.25, px: 2 }}
                                 >
-                                  <RestoreIcon sx={{ fontSize: 17 }} />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                          </Box>
-                        </Box>
-
-                        {/* ── Expanded panel: Data / Diff toggle ── */}
-                        {isViewing && (
-                          <Box sx={{
-                            ...(viewMode === 'data' ? { flex: 1, minHeight: 0 } : {}),
-                            display: 'flex', flexDirection: 'column',
-                            borderBottom: '1px solid', borderColor: 'divider',
-                            bgcolor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.02)',
-                            px: 2, py: 1.5,
-                          }}>
-                            {/* Mode toggle — always visible for consistency */}
-                              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <ButtonGroup size="small" variant="outlined" sx={{ height: 26 }}>
-                                  <Button
-                                    variant={viewMode === 'data' ? 'contained' : 'outlined'}
-                                    onClick={() => setViewMode('data')}
-                                    sx={{ fontSize: '0.7rem', px: 1.5, textTransform: 'none' }}
+                                  {/* Row 1: Commit message (primary) */}
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontWeight: 500,
+                                      fontSize: '0.82rem',
+                                      lineHeight: 1.4,
+                                      color: 'text.primary',
+                                      mb: 0.5,
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 2,
+                                      WebkitBoxOrient: 'vertical',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      ...(!entry.comment && {
+                                        color: 'text.disabled',
+                                        fontStyle: 'italic',
+                                        fontWeight: 400,
+                                      }),
+                                    }}
                                   >
-                                    Data
-                                  </Button>
-                                  <Button
-                                    variant={viewMode === 'diff' ? 'contained' : 'outlined'}
-                                    onClick={() => prevVersion != null ? switchToDiff(entry.version, prevVersion) : setViewMode('diff')}
-                                    startIcon={<CompareArrowsIcon sx={{ fontSize: '14px !important' }} />}
-                                    sx={{ fontSize: '0.7rem', px: 1.5, textTransform: 'none' }}
-                                  >
-                                    Diff
-                                  </Button>
-                                </ButtonGroup>
-                                {viewMode === 'diff' && prevVersion != null && (
-                                  <Typography variant="caption" sx={{ ml: 1, color: 'text.disabled', fontSize: '0.68rem' }}>
-                                    v{prevVersion} → v{entry.version}
+                                    {entry.comment ||
+                                      t('cms.history.noComment')}
                                   </Typography>
-                                )}
+
+                                  {/* Row 2: Metadata line */}
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.75,
+                                      flexWrap: 'wrap',
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        fontWeight: 600,
+                                        color: 'text.secondary',
+                                        fontSize: '0.72rem',
+                                      }}
+                                    >
+                                      {entry.uploadedBy || '—'}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: 'text.disabled',
+                                        fontSize: '0.7rem',
+                                      }}
+                                    >
+                                      pushed
+                                    </Typography>
+                                    <Tooltip
+                                      title={new Date(
+                                        entry.uploadedAt
+                                      ).toLocaleString('ko-KR')}
+                                    >
+                                      <Typography
+                                        variant="caption"
+                                        sx={{
+                                          color: 'text.disabled',
+                                          cursor: 'help',
+                                          fontSize: '0.7rem',
+                                        }}
+                                      >
+                                        {formatRelativeTime(entry.uploadedAt)}
+                                      </Typography>
+                                    </Tooltip>
+                                  </Box>
+                                </Box>
+
+                                {/* Right: version badge + hash + actions */}
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    pr: 1.5,
+                                    pl: 1,
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {/* Hash badge (like GitHub commit SHA) */}
+                                  <Tooltip title={entry.contentHash || ''}>
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        borderRadius: 1.5,
+                                        px: 1,
+                                        py: 0.25,
+                                        bgcolor: isDark
+                                          ? 'rgba(255,255,255,0.04)'
+                                          : 'rgba(0,0,0,0.03)',
+                                      }}
+                                    >
+                                      <Typography
+                                        variant="caption"
+                                        sx={{
+                                          fontFamily: 'monospace',
+                                          fontWeight: 600,
+                                          fontSize: '0.7rem',
+                                          color: 'primary.main',
+                                          userSelect: 'all',
+                                        }}
+                                      >
+                                        {entry.contentHash?.slice(0, 7)}
+                                      </Typography>
+                                    </Box>
+                                  </Tooltip>
+
+                                  {/* Version */}
+                                  <Chip
+                                    label={`v${entry.version}`}
+                                    size="small"
+                                    variant={
+                                      entry.isActive ? 'filled' : 'outlined'
+                                    }
+                                    color={
+                                      entry.isActive ? 'success' : 'default'
+                                    }
+                                    sx={{
+                                      fontWeight: 700,
+                                      fontFamily: 'monospace',
+                                      fontSize: '0.7rem',
+                                      height: 22,
+                                      minWidth: 36,
+                                    }}
+                                  />
+
+                                  {/* Rollback action */}
+                                  {!entry.isActive && (
+                                    <Tooltip
+                                      title={t(
+                                        'cms.history.rollbackToVersion',
+                                        { version: entry.version }
+                                      )}
+                                    >
+                                      <IconButton
+                                        size="small"
+                                        color="warning"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          confirmRollback(
+                                            detailTableName,
+                                            entry.version
+                                          );
+                                        }}
+                                        sx={{ p: 0.5 }}
+                                      >
+                                        <RestoreIcon sx={{ fontSize: 17 }} />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </Box>
                               </Box>
 
-                            {/* Data view */}
-                            {viewMode === 'data' && (
-                              viewingDataLoading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}><CircularProgress size={24} /></Box>
-                              ) : viewingData ? (
-                                <JsonEditor value={JSON.stringify(viewingData, null, 2)} onChange={() => {}} readOnly height="100%" />
-                              ) : null
-                            )}
+                              {/* ── Expanded panel: Data / Diff toggle ── */}
+                              {isViewing && (
+                                <Box
+                                  sx={{
+                                    ...(viewMode === 'data'
+                                      ? { flex: 1, minHeight: 0 }
+                                      : {}),
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    borderBottom: '1px solid',
+                                    borderColor: 'divider',
+                                    bgcolor: isDark
+                                      ? 'rgba(0,0,0,0.15)'
+                                      : 'rgba(0,0,0,0.02)',
+                                    px: 2,
+                                    py: 1.5,
+                                  }}
+                                >
+                                  {/* Mode toggle — always visible for consistency */}
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      mb: 1,
+                                    }}
+                                  >
+                                    <ButtonGroup
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ height: 26 }}
+                                    >
+                                      <Button
+                                        variant={
+                                          viewMode === 'data'
+                                            ? 'contained'
+                                            : 'outlined'
+                                        }
+                                        onClick={() => setViewMode('data')}
+                                        sx={{
+                                          fontSize: '0.7rem',
+                                          px: 1.5,
+                                          textTransform: 'none',
+                                        }}
+                                      >
+                                        Data
+                                      </Button>
+                                      <Button
+                                        variant={
+                                          viewMode === 'diff'
+                                            ? 'contained'
+                                            : 'outlined'
+                                        }
+                                        onClick={() =>
+                                          prevVersion != null
+                                            ? switchToDiff(
+                                                entry.version,
+                                                prevVersion
+                                              )
+                                            : setViewMode('diff')
+                                        }
+                                        startIcon={
+                                          <CompareArrowsIcon
+                                            sx={{ fontSize: '14px !important' }}
+                                          />
+                                        }
+                                        sx={{
+                                          fontSize: '0.7rem',
+                                          px: 1.5,
+                                          textTransform: 'none',
+                                        }}
+                                      >
+                                        Diff
+                                      </Button>
+                                    </ButtonGroup>
+                                    {viewMode === 'diff' &&
+                                      prevVersion != null && (
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            ml: 1,
+                                            color: 'text.disabled',
+                                            fontSize: '0.68rem',
+                                          }}
+                                        >
+                                          v{prevVersion} → v{entry.version}
+                                        </Typography>
+                                      )}
+                                  </Box>
 
-                            {/* Diff view */}
-                            {viewMode === 'diff' && (
-                              diffLoading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}><CircularProgress size={24} /></Box>
-                              ) : (
-                                <LightDiff patchText={diffPatchText} dark={isDark} noDiffMessage={t('cms.history.noDiffAvailable')} />
-                              )
-                            )}
-                          </Box>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
+                                  {/* Data view */}
+                                  {viewMode === 'data' &&
+                                    (viewingDataLoading ? (
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          py: 2,
+                                        }}
+                                      >
+                                        <CircularProgress size={24} />
+                                      </Box>
+                                    ) : viewingData ? (
+                                      <JsonEditor
+                                        value={JSON.stringify(
+                                          viewingData,
+                                          null,
+                                          2
+                                        )}
+                                        onChange={() => {}}
+                                        readOnly
+                                        height="100%"
+                                      />
+                                    ) : null)}
+
+                                  {/* Diff view */}
+                                  {viewMode === 'diff' &&
+                                    (diffLoading ? (
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          py: 3,
+                                        }}
+                                      >
+                                        <CircularProgress size={24} />
+                                      </Box>
+                                    ) : (
+                                      <LightDiff
+                                        patchText={diffPatchText}
+                                        dark={isDark}
+                                        noDiffMessage={t(
+                                          'cms.history.noDiffAvailable'
+                                        )}
+                                      />
+                                    ))}
+                                </Box>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
                       </Box>
                     </>
                   )}
                 </>
               ) : (
-                <EmptyPlaceholder message={t('cms.history.noHistory')} minHeight={120} />
+                <EmptyPlaceholder
+                  message={t('cms.history.noHistory')}
+                  minHeight={120}
+                />
               )}
             </Box>
           )}
@@ -1664,88 +2458,227 @@ const CmsManagementPage: React.FC = () => {
           {detailTab === 2 && (
             <Box sx={{ p: 2, flex: 1, minHeight: 0, overflowY: 'auto' }}>
               {propagationLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                  <CircularProgress />
+                </Box>
               ) : propagationData.length === 0 ? (
-                <EmptyPlaceholder message={t('ripple.history.empty')} minHeight={120} />
-              ) : (() => {
-                const groups = new Map<string, RippleHistoryEvent[]>();
-                for (const evt of propagationData) {
-                  const key = evt.requestId || evt.eventId;
-                  if (!groups.has(key)) groups.set(key, []);
-                  groups.get(key)!.push(evt);
-                }
-                return (
-                  <Stack spacing={1.5}>
-                    {Array.from(groups.entries()).map(([reqId, events]) => {
-                      const allSuccess = events.every(e => e.status === 'success');
-                      const hasFailure = events.some(e => e.status === 'failure' || e.status === 'timeout');
-                      return (
-                        <Paper key={reqId} variant="outlined" sx={{ borderRadius: 1.5, borderLeft: '3px solid', borderLeftColor: allSuccess ? 'success.main' : hasFailure ? 'error.main' : 'warning.main', overflow: 'hidden' }}>
-                          <Box sx={{ px: 2, py: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'grey.50', borderBottom: '1px solid', borderColor: 'divider' }}>
-                            {allSuccess ? <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} /> : <CancelIcon sx={{ fontSize: 16, color: 'error.main' }} />}
-                            <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{reqId.slice(0, 8)}</Typography>
-                            {events[0].tableName && (
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
-                                {events[0].tableName.split(',').map(tn => tn.trim()).filter(Boolean).map((tn, idx, arr) => {
-                                  if (idx > 2) {
-                                    if (idx === 3) {
+                <EmptyPlaceholder
+                  message={t('ripple.history.empty')}
+                  minHeight={120}
+                />
+              ) : (
+                (() => {
+                  const groups = new Map<string, RippleHistoryEvent[]>();
+                  for (const evt of propagationData) {
+                    const key = evt.requestId || evt.eventId;
+                    if (!groups.has(key)) groups.set(key, []);
+                    groups.get(key)!.push(evt);
+                  }
+                  return (
+                    <Stack spacing={1.5}>
+                      {Array.from(groups.entries()).map(([reqId, events]) => {
+                        const allSuccess = events.every(
+                          (e) => e.status === 'success'
+                        );
+                        const hasFailure = events.some(
+                          (e) =>
+                            e.status === 'failure' || e.status === 'timeout'
+                        );
+                        return (
+                          <Paper
+                            key={reqId}
+                            variant="outlined"
+                            sx={{
+                              borderRadius: 1.5,
+                              borderLeft: '3px solid',
+                              borderLeftColor: allSuccess
+                                ? 'success.main'
+                                : hasFailure
+                                  ? 'error.main'
+                                  : 'warning.main',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                px: 2,
+                                py: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                bgcolor: (theme) =>
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.02)'
+                                    : 'grey.50',
+                                borderBottom: '1px solid',
+                                borderColor: 'divider',
+                              }}
+                            >
+                              {allSuccess ? (
+                                <CheckCircleIcon
+                                  sx={{ fontSize: 16, color: 'success.main' }}
+                                />
+                              ) : (
+                                <CancelIcon
+                                  sx={{ fontSize: 16, color: 'error.main' }}
+                                />
+                              )}
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {reqId.slice(0, 8)}
+                              </Typography>
+                              {events[0].tableName && (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    gap: 0.5,
+                                    flexWrap: 'wrap',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  {events[0].tableName
+                                    .split(',')
+                                    .map((tn) => tn.trim())
+                                    .filter(Boolean)
+                                    .map((tn, idx, arr) => {
+                                      if (idx > 2) {
+                                        if (idx === 3) {
+                                          return (
+                                            <Tooltip
+                                              key="more"
+                                              title={arr.slice(3).join(', ')}
+                                            >
+                                              <Chip
+                                                label={`+${arr.length - 3} ${t('cms.history.moreItems')}`}
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{
+                                                  height: 20,
+                                                  fontSize: '0.65rem',
+                                                  cursor: 'pointer',
+                                                  borderColor: 'divider',
+                                                }}
+                                              />
+                                            </Tooltip>
+                                          );
+                                        }
+                                        return null;
+                                      }
                                       return (
-                                        <Tooltip key="more" title={arr.slice(3).join(', ')}>
-                                          <Chip
-                                            label={`+${arr.length - 3} ${t('cms.history.moreItems')}`}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ height: 20, fontSize: '0.65rem', cursor: 'pointer', borderColor: 'divider' }}
-                                          />
-                                        </Tooltip>
+                                        <Chip
+                                          key={tn}
+                                          label={tn}
+                                          size="small"
+                                          variant="outlined"
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            fontSize: '0.68rem',
+                                            height: 20,
+                                          }}
+                                        />
                                       );
-                                    }
-                                    return null;
-                                  }
-                                  return (
-                                    <Chip
-                                      key={tn}
-                                      label={tn}
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ fontFamily: 'monospace', fontSize: '0.68rem', height: 20 }}
-                                    />
-                                  );
-                                })}
-                              </Box>
-                            )}
-                            <Typography variant="caption" color="text.secondary">{events.length} servers</Typography>
-                            <Box sx={{ flex: 1 }} />
-                            <Tooltip title={new Date(events[0].createdAt).toLocaleString('ko-KR')}>
-                              <Typography variant="caption" color="text.secondary" sx={{ cursor: 'help' }}>{formatRelativeTime(new Date(events[0].createdAt).toISOString())}</Typography>
-                            </Tooltip>
-                          </Box>
-                          <Table size="small">
-                            <TableBody>
-                              {events.map((evt, idx) => (
-                                <TableRow key={evt.eventId || idx} sx={{ '&:last-child td': { border: 0 } }}>
-                                  <TableCell sx={{ py: 0.5, width: 24 }}>
-                                    {evt.status === 'success' ? <CheckCircleIcon sx={{ fontSize: 14, color: 'success.main' }} /> : <CancelIcon sx={{ fontSize: 14, color: 'error.main' }} />}
-                                  </TableCell>
-                                  <TableCell sx={{ py: 0.5 }}><Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{evt.serviceType || '—'}</Typography></TableCell>
-                                  <TableCell sx={{ py: 0.5 }}><Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{evt.serverId}</Typography></TableCell>
-                                  <TableCell sx={{ py: 0.5 }} align="right"><Typography variant="caption">{evt.durationMs}ms</Typography></TableCell>
-                                  <TableCell sx={{ py: 0.5 }}>{evt.error && <Typography variant="caption" color="error" sx={{ fontSize: '0.65rem' }}>{evt.error}</Typography>}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </Paper>
-                      );
-                    })}
-                  </Stack>
-                );
-              })()}
+                                    })}
+                                </Box>
+                              )}
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {events.length} servers
+                              </Typography>
+                              <Box sx={{ flex: 1 }} />
+                              <Tooltip
+                                title={new Date(
+                                  events[0].createdAt
+                                ).toLocaleString('ko-KR')}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ cursor: 'help' }}
+                                >
+                                  {formatRelativeTime(
+                                    new Date(events[0].createdAt).toISOString()
+                                  )}
+                                </Typography>
+                              </Tooltip>
+                            </Box>
+                            <Table size="small">
+                              <TableBody>
+                                {events.map((evt, idx) => (
+                                  <TableRow
+                                    key={evt.eventId || idx}
+                                    sx={{ '&:last-child td': { border: 0 } }}
+                                  >
+                                    <TableCell sx={{ py: 0.5, width: 24 }}>
+                                      {evt.status === 'success' ? (
+                                        <CheckCircleIcon
+                                          sx={{
+                                            fontSize: 14,
+                                            color: 'success.main',
+                                          }}
+                                        />
+                                      ) : (
+                                        <CancelIcon
+                                          sx={{
+                                            fontSize: 14,
+                                            color: 'error.main',
+                                          }}
+                                        />
+                                      )}
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5 }}>
+                                      <Typography
+                                        variant="caption"
+                                        sx={{ fontFamily: 'monospace' }}
+                                      >
+                                        {evt.serviceType || '—'}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5 }}>
+                                      <Typography
+                                        variant="caption"
+                                        sx={{ fontFamily: 'monospace' }}
+                                      >
+                                        {evt.serverId}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5 }} align="right">
+                                      <Typography variant="caption">
+                                        {evt.durationMs}ms
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5 }}>
+                                      {evt.error && (
+                                        <Typography
+                                          variant="caption"
+                                          color="error"
+                                          sx={{ fontSize: '0.65rem' }}
+                                        >
+                                          {evt.error}
+                                        </Typography>
+                                      )}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </Paper>
+                        );
+                      })}
+                    </Stack>
+                  );
+                })()
+              )}
             </Box>
           )}
         </Box>
       </ResizableDrawer>
-
 
       {/* Rollback Confirm Dialog */}
       <Dialog open={rollbackOpen} onClose={() => setRollbackOpen(false)}>
@@ -1757,11 +2690,7 @@ const CmsManagementPage: React.FC = () => {
               version: rollbackVersion,
             })}
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mt: 1 }}
-          >
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             {t('cms.rollback.description')}
           </Typography>
           <FormControlLabel
@@ -1785,11 +2714,7 @@ const CmsManagementPage: React.FC = () => {
             onClick={handleRollback}
             disabled={rollbackLoading}
             startIcon={
-              rollbackLoading ? (
-                <CircularProgress size={16} />
-              ) : (
-                <RestoreIcon />
-              )
+              rollbackLoading ? <CircularProgress size={16} /> : <RestoreIcon />
             }
           >
             {t('cms.rollback.execute')}
@@ -1808,7 +2733,9 @@ const CmsManagementPage: React.FC = () => {
             {t('cms.refreshTable.warning')}
           </Alert>
           <DialogContentText>
-            {t('cms.refreshTable.confirmMessage', { tableName: refreshConfirmTableName })}
+            {t('cms.refreshTable.confirmMessage', {
+              tableName: refreshConfirmTableName,
+            })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
