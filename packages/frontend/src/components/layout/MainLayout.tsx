@@ -112,6 +112,7 @@ import {
   MenuCategory,
 } from '@/config/navigation';
 import mailService from '@/services/mailService';
+import aiChatService from '@/services/aiChatService';
 import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
 
@@ -240,6 +241,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // AI Chat panel state
   const [aiChatOpen, setAIChatOpen] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(false);
+
+  // Check AI availability on mount
+  useEffect(() => {
+    let cancelled = false;
+    aiChatService.getStatus().then((status) => {
+      if (!cancelled) setAiEnabled(status.available);
+    }).catch(() => {
+      if (!cancelled) setAiEnabled(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   // Pending CR count for banner
   const [pendingCRCount, setPendingCRCount] = useState(0);
@@ -2363,7 +2376,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       {/* AI Chat Floating Button & Panel */}
       <AIChatFloatingButton
         onClick={() => setAIChatOpen(true)}
-        visible={!aiChatOpen && hasAnyPermissions}
+        visible={!aiChatOpen && hasAnyPermissions && aiEnabled}
       />
       <AIChatPanel open={aiChatOpen} onClose={() => setAIChatOpen(false)} />
 
