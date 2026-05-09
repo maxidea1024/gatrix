@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Table,
@@ -312,7 +318,9 @@ const PlayerListTab: React.FC<Props> = ({
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
   const [exportProcessedCount, setExportProcessedCount] = useState(0);
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const exportAbortRef = useRef<AbortController | null>(null);
 
   const handleRowMenuOpen = (
@@ -496,7 +504,10 @@ const PlayerListTab: React.FC<Props> = ({
           setExportProcessedCount(allUsers.length);
           setExportProgress(
             fetchedTotal > 0
-              ? Math.min(100, Math.round((allUsers.length / fetchedTotal) * 100))
+              ? Math.min(
+                  100,
+                  Math.round((allUsers.length / fetchedTotal) * 100)
+                )
               : 100
           );
 
@@ -550,7 +561,9 @@ const PlayerListTab: React.FC<Props> = ({
         if (error.message === 'Export cancelled') return;
         console.error('Export error:', error);
         enqueueSnackbar(
-          error?.response?.data?.message || error.message || t('common.exportFailed'),
+          error?.response?.data?.message ||
+            error.message ||
+            t('common.exportFailed'),
           { variant: 'error' }
         );
       } finally {
@@ -1233,15 +1246,8 @@ const PlayerListTab: React.FC<Props> = ({
       />
 
       {/* Export Progress Dialog */}
-      <Dialog
-        open={exporting}
-        maxWidth="xs"
-        fullWidth
-        onClose={() => {}}
-      >
-        <DialogTitle sx={{ pb: 1 }}>
-          {t('common.exporting')}
-        </DialogTitle>
+      <Dialog open={exporting} maxWidth="xs" fullWidth onClose={() => {}}>
+        <DialogTitle sx={{ pb: 1 }}>{t('common.exporting')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 1 }}>
             <LinearProgress
@@ -1251,8 +1257,8 @@ const PlayerListTab: React.FC<Props> = ({
             />
           </Box>
           <Typography variant="body2" color="text.secondary">
-            {exportProcessedCount.toLocaleString()} / {total.toLocaleString()}
-            {' '}({exportProgress}%)
+            {exportProcessedCount.toLocaleString()} / {total.toLocaleString()} (
+            {exportProgress}%)
           </Typography>
         </DialogContent>
         <DialogActions>

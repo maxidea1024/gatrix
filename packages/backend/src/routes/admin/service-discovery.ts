@@ -18,10 +18,16 @@ const logger = createLogger('serviceDiscovery');
  * Get ordered list of addresses to try for a service.
  * Tries internalAddress first, falls back to externalAddress on connection failure.
  */
-function getServiceAddresses(service: { internalAddress?: string; externalAddress?: string }): string[] {
+function getServiceAddresses(service: {
+  internalAddress?: string;
+  externalAddress?: string;
+}): string[] {
   const addresses: string[] = [];
   if (service.internalAddress) addresses.push(service.internalAddress);
-  if (service.externalAddress && service.externalAddress !== service.internalAddress) {
+  if (
+    service.externalAddress &&
+    service.externalAddress !== service.internalAddress
+  ) {
     addresses.push(service.externalAddress);
   }
   if (addresses.length === 0 && service.externalAddress) {
@@ -50,17 +56,24 @@ async function proxyServiceRequest(
     const url = `http://${address}:${port}${path}`;
     const startTime = Date.now();
     try {
-      const response = method === 'post'
-        ? await axios.post(url, options.data || {}, { timeout })
-        : await axios.get(url, { timeout });
+      const response =
+        method === 'post'
+          ? await axios.post(url, options.data || {}, { timeout })
+          : await axios.get(url, { timeout });
       return { response, address, latency: Date.now() - startTime };
     } catch (err: any) {
       lastError = err;
       lastError._latency = Date.now() - startTime;
       lastError._url = url;
       // Only retry with next address on connection-level failures
-      if (err.code === 'ECONNREFUSED' || err.code === 'EHOSTUNREACH' || err.code === 'ENETUNREACH') {
-        logger.warn(`Connection failed to ${url}, trying next address...`, { code: err.code });
+      if (
+        err.code === 'ECONNREFUSED' ||
+        err.code === 'EHOSTUNREACH' ||
+        err.code === 'ENETUNREACH'
+      ) {
+        logger.warn(`Connection failed to ${url}, trying next address...`, {
+          code: err.code,
+        });
         continue;
       }
       // For other errors (timeout, HTTP errors), don't retry
@@ -329,7 +342,9 @@ router.post(
 
       try {
         const { response, latency, address } = await proxyServiceRequest(
-          service, webPort, '/health'
+          service,
+          webPort,
+          '/health'
         );
         const healthUrl = `http://${address}:${webPort}/health`;
 
@@ -420,7 +435,9 @@ router.get(
 
       try {
         const { response, latency, address } = await proxyServiceRequest(
-          service, webPort, '/internal/cache/summary'
+          service,
+          webPort,
+          '/internal/cache/summary'
         );
         const cacheUrl = `http://${address}:${webPort}/internal/cache/summary`;
 
@@ -507,7 +524,9 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
 
     try {
       const { response, latency, address } = await proxyServiceRequest(
-        service, webPort, '/internal/cache'
+        service,
+        webPort,
+        '/internal/cache'
       );
       const cacheUrl = `http://${address}:${webPort}/internal/cache`;
 
@@ -595,7 +614,9 @@ router.post(
 
       try {
         const { response, latency } = await proxyServiceRequest(
-          service, webPort, '/internal/cache/refresh',
+          service,
+          webPort,
+          '/internal/cache/refresh',
           { method: 'post', timeout: 15000 }
         );
 
@@ -675,7 +696,9 @@ router.get(
 
       try {
         const { response, latency } = await proxyServiceRequest(
-          service, webPort, '/internal/stats/requests'
+          service,
+          webPort,
+          '/internal/stats/requests'
         );
 
         res.json({
@@ -751,7 +774,9 @@ router.post(
 
       try {
         const { response } = await proxyServiceRequest(
-          service, webPort, '/internal/stats/requests/reset',
+          service,
+          webPort,
+          '/internal/stats/requests/reset',
           { method: 'post' }
         );
         res.json(response.data);
@@ -826,7 +851,9 @@ router.post(
 
       try {
         const { response } = await proxyServiceRequest(
-          service, webPort, '/internal/stats/rate-limit',
+          service,
+          webPort,
+          '/internal/stats/rate-limit',
           { method: 'post', data: { limit } }
         );
         res.json(response.data);
@@ -894,7 +921,9 @@ router.get(
 
       try {
         const { response, latency } = await proxyServiceRequest(
-          service, webPort, '/internal/stats/streaming'
+          service,
+          webPort,
+          '/internal/stats/streaming'
         );
 
         res.json({

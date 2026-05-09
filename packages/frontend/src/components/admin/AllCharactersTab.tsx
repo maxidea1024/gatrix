@@ -318,17 +318,26 @@ export default function AllCharactersTab({
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
   const [exportProcessedCount, setExportProcessedCount] = useState(0);
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const exportAbortRef = useRef<AbortController | null>(null);
 
   // Multi-search state
   const MULTI_SEARCH_FIELDS = [
-    { value: 'accountId', labelKey: 'playerConnections.multiSearch.fieldAccountId' },
+    {
+      value: 'accountId',
+      labelKey: 'playerConnections.multiSearch.fieldAccountId',
+    },
     { value: 'userId', labelKey: 'playerConnections.multiSearch.fieldUserId' },
     { value: 'name', labelKey: 'playerConnections.multiSearch.fieldName' },
-    { value: 'characterId', labelKey: 'playerConnections.multiSearch.fieldCharacterId' },
+    {
+      value: 'characterId',
+      labelKey: 'playerConnections.multiSearch.fieldCharacterId',
+    },
   ];
-  const [multiSearchAnchor, setMultiSearchAnchor] = useState<null | HTMLElement>(null);
+  const [multiSearchAnchor, setMultiSearchAnchor] =
+    useState<null | HTMLElement>(null);
   const [multiSearchField, setMultiSearchField] = useState('accountId');
   const [multiSearchInput, setMultiSearchInput] = useState('');
   // Active multi-search (applied to fetch)
@@ -361,7 +370,9 @@ export default function AllCharactersTab({
     try {
       const saved = localStorage.getItem(MULTI_SEARCH_SIZE_KEY);
       if (saved) return JSON.parse(saved) as { width: number; height: number };
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return { width: 360, height: 160 };
   });
   const multiSearchTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -389,7 +400,7 @@ export default function AllCharactersTab({
         {
           page: page + 1, // API is 1-indexed
           limit: rowsPerPage,
-          search: activeMultiSearch ? undefined : (debouncedSearch || undefined),
+          search: activeMultiSearch ? undefined : debouncedSearch || undefined,
           worldId: worldFilter !== 'all' ? worldFilter : undefined,
           isOnline: isOnlineFilter || undefined,
           loginPlatform: loginPlatformFilter || undefined,
@@ -689,7 +700,9 @@ export default function AllCharactersTab({
             {
               page: currentPage,
               limit: EXPORT_CHUNK_SIZE,
-              search: activeMultiSearch ? undefined : (debouncedSearch || undefined),
+              search: activeMultiSearch
+                ? undefined
+                : debouncedSearch || undefined,
               worldId: worldFilter !== 'all' ? worldFilter : undefined,
               isOnline: isOnlineFilter || undefined,
               loginPlatform: loginPlatformFilter || undefined,
@@ -706,7 +719,9 @@ export default function AllCharactersTab({
           // Update progress
           setExportProcessedCount(allUsers.length);
           setExportProgress(
-            total > 0 ? Math.min(100, Math.round((allUsers.length / total) * 100)) : 100
+            total > 0
+              ? Math.min(100, Math.round((allUsers.length / total) * 100))
+              : 100
           );
 
           // Check if we've fetched all records
@@ -762,7 +777,9 @@ export default function AllCharactersTab({
         if (error.message === 'Export cancelled') return;
         console.error('Export error:', error);
         enqueueSnackbar(
-          error?.response?.data?.message || error.message || t('common.exportFailed'),
+          error?.response?.data?.message ||
+            error.message ||
+            t('common.exportFailed'),
           { variant: 'error' }
         );
       } finally {
@@ -1109,7 +1126,9 @@ export default function AllCharactersTab({
           <Chip
             label={t('playerConnections.multiSearch.activeLabel', {
               field: t(
-                MULTI_SEARCH_FIELDS.find((f) => f.value === activeMultiSearch.field)?.labelKey || ''
+                MULTI_SEARCH_FIELDS.find(
+                  (f) => f.value === activeMultiSearch.field
+                )?.labelKey || ''
               ),
               count: activeMultiSearch.values.length,
             })}
@@ -1133,7 +1152,9 @@ export default function AllCharactersTab({
               {t('playerConnections.multiSearch.title')}
             </Typography>
             <FormControl size="small" fullWidth sx={{ mb: 1.5 }}>
-              <InputLabel>{t('playerConnections.multiSearch.field')}</InputLabel>
+              <InputLabel>
+                {t('playerConnections.multiSearch.field')}
+              </InputLabel>
               <Select
                 value={multiSearchField}
                 label={t('playerConnections.multiSearch.field')}
@@ -1562,15 +1583,8 @@ export default function AllCharactersTab({
       />
 
       {/* Export Progress Dialog */}
-      <Dialog
-        open={exporting}
-        maxWidth="xs"
-        fullWidth
-        onClose={() => {}}
-      >
-        <DialogTitle sx={{ pb: 1 }}>
-          {t('common.exporting')}
-        </DialogTitle>
+      <Dialog open={exporting} maxWidth="xs" fullWidth onClose={() => {}}>
+        <DialogTitle sx={{ pb: 1 }}>{t('common.exporting')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 1 }}>
             <LinearProgress
@@ -1580,8 +1594,8 @@ export default function AllCharactersTab({
             />
           </Box>
           <Typography variant="body2" color="text.secondary">
-            {exportProcessedCount.toLocaleString()} / {data.total.toLocaleString()}
-            {' '}({exportProgress}%)
+            {exportProcessedCount.toLocaleString()} /{' '}
+            {data.total.toLocaleString()} ({exportProgress}%)
           </Typography>
         </DialogContent>
         <DialogActions>
