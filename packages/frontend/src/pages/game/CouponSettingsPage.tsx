@@ -181,7 +181,9 @@ const CouponSettingsPage: React.FC = () => {
   const [codesSetting, setCodesSetting] = useState<CouponSetting | null>(null);
   const [codesSearch, setCodesSearch] = useState('');
   const debouncedCodesSearch = useDebounce(codesSearch, 500);
-  const [codesStatusFilter, setCodesStatusFilter] = useState<'ALL' | 'USED' | 'ISSUED'>('ALL');
+  const [codesStatusFilter, setCodesStatusFilter] = useState<
+    'ALL' | 'USED' | 'ISSUED'
+  >('ALL');
   const [codesLoading, setCodesLoading] = useState(false);
   const [codesStatsLoading, setCodesStatsLoading] = useState(false);
   const [codesItems, setCodesItems] = useState<IssuedCouponCode[]>([]);
@@ -289,8 +291,13 @@ const CouponSettingsPage: React.FC = () => {
               codesSetting.id,
               {
                 limit: chunkSize,
-                search: useFilter ? (debouncedCodesSearch || undefined) : undefined,
-                status: useFilter && codesStatusFilter !== 'ALL' ? codesStatusFilter : undefined,
+                search: useFilter
+                  ? debouncedCodesSearch || undefined
+                  : undefined,
+                status:
+                  useFilter && codesStatusFilter !== 'ALL'
+                    ? codesStatusFilter
+                    : undefined,
                 cursorCreatedAt,
                 cursorId,
               }
@@ -999,7 +1006,15 @@ const CouponSettingsPage: React.FC = () => {
         setCodesLoading(false);
       }
     }
-  }, [codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch, codesStatusFilter, codesOrderBy, codesOrder]);
+  }, [
+    codesSetting,
+    codesPage,
+    codesRowsPerPage,
+    debouncedCodesSearch,
+    codesStatusFilter,
+    codesOrderBy,
+    codesOrder,
+  ]);
 
   // Load stats only once when drawer opens, not on every page change
   const loadCodesStats = useCallback(async () => {
@@ -2919,7 +2934,8 @@ const CouponSettingsPage: React.FC = () => {
                   ...(codesStatusFilter === 'ALL'
                     ? {
                         borderColor: 'transparent',
-                        background: 'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)',
+                        background:
+                          'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)',
                         boxShadow: '0 4px 14px rgba(92,107,192,0.4)',
                         transform: 'scale(1.02)',
                       }
@@ -2929,22 +2945,56 @@ const CouponSettingsPage: React.FC = () => {
                         boxShadow: 1,
                       }),
                   transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover': codesStatusFilter !== 'ALL' ? {
-                    borderColor: 'primary.light',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 3,
-                  } : {},
+                  '&:hover':
+                    codesStatusFilter !== 'ALL'
+                      ? {
+                          borderColor: 'primary.light',
+                          transform: 'translateY(-2px)',
+                          boxShadow: 3,
+                        }
+                      : {},
                 }}
-                onClick={() => { setCodesStatusFilter('ALL'); setCodesPage(0); }}
+                onClick={() => {
+                  setCodesStatusFilter('ALL');
+                  setCodesPage(0);
+                }}
               >
-                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                >
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <ListIcon sx={{ color: codesStatusFilter === 'ALL' ? '#fff' : 'text.secondary', fontSize: 28 }} />
+                    <ListIcon
+                      sx={{
+                        color:
+                          codesStatusFilter === 'ALL'
+                            ? '#fff'
+                            : 'text.secondary',
+                        fontSize: 28,
+                      }}
+                    />
                     <Box>
-                      <Typography variant="caption" sx={{ color: codesStatusFilter === 'ALL' ? 'rgba(255,255,255,0.85)' : 'text.secondary', fontWeight: 600 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color:
+                            codesStatusFilter === 'ALL'
+                              ? 'rgba(255,255,255,0.85)'
+                              : 'text.secondary',
+                          fontWeight: 600,
+                        }}
+                      >
                         {t('coupons.couponSettings.statistics.total')}
                       </Typography>
-                      <Typography variant="h6" sx={{ color: codesStatusFilter === 'ALL' ? '#fff' : 'text.primary', fontWeight: 700 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color:
+                            codesStatusFilter === 'ALL'
+                              ? '#fff'
+                              : 'text.primary',
+                          fontWeight: 700,
+                        }}
+                      >
                         {(codesStats?.issued || 0).toLocaleString()}
                       </Typography>
                     </Box>
@@ -2960,7 +3010,8 @@ const CouponSettingsPage: React.FC = () => {
                   ...(codesStatusFilter === 'USED'
                     ? {
                         borderColor: 'transparent',
-                        background: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
+                        background:
+                          'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
                         boxShadow: '0 4px 14px rgba(102,187,106,0.4)',
                         transform: 'scale(1.02)',
                       }
@@ -2970,22 +3021,56 @@ const CouponSettingsPage: React.FC = () => {
                         boxShadow: 1,
                       }),
                   transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover': codesStatusFilter !== 'USED' ? {
-                    borderColor: 'success.light',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 3,
-                  } : {},
+                  '&:hover':
+                    codesStatusFilter !== 'USED'
+                      ? {
+                          borderColor: 'success.light',
+                          transform: 'translateY(-2px)',
+                          boxShadow: 3,
+                        }
+                      : {},
                 }}
-                onClick={() => { setCodesStatusFilter('USED'); setCodesPage(0); }}
+                onClick={() => {
+                  setCodesStatusFilter('USED');
+                  setCodesPage(0);
+                }}
               >
-                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                >
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <CheckCircleIcon sx={{ color: codesStatusFilter === 'USED' ? '#fff' : 'success.main', fontSize: 28 }} />
+                    <CheckCircleIcon
+                      sx={{
+                        color:
+                          codesStatusFilter === 'USED'
+                            ? '#fff'
+                            : 'success.main',
+                        fontSize: 28,
+                      }}
+                    />
                     <Box>
-                      <Typography variant="caption" sx={{ color: codesStatusFilter === 'USED' ? 'rgba(255,255,255,0.85)' : 'text.secondary', fontWeight: 600 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color:
+                            codesStatusFilter === 'USED'
+                              ? 'rgba(255,255,255,0.85)'
+                              : 'text.secondary',
+                          fontWeight: 600,
+                        }}
+                      >
                         {t('coupons.couponSettings.statistics.used')}
                       </Typography>
-                      <Typography variant="h6" sx={{ color: codesStatusFilter === 'USED' ? '#fff' : 'text.primary', fontWeight: 700 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color:
+                            codesStatusFilter === 'USED'
+                              ? '#fff'
+                              : 'text.primary',
+                          fontWeight: 700,
+                        }}
+                      >
                         {(codesStats?.used || 0).toLocaleString()}
                       </Typography>
                     </Box>
@@ -3001,7 +3086,8 @@ const CouponSettingsPage: React.FC = () => {
                   ...(codesStatusFilter === 'ISSUED'
                     ? {
                         borderColor: 'transparent',
-                        background: 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
+                        background:
+                          'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
                         boxShadow: '0 4px 14px rgba(255,167,38,0.4)',
                         transform: 'scale(1.02)',
                       }
@@ -3011,22 +3097,56 @@ const CouponSettingsPage: React.FC = () => {
                         boxShadow: 1,
                       }),
                   transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover': codesStatusFilter !== 'ISSUED' ? {
-                    borderColor: 'warning.light',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 3,
-                  } : {},
+                  '&:hover':
+                    codesStatusFilter !== 'ISSUED'
+                      ? {
+                          borderColor: 'warning.light',
+                          transform: 'translateY(-2px)',
+                          boxShadow: 3,
+                        }
+                      : {},
                 }}
-                onClick={() => { setCodesStatusFilter('ISSUED'); setCodesPage(0); }}
+                onClick={() => {
+                  setCodesStatusFilter('ISSUED');
+                  setCodesPage(0);
+                }}
               >
-                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                >
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <HourglassEmptyIcon sx={{ color: codesStatusFilter === 'ISSUED' ? '#fff' : 'warning.main', fontSize: 28 }} />
+                    <HourglassEmptyIcon
+                      sx={{
+                        color:
+                          codesStatusFilter === 'ISSUED'
+                            ? '#fff'
+                            : 'warning.main',
+                        fontSize: 28,
+                      }}
+                    />
                     <Box>
-                      <Typography variant="caption" sx={{ color: codesStatusFilter === 'ISSUED' ? 'rgba(255,255,255,0.85)' : 'text.secondary', fontWeight: 600 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color:
+                            codesStatusFilter === 'ISSUED'
+                              ? 'rgba(255,255,255,0.85)'
+                              : 'text.secondary',
+                          fontWeight: 600,
+                        }}
+                      >
                         {t('coupons.couponSettings.statistics.unused')}
                       </Typography>
-                      <Typography variant="h6" sx={{ color: codesStatusFilter === 'ISSUED' ? '#fff' : 'text.primary', fontWeight: 700 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color:
+                            codesStatusFilter === 'ISSUED'
+                              ? '#fff'
+                              : 'text.primary',
+                          fontWeight: 700,
+                        }}
+                      >
                         {(codesStats?.unused || 0).toLocaleString()}
                       </Typography>
                     </Box>
@@ -3078,25 +3198,54 @@ const CouponSettingsPage: React.FC = () => {
               >
                 {(codesStatusFilter !== 'ALL' || debouncedCodesSearch) && (
                   <Box>
-                    <MenuItem disabled sx={{ fontWeight: 600, fontSize: '0.75rem', opacity: '1 !important', minHeight: 32 }}>
-                      {t('coupons.couponSettings.exportFiltered', '필터링된 데이터')}
+                    <MenuItem
+                      disabled
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        opacity: '1 !important',
+                        minHeight: 32,
+                      }}
+                    >
+                      {t(
+                        'coupons.couponSettings.exportFiltered',
+                        '필터링된 데이터'
+                      )}
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleExportIssuedCodes('csv', true)}
                       disabled={exportingCodes}
                     >
                       <TableChartIcon sx={{ mr: 1 }} />
-                      CSV ({t('coupons.couponSettings.exportFilterApplied', '필터 적용')})
+                      CSV (
+                      {t(
+                        'coupons.couponSettings.exportFilterApplied',
+                        '필터 적용'
+                      )}
+                      )
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleExportIssuedCodes('xlsx', true)}
                       disabled={exportingCodes}
                     >
                       <ExcelIcon sx={{ mr: 1 }} />
-                      Excel ({t('coupons.couponSettings.exportFilterApplied', '필터 적용')})
+                      Excel (
+                      {t(
+                        'coupons.couponSettings.exportFilterApplied',
+                        '필터 적용'
+                      )}
+                      )
                     </MenuItem>
                     <Divider />
-                    <MenuItem disabled sx={{ fontWeight: 600, fontSize: '0.75rem', opacity: '1 !important', minHeight: 32 }}>
+                    <MenuItem
+                      disabled
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        opacity: '1 !important',
+                        minHeight: 32,
+                      }}
+                    >
                       {t('coupons.couponSettings.exportAll', '전체 데이터')}
                     </MenuItem>
                   </Box>
@@ -3106,14 +3255,20 @@ const CouponSettingsPage: React.FC = () => {
                   disabled={exportingCodes}
                 >
                   <TableChartIcon sx={{ mr: 1 }} />
-                  CSV{(codesStatusFilter !== 'ALL' || debouncedCodesSearch) ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})` : ''}
+                  CSV
+                  {codesStatusFilter !== 'ALL' || debouncedCodesSearch
+                    ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})`
+                    : ''}
                 </MenuItem>
                 <MenuItem
                   onClick={() => handleExportIssuedCodes('xlsx', false)}
                   disabled={exportingCodes}
                 >
                   <ExcelIcon sx={{ mr: 1 }} />
-                  Excel{(codesStatusFilter !== 'ALL' || debouncedCodesSearch) ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})` : ''}
+                  Excel
+                  {codesStatusFilter !== 'ALL' || debouncedCodesSearch
+                    ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})`
+                    : ''}
                 </MenuItem>
               </Menu>
             </Stack>
@@ -3172,12 +3327,21 @@ const CouponSettingsPage: React.FC = () => {
                     <Table size="small">
                       <TableHead>
                         <TableRow sx={{ height: 48 }}>
-                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'code' ? codesOrder : false}>
+                          <TableCell
+                            sx={{ py: 1, px: 2 }}
+                            sortDirection={
+                              codesOrderBy === 'code' ? codesOrder : false
+                            }
+                          >
                             <TableSortLabel
                               active={codesOrderBy === 'code'}
-                              direction={codesOrderBy === 'code' ? codesOrder : 'asc'}
+                              direction={
+                                codesOrderBy === 'code' ? codesOrder : 'asc'
+                              }
                               onClick={() => {
-                                const isAsc = codesOrderBy === 'code' && codesOrder === 'asc';
+                                const isAsc =
+                                  codesOrderBy === 'code' &&
+                                  codesOrder === 'asc';
                                 setCodesOrder(isAsc ? 'desc' : 'asc');
                                 setCodesOrderBy('code');
                                 setCodesPage(0);
@@ -3186,12 +3350,21 @@ const CouponSettingsPage: React.FC = () => {
                               {t('coupons.issuedCodes.code')}
                             </TableSortLabel>
                           </TableCell>
-                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'status' ? codesOrder : false}>
+                          <TableCell
+                            sx={{ py: 1, px: 2 }}
+                            sortDirection={
+                              codesOrderBy === 'status' ? codesOrder : false
+                            }
+                          >
                             <TableSortLabel
                               active={codesOrderBy === 'status'}
-                              direction={codesOrderBy === 'status' ? codesOrder : 'asc'}
+                              direction={
+                                codesOrderBy === 'status' ? codesOrder : 'asc'
+                              }
                               onClick={() => {
-                                const isAsc = codesOrderBy === 'status' && codesOrder === 'asc';
+                                const isAsc =
+                                  codesOrderBy === 'status' &&
+                                  codesOrder === 'asc';
                                 setCodesOrder(isAsc ? 'desc' : 'asc');
                                 setCodesOrderBy('status');
                                 setCodesPage(0);
@@ -3200,12 +3373,23 @@ const CouponSettingsPage: React.FC = () => {
                               {t('coupons.issuedCodes.status')}
                             </TableSortLabel>
                           </TableCell>
-                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'createdAt' ? codesOrder : false}>
+                          <TableCell
+                            sx={{ py: 1, px: 2 }}
+                            sortDirection={
+                              codesOrderBy === 'createdAt' ? codesOrder : false
+                            }
+                          >
                             <TableSortLabel
                               active={codesOrderBy === 'createdAt'}
-                              direction={codesOrderBy === 'createdAt' ? codesOrder : 'asc'}
+                              direction={
+                                codesOrderBy === 'createdAt'
+                                  ? codesOrder
+                                  : 'asc'
+                              }
                               onClick={() => {
-                                const isAsc = codesOrderBy === 'createdAt' && codesOrder === 'asc';
+                                const isAsc =
+                                  codesOrderBy === 'createdAt' &&
+                                  codesOrder === 'asc';
                                 setCodesOrder(isAsc ? 'desc' : 'asc');
                                 setCodesOrderBy('createdAt');
                                 setCodesPage(0);
@@ -3214,12 +3398,21 @@ const CouponSettingsPage: React.FC = () => {
                               {t('coupons.issuedCodes.issuedAt')}
                             </TableSortLabel>
                           </TableCell>
-                          <TableCell sx={{ py: 1, px: 2 }} sortDirection={codesOrderBy === 'usedAt' ? codesOrder : false}>
+                          <TableCell
+                            sx={{ py: 1, px: 2 }}
+                            sortDirection={
+                              codesOrderBy === 'usedAt' ? codesOrder : false
+                            }
+                          >
                             <TableSortLabel
                               active={codesOrderBy === 'usedAt'}
-                              direction={codesOrderBy === 'usedAt' ? codesOrder : 'asc'}
+                              direction={
+                                codesOrderBy === 'usedAt' ? codesOrder : 'asc'
+                              }
                               onClick={() => {
-                                const isAsc = codesOrderBy === 'usedAt' && codesOrder === 'asc';
+                                const isAsc =
+                                  codesOrderBy === 'usedAt' &&
+                                  codesOrder === 'asc';
                                 setCodesOrder(isAsc ? 'desc' : 'asc');
                                 setCodesOrderBy('usedAt');
                                 setCodesPage(0);
@@ -3279,7 +3472,9 @@ const CouponSettingsPage: React.FC = () => {
                               />
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Tooltip title={formatDateTimeDetailed(c.createdAt)}>
+                              <Tooltip
+                                title={formatDateTimeDetailed(c.createdAt)}
+                              >
                                 <Typography
                                   variant="caption"
                                   sx={{ cursor: 'help' }}
@@ -3294,7 +3489,9 @@ const CouponSettingsPage: React.FC = () => {
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
                               {c.usedAt ? (
-                                <Tooltip title={formatDateTimeDetailed(c.usedAt)}>
+                                <Tooltip
+                                  title={formatDateTimeDetailed(c.usedAt)}
+                                >
                                   <Typography
                                     variant="caption"
                                     sx={{ cursor: 'help' }}

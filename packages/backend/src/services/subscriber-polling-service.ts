@@ -49,10 +49,9 @@ export class SubscriberPollingService {
       for (const inst of ready) {
         const port = inst.ports?.internalApi;
         if (!port || !inst.internalAddress) {
-          logger.warn(
-            'admind instance missing internalApi port, skipping',
-            { instanceId: inst.instanceId }
-          );
+          logger.warn('admind instance missing internalApi port, skipping', {
+            instanceId: inst.instanceId,
+          });
           continue;
         }
 

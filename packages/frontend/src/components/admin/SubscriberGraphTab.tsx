@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Card,
@@ -57,8 +63,6 @@ ChartJS.register(
   crosshairPlugin
 );
 
-
-
 // --- History Table: 10-minute bucket aggregation ---
 interface BucketRow {
   time: string;
@@ -66,9 +70,9 @@ interface BucketRow {
   newPlayers: number;
 }
 
-const SubscriberHistoryTable: React.FC<{ records: SubscriberHistoryRecord[] }> = ({
-  records,
-}) => {
+const SubscriberHistoryTable: React.FC<{
+  records: SubscriberHistoryRecord[];
+}> = ({ records }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -224,7 +228,10 @@ interface Props {
   refreshKey?: number;
 }
 
-const SubscriberGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
+const SubscriberGraphTab: React.FC<Props> = ({
+  projectApiPath,
+  refreshKey,
+}) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<SubscriberHistoryRecord[]>([]);
@@ -247,10 +254,12 @@ const SubscriberGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => 
     setShowLegendRaw(v);
     localStorage.setItem('subscriber-show-legend', String(v));
   }, []);
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    () => dayjs().subtract(7, 'day').startOf('day')
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(() =>
+    dayjs().subtract(7, 'day').startOf('day')
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(() => dayjs().endOf('day'));
+  const [dateTo, setDateTo] = useState<Dayjs | null>(() =>
+    dayjs().endOf('day')
+  );
   const [datePreset, setDatePreset] = useState<DateRangePreset>('last7d');
 
   const handleDateChange = useCallback(
@@ -264,7 +273,9 @@ const SubscriberGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => 
 
   const getDateRange = useCallback(() => {
     const to = dateTo ? dateTo.toDate() : new Date();
-    const from = dateFrom ? dateFrom.toDate() : new Date(to.getTime() - 7 * 24 * 3600000);
+    const from = dateFrom
+      ? dateFrom.toDate()
+      : new Date(to.getTime() - 7 * 24 * 3600000);
     return { from, to };
   }, [dateFrom, dateTo]);
 
@@ -304,8 +315,6 @@ const SubscriberGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => 
       loadHistory(false);
     }
   }, [refreshKey, loadHistory]);
-
-
 
   // Build chart data
   const chartData = useMemo(() => {
@@ -477,7 +486,15 @@ const SubscriberGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => 
           dateTo={dateTo}
           onChange={handleDateChange}
           preset={datePreset}
-          availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'last3m', 'last6m', 'custom']}
+          availablePresets={[
+            'today',
+            'yesterday',
+            'last7d',
+            'last30d',
+            'last3m',
+            'last6m',
+            'custom',
+          ]}
           size="small"
         />
       </Box>

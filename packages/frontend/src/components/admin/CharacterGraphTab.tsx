@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Card,
@@ -55,8 +61,6 @@ ChartJS.register(
   crosshairPlugin
 );
 
-
-
 const WORLD_COLORS = [
   { border: '#2196f3', bg: 'rgba(33,150,243,0.1)' },
   { border: '#4caf50', bg: 'rgba(76,175,80,0.1)' },
@@ -76,9 +80,9 @@ interface BucketRow {
   worlds: { name: string; total: number; newCount: number }[];
 }
 
-const CharacterHistoryTable: React.FC<{ records: CharacterHistoryRecord[] }> = ({
-  records,
-}) => {
+const CharacterHistoryTable: React.FC<{
+  records: CharacterHistoryRecord[];
+}> = ({ records }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -106,8 +110,14 @@ const CharacterHistoryTable: React.FC<{ records: CharacterHistoryRecord[] }> = (
         });
       } else {
         const existing = bucketMap.get(key)!;
-        existing.totalCharacters = Math.max(existing.totalCharacters, r.totalCharacters);
-        existing.newCharacters = Math.max(existing.newCharacters, r.newCharacters);
+        existing.totalCharacters = Math.max(
+          existing.totalCharacters,
+          r.totalCharacters
+        );
+        existing.newCharacters = Math.max(
+          existing.newCharacters,
+          r.newCharacters
+        );
       }
     });
 
@@ -124,7 +134,10 @@ const CharacterHistoryTable: React.FC<{ records: CharacterHistoryRecord[] }> = (
       );
       if (existingWorld) {
         existingWorld.total = Math.max(existingWorld.total, r.totalCharacters);
-        existingWorld.newCount = Math.max(existingWorld.newCount, r.newCharacters);
+        existingWorld.newCount = Math.max(
+          existingWorld.newCount,
+          r.newCharacters
+        );
       } else {
         bucket.worlds.push({
           name: r.worldName || r.worldId || '?',
@@ -298,10 +311,12 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     localStorage.setItem('character-show-legend', String(v));
   }, []);
 
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    () => dayjs().subtract(7, 'day').startOf('day')
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(() =>
+    dayjs().subtract(7, 'day').startOf('day')
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(() => dayjs().endOf('day'));
+  const [dateTo, setDateTo] = useState<Dayjs | null>(() =>
+    dayjs().endOf('day')
+  );
   const [datePreset, setDatePreset] = useState<DateRangePreset>('last7d');
 
   const handleDateChange = useCallback(
@@ -315,7 +330,9 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
 
   const getDateRange = useCallback(() => {
     const to = dateTo ? dateTo.toDate() : new Date();
-    const from = dateFrom ? dateFrom.toDate() : new Date(to.getTime() - 7 * 24 * 3600000);
+    const from = dateFrom
+      ? dateFrom.toDate()
+      : new Date(to.getTime() - 7 * 24 * 3600000);
     return { from, to };
   }, [dateFrom, dateTo]);
 
@@ -355,8 +372,6 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       loadHistory(false);
     }
   }, [refreshKey, loadHistory]);
-
-
 
   // Build chart data — like CCU with per-world breakdown
   const chartData = useMemo(() => {
@@ -524,7 +539,15 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           dateTo={dateTo}
           onChange={handleDateChange}
           preset={datePreset}
-          availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'last3m', 'last6m', 'custom']}
+          availablePresets={[
+            'today',
+            'yesterday',
+            'last7d',
+            'last30d',
+            'last3m',
+            'last6m',
+            'custom',
+          ]}
           size="small"
         />
       </Box>

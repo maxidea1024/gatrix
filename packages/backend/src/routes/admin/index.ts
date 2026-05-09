@@ -454,7 +454,12 @@ projectRouter.use(
 // Ripple Monitoring & CMS Data Management
 projectRouter.use(
   '/ripple-cms',
-  requireEnvPermission([P.RIPPLE_READ, P.RIPPLE_UPDATE, P.CMS_DATA_READ, P.CMS_DATA_UPDATE]) as any,
+  requireEnvPermission([
+    P.RIPPLE_READ,
+    P.RIPPLE_UPDATE,
+    P.CMS_DATA_READ,
+    P.CMS_DATA_UPDATE,
+  ]) as any,
   rippleCmsRoutes
 );
 

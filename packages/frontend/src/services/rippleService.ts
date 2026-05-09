@@ -59,9 +59,7 @@ const rippleService = {
   /**
    * Get Ripple status (health + refreshable handlers list)
    */
-  async getStatus(
-    projectApiPath: string
-  ): Promise<RippleStatusResponse> {
+  async getStatus(projectApiPath: string): Promise<RippleStatusResponse> {
     const res = await api.get(`${projectApiPath}/ripple-cms/ripple/status`);
     return res.data;
   },
@@ -75,10 +73,11 @@ const rippleService = {
     cascade = false,
     metadata?: Record<string, string>
   ): Promise<RippleRefreshResult> {
-    const res = await api.post(
-      `${projectApiPath}/ripple-cms/ripple/refresh`,
-      { pattern, cascade, metadata }
-    );
+    const res = await api.post(`${projectApiPath}/ripple-cms/ripple/refresh`, {
+      pattern,
+      cascade,
+      metadata,
+    });
     return res.data;
   },
 
@@ -103,10 +102,12 @@ const rippleService = {
     if (requestId) params.append('requestId', requestId);
     if (handlerKey) params.append('handlerKey', handlerKey);
     if (limit) params.append('limit', limit.toString());
-    
+
     const qs = params.toString();
-    const res = await api.get(`${projectApiPath}/ripple-cms/ripple/history${qs ? `?${qs}` : ''}`);
-    
+    const res = await api.get(
+      `${projectApiPath}/ripple-cms/ripple/history${qs ? `?${qs}` : ''}`
+    );
+
     // api.get returns the unwrapped AxiosResponse.data, so res is { success: boolean, data: { items: [] } }
     // res.data is already { items: [...] }
     return res.data || { items: [] };
@@ -120,7 +121,9 @@ const rippleService = {
     includeHistory = false
   ): Promise<{ deletedExecutionLogs: number; deletedHistory: number }> {
     const qs = includeHistory ? '?includeHistory=true' : '';
-    const res = await api.delete(`${projectApiPath}/ripple-cms/ripple/history${qs}`);
+    const res = await api.delete(
+      `${projectApiPath}/ripple-cms/ripple/history${qs}`
+    );
     return res.data;
   },
 };

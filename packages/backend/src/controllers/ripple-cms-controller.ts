@@ -159,15 +159,15 @@ export class RippleCmsController {
     async (req: AuthenticatedRequest, res: Response) => {
       const { requestId, limit, handlerKey } = req.query;
       const admindUrl = await getAdmindApiUrl(req.environmentId);
-      
+
       const params = new URLSearchParams();
       if (requestId) params.append('requestId', requestId as string);
       if (handlerKey) params.append('handlerKey', handlerKey as string);
       if (limit) params.append('limit', limit as string);
-      
+
       const queryString = params.toString();
-      const url = `/gatrix/v1/cms/execution-log${queryString ? `?${queryString}` : ''}`; 
-      
+      const url = `/gatrix/v1/cms/execution-log${queryString ? `?${queryString}` : ''}`;
+
       const data = await admindRequest(admindUrl, 'GET', url);
       res.json({ success: true, data });
     }

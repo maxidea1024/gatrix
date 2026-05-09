@@ -357,7 +357,8 @@ export class CouponSettingsController {
     async (req: AuthenticatedRequest, res: Response) => {
       const { id } = req.params;
       if (!id) throw new GatrixError('id is required', 400);
-      const { offset, limit, search, status, cursorCreatedAt, cursorId } = req.query;
+      const { offset, limit, search, status, cursorCreatedAt, cursorId } =
+        req.query;
       const data = await CouponSettingsService.getIssuedCodesForExport(id, {
         offset: offset ? parseInt(offset as string) : undefined,
         limit: limit ? parseInt(limit as string) : undefined,

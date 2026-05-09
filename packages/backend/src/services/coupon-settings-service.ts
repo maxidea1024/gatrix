@@ -762,11 +762,13 @@ export class CouponSettingsService {
     // Cursor-based: fetch rows after the cursor position
     if (query.cursorUsedAt && query.cursorId) {
       dataQuery.where(function () {
-        this.where('cu.usedAt', '<', query.cursorUsedAt!)
-          .orWhere(function () {
-            this.where('cu.usedAt', '=', query.cursorUsedAt!)
-              .andWhere('cu.id', '<', query.cursorId!);
-          });
+        this.where('cu.usedAt', '<', query.cursorUsedAt!).orWhere(function () {
+          this.where('cu.usedAt', '=', query.cursorUsedAt!).andWhere(
+            'cu.id',
+            '<',
+            query.cursorId!
+          );
+        });
       });
     }
 
@@ -853,11 +855,15 @@ export class CouponSettingsService {
     // Cursor-based: fetch rows after the cursor position
     if (query.cursorCreatedAt && query.cursorId) {
       dataQuery.where(function () {
-        this.where('createdAt', '<', query.cursorCreatedAt!)
-          .orWhere(function () {
-            this.where('createdAt', '=', query.cursorCreatedAt!)
-              .andWhere('id', '<', query.cursorId!);
-          });
+        this.where('createdAt', '<', query.cursorCreatedAt!).orWhere(
+          function () {
+            this.where('createdAt', '=', query.cursorCreatedAt!).andWhere(
+              'id',
+              '<',
+              query.cursorId!
+            );
+          }
+        );
       });
     }
 
@@ -881,7 +887,14 @@ export class CouponSettingsService {
    */
   static async getIssuedCodes(
     settingId: string,
-    query: { page?: number; limit?: number; search?: string; status?: string; sortBy?: string; sortOrder?: string }
+    query: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    }
   ) {
     const startTime = Date.now();
     const page = query.page || 1;
@@ -916,8 +929,7 @@ export class CouponSettingsService {
         `Cache hit: total=${total}, time=${Date.now() - startTime}ms`
       );
     } else {
-      const countQuery = db('g_coupons')
-        .where('settingId', settingId);
+      const countQuery = db('g_coupons').where('settingId', settingId);
       if (query.search) countQuery.where('code', 'like', `%${query.search}%`);
       if (query.status) countQuery.where('status', query.status);
       const countResult = await countQuery.count('* as total').first();

@@ -68,10 +68,10 @@ export class CcuHistoryModel {
         db.raw('MAX(worldName) as worldName'),
         db.raw('MAX(playerCount) as playerCount'),
         db.raw('MAX(botCount) as botCount'),
-        db.raw(
-          `${bucketSelectExpr} as recordedAt`,
-          [intervalSeconds, intervalSeconds]
-        )
+        db.raw(`${bucketSelectExpr} as recordedAt`, [
+          intervalSeconds,
+          intervalSeconds,
+        ])
       )
       .where('environmentId', environmentId)
       .where('recordedAt', '>=', from)
@@ -79,12 +79,12 @@ export class CcuHistoryModel {
       .groupBy(
         'environmentId',
         'worldId',
-        db.raw(
-          bucketSelectExpr,
-          [intervalSeconds, intervalSeconds]
-        )
+        db.raw(bucketSelectExpr, [intervalSeconds, intervalSeconds])
       )
-      .orderByRaw(`${bucketSelectExpr} asc`, [intervalSeconds, intervalSeconds]);
+      .orderByRaw(`${bucketSelectExpr} asc`, [
+        intervalSeconds,
+        intervalSeconds,
+      ]);
 
     if (worldId === null) {
       query.whereNull('worldId');

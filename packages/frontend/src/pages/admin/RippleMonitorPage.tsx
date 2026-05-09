@@ -126,13 +126,17 @@ const RippleMonitorPage: React.FC = () => {
 
   // Tracking dialog state
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
-  const [trackingRequestId, setTrackingRequestId] = useState<string | null>(null);
+  const [trackingRequestId, setTrackingRequestId] = useState<string | null>(
+    null
+  );
   const [trackingPattern, setTrackingPattern] = useState<string | null>(null);
   const [trackingMatchedKeys, setTrackingMatchedKeys] = useState<string[]>([]);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   // Last-acked info per handler key, per server (handlerKey → compositeKey → event)
-  const [historyMap, setHistoryMap] = useState<Record<string, Record<string, RippleHistoryEvent>>>({});
+  const [historyMap, setHistoryMap] = useState<
+    Record<string, Record<string, RippleHistoryEvent>>
+  >({});
   const [historyLoading, setHistoryLoading] = useState<string | null>(null);
 
   const fetchStatus = useCallback(async () => {
@@ -141,50 +145,59 @@ const RippleMonitorPage: React.FC = () => {
       const statusResult = await rippleService.getStatus(projectApiPath);
       setData(statusResult);
       setError(null);
-      
+
       // Also pre-fetch global history to populate overview columns
-      const historyResult = await rippleService.getHistory(projectApiPath, undefined, 500);
+      const historyResult = await rippleService.getHistory(
+        projectApiPath,
+        undefined,
+        500
+      );
       const newMap: Record<string, Record<string, RippleHistoryEvent>> = {};
-      for (const evt of (historyResult.items || [])) {
+      for (const evt of historyResult.items || []) {
         if (!evt.handlerKey) continue;
         if (!newMap[evt.handlerKey]) newMap[evt.handlerKey] = {};
         const serverKey = `${evt.serviceType || ''}:${evt.serverId || ''}:${evt.requestId || ''}`;
         newMap[evt.handlerKey][serverKey] = evt;
       }
       setHistoryMap(newMap);
-      
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || err.message || 'Failed to fetch'
-      );
+      setError(err.response?.data?.message || err.message || 'Failed to fetch');
     } finally {
       setLoading(false);
     }
   }, [getProjectApiPath]);
 
   // Lazy-load history for a specific handler key when expanded
-  const fetchHandlerHistory = useCallback(async (handlerKey: string) => {
-    setHistoryLoading(handlerKey);
-    try {
-      const projectApiPath = getProjectApiPath();
-      const result = await rippleService.getHistory(projectApiPath, undefined, 100, handlerKey);
-      setHistoryMap(prev => ({
-        ...prev,
-        [handlerKey]: (() => {
-          const map: Record<string, RippleHistoryEvent> = {};
-          for (const evt of (result.items || [])) {
-            const serverKey = `${evt.serviceType || ''}:${evt.serverId || ''}:${evt.requestId || ''}`;
-            map[serverKey] = evt;
-          }
-          return map;
-        })(),
-      }));
-    } catch {
-      // silent fail, user sees empty sub-table
-    } finally {
-      setHistoryLoading(null);
-    }
-  }, [getProjectApiPath]);
+  const fetchHandlerHistory = useCallback(
+    async (handlerKey: string) => {
+      setHistoryLoading(handlerKey);
+      try {
+        const projectApiPath = getProjectApiPath();
+        const result = await rippleService.getHistory(
+          projectApiPath,
+          undefined,
+          100,
+          handlerKey
+        );
+        setHistoryMap((prev) => ({
+          ...prev,
+          [handlerKey]: (() => {
+            const map: Record<string, RippleHistoryEvent> = {};
+            for (const evt of result.items || []) {
+              const serverKey = `${evt.serviceType || ''}:${evt.serverId || ''}:${evt.requestId || ''}`;
+              map[serverKey] = evt;
+            }
+            return map;
+          })(),
+        }));
+      } catch {
+        // silent fail, user sees empty sub-table
+      } finally {
+        setHistoryLoading(null);
+      }
+    },
+    [getProjectApiPath]
+  );
 
   // Initial load
   useEffect(() => {
@@ -251,13 +264,13 @@ const RippleMonitorPage: React.FC = () => {
           t('ripple.refreshSuccess', { count: result?.matchedCount ?? 0 }),
           { variant: 'success' }
         );
-        
+
         // Open tracking dialog
         setTrackingRequestId(result.requestId);
         setTrackingPattern(pattern);
         setTrackingMatchedKeys(result.matchedKeys || []);
         setTrackingDialogOpen(true);
-        
+
         setTimeout(fetchStatus, 1000);
       } catch (err: any) {
         enqueueSnackbar(
@@ -315,7 +328,6 @@ const RippleMonitorPage: React.FC = () => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
-
 
   return (
     <Box sx={{ p: 3 }}>
@@ -431,7 +443,9 @@ const RippleMonitorPage: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700 }}>
                       <TableSortLabel
                         active={sortField === 'serviceType'}
-                        direction={sortField === 'serviceType' ? sortOrder : 'asc'}
+                        direction={
+                          sortField === 'serviceType' ? sortOrder : 'asc'
+                        }
                         onClick={() => handleSort('serviceType')}
                       >
                         {t('ripple.history.column.serviceType', 'Service')}
@@ -446,7 +460,9 @@ const RippleMonitorPage: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700 }} align="right">
                       <TableSortLabel
                         active={sortField === 'timeoutMs'}
-                        direction={sortField === 'timeoutMs' ? sortOrder : 'asc'}
+                        direction={
+                          sortField === 'timeoutMs' ? sortOrder : 'asc'
+                        }
                         onClick={() => handleSort('timeoutMs')}
                       >
                         {t('ripple.timeout')}
@@ -476,349 +492,806 @@ const RippleMonitorPage: React.FC = () => {
                 <TableBody>
                   {paginatedHandlers.map((handler) => (
                     <React.Fragment key={handler.key}>
-                    <TableRow
-                      hover
-                      sx={{
-                        '&:last-child td, &:last-child th': { border: 0 },
-                      }}
-                    >
-                      <TableCell>
-                        <Chip
-                          label={handler.key}
-                          size="small"
-                          variant="outlined"
-                          color={
-                            handler.key.startsWith('cms/')
-                              ? 'primary'
-                              : 'default'
-                          }
-                          sx={{ fontFamily: 'monospace', fontWeight: 500 }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {(() => {
-                          const entries = Object.values(historyMap[handler.key] || {});
-                          if (!entries.length) return <Typography variant="caption" color="text.secondary">—</Typography>;
-                          const uniqueServices = [...new Set(entries.map(e => e.serviceType).filter(Boolean))].sort();
-                          return (
-                            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                              {uniqueServices.map(svc => (
+                      <TableRow
+                        hover
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell>
+                          <Chip
+                            label={handler.key}
+                            size="small"
+                            variant="outlined"
+                            color={
+                              handler.key.startsWith('cms/')
+                                ? 'primary'
+                                : 'default'
+                            }
+                            sx={{ fontFamily: 'monospace', fontWeight: 500 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const entries = Object.values(
+                              historyMap[handler.key] || {}
+                            );
+                            if (!entries.length)
+                              return (
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  —
+                                </Typography>
+                              );
+                            const uniqueServices = [
+                              ...new Set(
+                                entries
+                                  .map((e) => e.serviceType)
+                                  .filter(Boolean)
+                              ),
+                            ].sort();
+                            return (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  gap: 0.5,
+                                  flexWrap: 'wrap',
+                                }}
+                              >
+                                {uniqueServices.map((svc) => (
+                                  <Chip
+                                    key={svc}
+                                    label={svc}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{
+                                      fontSize: '0.7rem',
+                                      fontFamily: 'monospace',
+                                      height: 20,
+                                    }}
+                                  />
+                                ))}
+                              </Box>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell align="right">
+                          {(() => {
+                            const entries = Object.values(
+                              historyMap[handler.key] || {}
+                            );
+                            if (!entries.length)
+                              return (
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  —
+                                </Typography>
+                              );
+                            const count = new Set(
+                              entries.map((e) => e.serverId).filter(Boolean)
+                            ).size;
+                            return (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  fontSize: '0.75rem',
+                                }}
+                              >
+                                {count.toLocaleString()}
+                              </Typography>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(handler.dependsOn?.length ?? 0) > 0 ? (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                gap: 0.5,
+                                flexWrap: 'wrap',
+                              }}
+                            >
+                              {(handler.dependsOn ?? []).map((dep) => (
                                 <Chip
-                                  key={svc}
-                                  label={svc}
+                                  key={dep}
+                                  label={dep}
                                   size="small"
                                   variant="outlined"
-                                  sx={{ fontSize: '0.7rem', fontFamily: 'monospace', height: 20 }}
+                                  sx={{ fontSize: '0.7rem' }}
                                 />
                               ))}
                             </Box>
-                          );
-                        })()}
-                      </TableCell>
-                      <TableCell align="right">
-                        {(() => {
-                          const entries = Object.values(historyMap[handler.key] || {});
-                          if (!entries.length) return <Typography variant="caption" color="text.secondary">—</Typography>;
-                          const count = new Set(entries.map(e => e.serverId).filter(Boolean)).size;
-                          return (
-                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                              {count.toLocaleString()}
+                          ) : (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              —
                             </Typography>
-                          );
-                        })()}
-                      </TableCell>
-                      <TableCell>
-                        {(handler.dependsOn?.length ?? 0) > 0 ? (
-                          <Box
-                            sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography
+                            variant="body2"
+                            sx={{ fontFamily: 'monospace' }}
                           >
-                            {(handler.dependsOn ?? []).map((dep) => (
-                              <Chip
-                                key={dep}
-                                label={dep}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontSize: '0.7rem' }}
-                              />
-                            ))}
-                          </Box>
-                        ) : (
-                          <Typography variant="caption" color="text.secondary">
-                            —
+                            {handler.timeoutMs != null
+                              ? `${handler.timeoutMs}ms`
+                              : '—'}
                           </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography
-                          variant="body2"
-                          sx={{ fontFamily: 'monospace' }}
-                        >
-                          {handler.timeoutMs != null
-                            ? `${handler.timeoutMs}ms`
-                            : '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography
-                          variant="body2"
-                          sx={{ fontFamily: 'monospace' }}
-                        >
-                          {handler.debounceMs != null
-                            ? `${handler.debounceMs}ms`
-                            : '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {(() => {
-                          const entries = Object.values(historyMap[handler.key] || {});
-                          if (!entries.length) return <Typography variant="caption" color="text.secondary">—</Typography>;
-                          const latest = entries.reduce((a, b) => String(a.finishedAt) > String(b.finishedAt) ? a : b);
-                          return (
-                            <Tooltip title={new Date(latest.finishedAt).toLocaleString('ko-KR')}>
-                              <Typography variant="body2" sx={{ fontSize: '0.75rem', cursor: 'help' }}>
-                                {formatRelativeTime(new Date(latest.finishedAt))}
-                              </Typography>
-                            </Tooltip>
-                          );
-                        })()}
-                      </TableCell>
-                      <TableCell sx={{ width: 32, px: 0 }}>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (expandedKey === handler.key) {
-                              setExpandedKey(null);
-                            } else {
-                              setExpandedKey(handler.key);
-                              fetchHandlerHistory(handler.key);
-                            }
-                          }}
-                        >
-                          {expandedKey === handler.key ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
-                        </IconButton>
-                      </TableCell>
-                      <TableCell align="center" sx={{ px: 0 }}>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            setRowMenuAnchor(e.currentTarget);
-                            setRowMenuKey(handler.key);
-                          }}
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                    {/* Collapsible detail row — per-server breakdown */}
-                    <TableRow>
-                      <TableCell sx={{ py: 0, border: expandedKey === handler.key ? undefined : 'none' }} colSpan={9}>
-                        <Collapse in={expandedKey === handler.key} timeout="auto" unmountOnExit>
-                          <Box sx={{ py: 1.5, px: 2 }}>
-                            {historyLoading === handler.key ? (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-                                <CircularProgress size={24} />
-                              </Box>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography
+                            variant="body2"
+                            sx={{ fontFamily: 'monospace' }}
+                          >
+                            {handler.debounceMs != null
+                              ? `${handler.debounceMs}ms`
+                              : '—'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const entries = Object.values(
+                              historyMap[handler.key] || {}
+                            );
+                            if (!entries.length)
+                              return (
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  —
+                                </Typography>
+                              );
+                            const latest = entries.reduce((a, b) =>
+                              String(a.finishedAt) > String(b.finishedAt)
+                                ? a
+                                : b
+                            );
+                            return (
+                              <Tooltip
+                                title={new Date(
+                                  latest.finishedAt
+                                ).toLocaleString('ko-KR')}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontSize: '0.75rem', cursor: 'help' }}
+                                >
+                                  {formatRelativeTime(
+                                    new Date(latest.finishedAt)
+                                  )}
+                                </Typography>
+                              </Tooltip>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell sx={{ width: 32, px: 0 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              if (expandedKey === handler.key) {
+                                setExpandedKey(null);
+                              } else {
+                                setExpandedKey(handler.key);
+                                fetchHandlerHistory(handler.key);
+                              }
+                            }}
+                          >
+                            {expandedKey === handler.key ? (
+                              <KeyboardArrowUpIcon fontSize="small" />
                             ) : (
-                            <Paper variant="outlined" sx={{ borderRadius: 1.5, overflow: 'hidden' }}>
-                              <TableContainer>
-                                <Table size="small">
-                                  <TableHead>
-                                    <TableRow sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50' }}>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }}>{t('ripple.history.col.status')}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }}>{t('ripple.history.col.service')}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }}>{t('ripple.history.col.serverId')}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }}>{t('ripple.history.col.error')}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }} align="right">{t('ripple.history.col.delay')}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }} align="right">{t('ripple.history.col.duration')}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary', py: 0.75, whiteSpace: 'nowrap' }} align="center">{t('ripple.history.col.retry')}</TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {(() => {
-                                      const MAX_DISPLAY = 50;
-                                      const allEntries = Object.values(historyMap[handler.key] || {})
-                                        .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)));
-                                      const displayEntries = allEntries.slice(0, MAX_DISPLAY);
-                                      const isTruncated = allEntries.length > MAX_DISPLAY;
-
-                                      // Group by requestId
-                                      const grouped: { requestId: string; events: typeof displayEntries }[] = [];
-                                      const groupMap = new Map<string, typeof displayEntries>();
-                                      for (const evt of displayEntries) {
-                                        const rid = evt.requestId || `_no_rid_${evt.eventId}`;
-                                        if (!groupMap.has(rid)) {
-                                          const arr: typeof displayEntries = [];
-                                          groupMap.set(rid, arr);
-                                          grouped.push({ requestId: rid, events: arr });
-                                        }
-                                        groupMap.get(rid)!.push(evt);
-                                      }
-
-                                      return (<>
-                                        {grouped.map((group, gi) => {
-                                          const firstEvt = group.events[0];
-                                          const allSuccess = group.events.every(e => e.status === 'success');
-                                          const borderColor = allSuccess ? 'success.main' : 'error.main';
-                                          const isEven = gi % 2 === 0;
-                                          return (
-                                            <React.Fragment key={group.requestId}>
-                                              {/* ── Request group header ── */}
-                                              <TableRow sx={{
-                                                bgcolor: (theme) => theme.palette.mode === 'dark'
-                                                  ? isEven ? 'rgba(66,165,245,0.08)' : 'rgba(255,255,255,0.04)'
-                                                  : isEven ? 'rgba(25,118,210,0.05)' : 'rgba(0,0,0,0.025)',
-                                              }}>
-                                                <TableCell
-                                                  colSpan={7}
-                                                  sx={{
-                                                    py: 0.5,
-                                                    borderLeft: '3px solid',
-                                                    borderLeftColor: borderColor,
-                                                    borderBottom: 0,
-                                                  }}
-                                                >
-                                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    {allSuccess ? (
-                                                      <CheckCircleIcon sx={{ fontSize: 14, color: 'success.main' }} />
-                                                    ) : (
-                                                      <CancelIcon sx={{ fontSize: 14, color: 'error.main' }} />
-                                                    )}
-                                                    <Tooltip title={group.requestId.startsWith('_no_rid_') ? '' : group.requestId}>
-                                                      <Typography
-                                                        variant="caption"
-                                                        sx={{
-                                                          fontFamily: 'monospace',
-                                                          fontWeight: 700,
-                                                          fontSize: '0.72rem',
-                                                          color: 'text.primary',
-                                                          cursor: group.requestId.startsWith('_no_rid_') ? 'default' : 'help',
-                                                        }}
-                                                      >
-                                                        {group.requestId.startsWith('_no_rid_') ? '—' : group.requestId.slice(0, 10)}
-                                                      </Typography>
-                                                    </Tooltip>
-                                                    <Typography variant="caption" sx={{ color: 'text.disabled' }}>·</Typography>
-                                                    <Tooltip title={new Date(firstEvt.finishedAt).toLocaleString('ko-KR')}>
-                                                      <Typography variant="caption" sx={{ color: 'text.secondary', cursor: 'help', fontSize: '0.7rem' }}>
-                                                        {formatRelativeTime(new Date(firstEvt.finishedAt))}
-                                                      </Typography>
-                                                    </Tooltip>
-                                                    <Typography variant="caption" sx={{ color: 'text.disabled' }}>·</Typography>
-                                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.68rem' }}>
-                                                      {group.events.length} servers
-                                                    </Typography>
-                                                  </Box>
-                                                </TableCell>
-                                              </TableRow>
-                                              {/* ── Per-server rows ── */}
-                                              {group.events.map((evt, idx) => (
-                                                <TableRow
-                                                  key={evt.eventId}
-                                                  sx={{
-                                                    bgcolor: (theme) => theme.palette.mode === 'dark'
-                                                      ? isEven ? 'rgba(66,165,245,0.04)' : 'transparent'
-                                                      : isEven ? 'rgba(25,118,210,0.02)' : 'transparent',
-                                                    // Add bottom spacing after last row of each group
-                                                    ...(idx === group.events.length - 1 && {
-                                                      '& td': { borderBottomWidth: 2 },
-                                                    }),
-                                                  }}
-                                                >
-                                        <TableCell sx={{
-                                          py: 0.5,
-                                          pl: 2,
-                                          borderLeft: '3px solid',
-                                          borderLeftColor: borderColor,
-                                        }}>
-                                          {evt.status === 'success' ? (
-                                            <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
-                                          ) : (
-                                            <CancelIcon color="error" sx={{ fontSize: 16 }} />
-                                          )}
-                                        </TableCell>
-                                        <TableCell sx={{ py: 0.5 }}>
-                                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600 }}>
-                                            {evt.serviceType || '—'}
-                                          </Typography>
-                                        </TableCell>
-                                        <TableCell sx={{ py: 0.5 }}>
-                                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'text.secondary' }}>
-                                            {evt.serverId || '—'}
-                                          </Typography>
-                                        </TableCell>
-                                        <TableCell sx={{ py: 0.5 }}>
-                                          {evt.error ? (
-                                            <Tooltip title={evt.error} placement="top">
-                                              <Typography
-                                                variant="body2"
-                                                sx={{
-                                                  fontSize: '0.7rem',
-                                                  color: 'error.main',
-                                                  fontFamily: 'monospace',
-                                                  maxWidth: 200,
-                                                  overflow: 'hidden',
-                                                  textOverflow: 'ellipsis',
-                                                  whiteSpace: 'nowrap',
-                                                  cursor: 'help',
-                                                }}
-                                              >
-                                                {evt.error}
-                                              </Typography>
-                                            </Tooltip>
-                                          ) : (
-                                            <Typography variant="body2" sx={{ fontSize: '0.72rem', color: 'text.disabled' }}>—</Typography>
-                                          )}
-                                        </TableCell>
-                                        <TableCell align="right" sx={{ py: 0.5 }}>
-                                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary' }}>
-                                            {evt.delayMs != null ? `${evt.delayMs}ms` : '—'}
-                                          </Typography>
-                                        </TableCell>
-                                        <TableCell align="right" sx={{ py: 0.5 }}>
-                                          <Typography
-                                            variant="body2"
+                              <KeyboardArrowDownIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        </TableCell>
+                        <TableCell align="center" sx={{ px: 0 }}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              setRowMenuAnchor(e.currentTarget);
+                              setRowMenuKey(handler.key);
+                            }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                      {/* Collapsible detail row — per-server breakdown */}
+                      <TableRow>
+                        <TableCell
+                          sx={{
+                            py: 0,
+                            border:
+                              expandedKey === handler.key ? undefined : 'none',
+                          }}
+                          colSpan={9}
+                        >
+                          <Collapse
+                            in={expandedKey === handler.key}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box sx={{ py: 1.5, px: 2 }}>
+                              {historyLoading === handler.key ? (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    py: 3,
+                                  }}
+                                >
+                                  <CircularProgress size={24} />
+                                </Box>
+                              ) : (
+                                <Paper
+                                  variant="outlined"
+                                  sx={{ borderRadius: 1.5, overflow: 'hidden' }}
+                                >
+                                  <TableContainer>
+                                    <Table size="small">
+                                      <TableHead>
+                                        <TableRow
+                                          sx={{
+                                            bgcolor: (theme) =>
+                                              theme.palette.mode === 'dark'
+                                                ? 'rgba(255,255,255,0.03)'
+                                                : 'grey.50',
+                                          }}
+                                        >
+                                          <TableCell
                                             sx={{
-                                              fontFamily: 'monospace',
-                                              fontSize: '0.75rem',
-                                              fontWeight: (evt.durationMs || 0) > 5000 ? 700 : 400,
-                                              color: (evt.durationMs || 0) > 5000 ? 'warning.main' : 'text.primary',
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
                                             }}
                                           >
-                                            {evt.durationMs != null ? `${evt.durationMs.toLocaleString()}ms` : '—'}
-                                          </Typography>
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ py: 0.5 }}>
-                                          {evt.retryCount ? (
-                                            <Chip label={evt.retryCount} size="small" color="warning" sx={{ fontSize: '0.7rem', height: 20, minWidth: 28 }} />
-                                          ) : (
-                                            <Typography variant="body2" sx={{ fontSize: '0.72rem', color: 'text.disabled' }}>—</Typography>
-                                          )}
-                                        </TableCell>
-                                                </TableRow>
-                                              ))}
-                                            </React.Fragment>
+                                            {t('ripple.history.col.status')}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                          >
+                                            {t('ripple.history.col.service')}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                          >
+                                            {t('ripple.history.col.serverId')}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                          >
+                                            {t('ripple.history.col.error')}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                            align="right"
+                                          >
+                                            {t('ripple.history.col.delay')}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                            align="right"
+                                          >
+                                            {t('ripple.history.col.duration')}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 700,
+                                              fontSize: '0.7rem',
+                                              color: 'text.secondary',
+                                              py: 0.75,
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                            align="center"
+                                          >
+                                            {t('ripple.history.col.retry')}
+                                          </TableCell>
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {(() => {
+                                          const MAX_DISPLAY = 50;
+                                          const allEntries = Object.values(
+                                            historyMap[handler.key] || {}
+                                          ).sort((a, b) =>
+                                            String(b.finishedAt).localeCompare(
+                                              String(a.finishedAt)
+                                            )
                                           );
-                                        })}
-                                    {isTruncated && (
-                                      <TableRow>
-                                        <TableCell colSpan={7} align="center" sx={{ py: 0.75, border: 0 }}>
-                                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                            {t('common.maxDisplayNotice', { max: MAX_DISPLAY, total: allEntries.length })}
-                                          </Typography>
-                                        </TableCell>
-                                      </TableRow>
-                                    )}
-                                    </>);
-                                    })()}
-                                  </TableBody>
-                                </Table>
-                              </TableContainer>
-                            </Paper>
-                            )}
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
+                                          const displayEntries =
+                                            allEntries.slice(0, MAX_DISPLAY);
+                                          const isTruncated =
+                                            allEntries.length > MAX_DISPLAY;
+
+                                          // Group by requestId
+                                          const grouped: {
+                                            requestId: string;
+                                            events: typeof displayEntries;
+                                          }[] = [];
+                                          const groupMap = new Map<
+                                            string,
+                                            typeof displayEntries
+                                          >();
+                                          for (const evt of displayEntries) {
+                                            const rid =
+                                              evt.requestId ||
+                                              `_no_rid_${evt.eventId}`;
+                                            if (!groupMap.has(rid)) {
+                                              const arr: typeof displayEntries =
+                                                [];
+                                              groupMap.set(rid, arr);
+                                              grouped.push({
+                                                requestId: rid,
+                                                events: arr,
+                                              });
+                                            }
+                                            groupMap.get(rid)!.push(evt);
+                                          }
+
+                                          return (
+                                            <>
+                                              {grouped.map((group, gi) => {
+                                                const firstEvt =
+                                                  group.events[0];
+                                                const allSuccess =
+                                                  group.events.every(
+                                                    (e) =>
+                                                      e.status === 'success'
+                                                  );
+                                                const borderColor = allSuccess
+                                                  ? 'success.main'
+                                                  : 'error.main';
+                                                const isEven = gi % 2 === 0;
+                                                return (
+                                                  <React.Fragment
+                                                    key={group.requestId}
+                                                  >
+                                                    {/* ── Request group header ── */}
+                                                    <TableRow
+                                                      sx={{
+                                                        bgcolor: (theme) =>
+                                                          theme.palette.mode ===
+                                                          'dark'
+                                                            ? isEven
+                                                              ? 'rgba(66,165,245,0.08)'
+                                                              : 'rgba(255,255,255,0.04)'
+                                                            : isEven
+                                                              ? 'rgba(25,118,210,0.05)'
+                                                              : 'rgba(0,0,0,0.025)',
+                                                      }}
+                                                    >
+                                                      <TableCell
+                                                        colSpan={7}
+                                                        sx={{
+                                                          py: 0.5,
+                                                          borderLeft:
+                                                            '3px solid',
+                                                          borderLeftColor:
+                                                            borderColor,
+                                                          borderBottom: 0,
+                                                        }}
+                                                      >
+                                                        <Box
+                                                          sx={{
+                                                            display: 'flex',
+                                                            alignItems:
+                                                              'center',
+                                                            gap: 1,
+                                                          }}
+                                                        >
+                                                          {allSuccess ? (
+                                                            <CheckCircleIcon
+                                                              sx={{
+                                                                fontSize: 14,
+                                                                color:
+                                                                  'success.main',
+                                                              }}
+                                                            />
+                                                          ) : (
+                                                            <CancelIcon
+                                                              sx={{
+                                                                fontSize: 14,
+                                                                color:
+                                                                  'error.main',
+                                                              }}
+                                                            />
+                                                          )}
+                                                          <Tooltip
+                                                            title={
+                                                              group.requestId.startsWith(
+                                                                '_no_rid_'
+                                                              )
+                                                                ? ''
+                                                                : group.requestId
+                                                            }
+                                                          >
+                                                            <Typography
+                                                              variant="caption"
+                                                              sx={{
+                                                                fontFamily:
+                                                                  'monospace',
+                                                                fontWeight: 700,
+                                                                fontSize:
+                                                                  '0.72rem',
+                                                                color:
+                                                                  'text.primary',
+                                                                cursor:
+                                                                  group.requestId.startsWith(
+                                                                    '_no_rid_'
+                                                                  )
+                                                                    ? 'default'
+                                                                    : 'help',
+                                                              }}
+                                                            >
+                                                              {group.requestId.startsWith(
+                                                                '_no_rid_'
+                                                              )
+                                                                ? '—'
+                                                                : group.requestId.slice(
+                                                                    0,
+                                                                    10
+                                                                  )}
+                                                            </Typography>
+                                                          </Tooltip>
+                                                          <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                              color:
+                                                                'text.disabled',
+                                                            }}
+                                                          >
+                                                            ·
+                                                          </Typography>
+                                                          <Tooltip
+                                                            title={new Date(
+                                                              firstEvt.finishedAt
+                                                            ).toLocaleString(
+                                                              'ko-KR'
+                                                            )}
+                                                          >
+                                                            <Typography
+                                                              variant="caption"
+                                                              sx={{
+                                                                color:
+                                                                  'text.secondary',
+                                                                cursor: 'help',
+                                                                fontSize:
+                                                                  '0.7rem',
+                                                              }}
+                                                            >
+                                                              {formatRelativeTime(
+                                                                new Date(
+                                                                  firstEvt.finishedAt
+                                                                )
+                                                              )}
+                                                            </Typography>
+                                                          </Tooltip>
+                                                          <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                              color:
+                                                                'text.disabled',
+                                                            }}
+                                                          >
+                                                            ·
+                                                          </Typography>
+                                                          <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                              color:
+                                                                'text.disabled',
+                                                              fontSize:
+                                                                '0.68rem',
+                                                            }}
+                                                          >
+                                                            {
+                                                              group.events
+                                                                .length
+                                                            }{' '}
+                                                            servers
+                                                          </Typography>
+                                                        </Box>
+                                                      </TableCell>
+                                                    </TableRow>
+                                                    {/* ── Per-server rows ── */}
+                                                    {group.events.map(
+                                                      (evt, idx) => (
+                                                        <TableRow
+                                                          key={evt.eventId}
+                                                          sx={{
+                                                            bgcolor: (theme) =>
+                                                              theme.palette
+                                                                .mode === 'dark'
+                                                                ? isEven
+                                                                  ? 'rgba(66,165,245,0.04)'
+                                                                  : 'transparent'
+                                                                : isEven
+                                                                  ? 'rgba(25,118,210,0.02)'
+                                                                  : 'transparent',
+                                                            // Add bottom spacing after last row of each group
+                                                            ...(idx ===
+                                                              group.events
+                                                                .length -
+                                                                1 && {
+                                                              '& td': {
+                                                                borderBottomWidth: 2,
+                                                              },
+                                                            }),
+                                                          }}
+                                                        >
+                                                          <TableCell
+                                                            sx={{
+                                                              py: 0.5,
+                                                              pl: 2,
+                                                              borderLeft:
+                                                                '3px solid',
+                                                              borderLeftColor:
+                                                                borderColor,
+                                                            }}
+                                                          >
+                                                            {evt.status ===
+                                                            'success' ? (
+                                                              <CheckCircleIcon
+                                                                color="success"
+                                                                sx={{
+                                                                  fontSize: 16,
+                                                                }}
+                                                              />
+                                                            ) : (
+                                                              <CancelIcon
+                                                                color="error"
+                                                                sx={{
+                                                                  fontSize: 16,
+                                                                }}
+                                                              />
+                                                            )}
+                                                          </TableCell>
+                                                          <TableCell
+                                                            sx={{ py: 0.5 }}
+                                                          >
+                                                            <Typography
+                                                              variant="body2"
+                                                              sx={{
+                                                                fontFamily:
+                                                                  'monospace',
+                                                                fontSize:
+                                                                  '0.75rem',
+                                                                fontWeight: 600,
+                                                              }}
+                                                            >
+                                                              {evt.serviceType ||
+                                                                '—'}
+                                                            </Typography>
+                                                          </TableCell>
+                                                          <TableCell
+                                                            sx={{ py: 0.5 }}
+                                                          >
+                                                            <Typography
+                                                              variant="body2"
+                                                              sx={{
+                                                                fontFamily:
+                                                                  'monospace',
+                                                                fontSize:
+                                                                  '0.72rem',
+                                                                color:
+                                                                  'text.secondary',
+                                                              }}
+                                                            >
+                                                              {evt.serverId ||
+                                                                '—'}
+                                                            </Typography>
+                                                          </TableCell>
+                                                          <TableCell
+                                                            sx={{ py: 0.5 }}
+                                                          >
+                                                            {evt.error ? (
+                                                              <Tooltip
+                                                                title={
+                                                                  evt.error
+                                                                }
+                                                                placement="top"
+                                                              >
+                                                                <Typography
+                                                                  variant="body2"
+                                                                  sx={{
+                                                                    fontSize:
+                                                                      '0.7rem',
+                                                                    color:
+                                                                      'error.main',
+                                                                    fontFamily:
+                                                                      'monospace',
+                                                                    maxWidth: 200,
+                                                                    overflow:
+                                                                      'hidden',
+                                                                    textOverflow:
+                                                                      'ellipsis',
+                                                                    whiteSpace:
+                                                                      'nowrap',
+                                                                    cursor:
+                                                                      'help',
+                                                                  }}
+                                                                >
+                                                                  {evt.error}
+                                                                </Typography>
+                                                              </Tooltip>
+                                                            ) : (
+                                                              <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                  fontSize:
+                                                                    '0.72rem',
+                                                                  color:
+                                                                    'text.disabled',
+                                                                }}
+                                                              >
+                                                                —
+                                                              </Typography>
+                                                            )}
+                                                          </TableCell>
+                                                          <TableCell
+                                                            align="right"
+                                                            sx={{ py: 0.5 }}
+                                                          >
+                                                            <Typography
+                                                              variant="body2"
+                                                              sx={{
+                                                                fontFamily:
+                                                                  'monospace',
+                                                                fontSize:
+                                                                  '0.75rem',
+                                                                color:
+                                                                  'text.secondary',
+                                                              }}
+                                                            >
+                                                              {evt.delayMs !=
+                                                              null
+                                                                ? `${evt.delayMs}ms`
+                                                                : '—'}
+                                                            </Typography>
+                                                          </TableCell>
+                                                          <TableCell
+                                                            align="right"
+                                                            sx={{ py: 0.5 }}
+                                                          >
+                                                            <Typography
+                                                              variant="body2"
+                                                              sx={{
+                                                                fontFamily:
+                                                                  'monospace',
+                                                                fontSize:
+                                                                  '0.75rem',
+                                                                fontWeight:
+                                                                  (evt.durationMs ||
+                                                                    0) > 5000
+                                                                    ? 700
+                                                                    : 400,
+                                                                color:
+                                                                  (evt.durationMs ||
+                                                                    0) > 5000
+                                                                    ? 'warning.main'
+                                                                    : 'text.primary',
+                                                              }}
+                                                            >
+                                                              {evt.durationMs !=
+                                                              null
+                                                                ? `${evt.durationMs.toLocaleString()}ms`
+                                                                : '—'}
+                                                            </Typography>
+                                                          </TableCell>
+                                                          <TableCell
+                                                            align="center"
+                                                            sx={{ py: 0.5 }}
+                                                          >
+                                                            {evt.retryCount ? (
+                                                              <Chip
+                                                                label={
+                                                                  evt.retryCount
+                                                                }
+                                                                size="small"
+                                                                color="warning"
+                                                                sx={{
+                                                                  fontSize:
+                                                                    '0.7rem',
+                                                                  height: 20,
+                                                                  minWidth: 28,
+                                                                }}
+                                                              />
+                                                            ) : (
+                                                              <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                  fontSize:
+                                                                    '0.72rem',
+                                                                  color:
+                                                                    'text.disabled',
+                                                                }}
+                                                              >
+                                                                —
+                                                              </Typography>
+                                                            )}
+                                                          </TableCell>
+                                                        </TableRow>
+                                                      )
+                                                    )}
+                                                  </React.Fragment>
+                                                );
+                                              })}
+                                              {isTruncated && (
+                                                <TableRow>
+                                                  <TableCell
+                                                    colSpan={7}
+                                                    align="center"
+                                                    sx={{ py: 0.75, border: 0 }}
+                                                  >
+                                                    <Typography
+                                                      variant="caption"
+                                                      sx={{
+                                                        color: 'text.secondary',
+                                                      }}
+                                                    >
+                                                      {t(
+                                                        'common.maxDisplayNotice',
+                                                        {
+                                                          max: MAX_DISPLAY,
+                                                          total:
+                                                            allEntries.length,
+                                                        }
+                                                      )}
+                                                    </Typography>
+                                                  </TableCell>
+                                                </TableRow>
+                                              )}
+                                            </>
+                                          );
+                                        })()}
+                                      </TableBody>
+                                    </Table>
+                                  </TableContainer>
+                                </Paper>
+                              )}
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
                     </React.Fragment>
                   ))}
                 </TableBody>
@@ -972,7 +1445,10 @@ const RippleMonitorPage: React.FC = () => {
             : t('ripple.rowRefreshConfirm.title')}
         </DialogTitle>
         <DialogContent>
-          <Alert severity={rowRefreshCascade ? 'error' : 'warning'} sx={{ mb: 2, borderRadius: 2 }}>
+          <Alert
+            severity={rowRefreshCascade ? 'error' : 'warning'}
+            sx={{ mb: 2, borderRadius: 2 }}
+          >
             {rowRefreshCascade
               ? t('ripple.rowRefreshConfirm.cascadeWarning')
               : t('ripple.rowRefreshConfirm.warning')}
@@ -989,7 +1465,8 @@ const RippleMonitorPage: React.FC = () => {
             variant="contained"
             color={rowRefreshCascade ? 'error' : 'warning'}
             onClick={() => {
-              if (rowRefreshKey) handleRefresh(rowRefreshKey, rowRefreshCascade);
+              if (rowRefreshKey)
+                handleRefresh(rowRefreshKey, rowRefreshCascade);
               setRowRefreshConfirmOpen(false);
             }}
           >
@@ -997,7 +1474,7 @@ const RippleMonitorPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Real-Time Tracking Dialog */}
       <RippleTrackingDialog
         open={trackingDialogOpen}

@@ -295,7 +295,14 @@ export const couponService = {
   async getIssuedCodes(
     projectApiPath: string,
     settingId: string,
-    params?: { page?: number; limit?: number; search?: string; status?: string; sortBy?: string; sortOrder?: string }
+    params?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    }
   ): Promise<IssuedCodesResponse> {
     const res = await api.get(
       `${projectApiPath}/coupon-settings/${settingId}/issued-codes`,

@@ -147,17 +147,14 @@ const cmsService = {
     comment: string,
     options?: { binaryCode?: string; refresh?: boolean; cascade?: boolean }
   ): Promise<CmsUploadResult> {
-    const res = await api.post(
-      `${projectApiPath}/ripple-cms/cms/upload`,
-      {
-        tableName,
-        binaryCode: options?.binaryCode || null,
-        data,
-        comment,
-        refresh: options?.refresh || false,
-        cascade: options?.cascade || false,
-      }
-    );
+    const res = await api.post(`${projectApiPath}/ripple-cms/cms/upload`, {
+      tableName,
+      binaryCode: options?.binaryCode || null,
+      data,
+      comment,
+      refresh: options?.refresh || false,
+      cascade: options?.cascade || false,
+    });
     return res.data;
   },
 
@@ -170,15 +167,12 @@ const cmsService = {
     version: number,
     options?: { binaryCode?: string; refresh?: boolean }
   ): Promise<CmsRollbackResult> {
-    const res = await api.post(
-      `${projectApiPath}/ripple-cms/cms/rollback`,
-      {
-        tableName,
-        version,
-        binaryCode: options?.binaryCode || null,
-        refresh: options?.refresh || false,
-      }
-    );
+    const res = await api.post(`${projectApiPath}/ripple-cms/cms/rollback`, {
+      tableName,
+      version,
+      binaryCode: options?.binaryCode || null,
+      refresh: options?.refresh || false,
+    });
     return res.data;
   },
 
@@ -202,7 +196,12 @@ const cmsService = {
     tableName: string,
     version: number,
     binaryCode?: string
-  ): Promise<{ tableName: string; version: number; contentHash: string; data: any }> {
+  ): Promise<{
+    tableName: string;
+    version: number;
+    contentHash: string;
+    data: any;
+  }> {
     const params = new URLSearchParams();
     if (binaryCode) params.set('binaryCode', binaryCode);
     const qs = params.toString() ? `?${params}` : '';

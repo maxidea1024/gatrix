@@ -13,7 +13,11 @@ export const crosshairPlugin: Plugin<'line'> = {
 
   afterDraw(chart: Chart<'line'>) {
     const tooltip = chart.tooltip;
-    if (!tooltip || !tooltip.getActiveElements || tooltip.getActiveElements().length === 0) {
+    if (
+      !tooltip ||
+      !tooltip.getActiveElements ||
+      tooltip.getActiveElements().length === 0
+    ) {
       return;
     }
 

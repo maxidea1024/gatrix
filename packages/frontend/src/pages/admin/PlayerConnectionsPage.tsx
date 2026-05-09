@@ -170,8 +170,10 @@ const PlayerConnectionsPage: React.FC = () => {
   } | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
-  const [subscriberLatest, setSubscriberLatest] = useState<SubscriberLatest | null>(null);
-  const [characterLatest, setCharacterLatest] = useState<CharacterLatest | null>(null);
+  const [subscriberLatest, setSubscriberLatest] =
+    useState<SubscriberLatest | null>(null);
+  const [characterLatest, setCharacterLatest] =
+    useState<CharacterLatest | null>(null);
   const SCOREBOARD_STORAGE_KEY = 'playerConnections.scoreboardOpen';
   const [scoreboardOpen, setScoreboardOpen] = useState(
     () => sessionStorage.getItem(SCOREBOARD_STORAGE_KEY) === 'true'
@@ -264,8 +266,14 @@ const PlayerConnectionsPage: React.FC = () => {
       });
       setDataRefreshKey((k) => k + 1);
       // Load subscriber/character latest stats (non-blocking)
-      playerConnectionService.getSubscriberLatest(projectApiPath).then(setSubscriberLatest).catch(() => {});
-      playerConnectionService.getCharacterLatest(projectApiPath).then(setCharacterLatest).catch(() => {});
+      playerConnectionService
+        .getSubscriberLatest(projectApiPath)
+        .then(setSubscriberLatest)
+        .catch(() => {});
+      playerConnectionService
+        .getCharacterLatest(projectApiPath)
+        .then(setCharacterLatest)
+        .catch(() => {});
     } catch (err: any) {
       const status = err?.response?.status || err?.status;
       if (status === 502 || status === 504) {
@@ -1725,7 +1733,8 @@ const PlayerConnectionsPage: React.FC = () => {
                         fontWeight={700}
                         color="info.main"
                       >
-                        {subscriberLatest?.totalPlayers?.toLocaleString() ?? '-'}
+                        {subscriberLatest?.totalPlayers?.toLocaleString() ??
+                          '-'}
                       </Typography>
                     </Box>
                     <Avatar
@@ -1843,7 +1852,8 @@ const PlayerConnectionsPage: React.FC = () => {
                         fontWeight={700}
                         color="secondary.main"
                       >
-                        {characterLatest?.totalCharacters?.toLocaleString() ?? '-'}
+                        {characterLatest?.totalCharacters?.toLocaleString() ??
+                          '-'}
                       </Typography>
                     </Box>
                     <Avatar
@@ -2335,12 +2345,18 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 2: Subscriber (Player) Graph */}
       {activeTab === 2 && projectApiPath && (
-        <SubscriberGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
+        <SubscriberGraphTab
+          projectApiPath={projectApiPath}
+          refreshKey={dataRefreshKey}
+        />
       )}
 
       {/* Tab 3: Character Graph */}
       {activeTab === 3 && projectApiPath && (
-        <CharacterGraphTab projectApiPath={projectApiPath} refreshKey={dataRefreshKey} />
+        <CharacterGraphTab
+          projectApiPath={projectApiPath}
+          refreshKey={dataRefreshKey}
+        />
       )}
 
       {/* Tab 4: Player List */}

@@ -181,9 +181,8 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
     },
 
     'subscriber:poll': async (job) => {
-      const { subscriberPollingService } = await import(
-        './subscriber-polling-service'
-      );
+      const { subscriberPollingService } =
+        await import('./subscriber-polling-service');
       await subscriberPollingService.pollAll();
       logger.info('subscriber:poll completed', { jobId: job.id });
     },

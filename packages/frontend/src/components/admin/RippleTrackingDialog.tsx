@@ -70,15 +70,19 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
       if (!requestId) return;
 
       try {
-        const result = await rippleService.getHistory(getProjectApiPath(), requestId, 10000);
+        const result = await rippleService.getHistory(
+          getProjectApiPath(),
+          requestId,
+          10000
+        );
 
         const fetchedEvents = result.items || [];
-        const fetchedKeys = new Set(fetchedEvents.map(e => e.handlerKey));
+        const fetchedKeys = new Set(fetchedEvents.map((e) => e.handlerKey));
 
         // Find keys that haven't responded yet
         const pendingEvents: RippleHistoryEvent[] = matchedKeys
-          .filter(k => !fetchedKeys.has(k))
-          .map(k => ({
+          .filter((k) => !fetchedKeys.has(k))
+          .map((k) => ({
             eventId: `pending-${k}`,
             serverId: '...',
             requestId: requestId,
@@ -114,19 +118,21 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
 
     if (open && requestId) {
       // Pre-populate with pending
-      setEvents(matchedKeys.map(k => ({
-        eventId: `pending-${k}`,
-        serverId: '...',
-        requestId: requestId,
-        pattern: pattern || '',
-        handlerKey: k,
-        status: 'skipped' as const,
-        durationMs: 0,
-        delayMs: 0,
-        createdAt: Date.now(),
-        startedAt: 0,
-        finishedAt: 0,
-      })));
+      setEvents(
+        matchedKeys.map((k) => ({
+          eventId: `pending-${k}`,
+          serverId: '...',
+          requestId: requestId,
+          pattern: pattern || '',
+          handlerKey: k,
+          status: 'skipped' as const,
+          durationMs: 0,
+          delayMs: 0,
+          createdAt: Date.now(),
+          startedAt: 0,
+          finishedAt: 0,
+        }))
+      );
       setLoading(true);
       setIsPolling(true);
       fetchEvents().finally(() => setLoading(false));
@@ -171,24 +177,51 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
       keyStatusMap.set(e.handlerKey, e.status);
     }
   }
-  const uniqueSuccessCount = [...keyStatusMap.values()].filter(s => s === 'success').length;
-  const uniqueFailureCount = [...keyStatusMap.values()].filter(s => s === 'failure' || s === 'timeout').length;
-  const uniquePendingCount = [...keyStatusMap.values()].filter(s => s === 'skipped').length;
+  const uniqueSuccessCount = [...keyStatusMap.values()].filter(
+    (s) => s === 'success'
+  ).length;
+  const uniqueFailureCount = [...keyStatusMap.values()].filter(
+    (s) => s === 'failure' || s === 'timeout'
+  ).length;
+  const uniquePendingCount = [...keyStatusMap.values()].filter(
+    (s) => s === 'skipped'
+  ).length;
   const uniqueTotal = keyStatusMap.size;
-  const totalEvents = events.filter(e => e.status !== 'skipped').length;
-  const progress = uniqueTotal > 0 ? ((uniqueSuccessCount + uniqueFailureCount) / uniqueTotal) * 100 : 0;
+  const totalEvents = events.filter((e) => e.status !== 'skipped').length;
+  const progress =
+    uniqueTotal > 0
+      ? ((uniqueSuccessCount + uniqueFailureCount) / uniqueTotal) * 100
+      : 0;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <Typography variant="subtitle1" fontWeight={600}>
             {t('ripple.tracking.title', 'Ripple 전파 추적')}
           </Typography>
           {isPolling && <CircularProgress size={16} />}
         </Box>
-        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 0.5,
+            mt: 0.5,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontFamily: 'monospace' }}
+          >
             {requestId} / {pattern}
           </Typography>
         </Box>
@@ -196,17 +229,45 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
       <DialogContent dividers sx={{ p: 1.5 }}>
         {/* Summary */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
-          <Chip size="small" label={`✓ ${uniqueSuccessCount}`} color="success" variant="outlined" sx={{ height: 22, fontWeight: 600 }} />
-          <Chip size="small" label={`✕ ${uniqueFailureCount}`} color="error" variant="outlined" sx={{ height: 22, fontWeight: 600 }} />
+          <Chip
+            size="small"
+            label={`✓ ${uniqueSuccessCount}`}
+            color="success"
+            variant="outlined"
+            sx={{ height: 22, fontWeight: 600 }}
+          />
+          <Chip
+            size="small"
+            label={`✕ ${uniqueFailureCount}`}
+            color="error"
+            variant="outlined"
+            sx={{ height: 22, fontWeight: 600 }}
+          />
           {uniquePendingCount > 0 && (
-            <Chip size="small" label={`⏳ ${uniquePendingCount}`} variant="outlined" sx={{ height: 22 }} />
+            <Chip
+              size="small"
+              label={`⏳ ${uniquePendingCount}`}
+              variant="outlined"
+              sx={{ height: 22 }}
+            />
           )}
-          <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
-            {uniqueSuccessCount + uniqueFailureCount} / {uniqueTotal} keys ({totalEvents} events)
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ ml: 'auto' }}
+          >
+            {uniqueSuccessCount + uniqueFailureCount} / {uniqueTotal} keys (
+            {totalEvents} events)
           </Typography>
         </Box>
 
-        {isPolling && <LinearProgress variant="determinate" value={progress} sx={{ mb: 1, borderRadius: 1 }} />}
+        {isPolling && (
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{ mb: 1, borderRadius: 1 }}
+          />
+        )}
 
         {/* Event List */}
         {loading && events.length === 0 ? (
@@ -214,7 +275,12 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             <CircularProgress size={24} />
           </Box>
         ) : events.length === 0 ? (
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block', p: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            align="center"
+            sx={{ display: 'block', p: 2 }}
+          >
             {t('ripple.tracking.waiting', '응답을 기다리는 중입니다...')}
           </Typography>
         ) : (
@@ -232,7 +298,10 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                   <TableRow
                     key={event.eventId}
                     sx={{
-                      bgcolor: event.status === 'skipped' ? 'action.hover' : 'transparent',
+                      bgcolor:
+                        event.status === 'skipped'
+                          ? 'action.hover'
+                          : 'transparent',
                       animation: `${fadeSlideIn} 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both`,
                       animationDelay: `${Math.min(idx * 15, 500)}ms`,
                       '& td': { py: 0.25, px: 0.5, border: 0 },
@@ -247,7 +316,10 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                         sx={{
                           fontFamily: 'monospace',
                           fontWeight: 500,
-                          color: event.status === 'skipped' ? 'text.disabled' : 'text.primary',
+                          color:
+                            event.status === 'skipped'
+                              ? 'text.disabled'
+                              : 'text.primary',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
@@ -259,31 +331,59 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                     </TableCell>
                     <TableCell>
                       {event.status !== 'skipped' && event.serviceType && (
-                        <Typography variant="caption" color="info.main" sx={{ fontSize: '0.6rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                        <Typography
+                          variant="caption"
+                          color="info.main"
+                          sx={{
+                            fontSize: '0.6rem',
+                            fontFamily: 'monospace',
+                            fontWeight: 600,
+                          }}
+                        >
                           {event.serviceType}
                         </Typography>
                       )}
                     </TableCell>
                     <TableCell>
                       {event.status !== 'skipped' ? (
-                        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.6rem', fontFamily: 'monospace' }}>
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          sx={{ fontSize: '0.6rem', fontFamily: 'monospace' }}
+                        >
                           {event.serverId}
                         </Typography>
                       ) : null}
                     </TableCell>
                     <TableCell align="right">
                       {event.status === 'skipped' ? (
-                        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          sx={{ fontSize: '0.65rem' }}
+                        >
                           {t('ripple.tracking.pending', '대기 중')}
                         </Typography>
                       ) : (
-                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}
+                        >
                           {event.durationMs}ms ({event.delayMs}ms delay)
                         </Typography>
                       )}
                       {event.error && (
                         <Tooltip title={event.error}>
-                          <WarningIcon color="error" sx={{ fontSize: 14, cursor: 'help', ml: 0.5, verticalAlign: 'middle' }} />
+                          <WarningIcon
+                            color="error"
+                            sx={{
+                              fontSize: 14,
+                              cursor: 'help',
+                              ml: 0.5,
+                              verticalAlign: 'middle',
+                            }}
+                          />
                         </Tooltip>
                       )}
                     </TableCell>
@@ -295,7 +395,12 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions sx={{ px: 1.5, py: 1 }}>
-        <Button onClick={onClose} variant="contained" size="small" color="primary">
+        <Button
+          onClick={onClose}
+          variant="contained"
+          size="small"
+          color="primary"
+        >
           {t('common.close')}
         </Button>
       </DialogActions>
