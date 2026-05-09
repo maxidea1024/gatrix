@@ -995,435 +995,460 @@ const CmsManagementPage: React.FC = () => {
             minHeight={300}
           />
         ) : (
-        <>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-            {error}
-          </Alert>
-        )}
+          <>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            )}
 
-        {/* Compact filter chips + search */}
-        <Box sx={{ display: 'flex', gap: 1.5, mb: 2, alignItems: 'center' }}>
-          <SearchTextField
-            value={searchFilter}
-            onChange={setSearchFilter}
-            placeholder={t('cms.searchPlaceholder')}
-          />
-          <Box
-            sx={{ display: 'flex', gap: 1, ml: 'auto', alignItems: 'center' }}
-          >
-            <Chip
-              size="small"
-              icon={<StorageIcon sx={{ fontSize: 14 }} />}
-              label={`${t('cms.allTables')} ${tables.length}`}
-              color={reloadFilter === 'all' ? 'primary' : 'default'}
-              variant={reloadFilter === 'all' ? 'filled' : 'outlined'}
-              onClick={() => handleSetReloadFilter('all')}
-              sx={{ fontWeight: 600, cursor: 'pointer' }}
-            />
-            <Chip
-              size="small"
-              icon={<CloudSyncIcon sx={{ fontSize: 14 }} />}
-              label={`${t('cms.hotReload')} ${hotCount}`}
-              color={reloadFilter === 'hot' ? 'success' : 'default'}
-              variant={reloadFilter === 'hot' ? 'filled' : 'outlined'}
-              onClick={() => handleSetReloadFilter('hot')}
-              sx={{ fontWeight: 600, cursor: 'pointer' }}
-            />
-            <Chip
-              size="small"
-              icon={<RestartAltIcon sx={{ fontSize: 14 }} />}
-              label={`${t('cms.restartRequired')} ${restartCount}`}
-              color={reloadFilter === 'restart' ? 'warning' : 'default'}
-              variant={reloadFilter === 'restart' ? 'filled' : 'outlined'}
-              onClick={() => handleSetReloadFilter('restart')}
-              sx={{ fontWeight: 600, cursor: 'pointer' }}
-            />
-            {unsyncedCount > 0 && (
-              <Button
-                size="small"
-                variant="contained"
-                color="error"
-                startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
-                onClick={handleRefreshAllUnsynced}
+            {/* Compact filter chips + search */}
+            <Box
+              sx={{ display: 'flex', gap: 1.5, mb: 2, alignItems: 'center' }}
+            >
+              <SearchTextField
+                value={searchFilter}
+                onChange={setSearchFilter}
+                placeholder={t('cms.searchPlaceholder')}
+              />
+              <Box
                 sx={{
-                  fontWeight: 600,
-                  borderRadius: 8,
-                  px: 2,
-                  height: 24,
-                  fontSize: '0.8125rem',
-                  textTransform: 'none',
-                  boxShadow: 'none',
+                  display: 'flex',
+                  gap: 1,
+                  ml: 'auto',
+                  alignItems: 'center',
                 }}
               >
-                {t('cms.unsyncedCount', { count: unsyncedCount })}
-              </Button>
+                <Chip
+                  size="small"
+                  icon={<StorageIcon sx={{ fontSize: 14 }} />}
+                  label={`${t('cms.allTables')} ${tables.length}`}
+                  color={reloadFilter === 'all' ? 'primary' : 'default'}
+                  variant={reloadFilter === 'all' ? 'filled' : 'outlined'}
+                  onClick={() => handleSetReloadFilter('all')}
+                  sx={{ fontWeight: 600, cursor: 'pointer' }}
+                />
+                <Chip
+                  size="small"
+                  icon={<CloudSyncIcon sx={{ fontSize: 14 }} />}
+                  label={`${t('cms.hotReload')} ${hotCount}`}
+                  color={reloadFilter === 'hot' ? 'success' : 'default'}
+                  variant={reloadFilter === 'hot' ? 'filled' : 'outlined'}
+                  onClick={() => handleSetReloadFilter('hot')}
+                  sx={{ fontWeight: 600, cursor: 'pointer' }}
+                />
+                <Chip
+                  size="small"
+                  icon={<RestartAltIcon sx={{ fontSize: 14 }} />}
+                  label={`${t('cms.restartRequired')} ${restartCount}`}
+                  color={reloadFilter === 'restart' ? 'warning' : 'default'}
+                  variant={reloadFilter === 'restart' ? 'filled' : 'outlined'}
+                  onClick={() => handleSetReloadFilter('restart')}
+                  sx={{ fontWeight: 600, cursor: 'pointer' }}
+                />
+                {unsyncedCount > 0 && (
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="error"
+                    startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
+                    onClick={handleRefreshAllUnsynced}
+                    sx={{
+                      fontWeight: 600,
+                      borderRadius: 8,
+                      px: 2,
+                      height: 24,
+                      fontSize: '0.8125rem',
+                      textTransform: 'none',
+                      boxShadow: 'none',
+                    }}
+                  >
+                    {t('cms.unsyncedCount', { count: unsyncedCount })}
+                  </Button>
+                )}
+              </Box>
+            </Box>
+
+            {/* Selection Toolbar */}
+            {selectedTables.size > 0 && (
+              <Paper
+                variant="outlined"
+                sx={{
+                  mb: 1.5,
+                  px: 2,
+                  py: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  borderColor: 'primary.main',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(144,202,249,0.08)'
+                      : 'rgba(25,118,210,0.04)',
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  {t('cms.selectedCount', { count: selectedTables.size })}
+                </Typography>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<RefreshIcon />}
+                  onClick={handleBulkRefresh}
+                >
+                  {t('cms.bulkRefresh')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="text"
+                  onClick={() => setSelectedTables(new Set())}
+                >
+                  {t('cms.clearSelection')}
+                </Button>
+              </Paper>
             )}
-          </Box>
-        </Box>
 
-        {/* Selection Toolbar */}
-        {selectedTables.size > 0 && (
-          <Paper
-            variant="outlined"
-            sx={{
-              mb: 1.5,
-              px: 2,
-              py: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              borderColor: 'primary.main',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(144,202,249,0.08)'
-                  : 'rgba(25,118,210,0.04)',
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {t('cms.selectedCount', { count: selectedTables.size })}
-            </Typography>
-            <Button
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<RefreshIcon />}
-              onClick={handleBulkRefresh}
-            >
-              {t('cms.bulkRefresh')}
-            </Button>
-            <Button
-              size="small"
-              variant="text"
-              onClick={() => setSelectedTables(new Set())}
-            >
-              {t('cms.clearSelection')}
-            </Button>
-          </Paper>
-        )}
-
-        {/* Table */}
-        {filteredTables.length === 0 ? (
-          <EmptyPlaceholder
-            message={
-              searchFilter ? t('cms.noSearchResults') : t('cms.noTables')
-            }
-            minHeight={200}
-          />
-        ) : (
-          <Paper variant="outlined">
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox" sx={{ width: 42 }}>
-                      <Checkbox
-                        size="small"
-                        indeterminate={
-                          selectedTables.size > 0 &&
-                          selectedTables.size < paginatedTables.length
-                        }
-                        checked={
-                          paginatedTables.length > 0 &&
-                          paginatedTables.every((t2) =>
-                            selectedTables.has(t2.tableName)
-                          )
-                        }
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedTables(
-                              new Set(paginatedTables.map((t2) => t2.tableName))
-                            );
-                          } else {
-                            setSelectedTables(new Set());
-                          }
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      <TableSortLabel
-                        active={sortField === 'tableName'}
-                        direction={
-                          sortField === 'tableName' ? sortOrder : 'asc'
-                        }
-                        onClick={() => handleSort('tableName')}
-                      >
-                        {t('cms.tableName')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      <TableSortLabel
-                        active={sortField === 'binaryCode'}
-                        direction={
-                          sortField === 'binaryCode' ? sortOrder : 'asc'
-                        }
-                        onClick={() => handleSort('binaryCode')}
-                      >
-                        {t('cms.binaryCode')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      <TableSortLabel
-                        active={sortField === 'version'}
-                        direction={sortField === 'version' ? sortOrder : 'asc'}
-                        onClick={() => handleSort('version')}
-                      >
-                        {t('cms.version')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      {t('cms.hash')}
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>
-                      <TableSortLabel
-                        active={sortField === 'reloadability'}
-                        direction={
-                          sortField === 'reloadability' ? sortOrder : 'asc'
-                        }
-                        onClick={() => handleSort('reloadability')}
-                      >
-                        {t('cms.reload')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>
-                      Sync
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      <TableSortLabel
-                        active={sortField === 'dataSize'}
-                        direction={sortField === 'dataSize' ? sortOrder : 'asc'}
-                        onClick={() => handleSort('dataSize')}
-                      >
-                        {t('cms.size')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      <TableSortLabel
-                        active={sortField === 'uploadedAt'}
-                        direction={
-                          sortField === 'uploadedAt' ? sortOrder : 'asc'
-                        }
-                        onClick={() => handleSort('uploadedAt')}
-                      >
-                        {t('cms.uploadedAt')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      {t('cms.uploadedBy')}
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      {t('cms.comment')}
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontWeight: 700, width: 48 }}
-                      align="center"
-                    ></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedTables.map((table) => (
-                    <TableRow
-                      key={`${table.tableName}-${table.binaryCode || 'base'}`}
-                      hover
-                      selected={selectedTables.has(table.tableName)}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          size="small"
-                          checked={selectedTables.has(table.tableName)}
-                          onChange={(e) => {
-                            setSelectedTables((prev) => {
-                              const next = new Set(prev);
-                              if (e.target.checked) next.add(table.tableName);
-                              else next.delete(table.tableName);
-                              return next;
-                            });
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: 600,
-                            fontFamily: 'monospace',
-                            cursor: 'pointer',
-                            color: 'primary.main',
-                            '&:hover': { textDecoration: 'underline' },
-                          }}
-                          onClick={() => openDetail(table.tableName)}
-                        >
-                          {table.tableName}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {table.binaryCode ? (
-                          <Chip
-                            label={table.binaryCode}
+            {/* Table */}
+            {filteredTables.length === 0 ? (
+              <EmptyPlaceholder
+                message={
+                  searchFilter ? t('cms.noSearchResults') : t('cms.noTables')
+                }
+                minHeight={200}
+              />
+            ) : (
+              <Paper variant="outlined">
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell padding="checkbox" sx={{ width: 42 }}>
+                          <Checkbox
                             size="small"
-                            color="secondary"
-                            sx={{ fontSize: '0.65rem', height: 18 }}
+                            indeterminate={
+                              selectedTables.size > 0 &&
+                              selectedTables.size < paginatedTables.length
+                            }
+                            checked={
+                              paginatedTables.length > 0 &&
+                              paginatedTables.every((t2) =>
+                                selectedTables.has(t2.tableName)
+                              )
+                            }
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedTables(
+                                  new Set(
+                                    paginatedTables.map((t2) => t2.tableName)
+                                  )
+                                );
+                              } else {
+                                setSelectedTables(new Set());
+                              }
+                            }}
                           />
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">
-                            —
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={`v${table.version}`}
-                          size="small"
-                          variant="filled"
-                          color="info"
-                          sx={{ fontFamily: 'monospace', fontWeight: 700 }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography
-                          variant="caption"
-                          sx={{ fontFamily: 'monospace' }}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          <TableSortLabel
+                            active={sortField === 'tableName'}
+                            direction={
+                              sortField === 'tableName' ? sortOrder : 'asc'
+                            }
+                            onClick={() => handleSort('tableName')}
+                          >
+                            {t('cms.tableName')}
+                          </TableSortLabel>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          <TableSortLabel
+                            active={sortField === 'binaryCode'}
+                            direction={
+                              sortField === 'binaryCode' ? sortOrder : 'asc'
+                            }
+                            onClick={() => handleSort('binaryCode')}
+                          >
+                            {t('cms.binaryCode')}
+                          </TableSortLabel>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          <TableSortLabel
+                            active={sortField === 'version'}
+                            direction={
+                              sortField === 'version' ? sortOrder : 'asc'
+                            }
+                            onClick={() => handleSort('version')}
+                          >
+                            {t('cms.version')}
+                          </TableSortLabel>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t('cms.hash')}
+                        </TableCell>
+                        <TableCell align="center" sx={{ fontWeight: 700 }}>
+                          <TableSortLabel
+                            active={sortField === 'reloadability'}
+                            direction={
+                              sortField === 'reloadability' ? sortOrder : 'asc'
+                            }
+                            onClick={() => handleSort('reloadability')}
+                          >
+                            {t('cms.reload')}
+                          </TableSortLabel>
+                        </TableCell>
+                        <TableCell align="center" sx={{ fontWeight: 700 }}>
+                          Sync
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          <TableSortLabel
+                            active={sortField === 'dataSize'}
+                            direction={
+                              sortField === 'dataSize' ? sortOrder : 'asc'
+                            }
+                            onClick={() => handleSort('dataSize')}
+                          >
+                            {t('cms.size')}
+                          </TableSortLabel>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          <TableSortLabel
+                            active={sortField === 'uploadedAt'}
+                            direction={
+                              sortField === 'uploadedAt' ? sortOrder : 'asc'
+                            }
+                            onClick={() => handleSort('uploadedAt')}
+                          >
+                            {t('cms.uploadedAt')}
+                          </TableSortLabel>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t('cms.uploadedBy')}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t('cms.comment')}
+                        </TableCell>
+                        <TableCell
+                          sx={{ fontWeight: 700, width: 48 }}
+                          align="center"
+                        ></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {paginatedTables.map((table) => (
+                        <TableRow
+                          key={`${table.tableName}-${table.binaryCode || 'base'}`}
+                          hover
+                          selected={selectedTables.has(table.tableName)}
                         >
-                          {table.contentHash?.slice(0, 8)}..
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          icon={
-                            table.reloadability === 'hot' ? (
-                              <CheckCircleIcon />
-                            ) : (
-                              <WarningIcon />
-                            )
-                          }
-                          label={
-                            table.reloadability === 'hot'
-                              ? t('cms.reloadHot')
-                              : t('cms.reloadRestart')
-                          }
-                          size="small"
-                          color={
-                            table.reloadability === 'hot'
-                              ? 'success'
-                              : 'warning'
-                          }
-                          variant="outlined"
-                          sx={{ fontSize: '0.7rem' }}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        {table.runtime ? (
-                          table.runtime.synced ? (
-                            <Chip
-                              label={t('cms.synced')}
+                          <TableCell padding="checkbox">
+                            <Checkbox
                               size="small"
-                              color="default"
-                              sx={{
-                                fontSize: '0.68rem',
-                                height: 22,
-                                color: 'text.secondary',
+                              checked={selectedTables.has(table.tableName)}
+                              onChange={(e) => {
+                                setSelectedTables((prev) => {
+                                  const next = new Set(prev);
+                                  if (e.target.checked)
+                                    next.add(table.tableName);
+                                  else next.delete(table.tableName);
+                                  return next;
+                                });
                               }}
                             />
-                          ) : (
-                            <Tooltip
-                              title={t('cms.serverVsDb', {
-                                server: table.runtime.loadedVersion,
-                                db: table.version,
-                              })}
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 600,
+                                fontFamily: 'monospace',
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                '&:hover': { textDecoration: 'underline' },
+                              }}
+                              onClick={() => openDetail(table.tableName)}
                             >
-                              <Button
+                              {table.tableName}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            {table.binaryCode ? (
+                              <Chip
+                                label={table.binaryCode}
                                 size="small"
-                                variant="contained"
-                                color="error"
-                                startIcon={
-                                  <RefreshIcon sx={{ fontSize: 14 }} />
-                                }
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setRefreshConfirmTableName(table.tableName);
-                                  setRefreshConfirmOpen(true);
-                                }}
-                                sx={{
-                                  fontSize: '0.68rem',
-                                  textTransform: 'none',
-                                  minWidth: 0,
-                                  px: 1,
-                                  py: 0.25,
-                                }}
+                                color="secondary"
+                                sx={{ fontSize: '0.65rem', height: 18 }}
+                              />
+                            ) : (
+                              <Typography
+                                variant="caption"
+                                color="text.disabled"
                               >
-                                {t('cms.detail.refresh')}
-                              </Button>
+                                —
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={`v${table.version}`}
+                              size="small"
+                              variant="filled"
+                              color="info"
+                              sx={{ fontFamily: 'monospace', fontWeight: 700 }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontFamily: 'monospace' }}
+                            >
+                              {table.contentHash?.slice(0, 8)}..
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip
+                              icon={
+                                table.reloadability === 'hot' ? (
+                                  <CheckCircleIcon />
+                                ) : (
+                                  <WarningIcon />
+                                )
+                              }
+                              label={
+                                table.reloadability === 'hot'
+                                  ? t('cms.reloadHot')
+                                  : t('cms.reloadRestart')
+                              }
+                              size="small"
+                              color={
+                                table.reloadability === 'hot'
+                                  ? 'success'
+                                  : 'warning'
+                              }
+                              variant="outlined"
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            {table.runtime ? (
+                              table.runtime.synced ? (
+                                <Chip
+                                  label={t('cms.synced')}
+                                  size="small"
+                                  color="default"
+                                  sx={{
+                                    fontSize: '0.68rem',
+                                    height: 22,
+                                    color: 'text.secondary',
+                                  }}
+                                />
+                              ) : (
+                                <Tooltip
+                                  title={t('cms.serverVsDb', {
+                                    server: table.runtime.loadedVersion,
+                                    db: table.version,
+                                  })}
+                                >
+                                  <Button
+                                    size="small"
+                                    variant="contained"
+                                    color="error"
+                                    startIcon={
+                                      <RefreshIcon sx={{ fontSize: 14 }} />
+                                    }
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setRefreshConfirmTableName(
+                                        table.tableName
+                                      );
+                                      setRefreshConfirmOpen(true);
+                                    }}
+                                    sx={{
+                                      fontSize: '0.68rem',
+                                      textTransform: 'none',
+                                      minWidth: 0,
+                                      px: 1,
+                                      py: 0.25,
+                                    }}
+                                  >
+                                    {t('cms.detail.refresh')}
+                                  </Button>
+                                </Tooltip>
+                              )
+                            ) : (
+                              <Typography
+                                variant="caption"
+                                color="text.disabled"
+                              >
+                                —
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="caption">
+                              {formatBytes(table.dataSize)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Tooltip
+                              title={new Date(table.uploadedAt).toLocaleString(
+                                'ko-KR'
+                              )}
+                            >
+                              <Typography
+                                variant="caption"
+                                sx={{ cursor: 'help' }}
+                              >
+                                {formatRelativeTime(table.uploadedAt)}
+                              </Typography>
                             </Tooltip>
-                          )
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">
-                            —
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="caption">
-                          {formatBytes(table.dataSize)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip
-                          title={new Date(table.uploadedAt).toLocaleString(
-                            'ko-KR'
-                          )}
-                        >
-                          <Typography variant="caption" sx={{ cursor: 'help' }}>
-                            {formatRelativeTime(table.uploadedAt)}
-                          </Typography>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="caption">
-                          {table.uploadedBy || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            maxWidth: 150,
-                            display: 'block',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {table.comment || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center" sx={{ px: 0 }}>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            setRowMenuAnchor(e.currentTarget);
-                            setRowMenuTable(table);
-                          }}
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <SimplePagination
-              count={filteredTables.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              rowsPerPageOptions={PAGE_SIZE_OPTIONS}
-            />
-          </Paper>
-        )}
-        </>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="caption">
+                              {table.uploadedBy || '—'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                maxWidth: 150,
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {table.comment || '—'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center" sx={{ px: 0 }}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setRowMenuAnchor(e.currentTarget);
+                                setRowMenuTable(table);
+                              }}
+                            >
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <SimplePagination
+                  count={filteredTables.length}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  rowsPerPageOptions={PAGE_SIZE_OPTIONS}
+                />
+              </Paper>
+            )}
+          </>
         )}
       </PageContentLoader>
 

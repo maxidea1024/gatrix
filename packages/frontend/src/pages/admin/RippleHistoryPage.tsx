@@ -654,7 +654,9 @@ const RippleHistoryPage: React.FC = () => {
         setError(null);
       } else {
         setNoAdmind(false);
-        setError(err.error?.message || err.message || 'Failed to fetch history');
+        setError(
+          err.error?.message || err.message || 'Failed to fetch history'
+        );
       }
     } finally {
       setLoading(false);
