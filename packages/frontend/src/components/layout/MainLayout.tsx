@@ -246,12 +246,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Check AI availability on mount
   useEffect(() => {
     let cancelled = false;
-    aiChatService.getStatus().then((status) => {
-      if (!cancelled) setAiEnabled(status.available);
-    }).catch(() => {
-      if (!cancelled) setAiEnabled(false);
-    });
-    return () => { cancelled = true; };
+    aiChatService
+      .getStatus()
+      .then((status) => {
+        if (!cancelled) setAiEnabled(status.available);
+      })
+      .catch(() => {
+        if (!cancelled) setAiEnabled(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Pending CR count for banner
