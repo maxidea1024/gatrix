@@ -59,6 +59,7 @@ interface RequestGroup {
   successCount: number;
   failureCount: number;
   maxDurationMs: number;
+  maxDelayMs: number;
   handlerKeys: string[];
   services: string[];
   tableName: string | null;
@@ -89,6 +90,7 @@ function groupByRequest(items: RippleHistoryEvent[]): RequestGroup[] {
       successCount: events.filter((e) => e.status === 'success').length,
       failureCount: events.filter((e) => e.status !== 'success').length,
       maxDurationMs: Math.max(...events.map((e) => e.durationMs || 0)),
+      maxDelayMs: Math.max(...events.map((e) => e.delayMs || 0)),
       handlerKeys: [...new Set(events.map((e) => e.handlerKey))],
       services: [
         ...new Set(
@@ -338,6 +340,24 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
             sx={{
               fontFamily: 'monospace',
               fontSize: '0.8rem',
+              fontWeight: group.maxDelayMs > 3000 ? 700 : 400,
+              color:
+                group.maxDelayMs > 3000 ? 'warning.main' : 'text.primary',
+            }}
+          >
+            {group.maxDelayMs > 0
+              ? `${group.maxDelayMs.toLocaleString()}ms`
+              : '—'}
+          </Typography>
+        </TableCell>
+
+        {/* Duration */}
+        <TableCell align="right">
+          <Typography
+            variant="body2"
+            sx={{
+              fontFamily: 'monospace',
+              fontSize: '0.8rem',
               fontWeight: group.maxDurationMs > 5000 ? 700 : 400,
               color:
                 group.maxDurationMs > 5000 ? 'warning.main' : 'text.primary',
@@ -353,7 +373,7 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
       {/* Detail sub-table */}
       <TableRow>
         <TableCell
-          colSpan={10}
+          colSpan={11}
           sx={{ py: 0, borderBottom: expanded ? undefined : 'none' }}
         >
           <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -797,6 +817,9 @@ const RippleHistoryPage: React.FC = () => {
                     </TableCell>
                     <TableCell sx={{ fontWeight: 700 }} align="center">
                       {t('ripple.history.col.result')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }} align="right">
+                      {t('ripple.history.col.maxDelay')}
                     </TableCell>
                     <TableCell sx={{ fontWeight: 700 }} align="right">
                       {t('ripple.history.col.maxDuration')}
