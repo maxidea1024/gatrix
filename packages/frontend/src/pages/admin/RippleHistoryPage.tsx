@@ -344,7 +344,7 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
               color: group.maxDelayMs > 3000 ? 'warning.main' : 'text.primary',
             }}
           >
-            {group.maxDelayMs > 0
+            {group.maxDelayMs != null && group.maxDelayMs >= 0
               ? `${group.maxDelayMs.toLocaleString()}ms`
               : '—'}
           </Typography>
@@ -362,7 +362,7 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                 group.maxDurationMs > 5000 ? 'warning.main' : 'text.primary',
             }}
           >
-            {group.maxDurationMs > 0
+            {group.maxDurationMs != null && group.maxDurationMs >= 0
               ? `${group.maxDurationMs.toLocaleString()}ms`
               : '—'}
           </Typography>
