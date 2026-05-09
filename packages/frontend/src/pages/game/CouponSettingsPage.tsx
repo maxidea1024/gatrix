@@ -1919,9 +1919,13 @@ const CouponSettingsPage: React.FC = () => {
                                       <Typography
                                         variant="body2"
                                         color="text.secondary"
-                                        sx={{ cursor: 'help', fontWeight: 'medium' }}
+                                        sx={{
+                                          cursor: 'help',
+                                          fontWeight: 'medium',
+                                        }}
                                       >
-                                        {numerator.toLocaleString()} / {denominator}
+                                        {numerator.toLocaleString()} /{' '}
+                                        {denominator}
                                       </Typography>
                                     </Tooltip>
                                   </TableCell>
