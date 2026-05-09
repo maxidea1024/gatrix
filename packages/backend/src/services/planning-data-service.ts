@@ -824,7 +824,9 @@ export class PlanningDataService {
       // Cleanup temp files if any
       const cleanupTempFiles = async () => {
         if (!files) return;
-        for (const [fieldName, fileArray] of Object.entries(files as Record<string, any>)) {
+        for (const [fieldName, fileArray] of Object.entries(
+          files as Record<string, any>
+        )) {
           const fileList = Array.isArray(fileArray) ? fileArray : [fileArray];
           for (const file of fileList) {
             if (file && file.path) {
@@ -1007,7 +1009,9 @@ export class PlanningDataService {
       // Also try to cleanup on generic errors
       try {
         if (files) {
-          for (const [fieldName, fileArray] of Object.entries(files as Record<string, any>)) {
+          for (const [fieldName, fileArray] of Object.entries(
+            files as Record<string, any>
+          )) {
             const fileList = Array.isArray(fileArray) ? fileArray : [fileArray];
             for (const file of fileList) {
               if (file && file.path) {
@@ -1017,7 +1021,7 @@ export class PlanningDataService {
           }
         }
       } catch (cleanupError) {}
-      
+
       logger.error('Failed to upload planning data', { error, environmentId });
       throw new GatrixError('Failed to upload planning data', 500);
     }

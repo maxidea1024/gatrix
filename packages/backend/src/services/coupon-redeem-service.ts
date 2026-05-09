@@ -191,7 +191,7 @@ export class CouponRedeemService {
     if (!isSpecialCoupon && coupon) {
       const lockKey = `coupon:redeemed:${environmentId}:${code}`;
       const acquired = await redis.setnx(lockKey, useId);
-      
+
       if (acquired) {
         // Expire the lock after 90 days to prevent infinite memory growth
         await redis.expire(lockKey, 60 * 60 * 24 * 90);
@@ -207,12 +207,15 @@ export class CouponRedeemService {
 
     // 2. Atomic Check for User/Character Limits
     const usageLimitType = setting.usageLimitType || 'USER';
-    const limitTargetId = usageLimitType === 'CHARACTER' && request.characterId ? request.characterId : request.userId;
+    const limitTargetId =
+      usageLimitType === 'CHARACTER' && request.characterId
+        ? request.characterId
+        : request.userId;
     const usageKey = `coupon:usage:${environmentId}:${setting.id}:${limitTargetId}`;
-    
+
     // Increment the usage count atomically
     sequence = await redis.incr(usageKey);
-    
+
     // Lazy Loading: If sequence is 1, it might be a cache miss. Verify with DB to prevent abuse.
     if (sequence === 1) {
       const usageQuery = db('g_coupon_uses').where('settingId', setting.id);
@@ -223,7 +226,7 @@ export class CouponRedeemService {
       }
       const usageResult = await usageQuery.count('* as count').first();
       const dbUsedCount = Number(usageResult?.count || 0);
-      
+
       if (dbUsedCount > 0) {
         // Correct the Redis counter (dbUsedCount + 1 since they are using it now)
         sequence = dbUsedCount + 1;
@@ -235,7 +238,7 @@ export class CouponRedeemService {
     if (sequence > setting.perUserLimit) {
       // Rollback the increment since they exceeded the limit
       await redis.decr(usageKey);
-      
+
       // Also rollback the code lock if it was a NORMAL coupon
       if (!isSpecialCoupon && coupon) {
         await redis.del(`coupon:redeemed:${environmentId}:${code}`);
@@ -253,10 +256,13 @@ export class CouponRedeemService {
     if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
       const globalUsageKey = `coupon:global_usage:${environmentId}:${setting.id}`;
       let globalCount = await redis.incr(globalUsageKey);
-      
+
       if (globalCount === 1) {
         // Lazy load global count
-        const dbSetting = await db('g_coupon_settings').where('id', setting.id).select('usedCount').first();
+        const dbSetting = await db('g_coupon_settings')
+          .where('id', setting.id)
+          .select('usedCount')
+          .first();
         if (dbSetting && Number(dbSetting.usedCount || 0) > 0) {
           globalCount = Number(dbSetting.usedCount || 0) + 1;
           await redis.set(globalUsageKey, globalCount);

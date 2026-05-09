@@ -43,15 +43,20 @@ export class QueueService {
       await this.createQueue('audit-log', this.processAuditLogJob.bind(this));
       await this.createQueue('cleanup', this.processCleanupJob.bind(this));
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
-      
+
       // Initialize high-throughput async queue for coupon redemptions
-      await this.createQueue('coupon-redeem', async (job) => {
-        const { processCouponRedeemJob } = await import('./jobs/coupon-redeem-job');
-        await processCouponRedeemJob(job);
-      }, {
-        concurrency: 20, // High concurrency for DB writes
-        removeOnComplete: 1000,
-      });
+      await this.createQueue(
+        'coupon-redeem',
+        async (job) => {
+          const { processCouponRedeemJob } =
+            await import('./jobs/coupon-redeem-job');
+          await processCouponRedeemJob(job);
+        },
+        {
+          concurrency: 20, // High concurrency for DB writes
+          removeOnComplete: 1000,
+        }
+      );
 
       // Initialize feature metrics queue
       const { featureMetricsService } =
