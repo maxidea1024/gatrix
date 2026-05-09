@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import os from 'os';
 import { serverAuthBase, serverSDKAuth } from '../../middleware/api-token-auth';
 import { resolveEnvironment } from '../../middleware/environment-resolver';
 import ServerAuthController from '../../controllers/server-auth-controller';
@@ -28,10 +29,10 @@ import { VarsController } from '../../controllers/vars-controller';
 
 const router = express.Router();
 
-// Configure multer for planning data file uploads (memory storage)
+// Configure multer for planning data file uploads (disk storage to prevent OOM)
 // 100MB file size limit for planning data uploads
 const upload = multer({
-  storage: multer.memoryStorage(),
+  dest: os.tmpdir(),
   limits: {
     fileSize: 100 * 1024 * 1024, // 100MB
   },

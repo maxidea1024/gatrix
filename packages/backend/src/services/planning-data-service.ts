@@ -756,9 +756,22 @@ export class PlanningDataService {
           continue;
         }
 
+        // Read file content (from buffer or disk)
+        let content: string;
+        try {
+          if (file.buffer) {
+            content = file.buffer.toString('utf-8');
+          } else if (file.path) {
+            content = await fs.readFile(file.path, 'utf-8');
+          } else {
+            throw new GatrixError('No file content found', 400);
+          }
+        } catch (error) {
+          throw new GatrixError(`Failed to read file ${fileName}`, 400);
+        }
+
         // Validate JSON format
         try {
-          const content = file.buffer.toString('utf-8');
           JSON.parse(content);
         } catch (error) {
           throw new GatrixError(`File ${fileName} is not valid JSON`, 400);
@@ -767,12 +780,12 @@ export class PlanningDataService {
         // Calculate file hash
         const fileHash = crypto
           .createHash('sha256')
-          .update(file.buffer)
+          .update(content)
           .digest('hex');
         fileHashes[fileName] = fileHash;
-        fileContents[fileName] = file.buffer.toString('utf-8');
-        fileParsedData[fileName] = JSON.parse(file.buffer.toString('utf-8'));
-        allBuffers.push(file.buffer);
+        fileContents[fileName] = content;
+        fileParsedData[fileName] = JSON.parse(content);
+        allBuffers.push(Buffer.from(content));
 
         uploadedFiles.push(fileName);
         fileStats[fileName] = {
@@ -808,6 +821,19 @@ export class PlanningDataService {
         .orderBy('id', 'desc')
         .first();
 
+      // Cleanup temp files if any
+      const cleanupTempFiles = async () => {
+        if (!files) return;
+        for (const [fieldName, fileArray] of Object.entries(files as Record<string, any>)) {
+          const fileList = Array.isArray(fileArray) ? fileArray : [fileArray];
+          for (const file of fileList) {
+            if (file && file.path) {
+              await fs.unlink(file.path).catch(() => {});
+            }
+          }
+        }
+      };
+
       // Check if upload hash is the same - skip if no changes (unless forceUpload is true)
       if (
         !uploadInfo?.forceUpload &&
@@ -818,6 +844,7 @@ export class PlanningDataService {
           environmentId,
           uploadHash: uploadHash.substring(0, 16),
         });
+        await cleanupTempFiles();
         return {
           success: true,
           message: 'No changes detected - upload skipped',
@@ -950,7 +977,7 @@ export class PlanningDataService {
         uploadRecordId,
       });
 
-      return {
+      const result = {
         success: true,
         message: `${uploadedFiles.length} planning data files uploaded and cached successfully`,
         filesUploaded: uploadedFiles,
@@ -972,8 +999,25 @@ export class PlanningDataService {
             }
           : undefined,
       };
+
+      await cleanupTempFiles();
+      return result;
     } catch (error) {
       if (error instanceof GatrixError) throw error;
+      // Also try to cleanup on generic errors
+      try {
+        if (files) {
+          for (const [fieldName, fileArray] of Object.entries(files as Record<string, any>)) {
+            const fileList = Array.isArray(fileArray) ? fileArray : [fileArray];
+            for (const file of fileList) {
+              if (file && file.path) {
+                await fs.unlink(file.path).catch(() => {});
+              }
+            }
+          }
+        }
+      } catch (cleanupError) {}
+      
       logger.error('Failed to upload planning data', { error, environmentId });
       throw new GatrixError('Failed to upload planning data', 500);
     }
@@ -1502,7 +1546,15 @@ export class PlanningDataService {
     // Read file contents
     const fileContents: Record<string, string> = {};
     for (const file of fileArray) {
-      const content = file.buffer.toString('utf-8');
+      let content: string;
+      if (file.buffer) {
+        content = file.buffer.toString('utf-8');
+      } else if (file.path) {
+        content = await fs.readFile(file.path, 'utf-8');
+        await fs.unlink(file.path).catch(() => {}); // Cleanup temp file
+      } else {
+        continue; // Skip if no content
+      }
       fileContents[file.originalname] = content;
     }
 

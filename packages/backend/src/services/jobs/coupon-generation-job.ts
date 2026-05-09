@@ -120,6 +120,7 @@ export class CouponGenerationJob {
           const batchSize = Math.min(this.BATCH_SIZE, remaining - i);
 
           // Step 1: Generate candidate codes with local dedup
+          localSet.clear(); // Prevent OOM by clearing between batches
           const candidates: string[] = [];
           let genAttempts = 0;
           const maxGenAttempts = batchSize * 20;

@@ -88,24 +88,131 @@ export class CouponRedeemService {
       );
     }
 
-    return await db.transaction(async (trx) => {
-      // 1. First try to find in g_coupons (NORMAL coupon)
-      const coupon = await trx('g_coupons')
+    // --- PHASE 1: Read-only validation outside transaction ---
+    // First try to find in g_coupons (NORMAL coupon)
+    let coupon = await db('g_coupons')
+      .where('code', code)
+      .where('environmentId', environmentId)
+      .first();
+
+    let setting: any;
+    let isSpecialCoupon = false;
+    let couponId: string | null = null;
+
+    if (coupon) {
+      // NORMAL coupon found
+      couponId = coupon.id;
+
+      // Check if coupon is already used
+      if (coupon.status === 'USED') {
+        throw new GatrixError(
+          'Coupon has already been used',
+          409,
+          true,
+          CouponErrorCode.ALREADY_USED
+        );
+      }
+
+      // Get coupon setting
+      setting = await db('g_coupon_settings')
+        .where('id', coupon.settingId)
+        .where('environmentId', environmentId)
+        .first();
+    } else {
+      // Not found in g_coupons, try SPECIAL coupon in g_coupon_settings
+      setting = await db('g_coupon_settings')
         .where('code', code)
         .where('environmentId', environmentId)
-        .forUpdate()
+        .where('type', 'SPECIAL')
         .first();
 
-      let setting: any;
-      let isSpecialCoupon = false;
-      let couponId: string | null = null;
+      if (setting) {
+        isSpecialCoupon = true;
+      }
+    }
 
-      if (coupon) {
-        // NORMAL coupon found
-        couponId = coupon.id;
+    if (!setting) {
+      throw new GatrixError(
+        'Coupon code not found',
+        404,
+        true,
+        CouponErrorCode.CODE_NOT_FOUND
+      );
+    }
 
-        // Check if coupon is already used
-        if (coupon.status === 'USED') {
+    // Check if setting is active
+    if (setting.status !== 'ACTIVE') {
+      throw new GatrixError(
+        'Coupon is not active',
+        422,
+        true,
+        CouponErrorCode.NOT_ACTIVE
+      );
+    }
+
+    // Check date range
+    const now = new Date();
+    const startsAt = setting.startsAt ? new Date(setting.startsAt) : null;
+    const expiresAt = new Date(setting.expiresAt);
+
+    if (startsAt && now < startsAt) {
+      throw new GatrixError(
+        'Coupon is not available yet',
+        422,
+        true,
+        CouponErrorCode.NOT_STARTED
+      );
+    }
+
+    if (now > expiresAt) {
+      throw new GatrixError(
+        'Coupon has expired',
+        422,
+        true,
+        CouponErrorCode.EXPIRED
+      );
+    }
+
+    // Check targeting conditions BEFORE locking
+    await this.validateTargeting(db, setting.id, request, setting);
+
+    // --- PHASE 2: Transactional logic with minimal lock duration ---
+    return await db.transaction(async (trx) => {
+      // Re-fetch to acquire lock
+      if (isSpecialCoupon) {
+        setting = await trx('g_coupon_settings')
+          .where('id', setting.id)
+          .forUpdate()
+          .first();
+
+        if (!setting || setting.status !== 'ACTIVE') {
+          throw new GatrixError(
+            'Coupon is not active',
+            422,
+            true,
+            CouponErrorCode.NOT_ACTIVE
+          );
+        }
+
+        // For SPECIAL coupons, check maxTotalUses under lock
+        if (setting.maxTotalUses && setting.maxTotalUses > 0) {
+          const totalUsedCount = Number(setting.usedCount || 0);
+          if (totalUsedCount >= setting.maxTotalUses) {
+            throw new GatrixError(
+              'Coupon has reached its maximum usage limit',
+              409,
+              true,
+              CouponErrorCode.ALREADY_USED
+            );
+          }
+        }
+      } else {
+        coupon = await trx('g_coupons')
+          .where('id', couponId)
+          .forUpdate()
+          .first();
+
+        if (!coupon || coupon.status === 'USED') {
           throw new GatrixError(
             'Coupon has already been used',
             409,
@@ -114,71 +221,23 @@ export class CouponRedeemService {
           );
         }
 
-        // Get coupon setting
+        // We don't necessarily need to lock g_coupon_settings for NORMAL coupons 
+        // to prevent global bottlenecks, but we re-read to get latest usedCount
         setting = await trx('g_coupon_settings')
-          .where('id', coupon.settingId)
-          .where('environmentId', environmentId)
+          .where('id', setting.id)
           .first();
-      } else {
-        // Not found in g_coupons, try SPECIAL coupon in g_coupon_settings
-        setting = await trx('g_coupon_settings')
-          .where('code', code)
-          .where('environmentId', environmentId)
-          .where('type', 'SPECIAL')
-          .forUpdate()
-          .first();
-
-        if (setting) {
-          isSpecialCoupon = true;
+          
+        if (!setting || setting.status !== 'ACTIVE') {
+          throw new GatrixError(
+            'Coupon is not active',
+            422,
+            true,
+            CouponErrorCode.NOT_ACTIVE
+          );
         }
       }
 
-      if (!setting) {
-        throw new GatrixError(
-          'Coupon code not found',
-          404,
-          true,
-          CouponErrorCode.CODE_NOT_FOUND
-        );
-      }
-
-      // Check if setting is active
-      if (setting.status !== 'ACTIVE') {
-        throw new GatrixError(
-          'Coupon is not active',
-          422,
-          true,
-          CouponErrorCode.NOT_ACTIVE
-        );
-      }
-
-      // Check date range
-      const now = new Date();
-      const startsAt = setting.startsAt ? new Date(setting.startsAt) : null;
-      const expiresAt = new Date(setting.expiresAt);
-
-      if (startsAt && now < startsAt) {
-        throw new GatrixError(
-          'Coupon is not available yet',
-          422,
-          true,
-          CouponErrorCode.NOT_STARTED
-        );
-      }
-
-      if (now > expiresAt) {
-        throw new GatrixError(
-          'Coupon has expired',
-          422,
-          true,
-          CouponErrorCode.EXPIRED
-        );
-      }
-
-      // Check targeting conditions
-      await this.validateTargeting(trx, setting.id, request, setting);
-
-      // Check per-user/character limit based on usageLimitType
+      // Check per-user/character limit based on usageLimitType under transaction
       const usageLimitType = setting.usageLimitType || 'USER';
       const usageQuery = trx('g_coupon_uses').where('settingId', setting.id);
 
@@ -198,19 +257,6 @@ export class CouponRedeemService {
           true,
           CouponErrorCode.USER_LIMIT_EXCEEDED
         );
-      }
-
-      // For SPECIAL coupons, check maxTotalUses
-      if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
-        const totalUsedCount = Number(setting.usedCount || 0);
-        if (totalUsedCount >= setting.maxTotalUses) {
-          throw new GatrixError(
-            'Coupon has reached its maximum usage limit',
-            409,
-            true,
-            CouponErrorCode.ALREADY_USED
-          );
-        }
       }
 
       const usedAtISO = now.toISOString();
@@ -343,7 +389,7 @@ export class CouponRedeemService {
    * Validate targeting conditions
    */
   private static async validateTargeting(
-    trx: Knex.Transaction,
+    dbOrTrx: Knex | Knex.Transaction,
     settingId: string,
     request: RedeemRequest,
     setting: any
@@ -356,23 +402,23 @@ export class CouponRedeemService {
       subchannelCount,
       userCount,
     ] = await Promise.all([
-      trx('g_coupon_target_worlds')
+      dbOrTrx('g_coupon_target_worlds')
         .where('settingId', settingId)
         .count('* as count')
         .first(),
-      trx('g_coupon_target_platforms')
+      dbOrTrx('g_coupon_target_platforms')
         .where('settingId', settingId)
         .count('* as count')
         .first(),
-      trx('g_coupon_target_channels')
+      dbOrTrx('g_coupon_target_channels')
         .where('settingId', settingId)
         .count('* as count')
         .first(),
-      trx('g_coupon_target_subchannels')
+      dbOrTrx('g_coupon_target_subchannels')
         .where('settingId', settingId)
         .count('* as count')
         .first(),
-      trx('g_coupon_target_users')
+      dbOrTrx('g_coupon_target_users')
         .where('settingId', settingId)
         .count('* as count')
         .first(),
@@ -386,7 +432,7 @@ export class CouponRedeemService {
 
     // Validate world targeting
     if (hasWorldTargeting && request.worldId) {
-      const worldMatch = await trx('g_coupon_target_worlds')
+      const worldMatch = await dbOrTrx('g_coupon_target_worlds')
         .where('settingId', settingId)
         .where('gameWorldId', request.worldId)
         .count('* as count')
@@ -403,7 +449,7 @@ export class CouponRedeemService {
 
     // Validate platform targeting
     if (hasPlatformTargeting && request.platform) {
-      const platformMatch = await trx('g_coupon_target_platforms')
+      const platformMatch = await dbOrTrx('g_coupon_target_platforms')
         .where('settingId', settingId)
         .where('platform', request.platform)
         .count('* as count')
@@ -420,7 +466,7 @@ export class CouponRedeemService {
 
     // Validate channel targeting
     if (hasChannelTargeting && request.channel) {
-      const channelMatch = await trx('g_coupon_target_channels')
+      const channelMatch = await dbOrTrx('g_coupon_target_channels')
         .where('settingId', settingId)
         .where('channel', request.channel)
         .count('* as count')
@@ -440,7 +486,7 @@ export class CouponRedeemService {
 
     // Validate subchannel targeting
     if (hasSubchannelTargeting && request.subChannel) {
-      const subchannelMatch = await trx('g_coupon_target_subchannels')
+      const subchannelMatch = await dbOrTrx('g_coupon_target_subchannels')
         .where('settingId', settingId)
         .where('subchannel', request.subChannel)
         .count('* as count')
@@ -460,7 +506,7 @@ export class CouponRedeemService {
 
     // Validate user ID targeting
     if (hasUserTargeting) {
-      const userMatch = await trx('g_coupon_target_users')
+      const userMatch = await dbOrTrx('g_coupon_target_users')
         .where('settingId', settingId)
         .where('userId', request.userId)
         .count('* as count')
