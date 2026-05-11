@@ -35,6 +35,8 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
+  ContentCopy as ContentCopyIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -73,6 +75,7 @@ import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import SurveyLogsDrawer from '../../components/game/SurveyLogsDrawer';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -107,6 +110,10 @@ const SurveysPage: React.FC = () => {
     null
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+
+  // Logs drawer state
+  const [logsDrawerOpen, setLogsDrawerOpen] = useState(false);
+  const [logsDrawerSurvey, setLogsDrawerSurvey] = useState<Survey | null>(null);
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -636,17 +643,31 @@ const SurveysPage: React.FC = () => {
                           if (column.id === 'platformSurveyId') {
                             return (
                               <TableCell key={column.id}>
-                                <Typography
-                                  sx={{
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                      textDecoration: 'underline',
-                                    },
-                                  }}
-                                  onClick={() => handleEdit(survey)}
-                                >
-                                  {survey.platformSurveyId}
-                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        textDecoration: 'underline',
+                                      },
+                                    }}
+                                    onClick={() => handleEdit(survey)}
+                                  >
+                                    {survey.platformSurveyId}
+                                  </Typography>
+                                  <Tooltip title={t('common.copy')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(survey.platformSurveyId);
+                                        enqueueSnackbar(t('common.copied'), { variant: 'success', autoHideDuration: 1500 });
+                                      }}
+                                    >
+                                      <ContentCopyIcon fontSize="inherit" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
                               </TableCell>
                             );
                           }
@@ -828,6 +849,20 @@ const SurveysPage: React.FC = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
+            if (actionMenuTarget) {
+              setLogsDrawerSurvey(actionMenuTarget);
+              setLogsDrawerOpen(true);
+            }
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <HistoryIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('surveys.viewLogs', 'View Logs')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
             if (actionMenuTarget) handleDelete(actionMenuTarget);
             handleActionMenuClose();
           }}
@@ -928,6 +963,13 @@ const SurveysPage: React.FC = () => {
             enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
           }
         }}
+      />
+
+      {/* Survey Logs Drawer */}
+      <SurveyLogsDrawer
+        open={logsDrawerOpen}
+        onClose={() => setLogsDrawerOpen(false)}
+        survey={logsDrawerSurvey}
       />
     </Box>
   );

@@ -232,6 +232,7 @@ router.get(
 );
 router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
 router.get('/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
+router.post('/surveys/:id/logs', serverSDKAuth, SurveyController.postSurveyLog);
 
 // Whitelist routes
 router.get('/ip-whitelists', serverSDKAuth, getIpWhitelistsHandler);

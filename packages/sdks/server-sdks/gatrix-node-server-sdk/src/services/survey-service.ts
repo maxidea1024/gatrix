@@ -618,4 +618,62 @@ export class SurveyService {
       return true;
     });
   }
+
+  /**
+   * Report a survey participation log to Gatrix backend.
+   * This is a fire-and-forget operation — failures are logged as warnings
+   * and never propagate errors to the caller.
+   *
+   * POST /api/v1/server/surveys/:id/logs
+   *
+   * @param surveyId Gatrix survey ID (ULID)
+   * @param action 'JOINED' (survey completed) or 'SENT' (survey mail sent)
+   * @param accountId Player account ID
+   * @param characterId Player character/pub ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode)
+   */
+  reportLog(
+    surveyId: string,
+    action: 'JOINED' | 'SENT',
+    accountId: string,
+    characterId?: string,
+    userName?: string,
+    worldId?: string,
+    platform?: string,
+    channel?: string,
+    subchannel?: string,
+    environmentId?: string,
+  ): void {
+    try {
+      const client = this.getApiClient(environmentId);
+      const endpoint = `/api/v1/server/surveys/${surveyId}/logs`;
+
+      // Fire and forget — do not await
+      client
+        .post<{ success: boolean }>(endpoint, {
+          action,
+          accountId,
+          characterId,
+          userName,
+          worldId,
+          platform,
+          channel,
+          subchannel,
+        })
+        .catch((err: any) => {
+          this.logger.warn('Failed to report survey log', {
+            surveyId,
+            action,
+            accountId,
+            error: err.message,
+          });
+        });
+    } catch (err: any) {
+      this.logger.warn('Unexpected error preparing survey log report', {
+        surveyId,
+        action,
+        error: err.message,
+      });
+    }
+  }
 }

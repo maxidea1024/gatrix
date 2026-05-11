@@ -12,6 +12,7 @@ router.put('/config', SurveyController.updateSurveyConfig);
 
 // Survey CRUD routes
 router.get('/', SurveyController.getSurveys);
+router.get('/logs', SurveyController.getSurveyLogs);
 router.get(
   '/platform/:platformSurveyId',
   SurveyController.getSurveyByPlatformId

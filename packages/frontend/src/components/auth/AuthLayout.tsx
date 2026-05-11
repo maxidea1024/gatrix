@@ -63,7 +63,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: 'background.default',
+        background: theme.palette.mode === 'dark'
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e1e2f 100%)'
+          : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -78,7 +80,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             borderRadius: 4,
             overflow: 'hidden',
             minHeight: showLeftPanel ? '600px' : 'auto',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.05)'
+              : 'rgba(255, 255, 255, 0.06)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             maxWidth: showLeftPanel ? 'none' : '500px',
@@ -456,7 +460,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              backgroundColor: 'rgba(30, 30, 30, 0.95)',
+              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.7)' : 'rgba(20, 20, 35, 0.85)',
+              backdropFilter: 'blur(24px)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
+              boxShadow: 'inset 0 0 60px rgba(0, 0, 0, 0.1)',
               color: 'white',
               position: 'relative',
             }}
@@ -502,7 +509,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                 <Typography
                   variant="body1"
                   sx={{
-                    color: 'white',
+                    color: 'rgba(255, 255, 255, 0.7)',
                   }}
                 >
                   {subtitle}

@@ -326,6 +326,7 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
   );
 
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  const [isAllProductsExpanded, setIsAllProductsExpanded] = useState(false);
   const toggleDate = (date: string) => {
     setExpandedDates((prev) => {
       const next = new Set(prev);
@@ -541,31 +542,65 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
 
         {/* Product sales table */}
         <Box sx={{ px: 4, pb: 3, flexShrink: 0 }}>
-          <Typography
-            sx={{
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: '1rem',
-              fontWeight: 700,
-              mb: 1.5,
-              fontFamily: '"Inter", sans-serif',
-            }}
-          >
-            📦 {t(`${prefix}productSales`)}
-          </Typography>
           <Box
+            onClick={() => setIsAllProductsExpanded((prev) => !prev)}
             sx={{
-              background: 'rgba(0,0,0,0.25)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 2,
-              overflow: 'hidden',
-              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              mb: 1.5,
+              cursor: 'pointer',
+              userSelect: 'none',
+              width: 'fit-content',
             }}
           >
-            <ProductTable
-              products={stats.products}
-              emptyLabel={t(`${prefix}noSales`)}
-            />
+            <Box
+              component="span"
+              sx={{
+                fontSize: '0.7rem',
+                color: 'rgba(255,255,255,0.4)',
+                transition: 'transform 0.2s',
+                transform: isAllProductsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                mt: 0.2,
+              }}
+            >
+              ▶
+            </Box>
+            <Typography
+              sx={{
+                color: 'rgba(255,255,255,0.9)',
+                fontSize: '1rem',
+                fontWeight: 700,
+                fontFamily: '"Inter", sans-serif',
+                textShadow: '0 1px 6px rgba(0,0,0,0.7)',
+              }}
+            >
+              📦 {t(`${prefix}productSales`)}
+            </Typography>
           </Box>
+          
+          {isAllProductsExpanded && (
+            <Box
+              sx={{
+                background: 'rgba(0,0,0,0.25)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 2,
+                overflow: 'hidden',
+                backdropFilter: 'blur(8px)',
+                animation: 'expandDown 0.3s ease-out forwards',
+                transformOrigin: 'top center',
+                '@keyframes expandDown': {
+                  from: { opacity: 0, transform: 'scaleY(0.95)' },
+                  to: { opacity: 1, transform: 'scaleY(1)' },
+                },
+              }}
+            >
+              <ProductTable
+                products={stats.products}
+                emptyLabel={t(`${prefix}noSales`)}
+              />
+            </Box>
+          )}
         </Box>
 
         {/* Daily sales — collapsible sections */}

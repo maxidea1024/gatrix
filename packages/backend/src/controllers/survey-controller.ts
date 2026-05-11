@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { SurveyService } from '../services/survey-service';
+import { SurveyLogService } from '../services/survey-log-service';
 import { asyncHandler } from '../middleware/error-handler';
 import { GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../types/auth';
@@ -621,6 +622,79 @@ export class SurveyController {
             verificationKey: config.joinedSecretKey,
           },
         },
+      });
+    }
+  );
+
+  /**
+   * Report a survey log (join or mail sent) for Server SDK
+   * POST /api/v1/server/surveys/:id/logs
+   */
+  static postSurveyLog = asyncHandler(
+    async (req: EnvironmentRequest, res: Response) => {
+      const { id } = req.params;
+      const environmentId = req.environmentId!;
+      const { action, accountId, characterId, userName, worldId, platform, channel, subchannel } = req.body;
+
+      if (!id) throw new GatrixError('Survey ID is required', 400);
+      if (!action || !['JOINED', 'SENT'].includes(action)) {
+        throw new GatrixError('Invalid action. Must be JOINED or SENT', 400);
+      }
+      if (!accountId) throw new GatrixError('accountId is required', 400);
+
+      // Async logging to Redis stream
+      await SurveyLogService.pushLog(
+        environmentId,
+        id,
+        action,
+        accountId,
+        characterId,
+        userName,
+        worldId,
+        platform,
+        channel,
+        subchannel,
+      );
+
+      res.status(202).json({
+        success: true,
+        message: 'Survey log accepted for processing',
+      });
+    }
+  );
+
+  /**
+   * Get paginated survey logs for Admin
+   * GET /api/v1/admin/surveys/logs
+   */
+  static getSurveyLogs = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId!;
+      const { page, limit, surveyId, action, accountId, userName, worldId, platform, channel, subchannel, startDate, endDate, search, sortBy, sortOrder } = req.query;
+
+      const result = await SurveyLogService.getLogs({
+        environmentId,
+        page: page ? parseInt(page as string, 10) : 1,
+        limit: limit ? parseInt(limit as string, 10) : 50,
+        surveyId: surveyId as string,
+        action: action as 'JOINED' | 'SENT',
+        accountId: accountId as string,
+        userName: userName as string,
+        worldId: worldId as string,
+        platform: platform as string,
+        channel: channel as string,
+        subchannel: subchannel as string,
+        startDate: startDate as string,
+        endDate: endDate as string,
+        search: search as string,
+        sortBy: sortBy as string,
+        sortOrder: sortOrder as 'asc' | 'desc',
+      });
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Survey logs retrieved successfully',
       });
     }
   );

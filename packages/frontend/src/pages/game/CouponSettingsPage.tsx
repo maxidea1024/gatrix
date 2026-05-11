@@ -66,6 +66,7 @@ import SearchTextField from '../../components/common/SearchTextField';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import RecordDetailDialog, { DetailField } from '../../components/common/RecordDetailDialog';
 import {
   showChangeRequestCreatedToast,
   getActionLabel,
@@ -216,6 +217,30 @@ const CouponSettingsPage: React.FC = () => {
   const [rowMenuCoupon, setRowMenuCoupon] = useState<CouponSetting | null>(
     null
   );
+
+  // Detail dialog state
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [detailCode, setDetailCode] = useState<IssuedCouponCode | null>(null);
+
+  const handleOpenDetail = (code: IssuedCouponCode) => {
+    setDetailCode(code);
+    setDetailDialogOpen(true);
+  };
+
+  const DETAIL_FIELDS: DetailField[] = [
+    { key: 'code', labelKey: 'coupons.issuedCodes.code', mono: true },
+    { key: 'status', labelKey: 'coupons.issuedCodes.status' },
+    { key: 'userId', labelKey: 'coupons.couponUsage.columns.userId', mono: true },
+    { key: 'userName', labelKey: 'coupons.couponUsage.columns.userName' },
+    { key: 'characterId', labelKey: 'coupons.couponUsage.columns.characterId', mono: true },
+    { key: 'sequence', labelKey: 'coupons.couponUsage.columns.sequence' },
+    { key: 'gameWorldId', labelKey: 'coupons.couponUsage.columns.gameWorldId' },
+    { key: 'platform', labelKey: 'coupons.couponUsage.columns.platform' },
+    { key: 'channel', labelKey: 'coupons.couponUsage.columns.channel' },
+    { key: 'subchannel', labelKey: 'coupons.couponUsage.columns.subChannel' },
+    { key: 'createdAt', labelKey: 'coupons.issuedCodes.issuedAt', format: (val) => formatDateTime(val) },
+    { key: 'usedAt', labelKey: 'coupons.issuedCodes.usedAt', format: (val) => val ? formatDateTime(val) : '-' },
+  ];
 
   // Delete confirmation dialog state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -1699,13 +1724,23 @@ const CouponSettingsPage: React.FC = () => {
                                         gap: 0.5,
                                       }}
                                     >
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{ fontFamily: 'monospace' }}
+                                      <Tooltip
+                                        title={t('coupons.couponSettings.viewUsedCodes', '사용된 코드 수 보기')}
                                       >
-                                        {it.code || '-'}
-                                      </Typography>
+                                        <Chip
+                                          size="small"
+                                          variant="outlined"
+                                          label={`${it.code || '-'}: ${(it.usedCount || 0).toLocaleString()}`}
+                                          onClick={() => handleOpenCodes(it)}
+                                          sx={{
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                              bgcolor: 'action.hover',
+                                              borderColor: 'primary.main',
+                                            },
+                                          }}
+                                        />
+                                      </Tooltip>
                                       {it.code && (
                                         <Tooltip
                                           title={t(
@@ -2241,6 +2276,18 @@ const CouponSettingsPage: React.FC = () => {
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (rowMenuCoupon) handleOpenCodes(rowMenuCoupon);
+            setRowMenuAnchor(null);
+            setRowMenuCoupon(null);
+          }}
+        >
+          <ListItemIcon>
+            <ListIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('coupons.couponSettings.viewIssuedCodes', 'View Issued Codes')}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem
@@ -3013,7 +3060,11 @@ const CouponSettingsPage: React.FC = () => {
       <ResizableDrawer
         open={openCodes}
         onClose={() => setOpenCodes(false)}
-        title={t('coupons.couponSettings.issuedCodesDrawer.title') as string}
+        title={
+          codesSetting?.type === 'SPECIAL'
+            ? (t('coupons.couponUsage.title', 'Coupon Usage') as string)
+            : (t('coupons.couponSettings.issuedCodesDrawer.title') as string)
+        }
         subtitle={
           codesSetting
             ? `${t('coupons.couponSettings.issuedCodesDrawer.subtitlePrefix')} ${(codesSetting as any).name}`
@@ -3025,237 +3076,64 @@ const CouponSettingsPage: React.FC = () => {
       >
         <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
           <Stack spacing={2}>
-            {/* Statistics Cards – clickable status filter toggles */}
-            <Stack direction="row" spacing={2}>
-              <Card
-                sx={{
-                  flex: 1,
-                  cursor: 'pointer',
-                  border: 2,
-                  borderRadius: 2,
-                  ...(codesStatusFilter === 'ALL'
-                    ? {
-                        borderColor: 'transparent',
-                        background:
-                          'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)',
-                        boxShadow: '0 4px 14px rgba(92,107,192,0.4)',
-                        transform: 'scale(1.02)',
-                      }
-                    : {
-                        borderColor: 'divider',
-                        bgcolor: 'background.paper',
-                        boxShadow: 1,
-                      }),
-                  transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover':
-                    codesStatusFilter !== 'ALL'
+            {/* Statistics Cards – compact, clickable status filter toggles (only for NORMAL type) */}
+            {codesSetting?.type !== 'SPECIAL' && (
+            <Stack direction="row" spacing={1}>
+              {[
+                { filter: 'ALL' as const, label: t('coupons.couponSettings.statistics.total'), value: codesStats?.issued || 0, gradient: 'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)', shadow: 'rgba(92,107,192,0.4)', icon: <ListIcon sx={{ color: 'inherit', fontSize: 20 }} /> },
+                { filter: 'USED' as const, label: t('coupons.couponSettings.statistics.used'), value: codesStats?.used || 0, gradient: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)', shadow: 'rgba(102,187,106,0.4)', icon: <CheckCircleIcon sx={{ color: 'inherit', fontSize: 20 }} /> },
+                { filter: 'ISSUED' as const, label: t('coupons.couponSettings.statistics.unused'), value: codesStats?.unused || 0, gradient: 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)', shadow: 'rgba(255,167,38,0.4)', icon: <HourglassEmptyIcon sx={{ color: 'inherit', fontSize: 20 }} /> },
+              ].map((card) => (
+                <Card
+                  key={card.filter}
+                  sx={{
+                    flex: 1,
+                    cursor: 'pointer',
+                    border: 1.5,
+                    borderRadius: 1.5,
+                    ...(codesStatusFilter === card.filter
                       ? {
-                          borderColor: 'primary.light',
-                          transform: 'translateY(-2px)',
-                          boxShadow: 3,
+                          borderColor: 'transparent',
+                          background: card.gradient,
+                          color: '#fff',
+                          boxShadow: `0 2px 8px ${card.shadow}`,
                         }
-                      : {},
-                }}
-                onClick={() => {
-                  setCodesStatusFilter('ALL');
-                  setCodesPage(0);
-                }}
-              >
-                <CardContent
-                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                      : {
+                          borderColor: 'divider',
+                          bgcolor: 'background.paper',
+                        }),
+                    transition: 'all 0.2s ease',
+                    '&:hover':
+                      codesStatusFilter !== card.filter
+                        ? { borderColor: 'primary.light' }
+                        : {},
+                  }}
+                  onClick={() => {
+                    setCodesStatusFilter(card.filter);
+                    setCodesPage(0);
+                  }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <ListIcon
-                      sx={{
-                        color:
-                          codesStatusFilter === 'ALL'
-                            ? '#fff'
-                            : 'text.secondary',
-                        fontSize: 28,
-                      }}
-                    />
-                    <Box>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color:
-                            codesStatusFilter === 'ALL'
-                              ? 'rgba(255,255,255,0.85)'
-                              : 'text.secondary',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t('coupons.couponSettings.statistics.total')}
-                      </Typography>
+                  <CardContent sx={{ p: '8px 12px !important' }}>
+                    <Stack direction="row" alignItems="center" spacing={0.75}>
+                      {card.icon}
                       <Typography
                         variant="h6"
-                        sx={{
-                          color:
-                            codesStatusFilter === 'ALL'
-                              ? '#fff'
-                              : 'text.primary',
-                          fontWeight: 700,
-                        }}
+                        sx={{ fontWeight: 700, lineHeight: 1.2, color: codesStatusFilter === card.filter ? '#fff' : 'text.primary' }}
                       >
-                        {(codesStats?.issued || 0).toLocaleString()}
+                        {card.value.toLocaleString()}
                       </Typography>
-                    </Box>
-                  </Stack>
-                </CardContent>
-              </Card>
-              <Card
-                sx={{
-                  flex: 1,
-                  cursor: 'pointer',
-                  border: 2,
-                  borderRadius: 2,
-                  ...(codesStatusFilter === 'USED'
-                    ? {
-                        borderColor: 'transparent',
-                        background:
-                          'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
-                        boxShadow: '0 4px 14px rgba(102,187,106,0.4)',
-                        transform: 'scale(1.02)',
-                      }
-                    : {
-                        borderColor: 'divider',
-                        bgcolor: 'background.paper',
-                        boxShadow: 1,
-                      }),
-                  transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover':
-                    codesStatusFilter !== 'USED'
-                      ? {
-                          borderColor: 'success.light',
-                          transform: 'translateY(-2px)',
-                          boxShadow: 3,
-                        }
-                      : {},
-                }}
-                onClick={() => {
-                  setCodesStatusFilter('USED');
-                  setCodesPage(0);
-                }}
-              >
-                <CardContent
-                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <CheckCircleIcon
-                      sx={{
-                        color:
-                          codesStatusFilter === 'USED'
-                            ? '#fff'
-                            : 'success.main',
-                        fontSize: 28,
-                      }}
-                    />
-                    <Box>
                       <Typography
                         variant="caption"
-                        sx={{
-                          color:
-                            codesStatusFilter === 'USED'
-                              ? 'rgba(255,255,255,0.85)'
-                              : 'text.secondary',
-                          fontWeight: 600,
-                        }}
+                        sx={{ color: codesStatusFilter === card.filter ? 'rgba(255,255,255,0.8)' : 'text.secondary', fontWeight: 500 }}
                       >
-                        {t('coupons.couponSettings.statistics.used')}
+                        {card.label}
                       </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color:
-                            codesStatusFilter === 'USED'
-                              ? '#fff'
-                              : 'text.primary',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {(codesStats?.used || 0).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </CardContent>
-              </Card>
-              <Card
-                sx={{
-                  flex: 1,
-                  cursor: 'pointer',
-                  border: 2,
-                  borderRadius: 2,
-                  ...(codesStatusFilter === 'ISSUED'
-                    ? {
-                        borderColor: 'transparent',
-                        background:
-                          'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
-                        boxShadow: '0 4px 14px rgba(255,167,38,0.4)',
-                        transform: 'scale(1.02)',
-                      }
-                    : {
-                        borderColor: 'divider',
-                        bgcolor: 'background.paper',
-                        boxShadow: 1,
-                      }),
-                  transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover':
-                    codesStatusFilter !== 'ISSUED'
-                      ? {
-                          borderColor: 'warning.light',
-                          transform: 'translateY(-2px)',
-                          boxShadow: 3,
-                        }
-                      : {},
-                }}
-                onClick={() => {
-                  setCodesStatusFilter('ISSUED');
-                  setCodesPage(0);
-                }}
-              >
-                <CardContent
-                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <HourglassEmptyIcon
-                      sx={{
-                        color:
-                          codesStatusFilter === 'ISSUED'
-                            ? '#fff'
-                            : 'warning.main',
-                        fontSize: 28,
-                      }}
-                    />
-                    <Box>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color:
-                            codesStatusFilter === 'ISSUED'
-                              ? 'rgba(255,255,255,0.85)'
-                              : 'text.secondary',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t('coupons.couponSettings.statistics.unused')}
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color:
-                            codesStatusFilter === 'ISSUED'
-                              ? '#fff'
-                              : 'text.primary',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {(codesStats?.unused || 0).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </CardContent>
-              </Card>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))}
             </Stack>
+            )}
 
             {/* Search and Export */}
             <Stack
@@ -3614,17 +3492,29 @@ const CouponSettingsPage: React.FC = () => {
                               />
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">
+                              <Typography
+                                variant="caption"
+                                sx={c.userId ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
+                                onClick={() => c.userId && handleOpenDetail(c)}
+                              >
                                 {c.userId || '-'}
                               </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">
+                              <Typography
+                                variant="caption"
+                                sx={c.userName ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
+                                onClick={() => c.userName && handleOpenDetail(c)}
+                              >
                                 {c.userName || '-'}
                               </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">
+                              <Typography
+                                variant="caption"
+                                sx={c.characterId ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
+                                onClick={() => c.characterId && handleOpenDetail(c)}
+                              >
                                 {c.characterId || '-'}
                               </Typography>
                             </TableCell>
@@ -3723,6 +3613,15 @@ const CouponSettingsPage: React.FC = () => {
           />
         </Box>
       </ResizableDrawer>
+
+      {/* Detail Dialog */}
+      <RecordDetailDialog
+        open={detailDialogOpen}
+        onClose={() => setDetailDialogOpen(false)}
+        title={t('playerConnections.allPlayers.viewDetails')}
+        data={detailCode}
+        fields={DETAIL_FIELDS}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog

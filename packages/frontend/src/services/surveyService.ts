@@ -112,6 +112,49 @@ export interface GetSurveysResponse {
   limit: number;
 }
 
+export interface SurveyLog {
+  id: string;
+  environmentId: string;
+  surveyId: string;
+  action: 'JOINED' | 'SENT';
+  accountId: string;
+  characterId?: string | null;
+  userName?: string | null;
+  worldId?: string | null;
+  platform?: string | null;
+  channel?: string | null;
+  subchannel?: string | null;
+  createdAt: string;
+}
+
+export interface GetSurveyLogsParams {
+  page?: number;
+  limit?: number;
+  surveyId?: string;
+  action?: 'JOINED' | 'SENT';
+  accountId?: string;
+  userName?: string;
+  worldId?: string;
+  platform?: string;
+  channel?: string;
+  subchannel?: string;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface GetSurveyLogsResponse {
+  logs: SurveyLog[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 class SurveyService {
   /**
    * Get all surveys with pagination
@@ -221,6 +264,17 @@ class SurveyService {
   ): Promise<SurveyConfig> {
     const response = await api.put(`${projectApiPath}/surveys/config`, input);
     return response.data.config;
+  }
+
+  /**
+   * Get survey logs
+   */
+  async getSurveyLogs(
+    projectApiPath: string,
+    params?: GetSurveyLogsParams
+  ): Promise<GetSurveyLogsResponse> {
+    const response = await api.get(`${projectApiPath}/surveys/logs`, { params });
+    return response.data;
   }
 }
 

@@ -84,14 +84,9 @@ const LogoutPage: React.FC = () => {
 
   if (logoutComplete) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'background.default',
-        }}
+      <AuthLayout
+        title={t('auth.logout.title')}
+        showLeftPanel={false}
       >
         <Box
           sx={{
@@ -129,17 +124,17 @@ const LogoutPage: React.FC = () => {
             variant="h6"
             sx={{
               fontWeight: 500,
-              color: 'text.primary',
+              color: 'white',
               letterSpacing: '-0.01em',
             }}
           >
             {t('auth.logout.completed')}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
             {t('auth.logout.redirecting')}
           </Typography>
         </Box>
-      </Box>
+      </AuthLayout>
     );
   }
 
@@ -166,10 +161,7 @@ const LogoutPage: React.FC = () => {
           severity="error"
           sx={{
             mb: 3,
-            backgroundColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(244, 67, 54, 0.1)'
-                : 'rgba(244, 67, 54, 0.05)',
+            backgroundColor: 'rgba(244, 67, 54, 0.15)',
             color: 'error.main',
             border: `1px solid ${theme.palette.error.main}20`,
             '& .MuiAlert-icon': {
@@ -208,15 +200,10 @@ const LogoutPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            background:
-              theme.palette.mode === 'dark'
-                ? 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)'
-                : 'linear-gradient(45deg, #1976d2 30%, #1565c0 90%)',
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            color: 'white',
             '&:hover': {
-              background:
-                theme.palette.mode === 'dark'
-                  ? 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)'
-                  : 'linear-gradient(45deg, #1565c0 30%, #0d47a1 90%)',
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
             },
             '&:disabled': {
               background: theme.palette.action.disabledBackground,
@@ -234,30 +221,27 @@ const LogoutPage: React.FC = () => {
         </Button>
 
         <Button
-          variant="contained"
+          variant="outlined"
           size="large"
           onClick={handleCancel}
           disabled={isLoggingOut}
           fullWidth
           sx={{
             height: 48,
-            borderColor: 'primary.main',
-            color: 'primary.main',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            color: 'rgba(255, 255, 255, 0.85)',
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
             borderRadius: 2,
             '&:hover': {
-              borderColor: 'primary.dark',
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(144, 202, 249, 0.08)'
-                  : 'rgba(25, 118, 210, 0.04)',
-              color: 'primary.dark',
+              borderColor: 'rgba(255, 255, 255, 0.5)',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              color: 'white',
             },
             '&:disabled': {
-              borderColor: theme.palette.action.disabled,
-              color: theme.palette.action.disabled,
+              borderColor: 'rgba(255, 255, 255, 0.15)',
+              color: 'rgba(255, 255, 255, 0.3)',
             },
           }}
         >
@@ -266,7 +250,7 @@ const LogoutPage: React.FC = () => {
       </Box>
 
       <Box sx={{ mt: 3, textAlign: 'center' }}>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)' }}>
           {t('auth.logout.note')}
         </Typography>
       </Box>

@@ -209,6 +209,9 @@ const CouponUsagePage = React.lazy(
   () => import('./pages/game/CouponUsagePage')
 );
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
+const SurveyLogsPage = React.lazy(
+  () => import('./pages/game/SurveyLogsPage')
+);
 const RewardTemplatesPage = React.lazy(
   () => import('./pages/game/RewardTemplatesPage')
 );
@@ -905,6 +908,10 @@ const AppContent: React.FC = () => {
                                           <Route
                                             path="surveys"
                                             element={<SurveysPage />}
+                                          />
+                                          <Route
+                                            path="survey-logs"
+                                            element={<SurveyLogsPage />}
                                           />
                                           <Route
                                             path="store-products"

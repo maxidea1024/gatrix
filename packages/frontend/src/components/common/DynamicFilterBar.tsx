@@ -1298,7 +1298,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
         {/* Actions after filter add button */}
         {afterFilterAddActions && (
-          <Box sx={{ flexShrink: 0 }}>{afterFilterAddActions}</Box>
+          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>{afterFilterAddActions}</Box>
         )}
       </Box>
 

@@ -261,8 +261,21 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.surveys',
         icon: 'Poll',
-        path: '/game/surveys',
         requiredPermission: P.SURVEYS_READ,
+        children: [
+          {
+            text: 'sidebar.surveyDefinitions',
+            icon: 'Description',
+            path: '/game/surveys',
+            requiredPermission: P.SURVEYS_READ,
+          },
+          {
+            text: 'sidebar.surveyLogs',
+            icon: 'History',
+            path: '/game/survey-logs',
+            requiredPermission: P.SURVEYS_READ,
+          },
+        ],
       },
       {
         text: 'sidebar.operationEvents',
