@@ -39,23 +39,29 @@ export async function processCouponRedeemJob(
     }
   );
 
+  // STEP 1: Transaction for coupon status update + usage record insertion.
+  // The usedCount update is intentionally OUTSIDE this transaction to prevent
+  // InnoDB deadlocks. Under high concurrency, the previous COUNT(*) subquery
+  // inside the transaction caused deadlocks: each transaction acquired a shared
+  // lock on g_coupon_uses rows (for COUNT) then tried to acquire an exclusive
+  // lock on g_coupon_settings (for UPDATE), creating circular wait conditions.
+  let wasInserted = false;
+
   const trx = await db.transaction();
   try {
-    // 1. Update g_coupons (NORMAL only)
+    // 1. Update g_coupons status (NORMAL only — marks code as consumed)
+    //    User metadata is stored in g_coupon_uses, not in g_coupons.
     if (payload.settingType === 'NORMAL' && payload.couponId) {
       await trx('g_coupons').where('id', payload.couponId).update({
         status: 'USED',
         usedAt: payload.usedAtMySQL,
-        usedByUserId: payload.userId,
-        usedByWorldId: payload.worldId,
-        usedByCharacterId: payload.characterId,
-        usedByPlatform: payload.platform,
-        usedByChannel: payload.channel,
       });
     }
 
-    // 2. Insert g_coupon_uses (Idempotent using raw ON DUPLICATE KEY or ignore)
-    await trx.raw(
+    // 2. Insert g_coupon_uses (Idempotent via INSERT IGNORE on primary key)
+    //    We check affectedRows to determine if this was a genuinely new insert
+    //    vs. a duplicate (BullMQ retry of already-committed job).
+    const [insertResult] = await trx.raw(
       `
       INSERT IGNORE INTO g_coupon_uses (
         id, settingId, issuedCouponId, userId, characterId, userName,
@@ -77,24 +83,9 @@ export async function processCouponRedeemJob(
         payload.subchannel,
       ]
     );
-
-    // 3. Update total usedCount (SPECIAL only)
-    //    IDEMPOTENCY: Using COUNT(*) subquery instead of INCREMENT(1) to prevent
-    //    double-counting when BullMQ retries this job. If the job committed successfully
-    //    but BullMQ didn't receive the "completed" ack (e.g., process crash after commit),
-    //    a retry would increment usedCount again. The COUNT approach is inherently
-    //    idempotent: it always reflects the true number of usage records.
-    if (payload.settingType === 'SPECIAL') {
-      await trx.raw(
-        `UPDATE g_coupon_settings SET usedCount = (
-          SELECT COUNT(*) FROM g_coupon_uses WHERE settingId = ?
-        ) WHERE id = ?`,
-        [payload.settingId, payload.settingId]
-      );
-    }
+    wasInserted = (insertResult?.affectedRows ?? 0) > 0;
 
     await trx.commit();
-    logger.debug(`Coupon redeem job ${job.id} committed successfully`);
   } catch (error) {
     await trx.rollback();
     logger.error('Failed to persist coupon redeem async:', {
@@ -103,4 +94,37 @@ export async function processCouponRedeemJob(
     });
     throw error; // Let BullMQ handle retries
   }
+
+  // STEP 2: Update usedCount OUTSIDE the transaction.
+  // IDEMPOTENCY: Only increment when INSERT IGNORE actually inserted a new row.
+  // If this is a BullMQ retry of an already-committed job, affectedRows is 0
+  // and we skip the increment — preventing double-counting.
+  // DEADLOCK-FREE: A simple `usedCount = usedCount + 1` acquires only a single
+  // row-level exclusive lock on g_coupon_settings, with no subquery scanning
+  // g_coupon_uses. This eliminates the circular lock dependency that caused
+  // deadlocks under high concurrency.
+  if (wasInserted) {
+    try {
+      await db.raw(
+        `UPDATE g_coupon_settings SET usedCount = usedCount + 1 WHERE id = ?`,
+        [payload.settingId]
+      );
+    } catch (countError) {
+      // Non-fatal: usedCount is a display-only aggregate counter.
+      // Redis maintains the authoritative real-time count for concurrency control.
+      // The next successful job for this settingId will naturally increment past this.
+      // If persistent drift is a concern, a scheduled reconciliation job can fix it.
+      logger.warn('Failed to increment usedCount (non-fatal, Redis is authoritative):', {
+        jobId: job.id,
+        settingId: payload.settingId,
+        error: countError,
+      });
+    }
+  } else {
+    logger.debug(`Coupon redeem job ${job.id} skipped usedCount increment (duplicate insert)`, {
+      useId: payload.useId,
+    });
+  }
+
+  logger.debug(`Coupon redeem job ${job.id} completed successfully`);
 }
