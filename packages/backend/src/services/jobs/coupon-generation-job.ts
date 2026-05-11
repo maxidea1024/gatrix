@@ -195,6 +195,34 @@ export class CouponGenerationJob {
             totalGenerated - lastProgressUpdate >=
             this.PROGRESS_UPDATE_INTERVAL
           ) {
+            // Early abort: Check if the setting was deleted/disabled by an admin
+            // while this worker is running. Without this, the worker would continue
+            // inserting coupon codes into a setting that no longer needs them.
+            const [currentSetting] = await pool.execute<RowDataPacket[]>(
+              'SELECT status, generationStatus FROM g_coupon_settings WHERE id = ?',
+              [settingId]
+            );
+            if (
+              currentSetting[0]?.status === 'DELETED' ||
+              currentSetting[0]?.status === 'DISABLED' ||
+              currentSetting[0]?.generationStatus === 'FAILED'
+            ) {
+              logger.info('Setting was deleted/disabled during generation, aborting early', {
+                jobId,
+                settingId,
+                totalGenerated,
+                settingStatus: currentSetting[0]?.status,
+                generationStatus: currentSetting[0]?.generationStatus,
+              });
+              // Update with what we generated so far
+              await pool.execute(
+                'UPDATE g_coupon_settings SET generatedCount = ?, totalCount = ?, issuedCount = ?, generationJobId = NULL WHERE id = ?',
+                [totalGenerated, totalGenerated, totalGenerated, settingId]
+              );
+              await job.updateProgress(100);
+              return; // Exit cleanly without throwing
+            }
+
             const progress = Math.min(
               99,
               Math.round((totalGenerated / quantity) * 100)
