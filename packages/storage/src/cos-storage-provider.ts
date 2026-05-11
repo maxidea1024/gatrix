@@ -2,7 +2,7 @@
  * Tencent COS Storage Provider
  */
 import COS from 'cos-nodejs-sdk-v5';
-import { StorageProvider, StorageFileInfo } from './storage-provider';
+import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface COSStorageConfig {
@@ -36,20 +36,27 @@ export class COSStorageProvider implements StorageProvider {
   async upload(
     key: string,
     data: Buffer | string,
-    contentType?: string
+    contentType?: string,
+    options?: UploadOptions
   ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
 
-    await this.client.putObject({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const params: any = {
       Bucket: this.bucket,
       Region: this.region,
       Key: fullKey,
       Body: body,
       ContentType: (contentType || 'application/octet-stream') as string,
-    });
+    };
+    if (options?.acl) {
+      params.ACL = options.acl;
+    }
 
-    this.logger.debug('File uploaded to COS', { key: fullKey });
+    await this.client.putObject(params);
+
+    this.logger.debug('File uploaded to COS', { key: fullKey, acl: options?.acl });
     return key;
   }
 

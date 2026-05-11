@@ -2,7 +2,7 @@
  * Google Cloud Storage Provider
  */
 import { Storage, Bucket } from '@google-cloud/storage';
-import { StorageProvider, StorageFileInfo } from './storage-provider';
+import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface GCSStorageConfig {
@@ -38,7 +38,8 @@ export class GCSStorageProvider implements StorageProvider {
   async upload(
     key: string,
     data: Buffer | string,
-    contentType?: string
+    contentType?: string,
+    _options?: UploadOptions
   ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;

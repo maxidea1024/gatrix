@@ -25,6 +25,7 @@ import {
   Collapse,
   ToggleButton,
   ToggleButtonGroup,
+  CircularProgress,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -47,8 +48,13 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   FilterList as FilterIcon,
+  CloudUpload as UploadIcon,
+  PhotoLibrary as BrowseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { mediaAssetService } from '../../services/mediaAssetService';
+import MediaAssetBrowserDialog from '../common/MediaAssetBrowserDialog';
 import {
   Frame,
   FrameType,
@@ -258,10 +264,16 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
     'before' | 'after' | null
   >(null);
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const [settingsOpen, setSettingsOpen] = useState(forceDialogOpen || false);
   const [imageError, setImageError] = useState(false);
+
+  // Upload state
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [browserDialogOpen, setBrowserDialogOpen] = useState(false);
 
   // Local edit state for dialog (cancel/apply pattern)
   const [editFrame, setEditFrame] = useState<Frame>(frame);
@@ -418,6 +430,84 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         }
       });
     }
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (file: File) => {
+    // Client-side validation
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      enqueueSnackbar(
+        t('banners.fileTooLarge', { maxSize: '10' }),
+        { variant: 'error' }
+      );
+      return;
+    }
+
+    if (file.size === 0) {
+      enqueueSnackbar(t('banners.emptyFile'), { variant: 'error' });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const result = await mediaAssetService.uploadImage(file);
+
+      // Set the CDN URL as the image URL
+      handleImageUrlChange(result.cdnUrl);
+
+      if (result.isDuplicate) {
+        enqueueSnackbar(t('banners.duplicateImage'), { variant: 'info' });
+      } else {
+        enqueueSnackbar(t('banners.uploadSuccess'), { variant: 'success' });
+      }
+    } catch (error: any) {
+      console.error('Image upload failed:', error);
+      const errorMessage =
+        error?.message ||
+        error?.error?.message ||
+        t('banners.uploadError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setUploading(false);
+      // Reset file input so re-selecting the same file triggers onChange
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Handle file input change
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  // Handle drop on the dialog
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        handleFileUpload(file);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleImageUrlChange]
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  // Handle browse selection
+  const handleBrowseSelect = (cdnUrl: string) => {
+    handleImageUrlChange(cdnUrl);
+    enqueueSnackbar(t('banners.imageSelected'), { variant: 'success' });
   };
 
   // Handle image load to get dimensions
@@ -1004,6 +1094,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           {editFrame.imageUrl ? t('banners.editFrame') : t('banners.addFrame')}
         </DialogTitle>
         <DialogContent
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
           sx={{
             maxHeight: '70vh',
             overflowY: 'auto',
@@ -1020,21 +1112,62 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 gap: 1.5,
               }}
             >
-              {/* Image URL */}
-              <TextField
-                label={t('banners.imageUrl')}
-                value={editFrame.imageUrl}
-                onChange={(e) => handleImageUrlChange(e.target.value)}
-                fullWidth
-                size="small"
-                placeholder="https://cdn.example.com/image.png"
-                helperText={
-                  editFrame.imageUrl &&
-                  detectFrameTypeFromUrl(editFrame.imageUrl)
-                    ? `${t('banners.detectedType')}: ${editFrame.type?.toUpperCase()}`
-                    : ''
-                }
-              />
+              {/* Image URL + Upload + Browse */}
+              <Box>
+                <TextField
+                  label={t('banners.imageUrl')}
+                  value={editFrame.imageUrl}
+                  onChange={(e) => handleImageUrlChange(e.target.value)}
+                  fullWidth
+                  size="small"
+                  placeholder="https://cdn.example.com/image.png"
+                  helperText={
+                    editFrame.imageUrl &&
+                    detectFrameTypeFromUrl(editFrame.imageUrl)
+                      ? `${t('banners.detectedType')}: ${editFrame.type?.toUpperCase()}`
+                      : ''
+                  }
+                  InputProps={{
+                    endAdornment: uploading ? (
+                      <InputAdornment position="end">
+                        <CircularProgress size={20} />
+                      </InputAdornment>
+                    ) : undefined,
+                  }}
+                  disabled={uploading}
+                />
+                <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={uploading ? <CircularProgress size={14} /> : <UploadIcon />}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    sx={{ fontSize: '0.75rem', textTransform: 'none' }}
+                  >
+                    {uploading
+                      ? t('banners.uploading')
+                      : t('banners.uploadImage')}
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<BrowseIcon />}
+                    onClick={() => setBrowserDialogOpen(true)}
+                    disabled={uploading}
+                    sx={{ fontSize: '0.75rem', textTransform: 'none' }}
+                  >
+                    {t('banners.browseImages')}
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,video/mp4"
+                    style={{ display: 'none' }}
+                    onChange={handleFileInputChange}
+                  />
+                </Box>
+              </Box>
 
               {/* Basic Settings */}
               <Box sx={{ display: 'flex', gap: 2 }}>
@@ -1803,6 +1936,13 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Media Asset Browser Dialog */}
+      <MediaAssetBrowserDialog
+        open={browserDialogOpen}
+        onClose={() => setBrowserDialogOpen(false)}
+        onSelect={handleBrowseSelect}
+      />
     </>
   );
 };

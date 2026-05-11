@@ -9,7 +9,7 @@ import {
   StorageSharedKeyCredential,
   SASProtocol,
 } from '@azure/storage-blob';
-import { StorageProvider, StorageFileInfo } from './storage-provider';
+import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface AzureStorageConfig {
@@ -43,7 +43,8 @@ export class AzureStorageProvider implements StorageProvider {
   async upload(
     key: string,
     data: Buffer | string,
-    contentType?: string
+    contentType?: string,
+    _options?: UploadOptions
   ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;

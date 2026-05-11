@@ -12,18 +12,25 @@ export interface StorageFileInfo {
   lastModified: Date;
 }
 
+export interface UploadOptions {
+  /** Access control: 'public-read' makes the object publicly accessible */
+  acl?: 'public-read' | 'private';
+}
+
 export interface StorageProvider {
   /**
    * Upload a file to storage
    * @param key - Storage key (path-like, e.g. "crashes/logs/2026/03/18/abc.txt")
    * @param data - File content as Buffer or string
    * @param contentType - Optional MIME type
+   * @param options - Optional upload options (e.g. ACL)
    * @returns The stored key
    */
   upload(
     key: string,
     data: Buffer | string,
-    contentType?: string
+    contentType?: string,
+    options?: UploadOptions
   ): Promise<string>;
 
   /**

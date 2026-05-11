@@ -150,6 +150,25 @@ const config = {
       String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
     metricsPath: process.env.METRICS_PATH || '/metrics',
   },
+
+  // Media Assets configuration (banner image uploads)
+  mediaAssets: {
+    cdnBaseUrl: process.env.CDN_BASE_URL || '',
+    s3Bucket: process.env.S3_UPLOADS_BUCKET || '',
+    gcGracePeriodHours: parseInt(
+      process.env.MEDIA_GC_GRACE_PERIOD_HOURS || '24',
+      10
+    ),
+    maxUploadSizeMB: parseInt(
+      process.env.MEDIA_MAX_UPLOAD_SIZE_MB || '10',
+      10
+    ),
+    allowedMimeTypes: (
+      process.env.MEDIA_ALLOWED_MIME_TYPES ||
+      'image/jpeg,image/png,image/gif,image/webp,image/svg+xml,video/mp4'
+    ).split(','),
+    storagePrefix: process.env.MEDIA_STORAGE_PREFIX || 'media/banners',
+  },
 };
 
 // Validate required environment variables

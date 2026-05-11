@@ -61,6 +61,7 @@ import aiChatRoutes from './ai-chat';
 import globalNetworkTrafficRoutes from './global-network-traffic';
 import ImpactMetricsController from '../../controllers/impact-metrics-controller';
 import rippleCmsRoutes from './ripple-cms';
+import mediaAssetRoutes from './media-assets';
 
 const router = express.Router();
 
@@ -516,6 +517,12 @@ router.use(
   '/file-storage',
   requireOrgPermission(P.CRASH_EVENTS_READ) as any,
   fileStorageRoutes
+);
+
+// Media Assets
+router.use(
+  '/media-assets',
+  mediaAssetRoutes
 );
 
 // Console

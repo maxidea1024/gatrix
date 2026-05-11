@@ -208,6 +208,9 @@ const CouponSettingsPage = React.lazy(
 const CouponUsagePage = React.lazy(
   () => import('./pages/game/CouponUsagePage')
 );
+const MediaAssetsPage = React.lazy(
+  () => import('./pages/admin/MediaAssetsPage')
+);
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
 const SurveyLogsPage = React.lazy(() => import('./pages/game/SurveyLogsPage'));
 const RewardTemplatesPage = React.lazy(
@@ -854,6 +857,10 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="cms-data"
                                           element={<CmsManagementPage />}
+                                        />
+                                        <Route
+                                          path="media-assets"
+                                          element={<MediaAssetsPage />}
                                         />
                                       </Routes>
                                     </EnvironmentAwareLayout>

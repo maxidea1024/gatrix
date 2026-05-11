@@ -504,6 +504,11 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.CRASH_EVENTS_READ,
       },
       {
+        text: 'sidebar.mediaAssets',
+        icon: 'Image',
+        path: '/admin/media-assets',
+      },
+      {
         text: 'sidebar.security',
         icon: 'Security',
         requiredPermission: P.ADMIN_TOKENS_READ,

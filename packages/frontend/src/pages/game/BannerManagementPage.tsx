@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { P } from '@/types/permissions';
 import {
@@ -90,7 +91,8 @@ const BannerManagementPage: React.FC = () => {
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);

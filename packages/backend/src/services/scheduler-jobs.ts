@@ -174,6 +174,13 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
       logger.info('file-storage:cleanup completed', { jobId: job.id, deleted });
     },
 
+    'media-assets:gc': async (job) => {
+      const { processMediaAssetGcJob } =
+        await import('./media-asset-gc-scheduler');
+      const deleted = await processMediaAssetGcJob();
+      logger.info('media-assets:gc completed', { jobId: job.id, deleted });
+    },
+
     'ccu:poll': async (job) => {
       const { ccuPollingService } = await import('./ccu-polling-service');
       await ccuPollingService.pollAll();

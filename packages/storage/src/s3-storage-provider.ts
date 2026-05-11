@@ -14,7 +14,7 @@ import {
   ListObjectsV2Command,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { StorageProvider, StorageFileInfo } from './storage-provider';
+import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface S3StorageConfig {
@@ -62,21 +62,26 @@ export class S3StorageProvider implements StorageProvider {
   async upload(
     key: string,
     data: Buffer | string,
-    contentType?: string
+    contentType?: string,
+    options?: UploadOptions
   ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
 
-    await this.client.send(
-      new PutObjectCommand({
-        Bucket: this.bucket,
-        Key: fullKey,
-        Body: body,
-        ContentType: contentType || 'application/octet-stream',
-      })
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const params: any = {
+      Bucket: this.bucket,
+      Key: fullKey,
+      Body: body,
+      ContentType: contentType || 'application/octet-stream',
+    };
+    if (options?.acl) {
+      params.ACL = options.acl;
+    }
 
-    this.logger.debug('File uploaded to S3', { key: fullKey });
+    await this.client.send(new PutObjectCommand(params));
+
+    this.logger.debug('File uploaded to S3', { key: fullKey, acl: options?.acl });
     return key;
   }
 

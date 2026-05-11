@@ -8,6 +8,7 @@ import {
 } from '../models/banner';
 import { GatrixError } from '../middleware/error-handler';
 import { createLogger } from '../config/logger';
+import { MediaAssetService } from './media-asset-service';
 
 const logger = createLogger('BannerService');
 import { cacheService } from './cache-service';
@@ -191,6 +192,18 @@ class BannerService {
         createdBy: input.createdBy,
       });
 
+      // Sync media asset references (non-fatal)
+      try {
+        const newUrls = MediaAssetService.extractImageUrls(
+          input.sequences || []
+        );
+        if (newUrls.length > 0) {
+          await MediaAssetService.syncBannerRefs(bannerId, [], newUrls);
+        }
+      } catch (err) {
+        logger.error('Failed to sync media refs on banner create', err);
+      }
+
       // Publish SDK Event
       try {
         const environmentId = banner.environmentId;
@@ -255,10 +268,25 @@ class BannerService {
     }
 
     try {
-      // Check if banner exists
-      await this.getBannerById(bannerId, environmentId);
+      // Check if banner exists and get old sequences for ref comparison
+      const oldBanner = await this.getBannerById(bannerId, environmentId);
+      const oldUrls = MediaAssetService.extractImageUrls(
+        (oldBanner as any).sequences || []
+      );
 
       const banner = await BannerModel.update(bannerId, input, environmentId);
+
+      // Sync media asset references (non-fatal)
+      if (input.sequences !== undefined) {
+        try {
+          const newUrls = MediaAssetService.extractImageUrls(
+            input.sequences || []
+          );
+          await MediaAssetService.syncBannerRefs(bannerId, oldUrls, newUrls);
+        } catch (err) {
+          logger.error('Failed to sync media refs on banner update', err);
+        }
+      }
 
       // Invalidate cache (including ETag cache for SDK)
       await this.invalidateCache(banner.environmentId);
@@ -308,10 +336,22 @@ class BannerService {
     environmentId: string
   ): Promise<void> {
     try {
-      // Check if banner exists
+      // Check if banner exists and get image URLs for ref decrement
       const banner = await this.getBannerById(bannerId, environmentId);
 
       await BannerModel.delete(bannerId, environmentId);
+
+      // Decrement media asset references (non-fatal)
+      try {
+        const urls = MediaAssetService.extractImageUrls(
+          (banner as any).sequences || []
+        );
+        if (urls.length > 0) {
+          await MediaAssetService.syncBannerRefs(bannerId, urls, []);
+        }
+      } catch (err) {
+        logger.error('Failed to sync media refs on banner delete', err);
+      }
 
       // Invalidate cache (including ETag cache for SDK)
       await this.invalidateCache(banner.environmentId);
