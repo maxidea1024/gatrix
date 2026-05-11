@@ -79,10 +79,18 @@ export async function processCouponRedeemJob(
     );
 
     // 3. Update total usedCount (SPECIAL only)
+    //    IDEMPOTENCY: Using COUNT(*) subquery instead of INCREMENT(1) to prevent
+    //    double-counting when BullMQ retries this job. If the job committed successfully
+    //    but BullMQ didn't receive the "completed" ack (e.g., process crash after commit),
+    //    a retry would increment usedCount again. The COUNT approach is inherently
+    //    idempotent: it always reflects the true number of usage records.
     if (payload.settingType === 'SPECIAL') {
-      await trx('g_coupon_settings')
-        .where('id', payload.settingId)
-        .increment('usedCount', 1);
+      await trx.raw(
+        `UPDATE g_coupon_settings SET usedCount = (
+          SELECT COUNT(*) FROM g_coupon_uses WHERE settingId = ?
+        ) WHERE id = ?`,
+        [payload.settingId, payload.settingId]
+      );
     }
 
     await trx.commit();

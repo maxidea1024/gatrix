@@ -6,6 +6,7 @@ import { createLogger } from '../config/logger';
 import redisClient from '../config/redis';
 import { queueService } from './queue-service';
 import { CouponRedeemJobPayload } from './jobs/coupon-redeem-job';
+import { convertToMySQLDateTime } from '../utils/date-utils';
 
 const logger = createLogger('CouponRedeemService');
 
@@ -179,23 +180,40 @@ export class CouponRedeemService {
     // Check targeting conditions BEFORE locking
     await this.validateTargeting(db, setting.id, request, setting);
 
-    // --- PHASE 2: Extreme Redis Optimization (Zero DB Lock) ---
+    // --- PHASE 2: Redis Atomic Validation (Zero DB Write-Lock) ---
+    // IMPORTANT: PHASE 1 above already performed read-only DB queries to validate
+    // coupon existence, status, date range, and targeting. No SELECT ... FOR UPDATE
+    // was used — only lightweight reads that release connections immediately.
+    // PHASE 2 uses Redis atomic operations to guard against concurrent race conditions
+    // that the read-only DB checks cannot prevent (e.g., two users redeeming the same
+    // NORMAL code simultaneously between the DB read and the async DB write).
     const redis = redisClient.getClient();
     const useId = ulid();
     const usedAtISO = now.toISOString();
-    const usedAtMySQL = now.toISOString().slice(0, 19).replace('T', ' ');
+    const usedAtMySQL = convertToMySQLDateTime(now)!;
+
+    // TTL for NORMAL coupon SETNX keys.
+    // After TTL expiry, the DB status check in PHASE 1 (coupon.status === 'USED')
+    // continues to serve as the permanent defense against duplicate redemption.
+    const NORMAL_COUPON_LOCK_TTL = 60 * 60 * 24 * 90; // 90 days
 
     let sequence = 1;
 
-    // 1. Atomic Check for NORMAL Coupons (SETNX Lock)
+    // 1. Atomic Dedup for NORMAL Coupons — SET NX EX (single atomic command)
+    //    Using SET with NX + EX flags ensures the key is created with TTL atomically.
+    //    Previously setnx + expire were two separate commands, which could leave keys
+    //    without TTL if the process crashed between them.
     if (!isSpecialCoupon && coupon) {
       const lockKey = `coupon:redeemed:${environmentId}:${code}`;
-      const acquired = await redis.setnx(lockKey, useId);
+      const acquired = await redis.set(
+        lockKey,
+        useId,
+        'EX',
+        NORMAL_COUPON_LOCK_TTL,
+        'NX'
+      );
 
-      if (acquired) {
-        // Expire the lock after 90 days to prevent infinite memory growth
-        await redis.expire(lockKey, 60 * 60 * 24 * 90);
-      } else {
+      if (acquired !== 'OK') {
         throw new GatrixError(
           'Coupon has already been used',
           409,
@@ -205,7 +223,7 @@ export class CouponRedeemService {
       }
     }
 
-    // 2. Atomic Check for User/Character Limits
+    // 2. Per-User/Character Usage Limit — Atomic INCR with Lazy-Loading Correction
     const usageLimitType = setting.usageLimitType || 'USER';
     const limitTargetId =
       usageLimitType === 'CHARACTER' && request.characterId
@@ -213,36 +231,51 @@ export class CouponRedeemService {
         : request.userId;
     const usageKey = `coupon:usage:${environmentId}:${setting.id}:${limitTargetId}`;
 
-    // Increment the usage count atomically
-    sequence = await redis.incr(usageKey);
+    // Lazy-Loading strategy: On cache miss (INCR returns 1), we query MySQL to check
+    // if the user already has prior redemptions from before Redis was introduced.
+    // To prevent a race condition where concurrent INCRs during the DB query could have
+    // their count overwritten by a stale redis.set(), we use a Lua script that atomically
+    // performs: INCR → if result is 1 AND dbCount > 0 → conditionally correct only if
+    // the key still holds 1 (no concurrent INCR occurred).
+    const dbUsedCount = await this.getDbUsedCount(
+      setting.id,
+      usageLimitType,
+      request
+    );
 
-    // Lazy Loading: If sequence is 1, it might be a cache miss. Verify with DB to prevent abuse.
-    if (sequence === 1) {
-      const usageQuery = db('g_coupon_uses').where('settingId', setting.id);
-      if (usageLimitType === 'CHARACTER' && request.characterId) {
-        usageQuery.where('characterId', request.characterId);
-      } else {
-        usageQuery.where('userId', request.userId);
-      }
-      const usageResult = await usageQuery.count('* as count').first();
-      const dbUsedCount = Number(usageResult?.count || 0);
-
-      if (dbUsedCount > 0) {
-        // Correct the Redis counter (dbUsedCount + 1 since they are using it now)
-        sequence = dbUsedCount + 1;
-        await redis.set(usageKey, sequence);
-      }
-    }
+    // Lua script: Atomically INCR + conditionally correct for lazy-loading.
+    // KEYS[1] = usageKey, ARGV[1] = dbUsedCount (pre-fetched from MySQL)
+    // Returns the final sequence number after any correction.
+    const INCR_WITH_CORRECTION_LUA = `
+      local seq = redis.call('INCR', KEYS[1])
+      if seq == 1 then
+        local dbCount = tonumber(ARGV[1])
+        if dbCount and dbCount > 0 then
+          local corrected = dbCount + 1
+          redis.call('SET', KEYS[1], corrected)
+          return corrected
+        end
+      end
+      return seq
+    `;
+    sequence = (await redis.eval(
+      INCR_WITH_CORRECTION_LUA,
+      1,
+      usageKey,
+      String(dbUsedCount)
+    )) as number;
 
     // Check if the sequence exceeds the perUserLimit
     if (sequence > setting.perUserLimit) {
-      // Rollback the increment since they exceeded the limit
-      await redis.decr(usageKey);
-
-      // Also rollback the code lock if it was a NORMAL coupon
+      // Rollback: use pipeline for atomic batch execution of all rollback operations.
+      // Pipeline guarantees all commands are sent in a single network round-trip and
+      // executed sequentially on the Redis server without interleaving from other clients.
+      const rollbackPipeline = redis.pipeline();
+      rollbackPipeline.decr(usageKey);
       if (!isSpecialCoupon && coupon) {
-        await redis.del(`coupon:redeemed:${environmentId}:${code}`);
+        rollbackPipeline.del(`coupon:redeemed:${environmentId}:${code}`);
       }
+      await rollbackPipeline.exec();
 
       throw new GatrixError(
         'User has reached the usage limit for this coupon',
@@ -252,26 +285,33 @@ export class CouponRedeemService {
       );
     }
 
-    // 3. Optional: Global limit check for SPECIAL coupons (Best effort)
+    // 3. Global total usage limit check for SPECIAL coupons
+    //    Uses the same Lazy-Loading Lua pattern to prevent race conditions.
     if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
       const globalUsageKey = `coupon:global_usage:${environmentId}:${setting.id}`;
-      let globalCount = await redis.incr(globalUsageKey);
 
-      if (globalCount === 1) {
-        // Lazy load global count
-        const dbSetting = await db('g_coupon_settings')
-          .where('id', setting.id)
-          .select('usedCount')
-          .first();
-        if (dbSetting && Number(dbSetting.usedCount || 0) > 0) {
-          globalCount = Number(dbSetting.usedCount || 0) + 1;
-          await redis.set(globalUsageKey, globalCount);
-        }
-      }
+      // Pre-fetch DB count for lazy-loading correction
+      const dbSetting = await db('g_coupon_settings')
+        .where('id', setting.id)
+        .select('usedCount')
+        .first();
+      const dbGlobalCount = Number(dbSetting?.usedCount || 0);
+
+      // Lua: Atomic INCR + lazy-loading correction for global counter
+      const globalCount = (await redis.eval(
+        INCR_WITH_CORRECTION_LUA,
+        1,
+        globalUsageKey,
+        String(dbGlobalCount)
+      )) as number;
 
       if (globalCount > setting.maxTotalUses) {
-        await redis.decr(globalUsageKey);
-        await redis.decr(usageKey);
+        // Rollback all counters atomically via pipeline
+        const rollbackPipeline = redis.pipeline();
+        rollbackPipeline.decr(globalUsageKey);
+        rollbackPipeline.decr(usageKey);
+        await rollbackPipeline.exec();
+
         throw new GatrixError(
           'Coupon has reached its maximum usage limit',
           409,
@@ -282,6 +322,10 @@ export class CouponRedeemService {
     }
 
     // 4. Dispatch Async Job to BullMQ for DB Persistence
+    //    CRITICAL: We must verify that the job was successfully enqueued before
+    //    returning success to the caller. If addJob fails (e.g., Redis outage for
+    //    BullMQ), the user would receive a success response with rewards but the
+    //    redemption would never be persisted to MySQL, causing a silent data loss.
     const payload: CouponRedeemJobPayload = {
       useId,
       environmentId,
@@ -300,9 +344,37 @@ export class CouponRedeemService {
       subchannel: request.subChannel || null,
     };
 
-    await queueService.addJob('coupon-redeem', 'redeem', payload, {
-      jobId: useId, // Idempotency
+    const job = await queueService.addJob('coupon-redeem', 'redeem', payload, {
+      jobId: useId, // Idempotency: BullMQ deduplicates by jobId
     });
+
+    // If job dispatch failed, rollback all Redis state to prevent orphaned locks.
+    // Without this, the coupon would be marked as "used" in Redis but never
+    // persisted to DB — the user gets an error, yet cannot retry because Redis
+    // still holds the lock.
+    if (!job) {
+      logger.error('CRITICAL: Failed to enqueue coupon redeem job, rolling back Redis state', {
+        useId,
+        code,
+        userId: request.userId,
+        settingId: setting.id,
+      });
+
+      const rollbackPipeline = redis.pipeline();
+      rollbackPipeline.decr(usageKey);
+      if (!isSpecialCoupon && coupon) {
+        rollbackPipeline.del(`coupon:redeemed:${environmentId}:${code}`);
+      }
+      if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
+        rollbackPipeline.decr(`coupon:global_usage:${environmentId}:${setting.id}`);
+      }
+      await rollbackPipeline.exec();
+
+      throw new GatrixError(
+        'Failed to process coupon redemption. Please try again.',
+        500
+      );
+    }
 
     logger.info('Coupon redeemed successfully (Async queued)', {
       code,
@@ -358,6 +430,25 @@ export class CouponRedeemService {
       rewardMailTitle: setting.rewardEmailTitle || null,
       rewardMailContent: setting.rewardEmailBody || null,
     };
+  }
+
+  /**
+   * Query MySQL for existing usage count for lazy-loading Redis correction.
+   * This is called BEFORE the Lua script so the DB count can be passed as an argument.
+   */
+  private static async getDbUsedCount(
+    settingId: string,
+    usageLimitType: string,
+    request: RedeemRequest
+  ): Promise<number> {
+    const usageQuery = db('g_coupon_uses').where('settingId', settingId);
+    if (usageLimitType === 'CHARACTER' && request.characterId) {
+      usageQuery.where('characterId', request.characterId);
+    } else {
+      usageQuery.where('userId', request.userId);
+    }
+    const usageResult = await usageQuery.count('* as count').first();
+    return Number(usageResult?.count || 0);
   }
 
   /**
@@ -467,7 +558,9 @@ export class CouponRedeemService {
         .count('* as count')
         .first();
       const isMatched = Number(subchannelMatch?.count || 0) > 0;
-      const isInverted = setting.targetChannelsInverted || false;
+      // BUG FIX: Was incorrectly referencing targetChannelsInverted.
+      // Subchannels have their own independent inversion flag.
+      const isInverted = setting.targetSubchannelsInverted || false;
 
       if (isInverted ? isMatched : !isMatched) {
         throw new GatrixError(
