@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-05-11T06:15:53.622Z",
+  "results": {
+    "dbOnly": {
+      "throughput": 91,
+      "avgLatency": 1679.4288,
+      "p99Latency": 2294,
+      "successCount": 10000,
+      "errorCount": 0
+    },
+    "redisMegaLua": {
+      "throughput": 70,
+      "avgLatency": 2161.0407,
+      "p99Latency": 3086,
+      "successCount": 10000,
+      "errorCount": 0
+    },
+    "special": {
+      "throughput": 60,
+      "successCount": 200,
+      "errorCount": 0
+    }
+  },
+  "improvements": {
+    "throughputPercent": "-23.1"
+  }
+}

@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { invalidateSettingCache } from './coupon-redeem-cache';
 import { GatrixError } from '../middleware/error-handler';
 import { ulid } from 'ulid';
 import { convertToMySQLDateTime } from '../utils/date-utils';
@@ -432,6 +433,15 @@ export class CouponSettingsService {
         .update(updates);
     }
 
+    // Invalidate Redis cache immediately so CMS changes take effect instantly
+    const setting = await db('g_coupon_settings').where('id', id).select('code', 'type').first();
+    const codes: string[] = [];
+    if (setting?.code) codes.push(setting.code);
+    // Also invalidate any NORMAL coupon codes linked to this setting
+    const normalCodes = await db('g_coupons').where('settingId', id).select('code').limit(10000);
+    for (const nc of normalCodes) codes.push(nc.code);
+    await invalidateSettingCache(environmentId, id, codes);
+
     // Replace targeting if provided
     await this.replaceTargets(
       'g_coupon_target_worlds',
@@ -529,6 +539,14 @@ export class CouponSettingsService {
         });
       }
     }
+
+    // Invalidate Redis cache immediately before status change
+    const settingForCache = await db('g_coupon_settings').where('id', id).select('code', 'environmentId').first();
+    const delCodes: string[] = [];
+    if (settingForCache?.code) delCodes.push(settingForCache.code);
+    const normalDelCodes = await db('g_coupons').where('settingId', id).select('code').limit(10000);
+    for (const nc of normalDelCodes) delCodes.push(nc.code);
+    await invalidateSettingCache(environmentId, id, delCodes);
 
     // Update status to DELETED and reset cache
     const affectedRows = await db('g_coupon_settings')

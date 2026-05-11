@@ -20,6 +20,9 @@ export class CouponRedeemController {
    * Redeem a coupon code
    * POST /api/v1/server/coupons/:code/redeem
    * Requires: X-API-Token header (server SDK token)
+   *
+   * Query params:
+   *   mode=db-only  — Use synchronous DB transaction path (benchmark only, non-production)
    */
   static redeem = asyncHandler(
     async (req: EnvironmentRequest, res: Response) => {
@@ -40,7 +43,18 @@ export class CouponRedeemController {
         throw new GatrixError(error.message, 400);
       }
 
-      // Redeem coupon
+      // DB-only mode for benchmark comparison (non-production only)
+      const mode = req.query.mode as string | undefined;
+      if (mode === 'db-only' && process.env.NODE_ENV !== 'production') {
+        const result = await CouponRedeemService.redeemCouponDbOnly(
+          code,
+          value,
+          environmentId
+        );
+        return res.json({ success: true, data: result });
+      }
+
+      // Redeem coupon (Redis + BullMQ path)
       const result = await CouponRedeemService.redeemCoupon(
         code,
         value,

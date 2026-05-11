@@ -7,6 +7,12 @@ import redisClient from '../config/redis';
 import { queueService } from './queue-service';
 import { CouponRedeemJobPayload } from './jobs/coupon-redeem-job';
 import { convertToMySQLDateTime } from '../utils/date-utils';
+import {
+  resolveSettingCached,
+  validateTargetingCached,
+  getRewardCached,
+  invalidateSettingCache,
+} from './coupon-redeem-cache';
 
 const logger = createLogger('CouponRedeemService');
 
@@ -63,8 +69,12 @@ export interface RedeemResponse {
  * Handles validation, transaction processing, and usage recording
  */
 export class CouponRedeemService {
+  /** Expose cache invalidation for CMS use */
+  static invalidateSettingCache = invalidateSettingCache;
+
   /**
-   * Redeem a coupon code
+   * Redeem a coupon code — Redis-cached critical path.
+   * DB queries: 0 on cache hit, 1-2 on first request for a given code.
    */
   static async redeemCoupon(
     code: string,
@@ -92,50 +102,19 @@ export class CouponRedeemService {
       );
     }
 
-    // --- PHASE 1: Read-only validation outside transaction ---
-    // First try to find in g_coupons (NORMAL coupon)
-    let coupon = await db('g_coupons')
-      .where('code', code)
-      .where('environmentId', environmentId)
-      .first();
+    // --- PHASE 1: Resolve setting from Redis cache (DB only on miss) ---
+    const resolved = await resolveSettingCached(code, environmentId);
 
-    let setting: any;
-    let isSpecialCoupon = false;
-    let couponId: string | null = null;
-
-    if (coupon) {
-      // NORMAL coupon found
-      couponId = coupon.id;
-
-      // Check if coupon is already used
-      if (coupon.status === 'USED') {
-        throw new GatrixError(
-          'Coupon has already been used',
-          409,
-          true,
-          CouponErrorCode.ALREADY_USED
-        );
-      }
-
-      // Get coupon setting
-      setting = await db('g_coupon_settings')
-        .where('id', coupon.settingId)
-        .where('environmentId', environmentId)
-        .first();
-    } else {
-      // Not found in g_coupons, try SPECIAL coupon in g_coupon_settings
-      setting = await db('g_coupon_settings')
-        .where('code', code)
-        .where('environmentId', environmentId)
-        .where('type', 'SPECIAL')
-        .first();
-
-      if (setting) {
-        isSpecialCoupon = true;
-      }
+    if (resolved.setting?.__used) {
+      throw new GatrixError(
+        'Coupon has already been used',
+        409,
+        true,
+        CouponErrorCode.ALREADY_USED
+      );
     }
 
-    if (!setting) {
+    if (!resolved.setting) {
       throw new GatrixError(
         'Coupon code not found',
         404,
@@ -143,6 +122,8 @@ export class CouponRedeemService {
         CouponErrorCode.CODE_NOT_FOUND
       );
     }
+
+    const { setting, couponId, isSpecialCoupon } = resolved;
 
     // Check if setting is active
     if (setting.status !== 'ACTIVE') {
@@ -177,155 +158,43 @@ export class CouponRedeemService {
       );
     }
 
-    // Check targeting conditions BEFORE locking
-    await this.validateTargeting(db, setting.id, request, setting);
+    // Check targeting conditions (Redis Sets, DB only on first load)
+    const targetingError = await validateTargetingCached(
+      environmentId,
+      setting.id,
+      request,
+      setting
+    );
+    if (targetingError) {
+      const errorMap: Record<string, { msg: string; code: string }> = {
+        INVALID_WORLD: { msg: 'Coupon is not available for this game world', code: CouponErrorCode.INVALID_WORLD },
+        INVALID_PLATFORM: { msg: 'Coupon is not available for this platform', code: CouponErrorCode.INVALID_PLATFORM },
+        INVALID_CHANNEL: { msg: 'Coupon is not available for this channel', code: CouponErrorCode.INVALID_CHANNEL },
+        INVALID_SUBCHANNEL: { msg: 'Coupon is not available for this subchannel', code: CouponErrorCode.INVALID_SUBCHANNEL },
+        INVALID_USER: { msg: 'Coupon is not available for this user', code: CouponErrorCode.INVALID_USER },
+      };
+      const err = errorMap[targetingError] || { msg: 'Targeting validation failed', code: targetingError };
+      throw new GatrixError(err.msg, 422, true, err.code as any);
+    }
 
-    // --- PHASE 2: Redis Atomic Validation (Zero DB Write-Lock) ---
-    // IMPORTANT: PHASE 1 above already performed read-only DB queries to validate
-    // coupon existence, status, date range, and targeting. No SELECT ... FOR UPDATE
-    // was used — only lightweight reads that release connections immediately.
-    // PHASE 2 uses Redis atomic operations to guard against concurrent race conditions
-    // that the read-only DB checks cannot prevent (e.g., two users redeeming the same
-    // NORMAL code simultaneously between the DB read and the async DB write).
+    // --- PHASE 2: MEGA Redis Atomic Validation (Zero DB Write-Lock) ---
+    // We combine Deduplication, Per-User Limits, Global Limits, and Stream buffering
+    // into a single atomic Lua script to reduce network round-trips to exactly 1.
     const redis = redisClient.getClient();
     const useId = ulid();
     const usedAtISO = now.toISOString();
     const usedAtMySQL = convertToMySQLDateTime(now)!;
 
-    // TTL for NORMAL coupon SETNX keys.
-    // After TTL expiry, the DB status check in PHASE 1 (coupon.status === 'USED')
-    // continues to serve as the permanent defense against duplicate redemption.
     const NORMAL_COUPON_LOCK_TTL = 60 * 60 * 24 * 90; // 90 days
-
-    let sequence = 1;
-
-    // 1. Atomic Dedup for NORMAL Coupons — SET NX EX (single atomic command)
-    //    Using SET with NX + EX flags ensures the key is created with TTL atomically.
-    //    Previously setnx + expire were two separate commands, which could leave keys
-    //    without TTL if the process crashed between them.
-    if (!isSpecialCoupon && coupon) {
-      const lockKey = `coupon:redeemed:${environmentId}:${code}`;
-      const acquired = await redis.set(
-        lockKey,
-        useId,
-        'EX',
-        NORMAL_COUPON_LOCK_TTL,
-        'NX'
-      );
-
-      if (acquired !== 'OK') {
-        throw new GatrixError(
-          'Coupon has already been used',
-          409,
-          true,
-          CouponErrorCode.ALREADY_USED
-        );
-      }
-    }
-
-    // 2. Per-User/Character Usage Limit — Atomic INCR with Lazy-Loading Correction
+    
     const usageLimitType = setting.usageLimitType || 'USER';
-    const limitTargetId =
-      usageLimitType === 'CHARACTER' && request.characterId
-        ? request.characterId
-        : request.userId;
+    const limitTargetId = usageLimitType === 'CHARACTER' && request.characterId ? request.characterId : request.userId;
+    
+    const lockKey = `coupon:redeemed:${environmentId}:${code}`;
     const usageKey = `coupon:usage:${environmentId}:${setting.id}:${limitTargetId}`;
+    const globalUsageKey = `coupon:global_usage:${environmentId}:${setting.id}`;
+    const streamKey = 'coupon:stream:usage';
 
-    // Lazy-Loading strategy: On cache miss (INCR returns 1), we query MySQL to check
-    // if the user already has prior redemptions from before Redis was introduced.
-    // To prevent a race condition where concurrent INCRs during the DB query could have
-    // their count overwritten by a stale redis.set(), we use a Lua script that atomically
-    // performs: INCR → if result is 1 AND dbCount > 0 → conditionally correct only if
-    // the key still holds 1 (no concurrent INCR occurred).
-    const dbUsedCount = await this.getDbUsedCount(
-      setting.id,
-      usageLimitType,
-      request
-    );
-
-    // Lua script: Atomically INCR + conditionally correct for lazy-loading.
-    // KEYS[1] = usageKey, ARGV[1] = dbUsedCount (pre-fetched from MySQL)
-    // Returns the final sequence number after any correction.
-    const INCR_WITH_CORRECTION_LUA = `
-      local seq = redis.call('INCR', KEYS[1])
-      if seq == 1 then
-        local dbCount = tonumber(ARGV[1])
-        if dbCount and dbCount > 0 then
-          local corrected = dbCount + 1
-          redis.call('SET', KEYS[1], corrected)
-          return corrected
-        end
-      end
-      return seq
-    `;
-    sequence = (await redis.eval(
-      INCR_WITH_CORRECTION_LUA,
-      1,
-      usageKey,
-      String(dbUsedCount)
-    )) as number;
-
-    // Check if the sequence exceeds the perUserLimit
-    if (sequence > setting.perUserLimit) {
-      // Rollback: use pipeline for atomic batch execution of all rollback operations.
-      // Pipeline guarantees all commands are sent in a single network round-trip and
-      // executed sequentially on the Redis server without interleaving from other clients.
-      const rollbackPipeline = redis.pipeline();
-      rollbackPipeline.decr(usageKey);
-      if (!isSpecialCoupon && coupon) {
-        rollbackPipeline.del(`coupon:redeemed:${environmentId}:${code}`);
-      }
-      await rollbackPipeline.exec();
-
-      throw new GatrixError(
-        'User has reached the usage limit for this coupon',
-        409,
-        true,
-        CouponErrorCode.USER_LIMIT_EXCEEDED
-      );
-    }
-
-    // 3. Global total usage limit check for SPECIAL coupons
-    //    Uses the same Lazy-Loading Lua pattern to prevent race conditions.
-    if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
-      const globalUsageKey = `coupon:global_usage:${environmentId}:${setting.id}`;
-
-      // Pre-fetch DB count for lazy-loading correction
-      const dbSetting = await db('g_coupon_settings')
-        .where('id', setting.id)
-        .select('usedCount')
-        .first();
-      const dbGlobalCount = Number(dbSetting?.usedCount || 0);
-
-      // Lua: Atomic INCR + lazy-loading correction for global counter
-      const globalCount = (await redis.eval(
-        INCR_WITH_CORRECTION_LUA,
-        1,
-        globalUsageKey,
-        String(dbGlobalCount)
-      )) as number;
-
-      if (globalCount > setting.maxTotalUses) {
-        // Rollback all counters atomically via pipeline
-        const rollbackPipeline = redis.pipeline();
-        rollbackPipeline.decr(globalUsageKey);
-        rollbackPipeline.decr(usageKey);
-        await rollbackPipeline.exec();
-
-        throw new GatrixError(
-          'Coupon has reached its maximum usage limit',
-          409,
-          true,
-          CouponErrorCode.ALREADY_USED
-        );
-      }
-    }
-
-    // 4. Dispatch Async Job to BullMQ for DB Persistence
-    //    CRITICAL: We must verify that the job was successfully enqueued before
-    //    returning success to the caller. If addJob fails (e.g., Redis outage for
-    //    BullMQ), the user would receive a success response with rewards but the
-    //    redemption would never be persisted to MySQL, causing a silent data loss.
     const payload: CouponRedeemJobPayload = {
       useId,
       environmentId,
@@ -333,7 +202,7 @@ export class CouponRedeemService {
       code,
       couponId: couponId || null,
       settingType: setting.type as 'NORMAL' | 'SPECIAL',
-      sequence,
+      sequence: 0, // Ignored, will be injected by batch processor
       usedAtMySQL,
       userId: request.userId,
       characterId: request.characterId || null,
@@ -344,36 +213,99 @@ export class CouponRedeemService {
       subchannel: request.subChannel || null,
     };
 
-    const job = await queueService.addJob('coupon-redeem', 'redeem', payload, {
-      jobId: useId, // Idempotency: BullMQ deduplicates by jobId
-    });
+    const MEGA_LUA = `
+      -- MEGA COUPON VALIDATION SCRIPT
+      -- KEYS[1] = lockKey, KEYS[2] = usageKey, KEYS[3] = globalUsageKey, KEYS[4] = streamKey
+      -- ARGV[1] = useId, ARGV[2] = lockTTL, ARGV[3] = isNormal (1/0), ARGV[4] = dbUsedCount
+      -- ARGV[5] = perUserLimit, ARGV[6] = isSpecialCoupon (1/0), ARGV[7] = maxTotalUses
+      -- ARGV[8] = dbGlobalCount, ARGV[9] = payloadJSON
 
-    // If job dispatch failed, rollback all Redis state to prevent orphaned locks.
-    // Without this, the coupon would be marked as "used" in Redis but never
-    // persisted to DB — the user gets an error, yet cannot retry because Redis
-    // still holds the lock.
-    if (!job) {
-      logger.error('CRITICAL: Failed to enqueue coupon redeem job, rolling back Redis state', {
-        useId,
-        code,
-        userId: request.userId,
-        settingId: setting.id,
-      });
+      -- Step 1: NORMAL coupon dedup
+      if tonumber(ARGV[3]) == 1 then
+        local ok = redis.call('SET', KEYS[1], ARGV[1], 'EX', ARGV[2], 'NX')
+        if not ok then return {1, 0} end -- 1 = ALREADY_USED
+      end
 
-      const rollbackPipeline = redis.pipeline();
-      rollbackPipeline.decr(usageKey);
-      if (!isSpecialCoupon && coupon) {
-        rollbackPipeline.del(`coupon:redeemed:${environmentId}:${code}`);
-      }
-      if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
-        rollbackPipeline.decr(`coupon:global_usage:${environmentId}:${setting.id}`);
-      }
-      await rollbackPipeline.exec();
+      -- Step 2: Per-user INCR usage
+      local seq = redis.call('INCR', KEYS[2])
+      if seq == 1 then
+        local dbCount = tonumber(ARGV[4])
+        if dbCount and dbCount > 0 then
+          seq = dbCount + 1
+          redis.call('SET', KEYS[2], seq)
+        end
+      end
 
-      throw new GatrixError(
-        'Failed to process coupon redemption. Please try again.',
-        500
-      );
+      -- Step 3: Check Per-user limit
+      if seq > tonumber(ARGV[5]) then
+        redis.call('DECR', KEYS[2])
+        if tonumber(ARGV[3]) == 1 then redis.call('DEL', KEYS[1]) end
+        return {2, seq} -- 2 = USER_LIMIT_EXCEEDED
+      end
+
+      -- Step 4: Check Global limit (SPECIAL)
+      if tonumber(ARGV[6]) == 1 and tonumber(ARGV[7]) > 0 then
+        local gSeq = redis.call('INCR', KEYS[3])
+        if gSeq == 1 then
+          local gDbCount = tonumber(ARGV[8])
+          if gDbCount and gDbCount > 0 then
+            gSeq = gDbCount + 1
+            redis.call('SET', KEYS[3], gSeq)
+          end
+        end
+        if gSeq > tonumber(ARGV[7]) then
+          redis.call('DECR', KEYS[3])
+          redis.call('DECR', KEYS[2])
+          if tonumber(ARGV[3]) == 1 then redis.call('DEL', KEYS[1]) end
+          return {1, seq} -- 1 = ALREADY_USED (Global limit reached)
+        end
+      end
+
+      -- Step 5: Push to Stream (Append sequence as a separate field to avoid JSON parsing in Lua)
+      redis.call('XADD', KEYS[4], '*', 'payload', ARGV[9], 'sequence', seq)
+
+      return {0, seq} -- 0 = SUCCESS
+    `;
+
+    // Pipeline EXISTS checks for Lazy Loading
+    const pipe = redis.pipeline();
+    pipe.exists(usageKey);
+    if (isSpecialCoupon && setting.maxTotalUses > 0) {
+      pipe.exists(globalUsageKey);
+    }
+    const existsResults = await pipe.exec();
+    
+    let dbUsedCount = 0;
+    let dbGlobalCount = 0;
+
+    if (existsResults && existsResults[0] && existsResults[0][1] === 0) {
+      dbUsedCount = await this.getDbUsedCount(setting.id, usageLimitType, request);
+    }
+    if (isSpecialCoupon && setting.maxTotalUses > 0 && existsResults && existsResults[1] && existsResults[1][1] === 0) {
+      const dbSetting = await db('g_coupon_settings').where('id', setting.id).select('usedCount').first();
+      dbGlobalCount = Number(dbSetting?.usedCount || 0);
+    }
+
+    const [status, sequence] = (await redis.eval(
+      MEGA_LUA,
+      4,
+      lockKey, usageKey, globalUsageKey, streamKey,
+      useId,
+      String(NORMAL_COUPON_LOCK_TTL),
+      isSpecialCoupon ? '0' : '1',
+      String(dbUsedCount),
+      String(setting.perUserLimit),
+      isSpecialCoupon ? '1' : '0',
+      String(setting.maxTotalUses || 0),
+      String(dbGlobalCount),
+      JSON.stringify(payload)
+    )) as [number, number];
+
+    if (status === 1) {
+      throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
+    }
+    if (status === 2) {
+      throw new GatrixError('User has reached the usage limit for this coupon', 409, true, CouponErrorCode.USER_LIMIT_EXCEEDED);
     }
 
     logger.info('Coupon redeemed successfully (Async queued)', {
@@ -385,42 +317,8 @@ export class CouponRedeemService {
       isSpecialCoupon,
     });
 
-    // 5. Build response without waiting for DB Write
-    let reward: any[] = [];
-
-    if (setting.rewardTemplateId) {
-      const template = await db('g_reward_templates')
-        .where('id', setting.rewardTemplateId)
-        .where('environmentId', environmentId)
-        .select('rewardItems')
-        .first();
-
-      if (template) {
-        const rewardItems =
-          typeof template.rewardItems === 'string'
-            ? JSON.parse(template.rewardItems)
-            : template.rewardItems;
-        if (Array.isArray(rewardItems)) {
-          reward = rewardItems.map((item: any) => ({
-            type: parseInt(item.rewardType || item.type || 0),
-            id: parseInt(item.itemId || item.id || 0),
-            quantity: parseInt(item.quantity || 0),
-          }));
-        }
-      }
-    } else if (setting.rewardData) {
-      const rewardData =
-        typeof setting.rewardData === 'string'
-          ? JSON.parse(setting.rewardData)
-          : setting.rewardData;
-      if (Array.isArray(rewardData)) {
-        reward = rewardData.map((item: any) => ({
-          type: parseInt(item.rewardType || item.type || 0),
-          id: parseInt(item.itemId || item.id || 0),
-          quantity: parseInt(item.quantity || 0),
-        }));
-      }
-    }
+    // 5. Build response — reward from Redis cache (DB only on miss)
+    const reward = await getRewardCached(environmentId, setting);
 
     return {
       reward,
@@ -591,5 +489,187 @@ export class CouponRedeemService {
         );
       }
     }
+  }
+
+  /**
+   * DB-only coupon redemption (legacy path for benchmark comparison).
+   * This method performs the entire validation + write inside a single MySQL transaction.
+   * Available only in non-production environments via ?mode=db-only query param.
+   *
+   * WARNING: This path is susceptible to InnoDB deadlocks under high concurrency
+   * because it holds row-level locks on g_coupon_settings during the entire transaction.
+   */
+  static async redeemCouponDbOnly(
+    code: string,
+    request: RedeemRequest,
+    environmentId: string
+  ): Promise<RedeemResponse> {
+    // Validate input
+    if (!request.userId || !request.userName) {
+      throw new GatrixError(
+        'userId and userName are required',
+        400,
+        true,
+        CouponErrorCode.INVALID_PARAMETERS
+      );
+    }
+
+    const sanitizedUserName = (request.userName || '').substring(0, 128).trim();
+    if (!sanitizedUserName) {
+      throw new GatrixError(
+        'userName cannot be empty',
+        400,
+        true,
+        CouponErrorCode.INVALID_PARAMETERS
+      );
+    }
+
+    return db.transaction(async (trx) => {
+      // Find coupon
+      let coupon = await trx('g_coupons')
+        .where('code', code)
+        .where('environmentId', environmentId)
+        .first();
+
+      let setting: any;
+      let isSpecialCoupon = false;
+      let couponId: string | null = null;
+
+      if (coupon) {
+        couponId = coupon.id;
+        if (coupon.status === 'USED') {
+          throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
+        }
+        setting = await trx('g_coupon_settings')
+          .where('id', coupon.settingId)
+          .where('environmentId', environmentId)
+          .first();
+      } else {
+        setting = await trx('g_coupon_settings')
+          .where('code', code)
+          .where('environmentId', environmentId)
+          .where('type', 'SPECIAL')
+          .first();
+        if (setting) isSpecialCoupon = true;
+      }
+
+      if (!setting) {
+        throw new GatrixError('Coupon code not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
+      }
+      if (setting.status !== 'ACTIVE') {
+        throw new GatrixError('Coupon is not active', 422, true, CouponErrorCode.NOT_ACTIVE);
+      }
+
+      const now = new Date();
+      const startsAt = setting.startsAt ? new Date(setting.startsAt) : null;
+      const expiresAt = new Date(setting.expiresAt);
+      if (startsAt && now < startsAt) {
+        throw new GatrixError('Coupon is not available yet', 422, true, CouponErrorCode.NOT_STARTED);
+      }
+      if (now > expiresAt) {
+        throw new GatrixError('Coupon has expired', 422, true, CouponErrorCode.EXPIRED);
+      }
+
+      // Validate targeting inside transaction
+      await this.validateTargeting(trx, setting.id, request, setting);
+
+      // Lock the setting row for update
+      const lockedSetting = await trx('g_coupon_settings')
+        .where('id', setting.id)
+        .forUpdate()
+        .first();
+
+      // Check per-user usage limit
+      const usageLimitType = setting.usageLimitType || 'USER';
+      const usageQuery = trx('g_coupon_uses').where('settingId', setting.id);
+      if (usageLimitType === 'CHARACTER' && request.characterId) {
+        usageQuery.where('characterId', request.characterId);
+      } else {
+        usageQuery.where('userId', request.userId);
+      }
+      const usageResult = await usageQuery.count('* as count').first();
+      const userUsedCount = Number(usageResult?.count || 0);
+
+      if (userUsedCount >= setting.perUserLimit) {
+        throw new GatrixError('User has reached the usage limit for this coupon', 409, true, CouponErrorCode.USER_LIMIT_EXCEEDED);
+      }
+
+      // Check global limit for SPECIAL coupons
+      if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
+        if ((lockedSetting.usedCount || 0) >= setting.maxTotalUses) {
+          throw new GatrixError('Coupon has reached its maximum usage limit', 409, true, CouponErrorCode.ALREADY_USED);
+        }
+      }
+
+      const usedAtISO = now.toISOString();
+      const usedAtMySQL = convertToMySQLDateTime(now)!;
+
+      // Mark NORMAL coupon as used
+      if (!isSpecialCoupon && coupon) {
+        await trx('g_coupons').where('id', coupon.id).update({ status: 'USED', usedAt: usedAtMySQL });
+      }
+
+      // Record usage
+      const sequence = userUsedCount + 1;
+      const useId = ulid();
+
+      await trx('g_coupon_uses').insert({
+        id: useId,
+        settingId: setting.id,
+        issuedCouponId: couponId,
+        userId: request.userId,
+        characterId: request.characterId || null,
+        userName: sanitizedUserName,
+        sequence,
+        usedAt: usedAtMySQL,
+        gameWorldId: request.worldId || null,
+        platform: request.platform || null,
+        channel: request.channel || null,
+        subchannel: request.subChannel || null,
+      });
+
+      // Update usedCount
+      await trx('g_coupon_settings').where('id', setting.id).increment('usedCount', 1);
+
+      // Build response
+      let reward: any[] = [];
+      if (setting.rewardTemplateId) {
+        const template = await trx('g_reward_templates')
+          .where('id', setting.rewardTemplateId)
+          .where('environmentId', environmentId)
+          .select('rewardItems')
+          .first();
+        if (template) {
+          const rewardItems = typeof template.rewardItems === 'string'
+            ? JSON.parse(template.rewardItems) : template.rewardItems;
+          if (Array.isArray(rewardItems)) {
+            reward = rewardItems.map((item: any) => ({
+              type: parseInt(item.rewardType || item.type || 0),
+              id: parseInt(item.itemId || item.id || 0),
+              quantity: parseInt(item.quantity || 0),
+            }));
+          }
+        }
+      } else if (setting.rewardData) {
+        const rewardData = typeof setting.rewardData === 'string'
+          ? JSON.parse(setting.rewardData) : setting.rewardData;
+        if (Array.isArray(rewardData)) {
+          reward = rewardData.map((item: any) => ({
+            type: parseInt(item.rewardType || item.type || 0),
+            id: parseInt(item.itemId || item.id || 0),
+            quantity: parseInt(item.quantity || 0),
+          }));
+        }
+      }
+
+      return {
+        reward,
+        userUsedCount: sequence,
+        sequence,
+        usedAt: usedAtISO,
+        rewardMailTitle: setting.rewardEmailTitle || null,
+        rewardMailContent: setting.rewardEmailBody || null,
+      };
+    });
   }
 }

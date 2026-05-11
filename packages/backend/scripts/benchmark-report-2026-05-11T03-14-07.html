@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coupon System Benchmark Report — 5/11/2026</title>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#e6edf3; --dim:#8b949e;
+    --accent:#58a6ff; --success:#3fb950; --danger:#f85149; --warning:#d29922; --orange:#f0883e; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  .container { max-width:1100px; margin:0 auto; padding:24px; }
+  header { text-align:center; padding:32px 0 16px; border-bottom:1px solid var(--border); margin-bottom:24px; }
+  header h1 { font-size:1.8rem; background:linear-gradient(135deg,var(--accent),#a371f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  header .sub { color:var(--dim); margin-top:4px; font-size:0.9rem; }
+  .verdict { text-align:center; font-size:1.3rem; padding:16px; border-radius:12px; margin-bottom:28px;
+    background:linear-gradient(135deg,#0d2818,#0d3520); border:1px solid var(--success); }
+  .phase { margin-bottom:36px; }
+  .phase h2 { font-size:1.3rem; color:var(--accent); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:18px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center; }
+  .card-value { font-size:1.6rem; font-weight:700; }
+  .card-label { font-size:0.78rem; color:var(--dim); margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
+  .card.success .card-value { color:var(--success); }
+  .card.danger .card-value { color:var(--danger); }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  @media(max-width:768px){ .grid-2{grid-template-columns:1fr;} }
+  .section-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; }
+  .section-box h3 { font-size:0.95rem; color:var(--dim); margin-bottom:10px; }
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  th,td { padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); }
+  th { color:var(--dim); font-weight:600; font-size:0.78rem; text-transform:uppercase; }
+  .row-success td:last-child { color:var(--success); font-weight:600; }
+  .row-danger td:last-child { color:var(--danger); font-weight:600; }
+  .histogram { margin-top:12px; }
+  .hist-row { display:flex; align-items:center; margin-bottom:5px; font-size:0.8rem; }
+  .hist-label { width:80px; color:var(--dim); flex-shrink:0; text-align:right; padding-right:8px; }
+  .hist-bar-bg { flex:1; height:16px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .hist-bar { height:100%; background:linear-gradient(90deg,var(--accent),#a371f7); border-radius:4px; min-width:2px; transition:width 0.3s; }
+  .hist-value { width:100px; text-align:right; color:var(--dim); flex-shrink:0; padding-left:6px; }
+  .sparkline { width:100%; margin-top:8px; }
+  .legend-text { font-size:7px; text-anchor:end; }
+  .chart-title { font-size:0.75rem; color:var(--dim); margin-top:12px; }
+  footer { text-align:center; color:var(--dim); font-size:0.75rem; padding:20px 0; border-top:1px solid var(--border); margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎫 Coupon System Benchmark Report</h1>
+    <div class="sub">Monday, May 11, 2026 at 12:14:07 PM — Gatrix Backend</div>
+  </header>
+  <div class="verdict">🎉 ALL CHECKS PASSED — Zero Deadlocks, 100% Data Integrity</div>
+  
+    <div class="phase">
+      <h2>NORMAL 쿠폰 (10,000건, 동시성 50)</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-value">10,000</div>
+          <div class="card-label">Total Requests</div>
+        </div>
+        <div class="card success">
+          <div class="card-value">10,000</div>
+          <div class="card-label">Success</div>
+        </div>
+        <div class="card">
+          <div class="card-value">82</div>
+          <div class="card-label">req/s</div>
+        </div>
+        <div class="card success">
+          <div class="card-value">0</div>
+          <div class="card-label">Errors</div>
+        </div>
+        <div class="card success">
+          <div class="card-value">0</div>
+          <div class="card-label">Deadlocks</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Latency -->
+        <div class="section-box">
+          <h3>⏱ Latency Distribution</h3>
+          <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Avg</td><td>483.7ms</td></tr>
+            <tr><td>P50</td><td>478ms</td></tr>
+            <tr><td>P90</td><td>625ms</td></tr>
+            <tr><td>P95</td><td>667ms</td></tr>
+            <tr><td>P99</td><td>761ms</td></tr>
+            <tr><td>Max</td><td>944ms</td></tr>
+          </table>
+          <div class="histogram">
+            
+              <div class="hist-row">
+                <span class="hist-label">0–50ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">50–100ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">100–200ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (2)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">200–500ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 100%"></div>
+                </div>
+                <span class="hist-value">55.6% (5,563)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">500ms–1s</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 79.85611510791367%"></div>
+                </div>
+                <span class="hist-value">44.4% (4,435)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">1s+</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+          </div>
+        </div>
+
+        <!-- DB Health -->
+        <div class="section-box">
+          <h3>🗄 DB Connection &amp; Lock Health</h3>
+          <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Peak Connections</td><td><strong>13</strong></td></tr>
+            <tr><td>Avg Connections</td><td>12</td></tr>
+            <tr><td>Peak Running Threads</td><td>11</td></tr>
+            <tr><td>Avg Running Threads</td><td>2.7</td></tr>
+            <tr><td>Peak Active Queries</td><td>11</td></tr>
+            <tr><td>InnoDB Row Lock Waits</td><td>6071</td></tr>
+            <tr><td>InnoDB Row Lock Time</td><td>29050ms</td></tr>
+            <tr class="row-success">
+              <td>InnoDB Deadlocks</td><td><strong>0</strong></td>
+            </tr>
+          </table>
+          
+          <div class="chart-title">MySQL Connections Over Time (121s)</div>
+          <svg viewBox="0 0 400 65" class="sparkline">
+            <polyline points="10,10 14.086021505376344,10 18.172043010752688,10 22.258064516129032,10 26.344086021505376,10 30.43010752688172,10 34.516129032258064,10 38.60215053763441,10 42.68817204301075,10 46.774193548387096,10 50.86021505376344,10 54.946236559139784,10 59.03225806451613,10 63.118279569892465,10 67.20430107526882,10 71.29032258064515,10 75.3763440860215,10 79.46236559139786,10 83.54838709677419,10 87.63440860215054,10 91.72043010752688,10 95.80645161290322,10 99.89247311827957,10 103.97849462365592,10 108.06451612903226,10 112.1505376344086,10 116.23655913978493,10 120.3225806451613,10 124.40860215053763,10 128.49462365591398,10 132.5806451612903,10 136.66666666666666,10 140.752688172043,10 144.83870967741936,10 148.9247311827957,10 153.01075268817203,10 157.09677419354838,10 161.18279569892474,10 165.2688172043011,10 169.35483870967744,10 173.44086021505376,10 177.5268817204301,10 181.61290322580643,10 185.69892473118279,10 189.78494623655914,10 193.8709677419355,10 197.95698924731184,10 202.04301075268816,10 206.1290322580645,10 210.21505376344086,10 214.3010752688172,10 218.38709677419354,10 222.47311827956986,10 226.55913978494627,10 230.6451612903226,10 234.73118279569894,10 238.81720430107526,10 242.90322580645162,10 246.98924731182797,10 251.0752688172043,10 255.16129032258064,10 259.247311827957,10 263.3333333333333,10 267.41935483870964,10 271.505376344086,10 275.5913978494624,10 279.6774193548387,10 283.76344086021504,10 287.8494623655914,10 291.93548387096774,10 296.02150537634407,10 300.10752688172045,10 304.19354838709677,10 308.2795698924731,10 312.36559139784947,10 316.4516129032258,10 320.5376344086022,10 324.6236559139785,10 328.7096774193549,10 332.7956989247312,10 336.8817204301075,10 340.9677419354839,10 345.0537634408602,10 349.13978494623655,10 353.22580645161287,10 357.31182795698925,10 361.39784946236557,10 365.4838709677419,10 369.5698924731183,10 373.65591397849465,10 377.741935483871,10 381.8279569892473,10 385.9139784946237,10 390,10" fill="none" stroke="#58a6ff" stroke-width="1.5"/>
+            <polyline points="10,43.75 14.086021505376344,32.5 18.172043010752688,47.5 22.258064516129032,47.5 26.344086021505376,47.5 30.43010752688172,47.5 34.516129032258064,21.25 38.60215053763441,47.5 42.68817204301075,47.5 46.774193548387096,47.5 50.86021505376344,47.5 54.946236559139784,47.5 59.03225806451613,47.5 63.118279569892465,47.5 67.20430107526882,47.5 71.29032258064515,47.5 75.3763440860215,47.5 79.46236559139786,47.5 83.54838709677419,47.5 87.63440860215054,47.5 91.72043010752688,47.5 95.80645161290322,47.5 99.89247311827957,47.5 103.97849462365592,47.5 108.06451612903226,47.5 112.1505376344086,47.5 116.23655913978493,47.5 120.3225806451613,47.5 124.40860215053763,47.5 128.49462365591398,47.5 132.5806451612903,47.5 136.66666666666666,47.5 140.752688172043,47.5 144.83870967741936,47.5 148.9247311827957,47.5 153.01075268817203,47.5 157.09677419354838,47.5 161.18279569892474,47.5 165.2688172043011,21.25 169.35483870967744,47.5 173.44086021505376,47.5 177.5268817204301,47.5 181.61290322580643,47.5 185.69892473118279,47.5 189.78494623655914,40 193.8709677419355,47.5 197.95698924731184,17.5 202.04301075268816,47.5 206.1290322580645,47.5 210.21505376344086,32.5 214.3010752688172,40 218.38709677419354,21.25 222.47311827956986,28.75 226.55913978494627,28.75 230.6451612903226,47.5 234.73118279569894,47.5 238.81720430107526,47.5 242.90322580645162,36.25 246.98924731182797,47.5 251.0752688172043,47.5 255.16129032258064,36.25 259.247311827957,43.75 263.3333333333333,47.5 267.41935483870964,47.5 271.505376344086,47.5 275.5913978494624,47.5 279.6774193548387,43.75 283.76344086021504,47.5 287.8494623655914,47.5 291.93548387096774,47.5 296.02150537634407,40 300.10752688172045,47.5 304.19354838709677,47.5 308.2795698924731,47.5 312.36559139784947,47.5 316.4516129032258,43.75 320.5376344086022,43.75 324.6236559139785,47.5 328.7096774193549,47.5 332.7956989247312,47.5 336.8817204301075,43.75 340.9677419354839,47.5 345.0537634408602,43.75 349.13978494623655,47.5 353.22580645161287,32.5 357.31182795698925,47.5 361.39784946236557,47.5 365.4838709677419,47.5 369.5698924731183,47.5 373.65591397849465,47.5 377.741935483871,47.5 381.8279569892473,47.5 385.9139784946237,43.75 390,47.5" fill="none" stroke="#f0883e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="395" y="12" class="legend-text" fill="#58a6ff">Connected</text>
+            <text x="395" y="24" class="legend-text" fill="#f0883e">Running</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Integrity -->
+      <div class="section-box">
+        <h3>🔍 Data Integrity Check</h3>
+        <table>
+          <tr><th>Check</th><th>Expected</th><th>Actual</th><th>Result</th></tr>
+          
+            <tr class="row-success">
+              <td>g_coupons (USED)</td>
+              <td>10,000</td>
+              <td>10,000</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>g_coupon_uses</td>
+              <td>10,000</td>
+              <td>10,000</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>usedCount cache</td>
+              <td>10,000</td>
+              <td>10,000</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>Duplicate rejection</td>
+              <td>1,000</td>
+              <td>1,000</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+        </table>
+      </div>
+    </div>
+    <div class="phase">
+      <h2>SPECIAL 쿠폰 (100유저, perUser=3, maxTotal=200)</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-value">500</div>
+          <div class="card-label">Total Requests</div>
+        </div>
+        <div class="card success">
+          <div class="card-value">200</div>
+          <div class="card-label">Success</div>
+        </div>
+        <div class="card">
+          <div class="card-value">78</div>
+          <div class="card-label">req/s</div>
+        </div>
+        <div class="card success">
+          <div class="card-value">0</div>
+          <div class="card-label">Errors</div>
+        </div>
+        <div class="card success">
+          <div class="card-value">0</div>
+          <div class="card-label">Deadlocks</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Latency -->
+        <div class="section-box">
+          <h3>⏱ Latency Distribution</h3>
+          <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Avg</td><td>485.4ms</td></tr>
+            <tr><td>P50</td><td>475ms</td></tr>
+            <tr><td>P90</td><td>659ms</td></tr>
+            <tr><td>P95</td><td>726ms</td></tr>
+            <tr><td>P99</td><td>873ms</td></tr>
+            <tr><td>Max</td><td>899ms</td></tr>
+          </table>
+          <div class="histogram">
+            
+              <div class="hist-row">
+                <span class="hist-label">0–50ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">50–100ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">100–200ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">200–500ms</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 100%"></div>
+                </div>
+                <span class="hist-value">56.8% (284)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">500ms–1s</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 76.05633802816902%"></div>
+                </div>
+                <span class="hist-value">43.2% (216)</span>
+              </div>
+            
+              <div class="hist-row">
+                <span class="hist-label">1s+</span>
+                <div class="hist-bar-bg">
+                  <div class="hist-bar" style="width: 0%"></div>
+                </div>
+                <span class="hist-value">0% (0)</span>
+              </div>
+            
+          </div>
+        </div>
+
+        <!-- DB Health -->
+        <div class="section-box">
+          <h3>🗄 DB Connection &amp; Lock Health</h3>
+          <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Peak Connections</td><td><strong>12</strong></td></tr>
+            <tr><td>Avg Connections</td><td>12</td></tr>
+            <tr><td>Peak Running Threads</td><td>3</td></tr>
+            <tr><td>Avg Running Threads</td><td>2.1</td></tr>
+            <tr><td>Peak Active Queries</td><td>5</td></tr>
+            <tr><td>InnoDB Row Lock Waits</td><td>151</td></tr>
+            <tr><td>InnoDB Row Lock Time</td><td>1130ms</td></tr>
+            <tr class="row-success">
+              <td>InnoDB Deadlocks</td><td><strong>0</strong></td>
+            </tr>
+          </table>
+          
+          <div class="chart-title">MySQL Connections Over Time (5s)</div>
+          <svg viewBox="0 0 400 65" class="sparkline">
+            <polyline points="10,10 105,10 200,10 295,10 390,10" fill="none" stroke="#58a6ff" stroke-width="1.5"/>
+            <polyline points="10,43.75 105,47.5 200,47.5 295,47.5 390,47.5" fill="none" stroke="#f0883e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="395" y="12" class="legend-text" fill="#58a6ff">Connected</text>
+            <text x="395" y="24" class="legend-text" fill="#f0883e">Running</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Integrity -->
+      <div class="section-box">
+        <h3>🔍 Data Integrity Check</h3>
+        <table>
+          <tr><th>Check</th><th>Expected</th><th>Actual</th><th>Result</th></tr>
+          
+            <tr class="row-success">
+              <td>Success ≤ maxTotalUses</td>
+              <td>200</td>
+              <td>200</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>Users over per-user limit</td>
+              <td>0</td>
+              <td>0</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>Max per-user usage ≤ limit</td>
+              <td>3</td>
+              <td>3</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>DB records match success</td>
+              <td>200</td>
+              <td>200</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+            <tr class="row-success">
+              <td>usedCount cache</td>
+              <td>200</td>
+              <td>200</td>
+              <td>✅ PASS</td>
+            </tr>
+          
+        </table>
+      </div>
+    </div>
+  <footer>Generated by benchmark-coupon.ts — Gatrix Coupon System</footer>
+</div>
+</body>
+</html>

@@ -44,19 +44,9 @@ export class QueueService {
       await this.createQueue('cleanup', this.processCleanupJob.bind(this));
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
 
-      // Initialize high-throughput async queue for coupon redemptions
-      await this.createQueue(
-        'coupon-redeem',
-        async (job) => {
-          const { processCouponRedeemJob } =
-            await import('./jobs/coupon-redeem-job');
-          await processCouponRedeemJob(job);
-        },
-        {
-          concurrency: 20, // High concurrency for DB writes
-          removeOnComplete: 1000,
-        }
-      );
+      // Start the true batch processor for coupon redemptions
+      const { couponBatchProcessor } = await import('./jobs/coupon-batch-processor');
+      couponBatchProcessor.start(2000); // Run every 2 seconds
 
       // Initialize feature metrics queue
       const { featureMetricsService } =

@@ -162,6 +162,28 @@ router.get('/ready', async (req, res) => {
   });
 });
 
+// Pool stats diagnostic endpoint (non-production only)
+// Exposes the server's knex/tarn connection pool metrics for benchmarking
+if (process.env.NODE_ENV !== 'production') {
+  router.get('/pool-stats', async (_req, res) => {
+    try {
+      const db = (await import('../config/knex')).default;
+      const pool = (db as any).client?.pool;
+      res.json({
+        success: true,
+        data: {
+          numUsed: pool?.numUsed?.() ?? -1,
+          numFree: pool?.numFree?.() ?? -1,
+          numPendingAcquires: pool?.numPendingAcquires?.() ?? -1,
+          numPendingCreates: pool?.numPendingCreates?.() ?? -1,
+        },
+      });
+    } catch (err: any) {
+      res.json({ success: false, error: err.message });
+    }
+  });
+}
+
 // Public webhook endpoint for Grafana alert notifications
 router.post(
   '/monitoring/alerts',
