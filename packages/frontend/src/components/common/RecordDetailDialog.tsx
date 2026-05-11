@@ -138,9 +138,7 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
                           {displayValue !== '-' && (
                             <IconButton
                               size="small"
-                              onClick={() =>
-                                handleCopy(String(rawValue ?? ''))
-                              }
+                              onClick={() => handleCopy(String(rawValue ?? ''))}
                               sx={{
                                 opacity: 0.4,
                                 '&:hover': { opacity: 1 },

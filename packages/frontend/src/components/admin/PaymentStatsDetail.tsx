@@ -560,7 +560,9 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 fontSize: '0.7rem',
                 color: 'rgba(255,255,255,0.4)',
                 transition: 'transform 0.2s',
-                transform: isAllProductsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                transform: isAllProductsExpanded
+                  ? 'rotate(90deg)'
+                  : 'rotate(0deg)',
                 mt: 0.2,
               }}
             >
@@ -578,7 +580,7 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
               📦 {t(`${prefix}productSales`)}
             </Typography>
           </Box>
-          
+
           {isAllProductsExpanded && (
             <Box
               sx={{

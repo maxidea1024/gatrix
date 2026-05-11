@@ -643,7 +643,13 @@ const SurveysPage: React.FC = () => {
                           if (column.id === 'platformSurveyId') {
                             return (
                               <TableCell key={column.id}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                  }}
+                                >
                                   <Typography
                                     sx={{
                                       cursor: 'pointer',
@@ -660,8 +666,13 @@ const SurveysPage: React.FC = () => {
                                       size="small"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        navigator.clipboard.writeText(survey.platformSurveyId);
-                                        enqueueSnackbar(t('common.copied'), { variant: 'success', autoHideDuration: 1500 });
+                                        navigator.clipboard.writeText(
+                                          survey.platformSurveyId
+                                        );
+                                        enqueueSnackbar(t('common.copied'), {
+                                          variant: 'success',
+                                          autoHideDuration: 1500,
+                                        });
                                       }}
                                     >
                                       <ContentCopyIcon fontSize="inherit" />

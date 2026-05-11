@@ -273,7 +273,9 @@ class SurveyService {
     projectApiPath: string,
     params?: GetSurveyLogsParams
   ): Promise<GetSurveyLogsResponse> {
-    const response = await api.get(`${projectApiPath}/surveys/logs`, { params });
+    const response = await api.get(`${projectApiPath}/surveys/logs`, {
+      params,
+    });
     return response.data;
   }
 }

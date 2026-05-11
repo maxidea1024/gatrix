@@ -642,7 +642,7 @@ export class SurveyService {
     platform?: string,
     channel?: string,
     subchannel?: string,
-    environmentId?: string,
+    environmentId?: string
   ): void {
     try {
       const client = this.getApiClient(environmentId);

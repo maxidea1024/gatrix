@@ -37,7 +37,7 @@ export class SurveyLogService {
     worldId?: string,
     platform?: string,
     channel?: string,
-    subchannel?: string,
+    subchannel?: string
   ): Promise<void> {
     try {
       const redis = redisClient.getClient();
@@ -75,7 +75,10 @@ export class SurveyLogService {
     const limit = query.limit || 50;
     const offset = (page - 1) * limit;
 
-    let dbQuery = db('g_survey_logs').where('environmentId', query.environmentId);
+    let dbQuery = db('g_survey_logs').where(
+      'environmentId',
+      query.environmentId
+    );
 
     if (query.surveyId) {
       dbQuery = dbQuery.andWhere('surveyId', query.surveyId);
@@ -119,8 +122,20 @@ export class SurveyLogService {
     const countQuery = dbQuery.clone().count('id as total').first();
 
     // Determine sort column (whitelist allowed columns)
-    const allowedSortColumns = ['action', 'accountId', 'userName', 'worldId', 'platform', 'channel', 'subchannel', 'createdAt'];
-    const sortColumn = query.sortBy && allowedSortColumns.includes(query.sortBy) ? query.sortBy : 'createdAt';
+    const allowedSortColumns = [
+      'action',
+      'accountId',
+      'userName',
+      'worldId',
+      'platform',
+      'channel',
+      'subchannel',
+      'createdAt',
+    ];
+    const sortColumn =
+      query.sortBy && allowedSortColumns.includes(query.sortBy)
+        ? query.sortBy
+        : 'createdAt';
     const sortDirection = query.sortOrder === 'asc' ? 'asc' : 'desc';
 
     const logs = await dbQuery
@@ -129,7 +144,9 @@ export class SurveyLogService {
       .limit(limit)
       .offset(offset);
 
-    const countResult = (await countQuery) as { total: string | number } | undefined;
+    const countResult = (await countQuery) as
+      | { total: string | number }
+      | undefined;
     const total = parseInt(String(countResult?.total || 0), 10);
 
     return {

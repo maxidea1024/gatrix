@@ -50,7 +50,8 @@ export class QueueService {
       couponBatchProcessor.start(2000); // Run every 2 seconds
 
       // Start the batch processor for survey logs
-      const { surveyLogBatchProcessor } = await import('./jobs/survey-log-batch-processor');
+      const { surveyLogBatchProcessor } =
+        await import('./jobs/survey-log-batch-processor');
       surveyLogBatchProcessor.start(2000); // Run every 2 seconds
 
       // Initialize feature metrics queue

@@ -634,7 +634,16 @@ export class SurveyController {
     async (req: EnvironmentRequest, res: Response) => {
       const { id } = req.params;
       const environmentId = req.environmentId!;
-      const { action, accountId, characterId, userName, worldId, platform, channel, subchannel } = req.body;
+      const {
+        action,
+        accountId,
+        characterId,
+        userName,
+        worldId,
+        platform,
+        channel,
+        subchannel,
+      } = req.body;
 
       if (!id) throw new GatrixError('Survey ID is required', 400);
       if (!action || !['JOINED', 'SENT'].includes(action)) {
@@ -653,7 +662,7 @@ export class SurveyController {
         worldId,
         platform,
         channel,
-        subchannel,
+        subchannel
       );
 
       res.status(202).json({
@@ -670,7 +679,23 @@ export class SurveyController {
   static getSurveyLogs = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const environmentId = req.environmentId!;
-      const { page, limit, surveyId, action, accountId, userName, worldId, platform, channel, subchannel, startDate, endDate, search, sortBy, sortOrder } = req.query;
+      const {
+        page,
+        limit,
+        surveyId,
+        action,
+        accountId,
+        userName,
+        worldId,
+        platform,
+        channel,
+        subchannel,
+        startDate,
+        endDate,
+        search,
+        sortBy,
+        sortOrder,
+      } = req.query;
 
       const result = await SurveyLogService.getLogs({
         environmentId,

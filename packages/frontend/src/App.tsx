@@ -209,9 +209,7 @@ const CouponUsagePage = React.lazy(
   () => import('./pages/game/CouponUsagePage')
 );
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
-const SurveyLogsPage = React.lazy(
-  () => import('./pages/game/SurveyLogsPage')
-);
+const SurveyLogsPage = React.lazy(() => import('./pages/game/SurveyLogsPage'));
 const RewardTemplatesPage = React.lazy(
   () => import('./pages/game/RewardTemplatesPage')
 );

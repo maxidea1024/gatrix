@@ -66,7 +66,9 @@ import SearchTextField from '../../components/common/SearchTextField';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import RecordDetailDialog, { DetailField } from '../../components/common/RecordDetailDialog';
+import RecordDetailDialog, {
+  DetailField,
+} from '../../components/common/RecordDetailDialog';
 import {
   showChangeRequestCreatedToast,
   getActionLabel,
@@ -230,16 +232,32 @@ const CouponSettingsPage: React.FC = () => {
   const DETAIL_FIELDS: DetailField[] = [
     { key: 'code', labelKey: 'coupons.issuedCodes.code', mono: true },
     { key: 'status', labelKey: 'coupons.issuedCodes.status' },
-    { key: 'userId', labelKey: 'coupons.couponUsage.columns.userId', mono: true },
+    {
+      key: 'userId',
+      labelKey: 'coupons.couponUsage.columns.userId',
+      mono: true,
+    },
     { key: 'userName', labelKey: 'coupons.couponUsage.columns.userName' },
-    { key: 'characterId', labelKey: 'coupons.couponUsage.columns.characterId', mono: true },
+    {
+      key: 'characterId',
+      labelKey: 'coupons.couponUsage.columns.characterId',
+      mono: true,
+    },
     { key: 'sequence', labelKey: 'coupons.couponUsage.columns.sequence' },
     { key: 'gameWorldId', labelKey: 'coupons.couponUsage.columns.gameWorldId' },
     { key: 'platform', labelKey: 'coupons.couponUsage.columns.platform' },
     { key: 'channel', labelKey: 'coupons.couponUsage.columns.channel' },
     { key: 'subchannel', labelKey: 'coupons.couponUsage.columns.subChannel' },
-    { key: 'createdAt', labelKey: 'coupons.issuedCodes.issuedAt', format: (val) => formatDateTime(val) },
-    { key: 'usedAt', labelKey: 'coupons.issuedCodes.usedAt', format: (val) => val ? formatDateTime(val) : '-' },
+    {
+      key: 'createdAt',
+      labelKey: 'coupons.issuedCodes.issuedAt',
+      format: (val) => formatDateTime(val),
+    },
+    {
+      key: 'usedAt',
+      labelKey: 'coupons.issuedCodes.usedAt',
+      format: (val) => (val ? formatDateTime(val) : '-'),
+    },
   ];
 
   // Delete confirmation dialog state
@@ -1725,7 +1743,10 @@ const CouponSettingsPage: React.FC = () => {
                                       }}
                                     >
                                       <Tooltip
-                                        title={t('coupons.couponSettings.viewUsedCodes', '사용된 코드 수 보기')}
+                                        title={t(
+                                          'coupons.couponSettings.viewUsedCodes',
+                                          '사용된 코드 수 보기'
+                                        )}
                                       >
                                         <Chip
                                           size="small"
@@ -2287,7 +2308,9 @@ const CouponSettingsPage: React.FC = () => {
           <ListItemIcon>
             <ListIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('coupons.couponSettings.viewIssuedCodes', 'View Issued Codes')}</ListItemText>
+          <ListItemText>
+            {t('coupons.couponSettings.viewIssuedCodes', 'View Issued Codes')}
+          </ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem
@@ -3078,61 +3101,106 @@ const CouponSettingsPage: React.FC = () => {
           <Stack spacing={2}>
             {/* Statistics Cards – compact, clickable status filter toggles (only for NORMAL type) */}
             {codesSetting?.type !== 'SPECIAL' && (
-            <Stack direction="row" spacing={1}>
-              {[
-                { filter: 'ALL' as const, label: t('coupons.couponSettings.statistics.total'), value: codesStats?.issued || 0, gradient: 'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)', shadow: 'rgba(92,107,192,0.4)', icon: <ListIcon sx={{ color: 'inherit', fontSize: 20 }} /> },
-                { filter: 'USED' as const, label: t('coupons.couponSettings.statistics.used'), value: codesStats?.used || 0, gradient: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)', shadow: 'rgba(102,187,106,0.4)', icon: <CheckCircleIcon sx={{ color: 'inherit', fontSize: 20 }} /> },
-                { filter: 'ISSUED' as const, label: t('coupons.couponSettings.statistics.unused'), value: codesStats?.unused || 0, gradient: 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)', shadow: 'rgba(255,167,38,0.4)', icon: <HourglassEmptyIcon sx={{ color: 'inherit', fontSize: 20 }} /> },
-              ].map((card) => (
-                <Card
-                  key={card.filter}
-                  sx={{
-                    flex: 1,
-                    cursor: 'pointer',
-                    border: 1.5,
-                    borderRadius: 1.5,
-                    ...(codesStatusFilter === card.filter
-                      ? {
-                          borderColor: 'transparent',
-                          background: card.gradient,
-                          color: '#fff',
-                          boxShadow: `0 2px 8px ${card.shadow}`,
-                        }
-                      : {
-                          borderColor: 'divider',
-                          bgcolor: 'background.paper',
-                        }),
-                    transition: 'all 0.2s ease',
-                    '&:hover':
-                      codesStatusFilter !== card.filter
-                        ? { borderColor: 'primary.light' }
-                        : {},
-                  }}
-                  onClick={() => {
-                    setCodesStatusFilter(card.filter);
-                    setCodesPage(0);
-                  }}
-                >
-                  <CardContent sx={{ p: '8px 12px !important' }}>
-                    <Stack direction="row" alignItems="center" spacing={0.75}>
-                      {card.icon}
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: 700, lineHeight: 1.2, color: codesStatusFilter === card.filter ? '#fff' : 'text.primary' }}
-                      >
-                        {card.value.toLocaleString()}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: codesStatusFilter === card.filter ? 'rgba(255,255,255,0.8)' : 'text.secondary', fontWeight: 500 }}
-                      >
-                        {card.label}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
+              <Stack direction="row" spacing={1}>
+                {[
+                  {
+                    filter: 'ALL' as const,
+                    label: t('coupons.couponSettings.statistics.total'),
+                    value: codesStats?.issued || 0,
+                    gradient:
+                      'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)',
+                    shadow: 'rgba(92,107,192,0.4)',
+                    icon: <ListIcon sx={{ color: 'inherit', fontSize: 20 }} />,
+                  },
+                  {
+                    filter: 'USED' as const,
+                    label: t('coupons.couponSettings.statistics.used'),
+                    value: codesStats?.used || 0,
+                    gradient:
+                      'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
+                    shadow: 'rgba(102,187,106,0.4)',
+                    icon: (
+                      <CheckCircleIcon
+                        sx={{ color: 'inherit', fontSize: 20 }}
+                      />
+                    ),
+                  },
+                  {
+                    filter: 'ISSUED' as const,
+                    label: t('coupons.couponSettings.statistics.unused'),
+                    value: codesStats?.unused || 0,
+                    gradient:
+                      'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
+                    shadow: 'rgba(255,167,38,0.4)',
+                    icon: (
+                      <HourglassEmptyIcon
+                        sx={{ color: 'inherit', fontSize: 20 }}
+                      />
+                    ),
+                  },
+                ].map((card) => (
+                  <Card
+                    key={card.filter}
+                    sx={{
+                      flex: 1,
+                      cursor: 'pointer',
+                      border: 1.5,
+                      borderRadius: 1.5,
+                      ...(codesStatusFilter === card.filter
+                        ? {
+                            borderColor: 'transparent',
+                            background: card.gradient,
+                            color: '#fff',
+                            boxShadow: `0 2px 8px ${card.shadow}`,
+                          }
+                        : {
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper',
+                          }),
+                      transition: 'all 0.2s ease',
+                      '&:hover':
+                        codesStatusFilter !== card.filter
+                          ? { borderColor: 'primary.light' }
+                          : {},
+                    }}
+                    onClick={() => {
+                      setCodesStatusFilter(card.filter);
+                      setCodesPage(0);
+                    }}
+                  >
+                    <CardContent sx={{ p: '8px 12px !important' }}>
+                      <Stack direction="row" alignItems="center" spacing={0.75}>
+                        {card.icon}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            lineHeight: 1.2,
+                            color:
+                              codesStatusFilter === card.filter
+                                ? '#fff'
+                                : 'text.primary',
+                          }}
+                        >
+                          {card.value.toLocaleString()}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color:
+                              codesStatusFilter === card.filter
+                                ? 'rgba(255,255,255,0.8)'
+                                : 'text.secondary',
+                            fontWeight: 500,
+                          }}
+                        >
+                          {card.label}
+                        </Typography>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Stack>
             )}
 
             {/* Search and Export */}
@@ -3494,7 +3562,17 @@ const CouponSettingsPage: React.FC = () => {
                             <TableCell sx={{ py: 1, px: 2 }}>
                               <Typography
                                 variant="caption"
-                                sx={c.userId ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
+                                sx={
+                                  c.userId
+                                    ? {
+                                        cursor: 'pointer',
+                                        color: 'primary.main',
+                                        '&:hover': {
+                                          textDecoration: 'underline',
+                                        },
+                                      }
+                                    : {}
+                                }
                                 onClick={() => c.userId && handleOpenDetail(c)}
                               >
                                 {c.userId || '-'}
@@ -3503,8 +3581,20 @@ const CouponSettingsPage: React.FC = () => {
                             <TableCell sx={{ py: 1, px: 2 }}>
                               <Typography
                                 variant="caption"
-                                sx={c.userName ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
-                                onClick={() => c.userName && handleOpenDetail(c)}
+                                sx={
+                                  c.userName
+                                    ? {
+                                        cursor: 'pointer',
+                                        color: 'primary.main',
+                                        '&:hover': {
+                                          textDecoration: 'underline',
+                                        },
+                                      }
+                                    : {}
+                                }
+                                onClick={() =>
+                                  c.userName && handleOpenDetail(c)
+                                }
                               >
                                 {c.userName || '-'}
                               </Typography>
@@ -3512,8 +3602,20 @@ const CouponSettingsPage: React.FC = () => {
                             <TableCell sx={{ py: 1, px: 2 }}>
                               <Typography
                                 variant="caption"
-                                sx={c.characterId ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
-                                onClick={() => c.characterId && handleOpenDetail(c)}
+                                sx={
+                                  c.characterId
+                                    ? {
+                                        cursor: 'pointer',
+                                        color: 'primary.main',
+                                        '&:hover': {
+                                          textDecoration: 'underline',
+                                        },
+                                      }
+                                    : {}
+                                }
+                                onClick={() =>
+                                  c.characterId && handleOpenDetail(c)
+                                }
                               >
                                 {c.characterId || '-'}
                               </Typography>

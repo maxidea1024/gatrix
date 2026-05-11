@@ -34,7 +34,11 @@ import SearchTextField from '../common/SearchTextField';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useDebounce } from '@/hooks/useDebounce';
 import surveyService, { SurveyLog, Survey } from '@/services/surveyService';
-import { formatRelativeTime, formatDateTimeDetailed, formatDateTime } from '@/utils/dateFormat';
+import {
+  formatRelativeTime,
+  formatDateTimeDetailed,
+  formatDateTime,
+} from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
 import RewardDisplay from './RewardDisplay';
 import RecordDetailDialog, { DetailField } from '../common/RecordDetailDialog';
@@ -63,7 +67,9 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 500);
-  const [actionFilter, setActionFilter] = useState<'ALL' | 'JOINED' | 'SENT'>('ALL');
+  const [actionFilter, setActionFilter] = useState<'ALL' | 'JOINED' | 'SENT'>(
+    'ALL'
+  );
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -77,15 +83,27 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
   };
 
   const DETAIL_FIELDS: DetailField[] = [
-    { key: 'accountId', labelKey: 'surveys.logs.columns.accountId', mono: true },
+    {
+      key: 'accountId',
+      labelKey: 'surveys.logs.columns.accountId',
+      mono: true,
+    },
     { key: 'userName', labelKey: 'coupons.couponUsage.columns.userName' },
     { key: 'action', labelKey: 'surveys.logs.columns.action' },
-    { key: 'characterId', labelKey: 'playerConnections.allPlayers.characterId', mono: true },
+    {
+      key: 'characterId',
+      labelKey: 'playerConnections.allPlayers.characterId',
+      mono: true,
+    },
     { key: 'worldId', labelKey: 'surveys.logs.columns.worldId' },
     { key: 'platform', labelKey: 'coupons.couponUsage.columns.platform' },
     { key: 'channel', labelKey: 'coupons.couponUsage.columns.channel' },
     { key: 'subchannel', labelKey: 'coupons.couponUsage.columns.subChannel' },
-    { key: 'createdAt', labelKey: 'surveys.logs.columns.createdAt', format: (val) => formatDateTime(val) },
+    {
+      key: 'createdAt',
+      labelKey: 'surveys.logs.columns.createdAt',
+      format: (val) => formatDateTime(val),
+    },
   ];
 
   const handleSort = (column: string) => {
@@ -99,7 +117,11 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
   };
 
   // Stats
-  const [stats, setStats] = useState<{ total: number; joined: number; sent: number }>({
+  const [stats, setStats] = useState<{
+    total: number;
+    joined: number;
+    sent: number;
+  }>({
     total: 0,
     joined: 0,
     sent: 0,
@@ -107,7 +129,10 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    enqueueSnackbar(t('common.copied'), { variant: 'success', autoHideDuration: 1500 });
+    enqueueSnackbar(t('common.copied'), {
+      variant: 'success',
+      autoHideDuration: 1500,
+    });
   };
 
   const loadLogs = useCallback(async () => {
@@ -130,7 +155,16 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [survey, projectApiPath, page, rowsPerPage, debouncedSearch, actionFilter, sortBy, sortOrder]);
+  }, [
+    survey,
+    projectApiPath,
+    page,
+    rowsPerPage,
+    debouncedSearch,
+    actionFilter,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Load stats (all + joined + sent counts)
   const loadStats = useCallback(async () => {
@@ -217,11 +251,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
       open={open}
       onClose={onClose}
       title={t('surveys.logsDrawer.title', 'Participation Logs') as string}
-      subtitle={
-        survey
-          ? `${survey.surveyTitle}`
-          : ''
-      }
+      subtitle={survey ? `${survey.surveyTitle}` : ''}
       storageKey="surveyLogsDrawerWidth"
       defaultWidth={720}
       minWidth={560}
@@ -266,7 +296,10 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                       sx={{
                         fontWeight: 700,
                         lineHeight: 1.2,
-                        color: actionFilter === card.filter ? '#fff' : 'text.primary',
+                        color:
+                          actionFilter === card.filter
+                            ? '#fff'
+                            : 'text.primary',
                       }}
                     >
                       {card.value.toLocaleString()}
@@ -274,7 +307,10 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                     <Typography
                       variant="caption"
                       sx={{
-                        color: actionFilter === card.filter ? 'rgba(255,255,255,0.8)' : 'text.secondary',
+                        color:
+                          actionFilter === card.filter
+                            ? 'rgba(255,255,255,0.8)'
+                            : 'text.secondary',
                         fontWeight: 500,
                       }}
                     >
@@ -290,7 +326,10 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
           <SearchTextField
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder={t('surveys.logsDrawer.searchPlaceholder', 'Search by account ID or user name...')}
+            placeholder={t(
+              'surveys.logsDrawer.searchPlaceholder',
+              'Search by account ID or user name...'
+            )}
             size="small"
           />
 
@@ -307,43 +346,114 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sortDirection={sortBy === 'action' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'action'} direction={sortBy === 'action' ? sortOrder : 'asc'} onClick={() => handleSort('action')}>
+                      <TableCell
+                        sortDirection={sortBy === 'action' ? sortOrder : false}
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'action'}
+                          direction={sortBy === 'action' ? sortOrder : 'asc'}
+                          onClick={() => handleSort('action')}
+                        >
                           {t('surveys.logs.columns.action', 'Action')}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'accountId' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'accountId'} direction={sortBy === 'accountId' ? sortOrder : 'asc'} onClick={() => handleSort('accountId')}>
+                      <TableCell
+                        sortDirection={
+                          sortBy === 'accountId' ? sortOrder : false
+                        }
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'accountId'}
+                          direction={sortBy === 'accountId' ? sortOrder : 'asc'}
+                          onClick={() => handleSort('accountId')}
+                        >
                           {t('surveys.logs.columns.accountId', 'Account ID')}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'userName' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'userName'} direction={sortBy === 'userName' ? sortOrder : 'asc'} onClick={() => handleSort('userName')}>
-                          {t('coupons.couponUsage.columns.userName', 'User Name')}
+                      <TableCell
+                        sortDirection={
+                          sortBy === 'userName' ? sortOrder : false
+                        }
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'userName'}
+                          direction={sortBy === 'userName' ? sortOrder : 'asc'}
+                          onClick={() => handleSort('userName')}
+                        >
+                          {t(
+                            'coupons.couponUsage.columns.userName',
+                            'User Name'
+                          )}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'worldId' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'worldId'} direction={sortBy === 'worldId' ? sortOrder : 'asc'} onClick={() => handleSort('worldId')}>
+                      <TableCell
+                        sortDirection={sortBy === 'worldId' ? sortOrder : false}
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'worldId'}
+                          direction={sortBy === 'worldId' ? sortOrder : 'asc'}
+                          onClick={() => handleSort('worldId')}
+                        >
                           {t('surveys.logs.columns.worldId', 'World')}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'platform' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'platform'} direction={sortBy === 'platform' ? sortOrder : 'asc'} onClick={() => handleSort('platform')}>
-                          {t('coupons.couponUsage.columns.platform', 'Platform')}
+                      <TableCell
+                        sortDirection={
+                          sortBy === 'platform' ? sortOrder : false
+                        }
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'platform'}
+                          direction={sortBy === 'platform' ? sortOrder : 'asc'}
+                          onClick={() => handleSort('platform')}
+                        >
+                          {t(
+                            'coupons.couponUsage.columns.platform',
+                            'Platform'
+                          )}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'channel' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'channel'} direction={sortBy === 'channel' ? sortOrder : 'asc'} onClick={() => handleSort('channel')}>
+                      <TableCell
+                        sortDirection={sortBy === 'channel' ? sortOrder : false}
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'channel'}
+                          direction={sortBy === 'channel' ? sortOrder : 'asc'}
+                          onClick={() => handleSort('channel')}
+                        >
                           {t('coupons.couponUsage.columns.channel', 'Channel')}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'subchannel' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'subchannel'} direction={sortBy === 'subchannel' ? sortOrder : 'asc'} onClick={() => handleSort('subchannel')}>
-                          {t('coupons.couponUsage.columns.subChannel', 'Subchannel')}
+                      <TableCell
+                        sortDirection={
+                          sortBy === 'subchannel' ? sortOrder : false
+                        }
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'subchannel'}
+                          direction={
+                            sortBy === 'subchannel' ? sortOrder : 'asc'
+                          }
+                          onClick={() => handleSort('subchannel')}
+                        >
+                          {t(
+                            'coupons.couponUsage.columns.subChannel',
+                            'Subchannel'
+                          )}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sortDirection={sortBy === 'createdAt' ? sortOrder : false}>
-                        <TableSortLabel active={sortBy === 'createdAt'} direction={sortBy === 'createdAt' ? sortOrder : 'desc'} onClick={() => handleSort('createdAt')}>
+                      <TableCell
+                        sortDirection={
+                          sortBy === 'createdAt' ? sortOrder : false
+                        }
+                      >
+                        <TableSortLabel
+                          active={sortBy === 'createdAt'}
+                          direction={
+                            sortBy === 'createdAt' ? sortOrder : 'desc'
+                          }
+                          onClick={() => handleSort('createdAt')}
+                        >
                           {t('surveys.logs.columns.createdAt', 'Date')}
                         </TableSortLabel>
                       </TableCell>
@@ -354,18 +464,33 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                       <TableRow key={log.id} hover>
                         <TableCell>
                           <Chip
-                            label={t(`surveys.logsDrawer.action.${log.action}`, log.action)}
+                            label={t(
+                              `surveys.logsDrawer.action.${log.action}`,
+                              log.action
+                            )}
                             size="small"
-                            color={log.action === 'JOINED' ? 'success' : 'warning'}
+                            color={
+                              log.action === 'JOINED' ? 'success' : 'warning'
+                            }
                             variant="outlined"
                           />
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                            }}
+                          >
                             <Typography
                               variant="body2"
                               noWrap
-                              sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+                              sx={{
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                '&:hover': { textDecoration: 'underline' },
+                              }}
                               onClick={() => handleOpenDetail(log)}
                             >
                               {log.accountId}
@@ -384,8 +509,18 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           <Typography
                             variant="body2"
                             noWrap
-                            sx={log.userName ? { cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } } : {}}
-                            onClick={() => log.userName && handleOpenDetail(log)}
+                            sx={
+                              log.userName
+                                ? {
+                                    cursor: 'pointer',
+                                    color: 'primary.main',
+                                    '&:hover': { textDecoration: 'underline' },
+                                  }
+                                : {}
+                            }
+                            onClick={() =>
+                              log.userName && handleOpenDetail(log)
+                            }
                           >
                             {log.userName || '-'}
                           </Typography>
@@ -411,9 +546,15 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
+                          <Tooltip
+                            title={formatDateTimeDetailed(log.createdAt)}
+                          >
                             <Typography variant="caption" noWrap>
-                              {formatRelativeTime(log.createdAt, undefined, language)}
+                              {formatRelativeTime(
+                                log.createdAt,
+                                undefined,
+                                language
+                              )}
                             </Typography>
                           </Tooltip>
                         </TableCell>

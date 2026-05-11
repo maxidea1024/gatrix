@@ -84,10 +84,7 @@ const LogoutPage: React.FC = () => {
 
   if (logoutComplete) {
     return (
-      <AuthLayout
-        title={t('auth.logout.title')}
-        showLeftPanel={false}
-      >
+      <AuthLayout title={t('auth.logout.title')} showLeftPanel={false}>
         <Box
           sx={{
             textAlign: 'center',
@@ -130,7 +127,10 @@ const LogoutPage: React.FC = () => {
           >
             {t('auth.logout.completed')}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255, 255, 255, 0.6)' }}
+          >
             {t('auth.logout.redirecting')}
           </Typography>
         </Box>
@@ -250,7 +250,10 @@ const LogoutPage: React.FC = () => {
       </Box>
 
       <Box sx={{ mt: 3, textAlign: 'center' }}>
-        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)' }}>
+        <Typography
+          variant="caption"
+          sx={{ color: 'rgba(255, 255, 255, 0.45)' }}
+        >
           {t('auth.logout.note')}
         </Typography>
       </Box>

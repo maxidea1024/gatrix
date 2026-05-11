@@ -28,16 +28,22 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { usePageState } from '@/hooks/usePageState';
 import RewardDisplay from '@/components/game/RewardDisplay';
 import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, { DateRangePreset } from '@/components/common/DateRangePicker';
+import DateRangePicker, {
+  DateRangePreset,
+} from '@/components/common/DateRangePicker';
 import DynamicFilterBar, {
   ActiveFilter,
   FilterDefinition,
 } from '@/components/common/DynamicFilterBar';
-import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '@/components/common/ColumnSettingsDialog';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
-import RecordDetailDialog, { DetailField } from '@/components/common/RecordDetailDialog';
+import RecordDetailDialog, {
+  DetailField,
+} from '@/components/common/RecordDetailDialog';
 import {
   formatRelativeTime,
   formatDateTimeDetailed,
@@ -84,15 +90,27 @@ const SurveyLogsPage: React.FC = () => {
   };
 
   const DETAIL_FIELDS: DetailField[] = [
-    { key: 'accountId', labelKey: 'surveys.logs.columns.accountId', mono: true },
+    {
+      key: 'accountId',
+      labelKey: 'surveys.logs.columns.accountId',
+      mono: true,
+    },
     { key: 'userName', labelKey: 'coupons.couponUsage.columns.userName' },
     { key: 'action', labelKey: 'surveys.logs.columns.action' },
-    { key: 'characterId', labelKey: 'playerConnections.allPlayers.characterId', mono: true },
+    {
+      key: 'characterId',
+      labelKey: 'playerConnections.allPlayers.characterId',
+      mono: true,
+    },
     { key: 'worldId', labelKey: 'surveys.logs.columns.worldId' },
     { key: 'platform', labelKey: 'coupons.couponUsage.columns.platform' },
     { key: 'channel', labelKey: 'coupons.couponUsage.columns.channel' },
     { key: 'subchannel', labelKey: 'coupons.couponUsage.columns.subChannel' },
-    { key: 'createdAt', labelKey: 'surveys.logs.columns.createdAt', format: (val) => formatDateTime(val) },
+    {
+      key: 'createdAt',
+      labelKey: 'surveys.logs.columns.createdAt',
+      format: (val) => formatDateTime(val),
+    },
   ];
 
   // usePageState hook
@@ -118,10 +136,14 @@ const SurveyLogsPage: React.FC = () => {
 
   // Date Range State
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.startDate ? dayjs(pageState.filters.startDate) : dayjs().subtract(7, 'day').startOf('day')
+    pageState.filters?.startDate
+      ? dayjs(pageState.filters.startDate)
+      : dayjs().subtract(7, 'day').startOf('day')
   );
   const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.endDate ? dayjs(pageState.filters.endDate) : dayjs().endOf('day')
+    pageState.filters?.endDate
+      ? dayjs(pageState.filters.endDate)
+      : dayjs().endOf('day')
   );
   const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>(
     pageState.filters?.dateRangePreset || 'last7d'
@@ -130,76 +152,87 @@ const SurveyLogsPage: React.FC = () => {
   // active filters
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  const availableFilterDefinitions = useMemo<FilterDefinition[]>(() => [
-    {
-      key: 'surveyId',
-      label: t('surveys.logs.filters.survey', 'Survey'),
-      type: 'select',
-      options: surveys.map((s) => ({ value: s.id, label: s.surveyTitle })),
-    },
-    {
-      key: 'action',
-      label: t('surveys.logs.filters.action', 'Action'),
-      type: 'select',
-      options: [
-        { value: 'JOINED', label: 'JOINED' },
-        { value: 'SENT', label: 'SENT' },
-      ],
-    },
-    {
-      key: 'userName',
-      label: t('coupons.couponUsage.columns.userName', 'User Name'),
-      type: 'text',
-    },
-    {
-      key: 'platform',
-      label: t('coupons.couponUsage.columns.platform', 'Platform'),
-      type: 'text',
-    },
-    {
-      key: 'channel',
-      label: t('coupons.couponUsage.columns.channel', 'Channel'),
-      type: 'text',
-    },
-    {
-      key: 'subchannel',
-      label: t('coupons.couponUsage.columns.subChannel', 'Subchannel'),
-      type: 'text',
-    },
-    {
-      key: 'worldId',
-      label: t('surveys.logs.columns.worldId', 'World'),
-      type: 'text',
-    },
-  ], [t, surveys]);
+  const availableFilterDefinitions = useMemo<FilterDefinition[]>(
+    () => [
+      {
+        key: 'surveyId',
+        label: t('surveys.logs.filters.survey', 'Survey'),
+        type: 'select',
+        options: surveys.map((s) => ({ value: s.id, label: s.surveyTitle })),
+      },
+      {
+        key: 'action',
+        label: t('surveys.logs.filters.action', 'Action'),
+        type: 'select',
+        options: [
+          { value: 'JOINED', label: 'JOINED' },
+          { value: 'SENT', label: 'SENT' },
+        ],
+      },
+      {
+        key: 'userName',
+        label: t('coupons.couponUsage.columns.userName', 'User Name'),
+        type: 'text',
+      },
+      {
+        key: 'platform',
+        label: t('coupons.couponUsage.columns.platform', 'Platform'),
+        type: 'text',
+      },
+      {
+        key: 'channel',
+        label: t('coupons.couponUsage.columns.channel', 'Channel'),
+        type: 'text',
+      },
+      {
+        key: 'subchannel',
+        label: t('coupons.couponUsage.columns.subChannel', 'Subchannel'),
+        type: 'text',
+      },
+      {
+        key: 'worldId',
+        label: t('surveys.logs.columns.worldId', 'World'),
+        type: 'text',
+      },
+    ],
+    [t, surveys]
+  );
 
   // Restore active filters from URL query parameters (pageState)
   useEffect(() => {
     if (filtersInitialized || surveys.length === 0) return;
-    
+
     const restoredFilters: ActiveFilter[] = [];
-    Object.keys(pageState.filters || {}).forEach(key => {
-      if (['startDate', 'endDate', 'dateRangePreset', 'search'].includes(key)) return;
-      
-      const def = availableFilterDefinitions.find(d => d.key === key);
+    Object.keys(pageState.filters || {}).forEach((key) => {
+      if (['startDate', 'endDate', 'dateRangePreset', 'search'].includes(key))
+        return;
+
+      const def = availableFilterDefinitions.find((d) => d.key === key);
       if (def) {
         let label = def.label;
         if (def.type === 'select') {
-          const opt = def.options?.find(o => String(o.value) === String(pageState.filters![key]));
+          const opt = def.options?.find(
+            (o) => String(o.value) === String(pageState.filters![key])
+          );
           if (opt) label += ': ' + opt.label;
         }
         restoredFilters.push({
           key,
           value: pageState.filters![key],
           label: def.label,
-          operator: 'any_of'
+          operator: 'any_of',
         });
       }
     });
-    
+
     setActiveFilters(restoredFilters);
     setFiltersInitialized(true);
-  }, [surveys, pageState.filters, filtersInitialized, availableFilterDefinitions]);
+  }, [
+    surveys,
+    pageState.filters,
+    filtersInitialized,
+    availableFilterDefinitions,
+  ]);
 
   // Sync debounced search term to URL (use ref to prevent infinite loop)
   const lastSyncedSearch = React.useRef(debouncedSearchTerm);
@@ -215,19 +248,58 @@ const SurveyLogsPage: React.FC = () => {
   }, [debouncedSearchTerm, filtersInitialized]);
 
   // Columns state
-  const defaultColumns: ColumnConfig[] = useMemo(() => [
-    { id: 'surveyId', labelKey: 'surveys.logs.columns.survey', visible: true },
-    { id: 'action', labelKey: 'surveys.logs.columns.action', visible: true },
-    { id: 'accountId', labelKey: 'surveys.logs.columns.accountId', visible: true },
-    { id: 'userName', labelKey: 'coupons.couponUsage.columns.userName', visible: true },
-    { id: 'characterId', labelKey: 'surveys.logs.columns.characterId', visible: true },
-    { id: 'worldId', labelKey: 'surveys.logs.columns.worldId', visible: true },
-    { id: 'platform', labelKey: 'coupons.couponUsage.columns.platform', visible: true },
-    { id: 'channel', labelKey: 'coupons.couponUsage.columns.channel', visible: true },
-    { id: 'subchannel', labelKey: 'coupons.couponUsage.columns.subChannel', visible: true },
-    { id: 'rewards', labelKey: 'surveys.rewards', visible: true },
-    { id: 'createdAt', labelKey: 'surveys.logs.columns.createdAt', visible: true },
-  ], []);
+  const defaultColumns: ColumnConfig[] = useMemo(
+    () => [
+      {
+        id: 'surveyId',
+        labelKey: 'surveys.logs.columns.survey',
+        visible: true,
+      },
+      { id: 'action', labelKey: 'surveys.logs.columns.action', visible: true },
+      {
+        id: 'accountId',
+        labelKey: 'surveys.logs.columns.accountId',
+        visible: true,
+      },
+      {
+        id: 'userName',
+        labelKey: 'coupons.couponUsage.columns.userName',
+        visible: true,
+      },
+      {
+        id: 'characterId',
+        labelKey: 'surveys.logs.columns.characterId',
+        visible: true,
+      },
+      {
+        id: 'worldId',
+        labelKey: 'surveys.logs.columns.worldId',
+        visible: true,
+      },
+      {
+        id: 'platform',
+        labelKey: 'coupons.couponUsage.columns.platform',
+        visible: true,
+      },
+      {
+        id: 'channel',
+        labelKey: 'coupons.couponUsage.columns.channel',
+        visible: true,
+      },
+      {
+        id: 'subchannel',
+        labelKey: 'coupons.couponUsage.columns.subChannel',
+        visible: true,
+      },
+      { id: 'rewards', labelKey: 'surveys.rewards', visible: true },
+      {
+        id: 'createdAt',
+        labelKey: 'surveys.logs.columns.createdAt',
+        visible: true,
+      },
+    ],
+    []
+  );
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
     const saved = localStorage.getItem('surveyLogsColumns');
@@ -249,7 +321,8 @@ const SurveyLogsPage: React.FC = () => {
   });
 
   const visibleColumns = columns.filter((col) => col.visible);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
 
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
@@ -266,7 +339,8 @@ const SurveyLogsPage: React.FC = () => {
     if (!text) return;
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -288,7 +362,11 @@ const SurveyLogsPage: React.FC = () => {
     updateFilters({ ...pageState.filters, [filterKey]: value });
   };
 
-  const handleDateRangeChange = (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => {
+  const handleDateRangeChange = (
+    from: Dayjs | null,
+    to: Dayjs | null,
+    preset: DateRangePreset
+  ) => {
     setDateFrom(from);
     setDateTo(to);
     setDateRangePreset(preset);
@@ -343,7 +421,15 @@ const SurveyLogsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectApiPath, pageState.page, pageState.limit, pageState.filters, filtersInitialized, sortBy, sortOrder]);
+  }, [
+    projectApiPath,
+    pageState.page,
+    pageState.limit,
+    pageState.filters,
+    filtersInitialized,
+    sortBy,
+    sortOrder,
+  ]);
 
   useEffect(() => {
     load();
@@ -357,7 +443,9 @@ const SurveyLogsPage: React.FC = () => {
       case 'surveyId':
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="body2">{getSurveyTitle(r.surveyId)}</Typography>
+            <Typography variant="body2">
+              {getSurveyTitle(r.surveyId)}
+            </Typography>
             <Tooltip title={t('common.copy')}>
               <IconButton size="small" onClick={() => handleCopy(r.surveyId)}>
                 <ContentCopyIcon fontSize="inherit" />
@@ -366,13 +454,21 @@ const SurveyLogsPage: React.FC = () => {
           </Box>
         );
       case 'action':
-        return <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{t(`surveys.logsDrawer.action.${r.action}`, r.action)}</Typography>;
+        return (
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+            {t(`surveys.logsDrawer.action.${r.action}`, r.action)}
+          </Typography>
+        );
       case 'accountId':
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography
               variant="body2"
-              sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+              sx={{
+                cursor: 'pointer',
+                color: 'primary.main',
+                '&:hover': { textDecoration: 'underline' },
+              }}
               onClick={() => handleOpenDetail(r)}
             >
               {r.accountId}
@@ -389,35 +485,53 @@ const SurveyLogsPage: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography
               variant="body2"
-              sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+              sx={{
+                cursor: 'pointer',
+                color: 'primary.main',
+                '&:hover': { textDecoration: 'underline' },
+              }}
               onClick={() => handleOpenDetail(r)}
             >
               {r.userName}
             </Typography>
             <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => handleCopy(r.userName || '')}>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(r.userName || '')}
+              >
                 <ContentCopyIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
           </Box>
-        ) : '-';
+        ) : (
+          '-'
+        );
       case 'characterId':
         return r.characterId ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography
               variant="body2"
-              sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+              sx={{
+                cursor: 'pointer',
+                color: 'primary.main',
+                '&:hover': { textDecoration: 'underline' },
+              }}
               onClick={() => handleOpenDetail(r)}
             >
               {r.characterId}
             </Typography>
             <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => handleCopy(r.characterId!)}>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(r.characterId!)}
+              >
                 <ContentCopyIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
           </Box>
-        ) : '-';
+        ) : (
+          '-'
+        );
       case 'platform':
         return <Typography variant="body2">{r.platform || '-'}</Typography>;
       case 'channel':
@@ -433,7 +547,9 @@ const SurveyLogsPage: React.FC = () => {
             rewardTemplateId={getSurvey(r.surveyId)?.rewardTemplateId}
             maxDisplay={2}
           />
-        ) : '-';
+        ) : (
+          '-'
+        );
       case 'createdAt':
         return (
           <Tooltip title={formatDateTimeDetailed(r.createdAt)}>
@@ -452,7 +568,10 @@ const SurveyLogsPage: React.FC = () => {
       <PageHeader
         icon={<HistoryIcon />}
         title={t('surveys.logs.title', 'Survey Logs')}
-        subtitle={t('surveys.logs.subtitle', 'Participation and reward mail history')}
+        subtitle={t(
+          'surveys.logs.subtitle',
+          'Participation and reward mail history'
+        )}
       />
 
       <Box sx={{ mb: 2 }}>
@@ -492,13 +611,26 @@ const SurveyLogsPage: React.FC = () => {
               refreshDisabled={loading}
               noWrap
               afterFilterAddActions={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    flexShrink: 0,
+                  }}
+                >
                   <DateRangePicker
                     dateFrom={dateFrom}
                     dateTo={dateTo}
                     preset={dateRangePreset}
                     onChange={handleDateRangeChange}
-                    availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'custom']}
+                    availablePresets={[
+                      'today',
+                      'yesterday',
+                      'last7d',
+                      'last30d',
+                      'custom',
+                    ]}
                     size="small"
                   />
                   <Tooltip title={t('common.columnSettings')}>
@@ -532,36 +664,47 @@ const SurveyLogsPage: React.FC = () => {
               ) : (
                 <Box>
                   <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        {visibleColumns.map((column) => (
-                          <TableCell key={column.id} sortDirection={sortBy === column.id ? sortOrder : false}>
-                            <TableSortLabel
-                              active={sortBy === column.id}
-                              direction={sortBy === column.id ? sortOrder : (column.id === 'createdAt' ? 'desc' : 'asc')}
-                              onClick={() => handleSort(column.id)}
-                            >
-                              {t(column.labelKey)}
-                            </TableSortLabel>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {logs.map((r) => (
-                        <TableRow key={r.id} hover>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
                           {visibleColumns.map((column) => (
-                            <TableCell key={column.id}>
-                              {renderCellContent(r, column.id)}
+                            <TableCell
+                              key={column.id}
+                              sortDirection={
+                                sortBy === column.id ? sortOrder : false
+                              }
+                            >
+                              <TableSortLabel
+                                active={sortBy === column.id}
+                                direction={
+                                  sortBy === column.id
+                                    ? sortOrder
+                                    : column.id === 'createdAt'
+                                      ? 'desc'
+                                      : 'asc'
+                                }
+                                onClick={() => handleSort(column.id)}
+                              >
+                                {t(column.labelKey)}
+                              </TableSortLabel>
                             </TableCell>
                           ))}
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
+                      </TableHead>
+                      <TableBody>
+                        {logs.map((r) => (
+                          <TableRow key={r.id} hover>
+                            {visibleColumns.map((column) => (
+                              <TableCell key={column.id}>
+                                {renderCellContent(r, column.id)}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
               )}
             </PageContentLoader>
             {logs.length > 0 && (
