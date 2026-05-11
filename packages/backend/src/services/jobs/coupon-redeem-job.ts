@@ -114,16 +114,22 @@ export async function processCouponRedeemJob(
       // Redis maintains the authoritative real-time count for concurrency control.
       // The next successful job for this settingId will naturally increment past this.
       // If persistent drift is a concern, a scheduled reconciliation job can fix it.
-      logger.warn('Failed to increment usedCount (non-fatal, Redis is authoritative):', {
-        jobId: job.id,
-        settingId: payload.settingId,
-        error: countError,
-      });
+      logger.warn(
+        'Failed to increment usedCount (non-fatal, Redis is authoritative):',
+        {
+          jobId: job.id,
+          settingId: payload.settingId,
+          error: countError,
+        }
+      );
     }
   } else {
-    logger.debug(`Coupon redeem job ${job.id} skipped usedCount increment (duplicate insert)`, {
-      useId: payload.useId,
-    });
+    logger.debug(
+      `Coupon redeem job ${job.id} skipped usedCount increment (duplicate insert)`,
+      {
+        useId: payload.useId,
+      }
+    );
   }
 
   logger.debug(`Coupon redeem job ${job.id} completed successfully`);

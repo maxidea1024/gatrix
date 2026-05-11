@@ -57,7 +57,7 @@ function latencyStats(latencies: number[]) {
   const sorted = [...latencies].sort((a, b) => a - b);
   const sum = sorted.reduce((a, b) => a + b, 0);
   return {
-    avg: Math.round(sum / sorted.length * 10) / 10,
+    avg: Math.round((sum / sorted.length) * 10) / 10,
     p50: sorted[Math.floor(sorted.length * 0.5)],
     p90: sorted[Math.floor(sorted.length * 0.9)],
     p95: sorted[Math.floor(sorted.length * 0.95)],
@@ -76,32 +76,43 @@ function latencyHistogram(latencies: number[]) {
     { label: '500ms–1s', min: 500, max: 1000 },
     { label: '1s+', min: 1000, max: Infinity },
   ];
-  return buckets.map(b => {
-    const count = latencies.filter(l => l >= b.min && l < b.max).length;
-    return { bucket: b.label, count, pct: latencies.length > 0 ? Math.round(count / latencies.length * 1000) / 10 : 0 };
+  return buckets.map((b) => {
+    const count = latencies.filter((l) => l >= b.min && l < b.max).length;
+    return {
+      bucket: b.label,
+      count,
+      pct:
+        latencies.length > 0
+          ? Math.round((count / latencies.length) * 1000) / 10
+          : 0,
+    };
   });
 }
 
 function buildPhaseSection(r: PhaseResult): string {
   const stats = latencyStats(r.latencies);
   const hist = latencyHistogram(r.latencies);
-  const maxPct = Math.max(...hist.map(h => h.pct), 1);
+  const maxPct = Math.max(...hist.map((h) => h.pct), 1);
 
   // DB connection sparkline (sample every 5th point to keep it small)
   const dbSamples = r.dbMonitor.samples.filter((_, i) => i % 5 === 0);
-  const maxConn = Math.max(...dbSamples.map(s => s.threadsConnected), 1);
+  const maxConn = Math.max(...dbSamples.map((s) => s.threadsConnected), 1);
 
-  const connSvgPoints = dbSamples.map((s, i) => {
-    const x = (i / Math.max(dbSamples.length - 1, 1)) * 380 + 10;
-    const y = 55 - (s.threadsConnected / maxConn) * 45;
-    return `${x},${y}`;
-  }).join(' ');
+  const connSvgPoints = dbSamples
+    .map((s, i) => {
+      const x = (i / Math.max(dbSamples.length - 1, 1)) * 380 + 10;
+      const y = 55 - (s.threadsConnected / maxConn) * 45;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
-  const runningSvgPoints = dbSamples.map((s, i) => {
-    const x = (i / Math.max(dbSamples.length - 1, 1)) * 380 + 10;
-    const y = 55 - (s.threadsRunning / Math.max(maxConn, 1)) * 45;
-    return `${x},${y}`;
-  }).join(' ');
+  const runningSvgPoints = dbSamples
+    .map((s, i) => {
+      const x = (i / Math.max(dbSamples.length - 1, 1)) * 380 + 10;
+      const y = 55 - (s.threadsRunning / Math.max(maxConn, 1)) * 45;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return `
     <div class="phase">
@@ -151,7 +162,9 @@ function buildPhaseSection(r: PhaseResult): string {
             <tr><td>Max</td><td>${stats.max}ms</td></tr>
           </table>
           <div class="histogram">
-            ${hist.map(h => `
+            ${hist
+              .map(
+                (h) => `
               <div class="hist-row">
                 <span class="hist-label">${h.bucket}</span>
                 <div class="hist-bar-bg">
@@ -159,7 +172,9 @@ function buildPhaseSection(r: PhaseResult): string {
                 </div>
                 <span class="hist-value">${h.pct}% (${h.count.toLocaleString()})</span>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
         </div>
 
@@ -186,24 +201,33 @@ function buildPhaseSection(r: PhaseResult): string {
               <td>InnoDB Deadlocks</td><td><strong>${r.dbMonitor.deadlocksDelta}</strong></td>
             </tr>
           </table>
-          ${dbSamples.length > 2 ? `
-          <div class="chart-title">Connections & Pool Pending Over Time (${(dbSamples[dbSamples.length-1]?.elapsedMs / 1000).toFixed(0)}s)</div>
+          ${
+            dbSamples.length > 2
+              ? `
+          <div class="chart-title">Connections & Pool Pending Over Time (${(dbSamples[dbSamples.length - 1]?.elapsedMs / 1000).toFixed(0)}s)</div>
           <svg viewBox="0 0 400 65" class="sparkline">
             <polyline points="${connSvgPoints}" fill="none" stroke="#58a6ff" stroke-width="1.5"/>
             <polyline points="${runningSvgPoints}" fill="none" stroke="#f0883e" stroke-width="1.2" stroke-dasharray="3,2"/>
             ${(() => {
-              const maxPending = Math.max(...dbSamples.map(s => s.poolPendingAcquires), 1);
-              const pendingPts = dbSamples.map((s, i) => {
-                const x = (i / Math.max(dbSamples.length - 1, 1)) * 380 + 10;
-                const y = 55 - (s.poolPendingAcquires / maxPending) * 45;
-                return `${x},${y}`;
-              }).join(' ');
+              const maxPending = Math.max(
+                ...dbSamples.map((s) => s.poolPendingAcquires),
+                1
+              );
+              const pendingPts = dbSamples
+                .map((s, i) => {
+                  const x = (i / Math.max(dbSamples.length - 1, 1)) * 380 + 10;
+                  const y = 55 - (s.poolPendingAcquires / maxPending) * 45;
+                  return `${x},${y}`;
+                })
+                .join(' ');
               return `<polyline points="${pendingPts}" fill="none" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5,3"/>`;
             })()}
             <text x="395" y="12" class="legend-text" fill="#58a6ff">Connected</text>
             <text x="395" y="24" class="legend-text" fill="#f0883e">Running</text>
             <text x="395" y="36" class="legend-text" fill="#f85149">Pool Pending</text>
-          </svg>` : ''}
+          </svg>`
+              : ''
+          }
         </div>
       </div>
 
@@ -212,26 +236,34 @@ function buildPhaseSection(r: PhaseResult): string {
         <h3>🔍 Data Integrity Check</h3>
         <table>
           <tr><th>Check</th><th>Expected</th><th>Actual</th><th>Result</th></tr>
-          ${r.integrity.map(c => `
+          ${r.integrity
+            .map(
+              (c) => `
             <tr class="${c.pass ? 'row-success' : 'row-danger'}">
               <td>${c.label}</td>
               <td>${c.expected.toLocaleString()}</td>
               <td>${c.actual.toLocaleString()}</td>
               <td>${c.pass ? '✅ PASS' : '❌ FAIL'}</td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join('')}
         </table>
       </div>
     </div>`;
 }
 
-export function generateHtmlReport(phases: PhaseResult[], outputDir: string): string {
+export function generateHtmlReport(
+  phases: PhaseResult[],
+  outputDir: string
+): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const filename = `benchmark-report-${timestamp}.html`;
   const filepath = join(outputDir, filename);
 
-  const allPassed = phases.every(p => p.integrity.every(c => c.pass))
-    && phases.every(p => p.dbMonitor.deadlocksDelta === 0);
+  const allPassed =
+    phases.every((p) => p.integrity.every((c) => c.pass)) &&
+    phases.every((p) => p.dbMonitor.deadlocksDelta === 0);
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -287,7 +319,7 @@ export function generateHtmlReport(phases: PhaseResult[], outputDir: string): st
     <div class="sub">${new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'medium' })} — Gatrix Backend</div>
   </header>
   <div class="verdict">${allPassed ? '🎉 ALL CHECKS PASSED — Zero Deadlocks, 100% Data Integrity' : '💥 SOME CHECKS FAILED — See Details Below'}</div>
-  ${phases.map(p => buildPhaseSection(p)).join('')}
+  ${phases.map((p) => buildPhaseSection(p)).join('')}
   <footer>Generated by benchmark-coupon.ts — Gatrix Coupon System</footer>
 </div>
 </body>

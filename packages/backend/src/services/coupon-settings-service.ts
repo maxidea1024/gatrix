@@ -434,11 +434,17 @@ export class CouponSettingsService {
     }
 
     // Invalidate Redis cache immediately so CMS changes take effect instantly
-    const setting = await db('g_coupon_settings').where('id', id).select('code', 'type').first();
+    const setting = await db('g_coupon_settings')
+      .where('id', id)
+      .select('code', 'type')
+      .first();
     const codes: string[] = [];
     if (setting?.code) codes.push(setting.code);
     // Also invalidate any NORMAL coupon codes linked to this setting
-    const normalCodes = await db('g_coupons').where('settingId', id).select('code').limit(10000);
+    const normalCodes = await db('g_coupons')
+      .where('settingId', id)
+      .select('code')
+      .limit(10000);
     for (const nc of normalCodes) codes.push(nc.code);
     await invalidateSettingCache(environmentId, id, codes);
 
@@ -541,10 +547,16 @@ export class CouponSettingsService {
     }
 
     // Invalidate Redis cache immediately before status change
-    const settingForCache = await db('g_coupon_settings').where('id', id).select('code', 'environmentId').first();
+    const settingForCache = await db('g_coupon_settings')
+      .where('id', id)
+      .select('code', 'environmentId')
+      .first();
     const delCodes: string[] = [];
     if (settingForCache?.code) delCodes.push(settingForCache.code);
-    const normalDelCodes = await db('g_coupons').where('settingId', id).select('code').limit(10000);
+    const normalDelCodes = await db('g_coupons')
+      .where('settingId', id)
+      .select('code')
+      .limit(10000);
     for (const nc of normalDelCodes) delCodes.push(nc.code);
     await invalidateSettingCache(environmentId, id, delCodes);
 
@@ -884,7 +896,7 @@ export class CouponSettingsService {
         'cu.gameWorldId',
         'cu.platform',
         'cu.channel',
-        'cu.subchannel'
+        'cu.subchannel',
       ])
       .orderBy('g_coupons.createdAt', 'desc')
       .orderBy('g_coupons.id', 'desc')
@@ -895,11 +907,11 @@ export class CouponSettingsService {
       dataQuery.where(function () {
         this.where('g_coupons.createdAt', '<', query.cursorCreatedAt!).orWhere(
           function () {
-            this.where('g_coupons.createdAt', '=', query.cursorCreatedAt!).andWhere(
-              'g_coupons.id',
-              '<',
-              query.cursorId!
-            );
+            this.where(
+              'g_coupons.createdAt',
+              '=',
+              query.cursorCreatedAt!
+            ).andWhere('g_coupons.id', '<', query.cursorId!);
           }
         );
       });
@@ -991,7 +1003,7 @@ export class CouponSettingsService {
         'cu.gameWorldId',
         'cu.platform',
         'cu.channel',
-        'cu.subchannel'
+        'cu.subchannel',
       ])
       .orderBy(`c.${sortCol}`, sortDir)
       .orderBy('c.id', sortDir)

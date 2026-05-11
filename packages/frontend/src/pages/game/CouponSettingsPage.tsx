@@ -360,7 +360,9 @@ const CouponSettingsPage: React.FC = () => {
             c.userId || '-',
             c.userName || '-',
             c.characterId || '-',
-            c.sequence !== null && c.sequence !== undefined ? String(c.sequence) : '-',
+            c.sequence !== null && c.sequence !== undefined
+              ? String(c.sequence)
+              : '-',
             c.gameWorldId || '-',
             c.platform || '-',
             c.channel || '-',
@@ -386,7 +388,10 @@ const CouponSettingsPage: React.FC = () => {
               'User ID': c.userId || '-',
               'User Name': c.userName || '-',
               'Character ID': c.characterId || '-',
-              Sequence: c.sequence !== null && c.sequence !== undefined ? c.sequence : '-',
+              Sequence:
+                c.sequence !== null && c.sequence !== undefined
+                  ? c.sequence
+                  : '-',
               'Game World ID': c.gameWorldId || '-',
               Platform: c.platform || '-',
               Channel: c.channel || '-',
@@ -1985,7 +1990,8 @@ const CouponSettingsPage: React.FC = () => {
                                             whiteSpace: 'nowrap',
                                           }}
                                         >
-                                          {numerator.toLocaleString()} / {denominator}
+                                          {numerator.toLocaleString()} /{' '}
+                                          {denominator}
                                         </Typography>
                                       </Box>
                                     </Tooltip>
@@ -3470,28 +3476,44 @@ const CouponSettingsPage: React.FC = () => {
                             </TableSortLabel>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.userId')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.userId')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.userName')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.userName')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.characterId')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.characterId')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.sequence')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.sequence')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.gameWorldId')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.gameWorldId')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.platform')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.platform')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.channel')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.channel')}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1, px: 2 }}>
-                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.subChannel')}</Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              {t('coupons.couponUsage.columns.subChannel')}
+                            </Typography>
                           </TableCell>
                           <TableCell
                             sx={{ py: 1, px: 2 }}
@@ -3592,28 +3614,44 @@ const CouponSettingsPage: React.FC = () => {
                               />
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.userId || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.userId || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.userName || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.userName || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.characterId || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.characterId || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.sequence ?? '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.sequence ?? '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.gameWorldId || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.gameWorldId || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.platform || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.platform || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.channel || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.channel || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
-                              <Typography variant="caption">{c.subchannel || '-'}</Typography>
+                              <Typography variant="caption">
+                                {c.subchannel || '-'}
+                              </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
                               <Tooltip

@@ -23,8 +23,16 @@ export class CouponBatchProcessor {
     try {
       const redis = redisClient.getClient();
       // MKSTREAM creates the stream if it doesn't exist
-      await redis.xgroup('CREATE', this.STREAM_KEY, this.GROUP_NAME, '0', 'MKSTREAM');
-      logger.info(`Initialized Redis Consumer Group '${this.GROUP_NAME}' on stream '${this.STREAM_KEY}'`);
+      await redis.xgroup(
+        'CREATE',
+        this.STREAM_KEY,
+        this.GROUP_NAME,
+        '0',
+        'MKSTREAM'
+      );
+      logger.info(
+        `Initialized Redis Consumer Group '${this.GROUP_NAME}' on stream '${this.STREAM_KEY}'`
+      );
     } catch (err: any) {
       if (err.message && err.message.includes('BUSYGROUP')) {
         // Group already exists, which is fine
@@ -37,8 +45,10 @@ export class CouponBatchProcessor {
     this.intervalId = setInterval(() => this.processBatch(), intervalMs);
     // Run recovery every minute for crashed processes
     this.recoveryIntervalId = setInterval(() => this.recoverPending(), 60000);
-    
-    logger.info(`Started CouponBatchProcessor (consumer: ${this.CONSUMER_NAME}, batchSize: ${this.BATCH_SIZE})`);
+
+    logger.info(
+      `Started CouponBatchProcessor (consumer: ${this.CONSUMER_NAME}, batchSize: ${this.BATCH_SIZE})`
+    );
   }
 
   public stop() {
@@ -61,12 +71,18 @@ export class CouponBatchProcessor {
 
       // Read new messages from the stream
       // > means read messages never delivered to other consumers
-      const streams = await redis.xreadgroup(
-        'GROUP', this.GROUP_NAME, this.CONSUMER_NAME,
-        'COUNT', this.BATCH_SIZE,
-        'BLOCK', 10, // Minimal block to prevent tight loop, but keep responsive
-        'STREAMS', this.STREAM_KEY, '>'
-      ) as any;
+      const streams = (await redis.xreadgroup(
+        'GROUP',
+        this.GROUP_NAME,
+        this.CONSUMER_NAME,
+        'COUNT',
+        this.BATCH_SIZE,
+        'BLOCK',
+        10, // Minimal block to prevent tight loop, but keep responsive
+        'STREAMS',
+        this.STREAM_KEY,
+        '>'
+      )) as any;
 
       if (!streams || streams.length === 0) {
         this.isProcessing = false;
@@ -82,7 +98,6 @@ export class CouponBatchProcessor {
       }
 
       await this.processMessages(messages);
-
     } catch (error) {
       logger.error('Error in CouponBatchProcessor.processBatch', { error });
     } finally {
@@ -97,14 +112,21 @@ export class CouponBatchProcessor {
       const redis = redisClient.getClient();
       // Auto-claim messages pending for more than 30 seconds
       // MINID - means start from the very beginning of pending
-      const claimRes = await redis.xautoclaim(
-        this.STREAM_KEY, this.GROUP_NAME, this.CONSUMER_NAME,
-        30000, '-', 'COUNT', this.BATCH_SIZE
-      ) as any;
-      
+      const claimRes = (await redis.xautoclaim(
+        this.STREAM_KEY,
+        this.GROUP_NAME,
+        this.CONSUMER_NAME,
+        30000,
+        '-',
+        'COUNT',
+        this.BATCH_SIZE
+      )) as any;
+
       const messages = claimRes[1];
       if (messages && messages.length > 0) {
-        logger.info(`Recovered ${messages.length} pending messages from crashed consumers`);
+        logger.info(
+          `Recovered ${messages.length} pending messages from crashed consumers`
+        );
         await this.processMessages(messages);
       }
     } catch (error) {
@@ -132,80 +154,85 @@ export class CouponBatchProcessor {
           }
           payloads.push(payload);
         } catch (e) {
-          logger.error('Failed to parse stream message payload', { messageId: id });
+          logger.error('Failed to parse stream message payload', {
+            messageId: id,
+          });
         }
       }
     }
-      logger.info(`Processing coupon batch of ${payloads.length} items`);
+    logger.info(`Processing coupon batch of ${payloads.length} items`);
 
-      const trx = await db.transaction();
-      try {
-        // 1. Bulk Insert into g_coupon_uses
-        const insertData = payloads.map(p => ({
-          id: p.useId,
-          settingId: p.settingId,
-          issuedCouponId: p.couponId,
-          userId: p.userId,
-          characterId: p.characterId,
-          userName: p.userName,
-          sequence: p.sequence,
-          usedAt: p.usedAtMySQL,
-          gameWorldId: p.worldId,
-          platform: p.platform,
-          channel: p.channel,
-          subchannel: p.subchannel,
-        }));
-        
-        // Use insert() with ON DUPLICATE KEY UPDATE id=id (equivalent to INSERT IGNORE in Knex)
-        await trx('g_coupon_uses')
-          .insert(insertData)
-          .onConflict('id')
-          .ignore();
+    const trx = await db.transaction();
+    try {
+      // 1. Bulk Insert into g_coupon_uses
+      const insertData = payloads.map((p) => ({
+        id: p.useId,
+        settingId: p.settingId,
+        issuedCouponId: p.couponId,
+        userId: p.userId,
+        characterId: p.characterId,
+        userName: p.userName,
+        sequence: p.sequence,
+        usedAt: p.usedAtMySQL,
+        gameWorldId: p.worldId,
+        platform: p.platform,
+        channel: p.channel,
+        subchannel: p.subchannel,
+      }));
 
-        // 2. Bulk Update g_coupons status (NORMAL coupons only)
-        const normalCouponIds = payloads
-          .filter(p => p.settingType === 'NORMAL' && p.couponId)
-          .map(p => p.couponId as string);
+      // Use insert() with ON DUPLICATE KEY UPDATE id=id (equivalent to INSERT IGNORE in Knex)
+      await trx('g_coupon_uses').insert(insertData).onConflict('id').ignore();
 
-        if (normalCouponIds.length > 0) {
-          await trx('g_coupons')
-            .whereIn('id', normalCouponIds)
-            .update({ 
-              status: 'USED',
-              usedAt: db.fn.now()
-            });
-        }
+      // 2. Bulk Update g_coupons status (NORMAL coupons only)
+      const normalCouponIds = payloads
+        .filter((p) => p.settingType === 'NORMAL' && p.couponId)
+        .map((p) => p.couponId as string);
 
-        // 3. Aggregate used counts per setting and update
-        const countsPerSetting = payloads.reduce((acc, p) => {
+      if (normalCouponIds.length > 0) {
+        await trx('g_coupons').whereIn('id', normalCouponIds).update({
+          status: 'USED',
+          usedAt: db.fn.now(),
+        });
+      }
+
+      // 3. Aggregate used counts per setting and update
+      const countsPerSetting = payloads.reduce(
+        (acc, p) => {
           acc[p.settingId] = (acc[p.settingId] || 0) + 1;
           return acc;
-        }, {} as Record<string, number>);
+        },
+        {} as Record<string, number>
+      );
 
-        for (const [settingId, count] of Object.entries(countsPerSetting)) {
-          await trx('g_coupon_settings')
-            .where('id', settingId)
-            .increment('usedCount', count);
-        }
-
-        await trx.commit();
-        
-        // 4. Acknowledge and delete messages only AFTER successful commit
-        if (messageIds.length > 0) {
-          const pipeline = redis.pipeline();
-          pipeline.xack(this.STREAM_KEY, this.GROUP_NAME, ...messageIds);
-          // Optional: xdel to save memory, or let XTRIM handle it later
-          pipeline.xdel(this.STREAM_KEY, ...messageIds);
-          await pipeline.exec();
-        }
-
-        logger.info(`Successfully committed coupon batch of ${payloads.length} items`);
-      } catch (dbError) {
-        await trx.rollback();
-        logger.error('Failed to commit coupon batch. Messages will remain pending in Redis Stream for recovery', { error: dbError });
-        // DO NOT XACK here. The messages will remain in PEL (Pending Entries List)
-        // and will be retried automatically by recoverPending() after the timeout.
+      for (const [settingId, count] of Object.entries(countsPerSetting)) {
+        await trx('g_coupon_settings')
+          .where('id', settingId)
+          .increment('usedCount', count);
       }
+
+      await trx.commit();
+
+      // 4. Acknowledge and delete messages only AFTER successful commit
+      if (messageIds.length > 0) {
+        const pipeline = redis.pipeline();
+        pipeline.xack(this.STREAM_KEY, this.GROUP_NAME, ...messageIds);
+        // Optional: xdel to save memory, or let XTRIM handle it later
+        pipeline.xdel(this.STREAM_KEY, ...messageIds);
+        await pipeline.exec();
+      }
+
+      logger.info(
+        `Successfully committed coupon batch of ${payloads.length} items`
+      );
+    } catch (dbError) {
+      await trx.rollback();
+      logger.error(
+        'Failed to commit coupon batch. Messages will remain pending in Redis Stream for recovery',
+        { error: dbError }
+      );
+      // DO NOT XACK here. The messages will remain in PEL (Pending Entries List)
+      // and will be retried automatically by recoverPending() after the timeout.
+    }
   }
 }
 

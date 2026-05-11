@@ -45,7 +45,8 @@ export class QueueService {
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
 
       // Start the true batch processor for coupon redemptions
-      const { couponBatchProcessor } = await import('./jobs/coupon-batch-processor');
+      const { couponBatchProcessor } =
+        await import('./jobs/coupon-batch-processor');
       couponBatchProcessor.start(2000); // Run every 2 seconds
 
       // Initialize feature metrics queue

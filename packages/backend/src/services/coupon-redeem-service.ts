@@ -167,13 +167,31 @@ export class CouponRedeemService {
     );
     if (targetingError) {
       const errorMap: Record<string, { msg: string; code: string }> = {
-        INVALID_WORLD: { msg: 'Coupon is not available for this game world', code: CouponErrorCode.INVALID_WORLD },
-        INVALID_PLATFORM: { msg: 'Coupon is not available for this platform', code: CouponErrorCode.INVALID_PLATFORM },
-        INVALID_CHANNEL: { msg: 'Coupon is not available for this channel', code: CouponErrorCode.INVALID_CHANNEL },
-        INVALID_SUBCHANNEL: { msg: 'Coupon is not available for this subchannel', code: CouponErrorCode.INVALID_SUBCHANNEL },
-        INVALID_USER: { msg: 'Coupon is not available for this user', code: CouponErrorCode.INVALID_USER },
+        INVALID_WORLD: {
+          msg: 'Coupon is not available for this game world',
+          code: CouponErrorCode.INVALID_WORLD,
+        },
+        INVALID_PLATFORM: {
+          msg: 'Coupon is not available for this platform',
+          code: CouponErrorCode.INVALID_PLATFORM,
+        },
+        INVALID_CHANNEL: {
+          msg: 'Coupon is not available for this channel',
+          code: CouponErrorCode.INVALID_CHANNEL,
+        },
+        INVALID_SUBCHANNEL: {
+          msg: 'Coupon is not available for this subchannel',
+          code: CouponErrorCode.INVALID_SUBCHANNEL,
+        },
+        INVALID_USER: {
+          msg: 'Coupon is not available for this user',
+          code: CouponErrorCode.INVALID_USER,
+        },
       };
-      const err = errorMap[targetingError] || { msg: 'Targeting validation failed', code: targetingError };
+      const err = errorMap[targetingError] || {
+        msg: 'Targeting validation failed',
+        code: targetingError,
+      };
       throw new GatrixError(err.msg, 422, true, err.code as any);
     }
 
@@ -186,10 +204,13 @@ export class CouponRedeemService {
     const usedAtMySQL = convertToMySQLDateTime(now)!;
 
     const NORMAL_COUPON_LOCK_TTL = 60 * 60 * 24 * 90; // 90 days
-    
+
     const usageLimitType = setting.usageLimitType || 'USER';
-    const limitTargetId = usageLimitType === 'CHARACTER' && request.characterId ? request.characterId : request.userId;
-    
+    const limitTargetId =
+      usageLimitType === 'CHARACTER' && request.characterId
+        ? request.characterId
+        : request.userId;
+
     const lockKey = `coupon:redeemed:${environmentId}:${code}`;
     const usageKey = `coupon:usage:${environmentId}:${setting.id}:${limitTargetId}`;
     const globalUsageKey = `coupon:global_usage:${environmentId}:${setting.id}`;
@@ -274,22 +295,38 @@ export class CouponRedeemService {
       pipe.exists(globalUsageKey);
     }
     const existsResults = await pipe.exec();
-    
+
     let dbUsedCount = 0;
     let dbGlobalCount = 0;
 
     if (existsResults && existsResults[0] && existsResults[0][1] === 0) {
-      dbUsedCount = await this.getDbUsedCount(setting.id, usageLimitType, request);
+      dbUsedCount = await this.getDbUsedCount(
+        setting.id,
+        usageLimitType,
+        request
+      );
     }
-    if (isSpecialCoupon && setting.maxTotalUses > 0 && existsResults && existsResults[1] && existsResults[1][1] === 0) {
-      const dbSetting = await db('g_coupon_settings').where('id', setting.id).select('usedCount').first();
+    if (
+      isSpecialCoupon &&
+      setting.maxTotalUses > 0 &&
+      existsResults &&
+      existsResults[1] &&
+      existsResults[1][1] === 0
+    ) {
+      const dbSetting = await db('g_coupon_settings')
+        .where('id', setting.id)
+        .select('usedCount')
+        .first();
       dbGlobalCount = Number(dbSetting?.usedCount || 0);
     }
 
     const [status, sequence] = (await redis.eval(
       MEGA_LUA,
       4,
-      lockKey, usageKey, globalUsageKey, streamKey,
+      lockKey,
+      usageKey,
+      globalUsageKey,
+      streamKey,
       useId,
       String(NORMAL_COUPON_LOCK_TTL),
       isSpecialCoupon ? '0' : '1',
@@ -302,10 +339,20 @@ export class CouponRedeemService {
     )) as [number, number];
 
     if (status === 1) {
-      throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
+      throw new GatrixError(
+        'Coupon has already been used',
+        409,
+        true,
+        CouponErrorCode.ALREADY_USED
+      );
     }
     if (status === 2) {
-      throw new GatrixError('User has reached the usage limit for this coupon', 409, true, CouponErrorCode.USER_LIMIT_EXCEEDED);
+      throw new GatrixError(
+        'User has reached the usage limit for this coupon',
+        409,
+        true,
+        CouponErrorCode.USER_LIMIT_EXCEEDED
+      );
     }
 
     logger.info('Coupon redeemed successfully (Async queued)', {
@@ -538,7 +585,12 @@ export class CouponRedeemService {
       if (coupon) {
         couponId = coupon.id;
         if (coupon.status === 'USED') {
-          throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
+          throw new GatrixError(
+            'Coupon has already been used',
+            409,
+            true,
+            CouponErrorCode.ALREADY_USED
+          );
         }
         setting = await trx('g_coupon_settings')
           .where('id', coupon.settingId)
@@ -554,20 +606,40 @@ export class CouponRedeemService {
       }
 
       if (!setting) {
-        throw new GatrixError('Coupon code not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
+        throw new GatrixError(
+          'Coupon code not found',
+          404,
+          true,
+          CouponErrorCode.CODE_NOT_FOUND
+        );
       }
       if (setting.status !== 'ACTIVE') {
-        throw new GatrixError('Coupon is not active', 422, true, CouponErrorCode.NOT_ACTIVE);
+        throw new GatrixError(
+          'Coupon is not active',
+          422,
+          true,
+          CouponErrorCode.NOT_ACTIVE
+        );
       }
 
       const now = new Date();
       const startsAt = setting.startsAt ? new Date(setting.startsAt) : null;
       const expiresAt = new Date(setting.expiresAt);
       if (startsAt && now < startsAt) {
-        throw new GatrixError('Coupon is not available yet', 422, true, CouponErrorCode.NOT_STARTED);
+        throw new GatrixError(
+          'Coupon is not available yet',
+          422,
+          true,
+          CouponErrorCode.NOT_STARTED
+        );
       }
       if (now > expiresAt) {
-        throw new GatrixError('Coupon has expired', 422, true, CouponErrorCode.EXPIRED);
+        throw new GatrixError(
+          'Coupon has expired',
+          422,
+          true,
+          CouponErrorCode.EXPIRED
+        );
       }
 
       // Validate targeting inside transaction
@@ -591,13 +663,23 @@ export class CouponRedeemService {
       const userUsedCount = Number(usageResult?.count || 0);
 
       if (userUsedCount >= setting.perUserLimit) {
-        throw new GatrixError('User has reached the usage limit for this coupon', 409, true, CouponErrorCode.USER_LIMIT_EXCEEDED);
+        throw new GatrixError(
+          'User has reached the usage limit for this coupon',
+          409,
+          true,
+          CouponErrorCode.USER_LIMIT_EXCEEDED
+        );
       }
 
       // Check global limit for SPECIAL coupons
       if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
         if ((lockedSetting.usedCount || 0) >= setting.maxTotalUses) {
-          throw new GatrixError('Coupon has reached its maximum usage limit', 409, true, CouponErrorCode.ALREADY_USED);
+          throw new GatrixError(
+            'Coupon has reached its maximum usage limit',
+            409,
+            true,
+            CouponErrorCode.ALREADY_USED
+          );
         }
       }
 
@@ -606,7 +688,9 @@ export class CouponRedeemService {
 
       // Mark NORMAL coupon as used
       if (!isSpecialCoupon && coupon) {
-        await trx('g_coupons').where('id', coupon.id).update({ status: 'USED', usedAt: usedAtMySQL });
+        await trx('g_coupons')
+          .where('id', coupon.id)
+          .update({ status: 'USED', usedAt: usedAtMySQL });
       }
 
       // Record usage
@@ -629,7 +713,9 @@ export class CouponRedeemService {
       });
 
       // Update usedCount
-      await trx('g_coupon_settings').where('id', setting.id).increment('usedCount', 1);
+      await trx('g_coupon_settings')
+        .where('id', setting.id)
+        .increment('usedCount', 1);
 
       // Build response
       let reward: any[] = [];
@@ -640,8 +726,10 @@ export class CouponRedeemService {
           .select('rewardItems')
           .first();
         if (template) {
-          const rewardItems = typeof template.rewardItems === 'string'
-            ? JSON.parse(template.rewardItems) : template.rewardItems;
+          const rewardItems =
+            typeof template.rewardItems === 'string'
+              ? JSON.parse(template.rewardItems)
+              : template.rewardItems;
           if (Array.isArray(rewardItems)) {
             reward = rewardItems.map((item: any) => ({
               type: parseInt(item.rewardType || item.type || 0),
@@ -651,8 +739,10 @@ export class CouponRedeemService {
           }
         }
       } else if (setting.rewardData) {
-        const rewardData = typeof setting.rewardData === 'string'
-          ? JSON.parse(setting.rewardData) : setting.rewardData;
+        const rewardData =
+          typeof setting.rewardData === 'string'
+            ? JSON.parse(setting.rewardData)
+            : setting.rewardData;
         if (Array.isArray(rewardData)) {
           reward = rewardData.map((item: any) => ({
             type: parseInt(item.rewardType || item.type || 0),

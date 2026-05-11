@@ -207,13 +207,16 @@ export class CouponGenerationJob {
               currentSetting[0]?.status === 'DISABLED' ||
               currentSetting[0]?.generationStatus === 'FAILED'
             ) {
-              logger.info('Setting was deleted/disabled during generation, aborting early', {
-                jobId,
-                settingId,
-                totalGenerated,
-                settingStatus: currentSetting[0]?.status,
-                generationStatus: currentSetting[0]?.generationStatus,
-              });
+              logger.info(
+                'Setting was deleted/disabled during generation, aborting early',
+                {
+                  jobId,
+                  settingId,
+                  totalGenerated,
+                  settingStatus: currentSetting[0]?.status,
+                  generationStatus: currentSetting[0]?.generationStatus,
+                }
+              );
               // Update with what we generated so far
               await pool.execute(
                 'UPDATE g_coupon_settings SET generatedCount = ?, totalCount = ?, issuedCount = ?, generationJobId = NULL WHERE id = ?',
