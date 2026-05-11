@@ -340,10 +340,31 @@ const CouponSettingsPage: React.FC = () => {
 
         if (format === 'csv') {
           // CSV export
-          const headers = ['Code', 'Status', 'Issued At', 'Used At'];
+          const headers = [
+            'Code',
+            'Status',
+            'User ID',
+            'User Name',
+            'Character ID',
+            'Sequence',
+            'Game World ID',
+            'Platform',
+            'Channel',
+            'Subchannel',
+            'Issued At',
+            'Used At',
+          ];
           const rows = allCodes.map((c) => [
             c.code,
             c.status,
+            c.userId || '-',
+            c.userName || '-',
+            c.characterId || '-',
+            c.sequence !== null && c.sequence !== undefined ? String(c.sequence) : '-',
+            c.gameWorldId || '-',
+            c.platform || '-',
+            c.channel || '-',
+            c.subchannel || '-',
             formatDateTime(c.createdAt),
             c.usedAt ? formatDateTime(c.usedAt) : '-',
           ]);
@@ -362,6 +383,14 @@ const CouponSettingsPage: React.FC = () => {
             allCodes.map((c) => ({
               Code: c.code,
               Status: c.status,
+              'User ID': c.userId || '-',
+              'User Name': c.userName || '-',
+              'Character ID': c.characterId || '-',
+              Sequence: c.sequence !== null && c.sequence !== undefined ? c.sequence : '-',
+              'Game World ID': c.gameWorldId || '-',
+              Platform: c.platform || '-',
+              Channel: c.channel || '-',
+              Subchannel: c.subchannel || '-',
               'Issued At': formatDateTime(c.createdAt),
               'Used At': c.usedAt ? formatDateTime(c.usedAt) : '-',
             }))
@@ -1916,17 +1945,49 @@ const CouponSettingsPage: React.FC = () => {
                                     sx={{ py: 1, px: 2 }}
                                   >
                                     <Tooltip title={tooltipText}>
-                                      <Typography
-                                        variant="body2"
-                                        color="text.secondary"
+                                      <Box
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setCodesSetting(it);
+                                          setCodesStatusFilter('USED');
+                                          setCodesSearch('');
+                                          setCodesPage(0);
+                                          setOpenCodes(true);
+                                        }}
                                         sx={{
-                                          cursor: 'help',
-                                          fontWeight: 'medium',
+                                          position: 'relative',
+                                          width: '100%',
+                                          minWidth: 120,
+                                          cursor: 'pointer',
                                         }}
                                       >
-                                        {numerator.toLocaleString()} /{' '}
-                                        {denominator}
-                                      </Typography>
+                                        <LinearProgress
+                                          variant="determinate"
+                                          value={0}
+                                          sx={{
+                                            height: 24,
+                                            borderRadius: 1,
+                                            backgroundColor: 'action.hover',
+                                            border: '1px dashed',
+                                            borderColor: 'divider',
+                                          }}
+                                        />
+                                        <Typography
+                                          sx={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.75rem',
+                                            color: 'text.primary',
+                                            cursor: 'help',
+                                            whiteSpace: 'nowrap',
+                                          }}
+                                        >
+                                          {numerator.toLocaleString()} / {denominator}
+                                        </Typography>
+                                      </Box>
                                     </Tooltip>
                                   </TableCell>
                                 );
@@ -1955,10 +2016,19 @@ const CouponSettingsPage: React.FC = () => {
                                 >
                                   <Tooltip title={tooltipText}>
                                     <Box
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCodesSetting(it);
+                                        setCodesStatusFilter('USED');
+                                        setCodesSearch('');
+                                        setCodesPage(0);
+                                        setOpenCodes(true);
+                                      }}
                                       sx={{
                                         position: 'relative',
                                         width: '100%',
                                         minWidth: 120,
+                                        cursor: 'pointer',
                                       }}
                                     >
                                       <LinearProgress
@@ -3399,6 +3469,30 @@ const CouponSettingsPage: React.FC = () => {
                               {t('coupons.issuedCodes.status')}
                             </TableSortLabel>
                           </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.userId')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.userName')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.characterId')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.sequence')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.gameWorldId')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.platform')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.channel')}</Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1, px: 2 }}>
+                            <Typography variant="caption" fontWeight="bold">{t('coupons.couponUsage.columns.subChannel')}</Typography>
+                          </TableCell>
                           <TableCell
                             sx={{ py: 1, px: 2 }}
                             sortDirection={
@@ -3496,6 +3590,30 @@ const CouponSettingsPage: React.FC = () => {
                                       : t('coupons.issuedCodes.statusIssued')
                                 }
                               />
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.userId || '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.userName || '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.characterId || '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.sequence ?? '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.gameWorldId || '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.platform || '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.channel || '-'}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 1, px: 2 }}>
+                              <Typography variant="caption">{c.subchannel || '-'}</Typography>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>
                               <Tooltip

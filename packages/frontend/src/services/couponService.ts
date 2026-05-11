@@ -111,6 +111,14 @@ export interface IssuedCouponCode {
   status: 'ISSUED' | 'USED' | 'REVOKED';
   createdAt: string;
   usedAt: string | null;
+  userId?: string | null;
+  userName?: string | null;
+  characterId?: string | null;
+  sequence?: number | null;
+  gameWorldId?: string | null;
+  platform?: string | null;
+  channel?: string | null;
+  subchannel?: string | null;
 }
 
 export interface IssuedCodesResponse {
@@ -192,6 +200,7 @@ export const couponService = {
       page?: number;
       limit?: number;
       search?: string;
+      couponCode?: string;
       platform?: string;
       channel?: string;
       subChannel?: string;

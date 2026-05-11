@@ -79,6 +79,7 @@ export interface CouponUsageQuery {
   page?: number;
   limit?: number;
   search?: string; // userId or userName
+  couponCode?: string;
   platform?: string;
   channel?: string;
   subChannel?: string;
@@ -596,6 +597,9 @@ export class CouponSettingsService {
           );
         });
       }
+      if (query.couponCode) {
+        q.whereRaw('COALESCE(c.code, cs.code) = ?', [query.couponCode]);
+      }
       if (query.platform) q.where('cu.platform', query.platform);
       if (query.channel) q.where('cu.channel', query.channel);
       if (query.subChannel) q.where('cu.subchannel', query.subChannel);
@@ -847,18 +851,34 @@ export class CouponSettingsService {
     const total = Number(countResult?.total || 0);
 
     const dataQuery = buildQuery()
-      .select('id', 'settingId', 'code', 'status', 'createdAt', 'usedAt')
-      .orderBy('createdAt', 'desc')
-      .orderBy('id', 'desc')
+      .leftJoin('g_coupon_uses as cu', 'g_coupons.id', 'cu.issuedCouponId')
+      .select([
+        'g_coupons.id',
+        'g_coupons.settingId',
+        'g_coupons.code',
+        'g_coupons.status',
+        'g_coupons.createdAt',
+        'g_coupons.usedAt',
+        'cu.userId',
+        'cu.userName',
+        'cu.characterId',
+        'cu.sequence',
+        'cu.gameWorldId',
+        'cu.platform',
+        'cu.channel',
+        'cu.subchannel'
+      ])
+      .orderBy('g_coupons.createdAt', 'desc')
+      .orderBy('g_coupons.id', 'desc')
       .limit(limit);
 
     // Cursor-based: fetch rows after the cursor position
     if (query.cursorCreatedAt && query.cursorId) {
       dataQuery.where(function () {
-        this.where('createdAt', '<', query.cursorCreatedAt!).orWhere(
+        this.where('g_coupons.createdAt', '<', query.cursorCreatedAt!).orWhere(
           function () {
-            this.where('createdAt', '=', query.cursorCreatedAt!).andWhere(
-              'id',
+            this.where('g_coupons.createdAt', '=', query.cursorCreatedAt!).andWhere(
+              'g_coupons.id',
               '<',
               query.cursorId!
             );
@@ -936,19 +956,35 @@ export class CouponSettingsService {
       total = Number(countResult?.total || 0);
     }
 
-    const codesQuery = db('g_coupons')
-      .where('settingId', settingId)
-      .select('id', 'settingId', 'code', 'status', 'createdAt', 'usedAt')
-      .orderBy(sortCol, sortDir)
-      .orderBy('id', sortDir)
+    const codesQuery = db('g_coupons as c')
+      .leftJoin('g_coupon_uses as cu', 'c.id', 'cu.issuedCouponId')
+      .where('c.settingId', settingId)
+      .select([
+        'c.id',
+        'c.settingId',
+        'c.code',
+        'c.status',
+        'c.createdAt',
+        'c.usedAt',
+        'cu.userId',
+        'cu.userName',
+        'cu.characterId',
+        'cu.sequence',
+        'cu.gameWorldId',
+        'cu.platform',
+        'cu.channel',
+        'cu.subchannel'
+      ])
+      .orderBy(`c.${sortCol}`, sortDir)
+      .orderBy('c.id', sortDir)
       .limit(limit)
       .offset(offset);
 
     if (query.search) {
-      codesQuery.where('code', 'like', `%${query.search}%`);
+      codesQuery.where('c.code', 'like', `%${query.search}%`);
     }
     if (query.status) {
-      codesQuery.where('status', query.status);
+      codesQuery.where('c.status', query.status);
     }
 
     const codes = await codesQuery;

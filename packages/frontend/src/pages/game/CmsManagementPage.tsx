@@ -2149,7 +2149,8 @@ const CmsManagementPage: React.FC = () => {
                           borderRadius: 2,
                           overflow: 'hidden',
                           ...(viewingVersion != null &&
-                          viewingVersion !== historyData.history[0].version
+                          viewingVersion !== historyData.history[0].version &&
+                          viewMode === 'data'
                             ? {
                                 flex: 1,
                                 minHeight: 0,
