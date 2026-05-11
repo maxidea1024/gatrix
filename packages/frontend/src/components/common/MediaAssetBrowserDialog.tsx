@@ -105,10 +105,9 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
       setTotal(result.total);
     } catch (error: any) {
       console.error('Failed to load media assets:', error);
-      enqueueSnackbar(
-        error?.message || t('mediaAssets.loadError'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(error?.message || t('mediaAssets.loadError'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -189,7 +188,11 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
               <ListIcon fontSize="small" />
             </ToggleButton>
           </ToggleButtonGroup>
-          <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
             {total} {t('mediaAssets.assetsCount')}
           </Typography>
         </Box>
@@ -318,7 +321,10 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
                             '& .MuiChip-label': { px: 0.5 },
                           }}
                         />
-                        <Typography variant="caption" sx={{ fontSize: '0.55rem' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontSize: '0.55rem' }}
+                        >
                           {formatFileSize(asset.size)}
                         </Typography>
                       </Box>

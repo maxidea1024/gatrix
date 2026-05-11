@@ -2,7 +2,11 @@
  * Google Cloud Storage Provider
  */
 import { Storage, Bucket } from '@google-cloud/storage';
-import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
+import {
+  StorageProvider,
+  StorageFileInfo,
+  UploadOptions,
+} from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface GCSStorageConfig {

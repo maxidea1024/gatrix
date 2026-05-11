@@ -14,7 +14,11 @@ import {
   ListObjectsV2Command,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
+import {
+  StorageProvider,
+  StorageFileInfo,
+  UploadOptions,
+} from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface S3StorageConfig {
@@ -81,7 +85,10 @@ export class S3StorageProvider implements StorageProvider {
 
     await this.client.send(new PutObjectCommand(params));
 
-    this.logger.debug('File uploaded to S3', { key: fullKey, acl: options?.acl });
+    this.logger.debug('File uploaded to S3', {
+      key: fullKey,
+      acl: options?.acl,
+    });
     return key;
   }
 

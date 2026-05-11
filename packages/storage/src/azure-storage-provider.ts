@@ -9,7 +9,11 @@ import {
   StorageSharedKeyCredential,
   SASProtocol,
 } from '@azure/storage-blob';
-import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
+import {
+  StorageProvider,
+  StorageFileInfo,
+  UploadOptions,
+} from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface AzureStorageConfig {

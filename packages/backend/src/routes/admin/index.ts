@@ -520,10 +520,7 @@ router.use(
 );
 
 // Media Assets
-router.use(
-  '/media-assets',
-  mediaAssetRoutes
-);
+router.use('/media-assets', mediaAssetRoutes);
 
 // Console
 router.use(

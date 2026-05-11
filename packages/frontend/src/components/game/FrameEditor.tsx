@@ -437,10 +437,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
     // Client-side validation
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      enqueueSnackbar(
-        t('banners.fileTooLarge', { maxSize: '10' }),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(t('banners.fileTooLarge', { maxSize: '10' }), {
+        variant: 'error',
+      });
       return;
     }
 
@@ -464,9 +463,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
     } catch (error: any) {
       console.error('Image upload failed:', error);
       const errorMessage =
-        error?.message ||
-        error?.error?.message ||
-        t('banners.uploadError');
+        error?.message || error?.error?.message || t('banners.uploadError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setUploading(false);
@@ -1140,7 +1137,13 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   <Button
                     size="small"
                     variant="outlined"
-                    startIcon={uploading ? <CircularProgress size={14} /> : <UploadIcon />}
+                    startIcon={
+                      uploading ? (
+                        <CircularProgress size={14} />
+                      ) : (
+                        <UploadIcon />
+                      )
+                    }
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
                     sx={{ fontSize: '0.75rem', textTransform: 'none' }}

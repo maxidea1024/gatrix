@@ -101,9 +101,7 @@ export class MediaAssetModel {
 
       const asset = await this.findById(input.id);
       if (!asset) {
-        throw new Error(
-          `Media asset not found after creation: ${input.id}`
-        );
+        throw new Error(`Media asset not found after creation: ${input.id}`);
       }
       return asset;
     } catch (error) {

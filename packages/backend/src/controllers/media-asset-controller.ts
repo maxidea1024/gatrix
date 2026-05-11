@@ -119,8 +119,9 @@ export class MediaAssetController {
       }
 
       // Find which banners reference this asset
-      const referencingBanners =
-        await MediaAssetService.findReferencingBanners(asset.cdnUrl);
+      const referencingBanners = await MediaAssetService.findReferencingBanners(
+        asset.cdnUrl
+      );
 
       res.json({
         success: true,

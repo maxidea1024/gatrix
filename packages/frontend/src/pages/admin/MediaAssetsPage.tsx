@@ -147,10 +147,9 @@ const MediaAssetsPage: React.FC = () => {
       setTotal(result.total);
     } catch (error: any) {
       console.error('Failed to load media assets:', error);
-      enqueueSnackbar(
-        error?.message || t('mediaAssets.loadError'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(error?.message || t('mediaAssets.loadError'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -185,10 +184,9 @@ const MediaAssetsPage: React.FC = () => {
       setDetailBanners(result.referencingBanners);
     } catch (error: any) {
       console.error('Failed to load asset detail:', error);
-      enqueueSnackbar(
-        error?.message || t('mediaAssets.detailError'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(error?.message || t('mediaAssets.detailError'), {
+        variant: 'error',
+      });
     } finally {
       setDetailLoading(false);
     }
@@ -205,10 +203,9 @@ const MediaAssetsPage: React.FC = () => {
       loadAssets();
     } catch (error: any) {
       console.error('Failed to delete media asset:', error);
-      enqueueSnackbar(
-        error?.message || t('mediaAssets.deleteError'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(error?.message || t('mediaAssets.deleteError'), {
+        variant: 'error',
+      });
     } finally {
       setDeleting(false);
     }
@@ -242,10 +239,9 @@ const MediaAssetsPage: React.FC = () => {
       loadAssets();
     } catch (error: any) {
       console.error('Failed to bulk delete:', error);
-      enqueueSnackbar(
-        error?.message || t('mediaAssets.bulkDeleteError'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(error?.message || t('mediaAssets.bulkDeleteError'), {
+        variant: 'error',
+      });
     } finally {
       setBulkDeleting(false);
     }
@@ -298,7 +294,9 @@ const MediaAssetsPage: React.FC = () => {
                   setPage(0);
                 }}
               >
-                <MenuItem value="all">{t('mediaAssets.refStatus.all')}</MenuItem>
+                <MenuItem value="all">
+                  {t('mediaAssets.refStatus.all')}
+                </MenuItem>
                 <MenuItem value="referenced">
                   {t('mediaAssets.refStatus.referenced')}
                 </MenuItem>
@@ -359,7 +357,9 @@ const MediaAssetsPage: React.FC = () => {
                       <TableCell>
                         {t('mediaAssets.columns.uploadedBy')}
                       </TableCell>
-                      <TableCell>{t('mediaAssets.columns.createdAt')}</TableCell>
+                      <TableCell>
+                        {t('mediaAssets.columns.createdAt')}
+                      </TableCell>
                       <TableCell>{t('mediaAssets.columns.status')}</TableCell>
                       <TableCell align="center">
                         {t('mediaAssets.columns.actions')}
@@ -435,9 +435,7 @@ const MediaAssetsPage: React.FC = () => {
                             <Chip
                               label={asset.refCount}
                               size="small"
-                              color={
-                                asset.refCount > 0 ? 'primary' : 'default'
-                              }
+                              color={asset.refCount > 0 ? 'primary' : 'default'}
                               variant={
                                 asset.refCount > 0 ? 'filled' : 'outlined'
                               }
@@ -453,7 +451,9 @@ const MediaAssetsPage: React.FC = () => {
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Tooltip title={formatDateTimeDetailed(asset.createdAt)}>
+                            <Tooltip
+                              title={formatDateTimeDetailed(asset.createdAt)}
+                            >
                               <Typography variant="body2" component="span">
                                 {formatRelativeTime(asset.createdAt)}
                               </Typography>
@@ -619,7 +619,10 @@ const MediaAssetsPage: React.FC = () => {
                       {
                         label: 'ID',
                         value: (
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                          >
                             {detailAsset.id}
                           </Typography>
                         ),
@@ -647,7 +650,12 @@ const MediaAssetsPage: React.FC = () => {
                         value: (
                           <Typography
                             variant="body2"
-                            sx={{ fontFamily: 'monospace', fontSize: '0.75rem', wordBreak: 'break-all', opacity: 0.8 }}
+                            sx={{
+                              fontFamily: 'monospace',
+                              fontSize: '0.75rem',
+                              wordBreak: 'break-all',
+                              opacity: 0.8,
+                            }}
                           >
                             {detailAsset.hash}
                           </Typography>
@@ -656,10 +664,21 @@ const MediaAssetsPage: React.FC = () => {
                       {
                         label: 'CDN URL',
                         value: (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                            }}
+                          >
                             <Typography
                               variant="body2"
-                              sx={{ fontFamily: 'monospace', fontSize: '0.75rem', wordBreak: 'break-all', flex: 1 }}
+                              sx={{
+                                fontFamily: 'monospace',
+                                fontSize: '0.75rem',
+                                wordBreak: 'break-all',
+                                flex: 1,
+                              }}
                             >
                               {detailAsset.cdnUrl}
                             </Typography>
@@ -678,7 +697,9 @@ const MediaAssetsPage: React.FC = () => {
                           <Chip
                             label={detailAsset.refCount}
                             size="small"
-                            color={detailAsset.refCount > 0 ? 'primary' : 'default'}
+                            color={
+                              detailAsset.refCount > 0 ? 'primary' : 'default'
+                            }
                           />
                         ),
                       },
@@ -689,7 +710,11 @@ const MediaAssetsPage: React.FC = () => {
                       {
                         label: t('mediaAssets.columns.createdAt'),
                         value: (
-                          <Tooltip title={formatDateTimeDetailed(detailAsset.createdAt)}>
+                          <Tooltip
+                            title={formatDateTimeDetailed(
+                              detailAsset.createdAt
+                            )}
+                          >
                             <Typography variant="body2" component="span">
                               {formatRelativeTime(detailAsset.createdAt)}
                             </Typography>
@@ -718,11 +743,23 @@ const MediaAssetsPage: React.FC = () => {
                             borderColor: 'divider',
                           }}
                         >
-                          <Typography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}
+                          >
                             {row.label}
                           </Typography>
                         </Box>
-                        <Box sx={{ flex: 1, px: 1.5, py: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            px: 1.5,
+                            py: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            minWidth: 0,
+                          }}
+                        >
                           {typeof row.value === 'string' ? (
                             <Typography variant="body2">{row.value}</Typography>
                           ) : (
@@ -735,7 +772,8 @@ const MediaAssetsPage: React.FC = () => {
 
                   {/* Referencing Banners */}
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {t('mediaAssets.referencingBanners')} ({detailBanners.length})
+                    {t('mediaAssets.referencingBanners')} (
+                    {detailBanners.length})
                   </Typography>
                   {detailLoading ? (
                     <CircularProgress size={20} />
@@ -752,11 +790,15 @@ const MediaAssetsPage: React.FC = () => {
                           size="small"
                           variant="outlined"
                           color={
-                            banner.status === 'published' ? 'success' : 'default'
+                            banner.status === 'published'
+                              ? 'success'
+                              : 'default'
                           }
                           onClick={() => {
                             setDetailAsset(null);
-                            navigate(`/game/banners?search=${encodeURIComponent(banner.name)}`);
+                            navigate(
+                              `/game/banners?search=${encodeURIComponent(banner.name)}`
+                            );
                           }}
                           sx={{ cursor: 'pointer' }}
                         />
@@ -804,10 +846,7 @@ const MediaAssetsPage: React.FC = () => {
               )}
             </DialogContent>
             <DialogActions>
-              <Button
-                onClick={() => setDeleteTarget(null)}
-                disabled={deleting}
-              >
+              <Button onClick={() => setDeleteTarget(null)} disabled={deleting}>
                 {t('common.cancel')}
               </Button>
               <Button

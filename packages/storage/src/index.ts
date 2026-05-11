@@ -11,7 +11,11 @@
  */
 
 // Interface & types
-export type { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
+export type {
+  StorageProvider,
+  StorageFileInfo,
+  UploadOptions,
+} from './storage-provider';
 export type { StorageLogger } from './logger';
 export { defaultLogger } from './logger';
 

@@ -2,7 +2,11 @@
  * Alibaba Cloud OSS Storage Provider
  */
 import OSS from 'ali-oss';
-import { StorageProvider, StorageFileInfo, UploadOptions } from './storage-provider';
+import {
+  StorageProvider,
+  StorageFileInfo,
+  UploadOptions,
+} from './storage-provider';
 import { StorageLogger, defaultLogger } from './logger';
 
 export interface OSSStorageConfig {

@@ -159,10 +159,7 @@ const config = {
       process.env.MEDIA_GC_GRACE_PERIOD_HOURS || '24',
       10
     ),
-    maxUploadSizeMB: parseInt(
-      process.env.MEDIA_MAX_UPLOAD_SIZE_MB || '10',
-      10
-    ),
+    maxUploadSizeMB: parseInt(process.env.MEDIA_MAX_UPLOAD_SIZE_MB || '10', 10),
     allowedMimeTypes: (
       process.env.MEDIA_ALLOWED_MIME_TYPES ||
       'image/jpeg,image/png,image/gif,image/webp,image/svg+xml,video/mp4'

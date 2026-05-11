@@ -159,12 +159,18 @@ export class MediaAssetService {
     const provider = process.env.FILE_STORAGE_PROVIDER || 'local';
     const prefix = (() => {
       switch (provider) {
-        case 'cos': return process.env.FILE_STORAGE_COS_PREFIX || '';
-        case 's3': return process.env.FILE_STORAGE_S3_PREFIX || '';
-        case 'oss': return process.env.FILE_STORAGE_OSS_PREFIX || '';
-        case 'gcs': return process.env.FILE_STORAGE_GCS_PREFIX || '';
-        case 'azure': return process.env.FILE_STORAGE_AZURE_PREFIX || '';
-        default: return '';
+        case 'cos':
+          return process.env.FILE_STORAGE_COS_PREFIX || '';
+        case 's3':
+          return process.env.FILE_STORAGE_S3_PREFIX || '';
+        case 'oss':
+          return process.env.FILE_STORAGE_OSS_PREFIX || '';
+        case 'gcs':
+          return process.env.FILE_STORAGE_GCS_PREFIX || '';
+        case 'azure':
+          return process.env.FILE_STORAGE_AZURE_PREFIX || '';
+        default:
+          return '';
       }
     })();
     const fullKey = prefix
@@ -186,8 +192,8 @@ export class MediaAssetService {
         const endpoint = process.env.FILE_STORAGE_S3_ENDPOINT;
         logger.warn(
           '[MediaAssetService] CDN_BASE_URL is not set. ' +
-          'S3 buckets with CloudFront OAC are private — direct S3 URLs will return AccessDenied. ' +
-          'Set CDN_BASE_URL to your CloudFront domain (e.g. https://d1234.cloudfront.net).',
+            'S3 buckets with CloudFront OAC are private — direct S3 URLs will return AccessDenied. ' +
+            'Set CDN_BASE_URL to your CloudFront domain (e.g. https://d1234.cloudfront.net).',
           { bucket, region }
         );
         if (endpoint) {
@@ -249,12 +255,7 @@ export class MediaAssetService {
 
     // ── Validate minimum size (not empty) ───────────────────────────────
     if (fileBuffer.length === 0) {
-      throw new GatrixError(
-        'Uploaded file is empty',
-        400,
-        true,
-        'EMPTY_FILE'
-      );
+      throw new GatrixError('Uploaded file is empty', 400, true, 'EMPTY_FILE');
     }
 
     // ── Detect actual format via magic bytes ─────────────────────────────
@@ -359,12 +360,15 @@ export class MediaAssetService {
     // ── Verify CDN URL is publicly accessible ───────────────────────────
     if (cdnUrl.startsWith('http')) {
       try {
-        const resp = await fetch(cdnUrl, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
+        const resp = await fetch(cdnUrl, {
+          method: 'HEAD',
+          signal: AbortSignal.timeout(5000),
+        });
         if (!resp.ok) {
           logger.warn(
             `[MediaAssetService] Uploaded file is NOT publicly accessible (HTTP ${resp.status}). ` +
-            'Check: 1) CDN_BASE_URL is correct, 2) MEDIA_UPLOAD_ACL=public-read is set, ' +
-            '3) Bucket/CDN permissions allow public read.',
+              'Check: 1) CDN_BASE_URL is correct, 2) MEDIA_UPLOAD_ACL=public-read is set, ' +
+              '3) Bucket/CDN permissions allow public read.',
             { cdnUrl, status: resp.status }
           );
         }
@@ -490,8 +494,7 @@ export class MediaAssetService {
       // URLs added (in new but not in old) → increment
       const addedUrls = newImageUrls.filter((url) => !oldSet.has(url));
 
-      const gracePeriodHours =
-        config.mediaAssets?.gcGracePeriodHours ?? 24;
+      const gracePeriodHours = config.mediaAssets?.gcGracePeriodHours ?? 24;
 
       // Process decrements
       for (const url of removedUrls) {
