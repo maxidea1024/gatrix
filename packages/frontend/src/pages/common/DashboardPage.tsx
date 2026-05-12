@@ -6,7 +6,6 @@ import {
   CardContent,
   CardActionArea,
   Grid,
-  Paper,
   useTheme,
   Chip,
   Avatar,
@@ -885,90 +884,96 @@ const DashboardPage: React.FC = () => {
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       {/* Hero Section */}
-      <Paper
+      <Box
         sx={{
-          p: { xs: 3, md: 4 },
           mb: 4,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+          p: { xs: 3, md: 4 },
+          borderRadius: 3,
           position: 'relative',
           overflow: 'hidden',
+          border: '1px solid',
+          borderColor: theme.palette.mode === 'dark' 
+            ? 'rgba(255,255,255,0.08)' 
+            : 'rgba(0,0,0,0.06)',
+          background: theme.palette.mode === 'dark' 
+            ? 'linear-gradient(145deg, rgba(30,30,30,0.4) 0%, rgba(20,20,20,0.4) 100%)' 
+            : 'linear-gradient(145deg, rgba(255,255,255,0.6) 0%, rgba(245,245,250,0.6) 100%)',
+          boxShadow: theme.palette.mode === 'dark' 
+            ? '0 8px 32px rgba(0, 0, 0, 0.2)' 
+            : '0 8px 32px rgba(0, 0, 0, 0.04)',
+          backdropFilter: 'blur(12px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 3,
         }}
       >
-        <Box
+        {/* Decorative subtle glow */}
+        <Box 
           sx={{
             position: 'absolute',
-            top: -50,
-            right: -50,
-            width: 200,
-            height: 200,
-            borderRadius: '50%',
-            bgcolor: 'rgba(255,255,255,0.1)',
+            top: '-50%',
+            right: '-10%',
+            width: '60%',
+            height: '200%',
+            background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 60%)`,
+            zIndex: 0,
+            pointerEvents: 'none',
           }}
         />
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: -30,
-            right: 100,
-            width: 100,
-            height: 100,
-            borderRadius: '50%',
-            bgcolor: 'rgba(255,255,255,0.05)',
-          }}
-        />
-        <Box sx={{ position: 'relative', zIndex: 1, color: 'white' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 2,
-            }}
+        
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography
+            variant="h4"
+            fontWeight={800}
+            color="text.primary"
+            gutterBottom
+            sx={{ letterSpacing: '-0.02em' }}
           >
-            <Box>
-              <Typography variant="h4" fontWeight={700} gutterBottom>
-                {getGreeting()}, {user?.name}!
-              </Typography>
-              <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                {hasAnyPermissions
-                  ? t('dashboard.adminWelcome')
-                  : t('dashboard.userWelcome')}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Chip
-                label={t(inferRoleLabelKey(permissions))}
-                sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  fontWeight: 600,
-                  backdropFilter: 'blur(4px)',
-                }}
-              />
-              <Chip
-                icon={
-                  user?.status === 'active' ? (
-                    <CheckCircleIcon sx={{ color: 'white !important' }} />
-                  ) : (
-                    <WarningIcon sx={{ color: 'white !important' }} />
-                  )
-                }
-                label={t(`users.statuses.${user?.status}`)}
-                sx={{
-                  bgcolor:
-                    user?.status === 'active'
-                      ? 'rgba(76, 175, 80, 0.6)'
-                      : 'rgba(255, 152, 0, 0.6)',
-                  color: 'white',
-                  fontWeight: 600,
-                  backdropFilter: 'blur(4px)',
-                }}
-              />
-            </Box>
-          </Box>
+            {getGreeting()},{' '}
+            <Box component="span" sx={{ color: theme.palette.primary.main }}>
+              {user?.name}
+            </Box>!
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, lineHeight: 1.6 }}>
+            {hasAnyPermissions
+              ? t('dashboard.adminWelcome')
+              : t('dashboard.userWelcome')}
+          </Typography>
         </Box>
-      </Paper>
+        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', gap: 1.5 }}>
+          <Chip
+            label={t(inferRoleLabelKey(permissions))}
+            sx={{
+              fontWeight: 600,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              color: theme.palette.mode === 'dark' 
+                ? theme.palette.primary.light 
+                : theme.palette.primary.dark,
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              px: 1,
+            }}
+          />
+          <Chip
+            icon={
+              user?.status === 'active' ? (
+                <CheckCircleIcon sx={{ fontSize: 18 }} />
+              ) : (
+                <WarningIcon sx={{ fontSize: 18 }} />
+              )
+            }
+            label={t(`users.statuses.${user?.status}`)}
+            color={user?.status === 'active' ? 'success' : 'warning'}
+            variant="outlined"
+            sx={{ 
+              fontWeight: 600, 
+              borderWidth: 1.5,
+              px: 1,
+            }}
+          />
+        </Box>
+      </Box>
 
       {/* Maintenance Status - Shown at top when active or scheduled */}
       {hasAnyPermissions &&
