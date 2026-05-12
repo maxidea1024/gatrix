@@ -1334,8 +1334,8 @@ export default function AllCharactersTab({
                           letterSpacing: '0.05em',
                           bgcolor: (theme) =>
                             theme.palette.mode === 'dark'
-                              ? '#1e1e2f'
-                              : '#f4f2ff',
+                              ? '#272727'
+                              : '#f3f4f6',
                           zIndex: 2,
                           py: 1,
                           px: 1.5,

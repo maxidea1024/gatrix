@@ -547,8 +547,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             letterSpacing: '0.05em',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,
@@ -579,8 +579,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             letterSpacing: '0.05em',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,
@@ -612,8 +612,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             letterSpacing: '0.05em',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,
@@ -644,8 +644,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             letterSpacing: '0.05em',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,
@@ -676,8 +676,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             letterSpacing: '0.05em',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,
@@ -696,8 +696,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             letterSpacing: '0.05em',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,
@@ -715,8 +715,8 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                             fontSize: '0.75rem',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '#1e1e2f'
-                                : '#f4f2ff',
+                                ? '#272727'
+                                : '#f3f4f6',
                             zIndex: 2,
                             py: 1,
                             px: 1.5,

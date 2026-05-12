@@ -65,7 +65,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         minHeight: '100vh',
         background:
           theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, #0f172a 0%, #1e1e2f 100%)'
+            ? 'linear-gradient(135deg, #0f172a 0%, #272727 100%)'
             : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
         display: 'flex',
         alignItems: 'center',
