@@ -892,15 +892,18 @@ const DashboardPage: React.FC = () => {
           position: 'relative',
           overflow: 'hidden',
           border: '1px solid',
-          borderColor: theme.palette.mode === 'dark' 
-            ? 'rgba(255,255,255,0.08)' 
-            : 'rgba(0,0,0,0.06)',
-          background: theme.palette.mode === 'dark' 
-            ? 'linear-gradient(145deg, rgba(30,30,30,0.4) 0%, rgba(20,20,20,0.4) 100%)' 
-            : 'linear-gradient(145deg, rgba(255,255,255,0.6) 0%, rgba(245,245,250,0.6) 100%)',
-          boxShadow: theme.palette.mode === 'dark' 
-            ? '0 8px 32px rgba(0, 0, 0, 0.2)' 
-            : '0 8px 32px rgba(0, 0, 0, 0.04)',
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : 'rgba(0,0,0,0.06)',
+          background:
+            theme.palette.mode === 'dark'
+              ? 'linear-gradient(145deg, rgba(30,30,30,0.4) 0%, rgba(20,20,20,0.4) 100%)'
+              : 'linear-gradient(145deg, rgba(255,255,255,0.6) 0%, rgba(245,245,250,0.6) 100%)',
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 8px 32px rgba(0, 0, 0, 0.2)'
+              : '0 8px 32px rgba(0, 0, 0, 0.04)',
           backdropFilter: 'blur(12px)',
           display: 'flex',
           alignItems: 'center',
@@ -910,7 +913,7 @@ const DashboardPage: React.FC = () => {
         }}
       >
         {/* Decorative subtle glow */}
-        <Box 
+        <Box
           sx={{
             position: 'absolute',
             top: '-50%',
@@ -922,7 +925,7 @@ const DashboardPage: React.FC = () => {
             pointerEvents: 'none',
           }}
         />
-        
+
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <Typography
             variant="h4"
@@ -934,23 +937,31 @@ const DashboardPage: React.FC = () => {
             {getGreeting()},{' '}
             <Box component="span" sx={{ color: theme.palette.primary.main }}>
               {user?.name}
-            </Box>!
+            </Box>
+            !
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, lineHeight: 1.6 }}>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ maxWidth: 600, lineHeight: 1.6 }}
+          >
             {hasAnyPermissions
               ? t('dashboard.adminWelcome')
               : t('dashboard.userWelcome')}
           </Typography>
         </Box>
-        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', gap: 1.5 }}>
+        <Box
+          sx={{ position: 'relative', zIndex: 1, display: 'flex', gap: 1.5 }}
+        >
           <Chip
             label={t(inferRoleLabelKey(permissions))}
             sx={{
               fontWeight: 600,
               bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: theme.palette.mode === 'dark' 
-                ? theme.palette.primary.light 
-                : theme.palette.primary.dark,
+              color:
+                theme.palette.mode === 'dark'
+                  ? theme.palette.primary.light
+                  : theme.palette.primary.dark,
               border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
               px: 1,
             }}
@@ -966,8 +977,8 @@ const DashboardPage: React.FC = () => {
             label={t(`users.statuses.${user?.status}`)}
             color={user?.status === 'active' ? 'success' : 'warning'}
             variant="outlined"
-            sx={{ 
-              fontWeight: 600, 
+            sx={{
+              fontWeight: 600,
               borderWidth: 1.5,
               px: 1,
             }}
