@@ -136,9 +136,7 @@ export class CharacterHistoryModel {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
 
-    const deleted = await db(TABLE)
-      .where('recordedAt', '<', cutoff)
-      .delete();
+    const deleted = await db(TABLE).where('recordedAt', '<', cutoff).delete();
 
     if (deleted > 0) {
       logger.info(

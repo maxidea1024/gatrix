@@ -342,8 +342,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-
-
   // Feature Flags
   {
     id: 'feature-flags',

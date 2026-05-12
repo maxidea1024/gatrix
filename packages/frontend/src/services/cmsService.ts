@@ -243,11 +243,19 @@ const cmsService = {
   async backfillDiff(
     projectApiPath: string,
     options?: { tableName?: string; limit?: number }
-  ): Promise<{ total: number; filled: number; skipped: number; errors: number }> {
-    const res = await api.post(`${projectApiPath}/ripple-cms/cms/backfill-diff`, {
-      tableName: options?.tableName || undefined,
-      limit: options?.limit || 200,
-    });
+  ): Promise<{
+    total: number;
+    filled: number;
+    skipped: number;
+    errors: number;
+  }> {
+    const res = await api.post(
+      `${projectApiPath}/ripple-cms/cms/backfill-diff`,
+      {
+        tableName: options?.tableName || undefined,
+        limit: options?.limit || 200,
+      }
+    );
     return res.data;
   },
 };

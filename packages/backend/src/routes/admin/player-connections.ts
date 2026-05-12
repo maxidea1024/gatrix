@@ -12,14 +12,8 @@ router.get('/ccu', PlayerConnectionsController.getCcu);
 router.get('/ccu/history', PlayerConnectionsController.getCcuHistory);
 
 // Player endpoints
-router.get(
-  '/player/history',
-  PlayerConnectionsController.getPlayerHistory
-);
-router.get(
-  '/player/latest',
-  PlayerConnectionsController.getPlayerLatest
-);
+router.get('/player/history', PlayerConnectionsController.getPlayerHistory);
+router.get('/player/latest', PlayerConnectionsController.getPlayerLatest);
 
 // Character endpoints
 router.get(

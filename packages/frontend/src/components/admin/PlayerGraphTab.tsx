@@ -228,10 +228,7 @@ interface Props {
   refreshKey?: number;
 }
 
-const PlayerGraphTab: React.FC<Props> = ({
-  projectApiPath,
-  refreshKey,
-}) => {
+const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<PlayerHistoryRecord[]>([]);

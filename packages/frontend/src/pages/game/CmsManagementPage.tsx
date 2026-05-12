@@ -290,7 +290,9 @@ const CmsManagementPage: React.FC = () => {
   );
   const [propagationLoading, setPropagationLoading] = useState(false);
   const [propagationLoaded, setPropagationLoaded] = useState(false);
-  const [collapsedPropGroups, setCollapsedPropGroups] = useState<Set<string>>(new Set());
+  const [collapsedPropGroups, setCollapsedPropGroups] = useState<Set<string>>(
+    new Set()
+  );
 
   // Rollback confirm dialog
   const [rollbackOpen, setRollbackOpen] = useState(false);
@@ -301,13 +303,18 @@ const CmsManagementPage: React.FC = () => {
   const [rollbackDiffText, setRollbackDiffText] = useState<string>('');
   const [rollbackDiffLoading, setRollbackDiffLoading] = useState(false);
   const [rollbackComment, setRollbackComment] = useState('');
-  const [rollbackCurrentVersion, setRollbackCurrentVersion] = useState<number>(0);
+  const [rollbackCurrentVersion, setRollbackCurrentVersion] =
+    useState<number>(0);
 
   // Unsynced refresh dialog
   const [unsyncedDialogOpen, setUnsyncedDialogOpen] = useState(false);
-  const [unsyncedSelected, setUnsyncedSelected] = useState<Set<string>>(new Set());
+  const [unsyncedSelected, setUnsyncedSelected] = useState<Set<string>>(
+    new Set()
+  );
   const [unsyncedRefreshing, setUnsyncedRefreshing] = useState(false);
-  const [unsyncedDiffs, setUnsyncedDiffs] = useState<Record<string, { loading: boolean; text: string }>>({});
+  const [unsyncedDiffs, setUnsyncedDiffs] = useState<
+    Record<string, { loading: boolean; text: string }>
+  >({});
 
   // Row context menu
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
@@ -319,7 +326,10 @@ const CmsManagementPage: React.FC = () => {
   // Refresh confirm dialog
   const [refreshConfirmOpen, setRefreshConfirmOpen] = useState(false);
   const [refreshConfirmTableName, setRefreshConfirmTableName] = useState('');
-  const [refreshConfirmDiff, setRefreshConfirmDiff] = useState<{ loading: boolean; text: string }>({ loading: false, text: '' });
+  const [refreshConfirmDiff, setRefreshConfirmDiff] = useState<{
+    loading: boolean;
+    text: string;
+  }>({ loading: false, text: '' });
 
   // Ripple tracking dialog
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
@@ -328,7 +338,9 @@ const CmsManagementPage: React.FC = () => {
   );
   const [trackingPattern, setTrackingPattern] = useState<string | null>(null);
   const [trackingMatchedKeys, setTrackingMatchedKeys] = useState<string[]>([]);
-  const [trackingTargetTables, setTrackingTargetTables] = useState<string[]>([]);
+  const [trackingTargetTables, setTrackingTargetTables] = useState<string[]>(
+    []
+  );
 
   const handleSetReloadFilter = (val: 'all' | 'hot' | 'restart') => {
     setReloadFilter(val);
@@ -916,8 +928,10 @@ const CmsManagementPage: React.FC = () => {
         const oldStr = JSON.stringify(curData, null, 2);
         const newStr = JSON.stringify(tgtData, null, 2);
         const patch = await computeDiffInWorker(
-          oldStr, newStr,
-          `v${currentVersion} (current)`, `v${version} (rollback target)`
+          oldStr,
+          newStr,
+          `v${currentVersion} (current)`,
+          `v${version} (rollback target)`
         );
         setRollbackDiffText(patch);
       }
@@ -994,32 +1008,32 @@ const CmsManagementPage: React.FC = () => {
   };
 
   const requestRefreshTable = (tableName: string) => {
-      setRefreshConfirmTableName(tableName);
-      setRefreshConfirmOpen(true);
-      // Compute diff for this table
-      const tbl = tables.find((t) => t.tableName === tableName);
-      if (tbl?.runtime && !tbl.runtime.synced) {
-        setRefreshConfirmDiff({ loading: true, text: '' });
-        (async () => {
-          try {
-            const [curData, svrData] = await Promise.all([
-              fetchVersionData(tableName, tbl.version),
-              fetchVersionData(tableName, tbl.runtime!.loadedVersion),
-            ]);
-            const patch = await computeDiffInWorker(
-              JSON.stringify(svrData, null, 2),
-              JSON.stringify(curData, null, 2),
-              `v${tbl.runtime!.loadedVersion} (server)`,
-              `v${tbl.version} (saved)`
-            );
-            setRefreshConfirmDiff({ loading: false, text: patch });
-          } catch {
-            setRefreshConfirmDiff({ loading: false, text: '' });
-          }
-        })();
-      } else {
-        setRefreshConfirmDiff({ loading: false, text: '' });
-      }
+    setRefreshConfirmTableName(tableName);
+    setRefreshConfirmOpen(true);
+    // Compute diff for this table
+    const tbl = tables.find((t) => t.tableName === tableName);
+    if (tbl?.runtime && !tbl.runtime.synced) {
+      setRefreshConfirmDiff({ loading: true, text: '' });
+      (async () => {
+        try {
+          const [curData, svrData] = await Promise.all([
+            fetchVersionData(tableName, tbl.version),
+            fetchVersionData(tableName, tbl.runtime!.loadedVersion),
+          ]);
+          const patch = await computeDiffInWorker(
+            JSON.stringify(svrData, null, 2),
+            JSON.stringify(curData, null, 2),
+            `v${tbl.runtime!.loadedVersion} (server)`,
+            `v${tbl.version} (saved)`
+          );
+          setRefreshConfirmDiff({ loading: false, text: patch });
+        } catch {
+          setRefreshConfirmDiff({ loading: false, text: '' });
+        }
+      })();
+    } else {
+      setRefreshConfirmDiff({ loading: false, text: '' });
+    }
   };
 
   // ── File upload handler ──
@@ -1140,25 +1154,25 @@ const CmsManagementPage: React.FC = () => {
                 />
                 {unsyncedCount > 0 && (
                   <>
-                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="error"
-                    startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
-                    onClick={openUnsyncedDialog}
-                    sx={{
-                      fontWeight: 600,
-                      borderRadius: 8,
-                      px: 2,
-                      height: 24,
-                      fontSize: '0.8125rem',
-                      textTransform: 'none',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    {t('cms.unsyncedCount', { count: unsyncedCount })}
-                  </Button>
+                    <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="error"
+                      startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
+                      onClick={openUnsyncedDialog}
+                      sx={{
+                        fontWeight: 600,
+                        borderRadius: 8,
+                        px: 2,
+                        height: 24,
+                        fontSize: '0.8125rem',
+                        textTransform: 'none',
+                        boxShadow: 'none',
+                      }}
+                    >
+                      {t('cms.unsyncedCount', { count: unsyncedCount })}
+                    </Button>
                   </>
                 )}
               </Box>
@@ -1438,7 +1452,12 @@ const CmsManagementPage: React.FC = () => {
                                   }}
                                 />
                               ) : (
-                                <Tooltip title={t('cms.unsyncedTooltip', { server: table.runtime.loadedVersion, db: table.version })}>
+                                <Tooltip
+                                  title={t('cms.unsyncedTooltip', {
+                                    server: table.runtime.loadedVersion,
+                                    db: table.version,
+                                  })}
+                                >
                                   <Chip
                                     label={`v${table.runtime.loadedVersion} ≠ v${table.version}`}
                                     size="small"
@@ -1766,8 +1785,7 @@ const CmsManagementPage: React.FC = () => {
                             variant="subtitle2"
                             sx={{ fontWeight: 600 }}
                           >
-                            v{editingVersion}{' '}
-                            {t('cms.history.editingBased')}
+                            v{editingVersion} {t('cms.history.editingBased')}
                           </Typography>
                         </Box>
                         <IconButton
@@ -1808,7 +1826,14 @@ const CmsManagementPage: React.FC = () => {
                           version: editingVersion,
                         })}
                       </Alert>
-                      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                      <Box
+                        sx={{
+                          p: 2,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1.5,
+                        }}
+                      >
                         {editorLoading ? (
                           <Box
                             sx={{
@@ -1881,9 +1906,7 @@ const CmsManagementPage: React.FC = () => {
                               {t('cms.detail.save')}
                             </Button>
                             <Button
-                              onClick={() =>
-                                setSaveMenuOpen((prev) => !prev)
-                              }
+                              onClick={() => setSaveMenuOpen((prev) => !prev)}
                               disabled={
                                 editorSaving ||
                                 !editorComment.trim() ||
@@ -1905,9 +1928,7 @@ const CmsManagementPage: React.FC = () => {
                               <Grow {...TransitionProps}>
                                 <Paper elevation={8}>
                                   <ClickAwayListener
-                                    onClickAway={() =>
-                                      setSaveMenuOpen(false)
-                                    }
+                                    onClickAway={() => setSaveMenuOpen(false)}
                                   >
                                     <MenuList>
                                       <MenuItem
@@ -2134,9 +2155,7 @@ const CmsManagementPage: React.FC = () => {
                         {isViewing && (
                           <Box
                             sx={{
-                              ...(viewMode === 'data'
-                                ? {}
-                                : {}),
+                              ...(viewMode === 'data' ? {} : {}),
                               display: 'flex',
                               flexDirection: 'column',
                               border: '1px solid',
@@ -2341,7 +2360,12 @@ const CmsManagementPage: React.FC = () => {
                                 </Box>
                                 {/* Main content area */}
                                 <Box
-                                  sx={{ flex: 1, minWidth: 0, py: 1.25, px: 1.5 }}
+                                  sx={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    py: 1.25,
+                                    px: 1.5,
+                                  }}
                                 >
                                   {/* Row 1: Commit message (primary) */}
                                   <Typography
@@ -2660,7 +2684,7 @@ const CmsManagementPage: React.FC = () => {
                   minHeight={120}
                 />
               ) : (
-              (() => {
+                (() => {
                   const groups = new Map<string, RippleHistoryEvent[]>();
                   for (const evt of propagationData) {
                     const key = evt.requestId || evt.eventId;
@@ -2678,8 +2702,13 @@ const CmsManagementPage: React.FC = () => {
                       }}
                     >
                       {groupEntries.map(([reqId, events], groupIdx) => {
-                        const allSuccess = events.every((e) => e.status === 'success');
-                        const hasFailure = events.some((e) => e.status === 'failure' || e.status === 'timeout');
+                        const allSuccess = events.every(
+                          (e) => e.status === 'success'
+                        );
+                        const hasFailure = events.some(
+                          (e) =>
+                            e.status === 'failure' || e.status === 'timeout'
+                        );
                         const isFirstGroup = groupIdx === 0;
                         const isLast = groupIdx === groupEntries.length - 1;
                         const expanded = isFirstGroup
@@ -2702,7 +2731,8 @@ const CmsManagementPage: React.FC = () => {
                                 display: 'flex',
                                 alignItems: 'stretch',
                                 cursor: 'pointer',
-                                borderBottom: isLast && !expanded ? 'none' : '1px solid',
+                                borderBottom:
+                                  isLast && !expanded ? 'none' : '1px solid',
                                 borderColor: 'divider',
                                 transition: 'background-color 0.15s',
                                 '&:hover': {
@@ -2727,15 +2757,23 @@ const CmsManagementPage: React.FC = () => {
                                 }}
                               >
                                 {allSuccess ? (
-                                  <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                  <CheckCircleIcon
+                                    sx={{ fontSize: 18, color: 'success.main' }}
+                                  />
                                 ) : hasFailure ? (
-                                  <CancelIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                                  <CancelIcon
+                                    sx={{ fontSize: 18, color: 'error.main' }}
+                                  />
                                 ) : (
-                                  <WarningIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                                  <WarningIcon
+                                    sx={{ fontSize: 18, color: 'warning.main' }}
+                                  />
                                 )}
                               </Box>
                               {/* Main content */}
-                              <Box sx={{ flex: 1, minWidth: 0, py: 1.25, px: 1.5 }}>
+                              <Box
+                                sx={{ flex: 1, minWidth: 0, py: 1.25, px: 1.5 }}
+                              >
                                 {/* Row 1: Request ID + table names */}
                                 <Typography
                                   variant="body2"
@@ -2751,33 +2789,69 @@ const CmsManagementPage: React.FC = () => {
                                     <Typography
                                       component="span"
                                       variant="caption"
-                                      sx={{ color: 'text.secondary', fontFamily: 'monospace', fontSize: '0.72rem', ml: 1 }}
+                                      sx={{
+                                        color: 'text.secondary',
+                                        fontFamily: 'monospace',
+                                        fontSize: '0.72rem',
+                                        ml: 1,
+                                      }}
                                     >
-                                      {events[0].tableName.split(',').slice(0, 3).map(s => s.trim()).join(', ')}
-                                      {events[0].tableName.split(',').length > 3 && ` +${events[0].tableName.split(',').length - 3}`}
+                                      {events[0].tableName
+                                        .split(',')
+                                        .slice(0, 3)
+                                        .map((s) => s.trim())
+                                        .join(', ')}
+                                      {events[0].tableName.split(',').length >
+                                        3 &&
+                                        ` +${events[0].tableName.split(',').length - 3}`}
                                     </Typography>
                                   )}
                                 </Typography>
                                 {/* Row 2: Metadata line */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.75,
+                                  }}
+                                >
                                   <Typography
                                     variant="caption"
-                                    sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.72rem' }}
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: 'text.secondary',
+                                      fontSize: '0.72rem',
+                                    }}
                                   >
                                     {events.length} servers
                                   </Typography>
                                   <Typography
                                     variant="caption"
-                                    sx={{ color: 'text.disabled', fontSize: '0.7rem' }}
+                                    sx={{
+                                      color: 'text.disabled',
+                                      fontSize: '0.7rem',
+                                    }}
                                   >
                                     propagated
                                   </Typography>
-                                  <Tooltip title={new Date(events[0].createdAt).toLocaleString('ko-KR')}>
+                                  <Tooltip
+                                    title={new Date(
+                                      events[0].createdAt
+                                    ).toLocaleString('ko-KR')}
+                                  >
                                     <Typography
                                       variant="caption"
-                                      sx={{ color: 'text.disabled', cursor: 'help', fontSize: '0.7rem' }}
+                                      sx={{
+                                        color: 'text.disabled',
+                                        cursor: 'help',
+                                        fontSize: '0.7rem',
+                                      }}
                                     >
-                                      {formatRelativeTime(new Date(events[0].createdAt).toISOString())}
+                                      {formatRelativeTime(
+                                        new Date(
+                                          events[0].createdAt
+                                        ).toISOString()
+                                      )}
                                     </Typography>
                                   </Tooltip>
                                 </Box>
@@ -2796,7 +2870,9 @@ const CmsManagementPage: React.FC = () => {
                                   sx={{
                                     fontSize: 18,
                                     color: 'text.disabled',
-                                    transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transform: expanded
+                                      ? 'rotate(180deg)'
+                                      : 'rotate(0deg)',
                                     transition: 'transform 0.2s',
                                   }}
                                 />
@@ -2818,27 +2894,61 @@ const CmsManagementPage: React.FC = () => {
                                     {events.map((evt, idx) => (
                                       <TableRow
                                         key={evt.eventId || idx}
-                                        sx={{ '&:last-child td': { border: 0 } }}
+                                        sx={{
+                                          '&:last-child td': { border: 0 },
+                                        }}
                                       >
-                                        <TableCell sx={{ py: 0.4, pl: 4.5, width: 24 }}>
+                                        <TableCell
+                                          sx={{ py: 0.4, pl: 4.5, width: 24 }}
+                                        >
                                           {evt.status === 'success' ? (
-                                            <CheckCircleIcon sx={{ fontSize: 13, color: 'success.main' }} />
+                                            <CheckCircleIcon
+                                              sx={{
+                                                fontSize: 13,
+                                                color: 'success.main',
+                                              }}
+                                            />
                                           ) : (
-                                            <CancelIcon sx={{ fontSize: 13, color: 'error.main' }} />
+                                            <CancelIcon
+                                              sx={{
+                                                fontSize: 13,
+                                                color: 'error.main',
+                                              }}
+                                            />
                                           )}
                                         </TableCell>
                                         <TableCell sx={{ py: 0.4 }}>
-                                          <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.72rem' }}>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              fontFamily: 'monospace',
+                                              fontSize: '0.72rem',
+                                            }}
+                                          >
                                             {evt.serviceType || '—'}
                                           </Typography>
                                         </TableCell>
                                         <TableCell sx={{ py: 0.4 }}>
-                                          <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: '0.68rem' }}>
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{
+                                              fontFamily: 'monospace',
+                                              fontSize: '0.68rem',
+                                            }}
+                                          >
                                             {evt.serverId}
                                           </Typography>
                                         </TableCell>
-                                        <TableCell sx={{ py: 0.4 }} align="right">
-                                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>
+                                        <TableCell
+                                          sx={{ py: 0.4 }}
+                                          align="right"
+                                        >
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{ fontSize: '0.68rem' }}
+                                          >
                                             {evt.durationMs}ms
                                           </Typography>
                                         </TableCell>
@@ -2924,179 +3034,218 @@ const CmsManagementPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {t('cms.unsyncedRefresh.description')}
           </Typography>
-          <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox" sx={{ width: 42 }}>
-                  <Checkbox
-                    size="small"
-                    checked={
-                      unsyncedSelected.size ===
-                      tables.filter((tbl) => tbl.runtime && !tbl.runtime.synced).length
-                    }
-                    indeterminate={
-                      unsyncedSelected.size > 0 &&
-                      unsyncedSelected.size <
-                        tables.filter((tbl) => tbl.runtime && !tbl.runtime.synced).length
-                    }
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setUnsyncedSelected(
-                          new Set(
-                            tables
-                              .filter((tbl) => tbl.runtime && !tbl.runtime.synced)
-                              .map((t2) => t2.tableName)
-                          )
-                        );
-                      } else {
-                        setUnsyncedSelected(new Set());
+          <Box
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox" sx={{ width: 42 }}>
+                    <Checkbox
+                      size="small"
+                      checked={
+                        unsyncedSelected.size ===
+                        tables.filter(
+                          (tbl) => tbl.runtime && !tbl.runtime.synced
+                        ).length
                       }
-                    }}
-                  />
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
-                  {t('cms.tableName')}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }} align="center">
-                  Sync
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem', width: 40 }} align="center">
-                  Diff
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tables
-                .filter((tbl) => tbl.runtime && !tbl.runtime.synced)
-                .map((tbl) => (
-                  <React.Fragment key={tbl.tableName}>
-                    <TableRow
-                      hover
-                      selected={unsyncedSelected.has(tbl.tableName)}
-                      sx={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        const next = new Set(unsyncedSelected);
-                        if (next.has(tbl.tableName)) {
-                          next.delete(tbl.tableName);
+                      indeterminate={
+                        unsyncedSelected.size > 0 &&
+                        unsyncedSelected.size <
+                          tables.filter(
+                            (tbl) => tbl.runtime && !tbl.runtime.synced
+                          ).length
+                      }
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setUnsyncedSelected(
+                            new Set(
+                              tables
+                                .filter(
+                                  (tbl) => tbl.runtime && !tbl.runtime.synced
+                                )
+                                .map((t2) => t2.tableName)
+                            )
+                          );
                         } else {
-                          next.add(tbl.tableName);
+                          setUnsyncedSelected(new Set());
                         }
-                        setUnsyncedSelected(next);
                       }}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          size="small"
-                          checked={unsyncedSelected.has(tbl.tableName)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: 500, fontFamily: 'monospace', fontSize: '0.8rem' }}
-                        >
-                          {tbl.tableName}
-                        </Typography>
-                        {tbl.comment && (
+                    />
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                    {t('cms.tableName')}
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                    align="center"
+                  >
+                    Sync
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: 600, fontSize: '0.75rem', width: 40 }}
+                    align="center"
+                  >
+                    Diff
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tables
+                  .filter((tbl) => tbl.runtime && !tbl.runtime.synced)
+                  .map((tbl) => (
+                    <React.Fragment key={tbl.tableName}>
+                      <TableRow
+                        hover
+                        selected={unsyncedSelected.has(tbl.tableName)}
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          const next = new Set(unsyncedSelected);
+                          if (next.has(tbl.tableName)) {
+                            next.delete(tbl.tableName);
+                          } else {
+                            next.add(tbl.tableName);
+                          }
+                          setUnsyncedSelected(next);
+                        }}
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            size="small"
+                            checked={unsyncedSelected.has(tbl.tableName)}
+                          />
+                        </TableCell>
+                        <TableCell>
                           <Typography
-                            variant="caption"
-                            color="text.secondary"
+                            variant="body2"
                             sx={{
-                              display: 'block',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              maxWidth: 280,
+                              fontWeight: 500,
+                              fontFamily: 'monospace',
+                              fontSize: '0.8rem',
                             }}
                           >
-                            {tbl.comment}
+                            {tbl.tableName}
                           </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={`v${tbl.runtime!.loadedVersion} → v${tbl.version}`}
-                          size="small"
-                          color="warning"
-                          variant="filled"
-                          sx={{
-                            fontSize: '0.68rem',
-                            fontFamily: 'monospace',
-                            height: 20,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const key = tbl.tableName;
-                            if (unsyncedDiffs[key]?.text) {
-                              setUnsyncedDiffs((prev) => {
-                                const next = { ...prev };
-                                delete next[key];
-                                return next;
-                              });
-                              return;
-                            }
-                            setUnsyncedDiffs((prev) => ({
-                              ...prev,
-                              [key]: { loading: true, text: '' },
-                            }));
-                            (async () => {
-                              try {
-                                const [curData, svrData] = await Promise.all([
-                                  fetchVersionData(key, tbl.version),
-                                  fetchVersionData(key, tbl.runtime!.loadedVersion),
-                                ]);
-                                const patch = await computeDiffInWorker(
-                                  JSON.stringify(svrData, null, 2),
-                                  JSON.stringify(curData, null, 2),
-                                  `v${tbl.runtime!.loadedVersion} (server)`,
-                                  `v${tbl.version} (saved)`
-                                );
-                                setUnsyncedDiffs((prev) => ({
-                                  ...prev,
-                                  [key]: { loading: false, text: patch },
-                                }));
-                              } catch {
-                                setUnsyncedDiffs((prev) => ({
-                                  ...prev,
-                                  [key]: { loading: false, text: '' },
-                                }));
+                          {tbl.comment && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: 280,
+                              }}
+                            >
+                              {tbl.comment}
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={`v${tbl.runtime!.loadedVersion} → v${tbl.version}`}
+                            size="small"
+                            color="warning"
+                            variant="filled"
+                            sx={{
+                              fontSize: '0.68rem',
+                              fontFamily: 'monospace',
+                              height: 20,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const key = tbl.tableName;
+                              if (unsyncedDiffs[key]?.text) {
+                                setUnsyncedDiffs((prev) => {
+                                  const next = { ...prev };
+                                  delete next[key];
+                                  return next;
+                                });
+                                return;
                               }
-                            })();
-                          }}
-                        >
-                          <CompareArrowsIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                    {unsyncedDiffs[tbl.tableName] && (
-                      <TableRow>
-                        <TableCell colSpan={4} sx={{ p: 0 }}>
-                          <Box sx={{ maxHeight: 300, overflow: 'auto', px: 1, py: 0.5 }}>
-                            {unsyncedDiffs[tbl.tableName].loading ? (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                                <CircularProgress size={18} />
-                              </Box>
-                            ) : (
-                              <LightDiff
-                                patchText={unsyncedDiffs[tbl.tableName].text}
-                                dark={isDark}
-                                noDiffMessage="No diff"
-                              />
-                            )}
-                          </Box>
+                              setUnsyncedDiffs((prev) => ({
+                                ...prev,
+                                [key]: { loading: true, text: '' },
+                              }));
+                              (async () => {
+                                try {
+                                  const [curData, svrData] = await Promise.all([
+                                    fetchVersionData(key, tbl.version),
+                                    fetchVersionData(
+                                      key,
+                                      tbl.runtime!.loadedVersion
+                                    ),
+                                  ]);
+                                  const patch = await computeDiffInWorker(
+                                    JSON.stringify(svrData, null, 2),
+                                    JSON.stringify(curData, null, 2),
+                                    `v${tbl.runtime!.loadedVersion} (server)`,
+                                    `v${tbl.version} (saved)`
+                                  );
+                                  setUnsyncedDiffs((prev) => ({
+                                    ...prev,
+                                    [key]: { loading: false, text: patch },
+                                  }));
+                                } catch {
+                                  setUnsyncedDiffs((prev) => ({
+                                    ...prev,
+                                    [key]: { loading: false, text: '' },
+                                  }));
+                                }
+                              })();
+                            }}
+                          >
+                            <CompareArrowsIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </React.Fragment>
-                ))}
-            </TableBody>
-          </Table>
+                      {unsyncedDiffs[tbl.tableName] && (
+                        <TableRow>
+                          <TableCell colSpan={4} sx={{ p: 0 }}>
+                            <Box
+                              sx={{
+                                maxHeight: 300,
+                                overflow: 'auto',
+                                px: 1,
+                                py: 0.5,
+                              }}
+                            >
+                              {unsyncedDiffs[tbl.tableName].loading ? (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    py: 2,
+                                  }}
+                                >
+                                  <CircularProgress size={18} />
+                                </Box>
+                              ) : (
+                                <LightDiff
+                                  patchText={unsyncedDiffs[tbl.tableName].text}
+                                  dark={isDark}
+                                  noDiffMessage="No diff"
+                                />
+                              )}
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  ))}
+              </TableBody>
+            </Table>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -3122,11 +3271,19 @@ const CmsManagementPage: React.FC = () => {
       </Dialog>
 
       {/* Rollback Confirm Dialog */}
-      <Dialog open={rollbackOpen} onClose={() => setRollbackOpen(false)} maxWidth="md" fullWidth
+      <Dialog
+        open={rollbackOpen}
+        onClose={() => setRollbackOpen(false)}
+        maxWidth="md"
+        fullWidth
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
         <DialogTitle sx={{ px: 3, pt: 3, pb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            sx={{ fontSize: '1.1rem' }}
+          >
             {t('cms.rollback.title')}
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -3154,20 +3311,44 @@ const CmsManagementPage: React.FC = () => {
                 borderRadius: 2,
               }}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', lineHeight: 1 }}
+              >
                 Current
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
-                <Typography variant="h6" sx={{ fontFamily: 'monospace', fontWeight: 700, lineHeight: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 0.75,
+                  mt: 0.5,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: 'monospace',
+                    fontWeight: 700,
+                    lineHeight: 1,
+                  }}
+                >
                   v{rollbackCurrentVersion}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontFamily: 'monospace' }}
+                >
                   {rollbackTableName}
                 </Typography>
               </Box>
             </Paper>
 
-            <ArrowForwardIcon sx={{ fontSize: 20, color: 'text.disabled', flexShrink: 0 }} />
+            <ArrowForwardIcon
+              sx={{ fontSize: 20, color: 'text.disabled', flexShrink: 0 }}
+            />
 
             {/* Target */}
             <Paper
@@ -3180,14 +3361,36 @@ const CmsManagementPage: React.FC = () => {
                 borderRadius: 2,
               }}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', lineHeight: 1 }}
+              >
                 Rollback Target
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
-                <Typography variant="h6" sx={{ fontFamily: 'monospace', fontWeight: 700, lineHeight: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 0.75,
+                  mt: 0.5,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: 'monospace',
+                    fontWeight: 700,
+                    lineHeight: 1,
+                  }}
+                >
                   v{rollbackVersion}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontFamily: 'monospace' }}
+                >
                   {rollbackTableName}
                 </Typography>
               </Box>
@@ -3195,7 +3398,12 @@ const CmsManagementPage: React.FC = () => {
           </Box>
 
           {/* Diff */}
-          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ mb: 0.5, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            fontWeight={600}
+            sx={{ mb: 0.5, display: 'block' }}
+          >
             {t('cms.rollback.diffPreview')}
           </Typography>
           <Box
@@ -3252,7 +3460,10 @@ const CmsManagementPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button onClick={() => setRollbackOpen(false)} sx={{ borderRadius: 2 }}>
+          <Button
+            onClick={() => setRollbackOpen(false)}
+            sx={{ borderRadius: 2 }}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -3263,7 +3474,12 @@ const CmsManagementPage: React.FC = () => {
             startIcon={
               rollbackLoading ? <CircularProgress size={16} /> : <RestoreIcon />
             }
-            sx={{ borderRadius: 2, px: 3, fontWeight: 600, textTransform: 'none' }}
+            sx={{
+              borderRadius: 2,
+              px: 3,
+              fontWeight: 600,
+              textTransform: 'none',
+            }}
           >
             {t('cms.rollback.execute')}
           </Button>

@@ -679,13 +679,13 @@ const MediaAssetsPage: React.FC = () => {
                               rel="noopener noreferrer"
                               variant="body2"
                               color="primary"
-                              sx={{ 
-                                fontFamily: 'monospace', 
-                                fontSize: '0.75rem', 
-                                wordBreak: 'break-all', 
+                              sx={{
+                                fontFamily: 'monospace',
+                                fontSize: '0.75rem',
+                                wordBreak: 'break-all',
                                 flex: 1,
                                 textDecoration: 'none',
-                                '&:hover': { textDecoration: 'underline' }
+                                '&:hover': { textDecoration: 'underline' },
                               }}
                             >
                               {detailAsset.cdnUrl}
@@ -804,7 +804,9 @@ const MediaAssetsPage: React.FC = () => {
                           }
                           onClick={() => {
                             setDetailAsset(null);
-                            navigate(`/game/banners?search=${encodeURIComponent(banner.name)}&editId=${banner.bannerId}`);
+                            navigate(
+                              `/game/banners?search=${encodeURIComponent(banner.name)}&editId=${banner.bannerId}`
+                            );
                           }}
                           sx={{ cursor: 'pointer' }}
                         />

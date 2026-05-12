@@ -127,7 +127,10 @@ export class SubscriberPollingService {
       // Calculate newCharacters as delta from previous record
       const prevPlayer = await PlayerHistoryModel.getLatest(environmentId);
       if (prevPlayer) {
-        newCharacters = Math.max(0, totalCharacters - prevPlayer.totalCharacters);
+        newCharacters = Math.max(
+          0,
+          totalCharacters - prevPlayer.totalCharacters
+        );
       } else {
         newCharacters = totalCharacters;
       }
@@ -169,10 +172,7 @@ export class SubscriberPollingService {
 
     // Get world list from CCU endpoint (already being polled)
     try {
-      const ccuData = await this.fetchJson(
-        `${baseUrl}/gatrix/v1/ccu`,
-        timeout
-      );
+      const ccuData = await this.fetchJson(`${baseUrl}/gatrix/v1/ccu`, timeout);
 
       if (Array.isArray(ccuData?.worlds)) {
         for (const world of ccuData.worlds) {
@@ -188,7 +188,10 @@ export class SubscriberPollingService {
 
             // Calculate worldNew as delta from previous per-world record
             let worldNew = 0;
-            const prevWorld = await CharacterHistoryModel.getLatestByWorld(environmentId, wId);
+            const prevWorld = await CharacterHistoryModel.getLatestByWorld(
+              environmentId,
+              wId
+            );
             if (prevWorld) {
               worldNew = Math.max(0, worldTotal - prevWorld.totalCharacters);
             } else {

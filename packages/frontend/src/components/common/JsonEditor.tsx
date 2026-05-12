@@ -105,7 +105,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
     setTimeout(() => editor.layout(), 0);
 
     // Remeasure fonts after custom font load to prevent cursor gap
-    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+    if (
+      typeof document !== 'undefined' &&
+      document.fonts &&
+      document.fonts.ready
+    ) {
       document.fonts.ready.then(() => {
         if (monaco?.editor?.remeasureFonts) {
           monaco.editor.remeasureFonts();
@@ -118,12 +122,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   const isFlexHeight = height === '100%';
 
   // Compute height string for Monaco
-  const editorHeight =
-    isFlexHeight
-      ? '100%'
-      : typeof height === 'number'
-        ? `${height}px`
-        : height;
+  const editorHeight = isFlexHeight
+    ? '100%'
+    : typeof height === 'number'
+      ? `${height}px`
+      : height;
 
   return (
     <Box
@@ -166,9 +169,10 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
             pointerEvents: 'auto !important',
           },
           // Force Find Widget tooltips to not cause reflow
-          '& .monaco-editor .find-widget .monaco-action-bar .action-label[title]': {
-            overflow: 'visible',
-          },
+          '& .monaco-editor .find-widget .monaco-action-bar .action-label[title]':
+            {
+              overflow: 'visible',
+            },
         }}
       >
         <Editor

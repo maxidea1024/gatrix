@@ -170,8 +170,7 @@ const PlayerConnectionsPage: React.FC = () => {
   } | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
-  const [playerLatest, setPlayerLatest] =
-    useState<PlayerLatest | null>(null);
+  const [playerLatest, setPlayerLatest] = useState<PlayerLatest | null>(null);
   const [characterLatest, setCharacterLatest] =
     useState<CharacterLatest | null>(null);
   const SCOREBOARD_STORAGE_KEY = 'playerConnections.scoreboardOpen';
@@ -1733,8 +1732,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         fontWeight={700}
                         color="info.main"
                       >
-                        {playerLatest?.totalPlayers?.toLocaleString() ??
-                          '-'}
+                        {playerLatest?.totalPlayers?.toLocaleString() ?? '-'}
                       </Typography>
                     </Box>
                     <Avatar

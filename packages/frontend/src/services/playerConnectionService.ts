@@ -388,9 +388,7 @@ const playerConnectionService = {
   /**
    * Get latest player statistics for overview cards
    */
-  async getPlayerLatest(
-    projectApiPath: string
-  ): Promise<PlayerLatest | null> {
+  async getPlayerLatest(projectApiPath: string): Promise<PlayerLatest | null> {
     try {
       const res = await api.get(
         `${projectApiPath}/player-connections/player/latest`

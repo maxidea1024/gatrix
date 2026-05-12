@@ -1159,131 +1159,132 @@ const GatrixEdgesPage: React.FC = () => {
             minHeight={400}
           />
         ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            gap: 0,
-          }}
-        >
-          {/* Root Node with Connector Line Wrapper */}
           <Box
             sx={{
-              position: 'relative',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              pb: 4,
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: 0,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 2,
-                height: '34px',
-                bgcolor: 'divider',
-                zIndex: 0,
-              },
+              width: '100%',
+              gap: 0,
             }}
           >
-            <Card
+            {/* Root Node with Connector Line Wrapper */}
+            <Box
               sx={{
-                minWidth: 180,
-                textAlign: 'center',
-                boxShadow: theme.shadows[2],
-                zIndex: 1,
                 position: 'relative',
-                mb: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                pb: 4,
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 2,
+                  height: '34px',
+                  bgcolor: 'divider',
+                  zIndex: 0,
+                },
               }}
             >
-              <CardContent sx={{ pt: 2, pb: 0, '&:last-child': { pb: 0 } }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
+              <Card
+                sx={{
+                  minWidth: 180,
+                  textAlign: 'center',
+                  boxShadow: theme.shadows[2],
+                  zIndex: 1,
+                  position: 'relative',
+                  mb: 0,
+                }}
+              >
+                <CardContent sx={{ pt: 2, pb: 0, '&:last-child': { pb: 0 } }}>
                   <Box
                     sx={{
-                      width: 48,
-                      height: 48,
-                      bgcolor: 'primary.main',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      G
-                    </Typography>
-                  </Box>
-                  <Typography variant="h6" fontWeight="bold">
-                    Gatrix Core
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
-
-          {/* Groups container */}
-          <Box
-            sx={{
-              width: '100%',
-              maxWidth: groupingLevels.length === 0 ? '100%' : 600,
-              display: 'flex',
-              flexDirection: groupingLevels.length === 0 ? 'row' : 'column',
-              alignItems: groupingLevels.length === 0 ? 'flex-start' : 'center',
-              justifyContent: 'flex-start',
-              overflowX: groupingLevels.length === 0 ? 'auto' : 'visible',
-              px: groupingLevels.length === 0 ? 4 : 0,
-            }}
-          >
-            {groupingLevels.length === 0 ? (
-              // Horizontal Tree Layout
-              <Box sx={{ display: 'flex', gap: 0, pb: 2, m: '0 auto' }}>
-                {[...services]
-                  .sort((a, b) => a.instanceId.localeCompare(b.instanceId))
-                  .map((service, index, arr) =>
-                    renderInstanceTreeItem(service, index, arr.length)
-                  )}
-              </Box>
-            ) : (
-              groups.map((group, index) => (
-                <React.Fragment key={group.id}>
-                  <Box
-                    sx={{
-                      width: '100%',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
-                      gap: 0,
+                      gap: 1,
                     }}
                   >
-                    {/* Vertical line between groups (not for first group) */}
-                    {index > 0 && (
-                      <Box
-                        sx={{
-                          width: 2,
-                          height: 16,
-                          bgcolor: theme.palette.divider,
-                          flexShrink: 0,
-                        }}
-                      />
-                    )}
-                    {renderGroup(group, 0)}
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        bgcolor: 'primary.main',
+                        borderRadius: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                        G
+                      </Typography>
+                    </Box>
+                    <Typography variant="h6" fontWeight="bold">
+                      Gatrix Core
+                    </Typography>
                   </Box>
-                </React.Fragment>
-              ))
-            )}
+                </CardContent>
+              </Card>
+            </Box>
+
+            {/* Groups container */}
+            <Box
+              sx={{
+                width: '100%',
+                maxWidth: groupingLevels.length === 0 ? '100%' : 600,
+                display: 'flex',
+                flexDirection: groupingLevels.length === 0 ? 'row' : 'column',
+                alignItems:
+                  groupingLevels.length === 0 ? 'flex-start' : 'center',
+                justifyContent: 'flex-start',
+                overflowX: groupingLevels.length === 0 ? 'auto' : 'visible',
+                px: groupingLevels.length === 0 ? 4 : 0,
+              }}
+            >
+              {groupingLevels.length === 0 ? (
+                // Horizontal Tree Layout
+                <Box sx={{ display: 'flex', gap: 0, pb: 2, m: '0 auto' }}>
+                  {[...services]
+                    .sort((a, b) => a.instanceId.localeCompare(b.instanceId))
+                    .map((service, index, arr) =>
+                      renderInstanceTreeItem(service, index, arr.length)
+                    )}
+                </Box>
+              ) : (
+                groups.map((group, index) => (
+                  <React.Fragment key={group.id}>
+                    <Box
+                      sx={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 0,
+                      }}
+                    >
+                      {/* Vertical line between groups (not for first group) */}
+                      {index > 0 && (
+                        <Box
+                          sx={{
+                            width: 2,
+                            height: 16,
+                            bgcolor: theme.palette.divider,
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
+                      {renderGroup(group, 0)}
+                    </Box>
+                  </React.Fragment>
+                ))
+              )}
+            </Box>
           </Box>
-        </Box>
         )}
       </PageContentLoader>
 

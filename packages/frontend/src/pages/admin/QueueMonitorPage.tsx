@@ -97,14 +97,10 @@ function getJobIcon(
   const lower = name.toLowerCase();
   if (lower.includes('cleanup') || lower.includes('clean'))
     return <AutoDeleteIcon sx={sx} />;
-  if (lower.includes('poll'))
-    return <PollIcon sx={sx} />;
-  if (lower.includes('sync'))
-    return <SyncIcon sx={sx} />;
-  if (lower.includes('flush'))
-    return <FlushIcon sx={sx} />;
-  if (lower.includes('expire'))
-    return <ExpireIcon sx={sx} />;
+  if (lower.includes('poll')) return <PollIcon sx={sx} />;
+  if (lower.includes('sync')) return <SyncIcon sx={sx} />;
+  if (lower.includes('flush')) return <FlushIcon sx={sx} />;
+  if (lower.includes('expire')) return <ExpireIcon sx={sx} />;
   if (lower.includes('process') || lower.includes('signal'))
     return <ProcessIcon sx={sx} />;
   if (lower.includes('check') || lower.includes('progression'))
@@ -196,11 +192,11 @@ const QueueMonitorPage: React.FC = () => {
   const [confirmMessage, setConfirmMessage] = useState('');
 
   // Context menu for repeatable job actions
-  const [repeatMenuAnchor, setRepeatMenuAnchor] =
-    useState<null | HTMLElement>(null);
-  const [repeatMenuTarget, setRepeatMenuTarget] = useState<RepeatableJob | null>(
+  const [repeatMenuAnchor, setRepeatMenuAnchor] = useState<null | HTMLElement>(
     null
   );
+  const [repeatMenuTarget, setRepeatMenuTarget] =
+    useState<RepeatableJob | null>(null);
   // Warning dialog before dangerous repeatable job deletion
   const [deleteWarningOpen, setDeleteWarningOpen] = useState(false);
   const [deleteWarningTarget, setDeleteWarningTarget] =
@@ -697,167 +693,164 @@ const QueueMonitorPage: React.FC = () => {
                           </Box>
                         ) : (
                           <>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                <TableCell sx={thSx}>
-                                  {t('queueMonitor.jobName')}
-                                </TableCell>
-                                <TableCell sx={thSx}>
-                                  {t('queueMonitor.pattern')}
-                                </TableCell>
-                                <TableCell sx={thSx}>
-                                  {t('queueMonitor.every')}
-                                </TableCell>
-                                <TableCell sx={thSx}>
-                                  {t('queueMonitor.nextRun')}
-                                </TableCell>
-                                <TableCell sx={{ ...thSx, width: 48 }} />
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {repeatables.map((rj) => (
-                                <TableRow
-                                  key={rj.key}
-                                  hover
-                                  sx={{
-                                    '&:last-child td': { borderBottom: 0 },
-                                  }}
-                                >
-                                  <TableCell>
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.75,
-                                      }}
-                                    >
-                                      {getJobIcon(rj.name)}
-                                      <Typography
-                                        variant="body2"
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell sx={thSx}>
+                                    {t('queueMonitor.jobName')}
+                                  </TableCell>
+                                  <TableCell sx={thSx}>
+                                    {t('queueMonitor.pattern')}
+                                  </TableCell>
+                                  <TableCell sx={thSx}>
+                                    {t('queueMonitor.every')}
+                                  </TableCell>
+                                  <TableCell sx={thSx}>
+                                    {t('queueMonitor.nextRun')}
+                                  </TableCell>
+                                  <TableCell sx={{ ...thSx, width: 48 }} />
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {repeatables.map((rj) => (
+                                  <TableRow
+                                    key={rj.key}
+                                    hover
+                                    sx={{
+                                      '&:last-child td': { borderBottom: 0 },
+                                    }}
+                                  >
+                                    <TableCell>
+                                      <Box
                                         sx={{
-                                          fontFamily: 'monospace',
-                                          fontWeight: 600,
-                                          fontSize: '0.8rem',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 0.75,
                                         }}
                                       >
-                                        {rj.name}
+                                        {getJobIcon(rj.name)}
+                                        <Typography
+                                          variant="body2"
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            fontWeight: 600,
+                                            fontSize: '0.8rem',
+                                          }}
+                                        >
+                                          {rj.name}
+                                        </Typography>
+                                      </Box>
+                                    </TableCell>
+                                    <TableCell>
+                                      {rj.pattern ? (
+                                        <Chip
+                                          size="small"
+                                          label={rj.pattern}
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            height: 22,
+                                            bgcolor: (theme) =>
+                                              alpha(
+                                                theme.palette.primary.main,
+                                                0.08
+                                              ),
+                                            color: 'primary.main',
+                                            fontWeight: 600,
+                                            '& .MuiChip-label': {
+                                              fontSize: '0.72rem',
+                                              px: 1,
+                                            },
+                                          }}
+                                        />
+                                      ) : (
+                                        <Typography
+                                          variant="body2"
+                                          color="text.disabled"
+                                        >
+                                          —
+                                        </Typography>
+                                      )}
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography
+                                        variant="body2"
+                                        sx={{ fontSize: '0.8rem' }}
+                                      >
+                                        {rj.every
+                                          ? formatDuration(parseInt(rj.every))
+                                          : '—'}
                                       </Typography>
-                                    </Box>
-                                  </TableCell>
-                                  <TableCell>
-                                    {rj.pattern ? (
-                                      <Chip
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography
+                                        variant="body2"
+                                        sx={{ fontSize: '0.8rem' }}
+                                      >
+                                        {formatDateTime(rj.next)}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ pr: 1 }}>
+                                      <IconButton
                                         size="small"
-                                        label={rj.pattern}
+                                        onClick={(e) => {
+                                          setRepeatMenuAnchor(e.currentTarget);
+                                          setRepeatMenuTarget(rj);
+                                        }}
                                         sx={{
-                                          fontFamily: 'monospace',
-                                          height: 22,
-                                          bgcolor: (theme) =>
-                                            alpha(
-                                              theme.palette.primary.main,
-                                              0.08
-                                            ),
-                                          color: 'primary.main',
-                                          fontWeight: 600,
-                                          '& .MuiChip-label': {
-                                            fontSize: '0.72rem',
-                                            px: 1,
+                                          color: 'text.secondary',
+                                          '&:hover': {
+                                            bgcolor: 'action.hover',
                                           },
                                         }}
-                                      />
-                                    ) : (
-                                      <Typography
-                                        variant="body2"
-                                        color="text.disabled"
                                       >
-                                        —
-                                      </Typography>
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{ fontSize: '0.8rem' }}
-                                    >
-                                      {rj.every
-                                        ? formatDuration(parseInt(rj.every))
-                                        : '—'}
-                                    </Typography>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{ fontSize: '0.8rem' }}
-                                    >
-                                      {formatDateTime(rj.next)}
-                                    </Typography>
-                                  </TableCell>
-                                  <TableCell align="right" sx={{ pr: 1 }}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={(e) => {
-                                        setRepeatMenuAnchor(e.currentTarget);
-                                        setRepeatMenuTarget(rj);
-                                      }}
-                                      sx={{
-                                        color: 'text.secondary',
-                                        '&:hover': {
-                                          bgcolor: 'action.hover',
-                                        },
-                                      }}
-                                    >
-                                      <MoreVertIcon fontSize="small" />
-                                    </IconButton>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+                                        <MoreVertIcon fontSize="small" />
+                                      </IconButton>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
 
-                          {/* Context menu for repeatable job */}
-                          <Menu
-                            anchorEl={repeatMenuAnchor}
-                            open={Boolean(repeatMenuAnchor)}
-                            onClose={() => {
-                              setRepeatMenuAnchor(null);
-                              setRepeatMenuTarget(null);
-                            }}
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right',
-                            }}
-                            transformOrigin={{
-                              vertical: 'top',
-                              horizontal: 'right',
-                            }}
-                            slotProps={{
-                              paper: {
-                                sx: {
-                                  minWidth: 180,
-                                  boxShadow: 3,
-                                },
-                              },
-                            }}
-                          >
-                            <MenuItem
-                              onClick={() => {
-                                if (repeatMenuTarget)
-                                  handleRemoveRepeatable(repeatMenuTarget);
+                            {/* Context menu for repeatable job */}
+                            <Menu
+                              anchorEl={repeatMenuAnchor}
+                              open={Boolean(repeatMenuAnchor)}
+                              onClose={() => {
+                                setRepeatMenuAnchor(null);
+                                setRepeatMenuTarget(null);
                               }}
-                              sx={{ color: 'error.main' }}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                              }}
+                              slotProps={{
+                                paper: {
+                                  sx: {
+                                    minWidth: 180,
+                                    boxShadow: 3,
+                                  },
+                                },
+                              }}
                             >
-                              <ListItemIcon>
-                                <DeleteIcon
-                                  fontSize="small"
-                                  color="error"
-                                />
-                              </ListItemIcon>
-                              <ListItemText>
-                                {t('queueMonitor.removeRepeatable')}
-                              </ListItemText>
-                            </MenuItem>
-                          </Menu>
+                              <MenuItem
+                                onClick={() => {
+                                  if (repeatMenuTarget)
+                                    handleRemoveRepeatable(repeatMenuTarget);
+                                }}
+                                sx={{ color: 'error.main' }}
+                              >
+                                <ListItemIcon>
+                                  <DeleteIcon fontSize="small" color="error" />
+                                </ListItemIcon>
+                                <ListItemText>
+                                  {t('queueMonitor.removeRepeatable')}
+                                </ListItemText>
+                              </MenuItem>
+                            </Menu>
                           </>
                         )}
                       </Box>
@@ -1090,11 +1083,9 @@ const QueueMonitorPage: React.FC = () => {
               sx={{
                 p: 2,
                 borderRadius: 1.5,
-                bgcolor: (theme) =>
-                  alpha(theme.palette.error.main, 0.04),
+                bgcolor: (theme) => alpha(theme.palette.error.main, 0.04),
                 border: 1,
-                borderColor: (theme) =>
-                  alpha(theme.palette.error.main, 0.15),
+                borderColor: (theme) => alpha(theme.palette.error.main, 0.15),
               }}
             >
               <Typography

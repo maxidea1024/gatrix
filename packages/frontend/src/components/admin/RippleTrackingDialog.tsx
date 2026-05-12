@@ -237,7 +237,11 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
               alignItems: 'center',
             }}
           >
-            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5, fontSize: '0.65rem' }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mr: 0.5, fontSize: '0.65rem' }}
+            >
               Tables:
             </Typography>
             {targetTables.map((name) => (
