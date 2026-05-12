@@ -46,7 +46,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         main: '#818cf8',
         light: '#a5b4fc',
         dark: '#6366f1',
-        contrastText: '#0f1225',
+        contrastText: '#121212',
       },
     },
     // Secondary: Warm rose for accent
@@ -69,8 +69,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         paper: '#ffffff',
       },
       dark: {
-        default: '#0f1225',
-        paper: '#1a1d36',
+        default: '#121212',
+        paper: '#1e1e1e',
       },
     },
     // Text
@@ -80,8 +80,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         secondary: '#64748b',
       },
       dark: {
-        primary: '#e8e8f4',
-        secondary: '#94a3b8',
+        primary: '#e4e4e7',
+        secondary: '#a1a1aa',
       },
     },
     // Accent: Success, Warning, Error (harmonized)
@@ -90,25 +90,25 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
     error: mode === 'dark' ? '#f87171' : '#dc2626',
     info: mode === 'dark' ? '#60a5fa' : '#2563eb',
     // Borders
-    border: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e0e2eb',
-    borderHover: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : '#c7c9d9',
+    border: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : '#e0e2eb',
+    borderHover: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : '#c7c9d9',
     borderFocus: mode === 'dark' ? '#818cf8' : '#4f46e5',
     // Surfaces
     hoverBg:
-      mode === 'dark' ? 'rgba(129, 140, 248, 0.08)' : 'rgba(79, 70, 229, 0.04)',
+      mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(79, 70, 229, 0.04)',
     activeBg:
-      mode === 'dark' ? 'rgba(129, 140, 248, 0.12)' : 'rgba(79, 70, 229, 0.08)',
+      mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(79, 70, 229, 0.08)',
     stripeBg:
       mode === 'dark'
         ? 'rgba(255, 255, 255, 0.025)'
         : 'rgba(79, 70, 229, 0.02)',
     // Drawer / Sidebar
-    drawerBg: mode === 'dark' ? '#161935' : '#ffffff',
+    drawerBg: mode === 'dark' ? '#171717' : '#ffffff',
     // Input
-    inputBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
+    inputBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
     // Table head
     theadBg:
-      mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(79, 70, 229, 0.03)',
+      mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(79, 70, 229, 0.03)',
   };
 
   const p = mode === 'dark' ? colors.primary.dark : colors.primary.light;
