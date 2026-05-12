@@ -1077,7 +1077,6 @@ const PlayerListTab: React.FC<Props> = ({
               rowsPerPage={rowsPerPage}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
-              rowsPerPageOptions={[10, 20, 50, 100]}
             />
           )}
         </Card>

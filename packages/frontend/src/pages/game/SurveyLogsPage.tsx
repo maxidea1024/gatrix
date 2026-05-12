@@ -13,6 +13,7 @@ import {
   TableSortLabel,
   IconButton,
   Tooltip,
+  Chip,
 } from '@mui/material';
 import {
   History as HistoryIcon,
@@ -455,9 +456,12 @@ const SurveyLogsPage: React.FC = () => {
         );
       case 'action':
         return (
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            {t(`surveys.logsDrawer.action.${r.action}`, r.action)}
-          </Typography>
+          <Chip
+            label={t(`surveys.logsDrawer.action.${r.action}`, r.action)}
+            size="small"
+            color={r.action === 'JOINED' ? 'success' : 'primary'}
+            sx={{ fontWeight: 'bold', fontSize: '0.75rem', height: 24 }}
+          />
         );
       case 'accountId':
         return (
@@ -654,14 +658,14 @@ const SurveyLogsPage: React.FC = () => {
       </Box>
 
       <PageContentLoader loading={loading && logs.length === 0}>
-        <Card variant="outlined">
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            <PageContentLoader loading={loading}>
-              {logs.length === 0 ? (
-                <EmptyPagePlaceholder
-                  message={t('surveys.logs.noRecords', 'No survey logs found.')}
-                />
-              ) : (
+        {logs.length === 0 && !loading ? (
+          <EmptyPagePlaceholder
+            message={t('surveys.logs.noRecords', 'No survey logs found.')}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <PageContentLoader loading={loading}>
                 <Box>
                   <TableContainer>
                     <Table size="small">
@@ -705,21 +709,21 @@ const SurveyLogsPage: React.FC = () => {
                     </Table>
                   </TableContainer>
                 </Box>
+              </PageContentLoader>
+              {logs.length > 0 && (
+                <SimplePagination
+                  page={page}
+                  count={total}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={(event, newPage) => updatePage(newPage + 1)}
+                  onRowsPerPageChange={(event: any) => {
+                    updateLimit(Number(event.target.value));
+                  }}
+                />
               )}
-            </PageContentLoader>
-            {logs.length > 0 && (
-              <SimplePagination
-                page={page}
-                count={total}
-                rowsPerPage={rowsPerPage}
-                onPageChange={(event, newPage) => updatePage(newPage + 1)}
-                onRowsPerPageChange={(event: any) => {
-                  updateLimit(Number(event.target.value));
-                }}
-              />
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Column Settings Dialog */}

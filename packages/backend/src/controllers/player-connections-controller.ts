@@ -6,7 +6,7 @@ import { GatrixError } from '../middleware/error-handler';
 import { asyncHandler } from '../utils/async-handler';
 import { createLogger } from '../config/logger';
 import { CcuHistoryModel } from '../models/ccu-history';
-import { SubscriberHistoryModel } from '../models/subscriber-history';
+import { PlayerHistoryModel } from '../models/player-history';
 import { CharacterHistoryModel } from '../models/character-history';
 import serviceDiscoveryService from '../services/service-discovery-service';
 
@@ -665,10 +665,10 @@ export class PlayerConnectionsController {
   );
 
   /**
-   * GET /subscriber/history?from=...&to=...
-   * Query subscriber history from the local database for graphing
+   * GET /player/history?from=...&to=...
+   * Query player history from the local database for graphing
    */
-  static getSubscriberHistory = asyncHandler(
+  static getPlayerHistory = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const environmentId = req.environmentId;
       if (!environmentId) {
@@ -691,7 +691,8 @@ export class PlayerConnectionsController {
         );
       }
 
-      // Determine downsampling interval based on requested time range
+      // Determine downsampling interval based on requested time range.
+      // Data is collected every 10 minutes (600s), so never downsample below that.
       const rangeHours =
         (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60);
       let intervalSeconds: number | undefined;
@@ -699,12 +700,10 @@ export class PlayerConnectionsController {
         intervalSeconds = 3600; // 60-min buckets for >30D
       } else if (rangeHours > 24 * 7) {
         intervalSeconds = 1800; // 30-min buckets for >7D
-      } else if (rangeHours > 24) {
-        intervalSeconds = 1200; // 20-min buckets for >24H
       }
-      // ≤24H: no downsampling (raw 10-min data)
+      // ≤7D: no downsampling — raw 10-min data points
 
-      const records = await SubscriberHistoryModel.getHistory(
+      const records = await PlayerHistoryModel.getHistory(
         environmentId,
         fromDate,
         toDate,
@@ -719,17 +718,17 @@ export class PlayerConnectionsController {
   );
 
   /**
-   * GET /subscriber/latest
-   * Returns the latest subscriber statistics for overview cards
+   * GET /player/latest
+   * Returns the latest player statistics for overview cards
    */
-  static getSubscriberLatest = asyncHandler(
+  static getPlayerLatest = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const environmentId = req.environmentId;
       if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const latest = await SubscriberHistoryModel.getLatest(environmentId);
+      const latest = await PlayerHistoryModel.getLatest(environmentId);
 
       res.json({
         success: true,
@@ -771,17 +770,17 @@ export class PlayerConnectionsController {
         );
       }
 
-      // Determine downsampling interval based on requested time range
+      // Determine downsampling interval based on requested time range.
+      // Data is collected every 10 minutes (600s), so never downsample below that.
       const rangeHours =
         (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60);
       let intervalSeconds: number | undefined;
       if (rangeHours > 24 * 30) {
-        intervalSeconds = 3600;
+        intervalSeconds = 3600; // 60-min buckets for >30D
       } else if (rangeHours > 24 * 7) {
-        intervalSeconds = 1800;
-      } else if (rangeHours > 24) {
-        intervalSeconds = 1200;
+        intervalSeconds = 1800; // 30-min buckets for >7D
       }
+      // ≤7D: no downsampling — raw 10-min data points
 
       const records = await CharacterHistoryModel.getHistory(
         environmentId,

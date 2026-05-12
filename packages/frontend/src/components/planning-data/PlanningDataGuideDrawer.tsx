@@ -76,6 +76,7 @@ const CodeBlock: React.FC<{
             folding: false,
             padding: { top: 8, bottom: 8 },
             scrollbar: { vertical: 'hidden', horizontal: 'hidden' },
+            hover: { enabled: false },
           }}
         />
       </Box>

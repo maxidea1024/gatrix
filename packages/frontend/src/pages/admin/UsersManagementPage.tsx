@@ -2087,7 +2087,6 @@ const UsersManagementPage: React.FC = () => {
                   onRowsPerPageChange={(e) => {
                     updateLimit(parseInt(e.target.value, 10));
                   }}
-                  rowsPerPageOptions={[5, 10, 25, 50, 100]}
                 />
               )}
             </CardContent>

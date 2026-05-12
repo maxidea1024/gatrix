@@ -165,13 +165,14 @@ const cmsService = {
     projectApiPath: string,
     tableName: string,
     version: number,
-    options?: { binaryCode?: string; refresh?: boolean }
+    options?: { binaryCode?: string; refresh?: boolean; comment?: string }
   ): Promise<CmsRollbackResult> {
     const res = await api.post(`${projectApiPath}/ripple-cms/cms/rollback`, {
       tableName,
       version,
       binaryCode: options?.binaryCode || null,
       refresh: options?.refresh || false,
+      comment: options?.comment || undefined,
     });
     return res.data;
   },
@@ -233,6 +234,21 @@ const cmsService = {
     } catch {
       return null;
     }
+  },
+
+  /**
+   * Backfill NULL diffPatch values for existing history rows.
+   * Optionally filter by tableName and limit.
+   */
+  async backfillDiff(
+    projectApiPath: string,
+    options?: { tableName?: string; limit?: number }
+  ): Promise<{ total: number; filled: number; skipped: number; errors: number }> {
+    const res = await api.post(`${projectApiPath}/ripple-cms/cms/backfill-diff`, {
+      tableName: options?.tableName || undefined,
+      limit: options?.limit || 200,
+    });
+    return res.data;
   },
 };
 

@@ -55,12 +55,12 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         ...sx,
       }}
     >
-      <Typography variant="body2" color="text.secondary" fontWeight={500}>
+      <Typography variant="subtitle1" color="text.secondary" fontWeight={500}>
         {message}
       </Typography>
       {description && (
         <Typography
-          variant="caption"
+          variant="body2"
           color="text.secondary"
           sx={{ display: 'block', mt: 0.5, px: 2 }}
         >

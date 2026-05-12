@@ -25,11 +25,16 @@ async function getAdmindApiUrl(environmentId?: string): Promise<string> {
     if (envFiltered.length > 0) {
       ready = envFiltered;
     } else {
-      throw new GatrixError(
-        `No admind instance registered for this environment.`,
-        503,
-        true,
-        ErrorCodes.SERVICE_NOT_FOUND
+      logger.warn(
+        'No admind instances found for environment, using first available',
+        {
+          environmentId,
+          availableEnvs: ready.map((i) => ({
+            instanceId: i.instanceId,
+            environmentId: i.labels.environmentId,
+            environment: i.labels.environment,
+          })),
+        }
       );
     }
   }
@@ -309,7 +314,7 @@ export class RippleCmsController {
   /** POST /cms/rollback — Rollback CMS table to a previous version */
   static rollbackCmsTable = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { tableName, version, binaryCode, refresh } = req.body;
+      const { tableName, version, binaryCode, refresh, comment } = req.body;
 
       if (!tableName) {
         throw new GatrixError('Missing "tableName"', 400);
@@ -328,6 +333,7 @@ export class RippleCmsController {
           version,
           binaryCode: binaryCode || null,
           refresh: !!refresh,
+          comment: comment || undefined,
         }
       );
       res.json({ success: true, data: result });
@@ -359,6 +365,22 @@ export class RippleCmsController {
         `/gatrix/v1/cms/execution-log${qs}`
       );
       res.json({ success: true, data });
+    }
+  );
+
+  /** POST /cms/backfill-diff — Backfill NULL diffPatch values for existing history rows */
+  static backfillDiff = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { tableName, limit } = req.body;
+
+      const admindUrl = await getAdmindApiUrl(req.environmentId);
+      const result = await admindRequest(
+        admindUrl,
+        'POST',
+        '/gatrix/v1/cms/backfill-diff',
+        { tableName: tableName || undefined, limit: limit || 100 }
+      );
+      res.json({ success: true, data: result });
     }
   );
 }

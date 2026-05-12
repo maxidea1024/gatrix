@@ -44,6 +44,7 @@ interface RippleTrackingDialogProps {
   requestId: string | null;
   pattern: string | null;
   matchedKeys: string[];
+  targetTables?: string[];
   onClose: () => void;
 }
 
@@ -52,6 +53,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
   requestId,
   pattern,
   matchedKeys,
+  targetTables,
   onClose,
 }) => {
   const { t } = useTranslation();
@@ -225,6 +227,35 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             {requestId} / {pattern}
           </Typography>
         </Box>
+        {targetTables && targetTables.length > 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 0.5,
+              mt: 0.75,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
+            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5, fontSize: '0.65rem' }}>
+              Tables:
+            </Typography>
+            {targetTables.map((name) => (
+              <Chip
+                key={name}
+                label={name}
+                size="small"
+                variant="outlined"
+                sx={{
+                  height: 20,
+                  fontSize: '0.65rem',
+                  fontFamily: 'monospace',
+                  fontWeight: 500,
+                }}
+              />
+            ))}
+          </Box>
+        )}
       </DialogTitle>
       <DialogContent dividers sx={{ p: 1.5 }}>
         {/* Summary */}

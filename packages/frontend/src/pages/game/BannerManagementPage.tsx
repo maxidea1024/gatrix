@@ -238,6 +238,30 @@ const BannerManagementPage: React.FC = () => {
     setFormDialogOpen(true);
   };
 
+  // Handle direct edit from URL
+  useEffect(() => {
+    const editId = searchParams.get('editId');
+    if (editId) {
+      // Remove editId from URL to prevent reopening on reload
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('editId');
+      window.history.replaceState(null, '', `?${newSearchParams.toString()}`);
+
+      bannerService
+        .getBannerById(projectApiPath, editId)
+        .then((banner) => {
+          if (banner) {
+            setEditingBanner(banner);
+            setFormDialogOpen(true);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load banner for editing:', error);
+          enqueueSnackbar(t('banners.loadFailed'), { variant: 'error' });
+        });
+    }
+  }, [searchParams, projectApiPath, enqueueSnackbar, t]);
+
   const handleFormClose = () => {
     setFormDialogOpen(false);
     setEditingBanner(null);

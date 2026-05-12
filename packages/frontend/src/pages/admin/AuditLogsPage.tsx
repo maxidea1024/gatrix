@@ -1443,7 +1443,6 @@ const AuditLogsPage: React.FC = () => {
                 rowsPerPage={pageState.limit}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
-                rowsPerPageOptions={[5, 10, 25, 50, 100]}
               />
             </CardContent>
           </Card>

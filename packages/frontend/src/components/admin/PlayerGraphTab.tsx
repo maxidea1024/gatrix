@@ -44,7 +44,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import playerConnectionService from '../../services/playerConnectionService';
-import type { SubscriberHistoryRecord } from '../../services/playerConnectionService';
+import type { PlayerHistoryRecord } from '../../services/playerConnectionService';
 import PageContentLoader from '../common/PageContentLoader';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import { crosshairPlugin } from '../../utils/chartCrosshairPlugin';
@@ -70,8 +70,8 @@ interface BucketRow {
   newPlayers: number;
 }
 
-const SubscriberHistoryTable: React.FC<{
-  records: SubscriberHistoryRecord[];
+const PlayerHistoryTable: React.FC<{
+  records: PlayerHistoryRecord[];
 }> = ({ records }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -228,31 +228,31 @@ interface Props {
   refreshKey?: number;
 }
 
-const SubscriberGraphTab: React.FC<Props> = ({
+const PlayerGraphTab: React.FC<Props> = ({
   projectApiPath,
   refreshKey,
 }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [records, setRecords] = useState<SubscriberHistoryRecord[]>([]);
+  const [records, setRecords] = useState<PlayerHistoryRecord[]>([]);
 
   const [displayMode, setDisplayModeRaw] = useState<'all' | 'total' | 'new'>(
     () =>
-      (localStorage.getItem('subscriber-display-mode') as
+      (localStorage.getItem('player-display-mode') as
         | 'all'
         | 'total'
         | 'new') || 'all'
   );
   const setDisplayMode = useCallback((v: 'all' | 'total' | 'new') => {
     setDisplayModeRaw(v);
-    localStorage.setItem('subscriber-display-mode', v);
+    localStorage.setItem('player-display-mode', v);
   }, []);
   const [showLegend, setShowLegendRaw] = useState(
-    () => localStorage.getItem('subscriber-show-legend') !== 'false'
+    () => localStorage.getItem('player-show-legend') !== 'false'
   );
   const setShowLegend = useCallback((v: boolean) => {
     setShowLegendRaw(v);
-    localStorage.setItem('subscriber-show-legend', String(v));
+    localStorage.setItem('player-show-legend', String(v));
   }, []);
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(() =>
     dayjs().subtract(7, 'day').startOf('day')
@@ -287,14 +287,14 @@ const SubscriberGraphTab: React.FC<Props> = ({
       if (showLoading) setLoading(true);
       try {
         const { from, to } = getDateRange();
-        const data = await playerConnectionService.getSubscriberHistory(
+        const data = await playerConnectionService.getPlayerHistory(
           projectApiPath,
           { from: from.toISOString(), to: to.toISOString() }
         );
         setRecords(data);
         hasLoadedRef.current = true;
       } catch (err) {
-        console.error('Subscriber history load failed:', err);
+        console.error('Player history load failed:', err);
       } finally {
         setLoading(false);
       }
@@ -514,7 +514,7 @@ const SubscriberGraphTab: React.FC<Props> = ({
             </Card>
 
             {/* History table */}
-            <SubscriberHistoryTable records={records} />
+            <PlayerHistoryTable records={records} />
           </>
         )}
       </PageContentLoader>
@@ -522,4 +522,4 @@ const SubscriberGraphTab: React.FC<Props> = ({
   );
 };
 
-export default SubscriberGraphTab;
+export default PlayerGraphTab;

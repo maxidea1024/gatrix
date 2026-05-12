@@ -1145,13 +1145,20 @@ const GatrixEdgesPage: React.FC = () => {
         </Box>
       </Box>
 
-      {error && (
+      {error && services.length > 0 && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
       <PageContentLoader loading={initialLoading}>
+        {services.length === 0 ? (
+          <EmptyPlaceholder
+            message={t('gatrixEdges.noEdges')}
+            description={t('gatrixEdges.noEdgesDescription')}
+            minHeight={400}
+          />
+        ) : (
         <Box
           sx={{
             display: 'flex',
@@ -1168,24 +1175,18 @@ const GatrixEdgesPage: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              // Add padding bottom if there are services to make space for the line
-              pb: services.length > 0 ? 4 : 0,
-              // Draw line using pseudo-element for perfect alignment and overlap
-              '&::after':
-                services.length > 0
-                  ? {
-                      content: '""',
-                      position: 'absolute',
-                      bottom: 0,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: 2,
-                      // Height = padding(32px) + overlap(2px)
-                      height: '34px',
-                      bgcolor: 'divider',
-                      zIndex: 0,
-                    }
-                  : undefined,
+              pb: 4,
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 2,
+                height: '34px',
+                bgcolor: 'divider',
+                zIndex: 0,
+              },
             }}
           >
             <Card
@@ -1193,7 +1194,6 @@ const GatrixEdgesPage: React.FC = () => {
                 minWidth: 180,
                 textAlign: 'center',
                 boxShadow: theme.shadows[2],
-                // Ensure card sits on top of the line
                 zIndex: 1,
                 position: 'relative',
                 mb: 0,
@@ -1240,9 +1240,9 @@ const GatrixEdgesPage: React.FC = () => {
               display: 'flex',
               flexDirection: groupingLevels.length === 0 ? 'row' : 'column',
               alignItems: groupingLevels.length === 0 ? 'flex-start' : 'center',
-              justifyContent: 'flex-start', // Use flex-start to prevent left truncation on overflow
+              justifyContent: 'flex-start',
               overflowX: groupingLevels.length === 0 ? 'auto' : 'visible',
-              px: groupingLevels.length === 0 ? 4 : 0, // Add padding to ensure cards don't touch edges
+              px: groupingLevels.length === 0 ? 4 : 0,
             }}
           >
             {groupingLevels.length === 0 ? (
@@ -1282,18 +1282,9 @@ const GatrixEdgesPage: React.FC = () => {
                 </React.Fragment>
               ))
             )}
-
-            {services.length === 0 && !initialLoading && (
-              <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
-                <EmptyPlaceholder
-                  message={t('gatrixEdges.noEdges')}
-                  description={t('gatrixEdges.noEdgesDescription')}
-                  minHeight={200}
-                />
-              </Box>
-            )}
           </Box>
         </Box>
+        )}
       </PageContentLoader>
 
       {/* Cache Invalidation Confirmation Dialog */}
@@ -1489,6 +1480,7 @@ const GatrixEdgesPage: React.FC = () => {
                   verticalScrollbarSize: 12,
                   horizontalScrollbarSize: 12,
                 },
+                hover: { enabled: false },
               }}
             />
           </Box>

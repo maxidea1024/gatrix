@@ -559,6 +559,7 @@ const MediaAssetsPage: React.FC = () => {
         onClose={() => setDetailAsset(null)}
         maxWidth="md"
         fullWidth
+        sx={{ '& .MuiDialog-paper': { maxWidth: 750 } }}
       >
         {detailAsset && (
           <>
@@ -672,12 +673,19 @@ const MediaAssetsPage: React.FC = () => {
                             }}
                           >
                             <Typography
+                              component="a"
+                              href={detailAsset.cdnUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               variant="body2"
-                              sx={{
-                                fontFamily: 'monospace',
-                                fontSize: '0.75rem',
-                                wordBreak: 'break-all',
+                              color="primary"
+                              sx={{ 
+                                fontFamily: 'monospace', 
+                                fontSize: '0.75rem', 
+                                wordBreak: 'break-all', 
                                 flex: 1,
+                                textDecoration: 'none',
+                                '&:hover': { textDecoration: 'underline' }
                               }}
                             >
                               {detailAsset.cdnUrl}
@@ -796,9 +804,7 @@ const MediaAssetsPage: React.FC = () => {
                           }
                           onClick={() => {
                             setDetailAsset(null);
-                            navigate(
-                              `/game/banners?search=${encodeURIComponent(banner.name)}`
-                            );
+                            navigate(`/game/banners?search=${encodeURIComponent(banner.name)}&editId=${banner.bannerId}`);
                           }}
                           sx={{ cursor: 'pointer' }}
                         />

@@ -2,32 +2,36 @@ import db from '../config/knex';
 import { createLogger } from '../config/logger';
 import { ulid } from 'ulid';
 
-const logger = createLogger('SubscriberHistory');
+const logger = createLogger('PlayerHistory');
 
-export interface SubscriberHistoryRecord {
+const TABLE = 'g_player_history';
+
+export interface PlayerHistoryRecord {
   id?: string;
   environmentId: string;
   totalPlayers: number;
   newPlayers: number;
+  totalCharacters: number;
+  newCharacters: number;
   recordedAt: Date;
 }
 
-export class SubscriberHistoryModel {
+export class PlayerHistoryModel {
   /**
-   * Insert a single subscriber history record
+   * Insert a single player history record
    */
   static async insertRecord(
-    record: Omit<SubscriberHistoryRecord, 'id'>
+    record: Omit<PlayerHistoryRecord, 'id'>
   ): Promise<void> {
     const row = { id: ulid(), ...record };
-    await db('g_player_history').insert(row);
+    await db(TABLE).insert(row);
     logger.debug(
-      `Inserted subscriber history record: totalPlayers=${record.totalPlayers}, newPlayers=${record.newPlayers}`
+      `Inserted player history: players=${record.totalPlayers}(+${record.newPlayers}), chars=${record.totalCharacters}(+${record.newCharacters})`
     );
   }
 
   /**
-   * Get subscriber history for graphing.
+   * Get player history for graphing.
    * When intervalSeconds is provided, records are downsampled into
    * time buckets of that width using MAX aggregation.
    */
@@ -36,10 +40,10 @@ export class SubscriberHistoryModel {
     from: Date,
     to: Date,
     intervalSeconds?: number
-  ): Promise<SubscriberHistoryRecord[]> {
+  ): Promise<PlayerHistoryRecord[]> {
     // No downsampling needed — return raw records
     if (!intervalSeconds || intervalSeconds <= 600) {
-      return db('g_player_history')
+      return db(TABLE)
         .where('environmentId', environmentId)
         .where('recordedAt', '>=', from)
         .where('recordedAt', '<=', to)
@@ -50,11 +54,13 @@ export class SubscriberHistoryModel {
     const bucketExpr = 'FLOOR(UNIX_TIMESTAMP(recordedAt) / ?)';
     const bucketSelectExpr = `FROM_UNIXTIME(${bucketExpr} * ?)`;
 
-    return db('g_player_history')
+    return db(TABLE)
       .select(
         'environmentId',
         db.raw('MAX(totalPlayers) as totalPlayers'),
         db.raw('MAX(newPlayers) as newPlayers'),
+        db.raw('MAX(totalCharacters) as totalCharacters'),
+        db.raw('MAX(newCharacters) as newCharacters'),
         db.raw(`${bucketSelectExpr} as recordedAt`, [
           intervalSeconds,
           intervalSeconds,
@@ -74,13 +80,13 @@ export class SubscriberHistoryModel {
   }
 
   /**
-   * Get the latest subscriber record for a given environment.
+   * Get the latest player record for a given environment.
    * Used for the overview tab cards.
    */
   static async getLatest(
     environmentId: string
-  ): Promise<SubscriberHistoryRecord | null> {
-    const rows = await db('g_player_history')
+  ): Promise<PlayerHistoryRecord | null> {
+    const rows = await db(TABLE)
       .where('environmentId', environmentId)
       .orderBy('recordedAt', 'desc')
       .limit(1);
@@ -95,13 +101,13 @@ export class SubscriberHistoryModel {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
 
-    const deleted = await db('g_player_history')
+    const deleted = await db(TABLE)
       .where('recordedAt', '<', cutoff)
       .delete();
 
     if (deleted > 0) {
       logger.info(
-        `Cleaned up ${deleted} subscriber history records older than ${days} days`
+        `Cleaned up ${deleted} player history records older than ${days} days`
       );
     }
 

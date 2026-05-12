@@ -12,6 +12,7 @@ import {
   Button,
   ButtonGroup,
   Chip,
+  Card,
   TextField,
   CircularProgress,
   IconButton,
@@ -57,6 +58,9 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   CompareArrows as CompareArrowsIcon,
+  Edit as EditIcon,
+  ArrowForward as ArrowForwardIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -185,7 +189,6 @@ function formatBytes(bytes: number): string {
 
 const RELOAD_FILTER_KEY = 'cmsManagement.reloadFilter';
 const LS_PAGE_SIZE_KEY = 'cmsManagement.pageSize';
-const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100];
 
 type SortField =
   | 'tableName'
@@ -245,18 +248,24 @@ const CmsManagementPage: React.FC = () => {
   const [detailTableName, setDetailTableName] = useState('');
   const [detailTab, setDetailTab] = useState(0);
 
-  // Tab 0: Editor
+  // Inline editor (activated from version context menu)
   const [editorData, setEditorData] = useState('');
   const [editorOriginalData, setEditorOriginalData] = useState('');
   const [editorComment, setEditorComment] = useState('');
   const [editorSaving, setEditorSaving] = useState(false);
   const [editorLoading, setEditorLoading] = useState(false);
   const [editorJsonValid, setEditorJsonValid] = useState(true);
-  const [editorCurrentTable, setEditorCurrentTable] = useState<CmsTable | null>(
-    null
-  );
+  const [editingVersion, setEditingVersion] = useState<number | null>(null);
   const [saveMenuOpen, setSaveMenuOpen] = useState(false);
   const saveMenuRef = React.useRef<HTMLDivElement>(null);
+
+  // Version context menu (MoreVert)
+  const [versionMenuAnchor, setVersionMenuAnchor] =
+    useState<HTMLElement | null>(null);
+  const [versionMenuEntry, setVersionMenuEntry] = useState<{
+    version: number;
+    isActive: boolean;
+  } | null>(null);
 
   // Tab 1: History
   const [historyData, setHistoryData] =
@@ -281,6 +290,7 @@ const CmsManagementPage: React.FC = () => {
   );
   const [propagationLoading, setPropagationLoading] = useState(false);
   const [propagationLoaded, setPropagationLoaded] = useState(false);
+  const [collapsedPropGroups, setCollapsedPropGroups] = useState<Set<string>>(new Set());
 
   // Rollback confirm dialog
   const [rollbackOpen, setRollbackOpen] = useState(false);
@@ -288,6 +298,16 @@ const CmsManagementPage: React.FC = () => {
   const [rollbackVersion, setRollbackVersion] = useState<number>(0);
   const [rollbackRefresh, setRollbackRefresh] = useState(true);
   const [rollbackLoading, setRollbackLoading] = useState(false);
+  const [rollbackDiffText, setRollbackDiffText] = useState<string>('');
+  const [rollbackDiffLoading, setRollbackDiffLoading] = useState(false);
+  const [rollbackComment, setRollbackComment] = useState('');
+  const [rollbackCurrentVersion, setRollbackCurrentVersion] = useState<number>(0);
+
+  // Unsynced refresh dialog
+  const [unsyncedDialogOpen, setUnsyncedDialogOpen] = useState(false);
+  const [unsyncedSelected, setUnsyncedSelected] = useState<Set<string>>(new Set());
+  const [unsyncedRefreshing, setUnsyncedRefreshing] = useState(false);
+  const [unsyncedDiffs, setUnsyncedDiffs] = useState<Record<string, { loading: boolean; text: string }>>({});
 
   // Row context menu
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
@@ -299,6 +319,7 @@ const CmsManagementPage: React.FC = () => {
   // Refresh confirm dialog
   const [refreshConfirmOpen, setRefreshConfirmOpen] = useState(false);
   const [refreshConfirmTableName, setRefreshConfirmTableName] = useState('');
+  const [refreshConfirmDiff, setRefreshConfirmDiff] = useState<{ loading: boolean; text: string }>({ loading: false, text: '' });
 
   // Ripple tracking dialog
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
@@ -307,6 +328,7 @@ const CmsManagementPage: React.FC = () => {
   );
   const [trackingPattern, setTrackingPattern] = useState<string | null>(null);
   const [trackingMatchedKeys, setTrackingMatchedKeys] = useState<string[]>([]);
+  const [trackingTargetTables, setTrackingTargetTables] = useState<string[]>([]);
 
   const handleSetReloadFilter = (val: 'all' | 'hot' | 'restart') => {
     setReloadFilter(val);
@@ -485,12 +507,11 @@ const CmsManagementPage: React.FC = () => {
 
   // ── Detail Drawer ──
   const openDetail = async (tableName: string) => {
-    const tableInfo = tables.find((t2) => t2.tableName === tableName) || null;
     setDetailTableName(tableName);
-    setEditorCurrentTable(tableInfo);
     setDetailOpen(true);
-    setDetailTab(0);
+    setDetailTab(0); // 0 = History tab
     setEditorComment('');
+    setEditingVersion(null);
     setHistoryData(null);
     setHistoryLoaded(false);
     setPropagationData([]);
@@ -498,31 +519,26 @@ const CmsManagementPage: React.FC = () => {
     setViewingVersion(null);
     setViewingData(null);
 
-    // Load current version data for editor
-    if (tableInfo) {
-      setEditorLoading(true);
-      try {
-        const projectApiPath = getProjectApiPath();
-        const result = await cmsService.getTableVersionData(
-          projectApiPath,
-          tableName,
-          tableInfo.version
-        );
-        const jsonStr = JSON.stringify(result.data ?? result, null, 2);
-        setEditorData(jsonStr);
-        setEditorOriginalData(jsonStr);
-      } catch {
-        setEditorData('');
-        setEditorOriginalData('');
-        enqueueSnackbar(t('cms.history.dataLoadFailed'), { variant: 'error' });
-      } finally {
-        setEditorLoading(false);
-      }
+    // Load history immediately (tab 0 = history)
+    setHistoryLoading(true);
+    try {
+      const projectApiPath = getProjectApiPath();
+      const result = await cmsService.getTableHistory(
+        projectApiPath,
+        tableName,
+        30
+      );
+      setHistoryData(result);
+      setHistoryLoaded(true);
+    } catch {
+      enqueueSnackbar(t('cms.history.loadFailed'), { variant: 'error' });
+    } finally {
+      setHistoryLoading(false);
     }
   };
 
-  const fetchHistory = async () => {
-    if (historyLoaded) return;
+  const fetchHistory = async (force = false) => {
+    if (historyLoaded && !force) return;
     setHistoryLoading(true);
     try {
       const projectApiPath = getProjectApiPath();
@@ -569,8 +585,29 @@ const CmsManagementPage: React.FC = () => {
 
   const handleDetailTabChange = (_: any, newTab: number) => {
     setDetailTab(newTab);
-    if (newTab === 1 && !historyLoaded) fetchHistory();
-    if (newTab === 2 && !propagationLoaded) fetchPropagation();
+    if (newTab === 0 && !historyLoaded) fetchHistory();
+    if (newTab === 1 && !propagationLoaded) fetchPropagation();
+  };
+
+  // ── Start editing a version (inline) ──
+  const startEditing = async (version: number) => {
+    setEditingVersion(version);
+    setEditorComment('');
+    setEditorLoading(true);
+    setEditorJsonValid(true);
+    try {
+      const data = await fetchVersionData(detailTableName, version);
+      const jsonStr = JSON.stringify(data, null, 2);
+      setEditorData(jsonStr);
+      setEditorOriginalData(jsonStr);
+    } catch {
+      setEditorData('');
+      setEditorOriginalData('');
+      enqueueSnackbar(t('cms.history.dataLoadFailed'), { variant: 'error' });
+      setEditingVersion(null);
+    } finally {
+      setEditorLoading(false);
+    }
   };
 
   // ── Fetch version data (with cache) ──
@@ -728,17 +765,9 @@ const CmsManagementPage: React.FC = () => {
           }),
           { variant: 'success' }
         );
-        // Update local table info
-        setEditorCurrentTable((prev) =>
-          prev
-            ? {
-                ...prev,
-                version: result.version,
-                contentHash: result.contentHash,
-              }
-            : prev
-        );
+        setEditingVersion(null); // Close inline editor
         setHistoryLoaded(false); // Force reload history
+        fetchHistory(true); // Reload history list
         fetchTables();
 
         // Open tracking if refresh was triggered
@@ -746,9 +775,10 @@ const CmsManagementPage: React.FC = () => {
           setTrackingRequestId(result.refresh.requestId);
           setTrackingPattern(result.refresh.pattern || 'cms/reload');
           setTrackingMatchedKeys([]);
+          setTrackingTargetTables([detailTableName]);
           setTrackingDialogOpen(true);
           setPropagationLoaded(false);
-          if (detailTab === 2) fetchPropagation(true);
+          if (detailTab === 1) fetchPropagation(true);
         }
       }
     } catch (err: any) {
@@ -778,9 +808,10 @@ const CmsManagementPage: React.FC = () => {
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
+      setTrackingTargetTables([detailTableName]);
       setTrackingDialogOpen(true);
       setPropagationLoaded(false);
-      if (detailTab === 2) fetchPropagation(true);
+      if (detailTab === 1) fetchPropagation(true);
       // Re-fetch tables after servers reload to update synced status
       setTimeout(() => fetchTables(), 2000);
     } catch (err: any) {
@@ -812,6 +843,7 @@ const CmsManagementPage: React.FC = () => {
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
+      setTrackingTargetTables(Array.from(selectedTables));
       setTrackingDialogOpen(true);
       // Re-fetch tables after servers reload to update synced status
       setTimeout(() => fetchTables(), 2000);
@@ -822,15 +854,20 @@ const CmsManagementPage: React.FC = () => {
   };
 
   // ── Refresh All Unsynced ──
-  const handleRefreshAllUnsynced = async () => {
+  const openUnsyncedDialog = () => {
     const unsyncedTables = tables.filter(
       (tbl) => tbl.runtime && !tbl.runtime.synced
     );
-    if (unsyncedTables.length === 0) return;
+    setUnsyncedSelected(new Set(unsyncedTables.map((t) => t.tableName)));
+    setUnsyncedDialogOpen(true);
+  };
 
+  const handleRefreshSelectedUnsynced = async () => {
+    if (unsyncedSelected.size === 0) return;
+    setUnsyncedRefreshing(true);
     try {
       const projectApiPath = getProjectApiPath();
-      const tableNameList = unsyncedTables.map((t) => t.tableName).join(',');
+      const tableNameList = Array.from(unsyncedSelected).join(',');
       const result = await rippleService.triggerRefresh(
         projectApiPath,
         'cms/reload',
@@ -839,26 +876,56 @@ const CmsManagementPage: React.FC = () => {
       );
       enqueueSnackbar(
         t('cms.refreshTable.success', {
-          key: `${unsyncedTables.length} tables`,
+          key: `${unsyncedSelected.size} tables`,
         }),
         { variant: 'success' }
       );
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
+      setTrackingTargetTables(Array.from(unsyncedSelected));
       setTrackingDialogOpen(true);
-      // Re-fetch tables after servers reload to update synced status
+      setUnsyncedDialogOpen(false);
       setTimeout(() => fetchTables(), 2000);
     } catch {
       enqueueSnackbar(t('cms.refreshTable.failed'), { variant: 'error' });
+    } finally {
+      setUnsyncedRefreshing(false);
     }
   };
 
   // ── Rollback Handler ──
-  const confirmRollback = (tableName: string, version: number) => {
+  const confirmRollback = async (tableName: string, version: number) => {
     setRollbackTableName(tableName);
     setRollbackVersion(version);
+    setRollbackDiffText('');
+    setRollbackDiffLoading(true);
+    setRollbackComment('');
+    const tbl = tables.find((t2) => t2.tableName === tableName);
+    setRollbackCurrentVersion(tbl?.version || historyData?.activeVersion || 0);
     setRollbackOpen(true);
+
+    try {
+      const tbl = tables.find((t2) => t2.tableName === tableName);
+      const currentVersion = tbl?.version || historyData?.activeVersion;
+      if (currentVersion && currentVersion !== version) {
+        const [curData, tgtData] = await Promise.all([
+          fetchVersionData(tableName, currentVersion),
+          fetchVersionData(tableName, version),
+        ]);
+        const oldStr = JSON.stringify(curData, null, 2);
+        const newStr = JSON.stringify(tgtData, null, 2);
+        const patch = await computeDiffInWorker(
+          oldStr, newStr,
+          `v${currentVersion} (current)`, `v${version} (rollback target)`
+        );
+        setRollbackDiffText(patch);
+      }
+    } catch (err: any) {
+      setRollbackDiffText('');
+    } finally {
+      setRollbackDiffLoading(false);
+    }
   };
 
   const handleRollback = async () => {
@@ -869,7 +936,7 @@ const CmsManagementPage: React.FC = () => {
         projectApiPath,
         rollbackTableName,
         rollbackVersion,
-        { refresh: rollbackRefresh }
+        { refresh: rollbackRefresh, comment: rollbackComment }
       );
       enqueueSnackbar(
         t('cms.rollback.success', {
@@ -910,9 +977,10 @@ const CmsManagementPage: React.FC = () => {
       setTrackingRequestId(result.requestId);
       setTrackingPattern('cms/reload');
       setTrackingMatchedKeys(result.matchedKeys || []);
+      setTrackingTargetTables([tableName]);
       setTrackingDialogOpen(true);
       setPropagationLoaded(false);
-      if (detailTab === 2) fetchPropagation(true);
+      if (detailTab === 1) fetchPropagation(true);
       // Re-fetch tables after servers reload to update synced status
       setTimeout(() => fetchTables(), 2000);
     } catch (err: any) {
@@ -926,8 +994,32 @@ const CmsManagementPage: React.FC = () => {
   };
 
   const requestRefreshTable = (tableName: string) => {
-    setRefreshConfirmTableName(tableName);
-    setRefreshConfirmOpen(true);
+      setRefreshConfirmTableName(tableName);
+      setRefreshConfirmOpen(true);
+      // Compute diff for this table
+      const tbl = tables.find((t) => t.tableName === tableName);
+      if (tbl?.runtime && !tbl.runtime.synced) {
+        setRefreshConfirmDiff({ loading: true, text: '' });
+        (async () => {
+          try {
+            const [curData, svrData] = await Promise.all([
+              fetchVersionData(tableName, tbl.version),
+              fetchVersionData(tableName, tbl.runtime!.loadedVersion),
+            ]);
+            const patch = await computeDiffInWorker(
+              JSON.stringify(svrData, null, 2),
+              JSON.stringify(curData, null, 2),
+              `v${tbl.runtime!.loadedVersion} (server)`,
+              `v${tbl.version} (saved)`
+            );
+            setRefreshConfirmDiff({ loading: false, text: patch });
+          } catch {
+            setRefreshConfirmDiff({ loading: false, text: '' });
+          }
+        })();
+      } else {
+        setRefreshConfirmDiff({ loading: false, text: '' });
+      }
   };
 
   // ── File upload handler ──
@@ -1047,12 +1139,14 @@ const CmsManagementPage: React.FC = () => {
                   sx={{ fontWeight: 600, cursor: 'pointer' }}
                 />
                 {unsyncedCount > 0 && (
+                  <>
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
                   <Button
                     size="small"
                     variant="contained"
                     color="error"
                     startIcon={<RefreshIcon sx={{ fontSize: 14 }} />}
-                    onClick={handleRefreshAllUnsynced}
+                    onClick={openUnsyncedDialog}
                     sx={{
                       fontWeight: 600,
                       borderRadius: 8,
@@ -1065,6 +1159,7 @@ const CmsManagementPage: React.FC = () => {
                   >
                     {t('cms.unsyncedCount', { count: unsyncedCount })}
                   </Button>
+                  </>
                 )}
               </Box>
             </Box>
@@ -1334,44 +1429,35 @@ const CmsManagementPage: React.FC = () => {
                                 <Chip
                                   label={t('cms.synced')}
                                   size="small"
-                                  color="default"
+                                  variant="filled"
                                   sx={{
                                     fontSize: '0.68rem',
                                     height: 22,
-                                    color: 'text.secondary',
+                                    bgcolor: '#4caf50',
+                                    color: '#fff',
                                   }}
                                 />
                               ) : (
-                                <Tooltip
-                                  title={t('cms.serverVsDb', {
-                                    server: table.runtime.loadedVersion,
-                                    db: table.version,
-                                  })}
-                                >
-                                  <Button
+                                <Tooltip title={t('cms.unsyncedTooltip', { server: table.runtime.loadedVersion, db: table.version })}>
+                                  <Chip
+                                    label={`v${table.runtime.loadedVersion} ≠ v${table.version}`}
                                     size="small"
-                                    variant="contained"
-                                    color="error"
-                                    startIcon={
-                                      <RefreshIcon sx={{ fontSize: 14 }} />
-                                    }
+                                    color="warning"
+                                    variant="filled"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      setRefreshConfirmTableName(
-                                        table.tableName
-                                      );
-                                      setRefreshConfirmOpen(true);
+                                      requestRefreshTable(table.tableName);
                                     }}
                                     sx={{
                                       fontSize: '0.68rem',
-                                      textTransform: 'none',
-                                      minWidth: 0,
-                                      px: 1,
-                                      py: 0.25,
+                                      fontFamily: 'monospace',
+                                      fontWeight: 700,
+                                      height: 22,
+                                      cursor: 'pointer',
+                                      bgcolor: '#ef6c00',
+                                      color: '#fff',
                                     }}
-                                  >
-                                    {t('cms.detail.refresh')}
-                                  </Button>
+                                  />
                                 </Tooltip>
                               )
                             ) : (
@@ -1444,7 +1530,6 @@ const CmsManagementPage: React.FC = () => {
                   rowsPerPage={rowsPerPage}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={PAGE_SIZE_OPTIONS}
                 />
               </Paper>
             )}
@@ -1581,20 +1666,25 @@ const CmsManagementPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Detail Drawer (3-tab: Editor, History, Propagation) */}
+      {/* Detail Drawer (2-tab: History, Propagation) */}
       <ResizableDrawer
         open={detailOpen}
         onClose={() => {
           setDetailOpen(false);
           setViewingVersion(null);
           setViewingData(null);
+          setEditingVersion(null);
+          setEditorData('');
+          setEditorOriginalData('');
+          setEditorComment('');
         }}
         title={detailTableName}
-        subtitle={
-          editorCurrentTable
-            ? `v${editorCurrentTable.version} · ${formatBytes(editorCurrentTable.dataSize)}`
-            : undefined
-        }
+        subtitle={(() => {
+          const tbl = tables.find((t2) => t2.tableName === detailTableName);
+          return tbl
+            ? `v${tbl.version} · ${formatBytes(tbl.dataSize)}`
+            : undefined;
+        })()}
         storageKey="cmsDetail.drawer.width"
         defaultWidth={640}
         minWidth={480}
@@ -1617,211 +1707,18 @@ const CmsManagementPage: React.FC = () => {
               px: 2,
             }}
           >
-            <Tab label={t('cms.detail.tabEdit')} />
             <Tab label={t('cms.detail.tabHistory')} />
             <Tab label={t('cms.detail.tabRipple')} />
           </Tabs>
 
-          {/* ── Tab 0: Editor ── */}
+          {/* ── Tab 0: History (Timeline) ── */}
           {detailTab === 0 && (
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                flex: 1,
-                minHeight: 0,
-                p: 2,
-                gap: 1.5,
-              }}
-            >
-              {editorCurrentTable && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    flexShrink: 0,
-                  }}
-                >
-                  <Chip
-                    label={`v${editorCurrentTable.version}`}
-                    size="small"
-                    variant="filled"
-                    color="info"
-                    sx={{ fontFamily: 'monospace', fontWeight: 700 }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{ fontFamily: 'monospace', color: 'text.disabled' }}
-                  >
-                    {editorCurrentTable.contentHash?.slice(0, 12)}
-                  </Typography>
-                  {editorData !== editorOriginalData ? (
-                    <Chip
-                      label={t('cms.detail.modified')}
-                      size="small"
-                      color="warning"
-                      sx={{ fontSize: '0.65rem', height: 18 }}
-                    />
-                  ) : (
-                    <Chip
-                      label={t('cms.detail.same')}
-                      size="small"
-                      color="default"
-                      sx={{ fontSize: '0.65rem', height: 18 }}
-                    />
-                  )}
-                  <Box sx={{ ml: 'auto' }} />
-                  <Tooltip title={t('cms.detail.forceRefreshTooltip')}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="warning"
-                      startIcon={<RefreshIcon />}
-                      onClick={() => {
-                        setRefreshConfirmTableName(detailTableName);
-                        setRefreshConfirmOpen(true);
-                      }}
-                    >
-                      {t('cms.detail.refresh')}
-                    </Button>
-                  </Tooltip>
-                </Box>
-              )}
-              {editorLoading ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flex: 1,
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              ) : (
-                <Box sx={{ flex: 1, minHeight: 0 }}>
-                  <JsonEditor
-                    value={editorData}
-                    onChange={setEditorData}
-                    height="100%"
-                    onValidation={(isValid) => setEditorJsonValid(isValid)}
-                    helperText={
-                      !editorJsonValid
-                        ? t('cms.detail.jsonSyntaxError')
-                        : editorData !== editorOriginalData
-                          ? t('cms.detail.hasChanges')
-                          : t('cms.detail.currentData')
-                    }
-                  />
-                </Box>
-              )}
-              <TextField
-                size="small"
-                label="Comment"
-                value={editorComment}
-                onChange={(e) => setEditorComment(e.target.value)}
-                fullWidth
-                multiline
-                minRows={8}
-                sx={{ flexShrink: 0 }}
-                placeholder={t('cms.detail.commentPlaceholder')}
-                helperText={t('cms.detail.commentHelper')}
-              />
-              <Box
-                sx={{
-                  display: 'flex',
-                  gap: 1,
-                  flexShrink: 0,
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <ButtonGroup variant="contained" ref={saveMenuRef}>
-                  <Button
-                    startIcon={
-                      editorSaving ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <SaveIcon />
-                      )
-                    }
-                    onClick={() => handleSave(false)}
-                    disabled={
-                      editorSaving ||
-                      !editorData.trim() ||
-                      !editorComment.trim() ||
-                      editorData === editorOriginalData ||
-                      !editorJsonValid
-                    }
-                  >
-                    {t('cms.detail.save')}
-                  </Button>
-                  <Button
-                    size="small"
-                    onClick={() => setSaveMenuOpen((prev) => !prev)}
-                    disabled={
-                      editorSaving ||
-                      !editorComment.trim() ||
-                      editorData === editorOriginalData ||
-                      !editorJsonValid
-                    }
-                  >
-                    <ArrowDropDownIcon />
-                  </Button>
-                </ButtonGroup>
-                <Popper
-                  open={saveMenuOpen}
-                  anchorEl={saveMenuRef.current}
-                  placement="top-end"
-                  transition
-                  sx={{ zIndex: 1300 }}
-                >
-                  {({ TransitionProps }) => (
-                    <Grow {...TransitionProps}>
-                      <Paper elevation={8}>
-                        <ClickAwayListener
-                          onClickAway={() => setSaveMenuOpen(false)}
-                        >
-                          <MenuList>
-                            <MenuItem onClick={() => handleSave(false)}>
-                              <ListItemIcon>
-                                <SaveIcon fontSize="small" />
-                              </ListItemIcon>
-                              <ListItemText>
-                                {t('cms.detail.saveOnly')}
-                              </ListItemText>
-                            </MenuItem>
-                            <MenuItem onClick={() => handleSave(true)}>
-                              <ListItemIcon>
-                                <RefreshIcon fontSize="small" color="primary" />
-                              </ListItemIcon>
-                              <ListItemText>
-                                {t('cms.detail.saveAndRefresh')}
-                              </ListItemText>
-                            </MenuItem>
-                          </MenuList>
-                        </ClickAwayListener>
-                      </Paper>
-                    </Grow>
-                  )}
-                </Popper>
-              </Box>
-            </Box>
-          )}
-
-          {/* ── Tab 1: History (Timeline) ── */}
-          {detailTab === 1 && (
-            <Box
-              sx={{
                 p: 2,
                 flex: 1,
                 minHeight: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow:
-                  viewingVersion != null && viewMode === 'data'
-                    ? 'hidden'
-                    : 'auto',
+                overflow: 'auto',
               }}
             >
               {historyLoading ? (
@@ -1830,6 +1727,222 @@ const CmsManagementPage: React.FC = () => {
                 </Box>
               ) : historyData?.history?.length ? (
                 <>
+                  {/* ── Inline Editor (activated from version context menu) ── */}
+                  {editingVersion != null && (
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        mb: 2,
+                        border: '2px solid',
+                        borderColor: 'primary.main',
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          px: 2,
+                          py: 1.5,
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          bgcolor: isDark
+                            ? 'rgba(25,118,210,0.06)'
+                            : 'rgba(25,118,210,0.03)',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          <EditIcon
+                            sx={{ fontSize: 16, color: 'primary.main' }}
+                          />
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            v{editingVersion}{' '}
+                            {t('cms.history.editingBased')}
+                          </Typography>
+                        </Box>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (
+                              editorData !== editorOriginalData &&
+                              !window.confirm(
+                                t('cms.detail.discardChangesConfirm')
+                              )
+                            ) {
+                              return;
+                            }
+                            setEditingVersion(null);
+                            setEditorData('');
+                            setEditorOriginalData('');
+                            setEditorComment('');
+                          }}
+                        >
+                          <CancelIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Box>
+                      <Alert
+                        severity="info"
+                        variant="outlined"
+                        sx={{
+                          mx: 2,
+                          mt: 1.5,
+                          mb: 0,
+                          py: 0.5,
+                          '& .MuiAlert-message': {
+                            fontSize: '0.75rem',
+                            lineHeight: 1.5,
+                          },
+                        }}
+                      >
+                        {t('cms.history.editGuide', {
+                          version: editingVersion,
+                        })}
+                      </Alert>
+                      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        {editorLoading ? (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                              py: 4,
+                            }}
+                          >
+                            <CircularProgress size={28} />
+                          </Box>
+                        ) : (
+                          <Box sx={{ height: 360 }}>
+                            <JsonEditor
+                              value={editorData}
+                              onChange={setEditorData}
+                              height="100%"
+                              onValidation={(isValid) =>
+                                setEditorJsonValid(isValid)
+                              }
+                              helperText={
+                                !editorJsonValid
+                                  ? t('cms.detail.jsonSyntaxError')
+                                  : editorData !== editorOriginalData
+                                    ? t('cms.detail.hasChanges')
+                                    : t('cms.detail.currentData')
+                              }
+                            />
+                          </Box>
+                        )}
+                        <TextField
+                          size="small"
+                          label="Comment"
+                          value={editorComment}
+                          onChange={(e) => setEditorComment(e.target.value)}
+                          fullWidth
+                          required
+                          multiline
+                          minRows={2}
+                          placeholder={t('cms.detail.commentPlaceholder')}
+                        />
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            gap: 1,
+                            justifyContent: 'flex-end',
+                          }}
+                        >
+                          <ButtonGroup
+                            variant="contained"
+                            size="small"
+                            ref={saveMenuRef}
+                          >
+                            <Button
+                              startIcon={
+                                editorSaving ? (
+                                  <CircularProgress size={14} />
+                                ) : (
+                                  <SaveIcon />
+                                )
+                              }
+                              onClick={() => handleSave(false)}
+                              disabled={
+                                editorSaving ||
+                                !editorData.trim() ||
+                                !editorComment.trim() ||
+                                editorData === editorOriginalData ||
+                                !editorJsonValid
+                              }
+                            >
+                              {t('cms.detail.save')}
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                setSaveMenuOpen((prev) => !prev)
+                              }
+                              disabled={
+                                editorSaving ||
+                                !editorComment.trim() ||
+                                editorData === editorOriginalData ||
+                                !editorJsonValid
+                              }
+                            >
+                              <ArrowDropDownIcon />
+                            </Button>
+                          </ButtonGroup>
+                          <Popper
+                            open={saveMenuOpen}
+                            anchorEl={saveMenuRef.current}
+                            placement="top-end"
+                            transition
+                            sx={{ zIndex: 1300 }}
+                          >
+                            {({ TransitionProps }) => (
+                              <Grow {...TransitionProps}>
+                                <Paper elevation={8}>
+                                  <ClickAwayListener
+                                    onClickAway={() =>
+                                      setSaveMenuOpen(false)
+                                    }
+                                  >
+                                    <MenuList>
+                                      <MenuItem
+                                        onClick={() => handleSave(false)}
+                                      >
+                                        <ListItemIcon>
+                                          <SaveIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                          {t('cms.detail.saveOnly')}
+                                        </ListItemText>
+                                      </MenuItem>
+                                      <MenuItem
+                                        onClick={() => handleSave(true)}
+                                      >
+                                        <ListItemIcon>
+                                          <RefreshIcon
+                                            fontSize="small"
+                                            color="primary"
+                                          />
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                          {t('cms.detail.saveAndRefresh')}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    </MenuList>
+                                  </ClickAwayListener>
+                                </Paper>
+                              </Grow>
+                            )}
+                          </Popper>
+                        </Box>
+                      </Box>
+                    </Card>
+                  )}
                   {/* ── Active (current) version ── */}
                   {(() => {
                     const active = historyData.history[0];
@@ -1860,6 +1973,7 @@ const CmsManagementPage: React.FC = () => {
                                 ? 'rgba(76,175,80,0.1)'
                                 : 'rgba(76,175,80,0.06)',
                             },
+                            ...(!isViewing && { mb: 2 }),
                             ...(isViewing && {
                               bgcolor: isDark
                                 ? 'rgba(25,118,210,0.08)'
@@ -1876,6 +1990,14 @@ const CmsManagementPage: React.FC = () => {
                               px: 2,
                             }}
                           >
+                            <CheckCircleIcon
+                              sx={{
+                                fontSize: 18,
+                                color: 'success.main',
+                                mr: 1.5,
+                                flexShrink: 0,
+                              }}
+                            />
                             <Box sx={{ flex: 1, minWidth: 0 }}>
                               <Typography
                                 variant="body2"
@@ -1951,11 +2073,14 @@ const CmsManagementPage: React.FC = () => {
                               <Tooltip title={active.contentHash || ''}>
                                 <Box
                                   sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     border: '1px solid',
                                     borderColor: 'divider',
                                     borderRadius: 1.5,
                                     px: 1,
                                     py: 0.25,
+                                    height: 22,
                                     bgcolor: isDark
                                       ? 'rgba(255,255,255,0.04)'
                                       : 'rgba(0,0,0,0.03)',
@@ -1988,6 +2113,20 @@ const CmsManagementPage: React.FC = () => {
                                   minWidth: 36,
                                 }}
                               />
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setVersionMenuAnchor(e.currentTarget);
+                                  setVersionMenuEntry({
+                                    version: active.version,
+                                    isActive: true,
+                                  });
+                                }}
+                                sx={{ p: 0.25 }}
+                              >
+                                <MoreVertIcon sx={{ fontSize: 17 }} />
+                              </IconButton>
                             </Box>
                           </Box>
                         </Box>
@@ -1996,7 +2135,7 @@ const CmsManagementPage: React.FC = () => {
                           <Box
                             sx={{
                               ...(viewMode === 'data'
-                                ? { flex: 1, minHeight: 0 }
+                                ? {}
                                 : {}),
                               display: 'flex',
                               flexDirection: 'column',
@@ -2098,7 +2237,7 @@ const CmsManagementPage: React.FC = () => {
                                   value={JSON.stringify(viewingData, null, 2)}
                                   onChange={() => {}}
                                   readOnly
-                                  height="100%"
+                                  height={400}
                                 />
                               ) : null)}
                             {viewMode === 'diff' &&
@@ -2130,18 +2269,6 @@ const CmsManagementPage: React.FC = () => {
                   {/* ── Past versions ── */}
                   {historyData.history.length > 1 && (
                     <>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'text.disabled',
-                          fontSize: '0.7rem',
-                          mb: 0.75,
-                          display: 'block',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t('cms.history.previousVersions')}
-                      </Typography>
                       <Box
                         sx={{
                           border: '1px solid',
@@ -2196,9 +2323,25 @@ const CmsManagementPage: React.FC = () => {
                                   }),
                                 }}
                               >
+                                {/* Version icon */}
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    pl: 2,
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <HistoryIcon
+                                    sx={{
+                                      fontSize: 18,
+                                      color: 'text.disabled',
+                                    }}
+                                  />
+                                </Box>
                                 {/* Main content area */}
                                 <Box
-                                  sx={{ flex: 1, minWidth: 0, py: 1.25, px: 2 }}
+                                  sx={{ flex: 1, minWidth: 0, py: 1.25, px: 1.5 }}
                                 >
                                   {/* Row 1: Commit message (primary) */}
                                   <Typography
@@ -2294,6 +2437,7 @@ const CmsManagementPage: React.FC = () => {
                                         borderRadius: 1.5,
                                         px: 1,
                                         py: 0.25,
+                                        height: 22,
                                         bgcolor: isDark
                                           ? 'rgba(255,255,255,0.04)'
                                           : 'rgba(0,0,0,0.03)',
@@ -2314,7 +2458,7 @@ const CmsManagementPage: React.FC = () => {
                                     </Box>
                                   </Tooltip>
 
-                                  {/* Version */}
+                                  {/* Version + MoreVert */}
                                   <Chip
                                     label={`v${entry.version}`}
                                     size="small"
@@ -2333,30 +2477,20 @@ const CmsManagementPage: React.FC = () => {
                                     }}
                                   />
 
-                                  {/* Rollback action */}
-                                  {!entry.isActive && (
-                                    <Tooltip
-                                      title={t(
-                                        'cms.history.rollbackToVersion',
-                                        { version: entry.version }
-                                      )}
-                                    >
-                                      <IconButton
-                                        size="small"
-                                        color="warning"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          confirmRollback(
-                                            detailTableName,
-                                            entry.version
-                                          );
-                                        }}
-                                        sx={{ p: 0.5 }}
-                                      >
-                                        <RestoreIcon sx={{ fontSize: 17 }} />
-                                      </IconButton>
-                                    </Tooltip>
-                                  )}
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setVersionMenuAnchor(e.currentTarget);
+                                      setVersionMenuEntry({
+                                        version: entry.version,
+                                        isActive: !!entry.isActive,
+                                      });
+                                    }}
+                                    sx={{ p: 0.25 }}
+                                  >
+                                    <MoreVertIcon sx={{ fontSize: 17 }} />
+                                  </IconButton>
                                 </Box>
                               </Box>
 
@@ -2470,7 +2604,7 @@ const CmsManagementPage: React.FC = () => {
                                         )}
                                         onChange={() => {}}
                                         readOnly
-                                        height="100%"
+                                        height={400}
                                       />
                                     ) : null)}
 
@@ -2513,8 +2647,8 @@ const CmsManagementPage: React.FC = () => {
             </Box>
           )}
 
-          {/* ── Tab 2: Propagation ── */}
-          {detailTab === 2 && (
+          {/* ── Tab 1: Propagation ── */}
+          {detailTab === 1 && (
             <Box sx={{ p: 2, flex: 1, minHeight: 0, overflowY: 'auto' }}>
               {propagationLoading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -2526,211 +2660,198 @@ const CmsManagementPage: React.FC = () => {
                   minHeight={120}
                 />
               ) : (
-                (() => {
+              (() => {
                   const groups = new Map<string, RippleHistoryEvent[]>();
                   for (const evt of propagationData) {
                     const key = evt.requestId || evt.eventId;
                     if (!groups.has(key)) groups.set(key, []);
                     groups.get(key)!.push(evt);
                   }
+                  const groupEntries = Array.from(groups.entries());
                   return (
-                    <Stack spacing={1.5}>
-                      {Array.from(groups.entries()).map(([reqId, events]) => {
-                        const allSuccess = events.every(
-                          (e) => e.status === 'success'
-                        );
-                        const hasFailure = events.some(
-                          (e) =>
-                            e.status === 'failure' || e.status === 'timeout'
-                        );
+                    <Box
+                      sx={{
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {groupEntries.map(([reqId, events], groupIdx) => {
+                        const allSuccess = events.every((e) => e.status === 'success');
+                        const hasFailure = events.some((e) => e.status === 'failure' || e.status === 'timeout');
+                        const isFirstGroup = groupIdx === 0;
+                        const isLast = groupIdx === groupEntries.length - 1;
+                        const expanded = isFirstGroup
+                          ? !collapsedPropGroups.has(reqId)
+                          : collapsedPropGroups.has(reqId);
+                        const toggleExpanded = () => {
+                          setCollapsedPropGroups((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(reqId)) next.delete(reqId);
+                            else next.add(reqId);
+                            return next;
+                          });
+                        };
                         return (
-                          <Paper
-                            key={reqId}
-                            variant="outlined"
-                            sx={{
-                              borderRadius: 1.5,
-                              borderLeft: '3px solid',
-                              borderLeftColor: allSuccess
-                                ? 'success.main'
-                                : hasFailure
-                                  ? 'error.main'
-                                  : 'warning.main',
-                              overflow: 'hidden',
-                            }}
-                          >
+                          <React.Fragment key={reqId}>
+                            {/* Commit-style row — matches history tab */}
                             <Box
+                              onClick={toggleExpanded}
                               sx={{
-                                px: 2,
-                                py: 1,
                                 display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                                bgcolor: (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.02)'
-                                    : 'grey.50',
-                                borderBottom: '1px solid',
+                                alignItems: 'stretch',
+                                cursor: 'pointer',
+                                borderBottom: isLast && !expanded ? 'none' : '1px solid',
                                 borderColor: 'divider',
+                                transition: 'background-color 0.15s',
+                                '&:hover': {
+                                  bgcolor: isDark
+                                    ? 'rgba(255,255,255,0.025)'
+                                    : 'rgba(0,0,0,0.015)',
+                                },
+                                ...(expanded && {
+                                  bgcolor: isDark
+                                    ? 'rgba(25,118,210,0.06)'
+                                    : 'rgba(25,118,210,0.04)',
+                                }),
                               }}
                             >
-                              {allSuccess ? (
-                                <CheckCircleIcon
-                                  sx={{ fontSize: 16, color: 'success.main' }}
-                                />
-                              ) : (
-                                <CancelIcon
-                                  sx={{ fontSize: 16, color: 'error.main' }}
-                                />
-                              )}
-                              <Typography
-                                variant="caption"
+                              {/* Left icon */}
+                              <Box
                                 sx={{
-                                  fontFamily: 'monospace',
-                                  fontWeight: 600,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  pl: 2,
+                                  flexShrink: 0,
                                 }}
                               >
-                                {reqId.slice(0, 8)}
-                              </Typography>
-                              {events[0].tableName && (
-                                <Box
+                                {allSuccess ? (
+                                  <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                ) : hasFailure ? (
+                                  <CancelIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                                ) : (
+                                  <WarningIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                                )}
+                              </Box>
+                              {/* Main content */}
+                              <Box sx={{ flex: 1, minWidth: 0, py: 1.25, px: 1.5 }}>
+                                {/* Row 1: Request ID + table names */}
+                                <Typography
+                                  variant="body2"
                                   sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    flexWrap: 'wrap',
-                                    alignItems: 'center',
+                                    fontWeight: 500,
+                                    fontSize: '0.82rem',
+                                    lineHeight: 1.4,
+                                    mb: 0.5,
                                   }}
                                 >
-                                  {events[0].tableName
-                                    .split(',')
-                                    .map((tn) => tn.trim())
-                                    .filter(Boolean)
-                                    .map((tn, idx, arr) => {
-                                      if (idx > 2) {
-                                        if (idx === 3) {
-                                          return (
-                                            <Tooltip
-                                              key="more"
-                                              title={arr.slice(3).join(', ')}
-                                            >
-                                              <Chip
-                                                label={`+${arr.length - 3} ${t('cms.history.moreItems')}`}
-                                                size="small"
-                                                variant="outlined"
-                                                sx={{
-                                                  height: 20,
-                                                  fontSize: '0.65rem',
-                                                  cursor: 'pointer',
-                                                  borderColor: 'divider',
-                                                }}
-                                              />
-                                            </Tooltip>
-                                          );
-                                        }
-                                        return null;
-                                      }
-                                      return (
-                                        <Chip
-                                          key={tn}
-                                          label={tn}
-                                          size="small"
-                                          variant="outlined"
-                                          sx={{
-                                            fontFamily: 'monospace',
-                                            fontSize: '0.68rem',
-                                            height: 20,
-                                          }}
-                                        />
-                                      );
-                                    })}
-                                </Box>
-                              )}
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {events.length} servers
-                              </Typography>
-                              <Box sx={{ flex: 1 }} />
-                              <Tooltip
-                                title={new Date(
-                                  events[0].createdAt
-                                ).toLocaleString('ko-KR')}
-                              >
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ cursor: 'help' }}
-                                >
-                                  {formatRelativeTime(
-                                    new Date(events[0].createdAt).toISOString()
+                                  {reqId.slice(0, 8)}
+                                  {events[0].tableName && (
+                                    <Typography
+                                      component="span"
+                                      variant="caption"
+                                      sx={{ color: 'text.secondary', fontFamily: 'monospace', fontSize: '0.72rem', ml: 1 }}
+                                    >
+                                      {events[0].tableName.split(',').slice(0, 3).map(s => s.trim()).join(', ')}
+                                      {events[0].tableName.split(',').length > 3 && ` +${events[0].tableName.split(',').length - 3}`}
+                                    </Typography>
                                   )}
                                 </Typography>
-                              </Tooltip>
-                            </Box>
-                            <Table size="small">
-                              <TableBody>
-                                {events.map((evt, idx) => (
-                                  <TableRow
-                                    key={evt.eventId || idx}
-                                    sx={{ '&:last-child td': { border: 0 } }}
+                                {/* Row 2: Metadata line */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.72rem' }}
                                   >
-                                    <TableCell sx={{ py: 0.5, width: 24 }}>
-                                      {evt.status === 'success' ? (
-                                        <CheckCircleIcon
-                                          sx={{
-                                            fontSize: 14,
-                                            color: 'success.main',
-                                          }}
-                                        />
-                                      ) : (
-                                        <CancelIcon
-                                          sx={{
-                                            fontSize: 14,
-                                            color: 'error.main',
-                                          }}
-                                        />
-                                      )}
-                                    </TableCell>
-                                    <TableCell sx={{ py: 0.5 }}>
-                                      <Typography
-                                        variant="caption"
-                                        sx={{ fontFamily: 'monospace' }}
+                                    {events.length} servers
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ color: 'text.disabled', fontSize: '0.7rem' }}
+                                  >
+                                    propagated
+                                  </Typography>
+                                  <Tooltip title={new Date(events[0].createdAt).toLocaleString('ko-KR')}>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{ color: 'text.disabled', cursor: 'help', fontSize: '0.7rem' }}
+                                    >
+                                      {formatRelativeTime(new Date(events[0].createdAt).toISOString())}
+                                    </Typography>
+                                  </Tooltip>
+                                </Box>
+                              </Box>
+                              {/* Right: expand icon */}
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  pr: 1.5,
+                                  pl: 1,
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <ExpandMoreIcon
+                                  sx={{
+                                    fontSize: 18,
+                                    color: 'text.disabled',
+                                    transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.2s',
+                                  }}
+                                />
+                              </Box>
+                            </Box>
+                            {/* Expanded detail panel */}
+                            {expanded && (
+                              <Box
+                                sx={{
+                                  bgcolor: isDark
+                                    ? 'rgba(0,0,0,0.15)'
+                                    : 'rgba(0,0,0,0.02)',
+                                  borderBottom: isLast ? 'none' : '1px solid',
+                                  borderColor: 'divider',
+                                }}
+                              >
+                                <Table size="small">
+                                  <TableBody>
+                                    {events.map((evt, idx) => (
+                                      <TableRow
+                                        key={evt.eventId || idx}
+                                        sx={{ '&:last-child td': { border: 0 } }}
                                       >
-                                        {evt.serviceType || '—'}
-                                      </Typography>
-                                    </TableCell>
-                                    <TableCell sx={{ py: 0.5 }}>
-                                      <Typography
-                                        variant="caption"
-                                        sx={{ fontFamily: 'monospace' }}
-                                      >
-                                        {evt.serverId}
-                                      </Typography>
-                                    </TableCell>
-                                    <TableCell sx={{ py: 0.5 }} align="right">
-                                      <Typography variant="caption">
-                                        {evt.durationMs}ms
-                                      </Typography>
-                                    </TableCell>
-                                    <TableCell sx={{ py: 0.5 }}>
-                                      {evt.error && (
-                                        <Typography
-                                          variant="caption"
-                                          color="error"
-                                          sx={{ fontSize: '0.65rem' }}
-                                        >
-                                          {evt.error}
-                                        </Typography>
-                                      )}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </Paper>
+                                        <TableCell sx={{ py: 0.4, pl: 4.5, width: 24 }}>
+                                          {evt.status === 'success' ? (
+                                            <CheckCircleIcon sx={{ fontSize: 13, color: 'success.main' }} />
+                                          ) : (
+                                            <CancelIcon sx={{ fontSize: 13, color: 'error.main' }} />
+                                          )}
+                                        </TableCell>
+                                        <TableCell sx={{ py: 0.4 }}>
+                                          <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.72rem' }}>
+                                            {evt.serviceType || '—'}
+                                          </Typography>
+                                        </TableCell>
+                                        <TableCell sx={{ py: 0.4 }}>
+                                          <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: '0.68rem' }}>
+                                            {evt.serverId}
+                                          </Typography>
+                                        </TableCell>
+                                        <TableCell sx={{ py: 0.4 }} align="right">
+                                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>
+                                            {evt.durationMs}ms
+                                          </Typography>
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </Box>
+                            )}
+                          </React.Fragment>
                         );
                       })}
-                    </Stack>
+                    </Box>
                   );
                 })()
               )}
@@ -2739,42 +2860,410 @@ const CmsManagementPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* Rollback Confirm Dialog */}
-      <Dialog open={rollbackOpen} onClose={() => setRollbackOpen(false)}>
-        <DialogTitle>{t('cms.rollback.title')}</DialogTitle>
+      {/* Version Context Menu (MoreVert) */}
+      <Menu
+        anchorEl={versionMenuAnchor}
+        open={Boolean(versionMenuAnchor)}
+        onClose={() => {
+          setVersionMenuAnchor(null);
+          setVersionMenuEntry(null);
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem
+          onClick={async () => {
+            if (versionMenuEntry) {
+              startEditing(versionMenuEntry.version);
+            }
+            setVersionMenuAnchor(null);
+            setVersionMenuEntry(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('cms.history.editVersion')}</ListItemText>
+        </MenuItem>
+        {versionMenuEntry && !versionMenuEntry.isActive && (
+          <MenuItem
+            onClick={() => {
+              if (versionMenuEntry) {
+                confirmRollback(detailTableName, versionMenuEntry.version);
+              }
+              setVersionMenuAnchor(null);
+              setVersionMenuEntry(null);
+            }}
+          >
+            <ListItemIcon>
+              <RestoreIcon fontSize="small" color="warning" />
+            </ListItemIcon>
+            <ListItemText>
+              {t('cms.history.rollbackToVersion', {
+                version: versionMenuEntry?.version,
+              })}
+            </ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
+
+      {/* Unsynced Tables Refresh Dialog */}
+      <Dialog
+        open={unsyncedDialogOpen}
+        onClose={() => setUnsyncedDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <RefreshIcon color="error" />
+            {t('cms.unsyncedRefresh.title')}
+          </Box>
+        </DialogTitle>
         <DialogContent>
-          <Typography>
-            {t('cms.rollback.confirm', {
-              tableName: rollbackTableName,
-              version: rollbackVersion,
-            })}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('cms.unsyncedRefresh.description')}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox" sx={{ width: 42 }}>
+                  <Checkbox
+                    size="small"
+                    checked={
+                      unsyncedSelected.size ===
+                      tables.filter((tbl) => tbl.runtime && !tbl.runtime.synced).length
+                    }
+                    indeterminate={
+                      unsyncedSelected.size > 0 &&
+                      unsyncedSelected.size <
+                        tables.filter((tbl) => tbl.runtime && !tbl.runtime.synced).length
+                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setUnsyncedSelected(
+                          new Set(
+                            tables
+                              .filter((tbl) => tbl.runtime && !tbl.runtime.synced)
+                              .map((t2) => t2.tableName)
+                          )
+                        );
+                      } else {
+                        setUnsyncedSelected(new Set());
+                      }
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                  {t('cms.tableName')}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }} align="center">
+                  Sync
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem', width: 40 }} align="center">
+                  Diff
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tables
+                .filter((tbl) => tbl.runtime && !tbl.runtime.synced)
+                .map((tbl) => (
+                  <React.Fragment key={tbl.tableName}>
+                    <TableRow
+                      hover
+                      selected={unsyncedSelected.has(tbl.tableName)}
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        const next = new Set(unsyncedSelected);
+                        if (next.has(tbl.tableName)) {
+                          next.delete(tbl.tableName);
+                        } else {
+                          next.add(tbl.tableName);
+                        }
+                        setUnsyncedSelected(next);
+                      }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          size="small"
+                          checked={unsyncedSelected.has(tbl.tableName)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 500, fontFamily: 'monospace', fontSize: '0.8rem' }}
+                        >
+                          {tbl.tableName}
+                        </Typography>
+                        {tbl.comment && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              display: 'block',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: 280,
+                            }}
+                          >
+                            {tbl.comment}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={`v${tbl.runtime!.loadedVersion} → v${tbl.version}`}
+                          size="small"
+                          color="warning"
+                          variant="filled"
+                          sx={{
+                            fontSize: '0.68rem',
+                            fontFamily: 'monospace',
+                            height: 20,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const key = tbl.tableName;
+                            if (unsyncedDiffs[key]?.text) {
+                              setUnsyncedDiffs((prev) => {
+                                const next = { ...prev };
+                                delete next[key];
+                                return next;
+                              });
+                              return;
+                            }
+                            setUnsyncedDiffs((prev) => ({
+                              ...prev,
+                              [key]: { loading: true, text: '' },
+                            }));
+                            (async () => {
+                              try {
+                                const [curData, svrData] = await Promise.all([
+                                  fetchVersionData(key, tbl.version),
+                                  fetchVersionData(key, tbl.runtime!.loadedVersion),
+                                ]);
+                                const patch = await computeDiffInWorker(
+                                  JSON.stringify(svrData, null, 2),
+                                  JSON.stringify(curData, null, 2),
+                                  `v${tbl.runtime!.loadedVersion} (server)`,
+                                  `v${tbl.version} (saved)`
+                                );
+                                setUnsyncedDiffs((prev) => ({
+                                  ...prev,
+                                  [key]: { loading: false, text: patch },
+                                }));
+                              } catch {
+                                setUnsyncedDiffs((prev) => ({
+                                  ...prev,
+                                  [key]: { loading: false, text: '' },
+                                }));
+                              }
+                            })();
+                          }}
+                        >
+                          <CompareArrowsIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                    {unsyncedDiffs[tbl.tableName] && (
+                      <TableRow>
+                        <TableCell colSpan={4} sx={{ p: 0 }}>
+                          <Box sx={{ maxHeight: 300, overflow: 'auto', px: 1, py: 0.5 }}>
+                            {unsyncedDiffs[tbl.tableName].loading ? (
+                              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                                <CircularProgress size={18} />
+                              </Box>
+                            ) : (
+                              <LightDiff
+                                patchText={unsyncedDiffs[tbl.tableName].text}
+                                dark={isDark}
+                                noDiffMessage="No diff"
+                              />
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                ))}
+            </TableBody>
+          </Table>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUnsyncedDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleRefreshSelectedUnsynced}
+            disabled={unsyncedRefreshing || unsyncedSelected.size === 0}
+            startIcon={
+              unsyncedRefreshing ? (
+                <CircularProgress size={16} />
+              ) : (
+                <RefreshIcon />
+              )
+            }
+          >
+            {t('cms.unsyncedRefresh.execute', { count: unsyncedSelected.size })}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Rollback Confirm Dialog */}
+      <Dialog open={rollbackOpen} onClose={() => setRollbackOpen(false)} maxWidth="md" fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ px: 3, pt: 3, pb: 1 }}>
+          <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+            {t('cms.rollback.title')}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
             {t('cms.rollback.description')}
           </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ px: 3 }}>
+          {/* Version Flow — compact inline */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              my: 2,
+            }}
+          >
+            {/* Current */}
+            <Paper
+              variant="outlined"
+              sx={{
+                flex: 1,
+                p: 1.5,
+                borderLeft: '4px solid',
+                borderLeftColor: '#ef5350',
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                Current
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
+                <Typography variant="h6" sx={{ fontFamily: 'monospace', fontWeight: 700, lineHeight: 1 }}>
+                  v{rollbackCurrentVersion}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                  {rollbackTableName}
+                </Typography>
+              </Box>
+            </Paper>
+
+            <ArrowForwardIcon sx={{ fontSize: 20, color: 'text.disabled', flexShrink: 0 }} />
+
+            {/* Target */}
+            <Paper
+              variant="outlined"
+              sx={{
+                flex: 1,
+                p: 1.5,
+                borderLeft: '4px solid',
+                borderLeftColor: '#4caf50',
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                Rollback Target
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
+                <Typography variant="h6" sx={{ fontFamily: 'monospace', fontWeight: 700, lineHeight: 1 }}>
+                  v{rollbackVersion}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                  {rollbackTableName}
+                </Typography>
+              </Box>
+            </Paper>
+          </Box>
+
+          {/* Diff */}
+          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ mb: 0.5, display: 'block' }}>
+            {t('cms.rollback.diffPreview')}
+          </Typography>
+          <Box
+            sx={{
+              maxHeight: 320,
+              overflow: 'auto',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider',
+              mb: 2,
+            }}
+          >
+            {rollbackDiffLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress size={20} />
+              </Box>
+            ) : (
+              <LightDiff
+                patchText={rollbackDiffText}
+                dark={isDark}
+                noDiffMessage={t('cms.history.noDiffAvailable')}
+              />
+            )}
+          </Box>
+
+          {/* Comment */}
+          <TextField
+            fullWidth
+            required
+            multiline
+            rows={3}
+            size="small"
+            label="Comment *"
+            value={rollbackComment}
+            onChange={(e) => setRollbackComment(e.target.value)}
+            placeholder={t('cms.rollback.commentPlaceholder')}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+          />
+
           <FormControlLabel
             control={
               <Switch
                 checked={rollbackRefresh}
                 onChange={(e) => setRollbackRefresh(e.target.checked)}
+                size="small"
               />
             }
-            label={t('cms.rollback.triggerRefresh')}
+            label={
+              <Typography variant="body2" color="text.secondary">
+                {t('cms.rollback.triggerRefresh')}
+              </Typography>
+            }
             sx={{ mt: 1 }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRollbackOpen(false)}>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setRollbackOpen(false)} sx={{ borderRadius: 2 }}>
             {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
             color="warning"
             onClick={handleRollback}
-            disabled={rollbackLoading}
+            disabled={rollbackLoading || !rollbackComment.trim()}
             startIcon={
               rollbackLoading ? <CircularProgress size={16} /> : <RestoreIcon />
             }
+            sx={{ borderRadius: 2, px: 3, fontWeight: 600, textTransform: 'none' }}
           >
             {t('cms.rollback.execute')}
           </Button>
@@ -2785,6 +3274,8 @@ const CmsManagementPage: React.FC = () => {
       <Dialog
         open={refreshConfirmOpen}
         onClose={() => setRefreshConfirmOpen(false)}
+        maxWidth="sm"
+        fullWidth
       >
         <DialogTitle>{t('cms.refreshTable.confirmTitle')}</DialogTitle>
         <DialogContent>
@@ -2796,6 +3287,20 @@ const CmsManagementPage: React.FC = () => {
               tableName: refreshConfirmTableName,
             })}
           </DialogContentText>
+          {/* Diff Preview */}
+          {refreshConfirmDiff.loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+              <CircularProgress size={20} />
+            </Box>
+          ) : refreshConfirmDiff.text ? (
+            <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
+              <LightDiff
+                patchText={refreshConfirmDiff.text}
+                dark={isDark}
+                noDiffMessage="No diff"
+              />
+            </Box>
+          ) : null}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setRefreshConfirmOpen(false)}>
@@ -2821,6 +3326,7 @@ const CmsManagementPage: React.FC = () => {
         requestId={trackingRequestId}
         pattern={trackingPattern}
         matchedKeys={trackingMatchedKeys}
+        targetTables={trackingTargetTables}
       />
     </Box>
   );

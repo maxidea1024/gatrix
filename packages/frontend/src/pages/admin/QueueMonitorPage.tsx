@@ -23,6 +23,12 @@ import {
   ButtonGroup,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   Monitor as MonitorIcon,
@@ -37,6 +43,16 @@ import {
   PlayArrow as ActiveIcon,
   Timer as DelayedIcon,
   ArrowDropDown as ArrowDropDownIcon,
+  MoreVert as MoreVertIcon,
+  Warning as WarningIcon,
+  AutoDelete as AutoDeleteIcon,
+  Poll as PollIcon,
+  Sync as SyncIcon,
+  BoltOutlined as FlushIcon,
+  EventBusy as ExpireIcon,
+  SettingsSuggest as ProcessIcon,
+  FactCheck as CheckIcon,
+  WorkOutline as DefaultJobIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -60,6 +76,41 @@ import type {
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ContentLoader from '@/components/common/ContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+
+/** Shared flat table header cell style */
+const thSx = {
+  fontWeight: 600,
+  fontSize: '0.75rem',
+  color: 'text.secondary',
+  letterSpacing: '0.02em',
+  py: 1,
+  borderBottom: 1,
+  borderColor: 'divider',
+} as const;
+
+/** Map job name suffix to a semantic icon */
+function getJobIcon(
+  name: string,
+  color: string = 'text.disabled'
+): React.ReactElement {
+  const sx = { fontSize: 16, color } as const;
+  const lower = name.toLowerCase();
+  if (lower.includes('cleanup') || lower.includes('clean'))
+    return <AutoDeleteIcon sx={sx} />;
+  if (lower.includes('poll'))
+    return <PollIcon sx={sx} />;
+  if (lower.includes('sync'))
+    return <SyncIcon sx={sx} />;
+  if (lower.includes('flush'))
+    return <FlushIcon sx={sx} />;
+  if (lower.includes('expire'))
+    return <ExpireIcon sx={sx} />;
+  if (lower.includes('process') || lower.includes('signal'))
+    return <ProcessIcon sx={sx} />;
+  if (lower.includes('check') || lower.includes('progression'))
+    return <CheckIcon sx={sx} />;
+  return <DefaultJobIcon sx={sx} />;
+}
 
 // Format duration in ms to human-readable
 function formatDuration(ms: number): string {
@@ -144,6 +195,17 @@ const QueueMonitorPage: React.FC = () => {
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
   const [confirmMessage, setConfirmMessage] = useState('');
 
+  // Context menu for repeatable job actions
+  const [repeatMenuAnchor, setRepeatMenuAnchor] =
+    useState<null | HTMLElement>(null);
+  const [repeatMenuTarget, setRepeatMenuTarget] = useState<RepeatableJob | null>(
+    null
+  );
+  // Warning dialog before dangerous repeatable job deletion
+  const [deleteWarningOpen, setDeleteWarningOpen] = useState(false);
+  const [deleteWarningTarget, setDeleteWarningTarget] =
+    useState<RepeatableJob | null>(null);
+
   const statusTabs = ['completed', 'failed', 'active', 'waiting', 'delayed'];
 
   // Sync state to URL query params
@@ -199,9 +261,9 @@ const QueueMonitorPage: React.FC = () => {
 
   // Load details when queue or tab changes
   useEffect(() => {
-    setJobs([]);
-    setRepeatables([]);
-    loadQueueDetails();
+    // Data is already cleared in the event handler (handleTabChange / handleSelectQueue)
+    // so just silently load new data without spinner flicker.
+    loadQueueDetails(true);
   }, [selectedQueue, activeTab, loadQueueDetails]);
 
   // Auto-refresh
@@ -242,23 +304,30 @@ const QueueMonitorPage: React.FC = () => {
     }
   };
 
-  const handleRemoveRepeatable = (key: string) => {
-    setConfirmMessage(t('queueMonitor.removeRepeatableConfirm'));
-    setConfirmAction(() => async () => {
-      if (!selectedQueue) return;
-      try {
-        await removeRepeatableJob(selectedQueue, key);
-        enqueueSnackbar(t('queueMonitor.removeRepeatableSuccess'), {
-          variant: 'success',
-        });
-        loadQueueDetails();
-      } catch {
-        enqueueSnackbar(t('queueMonitor.removeRepeatableFailed'), {
-          variant: 'error',
-        });
-      }
-    });
-    setConfirmOpen(true);
+  const handleRemoveRepeatable = (rj: RepeatableJob) => {
+    // Close context menu first, open warning dialog
+    setRepeatMenuAnchor(null);
+    setRepeatMenuTarget(null);
+    setDeleteWarningTarget(rj);
+    setDeleteWarningOpen(true);
+  };
+
+  const confirmDeleteRepeatable = async () => {
+    if (!selectedQueue || !deleteWarningTarget) return;
+    try {
+      await removeRepeatableJob(selectedQueue, deleteWarningTarget.key);
+      enqueueSnackbar(t('queueMonitor.removeRepeatableSuccess'), {
+        variant: 'success',
+      });
+      loadQueueDetails();
+    } catch {
+      enqueueSnackbar(t('queueMonitor.removeRepeatableFailed'), {
+        variant: 'error',
+      });
+    } finally {
+      setDeleteWarningOpen(false);
+      setDeleteWarningTarget(null);
+    }
   };
 
   const handleClean = (status: string) => {
@@ -290,10 +359,14 @@ const QueueMonitorPage: React.FC = () => {
   const handleSelectQueue = (queueName: string) => {
     setSelectedQueue(queueName);
     setActiveTab(0);
+    setJobs([]);
+    setRepeatables([]);
   };
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+    setJobs([]);
+    setRepeatables([]);
   };
 
   if (!user) {
@@ -623,85 +696,169 @@ const QueueMonitorPage: React.FC = () => {
                             </Typography>
                           </Box>
                         ) : (
+                          <>
                           <Table size="small">
                             <TableHead>
                               <TableRow>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.jobName')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.pattern')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.every')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.nextRun')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600, width: 60 }}>
-                                  {t('common.actions')}
-                                </TableCell>
+                                <TableCell sx={{ ...thSx, width: 48 }} />
                               </TableRow>
                             </TableHead>
                             <TableBody>
                               {repeatables.map((rj) => (
-                                <TableRow key={rj.key} hover>
+                                <TableRow
+                                  key={rj.key}
+                                  hover
+                                  sx={{
+                                    '&:last-child td': { borderBottom: 0 },
+                                  }}
+                                >
                                   <TableCell>
-                                    <Typography
-                                      variant="body2"
+                                    <Box
                                       sx={{
-                                        fontFamily: 'monospace',
-                                        fontWeight: 600,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.75,
                                       }}
                                     >
-                                      {rj.name}
-                                    </Typography>
+                                      {getJobIcon(rj.name)}
+                                      <Typography
+                                        variant="body2"
+                                        sx={{
+                                          fontFamily: 'monospace',
+                                          fontWeight: 600,
+                                          fontSize: '0.8rem',
+                                        }}
+                                      >
+                                        {rj.name}
+                                      </Typography>
+                                    </Box>
                                   </TableCell>
                                   <TableCell>
                                     {rj.pattern ? (
                                       <Chip
                                         size="small"
                                         label={rj.pattern}
-                                        variant="outlined"
                                         sx={{
                                           fontFamily: 'monospace',
                                           height: 22,
+                                          bgcolor: (theme) =>
+                                            alpha(
+                                              theme.palette.primary.main,
+                                              0.08
+                                            ),
+                                          color: 'primary.main',
+                                          fontWeight: 600,
                                           '& .MuiChip-label': {
-                                            fontSize: '0.75rem',
+                                            fontSize: '0.72rem',
+                                            px: 1,
                                           },
                                         }}
                                       />
                                     ) : (
-                                      '-'
+                                      <Typography
+                                        variant="body2"
+                                        color="text.disabled"
+                                      >
+                                        —
+                                      </Typography>
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    {rj.every
-                                      ? formatDuration(parseInt(rj.every))
-                                      : '-'}
-                                  </TableCell>
-                                  <TableCell>
-                                    {formatDateTime(rj.next)}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Tooltip
-                                      title={t('queueMonitor.removeRepeatable')}
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontSize: '0.8rem' }}
                                     >
-                                      <IconButton
-                                        size="small"
-                                        color="error"
-                                        onClick={() =>
-                                          handleRemoveRepeatable(rj.key)
-                                        }
-                                      >
-                                        <DeleteIcon fontSize="small" />
-                                      </IconButton>
-                                    </Tooltip>
+                                      {rj.every
+                                        ? formatDuration(parseInt(rj.every))
+                                        : '—'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontSize: '0.8rem' }}
+                                    >
+                                      {formatDateTime(rj.next)}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="right" sx={{ pr: 1 }}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) => {
+                                        setRepeatMenuAnchor(e.currentTarget);
+                                        setRepeatMenuTarget(rj);
+                                      }}
+                                      sx={{
+                                        color: 'text.secondary',
+                                        '&:hover': {
+                                          bgcolor: 'action.hover',
+                                        },
+                                      }}
+                                    >
+                                      <MoreVertIcon fontSize="small" />
+                                    </IconButton>
                                   </TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>
                           </Table>
+
+                          {/* Context menu for repeatable job */}
+                          <Menu
+                            anchorEl={repeatMenuAnchor}
+                            open={Boolean(repeatMenuAnchor)}
+                            onClose={() => {
+                              setRepeatMenuAnchor(null);
+                              setRepeatMenuTarget(null);
+                            }}
+                            anchorOrigin={{
+                              vertical: 'bottom',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                            }}
+                            slotProps={{
+                              paper: {
+                                sx: {
+                                  minWidth: 180,
+                                  boxShadow: 3,
+                                },
+                              },
+                            }}
+                          >
+                            <MenuItem
+                              onClick={() => {
+                                if (repeatMenuTarget)
+                                  handleRemoveRepeatable(repeatMenuTarget);
+                              }}
+                              sx={{ color: 'error.main' }}
+                            >
+                              <ListItemIcon>
+                                <DeleteIcon
+                                  fontSize="small"
+                                  color="error"
+                                />
+                              </ListItemIcon>
+                              <ListItemText>
+                                {t('queueMonitor.removeRepeatable')}
+                              </ListItemText>
+                            </MenuItem>
+                          </Menu>
+                          </>
                         )}
                       </Box>
                     )}
@@ -726,27 +883,27 @@ const QueueMonitorPage: React.FC = () => {
                           <Table size="small">
                             <TableHead>
                               <TableRow>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.jobId')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.jobName')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.createdAt')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.duration')}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>
+                                <TableCell sx={thSx}>
                                   {t('queueMonitor.attempts')}
                                 </TableCell>
                                 {statusTabs[activeTab - 1] === 'failed' && (
-                                  <TableCell sx={{ fontWeight: 600 }}>
+                                  <TableCell sx={thSx}>
                                     {t('queueMonitor.failedReason')}
                                   </TableCell>
                                 )}
-                                <TableCell sx={{ fontWeight: 600, width: 80 }}>
+                                <TableCell sx={{ ...thSx, width: 80 }}>
                                   {t('common.actions')}
                                 </TableCell>
                               </TableRow>
@@ -773,6 +930,7 @@ const QueueMonitorPage: React.FC = () => {
                                     <TableCell>
                                       <Chip
                                         size="small"
+                                        icon={getJobIcon(job.name, 'inherit')}
                                         label={job.name}
                                         color={
                                           statusColors[
@@ -783,6 +941,11 @@ const QueueMonitorPage: React.FC = () => {
                                         sx={{
                                           fontFamily: 'monospace',
                                           height: 22,
+                                          '& .MuiChip-icon': {
+                                            fontSize: 14,
+                                            ml: 0.5,
+                                            color: 'inherit',
+                                          },
                                           '& .MuiChip-label': {
                                             fontSize: '0.75rem',
                                           },
@@ -892,6 +1055,83 @@ const QueueMonitorPage: React.FC = () => {
         }}
         onClose={() => setConfirmOpen(false)}
       />
+
+      {/* Warning dialog for repeatable job deletion */}
+      <Dialog
+        open={deleteWarningOpen}
+        onClose={() => {
+          setDeleteWarningOpen(false);
+          setDeleteWarningTarget(null);
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: 'error.main',
+            fontWeight: 700,
+          }}
+        >
+          <WarningIcon color="error" />
+          {t('queueMonitor.removeRepeatable')}
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {t('queueMonitor.removeRepeatableWarning', {
+              defaultValue:
+                '이 반복 작업을 삭제하면 관련 시스템 기능이 중단될 수 있습니다. 서버를 재시작하기 전까지 해당 작업이 다시 등록되지 않습니다.',
+            })}
+          </Alert>
+          {deleteWarningTarget && (
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 1.5,
+                bgcolor: (theme) =>
+                  alpha(theme.palette.error.main, 0.04),
+                border: 1,
+                borderColor: (theme) =>
+                  alpha(theme.palette.error.main, 0.15),
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: 'monospace', fontWeight: 700, mb: 0.5 }}
+              >
+                {deleteWarningTarget.name}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {deleteWarningTarget.pattern
+                  ? `Pattern: ${deleteWarningTarget.pattern}`
+                  : deleteWarningTarget.every
+                    ? `Every: ${formatDuration(parseInt(deleteWarningTarget.every))}`
+                    : ''}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button
+            onClick={() => {
+              setDeleteWarningOpen(false);
+              setDeleteWarningTarget(null);
+            }}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={confirmDeleteRepeatable}
+          >
+            {t('queueMonitor.removeRepeatable')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

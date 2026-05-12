@@ -1,9 +1,8 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import Editor from '@monaco-editor/react';
-import { Box, Typography, Alert, CircularProgress } from '@mui/material';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import Editor, { OnMount } from '@monaco-editor/react';
+import { Box, Typography, Alert } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import JSON5 from 'json5';
-import { prodLogger } from '../../utils/logger';
 
 interface JsonEditorProps {
   value: string;
@@ -36,9 +35,9 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   onValidation,
 }) => {
   const theme = useTheme();
-  const editorRef = useRef<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [internalError, setInternalError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<any>(null);
 
   // Real-time JSON validation with debounce to prevent flickering
   useEffect(() => {
@@ -74,108 +73,57 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   // Displayed error: external error takes priority, then internal validation error
   const displayError = error || internalError;
 
-  const handleEditorDidMount = (editor: any, monaco: any) => {
-    editorRef.current = editor;
-    setIsLoading(false);
+  const isDark = theme.palette.mode === 'dark';
 
-    try {
-      if (json5Mode) {
-        // JSON5 mode: Disable all validation in editor
-        // Validation happens on save via parseJson5()
-        if (monaco?.languages?.typescript?.javascriptDefaults) {
-          monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-            noSemanticValidation: true,
-            noSyntaxValidation: true,
-          });
-        }
-      } else {
-        // Standard JSON mode
-        if (monaco?.languages?.json?.jsonDefaults) {
-          monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-            validate: true,
-            allowComments: false,
-            schemas: [],
-            enableSchemaRequest: true,
-          });
-        }
-      }
-
-      // 에디터 옵션 Settings
-      if (editor?.updateOptions) {
-        editor.updateOptions({
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          wordWrap: 'on',
-          automaticLayout: true,
-          formatOnPaste: false,
-          formatOnType: false,
-          tabSize: 2,
-          insertSpaces: true,
-          fixedOverflowWidgets: true,
-          padding: { top: 8, bottom: 8 },
-        });
-      }
-
-      // 에디터 DOM 요소의 포커스 스타일 제거
-      const editorElement = editor.getDomNode();
-      if (editorElement) {
-        editorElement.style.outline = 'none';
-        editorElement.style.border = 'none';
-      }
-
-      // EOL을 LF로 강제 설정하여 \r\n 으로 인한 커서 튐 문제 방지
-      const model = editor.getModel();
-      if (model && monaco?.editor?.EndOfLineSequence) {
-        model.setEOL(monaco.editor.EndOfLineSequence.LF);
-      }
-
-      // 포맷팅 단축키 Settings
-      if (editor?.addAction && monaco?.KeyMod && monaco?.KeyCode) {
-        editor.addAction({
-          id: 'format-json',
-          label: 'Format JSON',
-          keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF],
-          run: () => {
-            const formatAction = editor.getAction(
-              'editor.action.formatDocument'
-            );
-            if (formatAction) {
-              formatAction.run();
-            }
-          },
-        });
-      }
-
-      // 웹 폰트 로드 등 지연으로 인해 글꼴 크기 계산이 어긋나는(커서 튐) 문제 방지
-      if (
-        typeof document !== 'undefined' &&
-        document.fonts &&
-        document.fonts.ready
-      ) {
-        document.fonts.ready.then(() => {
-          if (monaco?.editor?.remeasureFonts) {
-            monaco.editor.remeasureFonts();
-          }
-        });
-      }
-    } catch (error) {
-      prodLogger.warn('Monaco Editor initialization warning:', error);
-    }
-  };
-
-  const handleEditorChange = useCallback(
-    (newValue: string | undefined) => {
-      if (newValue !== undefined) {
-        onChange(newValue);
-      }
+  const handleChange = useCallback(
+    (val: string | undefined) => {
+      onChange(val || '');
     },
     [onChange]
   );
 
-  const editorTheme = theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
+  // Manual ResizeObserver instead of automaticLayout to avoid layout loops
+  useEffect(() => {
+    if (!containerRef.current || !editorRef.current) return;
+    const ro = new ResizeObserver(() => {
+      editorRef.current?.layout();
+    });
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const handleEditorMount: OnMount = useCallback((editor, monaco) => {
+    editorRef.current = editor;
+
+    // Force EOL to LF to prevent cursor misalignment caused by \r\n
+    const model = editor.getModel();
+    if (model && monaco?.editor?.EndOfLineSequence) {
+      model.setEOL(monaco.editor.EndOfLineSequence.LF);
+    }
+
+    // Trigger initial layout
+    setTimeout(() => editor.layout(), 0);
+
+    // Remeasure fonts after custom font load to prevent cursor gap
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        if (monaco?.editor?.remeasureFonts) {
+          monaco.editor.remeasureFonts();
+        }
+      });
+    }
+  }, []);
 
   // Check if height is 100% to use flex layout
   const isFlexHeight = height === '100%';
+
+  // Compute height string for Monaco
+  const editorHeight =
+    isFlexHeight
+      ? '100%'
+      : typeof height === 'number'
+        ? `${height}px`
+        : height;
 
   return (
     <Box
@@ -192,99 +140,72 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       )}
 
       <Box
+        ref={containerRef}
         sx={{
           border: '1px solid',
-          borderColor: error ? 'error.main' : 'divider',
+          borderColor: displayError ? 'error.main' : 'divider',
           borderRadius: 1,
+          overflow: 'hidden',
           ...(isFlexHeight && {
             flex: 1,
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
           }),
-          overflow: 'hidden',
           position: 'relative',
           transition: 'border-color 0.2s ease-in-out',
-          '& .monaco-editor': {
-            '& .margin': {
-              backgroundColor: 'transparent',
-            },
-            '& .monaco-editor-background': {
-              backgroundColor: 'transparent',
-            },
-            '&.focused': {
-              outline: 'none !important',
-              border: 'none !important',
-            },
+          // Suppress Monaco Find Widget tooltip flicker inside MUI Drawers
+          '& .monaco-editor .find-widget .button': {
+            title: 'none',
           },
-          '& .monaco-editor .decorationsOverviewRuler': {
-            display: 'none',
+          '& .monaco-editor .monaco-hover': {
+            pointerEvents: 'auto !important',
+          },
+          // Prevent tooltip overlay flicker by stabilizing the hover widget
+          '& .monaco-editor .monaco-hover-content': {
+            pointerEvents: 'auto !important',
+          },
+          // Force Find Widget tooltips to not cause reflow
+          '& .monaco-editor .find-widget .monaco-action-bar .action-label[title]': {
+            overflow: 'visible',
           },
         }}
       >
-        {isLoading && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: height,
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              backgroundColor: 'background.paper',
-              zIndex: 1,
-            }}
-          >
-            <CircularProgress size={24} />
-          </Box>
-        )}
-        <Box sx={isFlexHeight ? { flex: 1, minHeight: 0 } : { height }}>
-          <Editor
-            height="100%"
-            defaultLanguage={json5Mode ? 'javascript' : 'json'}
-            value={value !== undefined ? value : placeholder}
-            onChange={handleEditorChange}
-            onMount={handleEditorDidMount}
-            theme={editorTheme}
-            loading={<CircularProgress size={24} />}
-            options={{
-              readOnly,
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              wordWrap: 'on',
-              automaticLayout: true,
-              formatOnPaste: false,
-              formatOnType: false,
-              tabSize: 2,
-              insertSpaces: true,
-              lineNumbers: 'on',
-              fontFamily:
-                '"D2Coding", "NanumGothicCoding", "Consolas", "Courier New", monospace',
-              fontSize: 14,
-              letterSpacing: 0,
-              glyphMargin: false,
-              folding: true,
-              lineDecorationsWidth: 0,
-              lineNumbersMinChars: 3,
-              renderLineHighlight: 'none',
-              selectionHighlight: false,
-              occurrencesHighlight: 'off',
-              overviewRulerLanes: 0,
-              hideCursorInOverviewRuler: true,
-              overviewRulerBorder: false,
-              fixedOverflowWidgets: true,
-              padding: { top: 8, bottom: 8 },
-              scrollbar: {
-                vertical: 'auto',
-                horizontal: 'auto',
-                verticalScrollbarSize: 8,
-                horizontalScrollbarSize: 8,
-              },
-            }}
-          />
-        </Box>
+        <Editor
+          height={editorHeight}
+          language={json5Mode ? 'javascript' : 'json'}
+          value={value !== undefined ? value : placeholder}
+          theme={isDark ? 'vs-dark' : 'light'}
+          onChange={handleChange}
+          onMount={handleEditorMount}
+          options={{
+            readOnly,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            wordWrap: 'on',
+            fontSize: 14,
+            fontFamily:
+              '"D2Coding", "NanumGothicCoding", "Consolas", "Courier New", monospace',
+            lineNumbers: 'on',
+            folding: true,
+            padding: { top: 8, bottom: 8 },
+            renderLineHighlight: 'none',
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            overviewRulerBorder: false,
+            scrollbar: {
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10,
+            },
+            bracketPairColorization: { enabled: true },
+            // Disable automaticLayout - we use ResizeObserver instead
+            automaticLayout: false,
+            // Disable hover for stability inside MUI Drawer
+            hover: { enabled: false },
+            // Disable parameter hints to avoid tooltip conflicts
+            parameterHints: { enabled: false },
+          }}
+        />
       </Box>
 
       <Box sx={{ minHeight: '1.25rem' }}>
@@ -309,7 +230,20 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   );
 };
 
-export default JsonEditor;
+// Custom comparator: skip function props (onChange, onValidation, etc.)
+// which are typically recreated on every parent render.
+export default React.memo(JsonEditor, (prevProps, nextProps) => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.readOnly === nextProps.readOnly &&
+    prevProps.height === nextProps.height &&
+    prevProps.error === nextProps.error &&
+    prevProps.label === nextProps.label &&
+    prevProps.helperText === nextProps.helperText &&
+    prevProps.json5Mode === nextProps.json5Mode &&
+    prevProps.placeholder === nextProps.placeholder
+  );
+});
 
 // Utility function to parse JSON5 and convert to standard JSON object
 export const parseJson5 = (

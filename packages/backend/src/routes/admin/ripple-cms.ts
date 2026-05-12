@@ -27,6 +27,7 @@ router.get(
 );
 router.post('/cms/upload', RippleCmsController.uploadCmsTable);
 router.post('/cms/rollback', RippleCmsController.rollbackCmsTable);
+router.post('/cms/backfill-diff', RippleCmsController.backfillDiff);
 router.get('/cms/refresh-history', RippleCmsController.getCmsRefreshHistory);
 
 export default router;

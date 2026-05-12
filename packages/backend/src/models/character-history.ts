@@ -4,6 +4,8 @@ import { ulid } from 'ulid';
 
 const logger = createLogger('CharacterHistory');
 
+const TABLE = 'g_character_history';
+
 export interface CharacterHistoryRecord {
   id?: string;
   environmentId: string;
@@ -24,7 +26,7 @@ export class CharacterHistoryModel {
     if (records.length === 0) return;
 
     const rows = records.map((r) => ({ id: ulid(), ...r }));
-    await db('g_character_history').insert(rows);
+    await db(TABLE).insert(rows);
     logger.debug(`Inserted ${rows.length} character history records`);
   }
 
@@ -42,7 +44,7 @@ export class CharacterHistoryModel {
   ): Promise<CharacterHistoryRecord[]> {
     // No downsampling needed — return raw records
     if (!intervalSeconds || intervalSeconds <= 600) {
-      const query = db('g_character_history')
+      const query = db(TABLE)
         .where('environmentId', environmentId)
         .where('recordedAt', '>=', from)
         .where('recordedAt', '<=', to)
@@ -61,7 +63,7 @@ export class CharacterHistoryModel {
     const bucketExpr = 'FLOOR(UNIX_TIMESTAMP(recordedAt) / ?)';
     const bucketSelectExpr = `FROM_UNIXTIME(${bucketExpr} * ?)`;
 
-    const query = db('g_character_history')
+    const query = db(TABLE)
       .select(
         'environmentId',
         'worldId',
@@ -102,9 +104,25 @@ export class CharacterHistoryModel {
   static async getLatest(
     environmentId: string
   ): Promise<CharacterHistoryRecord | null> {
-    const rows = await db('g_character_history')
+    const rows = await db(TABLE)
       .where('environmentId', environmentId)
       .whereNull('worldId')
+      .orderBy('recordedAt', 'desc')
+      .limit(1);
+
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * Get the latest character record for a specific world in a given environment.
+   */
+  static async getLatestByWorld(
+    environmentId: string,
+    worldId: string
+  ): Promise<CharacterHistoryRecord | null> {
+    const rows = await db(TABLE)
+      .where('environmentId', environmentId)
+      .where('worldId', worldId)
       .orderBy('recordedAt', 'desc')
       .limit(1);
 
@@ -118,7 +136,7 @@ export class CharacterHistoryModel {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
 
-    const deleted = await db('g_character_history')
+    const deleted = await db(TABLE)
       .where('recordedAt', '<', cutoff)
       .delete();
 

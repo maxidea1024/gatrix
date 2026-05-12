@@ -46,7 +46,6 @@ import rippleService, { RippleHistoryEvent } from '@/services/rippleService';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 const LS_PAGE_SIZE_KEY = 'rippleHistory.pageSize';
-const PAGE_SIZE_OPTIONS = [5, 10, 15, 25, 50];
 
 // ── Grouped data ──
 
@@ -838,7 +837,6 @@ const RippleHistoryPage: React.FC = () => {
               rowsPerPage={rowsPerPage}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              rowsPerPageOptions={PAGE_SIZE_OPTIONS}
             />
           </Paper>
         )}

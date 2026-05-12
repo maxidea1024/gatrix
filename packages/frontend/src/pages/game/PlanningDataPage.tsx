@@ -1229,7 +1229,6 @@ const PlanningDataPage: React.FC = () => {
                                     onRowsPerPageChange={
                                       handleRowsPerPageChange
                                     }
-                                    rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
                               </>
@@ -1560,7 +1559,6 @@ const PlanningDataPage: React.FC = () => {
                                     onRowsPerPageChange={
                                       handleRowsPerPageChange
                                     }
-                                    rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
                               </>
@@ -1937,7 +1935,6 @@ const PlanningDataPage: React.FC = () => {
                                 onRowsPerPageChange={
                                   handleHotTimeBuffRowsPerPageChange
                                 }
-                                rowsPerPageOptions={[10, 20, 50, 100]}
                               />
                             )}
                           </>
@@ -2153,7 +2150,6 @@ const PlanningDataPage: React.FC = () => {
                                         Number(event.target.value)
                                       )
                                     }
-                                    rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
                               </>
@@ -2463,7 +2459,6 @@ const PlanningDataPage: React.FC = () => {
                                         Number(event.target.value)
                                       )
                                     }
-                                    rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
                               </>
@@ -2749,7 +2744,6 @@ const PlanningDataPage: React.FC = () => {
                                         Number(event.target.value)
                                       )
                                     }
-                                    rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
                               </>
@@ -3238,7 +3232,6 @@ const PlanningDataPage: React.FC = () => {
                                         Number(event.target.value)
                                       )
                                     }
-                                    rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
                               </>

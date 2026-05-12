@@ -332,7 +332,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
     });
 
     const view = new EditorView({
-      state,
+      state: state as any,
       parent: containerRef.current,
     });
 

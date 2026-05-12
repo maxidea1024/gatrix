@@ -68,7 +68,6 @@ const REFRESH_OPTIONS = [
   { value: 30000, label: '30s' },
 ];
 
-const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100];
 const LS_PAGE_SIZE_KEY = 'rippleMonitor.pageSize';
 
 type SortField = 'key' | 'timeoutMs' | 'debounceMs' | 'serviceType';
@@ -1365,7 +1364,6 @@ const RippleMonitorPage: React.FC = () => {
                   rowsPerPage={rowsPerPage}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={PAGE_SIZE_OPTIONS}
                 />
               </Paper>
             )}

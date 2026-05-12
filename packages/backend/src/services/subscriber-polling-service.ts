@@ -1,5 +1,5 @@
 import { createLogger } from '../config/logger';
-import { SubscriberHistoryModel } from '../models/subscriber-history';
+import { PlayerHistoryModel } from '../models/player-history';
 import { CharacterHistoryModel } from '../models/character-history';
 import serviceDiscoveryService from '../services/service-discovery-service';
 
@@ -11,8 +11,10 @@ const DEFAULT_RETENTION_DAYS = 180;
 /**
  * Subscriber Polling Service
  *
- * Polls admind API for total/new player and character counts and stores
- * the results in g_subscriber_history and g_character_history.
+ * Polls admind API for total/new player and character counts.
+ * - Player stats → g_player_history (global, no world)
+ * - Character stats → g_character_history (total + per-world)
+ *
  * Uses service discovery to find admind instances.
  * Invoked by BullMQ scheduler job 'subscriber:poll' (every 10 minutes).
  */
@@ -68,9 +70,9 @@ export class SubscriberPollingService {
         }
       }
 
-      // Cleanup old records from both tables
+      // Cleanup old records
       const retentionDays = this.getRetentionDays();
-      await SubscriberHistoryModel.cleanupOlderThan(retentionDays);
+      await PlayerHistoryModel.cleanupOlderThan(retentionDays);
       await CharacterHistoryModel.cleanupOlderThan(retentionDays);
     } catch (err: any) {
       logger.error('Subscriber pollAll error:', err);
@@ -87,10 +89,8 @@ export class SubscriberPollingService {
   ): Promise<void> {
     const baseUrl = admindApiUrl.replace(/\/+$/, '');
     const timeout = 8000;
-    const todayStart = new Date(recordedAt);
-    todayStart.setHours(0, 0, 0, 0);
 
-    // ── 1. Player (account) stats — global ────────────────────────
+    // ── 1. Player (account) stats → g_player_history ────────────
     let totalPlayers = 0;
     let newPlayers = 0;
     try {
@@ -100,26 +100,54 @@ export class SubscriberPollingService {
       );
       totalPlayers = playerData?.total || 0;
 
-      // Fetch today's new players
-      const todayNewData = await this.fetchJson(
-        `${baseUrl}/gatrix/v1/all-players?limit=1&sortBy=createTimeUtc&sortDesc=true&createdAfter=${todayStart.toISOString()}`,
-        timeout
-      );
-      newPlayers = todayNewData?.total || 0;
+      // Calculate newPlayers as delta from previous record
+      const prevPlayer = await PlayerHistoryModel.getLatest(environmentId);
+      if (prevPlayer) {
+        newPlayers = Math.max(0, totalPlayers - prevPlayer.totalPlayers);
+      } else {
+        // First record ever — count all as new
+        newPlayers = totalPlayers;
+      }
     } catch (err: any) {
       logger.warn(
         `Failed to fetch player stats for env ${environmentId}: ${err.message}`
       );
     }
 
-    await SubscriberHistoryModel.insertRecord({
+    // ── 2. Character stats (total) ────────────
+    let totalCharacters = 0;
+    let newCharacters = 0;
+    try {
+      const charData = await this.fetchJson(
+        `${baseUrl}/gatrix/v1/all-characters?limit=1`,
+        timeout
+      );
+      totalCharacters = charData?.total || 0;
+
+      // Calculate newCharacters as delta from previous record
+      const prevPlayer = await PlayerHistoryModel.getLatest(environmentId);
+      if (prevPlayer) {
+        newCharacters = Math.max(0, totalCharacters - prevPlayer.totalCharacters);
+      } else {
+        newCharacters = totalCharacters;
+      }
+    } catch (err: any) {
+      logger.warn(
+        `Failed to fetch character stats for env ${environmentId}: ${err.message}`
+      );
+    }
+
+    // Insert player stats into g_player_history
+    await PlayerHistoryModel.insertRecord({
       environmentId,
       totalPlayers,
       newPlayers,
+      totalCharacters,
+      newCharacters,
       recordedAt,
     });
 
-    // ── 2. Character stats — per-world (CCU pattern) ──────────────
+    // ── 3. Per-world character stats → g_character_history ────────────
     const characterRecords: Array<{
       environmentId: string;
       worldId: string | null;
@@ -129,61 +157,68 @@ export class SubscriberPollingService {
       recordedAt: Date;
     }> = [];
 
+    // Total record (worldId = null)
+    characterRecords.push({
+      environmentId,
+      worldId: null,
+      worldName: null,
+      totalCharacters,
+      newCharacters,
+      recordedAt,
+    });
+
+    // Get world list from CCU endpoint (already being polled)
     try {
-      // Total characters across all worlds
-      const charData = await this.fetchJson(
-        `${baseUrl}/gatrix/v1/all-characters?limit=1`,
+      const ccuData = await this.fetchJson(
+        `${baseUrl}/gatrix/v1/ccu`,
         timeout
       );
-      const totalCharacters = charData?.total || 0;
 
-      let totalNewCharacters = 0;
-      try {
-        const todayNewCharData = await this.fetchJson(
-          `${baseUrl}/gatrix/v1/all-characters?limit=1&sortBy=createTimeUtc&sortDesc=true&createdAfter=${todayStart.toISOString()}`,
-          timeout
-        );
-        totalNewCharacters = todayNewCharData?.total || 0;
-      } catch {
-        // Ignore — newCharacters stays 0
-      }
+      if (Array.isArray(ccuData?.worlds)) {
+        for (const world of ccuData.worlds) {
+          const wId = world.worldId || world.id;
+          if (!wId) continue;
 
-      // Total row (worldId=null)
-      characterRecords.push({
-        environmentId,
-        worldId: null,
-        worldName: null,
-        totalCharacters,
-        newCharacters: totalNewCharacters,
-        recordedAt,
-      });
+          try {
+            const worldCharData = await this.fetchJson(
+              `${baseUrl}/gatrix/v1/all-characters?limit=1&worldId=${wId}`,
+              timeout
+            );
+            const worldTotal = worldCharData?.total || 0;
 
-      // Per-world breakdown — fetch each world's characters
-      // Use the worlds list from the character data or CCU data
-      if (Array.isArray(charData?.worlds)) {
-        for (const w of charData.worlds) {
-          characterRecords.push({
-            environmentId,
-            worldId: w.worldId || w.id || 'unknown',
-            worldName: w.worldId || null,
-            totalCharacters: w.total || 0,
-            newCharacters: w.newToday || 0,
-            recordedAt,
-          });
+            // Calculate worldNew as delta from previous per-world record
+            let worldNew = 0;
+            const prevWorld = await CharacterHistoryModel.getLatestByWorld(environmentId, wId);
+            if (prevWorld) {
+              worldNew = Math.max(0, worldTotal - prevWorld.totalCharacters);
+            } else {
+              worldNew = worldTotal;
+            }
+
+            characterRecords.push({
+              environmentId,
+              worldId: wId,
+              worldName: wId,
+              totalCharacters: worldTotal,
+              newCharacters: worldNew,
+              recordedAt,
+            });
+          } catch {
+            // Skip this world
+          }
         }
       }
     } catch (err: any) {
-      logger.warn(
-        `Failed to fetch character stats for env ${environmentId}: ${err.message}`
+      logger.debug(
+        `Could not fetch per-world character stats for env ${environmentId}: ${err.message}`
       );
     }
 
-    if (characterRecords.length > 0) {
-      await CharacterHistoryModel.insertBatch(characterRecords);
-    }
+    // Insert character records
+    await CharacterHistoryModel.insertBatch(characterRecords);
 
     logger.debug(
-      `Subscriber polled for env ${environmentId}: totalPlayers=${totalPlayers}, newPlayers=${newPlayers}, charRecords=${characterRecords.length}`
+      `Subscriber polled for env ${environmentId}: players=${totalPlayers}(+${newPlayers}), chars=${totalCharacters}(+${newCharacters}), worlds=${characterRecords.length - 1}`
     );
   }
 

@@ -2250,7 +2250,6 @@ const ApiTokensPage: React.FC = () => {
                     setRowsPerPage(parseInt(e.target.value, 10));
                     setPage(0);
                   }}
-                  rowsPerPageOptions={[5, 10, 25, 50]}
                 />
               )}
             </Paper>

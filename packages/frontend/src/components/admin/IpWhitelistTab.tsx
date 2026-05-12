@@ -676,7 +676,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                   rowsPerPage={rowsPerPage}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={[5, 10, 25, 50, 100]}
                 />
               )}
             </CardContent>

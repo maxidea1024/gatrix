@@ -86,7 +86,7 @@ import type {
 import PageContentLoader from '../../components/common/PageContentLoader';
 import PageHeader from '../../components/common/PageHeader';
 import CcuGraphTab from '../../components/admin/CcuGraphTab';
-import SubscriberGraphTab from '../../components/admin/SubscriberGraphTab';
+import PlayerGraphTab from '../../components/admin/PlayerGraphTab';
 import CharacterGraphTab from '../../components/admin/CharacterGraphTab';
 import PlayerListTab from '../../components/admin/PlayerListTab';
 import AllPlayersTab from '../../components/admin/AllPlayersTab';
@@ -99,7 +99,7 @@ import CcuScoreboard from '../../components/admin/CcuScoreboard';
 import CountdownScoreboard from '../../components/admin/CountdownScoreboard';
 import LocalizedDateTimePicker from '../../components/common/LocalizedDateTimePicker';
 import type {
-  SubscriberLatest,
+  PlayerLatest,
   CharacterLatest,
 } from '../../services/playerConnectionService';
 
@@ -170,8 +170,8 @@ const PlayerConnectionsPage: React.FC = () => {
   } | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
-  const [subscriberLatest, setSubscriberLatest] =
-    useState<SubscriberLatest | null>(null);
+  const [playerLatest, setPlayerLatest] =
+    useState<PlayerLatest | null>(null);
   const [characterLatest, setCharacterLatest] =
     useState<CharacterLatest | null>(null);
   const SCOREBOARD_STORAGE_KEY = 'playerConnections.scoreboardOpen';
@@ -265,10 +265,10 @@ const PlayerConnectionsPage: React.FC = () => {
         return data;
       });
       setDataRefreshKey((k) => k + 1);
-      // Load subscriber/character latest stats (non-blocking)
+      // Load player/character latest stats (non-blocking)
       playerConnectionService
-        .getSubscriberLatest(projectApiPath)
-        .then(setSubscriberLatest)
+        .getPlayerLatest(projectApiPath)
+        .then(setPlayerLatest)
         .catch(() => {});
       playerConnectionService
         .getCharacterLatest(projectApiPath)
@@ -1690,7 +1690,7 @@ const PlayerConnectionsPage: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* Subscriber/Character stat cards */}
+          {/* Player/Character stat cards */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card
@@ -1733,7 +1733,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         fontWeight={700}
                         color="info.main"
                       >
-                        {subscriberLatest?.totalPlayers?.toLocaleString() ??
+                        {playerLatest?.totalPlayers?.toLocaleString() ??
                           '-'}
                       </Typography>
                     </Box>
@@ -1792,8 +1792,8 @@ const PlayerConnectionsPage: React.FC = () => {
                         fontWeight={700}
                         color="success.main"
                       >
-                        {subscriberLatest?.newPlayers != null
-                          ? `+${subscriberLatest.newPlayers.toLocaleString()}`
+                        {playerLatest?.newPlayers != null
+                          ? `+${playerLatest.newPlayers.toLocaleString()}`
                           : '-'}
                       </Typography>
                     </Box>
@@ -2335,28 +2335,34 @@ const PlayerConnectionsPage: React.FC = () => {
         </PageContentLoader>
       )}
 
-      {/* Tab 1: CCU Graph */}
-      {activeTab === 1 && projectApiPath && (
-        <CcuGraphTab
-          projectApiPath={projectApiPath}
-          refreshKey={dataRefreshKey}
-        />
+      {/* Tab 1: CCU Graph — persist once mounted to avoid flicker */}
+      {projectApiPath && (
+        <Box sx={{ display: activeTab === 1 ? 'block' : 'none' }}>
+          <CcuGraphTab
+            projectApiPath={projectApiPath}
+            refreshKey={dataRefreshKey}
+          />
+        </Box>
       )}
 
-      {/* Tab 2: Subscriber (Player) Graph */}
-      {activeTab === 2 && projectApiPath && (
-        <SubscriberGraphTab
-          projectApiPath={projectApiPath}
-          refreshKey={dataRefreshKey}
-        />
+      {/* Tab 2: Player Graph — persist once mounted */}
+      {projectApiPath && (
+        <Box sx={{ display: activeTab === 2 ? 'block' : 'none' }}>
+          <PlayerGraphTab
+            projectApiPath={projectApiPath}
+            refreshKey={dataRefreshKey}
+          />
+        </Box>
       )}
 
-      {/* Tab 3: Character Graph */}
-      {activeTab === 3 && projectApiPath && (
-        <CharacterGraphTab
-          projectApiPath={projectApiPath}
-          refreshKey={dataRefreshKey}
-        />
+      {/* Tab 3: Character Graph — persist once mounted */}
+      {projectApiPath && (
+        <Box sx={{ display: activeTab === 3 ? 'block' : 'none' }}>
+          <CharacterGraphTab
+            projectApiPath={projectApiPath}
+            refreshKey={dataRefreshKey}
+          />
+        </Box>
       )}
 
       {/* Tab 4: Player List */}

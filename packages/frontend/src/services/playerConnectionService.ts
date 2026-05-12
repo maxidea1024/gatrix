@@ -90,7 +90,7 @@ export interface LoginQueueData {
   world: Record<string, number>;
 }
 
-export interface SubscriberHistoryRecord {
+export interface PlayerHistoryRecord {
   id?: string;
   environmentId: string;
   totalPlayers: number;
@@ -98,7 +98,7 @@ export interface SubscriberHistoryRecord {
   recordedAt: string;
 }
 
-export interface SubscriberLatest {
+export interface PlayerLatest {
   totalPlayers: number;
   newPlayers: number;
   recordedAt: string;
@@ -369,31 +369,31 @@ const playerConnectionService = {
   },
 
   /**
-   * Get subscriber history from database for graphing
+   * Get player history from database for graphing
    */
-  async getSubscriberHistory(
+  async getPlayerHistory(
     projectApiPath: string,
     params: { from: string; to: string }
-  ): Promise<SubscriberHistoryRecord[]> {
+  ): Promise<PlayerHistoryRecord[]> {
     const searchParams = new URLSearchParams({
       from: params.from,
       to: params.to,
     });
     const res = await api.get(
-      `${projectApiPath}/player-connections/subscriber/history?${searchParams}`
+      `${projectApiPath}/player-connections/player/history?${searchParams}`
     );
     return res.data?.records || [];
   },
 
   /**
-   * Get latest subscriber statistics for overview cards
+   * Get latest player statistics for overview cards
    */
-  async getSubscriberLatest(
+  async getPlayerLatest(
     projectApiPath: string
-  ): Promise<SubscriberLatest | null> {
+  ): Promise<PlayerLatest | null> {
     try {
       const res = await api.get(
-        `${projectApiPath}/player-connections/subscriber/latest`
+        `${projectApiPath}/player-connections/player/latest`
       );
       return res.data || null;
     } catch {

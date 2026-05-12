@@ -11,14 +11,14 @@ router.use(authenticate as any);
 router.get('/ccu', PlayerConnectionsController.getCcu);
 router.get('/ccu/history', PlayerConnectionsController.getCcuHistory);
 
-// Subscriber endpoints
+// Player endpoints
 router.get(
-  '/subscriber/history',
-  PlayerConnectionsController.getSubscriberHistory
+  '/player/history',
+  PlayerConnectionsController.getPlayerHistory
 );
 router.get(
-  '/subscriber/latest',
-  PlayerConnectionsController.getSubscriberLatest
+  '/player/latest',
+  PlayerConnectionsController.getPlayerLatest
 );
 
 // Character endpoints

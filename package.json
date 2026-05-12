@@ -172,6 +172,8 @@
   "packageManager": "yarn@4.13.0",
   "resolutions": {
     "@types/express-serve-static-core": "4.19.8",
-    "debug": "4.3.4"
+    "debug": "4.3.4",
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/view": "^6.42.1"
   }
 }

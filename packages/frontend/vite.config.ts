@@ -253,8 +253,24 @@ export default defineConfig({
             '@mui/x-date-pickers',
             '@mui/x-date-pickers-pro',
           ],
-          // Monaco editor - very large, used only in specific pages
+          // Monaco editor - used in JSON editing pages
           'vendor-monaco': ['monaco-editor', '@monaco-editor/react'],
+          // CodeMirror editor - used in JSON5 editing
+          'vendor-codemirror': [
+            'codemirror',
+            '@codemirror/state',
+            '@codemirror/view',
+            '@codemirror/lang-json',
+            '@codemirror/lang-javascript',
+            '@codemirror/search',
+            '@codemirror/commands',
+            '@codemirror/language',
+            '@codemirror/autocomplete',
+            '@codemirror/lint',
+            '@codemirror/theme-one-dark',
+            '@uiw/react-codemirror',
+            'codemirror-json5',
+          ],
           // Chart libraries
           'vendor-charts': ['chart.js', 'react-chartjs-2'],
           // Calendar
@@ -268,6 +284,25 @@ export default defineConfig({
         },
       },
     },
+  },
+  // Force all CodeMirror packages into a single pre-bundle to prevent
+  // "multiple instances of @codemirror/state" runtime errors
+  optimizeDeps: {
+    include: [
+      'codemirror',
+      '@codemirror/state',
+      '@codemirror/view',
+      '@codemirror/lang-json',
+      '@codemirror/lang-javascript',
+      '@codemirror/search',
+      '@codemirror/commands',
+      '@codemirror/language',
+      '@codemirror/autocomplete',
+      '@codemirror/lint',
+      '@codemirror/theme-one-dark',
+      '@uiw/react-codemirror',
+      'codemirror-json5',
+    ],
   },
   test: {
     globals: true,

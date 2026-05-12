@@ -207,6 +207,17 @@ const CharacterHistoryTable: React.FC<{
               >
                 {t('playerConnections.character.colTotalCharacters')}
               </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  py: 1,
+                  bgcolor: 'background.paper',
+                }}
+              >
+                {t('playerConnections.character.colNewCharacters')}
+              </TableCell>
               {worldNames.map((name) => (
                 <TableCell
                   key={name}
@@ -256,6 +267,19 @@ const CharacterHistoryTable: React.FC<{
                   }}
                 >
                   {row.totalCharacters.toLocaleString()}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    fontSize: '0.75rem',
+                    py: 0.75,
+                    fontWeight: 600,
+                    color: 'success.main',
+                  }}
+                >
+                  {row.newCharacters > 0
+                    ? `+${row.newCharacters.toLocaleString()}`
+                    : row.newCharacters.toLocaleString()}
                 </TableCell>
                 {worldNames.map((name) => {
                   const w = row.worlds.find((x) => x.name === name);
@@ -373,7 +397,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     }
   }, [refreshKey, loadHistory]);
 
-  // Build chart data — like CCU with per-world breakdown
+  // Build chart data — with per-world breakdown
   const chartData = useMemo(() => {
     if (records.length === 0) return { labels: [], datasets: [] };
 
@@ -566,7 +590,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
               </Box>
             </Card>
 
-            {/* History table */}
+            {/* History table with per-world columns */}
             <CharacterHistoryTable records={records} />
           </>
         )}

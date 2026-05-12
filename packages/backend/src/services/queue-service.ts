@@ -204,21 +204,46 @@ export class QueueService {
         }
 
         // Register subscriber polling job (every 10 minutes)
-        const subscriberPollExists = repeatables.some(
+        // Force re-register if existing job has wrong interval
+        const SUBSCRIBER_POLL_INTERVAL = 600000; // 10 minutes
+        const existingSubscriberPoll = repeatables.find(
           (r) => r.name === 'subscriber:poll'
         );
-        if (!subscriberPollExists) {
+        if (existingSubscriberPoll) {
+          const existingEvery = parseInt(
+            String((existingSubscriberPoll as any).every || '0'),
+            10
+          );
+          if (existingEvery !== SUBSCRIBER_POLL_INTERVAL) {
+            logger.warn(
+              `subscriber:poll has wrong interval (${existingEvery}ms), re-registering with ${SUBSCRIBER_POLL_INTERVAL}ms`
+            );
+            await this.removeRepeatable(
+              'scheduler',
+              existingSubscriberPoll.key
+            );
+            await this.addJob(
+              'scheduler',
+              'subscriber:poll',
+              {},
+              { repeat: { every: SUBSCRIBER_POLL_INTERVAL } }
+            );
+            logger.info(
+              'Re-registered repeatable job: subscriber:poll (every 10 minutes)'
+            );
+          } else {
+            logger.info('Repeatable job already exists: subscriber:poll');
+          }
+        } else {
           await this.addJob(
             'scheduler',
             'subscriber:poll',
             {},
-            { repeat: { every: 600000 } }
+            { repeat: { every: SUBSCRIBER_POLL_INTERVAL } }
           );
           logger.info(
             'Registered repeatable job: subscriber:poll (every 10 minutes)'
           );
-        } else {
-          logger.info('Repeatable job already exists: subscriber:poll');
         }
 
         // Register context field usage flush job (every minute)

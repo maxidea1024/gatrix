@@ -96,6 +96,7 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
       }}
       ModalProps={{
         disableRestoreFocus: true,
+        disableEnforceFocus: true,
       }}
       slotProps={{
         backdrop: { sx: { zIndex: zIndex - 1 } },
