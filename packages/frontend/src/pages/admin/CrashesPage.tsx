@@ -1428,7 +1428,7 @@ const CrashesPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <CopyIcon sx={{ fontSize: 14 }} />
+            <CopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           <ListItemText>{t('common.copyData')}</ListItemText>
         </MenuItem>

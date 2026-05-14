@@ -660,7 +660,7 @@ const CouponUsagePage: React.FC = () => {
                                             handleCopy(r.couponName)
                                           }
                                         >
-                                          <ContentCopyIcon fontSize="inherit" />
+                                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                                         </IconButton>
                                       </Tooltip>
                                     )}
@@ -688,7 +688,7 @@ const CouponUsagePage: React.FC = () => {
                                             handleCopy(r.couponCode)
                                           }
                                         >
-                                          <ContentCopyIcon fontSize="inherit" />
+                                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                                         </IconButton>
                                       </Tooltip>
                                     )}
@@ -713,7 +713,7 @@ const CouponUsagePage: React.FC = () => {
                                         size="small"
                                         onClick={() => handleCopy(r.userId)}
                                       >
-                                        <ContentCopyIcon fontSize="inherit" />
+                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
@@ -737,7 +737,7 @@ const CouponUsagePage: React.FC = () => {
                                         size="small"
                                         onClick={() => handleCopy(r.userName)}
                                       >
-                                        <ContentCopyIcon fontSize="inherit" />
+                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
@@ -764,7 +764,7 @@ const CouponUsagePage: React.FC = () => {
                                             handleCopy(r.characterId)
                                           }
                                         >
-                                          <ContentCopyIcon fontSize="inherit" />
+                                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                                         </IconButton>
                                       </Tooltip>
                                     )}

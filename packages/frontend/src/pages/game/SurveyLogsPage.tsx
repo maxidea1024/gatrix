@@ -449,7 +449,7 @@ const SurveyLogsPage: React.FC = () => {
             </Typography>
             <Tooltip title={t('common.copy')}>
               <IconButton size="small" onClick={() => handleCopy(r.surveyId)}>
-                <ContentCopyIcon fontSize="inherit" />
+                <ContentCopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -479,7 +479,7 @@ const SurveyLogsPage: React.FC = () => {
             </Typography>
             <Tooltip title={t('common.copy')}>
               <IconButton size="small" onClick={() => handleCopy(r.accountId)}>
-                <ContentCopyIcon fontSize="inherit" />
+                <ContentCopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -503,7 +503,7 @@ const SurveyLogsPage: React.FC = () => {
                 size="small"
                 onClick={() => handleCopy(r.userName || '')}
               >
-                <ContentCopyIcon fontSize="inherit" />
+                <ContentCopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -529,7 +529,7 @@ const SurveyLogsPage: React.FC = () => {
                 size="small"
                 onClick={() => handleCopy(r.characterId!)}
               >
-                <ContentCopyIcon fontSize="inherit" />
+                <ContentCopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>

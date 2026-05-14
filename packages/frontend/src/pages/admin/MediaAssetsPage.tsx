@@ -694,7 +694,7 @@ const MediaAssetsPage: React.FC = () => {
                               size="small"
                               onClick={() => handleCopy(detailAsset.cdnUrl)}
                             >
-                              <CopyIcon sx={{ fontSize: 14 }} />
+                              <CopyIcon sx={{ fontSize: 13 }} />
                             </IconButton>
                           </Box>
                         ),

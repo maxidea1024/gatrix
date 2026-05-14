@@ -773,7 +773,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                                 }}
                                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
                               >
-                                <CopyIcon sx={{ fontSize: 14 }} />
+                                <CopyIcon sx={{ fontSize: 13 }} />
                               </IconButton>
                               {field.isIgnored && (
                                 <Chip

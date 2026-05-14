@@ -325,7 +325,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         onClick={() => handleCopy(event.instanceId)}
                         sx={{ p: 0.25 }}
                       >
-                        <ContentCopyIcon sx={{ fontSize: 14 }} />
+                        <ContentCopyIcon sx={{ fontSize: 13 }} />
                       </IconButton>
                     </Box>
                   </Box>
@@ -349,7 +349,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         onClick={() => handleCopy(event.serviceType)}
                         sx={{ p: 0.25 }}
                       >
-                        <ContentCopyIcon sx={{ fontSize: 14 }} />
+                        <ContentCopyIcon sx={{ fontSize: 13 }} />
                       </IconButton>
                     </Box>
                   </Box>
@@ -374,7 +374,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.serviceGroup!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -403,7 +403,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.hostname!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -429,7 +429,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.environmentId!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -458,7 +458,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.externalAddress!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -487,7 +487,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.internalAddress!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -522,7 +522,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           }
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -555,7 +555,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           }
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -581,7 +581,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.sdkVersion!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -607,7 +607,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           onClick={() => handleCopy(event.appVersion!)}
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       )}
                     </Box>
@@ -669,7 +669,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           }
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </Box>
@@ -709,7 +709,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           }
                           sx={{ p: 0.25 }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </Box>

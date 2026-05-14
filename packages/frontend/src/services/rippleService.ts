@@ -37,11 +37,12 @@ export interface RippleRefreshResult {
 export interface RippleHistoryEvent {
   eventId: string;
   serverId: string;
+  hostname?: string;
   serviceType?: string;
   requestId: string;
   pattern: string;
   handlerKey: string;
-  status: 'success' | 'failure' | 'timeout' | 'skipped';
+  status: 'success' | 'failure' | 'timeout' | 'skipped' | 'warning';
   durationMs: number;
   delayMs: number;
   error?: string;

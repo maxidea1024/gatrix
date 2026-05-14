@@ -699,7 +699,7 @@ const ServiceNoticesPage: React.FC = () => {
                 }}
               >
                 <ListItemIcon>
-                  <ContentCopyIcon sx={{ fontSize: 14 }} />
+                  <ContentCopyIcon sx={{ fontSize: 13 }} />
                 </ListItemIcon>
                 <ListItemText>
                   {t('serviceNotices.copyWebviewUrl')}

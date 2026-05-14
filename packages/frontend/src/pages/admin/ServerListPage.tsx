@@ -6619,7 +6619,7 @@ const ServerListPage: React.FC = () => {
                             visibility: item.service ? 'visible' : 'hidden',
                           }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -6658,7 +6658,7 @@ const ServerListPage: React.FC = () => {
                             visibility: item.group ? 'visible' : 'hidden',
                           }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -6697,7 +6697,7 @@ const ServerListPage: React.FC = () => {
                             visibility: item.env ? 'visible' : 'hidden',
                           }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -6742,7 +6742,7 @@ const ServerListPage: React.FC = () => {
                             visibility: item.hostname ? 'visible' : 'hidden',
                           }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -6787,7 +6787,7 @@ const ServerListPage: React.FC = () => {
                             visibility: item.internalIp ? 'visible' : 'hidden',
                           }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -6832,7 +6832,7 @@ const ServerListPage: React.FC = () => {
                             visibility: item.healthPort ? 'visible' : 'hidden',
                           }}
                         >
-                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                          <ContentCopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -6965,25 +6965,25 @@ const ServerListPage: React.FC = () => {
       >
         <MenuItem onClick={handleCopyServiceJson}>
           <ListItemIcon>
-            <ContentCopyIcon sx={{ fontSize: 14 }} />
+            <ContentCopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyJson')}
         </MenuItem>
         <MenuItem onClick={handleCopyInstanceId}>
           <ListItemIcon>
-            <ContentCopyIcon sx={{ fontSize: 14 }} />
+            <ContentCopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyInstanceId')}
         </MenuItem>
         <MenuItem onClick={handleCopyHostname}>
           <ListItemIcon>
-            <ContentCopyIcon sx={{ fontSize: 14 }} />
+            <ContentCopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyHostname')}
         </MenuItem>
         <MenuItem onClick={handleCopyAddress}>
           <ListItemIcon>
-            <ContentCopyIcon sx={{ fontSize: 14 }} />
+            <ContentCopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           {t('serverList.contextMenu.copyAddress')}
         </MenuItem>

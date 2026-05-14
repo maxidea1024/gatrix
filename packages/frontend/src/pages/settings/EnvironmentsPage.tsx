@@ -809,7 +809,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                               }}
                               sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
                             >
-                              <CopyIcon sx={{ fontSize: 14 }} />
+                              <CopyIcon sx={{ fontSize: 13 }} />
                             </IconButton>
                           </Tooltip>
                         </Box>

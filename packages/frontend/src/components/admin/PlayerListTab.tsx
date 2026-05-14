@@ -763,7 +763,7 @@ const PlayerListTab: React.FC<Props> = ({
             }}
             sx={{ p: 0.25 }}
           >
-            <CopyIcon sx={{ fontSize: 14 }} color="action" />
+            <CopyIcon sx={{ fontSize: 13 }} />
           </IconButton>
         </Box>
       );
@@ -1201,7 +1201,7 @@ const PlayerListTab: React.FC<Props> = ({
                                   flexShrink: 0,
                                 }}
                               >
-                                <CopyIcon sx={{ fontSize: 14 }} />
+                                <CopyIcon sx={{ fontSize: 13 }} />
                               </IconButton>
                             )}
                           </Box>

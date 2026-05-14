@@ -339,7 +339,7 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
                           }}
                           sx={{ color: 'rgba(255,255,255,0.7)' }}
                         >
-                          <CopyIcon sx={{ fontSize: 14 }} />
+                          <CopyIcon sx={{ fontSize: 13 }} />
                         </IconButton>
                       </Tooltip>
                     }

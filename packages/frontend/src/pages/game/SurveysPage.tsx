@@ -675,7 +675,7 @@ const SurveysPage: React.FC = () => {
                                         });
                                       }}
                                     >
-                                      <ContentCopyIcon fontSize="inherit" />
+                                      <ContentCopyIcon sx={{ fontSize: 13 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>

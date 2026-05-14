@@ -1396,9 +1396,7 @@ const StoreProductsPage: React.FC = () => {
                                         }}
                                         sx={{ p: 0.25 }}
                                       >
-                                        <ContentCopyIcon
-                                          sx={{ fontSize: 14 }}
-                                        />
+                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
                                       </IconButton>
                                     </Tooltip>
                                   )}
@@ -1476,7 +1474,7 @@ const StoreProductsPage: React.FC = () => {
                                       }}
                                       sx={{ p: 0.25 }}
                                     >
-                                      <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                      <ContentCopyIcon sx={{ fontSize: 13 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>
@@ -1555,7 +1553,7 @@ const StoreProductsPage: React.FC = () => {
                                       }}
                                       sx={{ p: 0.25 }}
                                     >
-                                      <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                      <ContentCopyIcon sx={{ fontSize: 13 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>
@@ -1797,7 +1795,7 @@ const StoreProductsPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <ContentCopyIcon sx={{ fontSize: 14 }} />
+            <ContentCopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           <ListItemText>{t('storeProducts.copyProduct')}</ListItemText>
         </MenuItem>

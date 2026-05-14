@@ -146,7 +146,7 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
                                 flexShrink: 0,
                               }}
                             >
-                              <CopyIcon sx={{ fontSize: 14 }} />
+                              <CopyIcon sx={{ fontSize: 13 }} />
                             </IconButton>
                           )}
                         </Box>

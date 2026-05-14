@@ -331,6 +331,10 @@ const CmsManagementPage: React.FC = () => {
     text: string;
   }>({ loading: false, text: '' });
 
+  // Discard confirm dialog
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const [pendingDiscardAction, setPendingDiscardAction] = useState<(() => void) | null>(null);
+
   // Ripple tracking dialog
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
   const [trackingRequestId, setTrackingRequestId] = useState<string | null>(
@@ -462,6 +466,215 @@ const CmsManagementPage: React.FC = () => {
   const unsyncedCount = tables.filter(
     (tbl) => tbl.runtime && !tbl.runtime.synced
   ).length;
+
+  const renderInlineEditor = (version: number, isHistorical: boolean) => {
+    if (editingVersion !== version) return null;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          ...(isHistorical
+            ? {
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                bgcolor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.02)',
+                px: 2,
+                py: 1.5,
+              }
+            : {
+                border: '1px solid',
+                borderColor: 'primary.main',
+                borderTop: 'none',
+                borderRadius: '0 0 8px 8px',
+                bgcolor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.02)',
+                px: 2,
+                py: 1.5,
+                mb: 2,
+              }),
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1.5,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <EditIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              v{editingVersion} {t('cms.history.editingBased')}
+            </Typography>
+          </Box>
+          <IconButton
+            size="small"
+            onClick={() => {
+              const doClose = () => {
+                setEditingVersion(null);
+                setEditorData('');
+                setEditorOriginalData('');
+                setEditorComment('');
+              };
+
+              if (editorData !== editorOriginalData) {
+                setPendingDiscardAction(() => doClose);
+                setDiscardConfirmOpen(true);
+                return;
+              }
+              doClose();
+            }}
+          >
+            <CancelIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+        <Alert
+          severity="info"
+          variant="outlined"
+          sx={{
+            mb: 1.5,
+            py: 0.5,
+            '& .MuiAlert-message': {
+              fontSize: '0.75rem',
+              lineHeight: 1.5,
+            },
+          }}
+        >
+          {t('cms.history.editGuide', { version: editingVersion })}
+        </Alert>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {editorLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                py: 4,
+              }}
+            >
+              <CircularProgress size={28} />
+            </Box>
+          ) : (
+            <Box sx={{ height: 360 }}>
+              <JsonEditor
+                value={editorData}
+                onChange={setEditorData}
+                height="100%"
+                onValidation={(isValid) =>
+                  setEditorJsonValid(isValid)
+                }
+                helperText={
+                  !editorJsonValid
+                    ? t('cms.detail.jsonSyntaxError')
+                    : editorData !== editorOriginalData
+                      ? t('cms.detail.hasChanges')
+                      : t('cms.detail.currentData')
+                }
+              />
+            </Box>
+          )}
+          <TextField
+            size="small"
+            label="Comment"
+            value={editorComment}
+            onChange={(e) => setEditorComment(e.target.value)}
+            fullWidth
+            required
+            multiline
+            minRows={2}
+            placeholder={t('cms.detail.commentPlaceholder')}
+          />
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              justifyContent: 'flex-end',
+            }}
+          >
+            <ButtonGroup
+              variant="contained"
+              size="small"
+              ref={saveMenuRef}
+            >
+              <Button
+                startIcon={
+                  editorSaving ? (
+                    <CircularProgress size={14} />
+                  ) : (
+                    <SaveIcon />
+                  )
+                }
+                onClick={() => handleSave(false)}
+                disabled={
+                  editorSaving ||
+                  !editorData.trim() ||
+                  !editorComment.trim() ||
+                  editorData === editorOriginalData ||
+                  !editorJsonValid
+                }
+              >
+                {t('cms.detail.save')}
+              </Button>
+              <Button
+                onClick={() => setSaveMenuOpen((prev) => !prev)}
+                disabled={
+                  editorSaving ||
+                  !editorComment.trim() ||
+                  editorData === editorOriginalData ||
+                  !editorJsonValid
+                }
+              >
+                <ArrowDropDownIcon />
+              </Button>
+            </ButtonGroup>
+            <Popper
+              open={saveMenuOpen}
+              anchorEl={saveMenuRef.current}
+              placement="top-end"
+              transition
+              sx={{ zIndex: 1300 }}
+            >
+              {({ TransitionProps }) => (
+                <Grow {...TransitionProps}>
+                  <Paper elevation={8}>
+                    <ClickAwayListener
+                      onClickAway={() => setSaveMenuOpen(false)}
+                    >
+                      <MenuList>
+                        <MenuItem
+                          onClick={() => handleSave(false)}
+                        >
+                          <ListItemIcon>
+                            <SaveIcon fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText>
+                            {t('cms.detail.saveOnly')}
+                          </ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => handleSave(true)}
+                        >
+                          <ListItemIcon>
+                            <RefreshIcon
+                              fontSize="small"
+                              color="primary"
+                            />
+                          </ListItemIcon>
+                          <ListItemText>
+                            {t('cms.detail.saveAndRefresh')}
+                          </ListItemText>
+                        </MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+          </Box>
+        </Box>
+      </Box>
+    );
+  };
 
   // ── Upload Handler ──
   const handleUpload = async () => {
@@ -602,7 +815,7 @@ const CmsManagementPage: React.FC = () => {
   };
 
   // ── Start editing a version (inline) ──
-  const startEditing = async (version: number) => {
+  const executeStartEditing = async (version: number) => {
     setEditingVersion(version);
     setEditorComment('');
     setEditorLoading(true);
@@ -620,6 +833,19 @@ const CmsManagementPage: React.FC = () => {
     } finally {
       setEditorLoading(false);
     }
+  };
+
+  const startEditing = async (version: number) => {
+    if (
+      editingVersion != null &&
+      editingVersion !== version &&
+      editorData !== editorOriginalData
+    ) {
+      setPendingDiscardAction(() => () => executeStartEditing(version));
+      setDiscardConfirmOpen(true);
+      return;
+    }
+    executeStartEditing(version);
   };
 
   // ── Fetch version data (with cache) ──
@@ -1746,224 +1972,7 @@ const CmsManagementPage: React.FC = () => {
                 </Box>
               ) : historyData?.history?.length ? (
                 <>
-                  {/* ── Inline Editor (activated from version context menu) ── */}
-                  {editingVersion != null && (
-                    <Card
-                      variant="outlined"
-                      sx={{
-                        mb: 2,
-                        border: '2px solid',
-                        borderColor: 'primary.main',
-                        borderRadius: 2,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          px: 2,
-                          py: 1.5,
-                          borderBottom: 1,
-                          borderColor: 'divider',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          bgcolor: isDark
-                            ? 'rgba(25,118,210,0.06)'
-                            : 'rgba(25,118,210,0.03)',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                          }}
-                        >
-                          <EditIcon
-                            sx={{ fontSize: 16, color: 'primary.main' }}
-                          />
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 600 }}
-                          >
-                            v{editingVersion} {t('cms.history.editingBased')}
-                          </Typography>
-                        </Box>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (
-                              editorData !== editorOriginalData &&
-                              !window.confirm(
-                                t('cms.detail.discardChangesConfirm')
-                              )
-                            ) {
-                              return;
-                            }
-                            setEditingVersion(null);
-                            setEditorData('');
-                            setEditorOriginalData('');
-                            setEditorComment('');
-                          }}
-                        >
-                          <CancelIcon sx={{ fontSize: 18 }} />
-                        </IconButton>
-                      </Box>
-                      <Alert
-                        severity="info"
-                        variant="outlined"
-                        sx={{
-                          mx: 2,
-                          mt: 1.5,
-                          mb: 0,
-                          py: 0.5,
-                          '& .MuiAlert-message': {
-                            fontSize: '0.75rem',
-                            lineHeight: 1.5,
-                          },
-                        }}
-                      >
-                        {t('cms.history.editGuide', {
-                          version: editingVersion,
-                        })}
-                      </Alert>
-                      <Box
-                        sx={{
-                          p: 2,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 1.5,
-                        }}
-                      >
-                        {editorLoading ? (
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'center',
-                              py: 4,
-                            }}
-                          >
-                            <CircularProgress size={28} />
-                          </Box>
-                        ) : (
-                          <Box sx={{ height: 360 }}>
-                            <JsonEditor
-                              value={editorData}
-                              onChange={setEditorData}
-                              height="100%"
-                              onValidation={(isValid) =>
-                                setEditorJsonValid(isValid)
-                              }
-                              helperText={
-                                !editorJsonValid
-                                  ? t('cms.detail.jsonSyntaxError')
-                                  : editorData !== editorOriginalData
-                                    ? t('cms.detail.hasChanges')
-                                    : t('cms.detail.currentData')
-                              }
-                            />
-                          </Box>
-                        )}
-                        <TextField
-                          size="small"
-                          label="Comment"
-                          value={editorComment}
-                          onChange={(e) => setEditorComment(e.target.value)}
-                          fullWidth
-                          required
-                          multiline
-                          minRows={2}
-                          placeholder={t('cms.detail.commentPlaceholder')}
-                        />
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            gap: 1,
-                            justifyContent: 'flex-end',
-                          }}
-                        >
-                          <ButtonGroup
-                            variant="contained"
-                            size="small"
-                            ref={saveMenuRef}
-                          >
-                            <Button
-                              startIcon={
-                                editorSaving ? (
-                                  <CircularProgress size={14} />
-                                ) : (
-                                  <SaveIcon />
-                                )
-                              }
-                              onClick={() => handleSave(false)}
-                              disabled={
-                                editorSaving ||
-                                !editorData.trim() ||
-                                !editorComment.trim() ||
-                                editorData === editorOriginalData ||
-                                !editorJsonValid
-                              }
-                            >
-                              {t('cms.detail.save')}
-                            </Button>
-                            <Button
-                              onClick={() => setSaveMenuOpen((prev) => !prev)}
-                              disabled={
-                                editorSaving ||
-                                !editorComment.trim() ||
-                                editorData === editorOriginalData ||
-                                !editorJsonValid
-                              }
-                            >
-                              <ArrowDropDownIcon />
-                            </Button>
-                          </ButtonGroup>
-                          <Popper
-                            open={saveMenuOpen}
-                            anchorEl={saveMenuRef.current}
-                            placement="top-end"
-                            transition
-                            sx={{ zIndex: 1300 }}
-                          >
-                            {({ TransitionProps }) => (
-                              <Grow {...TransitionProps}>
-                                <Paper elevation={8}>
-                                  <ClickAwayListener
-                                    onClickAway={() => setSaveMenuOpen(false)}
-                                  >
-                                    <MenuList>
-                                      <MenuItem
-                                        onClick={() => handleSave(false)}
-                                      >
-                                        <ListItemIcon>
-                                          <SaveIcon fontSize="small" />
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                          {t('cms.detail.saveOnly')}
-                                        </ListItemText>
-                                      </MenuItem>
-                                      <MenuItem
-                                        onClick={() => handleSave(true)}
-                                      >
-                                        <ListItemIcon>
-                                          <RefreshIcon
-                                            fontSize="small"
-                                            color="primary"
-                                          />
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                          {t('cms.detail.saveAndRefresh')}
-                                        </ListItemText>
-                                      </MenuItem>
-                                    </MenuList>
-                                  </ClickAwayListener>
-                                </Paper>
-                              </Grow>
-                            )}
-                          </Popper>
-                        </Box>
-                      </Box>
-                    </Card>
-                  )}
+                  {/* ── Inline Editor used to be here ── */}
                   {/* ── Active (current) version ── */}
                   {(() => {
                     const active = historyData.history[0];
@@ -1983,7 +1992,7 @@ const CmsManagementPage: React.FC = () => {
                             borderColor: isDark
                               ? 'success.dark'
                               : 'success.light',
-                            borderRadius: isViewing ? '8px 8px 0 0' : 2,
+                            borderRadius: isViewing || editingVersion === active.version ? '8px 8px 0 0' : 2,
                             cursor: 'pointer',
                             bgcolor: isDark
                               ? 'rgba(76,175,80,0.06)'
@@ -1994,7 +2003,7 @@ const CmsManagementPage: React.FC = () => {
                                 ? 'rgba(76,175,80,0.1)'
                                 : 'rgba(76,175,80,0.06)',
                             },
-                            ...(!isViewing && { mb: 2 }),
+                            ...(!isViewing && editingVersion !== active.version && { mb: 2 }),
                             ...(isViewing && {
                               bgcolor: isDark
                                 ? 'rgba(25,118,210,0.08)'
@@ -2152,7 +2161,7 @@ const CmsManagementPage: React.FC = () => {
                           </Box>
                         </Box>
                         {/* Expanded panel for active entry */}
-                        {isViewing && (
+                        {isViewing && editingVersion !== active.version && (
                           <Box
                             sx={{
                               ...(viewMode === 'data' ? {} : {}),
@@ -2281,6 +2290,7 @@ const CmsManagementPage: React.FC = () => {
                               ))}
                           </Box>
                         )}
+                        {renderInlineEditor(active.version, false)}
                       </>
                     );
                   })()}
@@ -2519,7 +2529,7 @@ const CmsManagementPage: React.FC = () => {
                               </Box>
 
                               {/* ── Expanded panel: Data / Diff toggle ── */}
-                              {isViewing && (
+                              {isViewing && editingVersion !== entry.version && (
                                 <Box
                                   sx={{
                                     ...(viewMode === 'data'
@@ -2655,6 +2665,7 @@ const CmsManagementPage: React.FC = () => {
                                     ))}
                                 </Box>
                               )}
+                              {renderInlineEditor(entry.version, true)}
                             </React.Fragment>
                           );
                         })}
@@ -3531,6 +3542,36 @@ const CmsManagementPage: React.FC = () => {
             }}
           >
             {t('cms.refreshTable.confirmButton')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Discard Confirm Dialog */}
+      <Dialog
+        open={discardConfirmOpen}
+        onClose={() => setDiscardConfirmOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t('cms.detail.discardChangesTitle', 'Unsaved Changes')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('cms.detail.discardChangesConfirm')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDiscardConfirmOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (pendingDiscardAction) pendingDiscardAction();
+              setDiscardConfirmOpen(false);
+            }}
+          >
+            {t('common.confirm', 'Confirm')}
           </Button>
         </DialogActions>
       </Dialog>

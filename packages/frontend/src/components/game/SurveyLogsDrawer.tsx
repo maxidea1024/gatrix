@@ -500,7 +500,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                                 size="small"
                                 onClick={() => handleCopy(log.accountId)}
                               >
-                                <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                <ContentCopyIcon sx={{ fontSize: 13 }} />
                               </IconButton>
                             </Tooltip>
                           </Box>

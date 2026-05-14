@@ -56,6 +56,7 @@ interface RequestGroup {
   time: number | string;
   events: RippleHistoryEvent[];
   successCount: number;
+  warningCount: number;
   failureCount: number;
   maxDurationMs: number;
   maxDelayMs: number;
@@ -87,7 +88,8 @@ function groupByRequest(items: RippleHistoryEvent[]): RequestGroup[] {
       time: first.finishedAt,
       events,
       successCount: events.filter((e) => e.status === 'success').length,
-      failureCount: events.filter((e) => e.status !== 'success').length,
+      warningCount: events.filter((e) => e.status === 'warning').length,
+      failureCount: events.filter((e) => e.status !== 'success' && e.status !== 'warning').length,
       maxDurationMs: Math.max(...events.map((e) => e.durationMs || 0)),
       maxDelayMs: Math.max(...events.map((e) => e.delayMs || 0)),
       handlerKeys: [...new Set(events.map((e) => e.handlerKey))],
@@ -112,7 +114,8 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [showAllTables, setShowAllTables] = useState(false);
-  const allSuccess = group.failureCount === 0;
+  const allSuccess = group.failureCount === 0 && group.warningCount === 0;
+  const hasWarningOnly = group.failureCount === 0 && group.warningCount > 0;
 
   return (
     <React.Fragment>
@@ -149,12 +152,14 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
               width: 10,
               height: 10,
               borderRadius: '50%',
-              bgcolor: allSuccess ? 'success.main' : 'error.main',
+              bgcolor: allSuccess ? 'success.main' : hasWarningOnly ? 'warning.main' : 'error.main',
               boxShadow: (theme) =>
                 `0 0 8px 1px ${alpha(
                   allSuccess
                     ? theme.palette.success.main
-                    : theme.palette.error.main,
+                    : hasWarningOnly
+                      ? theme.palette.warning.main
+                      : theme.palette.error.main,
                   0.4
                 )}`,
             }}
@@ -315,6 +320,16 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                 label={group.successCount}
                 size="small"
                 color="success"
+                variant="filled"
+                sx={{ height: 22, fontSize: '0.72rem', fontWeight: 600 }}
+              />
+            )}
+            {group.warningCount > 0 && (
+              <Chip
+                icon={<WarningIcon sx={{ fontSize: '14px !important' }} />}
+                label={group.warningCount}
+                size="small"
+                color="warning"
                 variant="filled"
                 sx={{ height: 22, fontSize: '0.72rem', fontWeight: 600 }}
               />
@@ -500,6 +515,8 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                                 color="success"
                                 sx={{ fontSize: 16 }}
                               />
+                            ) : evt.status === 'warning' ? (
+                              <WarningIcon color="warning" sx={{ fontSize: 16 }} />
                             ) : (
                               <CancelIcon color="error" sx={{ fontSize: 16 }} />
                             )}
@@ -528,16 +545,16 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                               {evt.serverId || '—'}
                             </Typography>
                           </TableCell>
-                          <TableCell sx={{ py: 0.5 }}>
+                          <TableCell sx={{ py: 0.5, maxWidth: 400 }}>
                             {evt.error ? (
                               <Tooltip title={evt.error} placement="top">
                                 <Typography
                                   variant="body2"
                                   sx={{
                                     fontSize: '0.7rem',
-                                    color: 'error.main',
+                                    color: evt.status === 'warning' ? 'warning.main' : 'error.main',
                                     fontFamily: 'monospace',
-                                    maxWidth: 200,
+                                    maxWidth: 400,
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',

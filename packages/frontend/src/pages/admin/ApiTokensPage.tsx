@@ -1481,7 +1481,7 @@ const ApiTokensPage: React.FC = () => {
                 }}
                 sx={{ p: 0.5 }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -2296,7 +2296,7 @@ const ApiTokensPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <CopyIcon sx={{ fontSize: 14 }} />
+            <CopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           <ListItemText>{t('apiTokens.copyToken')}</ListItemText>
         </MenuItem>
@@ -3574,7 +3574,7 @@ const ApiTokensPage: React.FC = () => {
                     size="small"
                     color="primary"
                   >
-                    <CopyIcon sx={{ fontSize: 14 }} />
+                    <CopyIcon sx={{ fontSize: 13 }} />
                   </IconButton>
                 </Tooltip>
               </Box>

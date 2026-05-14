@@ -1065,9 +1065,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                   '&:hover': { opacity: 1 },
                                                 }}
                                               >
-                                                <CopyIcon
-                                                  sx={{ fontSize: 14 }}
-                                                />
+                                                <CopyIcon sx={{ fontSize: 13 }} />
                                               </IconButton>
                                             </Tooltip>
                                           </Box>

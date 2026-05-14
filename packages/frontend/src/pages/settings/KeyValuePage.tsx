@@ -346,7 +346,7 @@ const KeyValuePage: React.FC = () => {
                               }
                               sx={{ p: 0.5 }}
                             >
-                              <CopyIcon sx={{ fontSize: 14 }} />
+                              <CopyIcon sx={{ fontSize: 13 }} />
                             </IconButton>
                           </Tooltip>
                           {item.isSystemDefined && (

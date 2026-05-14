@@ -2683,7 +2683,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                 '&:hover': { opacity: 1 },
                                               }}
                                             >
-                                              <CopyIcon sx={{ fontSize: 14 }} />
+                                              <CopyIcon sx={{ fontSize: 13 }} />
                                             </IconButton>
                                           </Tooltip>
                                           <IconButton
@@ -3188,7 +3188,7 @@ const FeatureFlagsPage: React.FC = () => {
       >
         <MenuItem onClick={handleCopyName}>
           <ListItemIcon>
-            <CopyIcon sx={{ fontSize: 14 }} />
+            <CopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           <ListItemText>{t('featureFlags.copyName')}</ListItemText>
         </MenuItem>

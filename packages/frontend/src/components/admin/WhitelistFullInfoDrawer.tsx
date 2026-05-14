@@ -479,7 +479,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                                 onClick={() => handleCopy(w.accountId)}
                                 sx={{ p: 0.25 }}
                               >
-                                <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                <ContentCopyIcon sx={{ fontSize: 13 }} />
                               </IconButton>
                             </Box>
                           </TableCell>
@@ -593,7 +593,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                                 onClick={() => handleCopy(ip.ipAddress)}
                                 sx={{ p: 0.25 }}
                               >
-                                <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                <ContentCopyIcon sx={{ fontSize: 13 }} />
                               </IconButton>
                             </Box>
                           </TableCell>

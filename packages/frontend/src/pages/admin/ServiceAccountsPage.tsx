@@ -823,7 +823,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
                       )
                     }
                   >
-                    <CopyIcon sx={{ fontSize: 14 }} />
+                    <CopyIcon sx={{ fontSize: 13 }} />
                   </IconButton>
                 ),
               }}

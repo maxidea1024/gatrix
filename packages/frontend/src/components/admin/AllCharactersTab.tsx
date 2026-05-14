@@ -868,7 +868,7 @@ export default function AllCharactersTab({
               onClick={() => copyToClipboard(String(user.userId))}
               sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
             >
-              <CopyIcon sx={{ fontSize: 14 }} />
+              <CopyIcon sx={{ fontSize: 13 }} />
             </IconButton>
           </Box>
         );
@@ -898,7 +898,7 @@ export default function AllCharactersTab({
                 onClick={() => copyToClipboard(user.name)}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             )}
           </Box>
@@ -930,7 +930,7 @@ export default function AllCharactersTab({
                 onClick={() => copyToClipboard(user.characterId)}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             )}
           </Box>
@@ -962,7 +962,7 @@ export default function AllCharactersTab({
                 onClick={() => copyToClipboard(user.accountId)}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             )}
           </Box>
@@ -977,7 +977,7 @@ export default function AllCharactersTab({
                 onClick={() => copyToClipboard(user.worldId)}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             )}
           </Box>
@@ -992,7 +992,7 @@ export default function AllCharactersTab({
                 onClick={() => copyToClipboard(String(user.nationCmsId))}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             )}
           </Box>
@@ -1535,7 +1535,7 @@ export default function AllCharactersTab({
                                   flexShrink: 0,
                                 }}
                               >
-                                <CopyIcon sx={{ fontSize: 14 }} />
+                                <CopyIcon sx={{ fontSize: 13 }} />
                               </IconButton>
                             )}
                           </Box>

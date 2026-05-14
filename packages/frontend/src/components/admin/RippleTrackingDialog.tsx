@@ -10,12 +10,15 @@ import {
   CircularProgress,
   Chip,
   Tooltip,
+  Paper,
+  IconButton,
   LinearProgress,
   keyframes,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableHead,
   TableRow,
 } from '@mui/material';
 import {
@@ -23,9 +26,12 @@ import {
   Cancel as CancelIcon,
   Warning as WarningIcon,
   HourglassEmpty as HourglassIcon,
+  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import rippleService, { RippleHistoryEvent } from '@/services/rippleService';
 
 const fadeSlideIn = keyframes`
@@ -57,6 +63,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const { getProjectApiPath } = useOrgProject();
   const [events, setEvents] = useState<RippleHistoryEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -100,12 +107,11 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
 
         setEvents([...fetchedEvents, ...pendingEvents]);
 
-        // Stabilization: stop polling when event count hasn't changed for 3 checks (6s)
-        // This ensures all servers across the cluster have time to report back.
+        // Stabilization: stop polling when event count hasn't changed for 1 check (2s)
         const currentCount = fetchedEvents.length;
         if (currentCount > 0 && currentCount === lastEventCount) {
           stableChecks++;
-          if (stableChecks >= 3) {
+          if (stableChecks >= 1) {
             setIsPolling(false);
             clearInterval(intervalId);
           }
@@ -156,13 +162,24 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
     };
   }, [open, requestId, pattern, matchedKeys, getProjectApiPath]);
 
+  const handleCopy = (text: string | undefined) => {
+    if (!text) return;
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' }),
+    );
+  };
+
   const getStatusIcon = (status: string) => {
-    const sx = { fontSize: 16 };
+    const sx = { fontSize: 18 };
     switch (status) {
       case 'success':
         return <CheckCircleIcon color="success" sx={sx} />;
       case 'failure':
         return <CancelIcon color="error" sx={sx} />;
+      case 'warning':
+        return <WarningIcon color="warning" sx={sx} />;
       case 'timeout':
         return <WarningIcon color="warning" sx={sx} />;
       default:
@@ -182,6 +199,9 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
   const uniqueSuccessCount = [...keyStatusMap.values()].filter(
     (s) => s === 'success'
   ).length;
+  const uniqueWarningCount = [...keyStatusMap.values()].filter(
+    (s) => s === 'warning'
+  ).length;
   const uniqueFailureCount = [...keyStatusMap.values()].filter(
     (s) => s === 'failure' || s === 'timeout'
   ).length;
@@ -196,7 +216,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
       : 0;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ pb: 1 }}>
         <Box
           sx={{
@@ -208,7 +228,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
           <Typography variant="subtitle1" fontWeight={600}>
             {t('ripple.tracking.title', 'Ripple 전파 추적')}
           </Typography>
-          {isPolling && <CircularProgress size={16} />}
         </Box>
         <Box
           sx={{
@@ -278,6 +297,15 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             variant="outlined"
             sx={{ height: 22, fontWeight: 600 }}
           />
+          {uniqueWarningCount > 0 && (
+            <Chip
+              size="small"
+              label={`⚠ ${uniqueWarningCount}`}
+              color="warning"
+              variant="outlined"
+              sx={{ height: 22, fontWeight: 600 }}
+            />
+          )}
           {uniquePendingCount > 0 && (
             <Chip
               size="small"
@@ -291,43 +319,60 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             color="text.secondary"
             sx={{ ml: 'auto' }}
           >
-            {uniqueSuccessCount + uniqueFailureCount} / {uniqueTotal} keys (
-            {totalEvents} events)
+            {t('ripple.tracking.keys', '{{success}} / {{total}} keys ({{events}} events)', {
+              success: uniqueSuccessCount + uniqueFailureCount,
+              total: uniqueTotal,
+              events: totalEvents,
+            })}
           </Typography>
         </Box>
-
-        {isPolling && (
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{ mb: 1, borderRadius: 1 }}
-          />
-        )}
 
         {/* Event List */}
         {loading && events.length === 0 ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
             <CircularProgress size={24} />
           </Box>
-        ) : events.length === 0 ? (
+        ) : events.filter((e) => e.status !== 'skipped').length === 0 ? (
           <Typography
             variant="caption"
             color="text.secondary"
             align="center"
-            sx={{ display: 'block', p: 2 }}
+            sx={{ display: 'block', p: 3 }}
           >
-            {t('ripple.tracking.waiting', '응답을 기다리는 중입니다...')}
+            {t('ripple.tracking.noEvents', '아직 전파 기록이 없습니다.')}
           </Typography>
         ) : (
+          <Paper variant="outlined" sx={{ borderRadius: 1.5, overflow: 'hidden' }}>
           <TableContainer sx={{ maxHeight: 400 }}>
-            <Table size="small" stickyHeader sx={{ tableLayout: 'fixed' }}>
-              <colgroup>
-                <col style={{ width: 28 }} />
-                <col />
-                <col style={{ width: 64 }} />
-                <col style={{ width: 160 }} />
-                <col style={{ width: 150 }} />
-              </colgroup>
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow
+                  sx={{
+                    '& th': {
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      color: 'text.secondary',
+                      py: 0.75,
+                      px: 1,
+                      whiteSpace: 'nowrap',
+                      borderBottom: 2,
+                      borderColor: 'divider',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'grey.900'
+                          : 'grey.100',
+                    },
+                  }}
+                >
+                  <TableCell sx={{ width: 36 }} />
+                  <TableCell>{t('ripple.tracking.col.handler', 'Handler')}</TableCell>
+                  <TableCell>{t('ripple.tracking.col.service', 'Service')}</TableCell>
+                  <TableCell>{t('ripple.tracking.col.hostname', 'Hostname')}</TableCell>
+                  <TableCell>{t('ripple.tracking.col.instance', 'Instance')}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{t('ripple.tracking.col.result', 'Result')}</TableCell>
+                  <TableCell>{t('ripple.tracking.col.message', 'Message')}</TableCell>
+                </TableRow>
+              </TableHead>
               <TableBody>
                 {events.map((event, idx) => (
                   <TableRow
@@ -339,94 +384,150 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                           : 'transparent',
                       animation: `${fadeSlideIn} 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both`,
                       animationDelay: `${Math.min(idx * 15, 500)}ms`,
-                      '& td': { py: 0.25, px: 0.5, border: 0 },
+                      '& td': { py: 0.5, px: 1 },
+                      '&:last-child td': { borderBottom: 0 },
                     }}
                   >
-                    <TableCell sx={{ width: 28 }}>
+                    <TableCell sx={{ width: 36 }}>
                       {getStatusIcon(event.status)}
                     </TableCell>
                     <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontFamily: 'monospace',
-                          fontWeight: 500,
-                          color:
-                            event.status === 'skipped'
-                              ? 'text.disabled'
-                              : 'text.primary',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          display: 'block',
-                        }}
-                      >
-                        {event.handlerKey}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      {event.status !== 'skipped' && event.serviceType && (
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Typography
-                          variant="caption"
-                          color="info.main"
+                          variant="body2"
                           sx={{
-                            fontSize: '0.6rem',
                             fontFamily: 'monospace',
-                            fontWeight: 600,
+                            fontSize: '0.78rem',
+                            fontWeight: 500,
+                            color:
+                              event.status === 'skipped'
+                                ? 'text.disabled'
+                                : 'text.primary',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
                           }}
                         >
-                          {event.serviceType}
+                          {event.handlerKey}
                         </Typography>
-                      )}
+                        {event.status !== 'skipped' && (
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton size="small" sx={{ p: 0.25, ml: 0.25 }} onClick={() => handleCopy(event.handlerKey)}>
+                              <ContentCopyIcon sx={{ fontSize: 13 }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
                     </TableCell>
                     <TableCell>
-                      {event.status !== 'skipped' ? (
-                        <Typography
-                          variant="caption"
-                          color="text.disabled"
-                          sx={{ fontSize: '0.6rem', fontFamily: 'monospace' }}
-                        >
-                          {event.serverId}
-                        </Typography>
+                      {event.status !== 'skipped' && event.serviceType ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Typography
+                            variant="body2"
+                            color="info.main"
+                            sx={{
+                              fontSize: '0.78rem',
+                              fontFamily: 'monospace',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {event.serviceType}
+                          </Typography>
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton size="small" sx={{ p: 0.25, ml: 0.25 }} onClick={() => handleCopy(event.serviceType)}>
+                              <ContentCopyIcon sx={{ fontSize: 13 }} />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       ) : null}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell>
+                      {event.status !== 'skipped' && event.hostname ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
+                          >
+                            {event.hostname}
+                          </Typography>
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton size="small" sx={{ p: 0.25, ml: 0.25 }} onClick={() => handleCopy(event.hostname)}>
+                              <ContentCopyIcon sx={{ fontSize: 13 }} />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      ) : event.status !== 'skipped' ? (
+                        <Typography variant="body2" color="text.disabled" sx={{ fontSize: '0.75rem' }}>—</Typography>
+                      ) : null}
+                    </TableCell>
+                    <TableCell>
+                      {event.status !== 'skipped' && event.serverId ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Typography
+                            variant="body2"
+                            color="text.disabled"
+                            sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
+                          >
+                            {event.serverId}
+                          </Typography>
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton size="small" sx={{ p: 0.25, ml: 0.25 }} onClick={() => handleCopy(event.serverId)}>
+                              <ContentCopyIcon sx={{ fontSize: 13 }} />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      ) : event.status !== 'skipped' ? (
+                        <Typography variant="body2" color="text.disabled" sx={{ fontSize: '0.75rem' }}>—</Typography>
+                      ) : null}
+                    </TableCell>
+                    <TableCell>
                       {event.status === 'skipped' ? (
                         <Typography
-                          variant="caption"
+                          variant="body2"
                           color="text.disabled"
-                          sx={{ fontSize: '0.65rem' }}
+                          sx={{ fontSize: '0.75rem' }}
                         >
                           {t('ripple.tracking.pending', '대기 중')}
                         </Typography>
                       ) : (
                         <Typography
-                          variant="caption"
+                          variant="body2"
                           color="text.secondary"
-                          sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}
+                          sx={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}
                         >
                           {event.durationMs}ms ({event.delayMs}ms delay)
                         </Typography>
                       )}
-                      {event.error && (
-                        <Tooltip title={event.error}>
-                          <WarningIcon
-                            color="error"
-                            sx={{
-                              fontSize: 14,
-                              cursor: 'help',
-                              ml: 0.5,
-                              verticalAlign: 'middle',
-                            }}
-                          />
-                        </Tooltip>
-                      )}
+                    </TableCell>
+                    <TableCell>
+                      {event.error ? (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '0.72rem',
+                            color: event.status === 'warning' ? 'warning.main' : 'error.main',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {event.error}
+                        </Typography>
+                      ) : event.status === 'success' ? (
+                        <Typography
+                          variant="body2"
+                          color="success.main"
+                          sx={{ fontSize: '0.72rem' }}
+                        >
+                          {t('ripple.tracking.success', '성공')}
+                        </Typography>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
+          </Paper>
         )}
       </DialogContent>
       <DialogActions sx={{ px: 1.5, py: 1 }}>
@@ -435,8 +536,9 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
           variant="contained"
           size="small"
           color="primary"
+          startIcon={isPolling ? <CircularProgress size={14} color="inherit" /> : undefined}
         >
-          {t('common.close')}
+          {isPolling ? t('ripple.tracking.tracking', '추적중...') : t('common.close')}
         </Button>
       </DialogActions>
     </Dialog>
