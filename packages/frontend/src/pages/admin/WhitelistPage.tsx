@@ -795,7 +795,9 @@ const WhitelistPage: React.FC = () => {
                                         }
                                         sx={{ p: 0.5 }}
                                       >
-                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                        <ContentCopyIcon
+                                          sx={{ fontSize: 13 }}
+                                        />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>

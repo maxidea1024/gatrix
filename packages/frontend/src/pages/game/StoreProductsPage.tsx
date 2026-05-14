@@ -1396,7 +1396,9 @@ const StoreProductsPage: React.FC = () => {
                                         }}
                                         sx={{ p: 0.25 }}
                                       >
-                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                        <ContentCopyIcon
+                                          sx={{ fontSize: 13 }}
+                                        />
                                       </IconButton>
                                     </Tooltip>
                                   )}

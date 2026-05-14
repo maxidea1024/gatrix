@@ -333,7 +333,9 @@ const CmsManagementPage: React.FC = () => {
 
   // Discard confirm dialog
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
-  const [pendingDiscardAction, setPendingDiscardAction] = useState<(() => void) | null>(null);
+  const [pendingDiscardAction, setPendingDiscardAction] = useState<
+    (() => void) | null
+  >(null);
 
   // Ripple tracking dialog
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
@@ -504,7 +506,10 @@ const CmsManagementPage: React.FC = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <EditIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, color: 'primary.main' }}
+            >
               v{editingVersion} {t('cms.history.editingBased')}
             </Typography>
           </Box>
@@ -560,9 +565,7 @@ const CmsManagementPage: React.FC = () => {
                 value={editorData}
                 onChange={setEditorData}
                 height="100%"
-                onValidation={(isValid) =>
-                  setEditorJsonValid(isValid)
-                }
+                onValidation={(isValid) => setEditorJsonValid(isValid)}
                 helperText={
                   !editorJsonValid
                     ? t('cms.detail.jsonSyntaxError')
@@ -591,18 +594,10 @@ const CmsManagementPage: React.FC = () => {
               justifyContent: 'flex-end',
             }}
           >
-            <ButtonGroup
-              variant="contained"
-              size="small"
-              ref={saveMenuRef}
-            >
+            <ButtonGroup variant="contained" size="small" ref={saveMenuRef}>
               <Button
                 startIcon={
-                  editorSaving ? (
-                    <CircularProgress size={14} />
-                  ) : (
-                    <SaveIcon />
-                  )
+                  editorSaving ? <CircularProgress size={14} /> : <SaveIcon />
                 }
                 onClick={() => handleSave(false)}
                 disabled={
@@ -641,9 +636,7 @@ const CmsManagementPage: React.FC = () => {
                       onClickAway={() => setSaveMenuOpen(false)}
                     >
                       <MenuList>
-                        <MenuItem
-                          onClick={() => handleSave(false)}
-                        >
+                        <MenuItem onClick={() => handleSave(false)}>
                           <ListItemIcon>
                             <SaveIcon fontSize="small" />
                           </ListItemIcon>
@@ -651,14 +644,9 @@ const CmsManagementPage: React.FC = () => {
                             {t('cms.detail.saveOnly')}
                           </ListItemText>
                         </MenuItem>
-                        <MenuItem
-                          onClick={() => handleSave(true)}
-                        >
+                        <MenuItem onClick={() => handleSave(true)}>
                           <ListItemIcon>
-                            <RefreshIcon
-                              fontSize="small"
-                              color="primary"
-                            />
+                            <RefreshIcon fontSize="small" color="primary" />
                           </ListItemIcon>
                           <ListItemText>
                             {t('cms.detail.saveAndRefresh')}
@@ -1992,7 +1980,10 @@ const CmsManagementPage: React.FC = () => {
                             borderColor: isDark
                               ? 'success.dark'
                               : 'success.light',
-                            borderRadius: isViewing || editingVersion === active.version ? '8px 8px 0 0' : 2,
+                            borderRadius:
+                              isViewing || editingVersion === active.version
+                                ? '8px 8px 0 0'
+                                : 2,
                             cursor: 'pointer',
                             bgcolor: isDark
                               ? 'rgba(76,175,80,0.06)'
@@ -2003,7 +1994,8 @@ const CmsManagementPage: React.FC = () => {
                                 ? 'rgba(76,175,80,0.1)'
                                 : 'rgba(76,175,80,0.06)',
                             },
-                            ...(!isViewing && editingVersion !== active.version && { mb: 2 }),
+                            ...(!isViewing &&
+                              editingVersion !== active.version && { mb: 2 }),
                             ...(isViewing && {
                               bgcolor: isDark
                                 ? 'rgba(25,118,210,0.08)'
@@ -2529,142 +2521,145 @@ const CmsManagementPage: React.FC = () => {
                               </Box>
 
                               {/* ── Expanded panel: Data / Diff toggle ── */}
-                              {isViewing && editingVersion !== entry.version && (
-                                <Box
-                                  sx={{
-                                    ...(viewMode === 'data'
-                                      ? { flex: 1, minHeight: 0 }
-                                      : {}),
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    borderBottom: '1px solid',
-                                    borderColor: 'divider',
-                                    bgcolor: isDark
-                                      ? 'rgba(0,0,0,0.15)'
-                                      : 'rgba(0,0,0,0.02)',
-                                    px: 2,
-                                    py: 1.5,
-                                  }}
-                                >
-                                  {/* Mode toggle — always visible for consistency */}
+                              {isViewing &&
+                                editingVersion !== entry.version && (
                                   <Box
                                     sx={{
+                                      ...(viewMode === 'data'
+                                        ? { flex: 1, minHeight: 0 }
+                                        : {}),
                                       display: 'flex',
-                                      alignItems: 'center',
-                                      mb: 1,
+                                      flexDirection: 'column',
+                                      borderBottom: '1px solid',
+                                      borderColor: 'divider',
+                                      bgcolor: isDark
+                                        ? 'rgba(0,0,0,0.15)'
+                                        : 'rgba(0,0,0,0.02)',
+                                      px: 2,
+                                      py: 1.5,
                                     }}
                                   >
-                                    <ButtonGroup
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ height: 26 }}
+                                    {/* Mode toggle — always visible for consistency */}
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        mb: 1,
+                                      }}
                                     >
-                                      <Button
-                                        variant={
-                                          viewMode === 'data'
-                                            ? 'contained'
-                                            : 'outlined'
-                                        }
-                                        onClick={() => setViewMode('data')}
-                                        sx={{
-                                          fontSize: '0.7rem',
-                                          px: 1.5,
-                                          textTransform: 'none',
-                                        }}
+                                      <ButtonGroup
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 26 }}
                                       >
-                                        Data
-                                      </Button>
-                                      <Button
-                                        variant={
-                                          viewMode === 'diff'
-                                            ? 'contained'
-                                            : 'outlined'
-                                        }
-                                        onClick={() =>
-                                          prevVersion != null
-                                            ? switchToDiff(
-                                                entry.version,
-                                                prevVersion
-                                              )
-                                            : setViewMode('diff')
-                                        }
-                                        startIcon={
-                                          <CompareArrowsIcon
-                                            sx={{ fontSize: '14px !important' }}
-                                          />
-                                        }
-                                        sx={{
-                                          fontSize: '0.7rem',
-                                          px: 1.5,
-                                          textTransform: 'none',
-                                        }}
-                                      >
-                                        Diff
-                                      </Button>
-                                    </ButtonGroup>
-                                    {viewMode === 'diff' &&
-                                      prevVersion != null && (
-                                        <Typography
-                                          variant="caption"
+                                        <Button
+                                          variant={
+                                            viewMode === 'data'
+                                              ? 'contained'
+                                              : 'outlined'
+                                          }
+                                          onClick={() => setViewMode('data')}
                                           sx={{
-                                            ml: 1,
-                                            color: 'text.disabled',
-                                            fontSize: '0.68rem',
+                                            fontSize: '0.7rem',
+                                            px: 1.5,
+                                            textTransform: 'none',
                                           }}
                                         >
-                                          v{prevVersion} → v{entry.version}
-                                        </Typography>
-                                      )}
+                                          Data
+                                        </Button>
+                                        <Button
+                                          variant={
+                                            viewMode === 'diff'
+                                              ? 'contained'
+                                              : 'outlined'
+                                          }
+                                          onClick={() =>
+                                            prevVersion != null
+                                              ? switchToDiff(
+                                                  entry.version,
+                                                  prevVersion
+                                                )
+                                              : setViewMode('diff')
+                                          }
+                                          startIcon={
+                                            <CompareArrowsIcon
+                                              sx={{
+                                                fontSize: '14px !important',
+                                              }}
+                                            />
+                                          }
+                                          sx={{
+                                            fontSize: '0.7rem',
+                                            px: 1.5,
+                                            textTransform: 'none',
+                                          }}
+                                        >
+                                          Diff
+                                        </Button>
+                                      </ButtonGroup>
+                                      {viewMode === 'diff' &&
+                                        prevVersion != null && (
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              ml: 1,
+                                              color: 'text.disabled',
+                                              fontSize: '0.68rem',
+                                            }}
+                                          >
+                                            v{prevVersion} → v{entry.version}
+                                          </Typography>
+                                        )}
+                                    </Box>
+
+                                    {/* Data view */}
+                                    {viewMode === 'data' &&
+                                      (viewingDataLoading ? (
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            py: 2,
+                                          }}
+                                        >
+                                          <CircularProgress size={24} />
+                                        </Box>
+                                      ) : viewingData ? (
+                                        <JsonEditor
+                                          value={JSON.stringify(
+                                            viewingData,
+                                            null,
+                                            2
+                                          )}
+                                          onChange={() => {}}
+                                          readOnly
+                                          height={400}
+                                        />
+                                      ) : null)}
+
+                                    {/* Diff view */}
+                                    {viewMode === 'diff' &&
+                                      (diffLoading ? (
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            py: 3,
+                                          }}
+                                        >
+                                          <CircularProgress size={24} />
+                                        </Box>
+                                      ) : (
+                                        <LightDiff
+                                          patchText={diffPatchText}
+                                          dark={isDark}
+                                          noDiffMessage={t(
+                                            'cms.history.noDiffAvailable'
+                                          )}
+                                        />
+                                      ))}
                                   </Box>
-
-                                  {/* Data view */}
-                                  {viewMode === 'data' &&
-                                    (viewingDataLoading ? (
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          justifyContent: 'center',
-                                          py: 2,
-                                        }}
-                                      >
-                                        <CircularProgress size={24} />
-                                      </Box>
-                                    ) : viewingData ? (
-                                      <JsonEditor
-                                        value={JSON.stringify(
-                                          viewingData,
-                                          null,
-                                          2
-                                        )}
-                                        onChange={() => {}}
-                                        readOnly
-                                        height={400}
-                                      />
-                                    ) : null)}
-
-                                  {/* Diff view */}
-                                  {viewMode === 'diff' &&
-                                    (diffLoading ? (
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          justifyContent: 'center',
-                                          py: 3,
-                                        }}
-                                      >
-                                        <CircularProgress size={24} />
-                                      </Box>
-                                    ) : (
-                                      <LightDiff
-                                        patchText={diffPatchText}
-                                        dark={isDark}
-                                        noDiffMessage={t(
-                                          'cms.history.noDiffAvailable'
-                                        )}
-                                      />
-                                    ))}
-                                </Box>
-                              )}
+                                )}
                               {renderInlineEditor(entry.version, true)}
                             </React.Fragment>
                           );
@@ -3553,7 +3548,9 @@ const CmsManagementPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t('cms.detail.discardChangesTitle', 'Unsaved Changes')}</DialogTitle>
+        <DialogTitle>
+          {t('cms.detail.discardChangesTitle', 'Unsaved Changes')}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t('cms.detail.discardChangesConfirm')}

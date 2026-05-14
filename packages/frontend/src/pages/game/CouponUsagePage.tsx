@@ -660,7 +660,9 @@ const CouponUsagePage: React.FC = () => {
                                             handleCopy(r.couponName)
                                           }
                                         >
-                                          <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                          <ContentCopyIcon
+                                            sx={{ fontSize: 13 }}
+                                          />
                                         </IconButton>
                                       </Tooltip>
                                     )}
@@ -688,7 +690,9 @@ const CouponUsagePage: React.FC = () => {
                                             handleCopy(r.couponCode)
                                           }
                                         >
-                                          <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                          <ContentCopyIcon
+                                            sx={{ fontSize: 13 }}
+                                          />
                                         </IconButton>
                                       </Tooltip>
                                     )}
@@ -713,7 +717,9 @@ const CouponUsagePage: React.FC = () => {
                                         size="small"
                                         onClick={() => handleCopy(r.userId)}
                                       >
-                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                        <ContentCopyIcon
+                                          sx={{ fontSize: 13 }}
+                                        />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
@@ -737,7 +743,9 @@ const CouponUsagePage: React.FC = () => {
                                         size="small"
                                         onClick={() => handleCopy(r.userName)}
                                       >
-                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                        <ContentCopyIcon
+                                          sx={{ fontSize: 13 }}
+                                        />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
@@ -764,7 +772,9 @@ const CouponUsagePage: React.FC = () => {
                                             handleCopy(r.characterId)
                                           }
                                         >
-                                          <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                          <ContentCopyIcon
+                                            sx={{ fontSize: 13 }}
+                                          />
                                         </IconButton>
                                       </Tooltip>
                                     )}

@@ -1725,7 +1725,9 @@ const CouponSettingsPage: React.FC = () => {
                                         size="small"
                                         onClick={() => handleCopyName(it.name)}
                                       >
-                                        <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                        <ContentCopyIcon
+                                          sx={{ fontSize: 13 }}
+                                        />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
@@ -1774,7 +1776,9 @@ const CouponSettingsPage: React.FC = () => {
                                               handleCopyCode(it.code!)
                                             }
                                           >
-                                            <ContentCopyIcon sx={{ fontSize: 13 }} />
+                                            <ContentCopyIcon
+                                              sx={{ fontSize: 13 }}
+                                            />
                                           </IconButton>
                                         </Tooltip>
                                       )}
