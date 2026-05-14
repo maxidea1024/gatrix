@@ -463,7 +463,8 @@ const ServiceNoticesPreviewPage: React.FC = () => {
         sx={{
           width: SIDEBAR_WIDTH,
           height: '100%',
-          background: 'linear-gradient(180deg, #302824 0%, #2b2420 30%, #251f1c 100%)',
+          background:
+            'linear-gradient(180deg, #302824 0%, #2b2420 30%, #251f1c 100%)',
           display: 'flex',
           flexDirection: 'column',
           borderRight: '2px solid #4a3d32',
@@ -602,8 +603,10 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 borderBottom: '1px solid rgba(155, 138, 120, 0.2)',
-                background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 100%)',
-                boxShadow: '0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.04)',
+                background:
+                  'linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                boxShadow:
+                  '0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.04)',
                 position: 'relative',
                 '&::after': {
                   content: '""',
@@ -612,7 +615,8 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   left: 24,
                   right: 24,
                   height: '1px',
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(212, 165, 116, 0.3) 50%, transparent 100%)',
+                  background:
+                    'linear-gradient(90deg, transparent 0%, rgba(212, 165, 116, 0.3) 50%, transparent 100%)',
                 },
               }}
             >
@@ -632,7 +636,8 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   label={selectedNotice.category.toUpperCase()}
                   size="small"
                   sx={{
-                    background: 'linear-gradient(135deg, #5c4f44 0%, #4a3d32 100%)',
+                    background:
+                      'linear-gradient(135deg, #5c4f44 0%, #4a3d32 100%)',
                     color: '#e8ddd0',
                     fontWeight: 600,
                     border: '1px solid rgba(212, 165, 116, 0.25)',

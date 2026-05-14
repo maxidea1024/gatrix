@@ -2070,7 +2070,8 @@ const ClientVersionsPage: React.FC = () => {
                         ))}
                       <TableCell>
                         <Typography variant="body2" noWrap>
-                          {clientVersion.createdByEmail || t('dashboard.unknown')}
+                          {clientVersion.createdByEmail ||
+                            t('dashboard.unknown')}
                         </Typography>
                       </TableCell>
                       {canManage && (
