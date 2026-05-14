@@ -1613,7 +1613,7 @@ const ClientVersionsPage: React.FC = () => {
                   }}
                   sx={{ p: 0.25 }}
                 >
-                  <CopyIcon sx={{ fontSize: 14 }} />
+                  <CopyIcon sx={{ fontSize: 13 }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -1651,7 +1651,7 @@ const ClientVersionsPage: React.FC = () => {
                   }}
                   sx={{ p: 0.25 }}
                 >
-                  <CopyIcon sx={{ fontSize: 14 }} />
+                  <CopyIcon sx={{ fontSize: 13 }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -1994,7 +1994,7 @@ const ClientVersionsPage: React.FC = () => {
                 pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
               }}
             >
-              <Table sx={{ tableLayout: 'auto' }}>
+              <Table size="small" sx={{ tableLayout: 'auto' }}>
                 <TableHead>
                   <TableRow>
                     {canManage && (
@@ -2069,21 +2069,9 @@ const ClientVersionsPage: React.FC = () => {
                           </TableCell>
                         ))}
                       <TableCell>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {clientVersion.createdByName ||
-                              t('dashboard.unknown')}
-                          </Typography>
-                          {clientVersion.createdByEmail && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{ display: 'block' }}
-                            >
-                              {clientVersion.createdByEmail}
-                            </Typography>
-                          )}
-                        </Box>
+                        <Typography variant="body2" noWrap>
+                          {clientVersion.createdByEmail || t('dashboard.unknown')}
+                        </Typography>
                       </TableCell>
                       {canManage && (
                         <TableCell align="center">
@@ -2128,7 +2116,7 @@ const ClientVersionsPage: React.FC = () => {
           }}
         >
           <ListItemIcon>
-            <CopyIcon sx={{ fontSize: 14 }} />
+            <CopyIcon sx={{ fontSize: 13 }} />
           </ListItemIcon>
           <ListItemText>{t('clientVersions.copyVersion')}</ListItemText>
         </MenuItem>

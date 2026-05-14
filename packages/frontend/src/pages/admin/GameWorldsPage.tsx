@@ -350,7 +350,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
               }}
             >
               <ListItemIcon>
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </ListItemIcon>
               <ListItemText>{t('common.copy')}</ListItemText>
             </MenuItem>
@@ -1636,7 +1636,7 @@ const GameWorldsPage: React.FC = () => {
                 }
                 sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -1653,7 +1653,7 @@ const GameWorldsPage: React.FC = () => {
                 onClick={() => handleCopy(world.name, t('gameWorlds.name'))}
                 sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
-                <CopyIcon sx={{ fontSize: 14 }} />
+                <CopyIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -1689,7 +1689,7 @@ const GameWorldsPage: React.FC = () => {
                   }
                   sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
                 >
-                  <CopyIcon sx={{ fontSize: 14 }} />
+                  <CopyIcon sx={{ fontSize: 13 }} />
                 </IconButton>
               </Tooltip>
             )}
@@ -1974,7 +1974,7 @@ const GameWorldsPage: React.FC = () => {
                 modifiers={[restrictToVerticalAxis]}
               >
                 <TableContainer>
-                  <Table sx={{ tableLayout: 'auto' }}>
+                  <Table size="small" sx={{ tableLayout: 'auto' }}>
                     <TableHead>
                       <TableRow>
                         <TableCell width="50px"></TableCell>

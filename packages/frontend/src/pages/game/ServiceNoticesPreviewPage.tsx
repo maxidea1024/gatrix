@@ -344,6 +344,20 @@ const ServiceNoticesPreviewPage: React.FC = () => {
   }
 
   if (notices.length === 0) {
+    const emptyMessages: Record<string, string> = {
+      ko: '현재 등록된 공지사항이 없습니다.',
+      zh: '目前没有公告。',
+      en: 'There are no notices at this time.',
+    };
+    const refreshLabels: Record<string, string> = {
+      ko: '새로고침',
+      zh: '刷新',
+      en: 'Refresh',
+    };
+    const lang = (i18n.language || 'en').substring(0, 2);
+    const emptyMsg = emptyMessages[lang] || emptyMessages.en;
+    const refreshLabel = refreshLabels[lang] || refreshLabels.en;
+
     return (
       <Box
         sx={{
@@ -352,8 +366,8 @@ const ServiceNoticesPreviewPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: 'background.default',
-          p: 3,
+          background:
+            'radial-gradient(ellipse at 50% 40%, #3a322c 0%, #2b2420 60%, #1e1916 100%)',
           position: 'fixed',
           top: 0,
           left: 0,
@@ -361,9 +375,66 @@ const ServiceNoticesPreviewPage: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        <Alert severity="info">
-          {t('serviceNotices.previewPage.noActiveNotices')}
-        </Alert>
+        <Box
+          sx={{
+            textAlign: 'center',
+            padding: '48px 32px',
+            width: '100%',
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderTop: '1px solid rgba(212, 165, 116, 0.15)',
+            borderBottom: '1px solid rgba(212, 165, 116, 0.15)',
+            boxShadow:
+              'inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 0 rgba(255, 255, 255, 0.03)',
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: '0.95rem',
+              color: 'rgba(232, 221, 208, 0.6)',
+              lineHeight: 1.6,
+              mb: 3.5,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {emptyMsg}
+          </Typography>
+          <Box
+            component="button"
+            onClick={() => window.location.reload()}
+            sx={{
+              display: 'inline-block',
+              padding: '10px 40px',
+              background:
+                'linear-gradient(180deg, rgba(212, 165, 116, 0.2) 0%, rgba(212, 165, 116, 0.08) 100%)',
+              color: 'rgba(232, 221, 208, 0.8)',
+              border: '1px solid rgba(212, 165, 116, 0.3)',
+              borderRadius: '4px',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              cursor: 'pointer',
+              transition: 'all 0.25s ease',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+              boxShadow:
+                '0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+              '&:hover': {
+                background:
+                  'linear-gradient(180deg, rgba(212, 165, 116, 0.3) 0%, rgba(212, 165, 116, 0.15) 100%)',
+                borderColor: 'rgba(212, 165, 116, 0.5)',
+                color: '#e8ddd0',
+                boxShadow:
+                  '0 3px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+                transform: 'translateY(-1px)',
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                boxShadow: '0 1px 4px rgba(0, 0, 0, 0.3)',
+              },
+            }}
+          >
+            {refreshLabel}
+          </Box>
+        </Box>
       </Box>
     );
   }
@@ -392,19 +463,11 @@ const ServiceNoticesPreviewPage: React.FC = () => {
         sx={{
           width: SIDEBAR_WIDTH,
           height: '100%',
-          bgcolor: GAME_COLORS.sidebarBg,
+          background: 'linear-gradient(180deg, #302824 0%, #2b2420 30%, #251f1c 100%)',
           display: 'flex',
           flexDirection: 'column',
-          borderRight: `1px solid ${GAME_COLORS.border}`,
-          boxShadow: '4px 0 8px rgba(0, 0, 0, 0.2)',
-          // Subtle diagonal stripe pattern for empty space
-          backgroundImage: `repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 3px,
-            rgba(74, 63, 53, 0.15) 3px,
-            rgba(74, 63, 53, 0.15) 6px
-          )`,
+          borderRight: '2px solid #4a3d32',
+          boxShadow: '4px 0 12px rgba(0, 0, 0, 0.35)',
         }}
       >
         {/* Notice List */}
@@ -513,7 +576,11 @@ const ServiceNoticesPreviewPage: React.FC = () => {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          bgcolor: GAME_COLORS.background,
+          background: `
+            radial-gradient(ellipse at 20% 30%, rgba(255, 250, 240, 0.6) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 80%, rgba(200, 180, 155, 0.25) 0%, transparent 50%),
+            linear-gradient(180deg, #ede3d6 0%, #e4d8c8 100%)
+          `,
         }}
       >
         {selectedNotice ? (
@@ -530,25 +597,32 @@ const ServiceNoticesPreviewPage: React.FC = () => {
               sx={{
                 px: 2.5,
                 py: 1.5,
-                minHeight: '80px', // Match the height of left list items (increased by 4px total)
+                minHeight: '80px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                borderBottom: `1px solid rgba(155, 138, 120, 0.3)`,
-                bgcolor: 'rgba(255, 255, 255, 0.3)', // Fixed color, not theme-dependent
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 10,
+                borderBottom: '1px solid rgba(155, 138, 120, 0.2)',
+                background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                boxShadow: '0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.04)',
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 24,
+                  right: 24,
+                  height: '1px',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(212, 165, 116, 0.3) 50%, transparent 100%)',
+                },
               }}
             >
               <Typography
                 variant="h5"
                 sx={{
                   fontWeight: 700,
-                  color: GAME_COLORS.textPrimary, // Fixed color, not theme-dependent
+                  color: '#2a1f18',
                   mb: 0.5,
-                  textShadow: '1px 1px 2px rgba(255, 255, 255, 0.5)',
+                  textShadow: '0 1px 0 rgba(255, 255, 255, 0.5)',
                 }}
               >
                 {selectedNotice.title}
@@ -558,10 +632,13 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   label={selectedNotice.category.toUpperCase()}
                   size="small"
                   sx={{
-                    bgcolor: GAME_COLORS.categoryBg,
-                    color: GAME_COLORS.textLight,
+                    background: 'linear-gradient(135deg, #5c4f44 0%, #4a3d32 100%)',
+                    color: '#e8ddd0',
                     fontWeight: 600,
-                    border: `1px solid ${GAME_COLORS.border}`,
+                    border: '1px solid rgba(212, 165, 116, 0.25)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                    fontSize: '0.7rem',
+                    letterSpacing: '0.08em',
                   }}
                 />
                 <Tooltip
@@ -570,7 +647,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
+                      color: '#8a7b6e',
                     }}
                   >
                     {formatRelativeTime(
@@ -597,8 +674,8 @@ const ServiceNoticesPreviewPage: React.FC = () => {
             >
               <Box
                 sx={{
-                  color: GAME_COLORS.textPrimary,
-                  lineHeight: 1.6,
+                  color: '#3d3228',
+                  lineHeight: 1.7,
                   fontSize: '0.95rem',
                   width: '100%',
                   maxWidth: '100%',
