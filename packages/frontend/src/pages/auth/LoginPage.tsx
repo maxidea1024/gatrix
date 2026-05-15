@@ -1122,7 +1122,16 @@ const LoginPage: React.FC = () => {
             </Alert>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, gap: 1, flexDirection: 'column', alignItems: 'stretch', '& > :not(style) ~ :not(style)': { ml: 0 } }}>
+        <DialogActions
+          sx={{
+            px: 3,
+            pb: 2,
+            gap: 1,
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            '& > :not(style) ~ :not(style)': { ml: 0 },
+          }}
+        >
           {!resetEmailSent && (
             <Button
               fullWidth
