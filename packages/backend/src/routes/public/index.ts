@@ -4,6 +4,7 @@ import invitationRoutes from './invitations';
 import serviceNoticeRoutes from './service-notices';
 import monitoringRoutes from './monitoring';
 import signalRoutes from './signals';
+import surveyRendererRoutes from './survey-renderer';
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use('/invitations', invitationRoutes);
 router.use('/service-notices', serviceNoticeRoutes);
 router.use('/monitoring', monitoringRoutes);
 router.use('/signals', signalRoutes);
+router.use('/surveys', surveyRendererRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

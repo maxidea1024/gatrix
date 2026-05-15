@@ -33,6 +33,7 @@ import crashesRoutes from './crashes';
 import fileStorageRoutes from './file-storage';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
+import surveyTemplateRoutes from './survey-templates';
 import rewardTemplateRoutes from './reward-templates';
 import storeProductRoutes from './store-products';
 import serviceNoticeRoutes from './service-notices';
@@ -386,6 +387,13 @@ projectRouter.use(
   '/surveys',
   requireEnvPermission([P.SURVEYS_READ, P.SURVEYS_UPDATE]) as any,
   surveyRoutes
+);
+
+// Survey Templates (same permission scope as surveys)
+projectRouter.use(
+  '/survey-templates',
+  requireEnvPermission([P.SURVEYS_READ, P.SURVEYS_UPDATE]) as any,
+  surveyTemplateRoutes
 );
 
 // Reward Templates

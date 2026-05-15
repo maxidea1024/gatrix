@@ -270,6 +270,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
             requiredPermission: P.SURVEYS_READ,
           },
           {
+            text: 'sidebar.surveyTemplates',
+            icon: 'Assignment',
+            path: '/game/survey-templates',
+            requiredPermission: P.SURVEYS_UPDATE,
+          },
+          {
             text: 'sidebar.surveyLogs',
             icon: 'History',
             path: '/game/survey-logs',

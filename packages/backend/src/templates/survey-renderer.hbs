@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="{{locale}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>{{title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary:{{primaryColor}};
+      --bg:#0f0f23;
+      --card:#1a1a2e;
+      --text:#e2e8f0;
+      --text-dim:#94a3b8;
+      --border:#334155;
+      --error:#f87171;
+    }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+
+    /* Layout */
+    #app{height:100%;display:flex;flex-direction:column}
+    .progress{height:3px;background:var(--border);position:fixed;top:0;left:0;right:0;z-index:10}
+    .progress-bar{height:100%;background:var(--primary);transition:width .4s ease}
+    .slide-container{flex:1;overflow:hidden;position:relative}
+
+    /* Slide transitions */
+    .slide{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:2rem;
+      opacity:0;transform:translateY(40px);
+      transition:all .5s cubic-bezier(.22,1,.36,1);
+      pointer-events:none;
+    }
+    .slide.active{opacity:1;transform:translateY(0);pointer-events:auto}
+    .slide.prev{opacity:0;transform:translateY(-40px)}
+
+    /* Question card */
+    .question-card{max-width:560px;width:100%}
+    .q-number{font-size:.75rem;color:var(--primary);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+    .q-title{font-size:1.5rem;font-weight:600;line-height:1.4;margin-bottom:.5rem}
+    .q-desc{font-size:.9rem;color:var(--text-dim);margin-bottom:1.5rem}
+    .q-error{color:var(--error);font-size:.8rem;margin-top:.5rem;display:none}
+    .q-error.show{display:block}
+
+    /* Choice options */
+    .option-list{display:flex;flex-direction:column;gap:.5rem}
+    .option{
+      display:flex;align-items:center;gap:.75rem;
+      padding:.75rem 1rem;
+      border:1.5px solid var(--border);border-radius:10px;
+      cursor:pointer;transition:all .2s;background:transparent;
+    }
+    .option:hover{border-color:var(--primary);background:rgba(99,102,241,.08)}
+    .option.selected{border-color:var(--primary);background:rgba(99,102,241,.15)}
+    .option .indicator{
+      width:20px;height:20px;border-radius:50%;
+      border:2px solid var(--border);
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;flex-shrink:0;
+    }
+    .option.selected .indicator{border-color:var(--primary);background:var(--primary)}
+    .option.selected .indicator::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%}
+    .option.multi .indicator{border-radius:4px}
+    .option.multi.selected .indicator::after{content:'✓';color:#fff;font-size:12px;background:none;width:auto;height:auto}
+
+    /* Text inputs */
+    .text-input{
+      width:100%;background:transparent;
+      border:1.5px solid var(--border);border-radius:10px;
+      padding:.75rem 1rem;color:var(--text);
+      font-size:1rem;font-family:inherit;outline:none;
+      transition:border .2s;resize:none;
+    }
+    .text-input:focus{border-color:var(--primary)}
+    .text-input::placeholder{color:var(--text-dim)}
+    .char-count{text-align:right;font-size:.75rem;color:var(--text-dim);margin-top:.25rem}
+
+    /* Rating / Scale */
+    .rating-row{display:flex;gap:.5rem;flex-wrap:wrap}
+    .rating-item{
+      width:48px;height:48px;
+      display:flex;align-items:center;justify-content:center;
+      border:1.5px solid var(--border);border-radius:10px;
+      cursor:pointer;font-size:1.1rem;font-weight:500;transition:all .2s;
+    }
+    .rating-item:hover{border-color:var(--primary);background:rgba(99,102,241,.08)}
+    .rating-item.selected{border-color:var(--primary);background:var(--primary);color:#fff}
+    .scale-labels{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.75rem;color:var(--text-dim)}
+
+    /* Dropdown */
+    select.dropdown{
+      width:100%;padding:.75rem 1rem;
+      background:var(--card);border:1.5px solid var(--border);border-radius:10px;
+      color:var(--text);font-size:1rem;font-family:inherit;
+      outline:none;cursor:pointer;
+      appearance:none;-webkit-appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 1rem center;
+    }
+    select.dropdown:focus{border-color:var(--primary)}
+    select.dropdown option{background:var(--card);color:var(--text)}
+
+    /* Navigation */
+    .nav{padding:1.5rem 2rem;display:flex;justify-content:center;gap:1rem}
+    .btn{
+      padding:.75rem 2rem;border:none;border-radius:10px;
+      font-size:.95rem;font-weight:500;cursor:pointer;
+      transition:all .2s;font-family:inherit;
+    }
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-secondary{background:transparent;color:var(--text-dim);border:1.5px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--text-dim)}
+
+    /* Welcome & Thank You */
+    .welcome-title{font-size:2rem;font-weight:700;margin-bottom:1rem;text-align:center}
+    .welcome-desc{font-size:1.1rem;color:var(--text-dim);text-align:center;max-width:480px;line-height:1.6}
+    .thank-you{text-align:center}
+    .thank-you h1{font-size:2rem;font-weight:700;margin-bottom:.5rem}
+    .thank-you p{color:var(--text-dim);font-size:1.1rem}
+    .thank-you .check{
+      width:64px;height:64px;border-radius:50%;
+      background:var(--primary);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 1.5rem;font-size:2rem;
+      animation:pop .4s ease;
+    }
+    @keyframes pop{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="progress" id="progressContainer" style="display:{{#if showProgressBar}}block{{else}}none{{/if}}">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="slide-container" id="slideContainer"></div>
+  <div class="nav" id="navBar"></div>
+</div>
+
+<script>
+(function(){
+  var D = {{{templateDataJson}}};
+  var current = 0;
+  var answers = {};
+  var totalSlides = 1 + D.questions.length + 1;
+  var container = document.getElementById('slideContainer');
+  var navBar = document.getElementById('navBar');
+
+  function getLocText(obj) {
+    if (!obj) return '';
+    return obj[D.locale] || obj.ko || obj.en || Object.values(obj)[0] || '';
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  function buildSlides() {
+    // Welcome slide
+    var welcome = document.createElement('div');
+    welcome.className = 'slide';
+    welcome.innerHTML =
+      '<div class="question-card">' +
+        '<div class="welcome-title">' + (D.welcomeBlock ? esc(getLocText(D.welcomeBlock.title)) : esc(D.title)) + '</div>' +
+        (D.welcomeBlock && D.welcomeBlock.description
+          ? '<div class="welcome-desc">' + esc(getLocText(D.welcomeBlock.description)) + '</div>'
+          : '') +
+      '</div>';
+    container.appendChild(welcome);
+
+    // Question slides
+    D.questions.forEach(function(q, i) {
+      var slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.dataset.qid = q.id;
+
+      var html = '<div class="question-card">';
+      html += '<div class="q-number">Q' + (i + 1) + (q.required ? ' *' : '') + '</div>';
+      html += '<div class="q-title">' + esc(getLocText(q.title)) + '</div>';
+      if (q.description) {
+        html += '<div class="q-desc">' + esc(getLocText(q.description)) + '</div>';
+      }
+      html += buildInput(q);
+      html += '<div class="q-error" id="err-' + q.id + '">' + D.requiredText + '</div>';
+      html += '</div>';
+
+      slide.innerHTML = html;
+      container.appendChild(slide);
+    });
+
+    // Thank-you slide
+    var ending = document.createElement('div');
+    ending.className = 'slide';
+    ending.innerHTML =
+      '<div class="thank-you">' +
+        '<div class="check">✓</div>' +
+        '<h1>' + (D.endingBlock ? esc(getLocText(D.endingBlock.title)) : esc(D.thankYouText)) + '</h1>' +
+        (D.endingBlock && D.endingBlock.description
+          ? '<p>' + esc(getLocText(D.endingBlock.description)) + '</p>'
+          : '') +
+      '</div>';
+    container.appendChild(ending);
+  }
+
+  function buildInput(q) {
+    var s = q.settings || {};
+    var opts = q.options || [];
+
+    switch (q.type) {
+      case 'single_choice':
+        return '<div class="option-list">' + opts.map(function(o) {
+          return '<div class="option" data-qid="' + q.id + '" data-val="' + o.id + '" onclick="window.__sel(this,\'single\')">' +
+            '<div class="indicator"></div><span>' + esc(getLocText(o.label)) + '</span></div>';
+        }).join('') + '</div>';
+
+      case 'multiple_choice':
+        return '<div class="option-list">' + opts.map(function(o) {
+          return '<div class="option multi" data-qid="' + q.id + '" data-val="' + o.id + '" onclick="window.__sel(this,\'multi\')">' +
+            '<div class="indicator"></div><span>' + esc(getLocText(o.label)) + '</span></div>';
+        }).join('') + '</div>';
+
+      case 'dropdown':
+        return '<select class="dropdown" data-qid="' + q.id + '" onchange="window.__drop(this)">' +
+          '<option value="">—</option>' +
+          opts.map(function(o) {
+            return '<option value="' + o.id + '">' + esc(getLocText(o.label)) + '</option>';
+          }).join('') + '</select>';
+
+      case 'short_text':
+        return '<input class="text-input" type="text" data-qid="' + q.id + '" maxlength="' + (s.maxLength || 200) + '" placeholder="..." oninput="window.__txt(this)">' +
+          (s.maxLength ? '<div class="char-count"><span id="cc-' + q.id + '">0</span>/' + s.maxLength + '</div>' : '');
+
+      case 'long_text':
+        return '<textarea class="text-input" data-qid="' + q.id + '" rows="4" maxlength="' + (s.maxLength || 2000) + '" placeholder="..." oninput="window.__txt(this)"></textarea>' +
+          (s.maxLength ? '<div class="char-count"><span id="cc-' + q.id + '">0</span>/' + s.maxLength + '</div>' : '');
+
+      case 'rating':
+      case 'linear_scale':
+        var min = s.min || 1, max = s.max || 5;
+        var items = '';
+        for (var v = min; v <= max; v++) {
+          items += '<div class="rating-item" data-qid="' + q.id + '" data-val="' + v + '" onclick="window.__rate(this)">' + v + '</div>';
+        }
+        var labels = '';
+        if (s.minLabel || s.maxLabel) {
+          labels = '<div class="scale-labels"><span>' + (getLocText(s.minLabel) || '') + '</span><span>' + (getLocText(s.maxLabel) || '') + '</span></div>';
+        }
+        return '<div class="rating-row">' + items + '</div>' + labels;
+
+      default:
+        return '';
+    }
+  }
+
+  // --- Event handlers (attached to window for inline onclick) ---
+
+  window.__sel = function(el, mode) {
+    var qid = el.dataset.qid;
+    if (mode === 'single') {
+      el.parentElement.querySelectorAll('.option').forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+      answers[qid] = el.dataset.val;
+    } else {
+      el.classList.toggle('selected');
+      var vals = [];
+      el.parentElement.querySelectorAll('.option.selected').forEach(function(o) { vals.push(o.dataset.val); });
+      answers[qid] = vals;
+    }
+    hideErr(qid);
+  };
+
+  window.__drop = function(el) {
+    answers[el.dataset.qid] = el.value;
+    hideErr(el.dataset.qid);
+  };
+
+  window.__txt = function(el) {
+    answers[el.dataset.qid] = el.value;
+    var cc = document.getElementById('cc-' + el.dataset.qid);
+    if (cc) cc.textContent = el.value.length;
+    hideErr(el.dataset.qid);
+  };
+
+  window.__rate = function(el) {
+    var qid = el.dataset.qid;
+    el.parentElement.querySelectorAll('.rating-item').forEach(function(r) { r.classList.remove('selected'); });
+    el.classList.add('selected');
+    answers[qid] = parseInt(el.dataset.val);
+    hideErr(qid);
+  };
+
+  // --- Validation ---
+
+  function hideErr(qid) { var e = document.getElementById('err-' + qid); if (e) e.classList.remove('show'); }
+  function showErr(qid) { var e = document.getElementById('err-' + qid); if (e) e.classList.add('show'); }
+
+  function validate() {
+    var q = D.questions[current - 1];
+    if (!q || !q.required) return true;
+    var a = answers[q.id];
+    if (a === undefined || a === null || a === '' || (Array.isArray(a) && a.length === 0)) {
+      showErr(q.id);
+      return false;
+    }
+    return true;
+  }
+
+  // --- Navigation ---
+
+  function goTo(idx) {
+    var slides = container.querySelectorAll('.slide');
+    slides.forEach(function(s, i) {
+      s.classList.remove('active', 'prev');
+      if (i === idx) s.classList.add('active');
+      else if (i < idx) s.classList.add('prev');
+    });
+    current = idx;
+    updateNav();
+    updateProgress();
+  }
+
+  function updateProgress() {
+    var pct = Math.round((current / (totalSlides - 1)) * 100);
+    var bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = pct + '%';
+  }
+
+  function updateNav() {
+    var isWelcome = current === 0;
+    var isEnd = current === totalSlides - 1;
+    var isLast = current === totalSlides - 2;
+    navBar.innerHTML = '';
+
+    if (!isWelcome && !isEnd) {
+      var pb = document.createElement('button');
+      pb.className = 'btn btn-secondary';
+      pb.textContent = D.prevText;
+      pb.onclick = function() { goTo(current - 1); };
+      navBar.appendChild(pb);
+    }
+
+    if (isWelcome) {
+      var sb = document.createElement('button');
+      sb.className = 'btn btn-primary';
+      sb.textContent = D.nextText;
+      sb.onclick = function() { goTo(1); };
+      navBar.appendChild(sb);
+    } else if (!isEnd && !isLast) {
+      var nb = document.createElement('button');
+      nb.className = 'btn btn-primary';
+      nb.textContent = D.nextText;
+      nb.onclick = function() { if (validate()) goTo(current + 1); };
+      navBar.appendChild(nb);
+    } else if (isLast) {
+      var sub = document.createElement('button');
+      sub.className = 'btn btn-primary';
+      sub.textContent = D.submitText;
+      sub.onclick = function() { if (validate()) submitSurvey(sub); };
+      navBar.appendChild(sub);
+    }
+  }
+
+  function submitSurvey(btn) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    fetch(D.submitUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        envId: D.envId,
+        roleId: D.roleId,
+        gpId: D.gpId,
+        locale: D.locale,
+        answers: answers
+      })
+    })
+    .then(function() { goTo(totalSlides - 1); })
+    .catch(function() { goTo(totalSlides - 1); });
+  }
+
+  // --- Init ---
+  buildSlides();
+  goTo(0);
+})();
+</script>
+</body>
+</html>
