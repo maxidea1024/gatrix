@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   Box,
   Drawer,
@@ -23,6 +23,12 @@ import {
   Zoom,
   keyframes,
   Slide,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import {
@@ -81,8 +87,11 @@ import {
   Refresh as RefreshIcon,
   Lock as LockIcon,
   HelpOutline as HelpOutlineIcon,
+  Close as CloseIcon,
+  AccessTime as AccessTimeIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { flushSync } from 'react-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthService } from '@/services/auth';
 import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
@@ -211,6 +220,55 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       return {};
     }
   });
+
+  // Recent pages state
+  const RECENT_PAGES_KEY = 'sidebarRecentPages';
+  const MAX_RECENT_PAGES = 5;
+  const EXCLUDED_RECENT_PATHS = ['/dashboard', '/settings', '/logout'];
+
+  interface RecentPageEntry {
+    path: string;
+    text: string; // i18n key
+    iconName: string; // icon component name for lookup
+  }
+
+  const [recentPages, setRecentPages] = useState<RecentPageEntry[]>(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_PAGES_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Recent pages collapsed state
+  const [recentPagesCollapsed, setRecentPagesCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('sidebarRecentPagesCollapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleRecentPagesCollapsed = useCallback(() => {
+    setRecentPagesCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('sidebarRecentPagesCollapsed', String(next));
+      } catch (e) {
+        console.warn('Failed to save recent pages collapsed state:', e);
+      }
+      return next;
+    });
+  }, []);
+
+  // Recent page confirm dialog state
+  const [recentPageConfirm, setRecentPageConfirm] = useState<{
+    open: boolean;
+    type: 'clearAll' | 'remove';
+    path?: string;
+    text?: string;
+  }>({ open: false, type: 'clearAll' });
 
   // Load sidebar state from localStorage
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -387,11 +445,44 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           return;
         }
 
-        // Expand the category section
+        // Expand the category section (accordion: close others)
         const categoryKey = `category-${category.id}`;
-        if (!expandedSubmenus[categoryKey]) {
+        setExpandedSubmenus((prev) => {
+          const newState = { ...prev };
+          // Close all other categories
+          for (const cat of categories) {
+            const key = `category-${cat.id}`;
+            if (key !== categoryKey) {
+              newState[key] = false;
+            }
+          }
+          newState[categoryKey] = true;
+          try {
+            localStorage.setItem(
+              'sidebarExpandedSubmenus',
+              JSON.stringify(newState)
+            );
+          } catch (error) {
+            console.warn('Failed to save expanded submenus:', error);
+          }
+          return newState;
+        });
+
+        // Find and expand the submenu that contains this path
+        const submenuIndex = findSubmenuIndex(category.children, currentPath);
+        if (submenuIndex >= 0) {
+          const submenuKey = `submenu-${submenuIndex}`;
+          // Always enforce accordion: close sibling submenus
           setExpandedSubmenus((prev) => {
-            const newState = { ...prev, [categoryKey]: true };
+            const newState = { ...prev };
+            // Close all sibling submenus in this category
+            category.children.forEach((_, sibIdx) => {
+              const sibKey = `submenu-${sibIdx}`;
+              if (sibKey !== submenuKey) {
+                newState[sibKey] = false;
+              }
+            });
+            newState[submenuKey] = true;
             try {
               localStorage.setItem(
                 'sidebarExpandedSubmenus',
@@ -404,33 +495,103 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           });
         }
 
-        // Find and expand the submenu that contains this path
-        const submenuIndex = findSubmenuIndex(category.children, currentPath);
-        if (submenuIndex >= 0) {
-          const submenuKey = `submenu-${submenuIndex}`;
-          if (!expandedSubmenus[submenuKey]) {
-            setExpandedSubmenus((prev) => {
-              const newState = { ...prev, [submenuKey]: true };
-              try {
-                localStorage.setItem(
-                  'sidebarExpandedSubmenus',
-                  JSON.stringify(newState)
-                );
-              } catch (error) {
-                console.warn('Failed to save expanded submenus:', error);
-              }
-              return newState;
-            });
-          }
-        }
-
         initialSyncDoneRef.current = true;
         return; // Found the category, no need to continue
       }
     }
 
     initialSyncDoneRef.current = true;
-  }, [location.pathname, getFilteredMenuCategories, expandedSubmenus]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, getFilteredMenuCategories]);
+
+  // Expand the sidebar category and submenu for a given path (used by recent pages)
+  const expandSidebarForPath = useCallback(
+    (targetPath: string) => {
+      const categories = getFilteredMenuCategories();
+
+      const findPathInItem = (item: NavMenuItem, path: string): boolean => {
+        if (item.path === path) return true;
+        if (item.children) {
+          return item.children.some((child) => findPathInItem(child, path));
+        }
+        return false;
+      };
+
+      const findSubmenuIndex = (
+        items: NavMenuItem[],
+        path: string
+      ): number => {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (
+            item.children &&
+            item.children.some((child) => findPathInItem(child, path))
+          ) {
+            return i;
+          }
+          if (item.path === path) {
+            return -1;
+          }
+        }
+        return -1;
+      };
+
+      for (const category of categories) {
+        // Check if this category directly has the path
+        if (category.path === targetPath) return;
+
+        const hasPath = category.children.some((item) =>
+          findPathInItem(item, targetPath)
+        );
+        if (!hasPath) continue;
+
+        if (category.id === 'navigation') return;
+
+        const categoryKey = `category-${category.id}`;
+
+        setExpandedSubmenus((prev) => {
+          const newState = { ...prev };
+          // Accordion: close other categories
+          for (const cat of categories) {
+            const key = `category-${cat.id}`;
+            if (key !== categoryKey) {
+              newState[key] = false;
+            }
+          }
+          newState[categoryKey] = true;
+
+          // Find and expand the submenu, close siblings
+          const submenuIndex = findSubmenuIndex(
+            category.children,
+            targetPath
+          );
+          if (submenuIndex >= 0) {
+            const submenuKey = `submenu-${submenuIndex}`;
+            category.children.forEach((_, sibIdx) => {
+              const sibKey = `submenu-${sibIdx}`;
+              if (sibKey !== submenuKey) {
+                newState[sibKey] = false;
+              }
+            });
+            newState[submenuKey] = true;
+          }
+
+          try {
+            localStorage.setItem(
+              'sidebarExpandedSubmenus',
+              JSON.stringify(newState)
+            );
+          } catch (e) {
+            console.warn('Failed to save expanded submenus:', e);
+          }
+          return newState;
+        });
+
+        return;
+      }
+    },
+    [getFilteredMenuCategories]
+  );
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
@@ -971,18 +1132,108 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     });
   };
 
+  // Find menu item info by path for recent pages tracking
+  const findMenuItemByPath = useCallback(
+    (
+      path: string
+    ): { text: string; iconName: string } | null => {
+      const categories = getFilteredMenuCategories();
+      for (const category of categories) {
+        // Check category-level path (e.g., change requests, dashboard)
+        if (category.path === path) {
+          return { text: category.text, iconName: category.text };
+        }
+        for (const item of category.children) {
+          if (item.path === path) {
+            return { text: item.text, iconName: item.text };
+          }
+          if (item.children) {
+            for (const child of item.children) {
+              if (child.path === path) {
+                return { text: child.text, iconName: child.text };
+              }
+            }
+          }
+        }
+      }
+      return null;
+    },
+    [getFilteredMenuCategories]
+  );
+
+  // Add a page to recent pages list
+  const addRecentPage = useCallback(
+    (path: string) => {
+      if (EXCLUDED_RECENT_PATHS.some((p) => path.startsWith(p))) return;
+      if (/^https?:\/\//i.test(path)) return;
+
+      const menuInfo = findMenuItemByPath(path);
+      if (!menuInfo) return;
+
+      setRecentPages((prev) => {
+        // If already in list, don't reorder — just keep it in place
+        if (prev.some((p) => p.path === path)) return prev;
+
+        // New page: insert at top, trim to max
+        const updated = [
+          { path, text: menuInfo.text, iconName: menuInfo.iconName },
+          ...prev,
+        ].slice(0, MAX_RECENT_PAGES);
+        try {
+          localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(updated));
+        } catch (e) {
+          console.warn('Failed to save recent pages:', e);
+        }
+        return updated;
+      });
+    },
+    [findMenuItemByPath]
+  );
+
+  // Remove a single page from recent pages
+  const removeRecentPage = useCallback((path: string) => {
+    setRecentPages((prev) => {
+      const updated = prev.filter((p) => p.path !== path);
+      try {
+        localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Failed to save recent pages:', e);
+      }
+      return updated;
+    });
+  }, []);
+
+  // Clear all recent pages
+  const clearRecentPages = useCallback(() => {
+    setRecentPages([]);
+    try {
+      localStorage.removeItem(RECENT_PAGES_KEY);
+    } catch (e) {
+      console.warn('Failed to clear recent pages:', e);
+    }
+  }, []);
+
   // Open external http(s) links in new tab; otherwise navigate within SPA
+
+  // Filter recent pages by current permissions (hide pages user no longer has access to)
+  const filteredRecentPages = useMemo(() => {
+    return recentPages.filter((page) => findMenuItemByPath(page.path) !== null);
+  }, [recentPages, findMenuItemByPath]);
+
   const openOrNavigate = (path: string) => {
     if (path === '/logout') {
       handleLogoutClick();
     } else if (/^https?:\/\//i.test(path)) {
       window.open(path, '_blank', 'noopener,noreferrer');
     } else {
+      // flushSync ensures the recent pages list updates in the same render
+      // as the navigation, so the new item appears already selected
+      flushSync(() => addRecentPage(path));
       navigate(path);
     }
   };
 
-  const renderMenuItem = (item: any, index: any) => {
+  const renderMenuItem = (item: any, index: number, siblings: any[] = []) => {
     // If there are submenus
     if (item.children) {
       const submenuKey = `submenu-${index}`;
@@ -993,10 +1244,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       const toggleSubmenu = () => {
         setExpandedSubmenus((prev) => {
-          const newState = {
-            ...prev,
-            [submenuKey]: !prev[submenuKey],
-          };
+          const newState = { ...prev };
+          // Accordion: close sibling submenus at the same level
+          siblings.forEach((_, siblingIndex) => {
+            const siblingKey = `submenu-${siblingIndex}`;
+            if (siblingKey !== submenuKey) {
+              newState[siblingKey] = false;
+            }
+          });
+          newState[submenuKey] = !prev[submenuKey];
           try {
             localStorage.setItem(
               'sidebarExpandedSubmenus',
@@ -1371,6 +1627,179 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           }
         }}
       >
+        {/* Recent Pages Section */}
+        {!sidebarCollapsed && filteredRecentPages.length > 0 && (
+          <Box sx={{ px: 1.5, pt: 1, pb: 0 }}>
+            <Box
+              onClick={toggleRecentPagesCollapsed}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: recentPagesCollapsed ? 0 : 0.75,
+                cursor: 'pointer',
+                userSelect: 'none',
+                borderRadius: 1,
+                '&:hover': {
+                  '& .recent-clear-btn': { opacity: 0.5 },
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <AccessTimeIcon
+                  sx={{ fontSize: 12, color: 'text.disabled', opacity: 0.7 }}
+                />
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: 'text.disabled',
+                    fontSize: '0.6rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    opacity: 0.8,
+                  }}
+                >
+                  {t('sidebar.recentPages')}
+                </Typography>
+                {recentPagesCollapsed ? (
+                  <ExpandMore
+                    sx={{ fontSize: 14, color: 'text.disabled', opacity: 0.6 }}
+                  />
+                ) : (
+                  <ExpandLess
+                    sx={{ fontSize: 14, color: 'text.disabled', opacity: 0.6 }}
+                  />
+                )}
+              </Box>
+            </Box>
+            <Collapse in={!recentPagesCollapsed} timeout={200}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px', mt: 0.5 }}>
+                {filteredRecentPages.map((page) => {
+                  const isActive = isActivePath(page.path);
+                  return (
+                    <Box
+                      key={page.path}
+                      onClick={() => {
+                        expandSidebarForPath(page.path);
+                        navigate(page.path);
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        borderRadius: '8px',
+                        py: 0.75,
+                        px: 1.5,
+                        cursor: 'pointer',
+                        color: isActive
+                          ? theme.palette.primary.main
+                          : theme.palette.text.secondary,
+                        bgcolor: isActive
+                          ? theme.palette.mode === 'dark'
+                            ? `${theme.palette.primary.main}20`
+                            : `${theme.palette.primary.main}12`
+                          : 'transparent',
+                        transition: 'all 0.15s ease',
+                        '&:hover': {
+                          bgcolor: isActive
+                            ? theme.palette.mode === 'dark'
+                              ? `${theme.palette.primary.main}28`
+                              : `${theme.palette.primary.main}18`
+                            : theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.06)'
+                              : 'rgba(0,0,0,0.04)',
+                          '& .recent-page-close': {
+                            opacity: 0.5,
+                          },
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: isActive ? 6 : 4,
+                          height: isActive ? 6 : 4,
+                          borderRadius: '50%',
+                          bgcolor: isActive
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.18)'
+                              : 'rgba(0,0,0,0.12)',
+                          mr: 1.25,
+                          flexShrink: 0,
+                          transition: 'all 0.2s ease',
+                        }}
+                      />
+                      <Typography
+                        variant="body2"
+                        noWrap
+                        sx={{
+                          flex: 1,
+                          fontSize: '0.8125rem',
+                          fontWeight: isActive ? 600 : 400,
+                          transition: 'color 0.15s ease',
+                        }}
+                      >
+                        {t(page.text)}
+                      </Typography>
+                      <IconButton
+                        className="recent-page-close"
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRecentPageConfirm({
+                            open: true,
+                            type: 'remove',
+                            path: page.path,
+                            text: page.text,
+                          });
+                        }}
+                        sx={{
+                          p: 0.25,
+                          opacity: 0,
+                          transition: 'opacity 0.15s',
+                          ml: 'auto',
+                        }}
+                      >
+                        <CloseIcon sx={{ fontSize: 11 }} />
+                      </IconButton>
+                    </Box>
+                  );
+                })}
+              </Box>
+              <Tooltip title={t('sidebar.clearRecentPagesConfirm')} arrow>
+                <Typography
+                  onClick={() =>
+                    setRecentPageConfirm({
+                      open: true,
+                      type: 'clearAll',
+                    })
+                  }
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    textAlign: 'right',
+                    mt: 0.5,
+                    pr: 0.5,
+                    py: 0.25,
+                    fontSize: '0.65rem',
+                    color: 'text.disabled',
+                    cursor: 'pointer',
+                    opacity: 0.5,
+                    transition: 'all 0.15s ease',
+                    '&:hover': {
+                      opacity: 1,
+                      color: theme.palette.error.main,
+                    },
+                  }}
+                >
+                  {t('sidebar.clearRecentPages')}
+                </Typography>
+              </Tooltip>
+            </Collapse>
+            <Divider sx={{ mt: recentPagesCollapsed ? 0.75 : 1, mb: 0.5, opacity: 0.5 }} />
+          </Box>
+        )}
+
         <List
           sx={{ px: 1, flexGrow: 1 }}
           onClick={(e) => {
@@ -1386,11 +1815,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             const isExpanded = expandedSubmenus[categoryKey];
 
             const toggleCategory = () => {
+              const allCategories = getFilteredMenuCategories();
               if (sidebarCollapsed) {
                 handleSidebarToggle();
                 if (!isExpanded) {
                   setExpandedSubmenus((prev) => {
-                    const newState = { ...prev, [categoryKey]: true };
+                    const newState = { ...prev };
+                    // Accordion: close all other categories
+                    for (const cat of allCategories) {
+                      const key = `category-${cat.id}`;
+                      if (key !== categoryKey) {
+                        newState[key] = false;
+                      }
+                    }
+                    newState[categoryKey] = true;
                     try {
                       localStorage.setItem(
                         'sidebarExpandedSubmenus',
@@ -1402,10 +1840,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 }
               } else {
                 setExpandedSubmenus((prev) => {
-                  const newState = {
-                    ...prev,
-                    [categoryKey]: !prev[categoryKey],
-                  };
+                  const isCurrentlyExpanded = prev[categoryKey];
+                  const newState = { ...prev };
+                  // Accordion: close all other categories
+                  for (const cat of allCategories) {
+                    const key = `category-${cat.id}`;
+                    if (key !== categoryKey) {
+                      newState[key] = false;
+                    }
+                  }
+                  newState[categoryKey] = !isCurrentlyExpanded;
                   try {
                     localStorage.setItem(
                       'sidebarExpandedSubmenus',
@@ -1433,7 +1877,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 key={category.id}
                 onClick={
                   category.path
-                    ? () => navigate(category.path!)
+                    ? () => openOrNavigate(category.path!)
                     : toggleCategory
                 }
                 sx={{
@@ -1535,7 +1979,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         return (
                           <React.Fragment key={index}>
                             {showDivider && <Divider sx={{ my: 0.5 }} />}
-                            {renderMenuItem(item, index)}
+                            {renderMenuItem(item, index, category.children)}
                           </React.Fragment>
                         );
                       })}
@@ -2501,6 +2945,53 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {t('sidebar.logout')}
         </MenuItem>
       </Menu>
+      {/* Recent Page Confirm Dialog */}
+      <Dialog
+        open={recentPageConfirm.open}
+        onClose={() => setRecentPageConfirm({ open: false, type: 'clearAll' })}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>
+          {recentPageConfirm.type === 'clearAll'
+            ? t('sidebar.clearRecentPages')
+            : t('sidebar.removeRecentPage')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {recentPageConfirm.type === 'clearAll'
+              ? t('sidebar.clearRecentPagesConfirm')
+              : t('sidebar.removeRecentPageConfirm', {
+                  name: recentPageConfirm.text
+                    ? t(recentPageConfirm.text)
+                    : '',
+                })}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() =>
+              setRecentPageConfirm({ open: false, type: 'clearAll' })
+            }
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (recentPageConfirm.type === 'clearAll') {
+                clearRecentPages();
+              } else if (recentPageConfirm.path) {
+                removeRecentPage(recentPageConfirm.path);
+              }
+              setRecentPageConfirm({ open: false, type: 'clearAll' });
+            }}
+          >
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
