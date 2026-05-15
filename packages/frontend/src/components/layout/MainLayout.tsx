@@ -1670,6 +1670,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   />
                 )}
               </Box>
+              <Tooltip title={t('sidebar.clearRecentPages')} arrow>
+                <IconButton
+                  className="recent-clear-btn"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRecentPageConfirm({
+                      open: true,
+                      type: 'clearAll',
+                    });
+                  }}
+                  sx={{
+                    p: 0.25,
+                    opacity: 0,
+                    transition: 'opacity 0.15s',
+                    '&:hover': { opacity: '1 !important' },
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: 12 }} />
+                </IconButton>
+              </Tooltip>
             </Box>
             <Collapse in={!recentPagesCollapsed} timeout={200}>
               <Box
@@ -1771,35 +1792,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   );
                 })}
               </Box>
-              <Tooltip title={t('sidebar.clearRecentPagesConfirm')} arrow>
-                <Typography
-                  onClick={() =>
-                    setRecentPageConfirm({
-                      open: true,
-                      type: 'clearAll',
-                    })
-                  }
-                  variant="caption"
-                  sx={{
-                    display: 'block',
-                    textAlign: 'right',
-                    mt: 0.5,
-                    pr: 0.5,
-                    py: 0.25,
-                    fontSize: '0.65rem',
-                    color: 'text.disabled',
-                    cursor: 'pointer',
-                    opacity: 0.5,
-                    transition: 'all 0.15s ease',
-                    '&:hover': {
-                      opacity: 1,
-                      color: theme.palette.error.main,
-                    },
-                  }}
-                >
-                  {t('sidebar.clearRecentPages')}
-                </Typography>
-              </Tooltip>
             </Collapse>
             <Divider
               sx={{
