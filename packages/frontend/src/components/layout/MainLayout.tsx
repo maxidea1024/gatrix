@@ -2056,7 +2056,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <Box
           component="nav"
           sx={{
-            width: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+            width: { xs: 0, md: sidebarCollapsed ? 0 : sidebarWidth },
+            transition: 'width 0.3s ease',
             flexShrink: 0,
             zIndex: (theme) => theme.zIndex.drawer,
           }}
@@ -2091,7 +2092,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               display: { xs: 'none', md: 'block' },
               '& .MuiDrawer-paper': {
                 boxSizing: 'border-box',
-                width: sidebarCollapsed ? 64 : sidebarWidth,
+                width: sidebarCollapsed ? 0 : sidebarWidth,
                 transition: 'width 0.3s ease',
                 backgroundColor: theme.palette.background.paper,
                 color: theme.palette.text.primary,
@@ -2633,7 +2634,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             sx={{
               position: 'fixed',
               top: 72,
-              left: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+              left: { xs: 0, md: sidebarCollapsed ? 0 : sidebarWidth },
               right: 0,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               display: 'flex',
