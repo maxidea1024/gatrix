@@ -60,9 +60,15 @@ const SurveyBuilderDialog: React.FC<Props> = ({
   const { t, i18n } = useTranslation();
   const [title, setTitle] = useState(template?.title || '');
   const [description, setDescription] = useState(template?.description || '');
-  const [questions, setQuestions] = useState<Question[]>(template?.questions || []);
-  const [settings, setSettings] = useState<TemplateSettings>(template?.settings || {});
-  const [locales, setLocales] = useState<TemplateLocales>(template?.locales || {});
+  const [questions, setQuestions] = useState<Question[]>(
+    template?.questions || []
+  );
+  const [settings, setSettings] = useState<TemplateSettings>(
+    template?.settings || {}
+  );
+  const [locales, setLocales] = useState<TemplateLocales>(
+    template?.locales || {}
+  );
   const [activeTab, setActiveTab] = useState(0);
   const [editLocale, setEditLocale] = useState(i18n.language || 'ko');
   const [saving, setSaving] = useState(false);
@@ -77,42 +83,54 @@ const SurveyBuilderDialog: React.FC<Props> = ({
         const val = parseFloat(saved);
         if (val >= MIN_SPLIT && val <= MAX_SPLIT) return val;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return DEFAULT_SPLIT;
   });
 
-  const handleSplitterMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    const container = containerRef.current;
-    if (!container) return;
+  const handleSplitterMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const container = containerRef.current;
+      if (!container) return;
 
-    const startX = e.clientX;
-    const startRatio = splitRatio;
-    const containerWidth = container.getBoundingClientRect().width;
+      const startX = e.clientX;
+      const startRatio = splitRatio;
+      const containerWidth = container.getBoundingClientRect().width;
 
-    const onMouseMove = (ev: MouseEvent) => {
-      const delta = ev.clientX - startX;
-      const deltaPercent = (delta / containerWidth) * 100;
-      const newRatio = Math.min(MAX_SPLIT, Math.max(MIN_SPLIT, startRatio + deltaPercent));
-      setSplitRatio(newRatio);
-    };
+      const onMouseMove = (ev: MouseEvent) => {
+        const delta = ev.clientX - startX;
+        const deltaPercent = (delta / containerWidth) * 100;
+        const newRatio = Math.min(
+          MAX_SPLIT,
+          Math.max(MIN_SPLIT, startRatio + deltaPercent)
+        );
+        setSplitRatio(newRatio);
+      };
 
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      setSplitRatio((cur) => {
-        try { localStorage.setItem(SPLIT_STORAGE_KEY, String(cur)); } catch { /* ignore */ }
-        return cur;
-      });
-    };
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        setSplitRatio((cur) => {
+          try {
+            localStorage.setItem(SPLIT_STORAGE_KEY, String(cur));
+          } catch {
+            /* ignore */
+          }
+          return cur;
+        });
+      };
 
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }, [splitRatio]);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    },
+    [splitRatio]
+  );
 
   // Reset state when template changes
   React.useEffect(() => {
@@ -133,13 +151,12 @@ const SurveyBuilderDialog: React.FC<Props> = ({
       type,
       title: { [editLocale]: '' },
       required: type !== 'welcome' && type !== 'ending',
-      options:
-        ['single_choice', 'multiple_choice', 'dropdown'].includes(type)
-          ? [
-              { id: genId(), label: { [editLocale]: '' } },
-              { id: genId(), label: { [editLocale]: '' } },
-            ]
-          : undefined,
+      options: ['single_choice', 'multiple_choice', 'dropdown'].includes(type)
+        ? [
+            { id: genId(), label: { [editLocale]: '' } },
+            { id: genId(), label: { [editLocale]: '' } },
+          ]
+        : undefined,
       settings:
         type === 'rating'
           ? { min: 1, max: 5, icon: 'star' }
@@ -200,7 +217,9 @@ const SurveyBuilderDialog: React.FC<Props> = ({
       fullWidth
       PaperProps={{ sx: { minHeight: '70vh', maxHeight: '90vh' } }}
     >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 6 }}>
+      <DialogTitle
+        sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 6 }}
+      >
         {template
           ? t('surveyTemplate.editTemplate')
           : t('surveyTemplate.createTemplate')}
@@ -212,11 +231,30 @@ const SurveyBuilderDialog: React.FC<Props> = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers sx={{ p: 0, display: 'flex', overflow: 'hidden' }} ref={containerRef}>
+      <DialogContent
+        dividers
+        sx={{ p: 0, display: 'flex', overflow: 'hidden' }}
+        ref={containerRef}
+      >
         {/* Left: Builder + Settings */}
-        <Box sx={{ width: `${splitRatio}%`, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box
+          sx={{
+            width: `${splitRatio}%`,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
           {/* Tab Navigation */}
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, flexShrink: 0 }}>
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: 'divider',
+              px: 2,
+              flexShrink: 0,
+            }}
+          >
             <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)}>
               <Tab label={t('surveyTemplate.builder')} />
               <Tab label={t('surveyTemplate.settings')} />
@@ -251,7 +289,9 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                 />
 
                 {/* Locale selector */}
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1 }}
+                >
                   <Typography variant="body2" color="text.secondary">
                     {t('surveyTemplate.locale')}:
                   </Typography>
@@ -267,7 +307,11 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup>
-                  <Typography variant="caption" color="text.disabled" sx={{ ml: 1 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.disabled"
+                    sx={{ ml: 1 }}
+                  >
                     {t('surveyTemplate.localeHelp')}
                   </Typography>
                 </Box>
@@ -359,8 +403,20 @@ const SurveyBuilderDialog: React.FC<Props> = ({
             flexDirection: 'column',
           }}
         >
-          <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
-            <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
+          <Box
+            sx={{
+              px: 2,
+              py: 1.5,
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              flexShrink: 0,
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              fontWeight={600}
+              color="text.secondary"
+            >
               {t('surveyTemplate.preview')}
             </Typography>
           </Box>

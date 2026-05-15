@@ -213,7 +213,9 @@ const MediaAssetsPage = React.lazy(
 );
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
 const SurveyLogsPage = React.lazy(() => import('./pages/game/SurveyLogsPage'));
-const SurveyTemplatesPage = React.lazy(() => import('./pages/game/SurveyTemplatesPage'));
+const SurveyTemplatesPage = React.lazy(
+  () => import('./pages/game/SurveyTemplatesPage')
+);
 const RewardTemplatesPage = React.lazy(
   () => import('./pages/game/RewardTemplatesPage')
 );

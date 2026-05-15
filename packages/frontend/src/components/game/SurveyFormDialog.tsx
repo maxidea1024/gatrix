@@ -90,7 +90,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   // Form state
   const [surveyType, setSurveyType] = useState<'SDO' | 'CUSTOM'>('SDO');
   const [templateId, setTemplateId] = useState<string | null>(null);
-  const [availableTemplates, setAvailableTemplates] = useState<SurveyTemplate[]>([]);
+  const [availableTemplates, setAvailableTemplates] = useState<
+    SurveyTemplate[]
+  >([]);
   const [platformSurveyId, setPlatformSurveyId] = useState('');
   const [surveyTitle, setSurveyTitle] = useState('');
   const [surveyContent, setSurveyContent] = useState('');
@@ -641,10 +643,16 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               <Select
                 value={surveyType}
                 label={t('surveyTemplate.surveyType')}
-                onChange={(e) => setSurveyType(e.target.value as 'SDO' | 'CUSTOM')}
+                onChange={(e) =>
+                  setSurveyType(e.target.value as 'SDO' | 'CUSTOM')
+                }
               >
-                <MenuItem value="SDO">{t('surveyTemplate.surveyTypeSDO')}</MenuItem>
-                <MenuItem value="CUSTOM">{t('surveyTemplate.surveyTypeCUSTOM')}</MenuItem>
+                <MenuItem value="SDO">
+                  {t('surveyTemplate.surveyTypeSDO')}
+                </MenuItem>
+                <MenuItem value="CUSTOM">
+                  {t('surveyTemplate.surveyTypeCUSTOM')}
+                </MenuItem>
               </Select>
             </FormControl>
             {surveyType === 'CUSTOM' && (
@@ -655,7 +663,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   label={t('surveyTemplate.selectTemplate')}
                   onChange={(e) => setTemplateId(e.target.value || null)}
                 >
-                  <MenuItem value=""><em>—</em></MenuItem>
+                  <MenuItem value="">
+                    <em>—</em>
+                  </MenuItem>
                   {availableTemplates.map((tpl) => (
                     <MenuItem key={tpl.id} value={tpl.id}>
                       {tpl.title} (v{tpl.version})

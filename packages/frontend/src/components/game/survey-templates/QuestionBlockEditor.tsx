@@ -18,7 +18,11 @@ import {
   Close,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { Question, QuestionOption, QuestionType } from '@/services/surveyTemplateService';
+import {
+  Question,
+  QuestionOption,
+  QuestionType,
+} from '@/services/surveyTemplateService';
 import { getQuestionIcon } from './QuestionTypeMenu';
 
 const genId = () => crypto.randomUUID();
@@ -99,15 +103,21 @@ const QuestionBlockEditor: React.FC<Props> = ({
     });
   };
 
-  const isContentBlock = question.type === 'welcome' || question.type === 'ending';
+  const isContentBlock =
+    question.type === 'welcome' || question.type === 'ending';
 
   const typeKey =
-    question.type === 'single_choice' ? 'singleChoice' :
-    question.type === 'multiple_choice' ? 'multipleChoice' :
-    question.type === 'short_text' ? 'shortText' :
-    question.type === 'long_text' ? 'longText' :
-    question.type === 'linear_scale' ? 'linearScale' :
-    question.type;
+    question.type === 'single_choice'
+      ? 'singleChoice'
+      : question.type === 'multiple_choice'
+        ? 'multipleChoice'
+        : question.type === 'short_text'
+          ? 'shortText'
+          : question.type === 'long_text'
+            ? 'longText'
+            : question.type === 'linear_scale'
+              ? 'linearScale'
+              : question.type;
 
   return (
     <Paper
@@ -151,7 +161,11 @@ const QuestionBlockEditor: React.FC<Props> = ({
             }
             label={
               <Typography variant="caption">
-                {t(question.required ? 'surveyTemplate.required' : 'surveyTemplate.optional')}
+                {t(
+                  question.required
+                    ? 'surveyTemplate.required'
+                    : 'surveyTemplate.optional'
+                )}
               </Typography>
             }
           />
@@ -192,7 +206,10 @@ const QuestionBlockEditor: React.FC<Props> = ({
         maxRows={3}
         sx={{
           mb: 1.5,
-          '& .MuiInput-input': { fontSize: '0.875rem', color: 'text.secondary' },
+          '& .MuiInput-input': {
+            fontSize: '0.875rem',
+            color: 'text.secondary',
+          },
         }}
       />
 
@@ -204,14 +221,20 @@ const QuestionBlockEditor: React.FC<Props> = ({
               key={opt.id}
               sx={{ display: 'flex', alignItems: 'center', mb: 0.5, gap: 1 }}
             >
-              <Typography variant="body2" color="text.secondary" sx={{ minWidth: 20 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ minWidth: 20 }}
+              >
                 {optIdx + 1}.
               </Typography>
               <TextField
                 fullWidth
                 variant="standard"
                 size="small"
-                placeholder={t('surveyTemplate.optionPlaceholder', { index: optIdx + 1 })}
+                placeholder={t('surveyTemplate.optionPlaceholder', {
+                  index: optIdx + 1,
+                })}
                 value={opt.label[locale] || ''}
                 onChange={(e) => updateOptionLabel(optIdx, e.target.value)}
               />
@@ -239,7 +262,9 @@ const QuestionBlockEditor: React.FC<Props> = ({
             type="number"
             size="small"
             value={question.settings?.min ?? 1}
-            onChange={(e) => updateSettings('min', parseInt(e.target.value) || 1)}
+            onChange={(e) =>
+              updateSettings('min', parseInt(e.target.value) || 1)
+            }
             sx={{ width: 100 }}
           />
           <TextField
@@ -247,7 +272,9 @@ const QuestionBlockEditor: React.FC<Props> = ({
             type="number"
             size="small"
             value={question.settings?.max ?? 5}
-            onChange={(e) => updateSettings('max', parseInt(e.target.value) || 5)}
+            onChange={(e) =>
+              updateSettings('max', parseInt(e.target.value) || 5)
+            }
             sx={{ width: 100 }}
           />
         </Box>
@@ -262,7 +289,10 @@ const QuestionBlockEditor: React.FC<Props> = ({
             size="small"
             value={question.settings?.maxLength ?? ''}
             onChange={(e) =>
-              updateSettings('maxLength', e.target.value ? parseInt(e.target.value) : undefined)
+              updateSettings(
+                'maxLength',
+                e.target.value ? parseInt(e.target.value) : undefined
+              )
             }
             sx={{ width: 150 }}
           />

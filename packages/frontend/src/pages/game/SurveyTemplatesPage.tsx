@@ -61,7 +61,9 @@ const SurveyTemplatesPage: React.FC = () => {
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<SurveyTemplate | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<SurveyTemplate | null>(
+    null
+  );
 
   // Context menu
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
@@ -69,7 +71,8 @@ const SurveyTemplatesPage: React.FC = () => {
 
   // Analytics dialog
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
-  const [analyticsTemplate, setAnalyticsTemplate] = useState<SurveyTemplate | null>(null);
+  const [analyticsTemplate, setAnalyticsTemplate] =
+    useState<SurveyTemplate | null>(null);
 
   // Delete confirmation
   const [deleteTarget, setDeleteTarget] = useState<SurveyTemplate | null>(null);
@@ -114,11 +117,19 @@ const SurveyTemplatesPage: React.FC = () => {
     if (!projectApiPath) return;
     try {
       if (editingTemplate) {
-        await surveyTemplateService.updateTemplate(projectApiPath, editingTemplate.id, data);
-        enqueueSnackbar(t('surveyTemplate.updateSuccess'), { variant: 'success' });
+        await surveyTemplateService.updateTemplate(
+          projectApiPath,
+          editingTemplate.id,
+          data
+        );
+        enqueueSnackbar(t('surveyTemplate.updateSuccess'), {
+          variant: 'success',
+        });
       } else {
         await surveyTemplateService.createTemplate(projectApiPath, data);
-        enqueueSnackbar(t('surveyTemplate.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('surveyTemplate.createSuccess'), {
+          variant: 'success',
+        });
       }
       setDialogOpen(false);
       loadTemplates();
@@ -131,7 +142,9 @@ const SurveyTemplatesPage: React.FC = () => {
     if (!projectApiPath) return;
     try {
       await surveyTemplateService.duplicateTemplate(projectApiPath, tpl.id);
-      enqueueSnackbar(t('surveyTemplate.duplicateSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('surveyTemplate.duplicateSuccess'), {
+        variant: 'success',
+      });
       loadTemplates();
     } catch {
       enqueueSnackbar(t('surveyTemplate.saveFailed'), { variant: 'error' });
@@ -143,12 +156,17 @@ const SurveyTemplatesPage: React.FC = () => {
     if (!projectApiPath) return;
     try {
       await surveyTemplateService.deleteTemplate(projectApiPath, tpl.id);
-      enqueueSnackbar(t('surveyTemplate.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('surveyTemplate.deleteSuccess'), {
+        variant: 'success',
+      });
       loadTemplates();
     } catch (err: any) {
-      enqueueSnackbar(err?.response?.data?.message || t('surveyTemplate.saveFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        err?.response?.data?.message || t('surveyTemplate.saveFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
     setDeleteTarget(null);
     setMenuAnchor(null);
@@ -159,7 +177,11 @@ const SurveyTemplatesPage: React.FC = () => {
     try {
       await surveyTemplateService.togglePublish(projectApiPath, tpl.id);
       enqueueSnackbar(
-        t(tpl.isPublished ? 'surveyTemplate.unpublishSuccess' : 'surveyTemplate.publishSuccess'),
+        t(
+          tpl.isPublished
+            ? 'surveyTemplate.unpublishSuccess'
+            : 'surveyTemplate.publishSuccess'
+        ),
         { variant: 'success' }
       );
       loadTemplates();
@@ -182,7 +204,11 @@ const SurveyTemplatesPage: React.FC = () => {
           </Typography>
         </Box>
         {canEdit && (
-          <Button variant="contained" startIcon={<Add />} onClick={handleCreate}>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleCreate}
+          >
             {t('surveyTemplate.createTemplate')}
           </Button>
         )}
@@ -207,81 +233,87 @@ const SurveyTemplatesPage: React.FC = () => {
             addButtonLabel={t('surveyTemplate.createTemplate')}
           />
         ) : (
-        <Grid container spacing={2}>
-          {templates.map((tpl) => (
-            <Grid key={tpl.id} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card
-                variant="outlined"
-                sx={{
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    borderColor: 'primary.main',
-                    boxShadow: 2,
-                    transform: 'translateY(-2px)',
-                  },
-                }}
-                onClick={() => canEdit && handleEdit(tpl)}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="subtitle1" fontWeight={600} noWrap>
-                        {tpl.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          mb: 1.5,
-                          minHeight: 40,
-                        }}
-                      >
-                        {tpl.description || '—'}
-                      </Typography>
+          <Grid container spacing={2}>
+            {templates.map((tpl) => (
+              <Grid key={tpl.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      boxShadow: 2,
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                  onClick={() => canEdit && handleEdit(tpl)}
+                >
+                  <CardContent>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="subtitle1" fontWeight={600} noWrap>
+                          {tpl.title}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            mb: 1.5,
+                            minHeight: 40,
+                          }}
+                        >
+                          {tpl.description || '—'}
+                        </Typography>
+                      </Box>
+                      {canEdit && (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuAnchor(e.currentTarget);
+                            setMenuTemplate(tpl);
+                          }}
+                        >
+                          <MoreVert fontSize="small" />
+                        </IconButton>
+                      )}
                     </Box>
-                    {canEdit && (
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMenuAnchor(e.currentTarget);
-                          setMenuTemplate(tpl);
-                        }}
-                      >
-                        <MoreVert fontSize="small" />
-                      </IconButton>
-                    )}
-                  </Box>
 
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <Chip
-                      label={tpl.isPublished ? t('surveyTemplate.published') : t('surveyTemplate.draft')}
-                      size="small"
-                      color={tpl.isPublished ? 'success' : 'default'}
-                      variant="outlined"
-                    />
-                    <Chip
-                      label={`${tpl.questions.length} ${t('surveyTemplate.questions')}`}
-                      size="small"
-                      variant="outlined"
-                    />
-                    <Chip
-                      label={`v${tpl.version}`}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                      <Chip
+                        label={
+                          tpl.isPublished
+                            ? t('surveyTemplate.published')
+                            : t('surveyTemplate.draft')
+                        }
+                        size="small"
+                        color={tpl.isPublished ? 'success' : 'default'}
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={`${tpl.questions.length} ${t('surveyTemplate.questions')}`}
+                        size="small"
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={`v${tpl.version}`}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         )}
       </PageContentLoader>
       {/* Context Menu */}
@@ -291,37 +323,58 @@ const SurveyTemplatesPage: React.FC = () => {
         onClose={() => setMenuAnchor(null)}
       >
         <MenuItem onClick={() => menuTemplate && handleEdit(menuTemplate)}>
-          <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <Edit fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('surveyTemplate.editTemplate')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => menuTemplate && handleDuplicate(menuTemplate)}>
-          <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <ContentCopy fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('surveyTemplate.duplicateTemplate')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => menuTemplate && handleTogglePublish(menuTemplate)}>
+        <MenuItem
+          onClick={() => menuTemplate && handleTogglePublish(menuTemplate)}
+        >
           <ListItemIcon>
-            {menuTemplate?.isPublished ? <Unpublished fontSize="small" /> : <Publish fontSize="small" />}
+            {menuTemplate?.isPublished ? (
+              <Unpublished fontSize="small" />
+            ) : (
+              <Publish fontSize="small" />
+            )}
           </ListItemIcon>
           <ListItemText>
-            {menuTemplate?.isPublished ? t('surveyTemplate.draft') : t('surveyTemplate.published')}
+            {menuTemplate?.isPublished
+              ? t('surveyTemplate.draft')
+              : t('surveyTemplate.published')}
           </ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => {
-          if (menuTemplate) setDeleteTarget(menuTemplate);
-          setMenuAnchor(null);
-        }} sx={{ color: 'error.main' }}>
-          <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            if (menuTemplate) setDeleteTarget(menuTemplate);
+            setMenuAnchor(null);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <Delete fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('surveyTemplate.deleteTemplate')}</ListItemText>
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => {
-          if (menuTemplate) {
-            setAnalyticsTemplate(menuTemplate);
-            setAnalyticsOpen(true);
-          }
-          setMenuAnchor(null);
-        }}>
-          <ListItemIcon><Assessment fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            if (menuTemplate) {
+              setAnalyticsTemplate(menuTemplate);
+              setAnalyticsOpen(true);
+            }
+            setMenuAnchor(null);
+          }}
+        >
+          <ListItemIcon>
+            <Assessment fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('surveyTemplate.viewResponses')}</ListItemText>
         </MenuItem>
       </Menu>
@@ -340,7 +393,9 @@ const SurveyTemplatesPage: React.FC = () => {
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
         title={t('surveyTemplate.deleteTemplate')}
-        message={t('surveyTemplate.deleteConfirmMessage', { name: deleteTarget?.title || '' })}
+        message={t('surveyTemplate.deleteConfirmMessage', {
+          name: deleteTarget?.title || '',
+        })}
         confirmText={t('common.delete')}
         confirmColor="error"
       />
@@ -353,7 +408,9 @@ const SurveyTemplatesPage: React.FC = () => {
         fullWidth
         PaperProps={{ sx: { minHeight: '60vh', maxHeight: '90vh' } }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 6 }}>
+        <DialogTitle
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 6 }}
+        >
           {analyticsTemplate?.title} — {t('surveyTemplate.responseAnalytics')}
           <IconButton
             onClick={() => setAnalyticsOpen(false)}

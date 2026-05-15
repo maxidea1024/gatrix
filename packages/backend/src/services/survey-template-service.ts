@@ -176,18 +176,10 @@ export class SurveyTemplateService {
     if (params.search) {
       const term = `%${params.search}%`;
       query = query.where(function () {
-        this.where('title', 'like', term).orWhere(
-          'description',
-          'like',
-          term
-        );
+        this.where('title', 'like', term).orWhere('description', 'like', term);
       });
       countQuery = countQuery.where(function () {
-        this.where('title', 'like', term).orWhere(
-          'description',
-          'like',
-          term
-        );
+        this.where('title', 'like', term).orWhere('description', 'like', term);
       });
     }
 

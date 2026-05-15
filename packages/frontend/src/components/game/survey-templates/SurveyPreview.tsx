@@ -30,7 +30,11 @@ import {
 } from '@mui/icons-material';
 import { Divider, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Question, TemplateSettings, TemplateLocales } from '@/services/surveyTemplateService';
+import {
+  Question,
+  TemplateSettings,
+  TemplateLocales,
+} from '@/services/surveyTemplateService';
 
 interface Props {
   title: string;
@@ -84,13 +88,17 @@ const SurveyPreview: React.FC<Props> = ({
 
   const current = slides[currentSlide];
   const totalSlides = slides.length;
-  const progress = totalSlides > 1 ? ((currentSlide + 1) / totalSlides) * 100 : 0;
+  const progress =
+    totalSlides > 1 ? ((currentSlide + 1) / totalSlides) * 100 : 0;
 
   const btnText = {
     submit: locales?.[locale]?.submitButton || t('common.submit') || 'Submit',
     next: locales?.[locale]?.nextButton || t('common.next') || 'Next',
     prev: locales?.[locale]?.prevButton || t('common.previous') || 'Back',
-    thankYou: locales?.[locale]?.thankYou || t('surveyTemplate.thankYouMessage') || 'Thank you!',
+    thankYou:
+      locales?.[locale]?.thankYou ||
+      t('surveyTemplate.thankYouMessage') ||
+      'Thank you!',
   };
 
   const renderWelcome = () => (
@@ -149,7 +157,13 @@ const SurveyPreview: React.FC<Props> = ({
             </Typography>
           )}
           {q.required && (
-            <Chip label={t('surveyTemplate.required')} size="small" color="error" variant="outlined" sx={{ mt: 0.5 }} />
+            <Chip
+              label={t('surveyTemplate.required')}
+              size="small"
+              color="error"
+              variant="outlined"
+              sx={{ mt: 0.5 }}
+            />
           )}
         </Box>
 
@@ -157,7 +171,9 @@ const SurveyPreview: React.FC<Props> = ({
         {q.type === 'single_choice' && (
           <RadioGroup
             value={answers[q.id] || ''}
-            onChange={(e) => setAnswers((p) => ({ ...p, [q.id]: e.target.value }))}
+            onChange={(e) =>
+              setAnswers((p) => ({ ...p, [q.id]: e.target.value }))
+            }
           >
             {q.options?.map((opt) => (
               <FormControlLabel
@@ -202,13 +218,17 @@ const SurveyPreview: React.FC<Props> = ({
         {q.type === 'dropdown' && (
           <Select
             value={answers[q.id] || ''}
-            onChange={(e) => setAnswers((p) => ({ ...p, [q.id]: e.target.value }))}
+            onChange={(e) =>
+              setAnswers((p) => ({ ...p, [q.id]: e.target.value }))
+            }
             fullWidth
             displayEmpty
             size="small"
           >
             <MenuItem value="" disabled>
-              {t('surveyTemplate.selectOption') || t('common.select') || '선택하세요'}
+              {t('surveyTemplate.selectOption') ||
+                t('common.select') ||
+                '선택하세요'}
             </MenuItem>
             {q.options?.map((opt) => (
               <MenuItem key={opt.id} value={opt.id}>
@@ -225,7 +245,9 @@ const SurveyPreview: React.FC<Props> = ({
             size="small"
             placeholder={t('surveyTemplate.placeholder')}
             value={answers[q.id] || ''}
-            onChange={(e) => setAnswers((p) => ({ ...p, [q.id]: e.target.value }))}
+            onChange={(e) =>
+              setAnswers((p) => ({ ...p, [q.id]: e.target.value }))
+            }
             inputProps={{ maxLength: q.settings?.maxLength || 200 }}
             helperText={`${(answers[q.id] || '').length} / ${q.settings?.maxLength || 200}`}
           />
@@ -239,7 +261,9 @@ const SurveyPreview: React.FC<Props> = ({
             rows={4}
             placeholder={t('surveyTemplate.placeholder')}
             value={answers[q.id] || ''}
-            onChange={(e) => setAnswers((p) => ({ ...p, [q.id]: e.target.value }))}
+            onChange={(e) =>
+              setAnswers((p) => ({ ...p, [q.id]: e.target.value }))
+            }
             inputProps={{ maxLength: q.settings?.maxLength || 2000 }}
             helperText={`${(answers[q.id] || '').length} / ${q.settings?.maxLength || 2000}`}
           />
@@ -260,16 +284,18 @@ const SurveyPreview: React.FC<Props> = ({
         {/* Linear Scale */}
         {q.type === 'linear_scale' && (
           <Box sx={{ px: 2, py: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
+            >
               <Typography variant="caption" color="text.secondary">
                 {typeof q.settings?.minLabel === 'object'
                   ? getLocText(q.settings.minLabel)
-                  : (q.settings?.minLabel || q.settings?.min || 1)}
+                  : q.settings?.minLabel || q.settings?.min || 1}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {typeof q.settings?.maxLabel === 'object'
                   ? getLocText(q.settings.maxLabel)
-                  : (q.settings?.maxLabel || q.settings?.max || 10)}
+                  : q.settings?.maxLabel || q.settings?.max || 10}
               </Typography>
             </Box>
             <Slider
@@ -314,7 +340,16 @@ const SurveyPreview: React.FC<Props> = ({
 
         {/* Submit */}
         {visibleQuestions.length > 0 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 3,
+              pt: 2,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
             <Button
               variant="contained"
               endIcon={<Send />}
@@ -344,9 +379,11 @@ const SurveyPreview: React.FC<Props> = ({
       {/* Content */}
       <Card elevation={0}>
         <CardContent sx={{ p: 3, minHeight: 300 }}>
-          {current === 'welcome' || (typeof current === 'object' && current.type === 'welcome')
+          {current === 'welcome' ||
+          (typeof current === 'object' && current.type === 'welcome')
             ? renderWelcome()
-            : current === 'ending' || (typeof current === 'object' && current.type === 'ending')
+            : current === 'ending' ||
+                (typeof current === 'object' && current.type === 'ending')
               ? renderEnding()
               : typeof current === 'object'
                 ? renderQuestion(current)
@@ -377,7 +414,9 @@ const SurveyPreview: React.FC<Props> = ({
             <Button
               variant="contained"
               endIcon={<NavigateNext />}
-              onClick={() => setCurrentSlide((p) => Math.min(totalSlides - 1, p + 1))}
+              onClick={() =>
+                setCurrentSlide((p) => Math.min(totalSlides - 1, p + 1))
+              }
               size="small"
             >
               {btnText.next}
@@ -403,7 +442,15 @@ const SurveyPreview: React.FC<Props> = ({
   return (
     <Box>
       {/* Controls row */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 2,
+          mb: 2,
+        }}
+      >
         {/* Display mode toggle */}
         <ToggleButtonGroup
           value={displayMode}
@@ -411,20 +458,29 @@ const SurveyPreview: React.FC<Props> = ({
           onChange={(_, v) => v && setDisplayMode(v)}
           size="small"
         >
-          <ToggleButton value="scroll" title={t('surveyTemplate.questionTypes.welcome') || 'Scroll'}>
+          <ToggleButton
+            value="scroll"
+            title={t('surveyTemplate.questionTypes.welcome') || 'Scroll'}
+          >
             <ViewList fontSize="small" />
           </ToggleButton>
-          <ToggleButton value="slide" title={t('surveyTemplate.questionTypes.ending') || 'Slide'}>
+          <ToggleButton
+            value="slide"
+            title={t('surveyTemplate.questionTypes.ending') || 'Slide'}
+          >
             <ViewCarousel fontSize="small" />
           </ToggleButton>
         </ToggleButtonGroup>
 
         {/* Device mode */}
-        {([
+        {[
           { mode: 'mobile' as ViewMode, icon: <Phone fontSize="small" /> },
           { mode: 'tablet' as ViewMode, icon: <Tablet fontSize="small" /> },
-          { mode: 'desktop' as ViewMode, icon: <DesktopWindows fontSize="small" /> },
-        ]).map(({ mode, icon }) => (
+          {
+            mode: 'desktop' as ViewMode,
+            icon: <DesktopWindows fontSize="small" />,
+          },
+        ].map(({ mode, icon }) => (
           <Chip
             key={mode}
             icon={icon}

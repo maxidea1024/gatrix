@@ -224,9 +224,7 @@ const surveyTemplateService = {
     projectApiPath: string,
     id: string
   ): Promise<SurveyTemplate> {
-    const response = await api.get(
-      `${projectApiPath}/survey-templates/${id}`
-    );
+    const response = await api.get(`${projectApiPath}/survey-templates/${id}`);
     return response.data.template;
   },
 
@@ -262,10 +260,7 @@ const surveyTemplateService = {
   /**
    * Delete template
    */
-  async deleteTemplate(
-    projectApiPath: string,
-    id: string
-  ): Promise<void> {
+  async deleteTemplate(projectApiPath: string, id: string): Promise<void> {
     await api.delete(`${projectApiPath}/survey-templates/${id}`);
   },
 
@@ -333,4 +328,3 @@ const surveyTemplateService = {
 };
 
 export default surveyTemplateService;
-

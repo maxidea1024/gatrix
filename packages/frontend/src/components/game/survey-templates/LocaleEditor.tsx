@@ -10,7 +10,10 @@ import {
   Divider,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { TemplateLocales, TemplateSettings } from '@/services/surveyTemplateService';
+import {
+  TemplateLocales,
+  TemplateSettings,
+} from '@/services/surveyTemplateService';
 
 const SUPPORTED_LOCALES = [
   { code: 'ko', label: '한국어' },
@@ -45,11 +48,35 @@ const LocaleEditor: React.FC<Props> = ({
   };
 
   const fields = [
-    { key: 'submitButton', label: t('surveyTemplate.submitButton'), defaults: { ko: '제출', en: 'Submit', zh: '提交' } },
-    { key: 'nextButton', label: t('surveyTemplate.nextButton'), defaults: { ko: '다음', en: 'Next', zh: '下一步' } },
-    { key: 'prevButton', label: t('surveyTemplate.prevButton'), defaults: { ko: '이전', en: 'Previous', zh: '上一步' } },
-    { key: 'thankYou', label: t('surveyTemplate.thankYouMessage'), defaults: { ko: '감사합니다!', en: 'Thank you!', zh: '谢谢！' } },
-    { key: 'requiredError', label: t('surveyTemplate.required'), defaults: { ko: '필수 항목입니다', en: 'This field is required', zh: '此字段为必填项' } },
+    {
+      key: 'submitButton',
+      label: t('surveyTemplate.submitButton'),
+      defaults: { ko: '제출', en: 'Submit', zh: '提交' },
+    },
+    {
+      key: 'nextButton',
+      label: t('surveyTemplate.nextButton'),
+      defaults: { ko: '다음', en: 'Next', zh: '下一步' },
+    },
+    {
+      key: 'prevButton',
+      label: t('surveyTemplate.prevButton'),
+      defaults: { ko: '이전', en: 'Previous', zh: '上一步' },
+    },
+    {
+      key: 'thankYou',
+      label: t('surveyTemplate.thankYouMessage'),
+      defaults: { ko: '감사합니다!', en: 'Thank you!', zh: '谢谢！' },
+    },
+    {
+      key: 'requiredError',
+      label: t('surveyTemplate.required'),
+      defaults: {
+        ko: '필수 항목입니다',
+        en: 'This field is required',
+        zh: '此字段为必填项',
+      },
+    },
   ];
 
   return (
@@ -64,7 +91,10 @@ const LocaleEditor: React.FC<Props> = ({
             <Switch
               checked={!!settings.showProgressBar}
               onChange={(e) =>
-                onSettingsChange({ ...settings, showProgressBar: e.target.checked })
+                onSettingsChange({
+                  ...settings,
+                  showProgressBar: e.target.checked,
+                })
               }
             />
           }
@@ -75,7 +105,10 @@ const LocaleEditor: React.FC<Props> = ({
             <Switch
               checked={!!settings.shuffleQuestions}
               onChange={(e) =>
-                onSettingsChange({ ...settings, shuffleQuestions: e.target.checked })
+                onSettingsChange({
+                  ...settings,
+                  shuffleQuestions: e.target.checked,
+                })
               }
             />
           }
@@ -92,7 +125,10 @@ const LocaleEditor: React.FC<Props> = ({
           onChange={(e) =>
             onSettingsChange({
               ...settings,
-              theme: { ...(settings.theme || {}), primaryColor: e.target.value },
+              theme: {
+                ...(settings.theme || {}),
+                primaryColor: e.target.value,
+              },
             })
           }
           style={{ width: 40, height: 30, border: 'none', cursor: 'pointer' }}
@@ -126,7 +162,9 @@ const LocaleEditor: React.FC<Props> = ({
               fullWidth
               size="small"
               label={field.label}
-              placeholder={field.defaults[loc.code as keyof typeof field.defaults] || ''}
+              placeholder={
+                field.defaults[loc.code as keyof typeof field.defaults] || ''
+              }
               value={(locales[loc.code] as any)?.[field.key] || ''}
               onChange={(e) =>
                 updateLocaleField(loc.code, field.key, e.target.value)

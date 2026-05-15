@@ -17,11 +17,7 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import {
-  BarChart,
-  People,
-  Refresh,
-} from '@mui/icons-material';
+import { BarChart, People, Refresh } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -48,7 +44,9 @@ const SurveyResponseAnalytics: React.FC<Props> = ({ template }) => {
 
   const [loading, setLoading] = useState(true);
   const [totalResponses, setTotalResponses] = useState(0);
-  const [questionStats, setQuestionStats] = useState<Record<string, QuestionStat>>({});
+  const [questionStats, setQuestionStats] = useState<
+    Record<string, QuestionStat>
+  >({});
   const [responses, setResponses] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -165,7 +163,10 @@ const SurveyResponseAnalytics: React.FC<Props> = ({ template }) => {
                     {t('surveyTemplate.submittedAt')}
                   </TableCell>
                   {questions.slice(0, 5).map((q, i) => (
-                    <TableCell key={q.id} sx={{ fontWeight: 600, minWidth: 140 }}>
+                    <TableCell
+                      key={q.id}
+                      sx={{ fontWeight: 600, minWidth: 140 }}
+                    >
                       Q{i + 1}
                     </TableCell>
                   ))}
@@ -190,8 +191,14 @@ const SurveyResponseAnalytics: React.FC<Props> = ({ template }) => {
                       const answer = resp.answers?.[q.id];
                       return (
                         <TableCell key={q.id}>
-                          <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                            {formatAnswer(answer, q, (optId) => getOptionLabel(q, optId))}
+                          <Typography
+                            variant="body2"
+                            noWrap
+                            sx={{ maxWidth: 200 }}
+                          >
+                            {formatAnswer(answer, q, (optId) =>
+                              getOptionLabel(q, optId)
+                            )}
                           </Typography>
                         </TableCell>
                       );
@@ -241,7 +248,9 @@ const QuestionStatsCard: React.FC<QuestionStatsCardProps> = ({
   getLocText,
   t,
 }) => {
-  const isChoice = ['single_choice', 'multiple_choice', 'dropdown'].includes(question.type);
+  const isChoice = ['single_choice', 'multiple_choice', 'dropdown'].includes(
+    question.type
+  );
   const isScale = ['rating', 'linear_scale'].includes(question.type);
   const isText = ['short_text', 'long_text'].includes(question.type);
   const responseCount = stats?.count || 0;
@@ -249,7 +258,12 @@ const QuestionStatsCard: React.FC<QuestionStatsCardProps> = ({
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-        <Chip label={`Q${index + 1}`} size="small" color="primary" variant="outlined" />
+        <Chip
+          label={`Q${index + 1}`}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
         <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1 }}>
           {getLocText(question.title)}
         </Typography>
@@ -269,10 +283,7 @@ const QuestionStatsCard: React.FC<QuestionStatsCardProps> = ({
       )}
 
       {isScale && stats && (
-        <ScaleDistribution
-          stats={stats}
-          question={question}
-        />
+        <ScaleDistribution stats={stats} question={question} />
       )}
 
       {isText && (
@@ -301,14 +312,25 @@ const ChoiceDistribution: React.FC<{
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {entries.map(([value, count]) => {
-        const pct = totalResponses > 0 ? Math.round((count / totalResponses) * 100) : 0;
+        const pct =
+          totalResponses > 0 ? Math.round((count / totalResponses) * 100) : 0;
         return (
           <Box key={value}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.25 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                mb: 0.25,
+              }}
+            >
               <Typography variant="body2" noWrap sx={{ flex: 1, mr: 1 }}>
                 {getOptionLabel(value)}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ flexShrink: 0 }}
+              >
                 {count} ({pct}%)
               </Typography>
             </Box>
@@ -360,7 +382,8 @@ const ScaleDistribution: React.FC<{
         {Array.from({ length: max - min + 1 }, (_, i) => {
           const val = String(min + i);
           const count = stats.values[val] || 0;
-          const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+          const pct =
+            totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
           return (
             <Box key={val} sx={{ flex: 1, textAlign: 'center' }}>
               <Box
@@ -385,7 +408,11 @@ const ScaleDistribution: React.FC<{
               <Typography variant="caption" fontWeight={500}>
                 {val}
               </Typography>
-              <Typography variant="caption" display="block" color="text.secondary">
+              <Typography
+                variant="caption"
+                display="block"
+                color="text.secondary"
+              >
                 {count}
               </Typography>
             </Box>
