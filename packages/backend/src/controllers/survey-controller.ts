@@ -533,6 +533,8 @@ export class SurveyController {
               return {
                 id: survey.id,
                 platformSurveyId: survey.platformSurveyId,
+                surveyType: survey.surveyType || 'SDO',
+                templateId: survey.templateId || null,
                 surveyTitle: survey.surveyTitle,
                 surveyContent: survey.surveyContent,
                 triggerConditions: survey.triggerConditions,
@@ -595,6 +597,8 @@ export class SurveyController {
       const formattedSurvey = {
         id: survey.id,
         platformSurveyId: survey.platformSurveyId,
+        surveyType: survey.surveyType || 'SDO',
+        templateId: survey.templateId || null,
         surveyTitle: survey.surveyTitle,
         surveyContent: survey.surveyContent,
         triggerConditions: survey.triggerConditions,

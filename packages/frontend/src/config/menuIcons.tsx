@@ -63,6 +63,8 @@ import {
   Shield as ShieldIcon,
   Groups as GroupIcon,
   TableChart as TableChartIcon,
+  Assignment as AssignmentIcon,
+  Description as DescriptionIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 
@@ -126,6 +128,8 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Shield: <ShieldIcon />,
   Group: <GroupIcon />,
   TableChart: <TableChartIcon />,
+  Assignment: <AssignmentIcon />,
+  Description: <DescriptionIcon />,
   Ripple: <RippleIcon />,
 };
 

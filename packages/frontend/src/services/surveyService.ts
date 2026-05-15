@@ -27,6 +27,8 @@ export interface ChannelSubchannelData {
 export interface Survey {
   id: string;
   platformSurveyId: string;
+  surveyType?: 'SDO' | 'CUSTOM';
+  templateId?: string | null;
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
@@ -58,6 +60,8 @@ export interface SurveyConfig {
 
 export interface CreateSurveyInput {
   platformSurveyId: string;
+  surveyType?: 'SDO' | 'CUSTOM';
+  templateId?: string | null;
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
@@ -79,6 +83,8 @@ export interface CreateSurveyInput {
 
 export interface UpdateSurveyInput {
   platformSurveyId?: string;
+  surveyType?: 'SDO' | 'CUSTOM';
+  templateId?: string | null;
   surveyTitle?: string;
   surveyContent?: string;
   triggerConditions?: TriggerCondition[];

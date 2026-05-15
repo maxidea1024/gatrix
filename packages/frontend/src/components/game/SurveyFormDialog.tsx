@@ -39,6 +39,9 @@ import surveyService, {
   ParticipationReward,
   ChannelSubchannelData,
 } from '../../services/surveyService';
+import surveyTemplateService, {
+  SurveyTemplate,
+} from '../../services/surveyTemplateService';
 import RewardSelector from './RewardSelector';
 import TargetSettingsGroup from './TargetSettingsGroup';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -85,6 +88,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   });
 
   // Form state
+  const [surveyType, setSurveyType] = useState<'SDO' | 'CUSTOM'>('SDO');
+  const [templateId, setTemplateId] = useState<string | null>(null);
+  const [availableTemplates, setAvailableTemplates] = useState<SurveyTemplate[]>([]);
   const [platformSurveyId, setPlatformSurveyId] = useState('');
   const [surveyTitle, setSurveyTitle] = useState('');
   const [surveyContent, setSurveyContent] = useState('');
@@ -127,6 +133,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   // Initialize form with survey data
   useEffect(() => {
     if (survey) {
+      setSurveyType(survey.surveyType || 'SDO');
+      setTemplateId(survey.templateId || null);
       setPlatformSurveyId(survey.platformSurveyId);
       setSurveyTitle(survey.surveyTitle);
       setSurveyContent(survey.surveyContent || '');
@@ -190,6 +198,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setSelectedTags(survey.tags || []);
     } else {
       // Reset form
+      setSurveyType('SDO');
+      setTemplateId(null);
       setPlatformSurveyId('');
       setSurveyTitle('');
       setSurveyContent('');
@@ -209,6 +219,16 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setSelectedTags([]);
     }
   }, [survey, open]);
+
+  // Load available templates when surveyType is CUSTOM
+  useEffect(() => {
+    if (open && surveyType === 'CUSTOM' && projectApiPath) {
+      surveyTemplateService
+        .getTemplates(projectApiPath, { isPublished: true, limit: 100 })
+        .then((res) => setAvailableTemplates(res.templates))
+        .catch(() => setAvailableTemplates([]));
+    }
+  }, [open, surveyType, projectApiPath]);
 
   // Check if form is dirty (data changed)
   const isDirty = useMemo(() => {
@@ -472,6 +492,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       }
 
       const data = {
+        surveyType,
+        templateId: surveyType === 'CUSTOM' ? templateId : null,
         platformSurveyId: platformSurveyId.trim(),
         surveyTitle: surveyTitle.trim(),
         surveyContent: surveyContent.trim() || undefined,
@@ -608,6 +630,41 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               {t('surveys.isActiveHelp')}
             </Typography>
           </Box>
+
+          {/* Survey Type Selection */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5 }}>
+              {t('surveyTemplate.surveyType')}
+            </Typography>
+            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>{t('surveyTemplate.surveyType')}</InputLabel>
+              <Select
+                value={surveyType}
+                label={t('surveyTemplate.surveyType')}
+                onChange={(e) => setSurveyType(e.target.value as 'SDO' | 'CUSTOM')}
+              >
+                <MenuItem value="SDO">{t('surveyTemplate.surveyTypeSDO')}</MenuItem>
+                <MenuItem value="CUSTOM">{t('surveyTemplate.surveyTypeCUSTOM')}</MenuItem>
+              </Select>
+            </FormControl>
+            {surveyType === 'CUSTOM' && (
+              <FormControl fullWidth size="small">
+                <InputLabel>{t('surveyTemplate.selectTemplate')}</InputLabel>
+                <Select
+                  value={templateId || ''}
+                  label={t('surveyTemplate.selectTemplate')}
+                  onChange={(e) => setTemplateId(e.target.value || null)}
+                >
+                  <MenuItem value=""><em>—</em></MenuItem>
+                  {availableTemplates.map((tpl) => (
+                    <MenuItem key={tpl.id} value={tpl.id}>
+                      {tpl.title} (v{tpl.version})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Paper>
 
           {/* Basic Information Group */}
           <Paper variant="outlined" sx={{ p: 2 }}>
