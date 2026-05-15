@@ -1929,154 +1929,154 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 } else {
                   setExpandedSubmenus((prev) => {
                     const isCurrentlyExpanded = prev[categoryKey];
-                  const newState = { ...prev };
-                  // Accordion: close all other categories
-                  for (const cat of allCategories) {
-                    const key = `category-${cat.id}`;
-                    if (key !== categoryKey) {
-                      newState[key] = false;
+                    const newState = { ...prev };
+                    // Accordion: close all other categories
+                    for (const cat of allCategories) {
+                      const key = `category-${cat.id}`;
+                      if (key !== categoryKey) {
+                        newState[key] = false;
+                      }
                     }
-                  }
-                  newState[categoryKey] = !isCurrentlyExpanded;
-                  try {
-                    localStorage.setItem(
-                      'sidebarExpandedSubmenus',
-                      JSON.stringify(newState)
-                    );
-                  } catch (e) {}
-                  return newState;
-                });
-              }
-            };
-
-            const hasActiveChild = category.children.some((child) => {
-              if (child.path && isActivePath(child.path)) return true;
-              if (child.children) {
-                return child.children.some(
-                  (c) => c.path && isActivePath(c.path)
-                );
-              }
-              return false;
-            });
-
-            // For navigation group (dashboard/settings) it acts as a normal menu, no collapsing
-            const categoryButton = (
-              <ListItemButton
-                key={category.id}
-                onClick={
-                  category.path
-                    ? () => openOrNavigate(category.path!)
-                    : toggleCategory
+                    newState[categoryKey] = !isCurrentlyExpanded;
+                    try {
+                      localStorage.setItem(
+                        'sidebarExpandedSubmenus',
+                        JSON.stringify(newState)
+                      );
+                    } catch (e) {}
+                    return newState;
+                  });
                 }
-                sx={{
-                  color: hasActiveChild
-                    ? theme.palette.text.primary
-                    : theme.palette.text.secondary,
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                  px: sidebarCollapsed ? 0 : 2,
-                  pl: sidebarCollapsed ? 0 : 2,
-                  borderRadius: 1,
-                  py: 0.75,
-                  my: 0.5,
-                  '&:hover': {
-                    backgroundColor:
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : 'rgba(0,0,0,0.08)',
-                  },
-                }}
-              >
-                <ListItemIcon
+              };
+
+              const hasActiveChild = category.children.some((child) => {
+                if (child.path && isActivePath(child.path)) return true;
+                if (child.children) {
+                  return child.children.some(
+                    (c) => c.path && isActivePath(c.path)
+                  );
+                }
+                return false;
+              });
+
+              // For navigation group (dashboard/settings) it acts as a normal menu, no collapsing
+              const categoryButton = (
+                <ListItemButton
+                  key={category.id}
+                  onClick={
+                    category.path
+                      ? () => openOrNavigate(category.path!)
+                      : toggleCategory
+                  }
                   sx={{
-                    color: 'inherit',
-                    minWidth: sidebarCollapsed ? 0 : 40,
-                    justifyContent: 'center',
+                    color: hasActiveChild
+                      ? theme.palette.text.primary
+                      : theme.palette.text.secondary,
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    px: sidebarCollapsed ? 0 : 2,
+                    pl: sidebarCollapsed ? 0 : 2,
+                    borderRadius: 1,
+                    py: 0.75,
+                    my: 0.5,
+                    '&:hover': {
+                      backgroundColor:
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)',
+                    },
                   }}
                 >
-                  {sidebarCollapsed ? (
-                    <Badge badgeContent={category.badge} color="primary">
-                      {category.icon}
-                    </Badge>
-                  ) : (
-                    category.icon
-                  )}
-                </ListItemIcon>
-                {!sidebarCollapsed && (
-                  <>
-                    <ListItemText
-                      primary={t(category.text)}
-                      primaryTypographyProps={{
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                      }}
-                    />
-                    {category.badge && (
-                      <Badge
-                        badgeContent={category.badge}
-                        color="primary"
-                        sx={{
-                          ml: 1,
-                          '& .MuiBadge-badge': { fontSize: '0.625rem' },
+                  <ListItemIcon
+                    sx={{
+                      color: 'inherit',
+                      minWidth: sidebarCollapsed ? 0 : 40,
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {sidebarCollapsed ? (
+                      <Badge badgeContent={category.badge} color="primary">
+                        {category.icon}
+                      </Badge>
+                    ) : (
+                      category.icon
+                    )}
+                  </ListItemIcon>
+                  {!sidebarCollapsed && (
+                    <>
+                      <ListItemText
+                        primary={t(category.text)}
+                        primaryTypographyProps={{
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
                         }}
                       />
-                    )}
-                    {!category.path &&
-                      (isExpanded ? <ExpandLess /> : <ExpandMore />)}
-                  </>
-                )}
-              </ListItemButton>
-            );
+                      {category.badge && (
+                        <Badge
+                          badgeContent={category.badge}
+                          color="primary"
+                          sx={{
+                            ml: 1,
+                            '& .MuiBadge-badge': { fontSize: '0.625rem' },
+                          }}
+                        />
+                      )}
+                      {!category.path &&
+                        (isExpanded ? <ExpandLess /> : <ExpandMore />)}
+                    </>
+                  )}
+                </ListItemButton>
+              );
 
-            return (
-              <React.Fragment key={category.id}>
-                {sidebarCollapsed ? (
-                  <Tooltip title={t(category.text)} placement="right" arrow>
-                    {categoryButton}
-                  </Tooltip>
-                ) : (
-                  categoryButton
-                )}
+              return (
+                <React.Fragment key={category.id}>
+                  {sidebarCollapsed ? (
+                    <Tooltip title={t(category.text)} placement="right" arrow>
+                      {categoryButton}
+                    </Tooltip>
+                  ) : (
+                    categoryButton
+                  )}
 
-                {/* Submenu items */}
-                {!category.path && !sidebarCollapsed && (
-                  <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                    <List
-                      component="div"
-                      disablePadding
-                      sx={{
-                        bgcolor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255,255,255,0.025)'
-                            : 'rgba(0,0,0,0.02)',
-                        borderRadius: 1,
-                        mx: 0.5,
-                        mb: 0.5,
-                      }}
-                    >
-                      {category.children.map((item, index, items) => {
-                        const prevItem = index > 0 ? items[index - 1] : null;
-                        const prevHasChildren =
-                          prevItem?.children && prevItem.children.length > 0;
-                        const currentHasChildren =
-                          item.children && item.children.length > 0;
-                        const showDivider =
-                          !currentHasChildren &&
-                          prevHasChildren &&
-                          sidebarCollapsed;
+                  {/* Submenu items */}
+                  {!category.path && !sidebarCollapsed && (
+                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                      <List
+                        component="div"
+                        disablePadding
+                        sx={{
+                          bgcolor:
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.025)'
+                              : 'rgba(0,0,0,0.02)',
+                          borderRadius: 1,
+                          mx: 0.5,
+                          mb: 0.5,
+                        }}
+                      >
+                        {category.children.map((item, index, items) => {
+                          const prevItem = index > 0 ? items[index - 1] : null;
+                          const prevHasChildren =
+                            prevItem?.children && prevItem.children.length > 0;
+                          const currentHasChildren =
+                            item.children && item.children.length > 0;
+                          const showDivider =
+                            !currentHasChildren &&
+                            prevHasChildren &&
+                            sidebarCollapsed;
 
-                        return (
-                          <React.Fragment key={index}>
-                            {showDivider && <Divider sx={{ my: 0.5 }} />}
-                            {renderMenuItem(item, index, category.children)}
-                          </React.Fragment>
-                        );
-                      })}
-                    </List>
-                  </Collapse>
-                )}
-              </React.Fragment>
-            );
-          })}
+                          return (
+                            <React.Fragment key={index}>
+                              {showDivider && <Divider sx={{ my: 0.5 }} />}
+                              {renderMenuItem(item, index, category.children)}
+                            </React.Fragment>
+                          );
+                        })}
+                      </List>
+                    </Collapse>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </List>
         </Collapse>
       </Box>
