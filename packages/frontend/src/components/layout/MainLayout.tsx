@@ -269,6 +269,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     });
   }, []);
 
+  // Navigation menu collapsed state
+  const [navMenuCollapsed, setNavMenuCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('sidebarNavMenuCollapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleNavMenuCollapsed = useCallback(() => {
+    setNavMenuCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('sidebarNavMenuCollapsed', String(next));
+      } catch (e) {
+        console.warn('Failed to save nav menu collapsed state:', e);
+      }
+      return next;
+    });
+  }, []);
+
   // Recent page confirm dialog state
   const [recentPageConfirm, setRecentPageConfirm] = useState<{
     open: boolean;
@@ -1826,47 +1847,88 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Box>
         )}
 
-        <List
-          sx={{ px: 1, flexGrow: 1 }}
-          onClick={(e) => {
-            // Expand sidebar when clicking on empty space in list
-            if (sidebarCollapsed && e.target === e.currentTarget) {
-              handleSidebarToggle();
-            }
-          }}
-        >
-          {/* Menu Categories */}
-          {getFilteredMenuCategories().map((category) => {
-            const categoryKey = `category-${category.id}`;
-            const isExpanded = expandedSubmenus[categoryKey];
+        {/* Navigation Menu Section - collapsible */}
+        {!sidebarCollapsed && (
+          <Box
+            onClick={toggleNavMenuCollapsed}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              px: 2,
+              py: 0.75,
+              cursor: 'pointer',
+              userSelect: 'none',
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
+            }}
+          >
+            {navMenuCollapsed ? (
+              <ExpandMore
+                sx={{ fontSize: 16, color: 'text.disabled', mr: 0.5 }}
+              />
+            ) : (
+              <ExpandLess
+                sx={{ fontSize: 16, color: 'text.disabled', mr: 0.5 }}
+              />
+            )}
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.disabled',
+                fontWeight: 600,
+                fontSize: '0.7rem',
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+              }}
+            >
+              {t('sidebar.navigation')}
+            </Typography>
+          </Box>
+        )}
 
-            const toggleCategory = () => {
-              const allCategories = getFilteredMenuCategories();
-              if (sidebarCollapsed) {
+        <Collapse in={sidebarCollapsed || !navMenuCollapsed} timeout={200}>
+          <List
+            sx={{ px: 1, flexGrow: 1 }}
+            onClick={(e) => {
+              // Expand sidebar when clicking on empty space in list
+              if (sidebarCollapsed && e.target === e.currentTarget) {
                 handleSidebarToggle();
-                if (!isExpanded) {
-                  setExpandedSubmenus((prev) => {
-                    const newState = { ...prev };
-                    // Accordion: close all other categories
-                    for (const cat of allCategories) {
-                      const key = `category-${cat.id}`;
-                      if (key !== categoryKey) {
-                        newState[key] = false;
+              }
+            }}
+          >
+            {/* Menu Categories */}
+            {getFilteredMenuCategories().map((category) => {
+              const categoryKey = `category-${category.id}`;
+              const isExpanded = expandedSubmenus[categoryKey];
+
+              const toggleCategory = () => {
+                const allCategories = getFilteredMenuCategories();
+                if (sidebarCollapsed) {
+                  handleSidebarToggle();
+                  if (!isExpanded) {
+                    setExpandedSubmenus((prev) => {
+                      const newState = { ...prev };
+                      // Accordion: close all other categories
+                      for (const cat of allCategories) {
+                        const key = `category-${cat.id}`;
+                        if (key !== categoryKey) {
+                          newState[key] = false;
+                        }
                       }
-                    }
-                    newState[categoryKey] = true;
-                    try {
-                      localStorage.setItem(
-                        'sidebarExpandedSubmenus',
-                        JSON.stringify(newState)
-                      );
-                    } catch (e) {}
-                    return newState;
-                  });
-                }
-              } else {
-                setExpandedSubmenus((prev) => {
-                  const isCurrentlyExpanded = prev[categoryKey];
+                      newState[categoryKey] = true;
+                      try {
+                        localStorage.setItem(
+                          'sidebarExpandedSubmenus',
+                          JSON.stringify(newState)
+                        );
+                      } catch (e) {}
+                      return newState;
+                    });
+                  }
+                } else {
+                  setExpandedSubmenus((prev) => {
+                    const isCurrentlyExpanded = prev[categoryKey];
                   const newState = { ...prev };
                   // Accordion: close all other categories
                   for (const cat of allCategories) {
@@ -2015,7 +2077,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </React.Fragment>
             );
           })}
-        </List>
+          </List>
+        </Collapse>
       </Box>
 
       {/* Version display - Balanced Minimal */}
@@ -2056,8 +2119,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <Box
           component="nav"
           sx={{
-            width: { xs: 0, md: sidebarCollapsed ? 0 : sidebarWidth },
-            transition: 'width 0.3s ease',
+            width: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
             flexShrink: 0,
             zIndex: (theme) => theme.zIndex.drawer,
           }}
@@ -2092,7 +2154,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               display: { xs: 'none', md: 'block' },
               '& .MuiDrawer-paper': {
                 boxSizing: 'border-box',
-                width: sidebarCollapsed ? 0 : sidebarWidth,
+                width: sidebarCollapsed ? 64 : sidebarWidth,
                 transition: 'width 0.3s ease',
                 backgroundColor: theme.palette.background.paper,
                 color: theme.palette.text.primary,
@@ -2634,7 +2696,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             sx={{
               position: 'fixed',
               top: 72,
-              left: { xs: 0, md: sidebarCollapsed ? 0 : sidebarWidth },
+              left: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
               right: 0,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               display: 'flex',
