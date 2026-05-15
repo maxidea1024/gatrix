@@ -1146,12 +1146,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }
         for (const item of category.children) {
           if (item.path === path) {
-            return { text: item.text, parentText: category.text, iconName: item.text };
+            return {
+              text: item.text,
+              parentText: category.text,
+              iconName: item.text,
+            };
           }
           if (item.children) {
             for (const child of item.children) {
               if (child.path === path) {
-                return { text: child.text, parentText: item.text, iconName: child.text };
+                return {
+                  text: child.text,
+                  parentText: item.text,
+                  iconName: child.text,
+                };
               }
             }
           }
@@ -1177,7 +1185,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
         // New page: insert at top, trim to max
         const updated = [
-          { path, text: menuInfo.text, parentText: menuInfo.parentText, iconName: menuInfo.iconName },
+          {
+            path,
+            text: menuInfo.text,
+            parentText: menuInfo.parentText,
+            iconName: menuInfo.iconName,
+          },
           ...prev,
         ].slice(0, MAX_RECENT_PAGES);
         try {
@@ -1758,7 +1771,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <Typography
                         variant="body2"
                         noWrap
-                        title={page.parentText ? `${t(page.parentText)} / ${t(page.text)}` : t(page.text)}
+                        title={
+                          page.parentText
+                            ? `${t(page.parentText)} / ${t(page.text)}`
+                            : t(page.text)
+                        }
                         sx={{
                           flex: 1,
                           fontSize: '0.8125rem',
