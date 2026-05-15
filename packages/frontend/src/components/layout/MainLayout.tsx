@@ -234,7 +234,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   interface RecentPageEntry {
     path: string;
-    text: string; // i18n key
+    text: string; // i18n key for the leaf menu item
+    parentText?: string; // i18n key for parent context (category or parent menu)
     iconName: string; // icon component name for lookup
   }
 
@@ -1134,7 +1135,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Find menu item info by path for recent pages tracking
   const findMenuItemByPath = useCallback(
-    (path: string): { text: string; iconName: string } | null => {
+    (
+      path: string
+    ): { text: string; parentText?: string; iconName: string } | null => {
       const categories = getFilteredMenuCategories();
       for (const category of categories) {
         // Check category-level path (e.g., change requests, dashboard)
@@ -1143,12 +1146,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }
         for (const item of category.children) {
           if (item.path === path) {
-            return { text: item.text, iconName: item.text };
+            return { text: item.text, parentText: category.text, iconName: item.text };
           }
           if (item.children) {
             for (const child of item.children) {
               if (child.path === path) {
-                return { text: child.text, iconName: child.text };
+                return { text: child.text, parentText: item.text, iconName: child.text };
               }
             }
           }
@@ -1174,7 +1177,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
         // New page: insert at top, trim to max
         const updated = [
-          { path, text: menuInfo.text, iconName: menuInfo.iconName },
+          { path, text: menuInfo.text, parentText: menuInfo.parentText, iconName: menuInfo.iconName },
           ...prev,
         ].slice(0, MAX_RECENT_PAGES);
         try {
@@ -1638,9 +1641,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 cursor: 'pointer',
                 userSelect: 'none',
                 borderRadius: 1,
-                '&:hover': {
-                  '& .recent-clear-btn': { opacity: 0.5 },
-                },
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -1683,9 +1683,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   }}
                   sx={{
                     p: 0.25,
-                    opacity: 0,
+                    opacity: 0.4,
                     transition: 'opacity 0.15s',
-                    '&:hover': { opacity: '1 !important' },
+                    '&:hover': { opacity: 1 },
                   }}
                 >
                   <CloseIcon sx={{ fontSize: 12 }} />
@@ -1758,14 +1758,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <Typography
                         variant="body2"
                         noWrap
+                        title={page.parentText ? `${t(page.parentText)} / ${t(page.text)}` : t(page.text)}
                         sx={{
                           flex: 1,
                           fontSize: '0.8125rem',
                           fontWeight: isActive ? 600 : 400,
                           transition: 'color 0.15s ease',
+                          direction: 'rtl',
+                          textAlign: 'left',
+                          unicodeBidi: 'plaintext',
                         }}
                       >
-                        {t(page.text)}
+                        {page.parentText
+                          ? `${t(page.parentText)} / ${t(page.text)}`
+                          : t(page.text)}
                       </Typography>
                       <IconButton
                         className="recent-page-close"
