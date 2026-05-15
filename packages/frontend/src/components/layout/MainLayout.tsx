@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import {
   Box,
   Drawer,
@@ -501,7 +507,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
 
     initialSyncDoneRef.current = true;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, getFilteredMenuCategories]);
 
   // Expand the sidebar category and submenu for a given path (used by recent pages)
@@ -517,10 +523,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         return false;
       };
 
-      const findSubmenuIndex = (
-        items: NavMenuItem[],
-        path: string
-      ): number => {
+      const findSubmenuIndex = (items: NavMenuItem[], path: string): number => {
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
           if (
@@ -561,10 +564,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           newState[categoryKey] = true;
 
           // Find and expand the submenu, close siblings
-          const submenuIndex = findSubmenuIndex(
-            category.children,
-            targetPath
-          );
+          const submenuIndex = findSubmenuIndex(category.children, targetPath);
           if (submenuIndex >= 0) {
             const submenuKey = `submenu-${submenuIndex}`;
             category.children.forEach((_, sibIdx) => {
@@ -1134,9 +1134,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Find menu item info by path for recent pages tracking
   const findMenuItemByPath = useCallback(
-    (
-      path: string
-    ): { text: string; iconName: string } | null => {
+    (path: string): { text: string; iconName: string } | null => {
       const categories = getFilteredMenuCategories();
       for (const category of categories) {
         // Check category-level path (e.g., change requests, dashboard)
@@ -1674,7 +1672,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </Box>
             </Box>
             <Collapse in={!recentPagesCollapsed} timeout={200}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px', mt: 0.5 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                  mt: 0.5,
+                }}
+              >
                 {filteredRecentPages.map((page) => {
                   const isActive = isActivePath(page.path);
                   return (
@@ -1796,7 +1801,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </Typography>
               </Tooltip>
             </Collapse>
-            <Divider sx={{ mt: recentPagesCollapsed ? 0.75 : 1, mb: 0.5, opacity: 0.5 }} />
+            <Divider
+              sx={{
+                mt: recentPagesCollapsed ? 0.75 : 1,
+                mb: 0.5,
+                opacity: 0.5,
+              }}
+            />
           </Box>
         )}
 
@@ -2962,9 +2973,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {recentPageConfirm.type === 'clearAll'
               ? t('sidebar.clearRecentPagesConfirm')
               : t('sidebar.removeRecentPageConfirm', {
-                  name: recentPageConfirm.text
-                    ? t(recentPageConfirm.text)
-                    : '',
+                  name: recentPageConfirm.text ? t(recentPageConfirm.text) : '',
                 })}
           </DialogContentText>
         </DialogContent>
