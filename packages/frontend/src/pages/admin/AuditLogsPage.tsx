@@ -756,7 +756,7 @@ const AuditLogsPage: React.FC = () => {
                   pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
                 }}
               >
-                <Table sx={{ tableLayout: 'auto' }}>
+                <Table size="small" sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ width: 50 }}></TableCell>

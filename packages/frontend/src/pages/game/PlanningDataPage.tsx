@@ -62,6 +62,7 @@ import PlanningDataUpload from '../../components/planning-data/PlanningDataUploa
 import PlanningDataGuideDrawer from '../../components/planning-data/PlanningDataGuideDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
 
 const PlanningDataPage: React.FC = () => {
@@ -3253,37 +3254,13 @@ const PlanningDataPage: React.FC = () => {
             </Card>
           </>
         ) : (
-          // Empty state when no planning data is uploaded
-          <Card>
-            <CardContent sx={{ py: 6 }}>
-              <Box sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}>
-                <CloudUploadIcon
-                  sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }}
-                />
-                <Typography variant="h5" gutterBottom>
-                  {t('planningData.noDataTitle')}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ mb: 3 }}
-                >
-                  {t('planningData.noDataDescription')}
-                </Typography>
-
-                {canManage && (
-                  <Button
-                    variant="contained"
-                    size="large"
-                    startIcon={<CloudUploadIcon />}
-                    onClick={handleRebuild}
-                  >
-                    {t('planningData.uploadData')}
-                  </Button>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
+          <EmptyPagePlaceholder
+            icon={<CloudUploadIcon sx={{ fontSize: 48 }} />}
+            message={t('planningData.noDataTitle')}
+            subtitle={t('planningData.noDataDescription')}
+            onAddClick={canManage ? handleRebuild : undefined}
+            addButtonLabel={t('planningData.uploadData')}
+          />
         )}
       </PageContentLoader>
 

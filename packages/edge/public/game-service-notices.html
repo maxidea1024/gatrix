@@ -796,10 +796,10 @@
       const NOTICES_ENDPOINT_BASE = '/public';
       const READ_NOTICES_KEY = 'serviceNotices_readStatus';
 
-      // Detect language from URL parameter and set html lang attribute
+      // Detect language from URL parameter only (UE4 CEF navigator.language is unreliable)
       (function () {
         const urlParams = new URLSearchParams(window.location.search);
-        const lang = urlParams.get('lang') || urlParams.get('language') || 'ko';
+        const lang = urlParams.get('lang') || urlParams.get('language') || 'zh';
         document.documentElement.lang = lang;
       })();
 
@@ -920,19 +920,19 @@
         }
       }
 
-      // Get localized empty message (en=default, ko, zh)
+      // Get localized empty message (zh=default, ko, en)
       function getEmptyMessage() {
-        var lang = document.documentElement.lang || 'en';
+        var lang = document.documentElement.lang || 'zh';
         if (lang.indexOf('ko') === 0) return '현재 등록된 공지사항이 없습니다.';
-        if (lang.indexOf('zh') === 0) return '目前没有公告。';
-        return 'There are no notices at this time.';
+        if (lang.indexOf('en') === 0) return 'There are no notices at this time.';
+        return '目前没有公告。';
       }
 
       function getRefreshLabel() {
-        var lang = document.documentElement.lang || 'en';
+        var lang = document.documentElement.lang || 'zh';
         if (lang.indexOf('ko') === 0) return '새로고침';
-        if (lang.indexOf('zh') === 0) return '刷新';
-        return 'Refresh';
+        if (lang.indexOf('en') === 0) return 'Refresh';
+        return '刷新';
       }
 
       function buildEmptyCardHtml() {

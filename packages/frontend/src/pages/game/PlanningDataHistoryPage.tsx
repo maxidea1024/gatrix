@@ -304,7 +304,7 @@ const PlanningDataHistoryPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell width={40}></TableCell>
@@ -364,8 +364,16 @@ const PlanningDataHistoryPage: React.FC = () => {
                               Object.keys(record.fileDiffs).length > 0
                                 ? 'pointer'
                                 : 'default',
+                            bgcolor:
+                              expandedRow === record.id
+                                ? 'action.selected'
+                                : index % 2 === 1
+                                  ? (theme) =>
+                                      theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.025)'
+                                        : 'rgba(79, 70, 229, 0.02)'
+                                  : undefined,
                             ...(expandedRow === record.id && {
-                              bgcolor: 'action.selected',
                               '&:hover': { bgcolor: 'action.selected' },
                             }),
                           }}

@@ -1100,6 +1100,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     } catch (error) {
       console.warn('Failed to save sidebar collapsed state:', error);
     }
+
+    // When expanding the sidebar, ensure the navigation menu is also expanded
+    if (!newCollapsed && navMenuCollapsed) {
+      setNavMenuCollapsed(false);
+      try {
+        localStorage.setItem('sidebarNavMenuCollapsed', 'false');
+      } catch (e) {
+        console.warn('Failed to save nav menu collapsed state:', e);
+      }
+    }
   };
 
   const handleMaintenanceBannerClick = () => {

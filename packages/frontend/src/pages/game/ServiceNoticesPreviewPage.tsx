@@ -354,9 +354,12 @@ const ServiceNoticesPreviewPage: React.FC = () => {
       zh: '刷新',
       en: 'Refresh',
     };
-    const lang = (i18n.language || 'en').substring(0, 2);
-    const emptyMsg = emptyMessages[lang] || emptyMessages.en;
-    const refreshLabel = refreshLabels[lang] || refreshLabels.en;
+    
+    // URL query param only (UE4 CEF navigator.language is unreliable)
+    const urlParams = new URLSearchParams(window.location.search);
+    const lang = (urlParams.get('lang') || urlParams.get('language') || 'zh').substring(0, 2).toLowerCase();
+    const emptyMsg = emptyMessages[lang] || emptyMessages.zh;
+    const refreshLabel = refreshLabels[lang] || refreshLabels.zh;
 
     return (
       <Box
