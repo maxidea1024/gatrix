@@ -532,6 +532,112 @@ const ServerListPage: React.FC = () => {
   useEffect(() => {
     let eventSource: EventSource | null = null;
 
+    // Helper: process a single put/delete event against a services array (mutates nothing, returns new array or null)
+    const applySingleEvent = (
+      prev: ServiceInstance[],
+      eventType: string,
+      eventData: ServiceInstance,
+      statusChanges: Map<string, ServiceInstance['status']>,
+      heartbeats: string[],
+      newKeys: string[]
+    ): ServiceInstance[] => {
+      if (eventType === 'delete') {
+        return prev.filter(
+          (s) =>
+            !(
+              s.instanceId === eventData.instanceId &&
+              s.labels.service === eventData.labels.service
+            )
+        );
+      }
+
+      // put event
+      const serviceKey = `${eventData.labels.service}-${eventData.instanceId}`;
+      const index = prev.findIndex(
+        (s) =>
+          s.instanceId === eventData.instanceId &&
+          s.labels.service === eventData.labels.service
+      );
+
+      if (index >= 0) {
+        // Update existing
+        const prevService = prev[index];
+        if (prevService.status !== eventData.status) {
+          statusChanges.set(serviceKey, eventData.status);
+        }
+        heartbeats.push(serviceKey);
+
+        const newServices = [...prev];
+        newServices[index] = eventData;
+        return newServices;
+      } else {
+        // Add new service
+        newKeys.push(serviceKey);
+        const newServices = [...prev, eventData];
+        newServices.sort((a, b) => {
+          const aTime = new Date(a.createdAt).getTime();
+          const bTime = new Date(b.createdAt).getTime();
+          return aTime - bTime;
+        });
+        return newServices;
+      }
+    };
+
+    // Helper: apply animation side effects after batch/single processing
+    const applyAnimationEffects = (
+      statusChanges: Map<string, ServiceInstance['status']>,
+      heartbeats: string[],
+      newKeys: string[]
+    ) => {
+      // Status change highlights
+      if (statusChanges.size > 0) {
+        setUpdatedServiceIds((prevIds) => {
+          const newMap = new Map(prevIds);
+          statusChanges.forEach((status, key) => newMap.set(key, status));
+          return newMap;
+        });
+        setTimeout(() => {
+          setUpdatedServiceIds((prevIds) => {
+            const newMap = new Map(prevIds);
+            statusChanges.forEach((_, key) => newMap.delete(key));
+            return newMap;
+          });
+        }, 2000);
+      }
+
+      // Heartbeat pulse animations
+      if (heartbeats.length > 0) {
+        setHeartbeatIds((prevIds) => {
+          const newSet = new Set(prevIds);
+          heartbeats.forEach((key) => newSet.add(key));
+          return newSet;
+        });
+        setTimeout(() => {
+          setHeartbeatIds((prevIds) => {
+            const newSet = new Set(prevIds);
+            heartbeats.forEach((key) => newSet.delete(key));
+            return newSet;
+          });
+        }, 600);
+      }
+
+      // New service appearance animations
+      if (newKeys.length > 0) {
+        setNewServiceIds((prevIds) => {
+          const newSet = new Set(prevIds);
+          newKeys.forEach((key) => newSet.add(key));
+          return newSet;
+        });
+        setTimeout(() => {
+          setNewServiceIds((prevIds) => {
+            const newSet = new Set(prevIds);
+            newKeys.forEach((key) => newSet.delete(key));
+            return newSet;
+          });
+        }, 1000);
+      }
+    };
+
     try {
       eventSource = serviceDiscoveryService.createSSEConnection(
         (event) => {
@@ -540,6 +646,68 @@ const ServerListPage: React.FC = () => {
             // This handles both first connection and SSE reconnection after network issues
             setServices(event.data);
             setPendingUpdates([]);
+          } else if (event.type === 'batch') {
+            // --- Batch event: array of {type, data} entries ---
+            // Process all events in a single setServices() call
+            const batchEvents = event.data as Array<{
+              type: string;
+              data: ServiceInstance;
+            }>;
+
+            if (isPausedRef.current) {
+              // If paused, add all to pending queue
+              setPendingUpdates((prev) => {
+                let updated = [...prev];
+                for (const evt of batchEvents) {
+                  if (evt.type === 'put') {
+                    const idx = updated.findIndex(
+                      (s) =>
+                        s.instanceId === evt.data.instanceId &&
+                        s.labels.service === evt.data.labels.service
+                    );
+                    if (idx >= 0) {
+                      updated[idx] = evt.data;
+                    } else {
+                      updated.push(evt.data);
+                    }
+                  } else if (evt.type === 'delete') {
+                    updated = updated.filter(
+                      (s) =>
+                        !(
+                          s.instanceId === evt.data.instanceId &&
+                          s.labels.service === evt.data.labels.service
+                        )
+                    );
+                  }
+                }
+                return updated;
+              });
+            } else {
+              // Not paused - apply all updates in a single setState
+              const statusChanges = new Map<
+                string,
+                ServiceInstance['status']
+              >();
+              const heartbeats: string[] = [];
+              const newKeys: string[] = [];
+
+              setServices((prev) => {
+                let current = prev;
+                for (const evt of batchEvents) {
+                  current = applySingleEvent(
+                    current,
+                    evt.type,
+                    evt.data,
+                    statusChanges,
+                    heartbeats,
+                    newKeys
+                  );
+                }
+                return current;
+              });
+
+              applyAnimationEffects(statusChanges, heartbeats, newKeys);
+            }
           } else if (isPausedRef.current) {
             // If paused, store updates in pending queue
             setPendingUpdates((prev) => {
@@ -568,73 +736,23 @@ const ServerListPage: React.FC = () => {
               return prev;
             });
           } else {
-            // Not paused - apply updates immediately
+            // Not paused - apply single update immediately
+            const statusChanges = new Map<string, ServiceInstance['status']>();
+            const heartbeats: string[] = [];
+            const newKeys: string[] = [];
+
             if (event.type === 'put') {
-              setServices((prev) => {
-                const index = prev.findIndex(
-                  (s) =>
-                    s.instanceId === event.data.instanceId &&
-                    s.labels.service === event.data.labels.service
-                );
-                const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
-
-                if (index >= 0) {
-                  // Update existing - only highlight if status actually changed (not just heartbeat update)
-                  const prevService = prev[index];
-                  const statusChanged =
-                    prevService.status !== event.data.status;
-
-                  if (statusChanged) {
-                    setUpdatedServiceIds((prevIds) =>
-                      new Map(prevIds).set(serviceKey, event.data.status)
-                    );
-                    setTimeout(() => {
-                      setUpdatedServiceIds((prevIds) => {
-                        const newMap = new Map(prevIds);
-                        newMap.delete(serviceKey);
-                        return newMap;
-                      });
-                    }, 2000);
-                  }
-
-                  // Trigger heartbeat pulse animation (for any update including heartbeat)
-                  setHeartbeatIds((prevIds) =>
-                    new Set(prevIds).add(serviceKey)
-                  );
-                  setTimeout(() => {
-                    setHeartbeatIds((prevIds) => {
-                      const newSet = new Set(prevIds);
-                      newSet.delete(serviceKey);
-                      return newSet;
-                    });
-                  }, 600); // Short pulse duration
-
-                  const newServices = [...prev];
-                  newServices[index] = event.data;
-                  return newServices;
-                } else {
-                  // Add new service - trigger appearance animation
-                  setNewServiceIds((prevIds) =>
-                    new Set(prevIds).add(serviceKey)
-                  );
-                  setTimeout(() => {
-                    setNewServiceIds((prevIds) => {
-                      const newSet = new Set(prevIds);
-                      newSet.delete(serviceKey);
-                      return newSet;
-                    });
-                  }, 1000); // Animation duration
-
-                  // Add new service and sort by createdAt (ascending - oldest first, newest last)
-                  const newServices = [...prev, event.data];
-                  newServices.sort((a, b) => {
-                    const aTime = new Date(a.createdAt).getTime();
-                    const bTime = new Date(b.createdAt).getTime();
-                    return aTime - bTime;
-                  });
-                  return newServices;
-                }
-              });
+              setServices((prev) =>
+                applySingleEvent(
+                  prev,
+                  event.type,
+                  event.data,
+                  statusChanges,
+                  heartbeats,
+                  newKeys
+                )
+              );
+              applyAnimationEffects(statusChanges, heartbeats, newKeys);
             } else if (event.type === 'delete') {
               // Service deleted/expired - remove from list immediately
               // Terminated services are kept for 5 minutes with TTL, so this only fires after TTL expires

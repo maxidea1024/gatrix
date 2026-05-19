@@ -165,6 +165,35 @@ router.get('/sse', authenticateSSE, async (req, res) => {
       `data: ${JSON.stringify({ type: 'init', data: normalizedServices })}\n\n`
     );
 
+    // --- Batch buffering for real-time events ---
+    // Instead of sending each event immediately, buffer events and flush every FLUSH_INTERVAL_MS.
+    // Deduplicates events by instance key (same instance updated multiple times within window → keep latest).
+    const FLUSH_INTERVAL_MS = 500;
+    const eventBuffer: Map<string, { type: string; data: any }> = new Map();
+    let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const flushBuffer = () => {
+      flushTimer = null;
+      if (eventBuffer.size === 0) return;
+
+      try {
+        const events = Array.from(eventBuffer.values());
+        eventBuffer.clear();
+
+        // If only one event, send it directly for backward compatibility
+        if (events.length === 1) {
+          res.write(`data: ${JSON.stringify(events[0])}\n\n`);
+        } else {
+          // Send as batch event
+          res.write(
+            `data: ${JSON.stringify({ type: 'batch', data: events })}\n\n`
+          );
+        }
+      } catch (error) {
+        logger.error('Failed to flush SSE event buffer:', error);
+      }
+    };
+
     // Watch for changes and get unwatch function
     let unwatch: (() => void) | null = null;
     try {
@@ -175,11 +204,17 @@ router.get('/sse', authenticateSSE, async (req, res) => {
           if (instance.status === 'heartbeat') {
             instance.status = 'ready' as any;
           }
-          res.write(
-            `data: ${JSON.stringify({ type: event.type, data: instance })}\n\n`
-          );
+
+          // Buffer the event, keyed by instance identity (deduplication)
+          const bufferKey = `${instance.labels.service}:${instance.instanceId}`;
+          eventBuffer.set(bufferKey, { type: event.type, data: instance });
+
+          // Schedule flush if not already scheduled
+          if (!flushTimer) {
+            flushTimer = setTimeout(flushBuffer, FLUSH_INTERVAL_MS);
+          }
         } catch (error) {
-          logger.error('Failed to send SSE event:', error);
+          logger.error('Failed to buffer SSE event:', error);
         }
       });
     } catch (error) {
@@ -197,6 +232,13 @@ router.get('/sse', authenticateSSE, async (req, res) => {
 
     // Handle client disconnect
     req.on('close', () => {
+      // Clear any pending flush timer
+      if (flushTimer) {
+        clearTimeout(flushTimer);
+        flushTimer = null;
+      }
+      eventBuffer.clear();
+
       if (unwatch) {
         unwatch();
       }
