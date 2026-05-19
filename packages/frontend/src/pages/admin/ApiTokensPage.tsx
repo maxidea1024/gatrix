@@ -1568,18 +1568,30 @@ const ApiTokensPage: React.FC = () => {
             {token.description || '-'}
           </Typography>
         );
-      case 'usageCount':
-        return (
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 500 }}
-            color={!token.usageCount ? 'text.secondary' : 'text.primary'}
-          >
-            {token.usageCount
-              ? token.usageCount.toLocaleString()
-              : t('apiTokens.neverUsed')}
+      case 'usageCount': {
+        const count = token.usageCount;
+        if (!count) {
+          return (
+            <Typography variant="body2" sx={{ fontWeight: 500 }} color="text.secondary">
+              {t('apiTokens.neverUsed')}
+            </Typography>
+          );
+        }
+        const isCompact = count >= 1_000;
+        const compact = count >= 1_000_000
+          ? `${(count / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`
+          : count >= 1_000
+            ? `${(count / 1_000).toFixed(1).replace(/\.0$/, '')}K`
+            : String(count);
+        const text = (
+          <Typography variant="body2" sx={{ fontWeight: 500 }} color="text.primary">
+            {compact}
           </Typography>
         );
+        return isCompact ? (
+          <Tooltip title={count.toLocaleString()} arrow>{text}</Tooltip>
+        ) : text;
+      }
       case 'lastUsedAt':
         return token.lastUsedAt ? (
           <Tooltip title={formatDateTimeUI(token.lastUsedAt)} arrow>
@@ -2165,7 +2177,7 @@ const ApiTokensPage: React.FC = () => {
               sx={{ width: '100%', overflow: 'hidden' }}
             >
               <TableContainer>
-                <Table stickyHeader sx={{ tableLayout: 'auto' }}>
+                <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       {canManage && (
@@ -2184,7 +2196,7 @@ const ApiTokensPage: React.FC = () => {
                       {columns
                         .filter((col) => col.visible)
                         .map((column) => (
-                          <TableCell key={column.id}>
+                          <TableCell key={column.id} align={column.id === 'usageCount' ? 'right' : 'left'}>
                             {t(column.labelKey)}
                           </TableCell>
                         ))}
@@ -2218,7 +2230,7 @@ const ApiTokensPage: React.FC = () => {
                         {columns
                           .filter((col) => col.visible)
                           .map((column) => (
-                            <TableCell key={column.id}>
+                            <TableCell key={column.id} align={column.id === 'usageCount' ? 'right' : 'left'}>
                               {renderCellContent(token, column.id)}
                             </TableCell>
                           ))}

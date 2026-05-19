@@ -1411,10 +1411,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 component="div"
                 disablePadding
                 sx={{
-                  bgcolor:
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.025)'
-                      : 'rgba(0,0,0,0.02)',
                   borderRadius: 1,
                   mx: 0.5,
                   mb: 0.5,
@@ -2054,10 +2050,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         component="div"
                         disablePadding
                         sx={{
-                          bgcolor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255,255,255,0.025)'
-                              : 'rgba(0,0,0,0.02)',
                           borderRadius: 1,
                           mx: 0.5,
                           mb: 0.5,
