@@ -2800,6 +2800,7 @@ const ServerListPage: React.FC = () => {
                                 minWidth: 100,
                                 height: 20,
                                 bgcolor: 'action.hover',
+                                borderRadius: 1,
                                 position: 'relative',
                                 overflow: 'hidden',
                                 display: 'flex',
