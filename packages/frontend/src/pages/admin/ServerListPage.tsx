@@ -1816,6 +1816,54 @@ const ServerListPage: React.FC = () => {
       </Tooltip>
     );
   };
+  // Refs for stable TableVirtuoso components (prevents unmount/remount on state changes)
+  const updatedServiceIdsRef = useRef(updatedServiceIds);
+  updatedServiceIdsRef.current = updatedServiceIds;
+  const handleContextMenuRef = useRef(handleContextMenu);
+  handleContextMenuRef.current = handleContextMenu;
+
+  const virtuosoTableComponents = useMemo(
+    () => ({
+      Table: (props: React.HTMLAttributes<HTMLTableElement> & { style?: React.CSSProperties }) => (
+        <Table
+          {...props}
+          stickyHeader
+          size="small"
+          style={{ ...props.style, borderCollapse: 'separate' }}
+        />
+      ),
+      TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+        <TableHead {...props} ref={ref} />
+      )),
+      TableRow: (props: any) => {
+        const service = props.item as ServiceInstance | undefined;
+        if (!service) return <TableRow {...props} />;
+        const serviceKey = `${service.labels.service}-${service.instanceId}`;
+        const updatedStatus = updatedServiceIdsRef.current.get(serviceKey);
+        const isUpdated = updatedStatus !== undefined;
+        const highlightStatus = updatedStatus || service.status;
+        return (
+          <TableRow
+            {...props}
+            hover
+            onContextMenu={(e: React.MouseEvent) =>
+              handleContextMenuRef.current(e, service)
+            }
+            sx={{
+              bgcolor: isUpdated
+                ? (t: any) => getHighlightColor(highlightStatus, t)
+                : (t: any) => getStatusBgColor(service.status, t),
+              transition: 'background-color 0.2s ease',
+            }}
+          />
+        );
+      },
+      TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+        <TableBody {...props} ref={ref} />
+      )),
+    }),
+    [] // Empty deps = stable reference, uses refs for dynamic data
+  );
 
   const renderHeartbeatIcon = (
     service: ServiceInstance,
@@ -3133,6 +3181,9 @@ const ServerListPage: React.FC = () => {
                   <TableVirtuoso
                     style={{ flex: 1 }}
                     data={displayServices}
+                    computeItemKey={(_index, service) =>
+                      `${service.labels.service}-${service.instanceId}`
+                    }
                     fixedHeaderContent={() => (
                       <TableRow>
                         {visibleColumnsHeader.map((column) => (
@@ -3153,43 +3204,7 @@ const ServerListPage: React.FC = () => {
                     itemContent={(_index, service) =>
                       renderServiceRowCells(service, 0)
                     }
-                    components={{
-                      Table: (props) => (
-                        <Table
-                          {...props}
-                          stickyHeader
-                          size="small"
-                          style={{ ...props.style, borderCollapse: 'separate' }}
-                        />
-                      ),
-                      TableHead: React.forwardRef((props, ref) => (
-                        <TableHead {...props} ref={ref} />
-                      )),
-                      TableRow: (props) => {
-                        const service = props.item as ServiceInstance | undefined;
-                        if (!service) return <TableRow {...props} />;
-                        const serviceKey = `${service.labels.service}-${service.instanceId}`;
-                        const updatedStatus = updatedServiceIds.get(serviceKey);
-                        const isUpdated = updatedStatus !== undefined;
-                        const highlightStatus = updatedStatus || service.status;
-                        return (
-                          <TableRow
-                            {...props}
-                            hover
-                            onContextMenu={(e) => handleContextMenu(e, service)}
-                            sx={{
-                              bgcolor: isUpdated
-                                ? (t) => getHighlightColor(highlightStatus, t)
-                                : (t) => getStatusBgColor(service.status, t),
-                              transition: 'background-color 0.2s ease',
-                            }}
-                          />
-                        );
-                      },
-                      TableBody: React.forwardRef((props, ref) => (
-                        <TableBody {...props} ref={ref} />
-                      )),
-                    }}
+                    components={virtuosoTableComponents}
                   />
                 )}
               </Card>
