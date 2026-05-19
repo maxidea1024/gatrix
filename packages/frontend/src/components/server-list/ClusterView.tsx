@@ -74,6 +74,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   > | null>(null);
   const nodesRef = useRef<ClusterNode[]>([]);
   const linksRef = useRef<ClusterLink[]>([]);
+  const rafPendingRef = useRef(false);
 
   // Track rumble and heartbeat animation states
   const [rumbleNodes, setRumbleNodes] = useState<Set<string>>(new Set());
@@ -330,7 +331,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     prevHeartbeatRef.current = new Set(heartbeatIds);
   }, [heartbeatIds]);
 
-  // Update ping progress every 100ms
+  // Update ping progress every 1000ms (was 100ms - reduced to lower CPU overhead)
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
@@ -350,7 +351,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         });
         return next;
       });
-    }, 100);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [services, lastHeartbeatTime]);
@@ -394,8 +395,16 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       .alphaDecay(0.02) // Slower decay for smoother movement
       .velocityDecay(0.3)
       .on('tick', () => {
-        setNodes([...nodesRef.current]);
-        setLinks([...linksRef.current]);
+        // Throttle React state updates via requestAnimationFrame
+        // D3 tick fires frequently; coalesce into a single frame update
+        if (!rafPendingRef.current) {
+          rafPendingRef.current = true;
+          requestAnimationFrame(() => {
+            rafPendingRef.current = false;
+            setNodes([...nodesRef.current]);
+            setLinks([...linksRef.current]);
+          });
+        }
       });
 
     simulationRef.current = simulation;
@@ -433,6 +442,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     },
     [groupingBy]
   );
+
+  // Pre-compute center node instance counts (avoids O(N*M) filter inside render loop)
+  const centerCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    counts.set('__all__', services.length);
+    services.forEach((s) => {
+      const key = getGroupKey(s);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+    return counts;
+  }, [services, getGroupKey]);
 
   // Track previous groupingBy to detect changes
   const prevGroupingByRef = useRef<GroupingOption>(groupingBy);
@@ -903,11 +923,24 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 </filter>
               </defs>
 
-              {/* Links */}
+              {/* Links - with viewport culling */}
               {links.map((link, idx) => {
                 const source = getNodeById(link.source);
                 const target = getNodeById(link.target);
                 if (!source || !target) return null;
+
+                // Viewport culling: skip links where both endpoints are outside visible area
+                const sx = source.x || 0;
+                const sy = source.y || 0;
+                const tx = target.x || 0;
+                const ty = target.y || 0;
+                const margin = 50;
+                const bothOutside =
+                  (sx < viewBox.x - margin && tx < viewBox.x - margin) ||
+                  (sx > viewBox.x + viewBox.width + margin && tx > viewBox.x + viewBox.width + margin) ||
+                  (sy < viewBox.y - margin && ty < viewBox.y - margin) ||
+                  (sy > viewBox.y + viewBox.height + margin && ty > viewBox.y + viewBox.height + margin);
+                if (bothOutside) return null;
 
                 // Check if this link's target node has heartbeat
                 const targetId =
@@ -920,10 +953,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                   <g key={`link-${idx}`}>
                     {/* Base line */}
                     <line
-                      x1={source.x || 0}
-                      y1={source.y || 0}
-                      x2={target.x || 0}
-                      y2={target.y || 0}
+                      x1={sx}
+                      y1={sy}
+                      x2={tx}
+                      y2={ty}
                       stroke={hasHeartbeat ? 'url(#pulseGradient)' : '#90a4ae'}
                       strokeWidth={hasHeartbeat ? 3 : 2}
                       strokeDasharray={hasHeartbeat ? '8,4' : '4,4'}
@@ -944,13 +977,22 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
               {/* Nodes */}
               {nodes.map((node) => {
+                // Viewport culling: skip nodes outside visible area (with generous margin)
+                const nx = node.x || 0;
+                const ny = node.y || 0;
+                const margin = 100; // generous margin for animations/labels
+                if (
+                  nx < viewBox.x - margin ||
+                  nx > viewBox.x + viewBox.width + margin ||
+                  ny < viewBox.y - margin ||
+                  ny > viewBox.y + viewBox.height + margin
+                ) {
+                  return null;
+                }
+
                 if (node.isCenter) {
                   // Center cluster node - draggable
-                  // Calculate count for this center node
-                  const centerCount = node.groupKey
-                    ? services.filter((s) => getGroupKey(s) === node.groupKey)
-                        .length
-                    : services.length;
+                  const centerCount = centerCounts.get(node.groupKey ?? '__all__') ?? services.length;
 
                   return (
                     <g
