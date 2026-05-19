@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -23,6 +23,7 @@ import {
 import { ServiceInstance } from '../../services/serviceDiscoveryService';
 import { getStatusColor, getStatusTranslationKey } from './constants';
 import type { GroupingField } from './types';
+import { VirtuosoGrid } from 'react-virtuoso';
 
 type ServiceStatus = ServiceInstance['status'];
 // CheckerboardView component props
@@ -227,7 +228,452 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     const cellSize = 75; // Cell size in pixels
     const gap = 4; // Gap between cells
 
-    // Render a grid section of items
+    // Render a single checkerboard cell (shared between grouped grid and ungrouped VirtuosoGrid)
+    const renderCheckerboardCell = (service: ServiceInstance, serviceKey: string) => {
+      const updatedStatus = updatedServiceIds.get(serviceKey);
+      const highlightStatus = updatedStatus || service.status;
+      const isUpdated = updatedStatus !== undefined;
+      const hasHeartbeat = heartbeatIds.has(serviceKey);
+
+      return (
+        <Tooltip
+          key={serviceKey}
+          arrow
+          placement="top"
+          slotProps={{
+            tooltip: {
+              sx: {
+                bgcolor: 'background.paper',
+                color: 'text.primary',
+                boxShadow: (theme) => theme.shadows[10],
+                border: 1,
+                borderColor: 'divider',
+                p: 0,
+                maxWidth: 'none',
+              },
+            },
+          }}
+          title={
+            <Box sx={{ p: 1.5, minWidth: 320 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1.5,
+                  gap: 2,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 800,
+                    color: 'primary.main',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  <DnsIcon sx={{ fontSize: 20 }} />
+                  {service.labels.service}
+                </Typography>
+                <Chip
+                  label={t(
+                    `serverList.status.${getStatusTranslationKey(service.status)}`
+                  )}
+                  size="small"
+                  color={
+                    service.status === 'ready'
+                      ? 'success'
+                      : service.status === 'error'
+                        ? 'error'
+                        : 'warning'
+                  }
+                  variant="outlined"
+                  sx={{ fontWeight: 'bold' }}
+                />
+              </Box>
+
+              <Table
+                size="small"
+                sx={{ '& td': { border: 0, py: 0.5, px: 0 } }}
+              >
+                <TableBody>
+                  <TableRow hover>
+                    <TableCell
+                      sx={{
+                        width: 100,
+                        color: 'text.secondary',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t('serverList.table.instanceId')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontFamily: '"D2Coding", monospace',
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        color: 'text.primary',
+                      }}
+                    >
+                      {service.instanceId}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover>
+                    <TableCell
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t('serverList.table.hostname')}
+                    </TableCell>
+                    <TableCell
+                      sx={{ fontWeight: 500, fontSize: '0.75rem' }}
+                    >
+                      {service.hostname}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover>
+                    <TableCell
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t('serverList.tooltip.addressExt')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontFamily: '"D2Coding", monospace',
+                        fontSize: '0.75rem',
+                      }}
+                    >
+                      {service.externalAddress}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover>
+                    <TableCell
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t('serverList.tooltip.addressInt')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontFamily: '"D2Coding", monospace',
+                        fontSize: '0.75rem',
+                      }}
+                    >
+                      {service.internalAddress}
+                    </TableCell>
+                  </TableRow>
+                  {(service.labels.environmentId ||
+                    service.labels.environment) && (
+                    <TableRow hover>
+                      <TableCell
+                        sx={{
+                          color: 'text.secondary',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t('serverList.table.environment')}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem' }}>
+                        <Chip
+                          label={
+                            service.labels.environmentId ||
+                            service.labels.environment
+                          }
+                          size="small"
+                          variant="outlined"
+                          color="secondary"
+                          sx={{
+                            height: 20,
+                            fontSize: '0.65rem',
+                            fontWeight: 600,
+                            borderRadius: 0.5,
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {service.labels.region && (
+                    <TableRow hover>
+                      <TableCell
+                        sx={{
+                          color: 'text.secondary',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t('serverList.table.region')}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem' }}>
+                        <Chip
+                          label={service.labels.region}
+                          size="small"
+                          variant="outlined"
+                          color="info"
+                          sx={{
+                            height: 20,
+                            fontSize: '0.65rem',
+                            fontWeight: 600,
+                            borderRadius: 0.5,
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {service.labels.version && (
+                    <TableRow hover>
+                      <TableCell
+                        sx={{
+                          color: 'text.secondary',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t('serverList.filters.version')}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontFamily: '"D2Coding", monospace',
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        {service.labels.version}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+          }
+        >
+          <Box
+            onContextMenu={(e) => onContextMenu(e, service)}
+            sx={{
+              width: cellSize,
+              height: cellSize,
+              background: `linear-gradient(135deg, ${getStatusColor(service.status)} 0%, ${getStatusColor(service.status)}dd 100%)`,
+              border: 0,
+              boxShadow: (theme) =>
+                `inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px ${alpha(theme.palette.common.black, 0.15)}`,
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+              pb: 0,
+              // Heartbeat glow animation
+              ...(hasHeartbeat && {
+                animation: 'heartbeatGlowPulse 1s ease-out',
+                '@keyframes heartbeatGlowPulse': {
+                  '0%': {
+                    boxShadow:
+                      '0 0 0 0 rgba(76, 175, 80, 0.7), 0 0 20px rgba(76, 175, 80, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.3)',
+                    transform: 'scale(1.08)',
+                    filter: 'brightness(1.3)',
+                  },
+                  '30%': {
+                    boxShadow:
+                      '0 0 0 8px rgba(76, 175, 80, 0.4), 0 0 30px rgba(76, 175, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2)',
+                    transform: 'scale(1.04)',
+                    filter: 'brightness(1.15)',
+                  },
+                  '60%': {
+                    boxShadow:
+                      '0 0 0 12px rgba(76, 175, 80, 0.1), 0 0 15px rgba(76, 175, 80, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1)',
+                    transform: 'scale(1.02)',
+                    filter: 'brightness(1.05)',
+                  },
+                  '100%': {
+                    boxShadow:
+                      'inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.15)',
+                    transform: 'scale(1)',
+                    filter: 'brightness(1)',
+                  },
+                },
+              }),
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background:
+                  'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                pointerEvents: 'none',
+              },
+              '&:hover': {
+                transform: 'scale(1.15) translateY(-2px)',
+                boxShadow: (theme) =>
+                  `0 8px 16px ${alpha(theme.palette.common.black, 0.25)}`,
+                zIndex: 2,
+              },
+            }}
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 4,
+                left: 2,
+                right: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                zIndex: 2,
+              }}
+            >
+              <Chip
+                label={service.labels.service}
+                size="small"
+                sx={{
+                  height: 18,
+                  fontSize: '0.6rem',
+                  fontWeight: 600,
+                  bgcolor: 'rgba(0,0,0,0.4)',
+                  color: 'white',
+                  backdropFilter: 'blur(2px)',
+                  maxWidth: '100%',
+                  '& .MuiChip-label': {
+                    px: 0.5,
+                    display: 'block',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+              />
+            </Box>
+            {/* Status indicator - simple elegant symbol */}
+            <Box
+              sx={{
+                width: 27,
+                height: 27,
+                mt: 0,
+                borderRadius: '50%',
+                bgcolor: 'rgba(255,255,255,0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
+                zIndex: 1,
+              }}
+            >
+              {service.status === 'ready' ? (
+                <CheckCircleIcon sx={{ fontSize: 21, color: 'white' }} />
+              ) : service.status === 'initializing' ? (
+                <SearchIcon
+                  sx={{
+                    fontSize: 20,
+                    color: 'white',
+                    animation: 'searchingAnim 2s ease-in-out infinite',
+                    '@keyframes searchingAnim': {
+                      '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                      '25%': {
+                        transform: 'translate(2px, -2px) rotate(15deg)',
+                      },
+                      '50%': {
+                        transform: 'translate(-2px, 2px) rotate(-15deg)',
+                      },
+                      '75%': {
+                        transform: 'translate(2px, 2px) rotate(15deg)',
+                      },
+                      '100%': {
+                        transform: 'translate(0, 0) rotate(0deg)',
+                      },
+                    },
+                  }}
+                />
+              ) : service.status === 'shutting_down' ? (
+                <PowerSettingsNewIcon
+                  sx={{ fontSize: 18, color: 'white' }}
+                />
+              ) : service.status === 'terminated' ? (
+                <PowerSettingsNewIcon
+                  sx={{ fontSize: 18, color: 'white', opacity: 0.7 }}
+                />
+              ) : service.status === 'error' ? (
+                <ErrorIcon sx={{ fontSize: 18, color: 'white' }} />
+              ) : service.status === 'no-response' ? (
+                <WarningIcon sx={{ fontSize: 18, color: 'white' }} />
+              ) : service.status === 'busy' ? (
+                <SearchIcon
+                  sx={{
+                    fontSize: 20,
+                    color: 'white',
+                    animation: 'searchingAnim 2s ease-in-out infinite',
+                    '@keyframes searchingAnim': {
+                      '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                      '25%': {
+                        transform: 'translate(2px, -2px) rotate(15deg)',
+                      },
+                      '50%': {
+                        transform: 'translate(-2px, 2px) rotate(-15deg)',
+                      },
+                      '75%': {
+                        transform: 'translate(2px, 2px) rotate(15deg)',
+                      },
+                      '100%': {
+                        transform: 'translate(0, 0) rotate(0deg)',
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <HelpOutlineIcon sx={{ fontSize: 18, color: 'white' }} />
+              )}
+            </Box>
+            <Typography
+              variant="caption"
+              sx={{
+                position: 'absolute',
+                bottom: 4,
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                color: 'white',
+                lineHeight: 1,
+                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                fontFamily: 'monospace',
+              }}
+            >
+              {service.status === 'ready'
+                ? 'READY'
+                : service.status === 'initializing'
+                  ? 'INITIALIZING'
+                  : service.status === 'shutting_down'
+                    ? 'SHUTTING DOWN'
+                    : service.status === 'terminated'
+                      ? 'TERMINATED'
+                      : service.status === 'error'
+                        ? 'ERROR'
+                        : service.status === 'no-response'
+                          ? 'NO RESPONSE'
+                          : service.status === 'busy'
+                            ? 'BUSY'
+                            : '?'}
+            </Typography>
+          </Box>
+        </Tooltip>
+      );
+    };
+
     const renderItemsGrid = (items: ServiceInstance[], groupKey?: string) => {
       const colCount = 25;
       const itemCount = items.length;
@@ -247,448 +693,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
         >
           {items.map((service) => {
             const serviceKey = `${service.labels.service}-${service.instanceId}`;
-            const updatedStatus = updatedServiceIds.get(serviceKey);
-            const highlightStatus = updatedStatus || service.status;
-            const isUpdated = updatedStatus !== undefined;
-            const hasHeartbeat = heartbeatIds.has(serviceKey);
-
-            return (
-              <Tooltip
-                key={serviceKey}
-                arrow
-                placement="top"
-                slotProps={{
-                  tooltip: {
-                    sx: {
-                      bgcolor: 'background.paper',
-                      color: 'text.primary',
-                      boxShadow: (theme) => theme.shadows[10],
-                      border: 1,
-                      borderColor: 'divider',
-                      p: 0,
-                      maxWidth: 'none',
-                    },
-                  },
-                }}
-                title={
-                  <Box sx={{ p: 1.5, minWidth: 320 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 1.5,
-                        gap: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          fontWeight: 800,
-                          color: 'primary.main',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 1,
-                        }}
-                      >
-                        <DnsIcon sx={{ fontSize: 20 }} />
-                        {service.labels.service}
-                      </Typography>
-                      <Chip
-                        label={t(
-                          `serverList.status.${getStatusTranslationKey(service.status)}`
-                        )}
-                        size="small"
-                        color={
-                          service.status === 'ready'
-                            ? 'success'
-                            : service.status === 'error'
-                              ? 'error'
-                              : 'warning'
-                        }
-                        variant="outlined"
-                        sx={{ fontWeight: 'bold' }}
-                      />
-                    </Box>
-
-                    <Table
-                      size="small"
-                      sx={{ '& td': { border: 0, py: 0.5, px: 0 } }}
-                    >
-                      <TableBody>
-                        <TableRow hover>
-                          <TableCell
-                            sx={{
-                              width: 100,
-                              color: 'text.secondary',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                            }}
-                          >
-                            {t('serverList.table.instanceId')}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              fontFamily: '"D2Coding", monospace',
-                              fontWeight: 600,
-                              fontSize: '0.75rem',
-                              color: 'text.primary',
-                            }}
-                          >
-                            {service.instanceId}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow hover>
-                          <TableCell
-                            sx={{
-                              color: 'text.secondary',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                            }}
-                          >
-                            {t('serverList.table.hostname')}
-                          </TableCell>
-                          <TableCell
-                            sx={{ fontWeight: 500, fontSize: '0.75rem' }}
-                          >
-                            {service.hostname}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow hover>
-                          <TableCell
-                            sx={{
-                              color: 'text.secondary',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                            }}
-                          >
-                            {t('serverList.tooltip.addressExt')}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              fontFamily: '"D2Coding", monospace',
-                              fontSize: '0.75rem',
-                            }}
-                          >
-                            {service.externalAddress}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow hover>
-                          <TableCell
-                            sx={{
-                              color: 'text.secondary',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                            }}
-                          >
-                            {t('serverList.tooltip.addressInt')}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              fontFamily: '"D2Coding", monospace',
-                              fontSize: '0.75rem',
-                            }}
-                          >
-                            {service.internalAddress}
-                          </TableCell>
-                        </TableRow>
-                        {(service.labels.environmentId ||
-                          service.labels.environment) && (
-                          <TableRow hover>
-                            <TableCell
-                              sx={{
-                                color: 'text.secondary',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              {t('serverList.table.environment')}
-                            </TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem' }}>
-                              <Chip
-                                label={
-                                  service.labels.environmentId ||
-                                  service.labels.environment
-                                }
-                                size="small"
-                                variant="outlined"
-                                color="secondary"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.65rem',
-                                  fontWeight: 600,
-                                  borderRadius: 0.5,
-                                }}
-                              />
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {service.labels.region && (
-                          <TableRow hover>
-                            <TableCell
-                              sx={{
-                                color: 'text.secondary',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              {t('serverList.table.region')}
-                            </TableCell>
-                            <TableCell sx={{ fontSize: '0.75rem' }}>
-                              <Chip
-                                label={service.labels.region}
-                                size="small"
-                                variant="outlined"
-                                color="info"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.65rem',
-                                  fontWeight: 600,
-                                  borderRadius: 0.5,
-                                }}
-                              />
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {service.labels.version && (
-                          <TableRow hover>
-                            <TableCell
-                              sx={{
-                                color: 'text.secondary',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              {t('serverList.filters.version')}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                fontFamily: '"D2Coding", monospace',
-                                fontSize: '0.75rem',
-                              }}
-                            >
-                              {service.labels.version}
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </Box>
-                }
-              >
-                <Box
-                  onContextMenu={(e) => onContextMenu(e, service)}
-                  sx={{
-                    width: cellSize,
-                    height: cellSize,
-                    background: `linear-gradient(135deg, ${getStatusColor(service.status)} 0%, ${getStatusColor(service.status)}dd 100%)`,
-                    border: 0,
-                    boxShadow: (theme) =>
-                      `inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px ${alpha(theme.palette.common.black, 0.15)}`,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pb: 0,
-                    // Heartbeat glow animation
-                    ...(hasHeartbeat && {
-                      animation: 'heartbeatGlowPulse 1s ease-out',
-                      '@keyframes heartbeatGlowPulse': {
-                        '0%': {
-                          boxShadow:
-                            '0 0 0 0 rgba(76, 175, 80, 0.7), 0 0 20px rgba(76, 175, 80, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.3)',
-                          transform: 'scale(1.08)',
-                          filter: 'brightness(1.3)',
-                        },
-                        '30%': {
-                          boxShadow:
-                            '0 0 0 8px rgba(76, 175, 80, 0.4), 0 0 30px rgba(76, 175, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2)',
-                          transform: 'scale(1.04)',
-                          filter: 'brightness(1.15)',
-                        },
-                        '60%': {
-                          boxShadow:
-                            '0 0 0 12px rgba(76, 175, 80, 0.1), 0 0 15px rgba(76, 175, 80, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1)',
-                          transform: 'scale(1.02)',
-                          filter: 'brightness(1.05)',
-                        },
-                        '100%': {
-                          boxShadow:
-                            'inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.15)',
-                          transform: 'scale(1)',
-                          filter: 'brightness(1)',
-                        },
-                      },
-                    }),
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background:
-                        'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
-                      pointerEvents: 'none',
-                    },
-                    '&:hover': {
-                      transform: 'scale(1.15) translateY(-2px)',
-                      boxShadow: (theme) =>
-                        `0 8px 16px ${alpha(theme.palette.common.black, 0.25)}`,
-                      zIndex: 2,
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 4,
-                      left: 2,
-                      right: 2,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      pointerEvents: 'none',
-                      zIndex: 2,
-                    }}
-                  >
-                    <Chip
-                      label={service.labels.service}
-                      size="small"
-                      sx={{
-                        height: 18,
-                        fontSize: '0.6rem',
-                        fontWeight: 600,
-                        bgcolor: 'rgba(0,0,0,0.4)',
-                        color: 'white',
-                        backdropFilter: 'blur(2px)',
-                        maxWidth: '100%',
-                        '& .MuiChip-label': {
-                          px: 0.5,
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        },
-                      }}
-                    />
-                  </Box>
-                  {/* Status indicator - simple elegant symbol */}
-                  <Box
-                    sx={{
-                      width: 27,
-                      height: 27,
-                      mt: 0,
-                      borderRadius: '50%',
-                      bgcolor: 'rgba(255,255,255,0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
-                      zIndex: 1,
-                    }}
-                  >
-                    {service.status === 'ready' ? (
-                      <CheckCircleIcon sx={{ fontSize: 21, color: 'white' }} />
-                    ) : service.status === 'initializing' ? (
-                      <SearchIcon
-                        sx={{
-                          fontSize: 20,
-                          color: 'white',
-                          animation: 'searchingAnim 2s ease-in-out infinite',
-                          '@keyframes searchingAnim': {
-                            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '25%': {
-                              transform: 'translate(2px, -2px) rotate(15deg)',
-                            },
-                            '50%': {
-                              transform: 'translate(-2px, 2px) rotate(-15deg)',
-                            },
-                            '75%': {
-                              transform: 'translate(2px, 2px) rotate(15deg)',
-                            },
-                            '100%': {
-                              transform: 'translate(0, 0) rotate(0deg)',
-                            },
-                          },
-                        }}
-                      />
-                    ) : service.status === 'shutting_down' ? (
-                      <PowerSettingsNewIcon
-                        sx={{ fontSize: 18, color: 'white' }}
-                      />
-                    ) : service.status === 'terminated' ? (
-                      <PowerSettingsNewIcon
-                        sx={{ fontSize: 18, color: 'white', opacity: 0.7 }}
-                      />
-                    ) : service.status === 'error' ? (
-                      <ErrorIcon sx={{ fontSize: 18, color: 'white' }} />
-                    ) : service.status === 'no-response' ? (
-                      <WarningIcon sx={{ fontSize: 18, color: 'white' }} />
-                    ) : service.status === 'busy' ? (
-                      <SearchIcon
-                        sx={{
-                          fontSize: 20,
-                          color: 'white',
-                          animation: 'searchingAnim 2s ease-in-out infinite',
-                          '@keyframes searchingAnim': {
-                            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '25%': {
-                              transform: 'translate(2px, -2px) rotate(15deg)',
-                            },
-                            '50%': {
-                              transform: 'translate(-2px, 2px) rotate(-15deg)',
-                            },
-                            '75%': {
-                              transform: 'translate(2px, 2px) rotate(15deg)',
-                            },
-                            '100%': {
-                              transform: 'translate(0, 0) rotate(0deg)',
-                            },
-                          },
-                        }}
-                      />
-                    ) : (
-                      <HelpOutlineIcon sx={{ fontSize: 18, color: 'white' }} />
-                    )}
-                  </Box>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      position: 'absolute',
-                      bottom: 4,
-                      left: 0,
-                      right: 0,
-                      textAlign: 'center',
-                      fontSize: '0.65rem',
-                      fontWeight: 700,
-                      color: 'white',
-                      lineHeight: 1,
-                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {service.status === 'ready'
-                      ? 'READY'
-                      : service.status === 'initializing'
-                        ? 'INITIALIZING'
-                        : service.status === 'shutting_down'
-                          ? 'SHUTTING DOWN'
-                          : service.status === 'terminated'
-                            ? 'TERMINATED'
-                            : service.status === 'error'
-                              ? 'ERROR'
-                              : service.status === 'no-response'
-                                ? 'NO RESPONSE'
-                                : service.status === 'busy'
-                                  ? 'BUSY'
-                                  : '?'}
-                  </Typography>
-                </Box>
-              </Tooltip>
-            );
+            return renderCheckerboardCell(service, serviceKey);
           })}
           {/* Empty placeholders with dashed border - fill remaining spots in row */}
           {emptyCount > 0 &&
@@ -882,23 +887,51 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
       );
     }
 
-    // No grouping - render all items in single grid
+    // No grouping - render all items in virtualized grid
     return (
       <Box
         sx={{
           flex: 1,
           minHeight: 0,
-          overflow: 'auto',
+          overflow: 'hidden',
           p: 1.5,
-          alignContent: 'start',
-          justifyContent: 'start',
           bgcolor: (theme) => alpha(theme.palette.background.paper, 0.3),
           borderRadius: 1,
           border: 1,
           borderColor: 'divider',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        {renderItemsGrid(services)}
+        <VirtuosoGrid
+          style={{ flex: 1 }}
+          totalCount={services.length}
+          itemContent={(index) => {
+            const service = services[index];
+            const serviceKey = `${service.labels.service}-${service.instanceId}`;
+            return renderCheckerboardCell(service, serviceKey);
+          }}
+          components={{
+            List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+              <div
+                ref={ref}
+                {...props}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(auto-fill, ${cellSize}px)`,
+                  gridAutoRows: `${cellSize}px`,
+                  gap: `${gap}px`,
+                  alignContent: 'start',
+                  justifyContent: 'start',
+                  ...props.style,
+                }}
+              />
+            )),
+            Item: (props: React.HTMLAttributes<HTMLDivElement>) => (
+              <div {...props} style={{ width: cellSize, height: cellSize, ...props.style }} />
+            ),
+          }}
+        />
       </Box>
     );
   },
@@ -947,4 +980,3 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
 
 export { StatusStatsDisplay };
 export default CheckerboardView;
-

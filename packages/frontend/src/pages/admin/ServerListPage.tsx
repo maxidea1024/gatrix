@@ -142,7 +142,7 @@ interface ColumnConfig {
 }
 
 import type { GroupingField, GroupingOption } from '../../components/server-list/types';
-import { TableVirtuoso } from 'react-virtuoso';
+import { TableVirtuoso, VirtuosoGrid } from 'react-virtuoso';
 
 
 interface SortableColumnItemProps {
@@ -3540,40 +3540,32 @@ const ServerListPage: React.FC = () => {
                 : [];
 
             if (groupingLevels.length === 0) {
-              const colCount = 5;
-              const emptyCount =
-                gridDisplayServices.length > 0
-                  ? (colCount - (gridDisplayServices.length % colCount)) %
-                    colCount
-                  : 0;
               return (
-                <Box
-                  sx={{
-                    flex: 1,
-                    minHeight: 0,
-                    overflow: 'auto',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)',
-                    gap: 1,
-                    alignContent: 'start',
+                <VirtuosoGrid
+                  style={{ flex: 1 }}
+                  totalCount={gridDisplayServices.length}
+                  itemContent={(index) =>
+                    renderDetailedGridCard(gridDisplayServices[index])
+                  }
+                  components={{
+                    List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+                      <div
+                        ref={ref}
+                        {...props}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(5, 1fr)',
+                          gap: 8,
+                          alignContent: 'start',
+                          ...props.style,
+                        }}
+                      />
+                    )),
+                    Item: (props: React.HTMLAttributes<HTMLDivElement>) => (
+                      <div {...props} />
+                    ),
                   }}
-                >
-                  {gridDisplayServices.map((service) =>
-                    renderDetailedGridCard(service)
-                  )}
-                  {Array.from({ length: emptyCount }).map((_, idx) => (
-                    <Box
-                      key={`empty-flatTarget-${idx}`}
-                      sx={{
-                        border: '1px dashed',
-                        borderColor: 'divider',
-                        height: '100%',
-                        minHeight: 120,
-                        opacity: 0.3,
-                      }}
-                    />
-                  ))}
-                </Box>
+                />
               );
             }
 
@@ -4179,34 +4171,37 @@ const ServerListPage: React.FC = () => {
                 ? buildCardGroups(gridDisplayServices, groupingLevels)
                 : [];
 
-            // No grouping - render flat grid
+            // No grouping - render virtualized flat grid
             if (groupingLevels.length === 0) {
+              if (gridDisplayServices.length === 0) {
+                return <EmptyPagePlaceholder message={t('serverList.noData')} />;
+              }
               return (
-                <Box
-                  sx={{
-                    flex: 1,
-                    minHeight: 0,
-                    overflow: 'auto',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 1.5,
-                    alignContent: 'start',
-                    '@media (max-width: 1200px)': {
-                      gridTemplateColumns: 'repeat(2, 1fr)',
-                    },
-                    '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
+                <VirtuosoGrid
+                  style={{ flex: 1 }}
+                  totalCount={gridDisplayServices.length}
+                  itemContent={(index) =>
+                    renderServiceCard(gridDisplayServices[index])
+                  }
+                  components={{
+                    List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+                      <div
+                        ref={ref}
+                        {...props}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(3, 1fr)',
+                          gap: 12,
+                          alignContent: 'start',
+                          ...props.style,
+                        }}
+                      />
+                    )),
+                    Item: (props: React.HTMLAttributes<HTMLDivElement>) => (
+                      <div {...props} />
+                    ),
                   }}
-                >
-                  {gridDisplayServices.length === 0 ? (
-                    <Box sx={{ gridColumn: '1 / -1' }}>
-                      <EmptyPagePlaceholder message={t('serverList.noData')} />
-                    </Box>
-                  ) : (
-                    gridDisplayServices.map((service) =>
-                      renderServiceCard(service)
-                    )
-                  )}
-                </Box>
+                />
               );
             }
 
