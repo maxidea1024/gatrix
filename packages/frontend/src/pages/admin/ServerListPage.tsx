@@ -142,6 +142,7 @@ interface ColumnConfig {
 }
 
 import type { GroupingField, GroupingOption } from '../../components/server-list/types';
+import { TableVirtuoso } from 'react-virtuoso';
 
 
 interface SortableColumnItemProps {
@@ -919,7 +920,7 @@ const ServerListPage: React.FC = () => {
 
   const handleCleanupConfirm = async () => {
     try {
-      console.log('?肉딀닼?Starting cleanup...');
+      console.log('??됰???Starting cleanup...');
 
       // Call backend cleanup endpoint (handles all terminated/error/no-response servers)
       const result = await serviceDiscoveryService.cleanupServices();
@@ -2416,28 +2417,17 @@ const ServerListPage: React.FC = () => {
               return group.instances;
             };
 
-            const renderServiceRow = (
+
+            // Render service cells only (without TableRow wrapper) - used by TableVirtuoso
+            const renderServiceRowCells = (
               service: ServiceInstance,
               depth: number
             ) => {
               const serviceKey = `${service.labels.service}-${service.instanceId}`;
-              const updatedStatus = updatedServiceIds.get(serviceKey);
-              const isUpdated = updatedStatus !== undefined;
-              const highlightStatus = updatedStatus || service.status;
               const visibleColumns = columns.filter((col) => col.visible);
 
               return (
-                <TableRow
-                  key={serviceKey}
-                  hover
-                  onContextMenu={(e) => handleContextMenu(e, service)}
-                  sx={{
-                    bgcolor: isUpdated
-                      ? (t) => getHighlightColor(highlightStatus, t)
-                      : (t) => getStatusBgColor(service.status, t),
-                    transition: 'background-color 0.2s ease',
-                  }}
-                >
+                <>
                   {visibleColumns.map((column) => {
                     switch (column.id) {
                       case 'instanceId':
@@ -2985,6 +2975,32 @@ const ServerListPage: React.FC = () => {
                         return null;
                     }
                   })}
+                </>
+              );
+            };
+
+            const renderServiceRow = (
+              service: ServiceInstance,
+              depth: number
+            ) => {
+              const serviceKey = `${service.labels.service}-${service.instanceId}`;
+              const updatedStatus = updatedServiceIds.get(serviceKey);
+              const isUpdated = updatedStatus !== undefined;
+              const highlightStatus = updatedStatus || service.status;
+
+              return (
+                <TableRow
+                  key={serviceKey}
+                  hover
+                  onContextMenu={(e) => handleContextMenu(e, service)}
+                  sx={{
+                    bgcolor: isUpdated
+                      ? (t) => getHighlightColor(highlightStatus, t)
+                      : (t) => getStatusBgColor(service.status, t),
+                    transition: 'background-color 0.2s ease',
+                  }}
+                >
+                  {renderServiceRowCells(service, depth)}
                 </TableRow>
               );
             };
@@ -3103,36 +3119,79 @@ const ServerListPage: React.FC = () => {
                   overflow: 'hidden',
                 }}
               >
-                <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
-                  <Table stickyHeader size="small">
-                    {groupingLevels.length === 0 && (
-                      <TableHead>
-                        <TableRow>
-                          {visibleColumnsHeader.map((column) => (
-                            <TableCell
-                              key={column.id}
-                              sx={{
-                                fontWeight: 600,
-                                bgcolor: 'background.paper',
-                                borderBottom: '2px solid',
-                                borderColor: 'divider',
-                              }}
-                            >
-                              {t(column.labelKey)}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
+                {groupingLevels.length > 0 ? (
+                  /* Grouped view: standard table (group headers need special rendering) */
+                  <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
+                    <Table stickyHeader size="small">
+                      <TableBody>
+                        {listGroups.flatMap((group) => renderGroupRows(group))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  /* Ungrouped view: virtualized table for performance */
+                  <TableVirtuoso
+                    style={{ flex: 1 }}
+                    data={displayServices}
+                    fixedHeaderContent={() => (
+                      <TableRow>
+                        {visibleColumnsHeader.map((column) => (
+                          <TableCell
+                            key={column.id}
+                            sx={{
+                              fontWeight: 600,
+                              bgcolor: 'background.paper',
+                              borderBottom: '2px solid',
+                              borderColor: 'divider',
+                            }}
+                          >
+                            {t(column.labelKey)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
                     )}
-                    <TableBody>
-                      {groupingLevels.length > 0
-                        ? listGroups.flatMap((group) => renderGroupRows(group))
-                        : displayServices.map((service) =>
-                            renderServiceRow(service, 0)
-                          )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    itemContent={(_index, service) =>
+                      renderServiceRowCells(service, 0)
+                    }
+                    components={{
+                      Table: (props) => (
+                        <Table
+                          {...props}
+                          stickyHeader
+                          size="small"
+                          style={{ ...props.style, borderCollapse: 'separate' }}
+                        />
+                      ),
+                      TableHead: React.forwardRef((props, ref) => (
+                        <TableHead {...props} ref={ref} />
+                      )),
+                      TableRow: (props) => {
+                        const service = props.item as ServiceInstance | undefined;
+                        if (!service) return <TableRow {...props} />;
+                        const serviceKey = `${service.labels.service}-${service.instanceId}`;
+                        const updatedStatus = updatedServiceIds.get(serviceKey);
+                        const isUpdated = updatedStatus !== undefined;
+                        const highlightStatus = updatedStatus || service.status;
+                        return (
+                          <TableRow
+                            {...props}
+                            hover
+                            onContextMenu={(e) => handleContextMenu(e, service)}
+                            sx={{
+                              bgcolor: isUpdated
+                                ? (t) => getHighlightColor(highlightStatus, t)
+                                : (t) => getStatusBgColor(service.status, t),
+                              transition: 'background-color 0.2s ease',
+                            }}
+                          />
+                        );
+                      },
+                      TableBody: React.forwardRef((props, ref) => (
+                        <TableBody {...props} ref={ref} />
+                      )),
+                    }}
+                  />
+                )}
               </Card>
             );
           })()}
