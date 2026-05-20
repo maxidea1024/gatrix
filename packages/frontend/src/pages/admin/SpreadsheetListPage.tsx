@@ -501,22 +501,35 @@ const SpreadsheetListPage: React.FC = () => {
                               if (e.key === 'Escape') setRenameTarget(null);
                             }}
                             onBlur={handleRenameConfirm}
-                            sx={{ flex: 1 }}
+                            sx={{ minWidth: 250 }}
                             inputProps={{ style: { fontSize: '0.875rem', fontWeight: 500 } }}
                           />
                         ) : (
-                          <Typography
-                            variant="body2"
-                            noWrap
-                            sx={{
-                              fontWeight: 500,
-                              cursor: 'text',
-                              '&:hover': { textDecoration: 'underline', textDecorationColor: 'text.disabled' },
-                            }}
-                            onClick={() => { setRenameTarget(item); setRenameValue(item.title); }}
-                          >
-                            {item.title}
-                          </Typography>
+                          <>
+                            <Typography
+                              variant="body2"
+                              noWrap
+                              sx={{
+                                fontWeight: 500,
+                              }}
+                            >
+                              {item.title}
+                            </Typography>
+                            <Tooltip title={t('common.rename', 'Rename')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => { setRenameTarget(item); setRenameValue(item.title); }}
+                                sx={{
+                                  width: 22,
+                                  height: 22,
+                                  color: 'action.active',
+                                  '&:hover': { color: 'text.primary' }
+                                }}
+                              >
+                                <EditIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Tooltip>
+                          </>
                         )}
                       </Box>
                     </TableCell>
