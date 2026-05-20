@@ -52,7 +52,7 @@ ENV VITE_APP_VERSION=$APP_VERSION
 # Build the frontend
 ENV NODE_ENV=production
 # Increase Node.js heap size for build process to prevent out of memory errors
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 # Build shared package first (required for frontend)
 RUN yarn workspace @gatrix/shared build
 # Run tsc and vite build directly (cross-env not available in Docker)
