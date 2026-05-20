@@ -97,9 +97,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
         position: 'relative',
         borderTop: `3px solid ${accent}`,
         transition: 'none',
-        '&:hover': {
-          '& .ss-card-menu': { opacity: 1 },
-        },
+        // Hover rules if any
       }}
     >
       <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleMenuClose}>
@@ -235,11 +233,10 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                 handleMenuClick(e);
               }}
               sx={{
-                opacity: menuOpen ? 1 : 0,
-                transition: 'opacity 0.15s',
                 width: 28,
                 height: 28,
-                mr: -1, // Pull slightly to the right to align nicely with the card edge
+                mr: -1,
+                color: menuOpen ? 'text.primary' : 'action.active',
               }}
             >
               <MoreVertIcon sx={{ fontSize: 18 }} />
