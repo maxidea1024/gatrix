@@ -6,12 +6,27 @@ import {
   TextField,
   Tooltip,
   CircularProgress,
+  Fade,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
-  Save as SaveIcon,
+  FiberManualRecord as DotIcon,
   Check as CheckIcon,
   ErrorOutline as ErrorIcon,
+  MoreVert as MoreVertIcon,
+  FileDownload as ExportIcon,
+  FileUpload as ImportIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -19,30 +34,61 @@ import { useSnackbar } from 'notistack';
 import spreadsheetService from '@/services/spreadsheetService';
 import { useAutoSave, AutoSaveStatus } from '@/hooks/useAutoSave';
 import SpreadsheetEditorWrapper from '@/components/spreadsheet/SpreadsheetEditorWrapper';
+import ShareDialog from '@/components/spreadsheet/ShareDialog';
+import { exportToXlsx, importFromXlsx } from '@/utils/spreadsheetExcelUtils';
 
 // ==================== Save Status Indicator ====================
 
 const SaveStatusIndicator: React.FC<{ status: AutoSaveStatus }> = ({ status }) => {
   const { t } = useTranslation();
+  const [visible, setVisible] = useState(false);
 
-  const config: Record<AutoSaveStatus, { icon: React.ReactNode; text: string; color: string }> = {
-    idle: { icon: null, text: '', color: 'text.secondary' },
-    pending: { icon: <SaveIcon sx={{ fontSize: 16 }} />, text: t('spreadsheets.unsaved', 'Unsaved changes'), color: 'warning.main' },
-    saving: { icon: <CircularProgress size={14} />, text: t('spreadsheets.saving', 'Saving...'), color: 'info.main' },
-    saved: { icon: <CheckIcon sx={{ fontSize: 16 }} />, text: t('spreadsheets.saved', 'Saved'), color: 'success.main' },
-    error: { icon: <ErrorIcon sx={{ fontSize: 16 }} />, text: t('spreadsheets.saveError', 'Save failed'), color: 'error.main' },
+  useEffect(() => {
+    if (status === 'idle') {
+      setVisible(false);
+      return;
+    }
+    setVisible(true);
+    // Auto-hide "saved" after 2s
+    if (status === 'saved') {
+      const timer = setTimeout(() => setVisible(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
+  const tooltipMap: Record<AutoSaveStatus, string> = {
+    idle: '',
+    pending: t('spreadsheets.unsaved', 'Unsaved changes'),
+    saving: t('spreadsheets.saving', 'Saving...'),
+    saved: t('spreadsheets.saved', 'Saved'),
+    error: t('spreadsheets.saveError', 'Save failed'),
   };
 
-  const { icon, text, color } = config[status];
-  if (!text) return null;
+  const renderIcon = () => {
+    switch (status) {
+      case 'pending':
+        return <DotIcon sx={{ fontSize: 10, color: 'warning.main', animation: 'pulse 1.5s ease-in-out infinite', '@keyframes pulse': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.3 } } }} />;
+      case 'saving':
+        return <CircularProgress size={12} sx={{ color: 'text.secondary' }} />;
+      case 'saved':
+        return <CheckIcon sx={{ fontSize: 14, color: 'success.main' }} />;
+      case 'error':
+        return <ErrorIcon sx={{ fontSize: 14, color: 'error.main' }} />;
+      default:
+        return null;
+    }
+  };
+
+  if (status === 'idle' && !visible) return null;
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color, mr: 1 }}>
-      {icon}
-      <Typography variant="caption" sx={{ color: 'inherit', whiteSpace: 'nowrap' }}>
-        {text}
-      </Typography>
-    </Box>
+    <Fade in={visible} timeout={300}>
+      <Tooltip title={tooltipMap[status]} arrow placement="bottom">
+        <Box sx={{ display: 'flex', alignItems: 'center', mr: 1, cursor: 'default' }}>
+          {renderIcon()}
+        </Box>
+      </Tooltip>
+    </Fade>
   );
 };
 
@@ -62,6 +108,16 @@ const SpreadsheetEditorPage: React.FC = () => {
 
   // Ref to get current snapshot from Univer
   const getSnapshotRef = useRef<(() => string | null) | null>(null);
+  // Ref to access Univer API (for XLSX export/import)
+  const univerAPIRef = useRef<any>(null);
+  // File input ref for XLSX import
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Menu & import dialog state
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // Auto-save
   const { status: saveStatus, markDirty, saveNow } = useAutoSave({
@@ -132,6 +188,51 @@ const SpreadsheetEditorPage: React.FC = () => {
     }
   }, [id, titleDraft, enqueueSnackbar]);
 
+  // XLSX Export
+  const handleExport = useCallback(() => {
+    setMenuAnchor(null);
+    try {
+      if (!univerAPIRef.current) {
+        enqueueSnackbar('Spreadsheet not ready', { variant: 'warning' });
+        return;
+      }
+      exportToXlsx(univerAPIRef.current, title || 'spreadsheet');
+      enqueueSnackbar(t('spreadsheets.exportSuccess', 'Exported successfully'), { variant: 'success' });
+    } catch (err) {
+      console.error('[SpreadsheetEditor] Export failed:', err);
+      enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), { variant: 'error' });
+    }
+  }, [title, enqueueSnackbar, t]);
+
+  // XLSX Import — file selection
+  const handleImportFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+    setPendingImportFile(file);
+    setImportDialogOpen(true);
+  }, []);
+
+  // XLSX Import — confirmed
+  const handleImportConfirm = useCallback(async () => {
+    if (!pendingImportFile || !id) return;
+    setImportDialogOpen(false);
+    try {
+      const newData = await importFromXlsx(pendingImportFile);
+      // Save to backend
+      await spreadsheetService.update(id, { sheetData: newData });
+      // Reload page to re-initialize Univer with new data
+      enqueueSnackbar(t('spreadsheets.importSuccess', 'Imported successfully'), { variant: 'success' });
+      window.location.reload();
+    } catch (err) {
+      console.error('[SpreadsheetEditor] Import failed:', err);
+      enqueueSnackbar(t('spreadsheets.importError', 'Import failed'), { variant: 'error' });
+    } finally {
+      setPendingImportFile(null);
+    }
+  }, [pendingImportFile, id, enqueueSnackbar, t]);
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -198,16 +299,89 @@ const SpreadsheetEditorPage: React.FC = () => {
 
         <Box sx={{ flex: 1 }} />
         <SaveStatusIndicator status={saveStatus} />
+
+        {/* Share button */}
+        <Tooltip title={t('spreadsheets.share', '공유')}>
+          <IconButton size="small" onClick={() => setShareOpen(true)} sx={{ mr: 0.5 }}>
+            <ShareIcon />
+          </IconButton>
+        </Tooltip>
+
+        {/* More menu (Export/Import) */}
+        <Tooltip title={t('common.more', 'More')}>
+          <IconButton size="small" onClick={(e) => setMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+        </Tooltip>
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={() => setMenuAnchor(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <MenuItem onClick={handleExport}>
+            <ListItemIcon><ExportIcon fontSize="small" /></ListItemIcon>
+            <ListItemText>{t('spreadsheets.exportXlsx', 'Export as XLSX')}</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={() => { setMenuAnchor(null); fileInputRef.current?.click(); }}>
+            <ListItemIcon><ImportIcon fontSize="small" /></ListItemIcon>
+            <ListItemText>{t('spreadsheets.importXlsx', 'Import XLSX')}</ListItemText>
+          </MenuItem>
+        </Menu>
+        {/* Hidden file input for XLSX import */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          style={{ display: 'none' }}
+          onChange={handleImportFileSelect}
+        />
       </Box>
 
-      {/* Univer Editor */}
+      {/* Fortune-sheet Editor */}
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
         <SpreadsheetEditorWrapper
+          spreadsheetId={id}
           initialData={initialData}
           onContentChange={handleContentChange}
           getSnapshotRef={getSnapshotRef}
+          univerAPIRef={univerAPIRef}
         />
       </Box>
+
+      {/* Import confirmation dialog */}
+      <Dialog open={importDialogOpen} onClose={() => { setImportDialogOpen(false); setPendingImportFile(null); }}>
+        <DialogTitle>{t('spreadsheets.importConfirmTitle', 'Import XLSX')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('spreadsheets.importConfirmMessage', 'This will replace all current data with the imported file. This action cannot be undone. Continue?')}
+          </DialogContentText>
+          {pendingImportFile && (
+            <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
+              {pendingImportFile.name}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setImportDialogOpen(false); setPendingImportFile(null); }}>
+            {t('common.cancel', 'Cancel')}
+          </Button>
+          <Button onClick={handleImportConfirm} variant="contained" color="primary">
+            {t('spreadsheets.importConfirm', 'Import')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Share Dialog */}
+      {id && (
+        <ShareDialog
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          spreadsheetId={id}
+          spreadsheetTitle={title}
+        />
+      )}
     </Box>
   );
 };

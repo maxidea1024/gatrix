@@ -277,6 +277,9 @@ const SpreadsheetListPage = React.lazy(
 const SpreadsheetEditorPage = React.lazy(
   () => import('./pages/admin/SpreadsheetEditorPage')
 );
+const SharedSpreadsheetPage = React.lazy(
+  () => import('./pages/shared/SharedSpreadsheetPage')
+);
 
 // Lottie Loading Animation Component
 const LottieLoader: React.FC = () => {
@@ -464,52 +467,7 @@ const AppContent: React.FC = () => {
                 <AuthInitializer>
                   <LocalizedDatePickers>
                     <CssBaseline />
-                    {/* Global scrollbar styles */}
-                    <GlobalStyles
-                      styles={(theme) => ({
-                        // Thin scrollbar — only semantic elements, NOT div (Monaco uses div internally)
-                        'html, body, main, section, article, aside, nav, ul, ol, pre, table':
-                          {
-                            scrollbarWidth: 'thin',
-                            scrollbarColor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.2) transparent'
-                                : 'rgba(0, 0, 0, 0.2) transparent',
-                          },
-                        // WebKit/Blink (Chrome, Edge, Safari)
-                        'html::-webkit-scrollbar, body::-webkit-scrollbar, main::-webkit-scrollbar, section::-webkit-scrollbar, article::-webkit-scrollbar, aside::-webkit-scrollbar, nav::-webkit-scrollbar, ul::-webkit-scrollbar, ol::-webkit-scrollbar, pre::-webkit-scrollbar, table::-webkit-scrollbar':
-                          {
-                            width: '8px',
-                            height: '8px',
-                          },
-                        'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, main::-webkit-scrollbar-track, section::-webkit-scrollbar-track':
-                          {
-                            background: 'transparent',
-                          },
-                        'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, main::-webkit-scrollbar-thumb, section::-webkit-scrollbar-thumb':
-                          {
-                            backgroundColor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.2)'
-                                : 'rgba(0, 0, 0, 0.2)',
-                            borderRadius: 0,
-                          },
-                        'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, main::-webkit-scrollbar-thumb:hover, section::-webkit-scrollbar-thumb:hover':
-                          {
-                            backgroundColor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.3)'
-                                : 'rgba(0, 0, 0, 0.3)',
-                          },
-                        'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, main::-webkit-scrollbar-thumb:active, section::-webkit-scrollbar-thumb:active':
-                          {
-                            backgroundColor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.4)'
-                                : 'rgba(0, 0, 0, 0.4)',
-                          },
-                      })}
-                    />
+                    {/* Scrollbar styles are handled by scrollbar.css (imported after Univer CSS to override its global reset) */}
                     <SnackbarProvider
                       maxSnack={3}
                       dense
@@ -589,6 +547,12 @@ const AppContent: React.FC = () => {
                               <Route
                                 path="/service-notices-preview"
                                 element={<ServiceNoticesPreviewPage />}
+                              />
+
+                              {/* Shared Spreadsheet - Public Route */}
+                              <Route
+                                path="/shared/spreadsheet/:token"
+                                element={<SharedSpreadsheetPage />}
                               />
 
                               {/* Landing Page - only for first-time visitors */}

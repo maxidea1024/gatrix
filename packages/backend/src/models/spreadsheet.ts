@@ -1,9 +1,30 @@
 import db from '../config/knex';
 import { nanoid } from 'nanoid';
 import { createLogger } from '../config/logger';
+import zlib from 'zlib';
 
 const logger = createLogger('SpreadsheetModel');
 const TABLE = 'g_spreadsheets';
+
+// ==================== Compression Helpers ====================
+// Compress JSON string to base64 gzip for DB storage
+function compressSheetData(data: string): string {
+  if (!data || data === '{}') return data;
+  return zlib.gzipSync(Buffer.from(data, 'utf8')).toString('base64');
+}
+
+// Decompress base64 gzip back to JSON string
+function decompressSheetData(data: string): string {
+  if (!data) return data;
+  // If it starts with { or [, it's uncompressed legacy data
+  if (data.startsWith('{') || data.startsWith('[')) return data;
+  try {
+    return zlib.gunzipSync(Buffer.from(data, 'base64')).toString('utf8');
+  } catch (err) {
+    logger.warn('Failed to decompress sheetData, returning as-is', { err });
+    return data;
+  }
+}
 
 // ==================== Types ====================
 
@@ -15,6 +36,7 @@ export interface SpreadsheetAttributes {
   sheetData: string; // JSON string of Univer IWorkbookData
   thumbnail: string | null;
   isPinned: boolean;
+  version: number;
   createdBy: string;
   updatedBy: string | null;
   createdAt: string;
@@ -41,6 +63,7 @@ export interface UpdateSpreadsheetData {
   sheetData?: string;
   thumbnail?: string | null;
   isPinned?: boolean;
+  expectedVersion?: number; // For optimistic concurrency
   updatedBy: string;
 }
 
@@ -145,6 +168,10 @@ export default class SpreadsheetModel {
           'u.name as updatedByName',
         ])
         .first();
+      
+      if (row && row.sheetData) {
+        row.sheetData = decompressSheetData(row.sheetData);
+      }
       return row || null;
     } catch (error) {
       logger.error('Failed to find spreadsheet by id', { error, id });
@@ -163,7 +190,7 @@ export default class SpreadsheetModel {
         orgId: data.orgId,
         title: data.title || 'Untitled Spreadsheet',
         description: data.description || null,
-        sheetData: data.sheetData,
+        sheetData: compressSheetData(data.sheetData),
         isPinned: false,
         createdBy: data.createdBy,
         updatedBy: data.createdBy,
@@ -180,22 +207,43 @@ export default class SpreadsheetModel {
   }
 
   /**
-   * Full update (auto-save from editor — includes sheetData)
+   * Full update (auto-save from editor — includes sheetData).
+   * If expectedVersion is provided, uses optimistic concurrency control.
+   * Throws VersionConflictError if version doesn't match.
    */
   static async update(
     id: string,
     data: UpdateSpreadsheetData
   ): Promise<SpreadsheetAttributes | null> {
     try {
+      // Optimistic concurrency check
+      if (data.expectedVersion !== undefined) {
+        const current = await db(TABLE).where({ id }).select('version').first();
+        if (!current) return null;
+        if (current.version !== data.expectedVersion) {
+          const error: any = new Error(
+            `Version conflict: expected ${data.expectedVersion}, actual ${current.version}`
+          );
+          error.code = 'VERSION_CONFLICT';
+          error.currentVersion = current.version;
+          throw error;
+        }
+      }
+
       const updateFields: Record<string, any> = {
         updatedBy: data.updatedBy,
         updatedAt: db.fn.now(),
       };
       if (data.title !== undefined) updateFields.title = data.title;
       if (data.description !== undefined) updateFields.description = data.description;
-      if (data.sheetData !== undefined) updateFields.sheetData = data.sheetData;
+      if (data.sheetData !== undefined) updateFields.sheetData = compressSheetData(data.sheetData);
       if (data.thumbnail !== undefined) updateFields.thumbnail = data.thumbnail;
       if (data.isPinned !== undefined) updateFields.isPinned = data.isPinned ? 1 : 0;
+
+      // Increment version when sheetData changes
+      if (data.sheetData !== undefined) {
+        updateFields.version = db.raw('version + 1');
+      }
 
       await db(TABLE).where({ id }).update(updateFields);
       return this.findById(id);

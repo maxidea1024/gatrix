@@ -9,6 +9,7 @@ export interface SpreadsheetListItem {
   description: string | null;
   thumbnail: string | null;
   isPinned: boolean;
+  version: number;
   createdBy: string;
   updatedBy: string | null;
   createdAt: string;
@@ -55,6 +56,7 @@ class SpreadsheetService {
   async create(data?: {
     title?: string;
     description?: string;
+    sheetData?: string;
   }): Promise<SpreadsheetDetail> {
     const response = await api.post(this.basePath, data || {});
     return response.data;
@@ -68,6 +70,7 @@ class SpreadsheetService {
       sheetData?: string;
       thumbnail?: string;
       isPinned?: boolean;
+      expectedVersion?: number;
     }
   ): Promise<SpreadsheetDetail> {
     const response = await api.put(`${this.basePath}/${id}`, data);
@@ -94,6 +97,62 @@ class SpreadsheetService {
     const response = await api.post(`${this.basePath}/${id}/duplicate`);
     return response.data;
   }
+
+  // ==================== Sharing ====================
+
+  async listShares(id: string): Promise<SpreadsheetShare[]> {
+    const response = await api.get(`${this.basePath}/${id}/shares`);
+    return response.data;
+  }
+
+  async addShare(
+    id: string,
+    data: { shareType: ShareType; targetId?: string; permission: SharePermission }
+  ): Promise<SpreadsheetShare> {
+    const response = await api.post(`${this.basePath}/${id}/shares`, data);
+    return response.data;
+  }
+
+  async updateSharePermission(
+    id: string,
+    shareId: string,
+    permission: SharePermission
+  ): Promise<void> {
+    await api.patch(`${this.basePath}/${id}/shares/${shareId}`, { permission });
+  }
+
+  async removeShare(id: string, shareId: string): Promise<void> {
+    await api.delete(`${this.basePath}/${id}/shares/${shareId}`);
+  }
+
+  async getSharedWithMe(): Promise<SpreadsheetListItem[]> {
+    const response = await api.get(`${this.basePath}/shared`);
+    return response.data?.items || [];
+  }
+
+  async getByShareToken(token: string): Promise<SpreadsheetDetail & { permission: SharePermission }> {
+    const response = await api.get(`/public/spreadsheets/shared/${token}`);
+    return response.data;
+  }
+}
+
+// ==================== Share Types ====================
+
+export type ShareType = 'user' | 'org' | 'public';
+export type SharePermission = 'viewer' | 'editor';
+
+export interface SpreadsheetShare {
+  id: string;
+  spreadsheetId: string;
+  shareType: ShareType;
+  targetId: string | null;
+  permission: SharePermission;
+  shareToken: string | null;
+  createdBy: string;
+  createdAt: string;
+  targetName?: string | null;
+  targetEmail?: string | null;
+  targetAvatarUrl?: string | null;
 }
 
 export default new SpreadsheetService();

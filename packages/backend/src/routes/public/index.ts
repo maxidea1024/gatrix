@@ -5,6 +5,7 @@ import serviceNoticeRoutes from './service-notices';
 import monitoringRoutes from './monitoring';
 import signalRoutes from './signals';
 import surveyRendererRoutes from './survey-renderer';
+import { SpreadsheetController } from '../../controllers/spreadsheet-controller';
 
 const router = express.Router();
 
@@ -15,6 +16,9 @@ router.use('/service-notices', serviceNoticeRoutes);
 router.use('/monitoring', monitoringRoutes);
 router.use('/signals', signalRoutes);
 router.use('/surveys', surveyRendererRoutes);
+
+// Public spreadsheet share access (no auth required)
+router.get('/spreadsheets/shared/:token', SpreadsheetController.getByShareToken as any);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

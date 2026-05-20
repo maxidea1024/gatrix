@@ -66,19 +66,14 @@ const EmptyPagePlaceholder: React.FC<EmptyPagePlaceholderProps> = ({
       {/* Subtitle / CTA */}
       {onAddClick && showAddButton ? (
         <Button
-          variant="text"
+          variant="contained"
           onClick={onAddClick}
           startIcon={<AddIcon />}
           sx={{
             mt: 0.5,
             textTransform: 'none',
             fontSize: '0.875rem',
-            color: 'primary.main',
             fontWeight: 600,
-            '&:hover': {
-              backgroundColor: 'transparent',
-              textDecoration: 'underline',
-            },
           }}
         >
           {subtitle ||
