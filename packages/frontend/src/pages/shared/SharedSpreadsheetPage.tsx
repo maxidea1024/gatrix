@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Typography,
-  CircularProgress,
   Chip,
   Button,
   alpha,
 } from '@mui/material';
+import LottieLoader from '@/components/common/LottieLoader';
 import {
   GridOn as GridOnIcon,
   OpenInNew as OpenInNewIcon,
@@ -79,8 +79,8 @@ const SharedSpreadsheetPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', bgcolor: 'background.default' }}>
-        <CircularProgress />
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <LottieLoader size={80} message={t('spreadsheets.loading', 'Loading spreadsheet...')} />
       </Box>
     );
   }

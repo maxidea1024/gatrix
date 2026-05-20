@@ -10,8 +10,9 @@
  *   </ContentLoader>
  */
 import React from 'react';
-import { Box, CircularProgress, Fade } from '@mui/material';
+import { Box, Fade } from '@mui/material';
 import { DeferredComponent } from './DeferredComponent';
+import LottieLoader from './LottieLoader';
 
 interface ContentLoaderProps {
   loading: boolean;
@@ -35,7 +36,7 @@ const ContentLoader: React.FC<ContentLoaderProps> = ({
     return (
       <DeferredComponent shouldRender={loading} delay={spinnerDelay}>
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress size={spinnerSize} />
+          <LottieLoader size={Math.max(spinnerSize * 1.5, 40)} />
         </Box>
       </DeferredComponent>
     );

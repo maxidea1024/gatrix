@@ -35,6 +35,7 @@ import spreadsheetService from '@/services/spreadsheetService';
 import { useAutoSave, AutoSaveStatus } from '@/hooks/useAutoSave';
 import SpreadsheetEditorWrapper from '@/components/spreadsheet/SpreadsheetEditorWrapper';
 import ShareDialog from '@/components/spreadsheet/ShareDialog';
+import LottieLoader from '@/components/common/LottieLoader';
 import { exportToXlsx, importFromXlsx } from '@/utils/spreadsheetExcelUtils';
 
 // ==================== Save Status Indicator ====================
@@ -236,7 +237,7 @@ const SpreadsheetEditorPage: React.FC = () => {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <CircularProgress />
+        <LottieLoader size={80} message={t('spreadsheets.loading', 'Loading spreadsheet...')} />
       </Box>
     );
   }

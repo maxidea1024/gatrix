@@ -2900,6 +2900,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* Main content */}
         <Box
           component="main"
+          id="main-scroll-container"
           sx={{
             flexGrow: 1,
             p: 3,

@@ -7,6 +7,7 @@ import {
   keyframes,
 } from '@mui/material';
 import { DeferredComponent } from './DeferredComponent';
+import LottieLoader from './LottieLoader';
 
 const slideUpFadeIn = keyframes`
   from {
@@ -62,7 +63,7 @@ const PageContentLoader: React.FC<PageContentLoaderProps> = ({
             flexDirection: 'row',
           }}
         >
-          <CircularProgress size={28} />
+          <LottieLoader size={60} />
         </Box>
       </DeferredComponent>
     );
