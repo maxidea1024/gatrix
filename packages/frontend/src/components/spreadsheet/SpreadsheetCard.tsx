@@ -14,6 +14,7 @@ import {
   alpha,
   useTheme,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -140,17 +141,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           >
             <GridOnIcon sx={{ fontSize: 18 }} />
           </Avatar>
-          <Box
-            sx={{ minWidth: 0, flex: 1 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              // Don't re-enter rename mode if blur just completed rename
-              if (!isRenaming) {
-                setTimeout(() => onRename(item), 0);
-              }
-            }}
-          >
+          <Box sx={{ minWidth: 0, flex: 1 }}>
             {isRenaming ? (
               <TextField
                 size="small"
@@ -177,52 +168,75 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                 onMouseDown={(e) => e.stopPropagation()}
               />
             ) : (
-              <Typography
-                variant="subtitle2"
-                noWrap
-                sx={{
-                  fontWeight: 600,
-                  lineHeight: 1.3,
-                  cursor: 'text',
-                  '&:hover': { textDecoration: 'underline', textDecorationColor: 'text.disabled' },
-                }}
-              >
-                {item.title}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0 }}>
+                <Typography
+                  variant="subtitle2"
+                  noWrap
+                  sx={{
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {item.title}
+                </Typography>
+                <Tooltip title={t('common.rename', 'Rename')}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      if (!isRenaming) setTimeout(() => onRename(item), 0);
+                    }}
+                    sx={{
+                      width: 22,
+                      height: 22,
+                      color: 'action.active',
+                      flexShrink: 0,
+                      '&:hover': { color: 'text.primary' }
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: 14 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             )}
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {/* Share Button */}
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onShare(item);
-              }}
-              sx={{ width: 28, height: 28, color: 'action.active' }}
-            >
-              <ShareIcon sx={{ fontSize: 18 }} />
-            </IconButton>
+            <Tooltip title={t('spreadsheets.share', 'Share')}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShare(item);
+                }}
+                sx={{ width: 28, height: 28, color: 'action.active' }}
+              >
+                <ShareIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
 
             {/* Pin Toggle Button */}
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onTogglePin(item);
-              }}
-              sx={{ 
-                width: 28, 
-                height: 28, 
-                color: item.isPinned ? 'primary.main' : 'action.active' 
-              }}
-            >
-              {item.isPinned ? (
-                <PushPinIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
-              ) : (
-                <PushPinOutlinedIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
-              )}
-            </IconButton>
+            <Tooltip title={item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTogglePin(item);
+                }}
+                sx={{ 
+                  width: 28, 
+                  height: 28, 
+                  color: item.isPinned ? 'primary.main' : 'action.active' 
+                }}
+              >
+                {item.isPinned ? (
+                  <PushPinIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+                ) : (
+                  <PushPinOutlinedIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+                )}
+              </IconButton>
+            </Tooltip>
             
             {/* ⋮ Menu */}
             <IconButton
@@ -282,16 +296,11 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
 
         {/* Footer */}
         <CardContent sx={{ pt: 1, pb: '8px !important', px: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-            <RelativeTime date={item.updatedAt} variant="caption" />
-            {item.createdByName && (
-              <>
-                <Typography variant="caption" color="text.disabled">·</Typography>
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ flex: 1, minWidth: 0 }}>
-                  {item.createdByName}
-                </Typography>
-              </>
-            )}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+            <Typography variant="caption" color="text.secondary" noWrap sx={{ flex: 1, textAlign: 'left' }}>
+              {item.updatedByName || item.createdByName}
+            </Typography>
+            <RelativeTime date={item.updatedAt} variant="caption" sx={{ color: 'text.secondary', flexShrink: 0, textAlign: 'right' }} />
           </Box>
         </CardContent>
       </Box>

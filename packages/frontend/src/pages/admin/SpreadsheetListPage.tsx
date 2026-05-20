@@ -31,6 +31,7 @@ import {
   LinearProgress,
   Fade,
   alpha,
+  Tooltip,
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
@@ -475,13 +476,15 @@ const SpreadsheetListPage: React.FC = () => {
                     sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
                   >
                     <TableCell sx={{ pr: 0 }} onClick={(e) => { e.stopPropagation(); handleTogglePin(item); }}>
-                      <IconButton size="small" sx={{ p: 0.5, color: item.isPinned ? 'primary.main' : 'action.active' }}>
-                        {item.isPinned ? (
-                          <PushPinIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
-                        ) : (
-                          <PushPinOutlinedIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
-                        )}
-                      </IconButton>
+                      <Tooltip title={item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}>
+                        <IconButton size="small" sx={{ p: 0.5, color: item.isPinned ? 'primary.main' : 'action.active' }}>
+                          {item.isPinned ? (
+                            <PushPinIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
+                          ) : (
+                            <PushPinOutlinedIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
+                          )}
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
