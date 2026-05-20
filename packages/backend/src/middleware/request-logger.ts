@@ -33,6 +33,28 @@ const isRequestLoggingEnabled = (): boolean => {
   return true;
 };
 
+// 필드가 너무 클 경우 로그 출력용으로 축약하는 헬퍼 함수
+const sanitizeForLog = (obj: any): any => {
+  if (typeof obj === 'string') {
+    return obj.length > 200 ? obj.substring(0, 200) + '... (truncated)' : obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.length > 5 ? [...obj.slice(0, 5), `... (${obj.length - 5} more items)`] : obj.map(sanitizeForLog);
+  }
+  if (obj && typeof obj === 'object') {
+    const sanitized: any = {};
+    for (const key of Object.keys(obj)) {
+      if (key === 'sheetData' && typeof obj[key] === 'string') {
+         sanitized[key] = `[SheetData: ${obj[key].length} bytes]`;
+      } else {
+         sanitized[key] = sanitizeForLog(obj[key]);
+      }
+    }
+    return sanitized;
+  }
+  return obj;
+};
+
 export const requestLogger = (
   req: RequestWithStartTime,
   res: Response,
@@ -75,7 +97,7 @@ export const requestLogger = (
       req.body &&
       Object.keys(req.body).length > 0
     ) {
-      requestLogData.requestBody = req.body;
+      requestLogData.requestBody = sanitizeForLog(req.body);
     }
   }
 
@@ -114,7 +136,9 @@ export const requestLogger = (
 
         // Attempt JSON parsing if string
         if (responseText) {
-          responseLogData.responseBody = JSON.parse(responseText);
+          responseLogData.responseBody = sanitizeForLog(JSON.parse(responseText));
+        } else if (responseLogData.responseBody) {
+          responseLogData.responseBody = sanitizeForLog(responseLogData.responseBody);
         }
       } catch (error) {
         // Ignore JSON parse failure

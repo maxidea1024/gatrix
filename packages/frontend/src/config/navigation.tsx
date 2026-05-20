@@ -508,6 +508,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.CRASH_EVENTS_READ,
       },
       {
+        text: 'sidebar.spreadsheets',
+        icon: 'GridOn',
+        path: '/admin/spreadsheets',
+        requiredPermission: P.SPREADSHEETS_READ,
+      },
+      {
         text: 'sidebar.mediaAssets',
         icon: 'Image',
         path: '/admin/media-assets',

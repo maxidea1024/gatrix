@@ -65,6 +65,8 @@ import {
   TableChart as TableChartIcon,
   Assignment as AssignmentIcon,
   Description as DescriptionIcon,
+  GridOn as GridOnIcon,
+  Image as ImageIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 
@@ -130,6 +132,8 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   TableChart: <TableChartIcon />,
   Assignment: <AssignmentIcon />,
   Description: <DescriptionIcon />,
+  GridOn: <GridOnIcon />,
+  Image: <ImageIcon />,
   Ripple: <RippleIcon />,
 };
 
