@@ -63,6 +63,7 @@ import {
   ReferencingBanner,
 } from '../../services/mediaAssetService';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useListRestoration } from '../../hooks/useListRestoration';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
@@ -109,6 +110,20 @@ const MediaAssetsPage: React.FC = () => {
     'all' | 'referenced' | 'garbage'
   >('all');
   const debouncedSearch = useDebounce(searchTerm, 400);
+
+  // Restore list state
+  const listState = React.useMemo(() => ({ searchTerm, refStatusFilter, page, rowsPerPage }), [searchTerm, refStatusFilter, page, rowsPerPage]);
+  
+  useListRestoration(
+    listState,
+    (saved) => {
+      if (saved.searchTerm !== undefined) setSearchTerm(saved.searchTerm);
+      if (saved.refStatusFilter !== undefined) setRefStatusFilter(saved.refStatusFilter);
+      if (saved.page !== undefined) setPage(saved.page);
+      if (saved.rowsPerPage !== undefined) setRowsPerPage(saved.rowsPerPage);
+    },
+    [loading, assets]
+  );
 
   // Detail dialog
   const [detailAsset, setDetailAsset] = useState<MediaAsset | null>(null);
@@ -236,7 +251,11 @@ const MediaAssetsPage: React.FC = () => {
         { variant: 'success' }
       );
       setBulkDeleteOpen(false);
-      loadAssets();
+      
+      // 삭제된 항목이 있을 때만 목록 새로고침
+      if (result.deleted > 0) {
+        loadAssets();
+      }
     } catch (error: any) {
       console.error('Failed to bulk delete:', error);
       enqueueSnackbar(error?.message || t('mediaAssets.bulkDeleteError'), {
@@ -311,7 +330,7 @@ const MediaAssetsPage: React.FC = () => {
               <span>
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant="contained"
                   color="error"
                   startIcon={<DeleteSweepIcon />}
                   onClick={() => setBulkDeleteOpen(true)}

@@ -67,6 +67,7 @@ import ShareDialog from '@/components/spreadsheet/ShareDialog';
 import RelativeTime from '@/components/common/RelativeTime';
 import { useDebounce } from '@/hooks/useDebounce';
 import { exportSnapshotToXlsx, importFromXlsx } from '@/utils/spreadsheetExcelUtils';
+import { useListRestoration } from '@/hooks/useListRestoration';
 
 // ─── SpreadsheetRowMenu (list view context menu) ───
 
@@ -132,6 +133,18 @@ const SpreadsheetListPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
     return (localStorage.getItem('spreadsheet-view-mode') as any) || 'grid';
   });
+
+  // 복원할 상태를 하나로 묶음
+  const listState = React.useMemo(() => ({ search, viewMode }), [search, viewMode]);
+  
+  useListRestoration(
+    listState,
+    (saved) => {
+      if (saved.search !== undefined) setSearch(saved.search);
+      if (saved.viewMode !== undefined) setViewMode(saved.viewMode);
+    },
+    [loading, items] // 로딩이 끝나고 items가 렌더링 된 직후 스크롤 복원
+  );
 
   // Delete confirmation dialog
   const [deleteTarget, setDeleteTarget] = useState<SpreadsheetListItem | null>(null);
