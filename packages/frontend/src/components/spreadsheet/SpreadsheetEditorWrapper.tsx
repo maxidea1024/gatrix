@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { createUniver, defaultTheme, LocaleType, mergeLocales } from '@univerjs/presets';
+import {
+  createUniver,
+  defaultTheme,
+  LocaleType,
+  mergeLocales,
+} from '@univerjs/presets';
 import { UniverSheetsCorePreset } from '@univerjs/preset-sheets-core';
 import { UniverSheetsFilterPreset } from '@univerjs/preset-sheets-filter';
 
@@ -93,258 +98,378 @@ function getUniverLocale(lang: string): LocaleType {
 // ==================== Component ====================
 
 const SpreadsheetEditorWrapper: React.FC<SpreadsheetEditorWrapperProps> =
-  React.memo(({ spreadsheetId, initialData, onContentChange, getSnapshotRef, univerAPIRef, readOnly }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const univerRef = useRef<ReturnType<typeof createUniver> | null>(null);
-    const disposeRef = useRef<(() => void) | null>(null);
-    const onContentChangeRef = useRef(onContentChange);
-    onContentChangeRef.current = onContentChange;
+  React.memo(
+    ({
+      spreadsheetId,
+      initialData,
+      onContentChange,
+      getSnapshotRef,
+      univerAPIRef,
+      readOnly,
+    }) => {
+      const containerRef = useRef<HTMLDivElement>(null);
+      const univerRef = useRef<ReturnType<typeof createUniver> | null>(null);
+      const disposeRef = useRef<(() => void) | null>(null);
+      const onContentChangeRef = useRef(onContentChange);
+      onContentChangeRef.current = onContentChange;
 
-    const { isDark } = useTheme();
-    const { i18n } = useTranslation();
+      const { isDark } = useTheme();
+      const { i18n } = useTranslation();
 
-    // Get snapshot function — exposed to parent
-    const getSnapshot = useCallback((): string | null => {
-      if (!univerRef.current) return null;
-      try {
-        const workbook = univerRef.current.univerAPI.getActiveWorkbook();
-        if (!workbook) return null;
-        const snapshot = workbook.save();
-        return JSON.stringify(snapshot);
-      } catch (err) {
-        console.error('[SpreadsheetEditor] Failed to get snapshot:', err);
-        return null;
-      }
-    }, []);
+      // Get snapshot function — exposed to parent
+      const getSnapshot = useCallback((): string | null => {
+        if (!univerRef.current) return null;
+        try {
+          const workbook = univerRef.current.univerAPI.getActiveWorkbook();
+          if (!workbook) return null;
+          const snapshot = workbook.save();
+          return JSON.stringify(snapshot);
+        } catch (err) {
+          console.error('[SpreadsheetEditor] Failed to get snapshot:', err);
+          return null;
+        }
+      }, []);
 
-    // Expose getSnapshot to parent via ref
-    useEffect(() => {
-      if (getSnapshotRef) {
-        getSnapshotRef.current = getSnapshot;
-      }
-      return () => {
+      // Expose getSnapshot to parent via ref
+      useEffect(() => {
         if (getSnapshotRef) {
-          getSnapshotRef.current = null;
+          getSnapshotRef.current = getSnapshot;
         }
-      };
-    }, [getSnapshot, getSnapshotRef]);
-
-    // Expose univerAPI to parent via ref (for XLSX export/import)
-    useEffect(() => {
-      if (univerAPIRef) {
-        univerAPIRef.current = univerRef.current?.univerAPI || null;
-      }
-      return () => {
-        if (univerAPIRef) {
-          univerAPIRef.current = null;
-        }
-      };
-    }, [univerAPIRef]);
-
-    // Initialize Univer (wait for web fonts to load first)
-    useEffect(() => {
-      if (!containerRef.current) return;
-      let cancelled = false;
-      const container = containerRef.current;
-
-      // Wait for web fonts to finish loading so Univer sees them as available
-      document.fonts.ready.then(() => {
-        if (cancelled || !container) return;
-
-        const locale = getUniverLocale(i18n.language);
-
-        const { univerAPI } = createUniver({
-          locale,
-          darkMode: isDark,
-          theme: gatrixUniverTheme,
-          locales: {
-            [LocaleType.EN_US]: mergeLocales(
-              UniverPresetSheetsCoreEnUS,
-              UniverPresetSheetsFilterEnUS
-            ),
-            [LocaleType.KO_KR]: mergeLocales(
-              UniverPresetSheetsCoreKoKR,
-              UniverPresetSheetsFilterKoKR,
-              // Override untranslated statusbar keys
-              { statusbar: { sum: '합계', average: '평균', min: '최소', max: '최대', count: '숫자 개수', countA: '개수' } }
-            ),
-            [LocaleType.ZH_CN]: mergeLocales(
-              UniverPresetSheetsCoreZhCN,
-              UniverPresetSheetsFilterZhCN,
-              { statusbar: { sum: '求和', average: '平均值', min: '最小值', max: '最大值', count: '数值计数', countA: '计数' } }
-            ),
-          },
-          presets: [
-            UniverSheetsCorePreset({
-              container,
-              customFontFamily: {
-                override: true,
-                list: [
-                  // ── 기본 (시스템 내장) ──
-                  { value: 'Arial', label: 'Arial', category: 'sans-serif' },
-                  { value: 'Times New Roman', label: 'Times New Roman', category: 'serif' },
-                  { value: 'Tahoma', label: 'Tahoma', category: 'sans-serif' },
-                  { value: 'Verdana', label: 'Verdana', category: 'sans-serif' },
-                  { value: 'Georgia', label: 'Georgia', category: 'serif' },
-                  { value: 'Consolas', label: 'Consolas', category: 'monospace' },
-                  // ── 웹 폰트 (Google Fonts) ──
-                  { value: 'Inter', label: 'Inter', category: 'sans-serif' },
-                  { value: 'Roboto', label: 'Roboto', category: 'sans-serif' },
-                  { value: 'Open Sans', label: 'Open Sans', category: 'sans-serif' },
-                  { value: 'Lato', label: 'Lato', category: 'sans-serif' },
-                  { value: 'Montserrat', label: 'Montserrat', category: 'sans-serif' },
-                  { value: 'Poppins', label: 'Poppins', category: 'sans-serif' },
-                  { value: 'Fira Code', label: 'Fira Code', category: 'monospace' },
-                  // ── 한국어 (Google Fonts / CDN) ──
-                  { value: 'Noto Sans KR', label: 'Noto Sans KR (본고딕)', category: 'sans-serif' },
-                  { value: 'Noto Serif KR', label: 'Noto Serif KR (본명조)', category: 'serif' },
-                  { value: 'Pretendard', label: 'Pretendard', category: 'sans-serif' },
-                  { value: 'Nanum Gothic', label: '나눔고딕', category: 'sans-serif' },
-                  { value: 'Nanum Myeongjo', label: '나눔명조', category: 'serif' },
-                  { value: 'D2Coding', label: 'D2Coding', category: 'monospace' },
-                  // ── 중국어 (Google Fonts / 시스템) ──
-                  { value: 'Noto Sans SC', label: 'Noto Sans SC (思源黑体)', category: 'sans-serif' },
-                  { value: 'Noto Serif SC', label: 'Noto Serif SC (思源宋体)', category: 'serif' },
-                  { value: 'Microsoft YaHei', label: '微软雅黑', category: 'sans-serif' },
-                ],
-              },
-            }),
-            UniverSheetsFilterPreset(),
-          ],
-        });
-
-        univerRef.current = { univerAPI } as any;
-        // Expose to parent for XLSX export/import
-        if (univerAPIRef) {
-          univerAPIRef.current = univerAPI;
-        }
-
-        // Load initial data or create empty workbook
-        let workbookData: any = null;
-        if (initialData) {
-          try {
-            workbookData = JSON.parse(initialData);
-          } catch (err) {
-            console.error('[SpreadsheetEditor] Failed to parse initialData:', err);
+        return () => {
+          if (getSnapshotRef) {
+            getSnapshotRef.current = null;
           }
+        };
+      }, [getSnapshot, getSnapshotRef]);
+
+      // Expose univerAPI to parent via ref (for XLSX export/import)
+      useEffect(() => {
+        if (univerAPIRef) {
+          univerAPIRef.current = univerRef.current?.univerAPI || null;
         }
+        return () => {
+          if (univerAPIRef) {
+            univerAPIRef.current = null;
+          }
+        };
+      }, [univerAPIRef]);
 
-        univerAPI.createWorkbook(workbookData || {});
+      // Initialize Univer (wait for web fonts to load first)
+      useEffect(() => {
+        if (!containerRef.current) return;
+        let cancelled = false;
+        const container = containerRef.current;
 
-        // Restore last viewed sheet from localStorage
-        if (spreadsheetId) {
-          try {
-            const saved = localStorage.getItem(`ss-view-${spreadsheetId}`);
-            if (saved) {
-              const viewState = JSON.parse(saved);
-              if (viewState.sheetId) {
-                const wb = univerAPI.getActiveWorkbook();
-                const sheet = wb?.getSheetBySheetId(viewState.sheetId);
-                if (sheet) {
-                  sheet.activate();
+        // Wait for web fonts to finish loading so Univer sees them as available
+        document.fonts.ready.then(() => {
+          if (cancelled || !container) return;
+
+          const locale = getUniverLocale(i18n.language);
+
+          const { univerAPI } = createUniver({
+            locale,
+            darkMode: isDark,
+            theme: gatrixUniverTheme,
+            locales: {
+              [LocaleType.EN_US]: mergeLocales(
+                UniverPresetSheetsCoreEnUS,
+                UniverPresetSheetsFilterEnUS
+              ),
+              [LocaleType.KO_KR]: mergeLocales(
+                UniverPresetSheetsCoreKoKR,
+                UniverPresetSheetsFilterKoKR,
+                // Override untranslated statusbar keys
+                {
+                  statusbar: {
+                    sum: '합계',
+                    average: '평균',
+                    min: '최소',
+                    max: '최대',
+                    count: '숫자 개수',
+                    countA: '개수',
+                  },
+                }
+              ),
+              [LocaleType.ZH_CN]: mergeLocales(
+                UniverPresetSheetsCoreZhCN,
+                UniverPresetSheetsFilterZhCN,
+                {
+                  statusbar: {
+                    sum: '求和',
+                    average: '平均值',
+                    min: '最小值',
+                    max: '最大值',
+                    count: '数值计数',
+                    countA: '计数',
+                  },
+                }
+              ),
+            },
+            presets: [
+              UniverSheetsCorePreset({
+                container,
+                customFontFamily: {
+                  override: true,
+                  list: [
+                    // ── 기본 (시스템 내장) ──
+                    { value: 'Arial', label: 'Arial', category: 'sans-serif' },
+                    {
+                      value: 'Times New Roman',
+                      label: 'Times New Roman',
+                      category: 'serif',
+                    },
+                    {
+                      value: 'Tahoma',
+                      label: 'Tahoma',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Verdana',
+                      label: 'Verdana',
+                      category: 'sans-serif',
+                    },
+                    { value: 'Georgia', label: 'Georgia', category: 'serif' },
+                    {
+                      value: 'Consolas',
+                      label: 'Consolas',
+                      category: 'monospace',
+                    },
+                    // ── 웹 폰트 (Google Fonts) ──
+                    { value: 'Inter', label: 'Inter', category: 'sans-serif' },
+                    {
+                      value: 'Roboto',
+                      label: 'Roboto',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Open Sans',
+                      label: 'Open Sans',
+                      category: 'sans-serif',
+                    },
+                    { value: 'Lato', label: 'Lato', category: 'sans-serif' },
+                    {
+                      value: 'Montserrat',
+                      label: 'Montserrat',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Poppins',
+                      label: 'Poppins',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Fira Code',
+                      label: 'Fira Code',
+                      category: 'monospace',
+                    },
+                    // ── 한국어 (Google Fonts / CDN) ──
+                    {
+                      value: 'Noto Sans KR',
+                      label: 'Noto Sans KR (본고딕)',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Noto Serif KR',
+                      label: 'Noto Serif KR (본명조)',
+                      category: 'serif',
+                    },
+                    {
+                      value: 'Pretendard',
+                      label: 'Pretendard',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Nanum Gothic',
+                      label: '나눔고딕',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Nanum Myeongjo',
+                      label: '나눔명조',
+                      category: 'serif',
+                    },
+                    {
+                      value: 'D2Coding',
+                      label: 'D2Coding',
+                      category: 'monospace',
+                    },
+                    // ── 중국어 (Google Fonts / 시스템) ──
+                    {
+                      value: 'Noto Sans SC',
+                      label: 'Noto Sans SC (思源黑体)',
+                      category: 'sans-serif',
+                    },
+                    {
+                      value: 'Noto Serif SC',
+                      label: 'Noto Serif SC (思源宋体)',
+                      category: 'serif',
+                    },
+                    {
+                      value: 'Microsoft YaHei',
+                      label: '微软雅黑',
+                      category: 'sans-serif',
+                    },
+                  ],
+                },
+              }),
+              UniverSheetsFilterPreset(),
+            ],
+          });
+
+          univerRef.current = { univerAPI } as any;
+          // Expose to parent for XLSX export/import
+          if (univerAPIRef) {
+            univerAPIRef.current = univerAPI;
+          }
+
+          // Load initial data or create empty workbook
+          let workbookData: any = null;
+          if (initialData) {
+            try {
+              workbookData = JSON.parse(initialData);
+            } catch (err) {
+              console.error(
+                '[SpreadsheetEditor] Failed to parse initialData:',
+                err
+              );
+            }
+          }
+
+          univerAPI.createWorkbook(workbookData || {});
+
+          // Restore last viewed sheet from localStorage
+          if (spreadsheetId) {
+            try {
+              const saved = localStorage.getItem(`ss-view-${spreadsheetId}`);
+              if (saved) {
+                const viewState = JSON.parse(saved);
+                if (viewState.sheetId) {
+                  const wb = univerAPI.getActiveWorkbook();
+                  const sheet = wb?.getSheetBySheetId(viewState.sheetId);
+                  if (sheet) {
+                    sheet.activate();
+                  }
+                }
+              }
+            } catch {
+              /* ignore */
+            }
+          }
+
+          // Listen for data-modifying changes only (MUTATION type)
+          // Exclude scroll, selection, and other non-data operations
+          const NON_DATA_MUTATIONS = new Set([
+            // Scroll & viewport (confirmed via console: type=1 on scroll)
+            'sheet.operation.set-scroll',
+            'sheet.mutation.set-scroll-relative',
+            'sheet.operation.set-scroll-relative',
+            'sheet.command.set-scroll-relative',
+            'sheet.mutation.scroll',
+            // Selection (confirmed via console: type=1 on click/select)
+            'sheet.operation.set-selections',
+            'sheet.mutation.set-selections',
+            'doc.operation.set-selections',
+            'sheet.operation.set-activate-cell-edit',
+            // Worksheet activation
+            'sheet.operation.set-worksheet-active',
+            'sheet.mutation.set-worksheet-active-operation',
+            // Focus / UI / initial load
+            'sheet.operation.set-focus',
+            'doc.mutation.rich-text-editing',
+            'doc.command-replace-snapshot',
+          ]);
+
+          const subscription = univerAPI.onCommandExecuted((command: any) => {
+            if (command.type === 2) return; // Always skip OPERATION
+            if (NON_DATA_MUTATIONS.has(command.id)) return; // Skip known non-data mutations
+
+            if (command.type === 1) {
+              onContentChangeRef.current?.();
+            }
+          });
+
+          // Track sheet tab switches → save to localStorage
+          const viewSubscription = univerAPI.onCommandExecuted(
+            (command: any) => {
+              if (
+                command.id === 'sheet.operation.set-worksheet-active' &&
+                spreadsheetId
+              ) {
+                try {
+                  const wb = univerAPI.getActiveWorkbook();
+                  if (wb) {
+                    const activeSheet = wb.getActiveSheet();
+                    const viewState: any = {
+                      sheetId: activeSheet?.getSheetId(),
+                    };
+                    localStorage.setItem(
+                      `ss-view-${spreadsheetId}`,
+                      JSON.stringify(viewState)
+                    );
+                  }
+                } catch {
+                  /* ignore */
                 }
               }
             }
-          } catch { /* ignore */ }
-        }
+          );
 
-        // Listen for data-modifying changes only (MUTATION type)
-        // Exclude scroll, selection, and other non-data operations
-        const NON_DATA_MUTATIONS = new Set([
-          // Scroll & viewport (confirmed via console: type=1 on scroll)
-          'sheet.operation.set-scroll',
-          'sheet.mutation.set-scroll-relative',
-          'sheet.operation.set-scroll-relative',
-          'sheet.command.set-scroll-relative',
-          'sheet.mutation.scroll',
-          // Selection (confirmed via console: type=1 on click/select)
-          'sheet.operation.set-selections',
-          'sheet.mutation.set-selections',
-          'doc.operation.set-selections',
-          'sheet.operation.set-activate-cell-edit',
-          // Worksheet activation
-          'sheet.operation.set-worksheet-active',
-          'sheet.mutation.set-worksheet-active-operation',
-          // Focus / UI / initial load
-          'sheet.operation.set-focus',
-          'doc.mutation.rich-text-editing',
-          'doc.command-replace-snapshot',
-        ]);
-
-        const subscription = univerAPI.onCommandExecuted((command: any) => {
-          if (command.type === 2) return; // Always skip OPERATION
-          if (NON_DATA_MUTATIONS.has(command.id)) return; // Skip known non-data mutations
-
-          if (command.type === 1) {
-            onContentChangeRef.current?.();
-          }
+          disposeRef.current = () => {
+            // Save view state to localStorage before disposing
+            if (spreadsheetId) {
+              try {
+                const wb = univerAPI.getActiveWorkbook();
+                if (wb) {
+                  const activeSheet = wb.getActiveSheet();
+                  const viewState: any = { sheetId: activeSheet?.getSheetId() };
+                  localStorage.setItem(
+                    `ss-view-${spreadsheetId}`,
+                    JSON.stringify(viewState)
+                  );
+                }
+              } catch {
+                /* ignore */
+              }
+            }
+            subscription?.dispose();
+            viewSubscription?.dispose();
+            univerAPI.dispose();
+          };
         });
 
-        // Track sheet tab switches → save to localStorage
-        const viewSubscription = univerAPI.onCommandExecuted((command: any) => {
-          if (command.id === 'sheet.operation.set-worksheet-active' && spreadsheetId) {
-            try {
-              const wb = univerAPI.getActiveWorkbook();
-              if (wb) {
-                const activeSheet = wb.getActiveSheet();
-                const viewState: any = { sheetId: activeSheet?.getSheetId() };
-                localStorage.setItem(`ss-view-${spreadsheetId}`, JSON.stringify(viewState));
-              }
-            } catch { /* ignore */ }
-          }
-        });
-
-        disposeRef.current = () => {
-          // Save view state to localStorage before disposing
-          if (spreadsheetId) {
-            try {
-              const wb = univerAPI.getActiveWorkbook();
-              if (wb) {
-                const activeSheet = wb.getActiveSheet();
-                const viewState: any = { sheetId: activeSheet?.getSheetId() };
-                localStorage.setItem(`ss-view-${spreadsheetId}`, JSON.stringify(viewState));
-              }
-            } catch { /* ignore */ }
-          }
-          subscription?.dispose();
-          viewSubscription?.dispose();
-          univerAPI.dispose();
+        return () => {
+          cancelled = true;
+          disposeRef.current?.();
+          disposeRef.current = null;
+          univerRef.current = null;
         };
-      });
+        // Only run on mount — initialData changes are not hot-reloaded
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
 
-      return () => {
-        cancelled = true;
-        disposeRef.current?.();
-        disposeRef.current = null;
-        univerRef.current = null;
-      };
-      // Only run on mount — initialData changes are not hot-reloaded
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // Toggle dark mode reactively when theme changes
-    useEffect(() => {
-      if (univerRef.current) {
-        try {
-          univerRef.current.univerAPI.toggleDarkMode(isDark);
-        } catch {
-          // Ignore if API not ready
+      // Toggle dark mode reactively when theme changes
+      useEffect(() => {
+        if (univerRef.current) {
+          try {
+            univerRef.current.univerAPI.toggleDarkMode(isDark);
+          } catch {
+            // Ignore if API not ready
+          }
         }
-      }
-    }, [isDark]);
+      }, [isDark]);
 
-
-    return (
-      <div
-        ref={containerRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-        }}
-      />
-    );
-  });
+      return (
+        <div
+          ref={containerRef}
+          style={{
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+          }}
+        />
+      );
+    }
+  );
 
 SpreadsheetEditorWrapper.displayName = 'SpreadsheetEditorWrapper';
 

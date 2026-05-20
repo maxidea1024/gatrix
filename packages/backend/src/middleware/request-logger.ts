@@ -39,15 +39,17 @@ const sanitizeForLog = (obj: any): any => {
     return obj.length > 200 ? obj.substring(0, 200) + '... (truncated)' : obj;
   }
   if (Array.isArray(obj)) {
-    return obj.length > 5 ? [...obj.slice(0, 5), `... (${obj.length - 5} more items)`] : obj.map(sanitizeForLog);
+    return obj.length > 5
+      ? [...obj.slice(0, 5), `... (${obj.length - 5} more items)`]
+      : obj.map(sanitizeForLog);
   }
   if (obj && typeof obj === 'object') {
     const sanitized: any = {};
     for (const key of Object.keys(obj)) {
       if (key === 'sheetData' && typeof obj[key] === 'string') {
-         sanitized[key] = `[SheetData: ${obj[key].length} bytes]`;
+        sanitized[key] = `[SheetData: ${obj[key].length} bytes]`;
       } else {
-         sanitized[key] = sanitizeForLog(obj[key]);
+        sanitized[key] = sanitizeForLog(obj[key]);
       }
     }
     return sanitized;
@@ -136,9 +138,13 @@ export const requestLogger = (
 
         // Attempt JSON parsing if string
         if (responseText) {
-          responseLogData.responseBody = sanitizeForLog(JSON.parse(responseText));
+          responseLogData.responseBody = sanitizeForLog(
+            JSON.parse(responseText)
+          );
         } else if (responseLogData.responseBody) {
-          responseLogData.responseBody = sanitizeForLog(responseLogData.responseBody);
+          responseLogData.responseBody = sanitizeForLog(
+            responseLogData.responseBody
+          );
         }
       } catch (error) {
         // Ignore JSON parse failure

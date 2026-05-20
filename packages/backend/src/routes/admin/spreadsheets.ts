@@ -36,7 +36,10 @@ router.post('/:id/duplicate', SpreadsheetController.duplicate as any);
 // Sharing
 router.get('/:id/shares', SpreadsheetController.listShares as any);
 router.post('/:id/shares', SpreadsheetController.addShare as any);
-router.patch('/:id/shares/:shareId', SpreadsheetController.updateSharePermission as any);
+router.patch(
+  '/:id/shares/:shareId',
+  SpreadsheetController.updateSharePermission as any
+);
 router.delete('/:id/shares/:shareId', SpreadsheetController.removeShare as any);
 
 // Collaboration

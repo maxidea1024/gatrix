@@ -1,9 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import {
-  GridOn as GridOnIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
+import { GridOn as GridOnIcon, Add as AddIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 interface SpreadsheetEmptyStateProps {
@@ -38,7 +35,9 @@ const SpreadsheetEmptyState: React.FC<SpreadsheetEmptyStateProps> = ({
           mb: 1,
         }}
       >
-        <GridOnIcon sx={{ fontSize: 56, color: 'primary.main', opacity: 0.6 }} />
+        <GridOnIcon
+          sx={{ fontSize: 56, color: 'primary.main', opacity: 0.6 }}
+        />
       </Box>
 
       <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>

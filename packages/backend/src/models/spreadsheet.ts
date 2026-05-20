@@ -116,7 +116,11 @@ export default class SpreadsheetModel {
         };
         query = query.where(searchCond);
         countQuery = countQuery.where(function (this: any) {
-          this.where('title', 'like', term).orWhere('description', 'like', term);
+          this.where('title', 'like', term).orWhere(
+            'description',
+            'like',
+            term
+          );
         });
       }
 
@@ -162,13 +166,9 @@ export default class SpreadsheetModel {
         .leftJoin('g_users as c', 'c.id', 's.createdBy')
         .leftJoin('g_users as u', 'u.id', 's.updatedBy')
         .where('s.id', id)
-        .select([
-          's.*',
-          'c.name as createdByName',
-          'u.name as updatedByName',
-        ])
+        .select(['s.*', 'c.name as createdByName', 'u.name as updatedByName'])
         .first();
-      
+
       if (row && row.sheetData) {
         row.sheetData = decompressSheetData(row.sheetData);
       }
@@ -182,7 +182,9 @@ export default class SpreadsheetModel {
   /**
    * Create a new spreadsheet
    */
-  static async create(data: CreateSpreadsheetData): Promise<SpreadsheetAttributes> {
+  static async create(
+    data: CreateSpreadsheetData
+  ): Promise<SpreadsheetAttributes> {
     const id = nanoid();
     try {
       await db(TABLE).insert({
@@ -235,10 +237,13 @@ export default class SpreadsheetModel {
         updatedAt: db.fn.now(),
       };
       if (data.title !== undefined) updateFields.title = data.title;
-      if (data.description !== undefined) updateFields.description = data.description;
-      if (data.sheetData !== undefined) updateFields.sheetData = compressSheetData(data.sheetData);
+      if (data.description !== undefined)
+        updateFields.description = data.description;
+      if (data.sheetData !== undefined)
+        updateFields.sheetData = compressSheetData(data.sheetData);
       if (data.thumbnail !== undefined) updateFields.thumbnail = data.thumbnail;
-      if (data.isPinned !== undefined) updateFields.isPinned = data.isPinned ? 1 : 0;
+      if (data.isPinned !== undefined)
+        updateFields.isPinned = data.isPinned ? 1 : 0;
 
       // Increment version when sheetData changes
       if (data.sheetData !== undefined) {
@@ -266,8 +271,10 @@ export default class SpreadsheetModel {
         updatedAt: db.fn.now(),
       };
       if (data.title !== undefined) updateFields.title = data.title;
-      if (data.description !== undefined) updateFields.description = data.description;
-      if (data.isPinned !== undefined) updateFields.isPinned = data.isPinned ? 1 : 0;
+      if (data.description !== undefined)
+        updateFields.description = data.description;
+      if (data.isPinned !== undefined)
+        updateFields.isPinned = data.isPinned ? 1 : 0;
 
       await db(TABLE).where({ id }).update(updateFields);
       return this.findById(id);

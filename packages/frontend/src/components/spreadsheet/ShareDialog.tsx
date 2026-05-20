@@ -38,7 +38,12 @@ interface ShareDialogProps {
   spreadsheetTitle: string;
 }
 
-const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId, spreadsheetTitle }) => {
+const ShareDialog: React.FC<ShareDialogProps> = ({
+  open,
+  onClose,
+  spreadsheetId,
+  spreadsheetTitle,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -57,23 +62,43 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
   const loadShares = useCallback(async () => {
     if (!spreadsheetId) return;
     setLoading(true);
-    try { setShares(await spreadsheetService.listShares(spreadsheetId)); }
-    catch { setShares([]); }
-    finally { setLoading(false); }
+    try {
+      setShares(await spreadsheetService.listShares(spreadsheetId));
+    } catch {
+      setShares([]);
+    } finally {
+      setLoading(false);
+    }
   }, [spreadsheetId]);
 
   useEffect(() => {
-    if (open) { loadShares(); setEmail(''); setCopied(false); setShowUserSharing(false); }
+    if (open) {
+      loadShares();
+      setEmail('');
+      setCopied(false);
+      setShowUserSharing(false);
+    }
   }, [open, loadShares]);
 
   const handleCreatePublicLink = useCallback(async () => {
     setCreatingLink(true);
     try {
-      await spreadsheetService.addShare(spreadsheetId, { shareType: 'public', permission: 'viewer' });
+      await spreadsheetService.addShare(spreadsheetId, {
+        shareType: 'public',
+        permission: 'viewer',
+      });
       loadShares();
     } catch {
-      enqueueSnackbar(t('spreadsheets.publicLinkCreateFailed', '공개 링크 생성에 실패했습니다'), { variant: 'error' });
-    } finally { setCreatingLink(false); }
+      enqueueSnackbar(
+        t(
+          'spreadsheets.publicLinkCreateFailed',
+          '공개 링크 생성에 실패했습니다'
+        ),
+        { variant: 'error' }
+      );
+    } finally {
+      setCreatingLink(false);
+    }
   }, [spreadsheetId, loadShares, enqueueSnackbar, t]);
 
   const handleRemovePublicLink = useCallback(async () => {
@@ -82,13 +107,21 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
       await spreadsheetService.removeShare(spreadsheetId, publicShare.id);
       setShares((prev) => prev.filter((s) => s.id !== publicShare.id));
     } catch {
-      enqueueSnackbar(t('spreadsheets.publicLinkRemoveFailed', '공개 링크 해제에 실패했습니다'), { variant: 'error' });
+      enqueueSnackbar(
+        t(
+          'spreadsheets.publicLinkRemoveFailed',
+          '공개 링크 해제에 실패했습니다'
+        ),
+        { variant: 'error' }
+      );
     }
   }, [publicShare, spreadsheetId, enqueueSnackbar, t]);
 
   const handleCopyLink = useCallback(async () => {
     if (!publicShare?.shareToken) return;
-    await navigator.clipboard.writeText(`${window.location.origin}/shared/spreadsheet/${publicShare.shareToken}`);
+    await navigator.clipboard.writeText(
+      `${window.location.origin}/shared/spreadsheet/${publicShare.shareToken}`
+    );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [publicShare]);
@@ -97,39 +130,80 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
     if (!email.trim()) return;
     setAdding(true);
     try {
-      await spreadsheetService.addShare(spreadsheetId, { shareType: 'user', targetId: email.trim(), permission });
+      await spreadsheetService.addShare(spreadsheetId, {
+        shareType: 'user',
+        targetId: email.trim(),
+        permission,
+      });
       setEmail('');
       loadShares();
     } catch {
-      enqueueSnackbar(t('spreadsheets.shareAddFailed', '공유 추가에 실패했습니다'), { variant: 'error' });
-    } finally { setAdding(false); }
+      enqueueSnackbar(
+        t('spreadsheets.shareAddFailed', '공유 추가에 실패했습니다'),
+        { variant: 'error' }
+      );
+    } finally {
+      setAdding(false);
+    }
   }, [email, permission, spreadsheetId, loadShares, enqueueSnackbar, t]);
 
-  const handlePermissionChange = useCallback(async (shareId: string, p: SharePermission) => {
-    try {
-      await spreadsheetService.updateSharePermission(spreadsheetId, shareId, p);
-      setShares((prev) => prev.map((s) => (s.id === shareId ? { ...s, permission: p } : s)));
-    } catch {
-      enqueueSnackbar(t('spreadsheets.permissionUpdateFailed', '권한 변경에 실패했습니다'), { variant: 'error' });
-    }
-  }, [spreadsheetId, enqueueSnackbar, t]);
+  const handlePermissionChange = useCallback(
+    async (shareId: string, p: SharePermission) => {
+      try {
+        await spreadsheetService.updateSharePermission(
+          spreadsheetId,
+          shareId,
+          p
+        );
+        setShares((prev) =>
+          prev.map((s) => (s.id === shareId ? { ...s, permission: p } : s))
+        );
+      } catch {
+        enqueueSnackbar(
+          t('spreadsheets.permissionUpdateFailed', '권한 변경에 실패했습니다'),
+          { variant: 'error' }
+        );
+      }
+    },
+    [spreadsheetId, enqueueSnackbar, t]
+  );
 
-  const handleRemoveShare = useCallback(async (shareId: string) => {
-    try {
-      await spreadsheetService.removeShare(spreadsheetId, shareId);
-      setShares((prev) => prev.filter((s) => s.id !== shareId));
-    } catch {
-      enqueueSnackbar(t('spreadsheets.shareRemoveFailed', '공유 제거에 실패했습니다'), { variant: 'error' });
-    }
-  }, [spreadsheetId, enqueueSnackbar, t]);
+  const handleRemoveShare = useCallback(
+    async (shareId: string) => {
+      try {
+        await spreadsheetService.removeShare(spreadsheetId, shareId);
+        setShares((prev) => prev.filter((s) => s.id !== shareId));
+      } catch {
+        enqueueSnackbar(
+          t('spreadsheets.shareRemoveFailed', '공유 제거에 실패했습니다'),
+          { variant: 'error' }
+        );
+      }
+    },
+    [spreadsheetId, enqueueSnackbar, t]
+  );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{ sx: { borderRadius: 3 } }}
+    >
       <DialogTitle sx={{ pb: 1.5 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'start',
+          }}
+        >
           <Box>
             <Typography sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
-              {t('spreadsheets.shareTitle', '"{{title}}" 공유', { title: spreadsheetTitle })}
+              {t('spreadsheets.shareTitle', '"{{title}}" 공유', {
+                title: spreadsheetTitle,
+              })}
             </Typography>
           </Box>
           <IconButton onClick={onClose} size="small" sx={{ mt: -0.5 }}>
@@ -140,14 +214,26 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
 
       <DialogContent sx={{ pt: 2.5 }}>
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={24} /></Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress size={24} />
+          </Box>
         ) : (
           <>
             {/* ── 공개 링크 ── */}
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}
+              >
                 <PublicIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                <Typography variant="overline" sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'primary.main', lineHeight: 1 }}>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                    color: 'primary.main',
+                    lineHeight: 1,
+                  }}
+                >
                   {t('spreadsheets.publicLink', '공개 링크')}
                 </Typography>
               </Box>
@@ -161,17 +247,31 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                     onClick={handleCopyLink}
                     InputProps={{
                       readOnly: true,
-                      sx: { fontSize: '0.8rem', fontFamily: 'monospace', color: 'text.primary', cursor: 'pointer' },
+                      sx: {
+                        fontSize: '0.8rem',
+                        fontFamily: 'monospace',
+                        color: 'text.primary',
+                        cursor: 'pointer',
+                      },
                     }}
                   />
                   <Select
                     size="small"
                     value={publicShare.permission}
-                    onChange={(e) => handlePermissionChange(publicShare.id, e.target.value as SharePermission)}
+                    onChange={(e) =>
+                      handlePermissionChange(
+                        publicShare.id,
+                        e.target.value as SharePermission
+                      )
+                    }
                     sx={{ minWidth: 80, fontSize: '0.8rem' }}
                   >
-                    <MenuItem value="viewer">{t('spreadsheets.viewer', '뷰어')}</MenuItem>
-                    <MenuItem value="editor">{t('spreadsheets.editor', '편집자')}</MenuItem>
+                    <MenuItem value="viewer">
+                      {t('spreadsheets.viewer', '뷰어')}
+                    </MenuItem>
+                    <MenuItem value="editor">
+                      {t('spreadsheets.editor', '편집자')}
+                    </MenuItem>
                   </Select>
                   <Button
                     size="small"
@@ -179,13 +279,32 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                     color={copied ? 'success' : 'primary'}
                     onClick={handleCopyLink}
                     disableElevation
-                    startIcon={copied ? <CheckIcon sx={{ fontSize: 14 }} /> : <CopyIcon sx={{ fontSize: 14 }} />}
-                    sx={{ minWidth: 72, textTransform: 'none', fontWeight: 600, borderRadius: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                    startIcon={
+                      copied ? (
+                        <CheckIcon sx={{ fontSize: 14 }} />
+                      ) : (
+                        <CopyIcon sx={{ fontSize: 14 }} />
+                      )
+                    }
+                    sx={{
+                      minWidth: 72,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderRadius: 1.5,
+                      fontSize: '0.78rem',
+                      whiteSpace: 'nowrap',
+                    }}
                   >
-                    {copied ? t('spreadsheets.copied', '복사됨') : t('spreadsheets.copy', '복사')}
+                    {copied
+                      ? t('spreadsheets.copied', '복사됨')
+                      : t('spreadsheets.copy', '복사')}
                   </Button>
                   <Tooltip title={t('spreadsheets.removePublicLink', '해제')}>
-                    <IconButton size="small" onClick={handleRemovePublicLink} sx={{ '&:hover': { color: 'error.main' } }}>
+                    <IconButton
+                      size="small"
+                      onClick={handleRemovePublicLink}
+                      sx={{ '&:hover': { color: 'error.main' } }}
+                    >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -194,10 +313,20 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={creatingLink ? <CircularProgress size={14} /> : <PublicIcon sx={{ fontSize: 16 }} />}
+                  startIcon={
+                    creatingLink ? (
+                      <CircularProgress size={14} />
+                    ) : (
+                      <PublicIcon sx={{ fontSize: 16 }} />
+                    )
+                  }
                   onClick={handleCreatePublicLink}
                   disabled={creatingLink}
-                  sx={{ textTransform: 'none', fontWeight: 500, borderRadius: 1.5 }}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    borderRadius: 1.5,
+                  }}
                 >
                   {t('spreadsheets.createLink', '공개 링크 생성')}
                 </Button>
@@ -213,33 +342,62 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                 variant="text"
                 startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
                 onClick={() => setShowUserSharing(true)}
-                sx={{ textTransform: 'none', mt: 2, color: 'primary.main', fontWeight: 500 }}
+                sx={{
+                  textTransform: 'none',
+                  mt: 2,
+                  color: 'primary.main',
+                  fontWeight: 500,
+                }}
               >
-                {t('spreadsheets.addSpecificUser', '특정 사용자에게 별도 권한 부여')}
+                {t(
+                  'spreadsheets.addSpecificUser',
+                  '특정 사용자에게 별도 권한 부여'
+                )}
               </Button>
             ) : (
               <Box sx={{ mt: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    mb: 1,
+                  }}
+                >
                   <PersonAddIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                  <Typography variant="overline" sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'primary.main', lineHeight: 1 }}>
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      color: 'primary.main',
+                      lineHeight: 1,
+                    }}
+                  >
                     {t('spreadsheets.sharedWith', '사용자 공유')}
                   </Typography>
                 </Box>
-                <Typography sx={{ display: 'none' }}>
-                </Typography>
+                <Typography sx={{ display: 'none' }}></Typography>
 
                 <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
                   <TextField
-                    placeholder={t('spreadsheets.shareEmailPlaceholder', '이메일 주소 입력')}
+                    placeholder={t(
+                      'spreadsheets.shareEmailPlaceholder',
+                      '이메일 주소 입력'
+                    )}
                     size="small"
                     fullWidth
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddUser(); }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddUser();
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <PersonAddIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                          <PersonAddIcon
+                            sx={{ fontSize: 18, color: 'text.disabled' }}
+                          />
                         </InputAdornment>
                       ),
                     }}
@@ -247,11 +405,17 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                   <Select
                     size="small"
                     value={permission}
-                    onChange={(e) => setPermission(e.target.value as SharePermission)}
+                    onChange={(e) =>
+                      setPermission(e.target.value as SharePermission)
+                    }
                     sx={{ minWidth: 80, fontSize: '0.8rem' }}
                   >
-                    <MenuItem value="viewer">{t('spreadsheets.viewer', '뷰어')}</MenuItem>
-                    <MenuItem value="editor">{t('spreadsheets.editor', '편집자')}</MenuItem>
+                    <MenuItem value="viewer">
+                      {t('spreadsheets.viewer', '뷰어')}
+                    </MenuItem>
+                    <MenuItem value="editor">
+                      {t('spreadsheets.editor', '편집자')}
+                    </MenuItem>
                   </Select>
                   <Button
                     variant="contained"
@@ -259,32 +423,68 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                     onClick={handleAddUser}
                     disabled={adding || !email.trim()}
                     disableElevation
-                    sx={{ minWidth: 50, textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
+                    sx={{
+                      minWidth: 50,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderRadius: 1.5,
+                    }}
                   >
-                    {adding ? <CircularProgress size={16} /> : t('common.add', '추가')}
+                    {adding ? (
+                      <CircularProgress size={16} />
+                    ) : (
+                      t('common.add', '추가')
+                    )}
                   </Button>
                 </Box>
 
                 {/* 목록 */}
                 {userOrgShares.length === 0 && !publicShare ? (
-                  <Typography variant="body2" color="text.disabled" sx={{ py: 2, textAlign: 'center' }}>
-                    {t('spreadsheets.noShares', '아직 공유된 사용자가 없습니다')}
+                  <Typography
+                    variant="body2"
+                    color="text.disabled"
+                    sx={{ py: 2, textAlign: 'center' }}
+                  >
+                    {t(
+                      'spreadsheets.noShares',
+                      '아직 공유된 사용자가 없습니다'
+                    )}
                   </Typography>
                 ) : (
                   userOrgShares.map((share) => (
                     <Box
                       key={share.id}
-                      sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.75, '&:hover .delete-btn': { opacity: 1 } }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        py: 0.75,
+                        '&:hover .delete-btn': { opacity: 1 },
+                      }}
                     >
-                      <Avatar src={share.targetAvatarUrl || undefined} sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
-                        {(share.targetName || share.targetEmail || '?')[0].toUpperCase()}
+                      <Avatar
+                        src={share.targetAvatarUrl || undefined}
+                        sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
+                      >
+                        {(share.targetName ||
+                          share.targetEmail ||
+                          '?')[0].toUpperCase()}
                       </Avatar>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="body2" noWrap sx={{ fontWeight: 500, fontSize: '0.85rem' }}>
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{ fontWeight: 500, fontSize: '0.85rem' }}
+                        >
                           {share.targetName || share.targetId}
                         </Typography>
                         {share.targetEmail && (
-                          <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.72rem' }}>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            noWrap
+                            sx={{ fontSize: '0.72rem' }}
+                          >
                             {share.targetEmail}
                           </Typography>
                         )}
@@ -292,19 +492,32 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onClose, spreadsheetId,
                       <Select
                         size="small"
                         value={share.permission}
-                        onChange={(e) => handlePermissionChange(share.id, e.target.value as SharePermission)}
+                        onChange={(e) =>
+                          handlePermissionChange(
+                            share.id,
+                            e.target.value as SharePermission
+                          )
+                        }
                         variant="standard"
                         disableUnderline
                         sx={{ fontSize: '0.8rem', minWidth: 60 }}
                       >
-                        <MenuItem value="viewer">{t('spreadsheets.viewer', '뷰어')}</MenuItem>
-                        <MenuItem value="editor">{t('spreadsheets.editor', '편집자')}</MenuItem>
+                        <MenuItem value="viewer">
+                          {t('spreadsheets.viewer', '뷰어')}
+                        </MenuItem>
+                        <MenuItem value="editor">
+                          {t('spreadsheets.editor', '편집자')}
+                        </MenuItem>
                       </Select>
                       <IconButton
                         className="delete-btn"
                         size="small"
                         onClick={() => handleRemoveShare(share.id)}
-                        sx={{ opacity: 0, transition: 'opacity 0.15s', '&:hover': { color: 'error.main' } }}
+                        sx={{
+                          opacity: 0,
+                          transition: 'opacity 0.15s',
+                          '&:hover': { color: 'error.main' },
+                        }}
                       >
                         <DeleteIcon sx={{ fontSize: 16 }} />
                       </IconButton>

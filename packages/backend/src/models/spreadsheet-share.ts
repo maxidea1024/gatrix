@@ -99,10 +99,18 @@ export default class SpreadsheetShareModel {
   static async listShares(spreadsheetId: string): Promise<SpreadsheetShare[]> {
     const shares = await db(TABLE + ' as s')
       .leftJoin('g_users as u', function () {
-        this.on('s.targetId', '=', 'u.id').andOn('s.shareType', '=', db.raw("'user'"));
+        this.on('s.targetId', '=', 'u.id').andOn(
+          's.shareType',
+          '=',
+          db.raw("'user'")
+        );
       })
       .leftJoin('g_organisations as o', function () {
-        this.on('s.targetId', '=', 'o.id').andOn('s.shareType', '=', db.raw("'org'"));
+        this.on('s.targetId', '=', 'o.id').andOn(
+          's.shareType',
+          '=',
+          db.raw("'org'")
+        );
       })
       .where('s.spreadsheetId', spreadsheetId)
       .select(
@@ -119,7 +127,10 @@ export default class SpreadsheetShareModel {
   /**
    * Update permission for a share
    */
-  static async updatePermission(id: string, permission: SharePermission): Promise<boolean> {
+  static async updatePermission(
+    id: string,
+    permission: SharePermission
+  ): Promise<boolean> {
     const updated = await db(TABLE).where('id', id).update({ permission });
     return updated > 0;
   }
@@ -127,7 +138,9 @@ export default class SpreadsheetShareModel {
   /**
    * Find share by public token
    */
-  static async findByToken(shareToken: string): Promise<SpreadsheetShare | null> {
+  static async findByToken(
+    shareToken: string
+  ): Promise<SpreadsheetShare | null> {
     const share = await db(TABLE)
       .where('shareToken', shareToken)
       .andWhere('shareType', 'public')
@@ -149,9 +162,11 @@ export default class SpreadsheetShareModel {
       .andWhere(function () {
         this.where(function () {
           this.where('shareType', 'user').andWhere('targetId', userId);
-        }).orWhere(function () {
-          this.where('shareType', 'org').andWhere('targetId', orgId);
-        }).orWhere('shareType', 'public');
+        })
+          .orWhere(function () {
+            this.where('shareType', 'org').andWhere('targetId', orgId);
+          })
+          .orWhere('shareType', 'public');
       })
       .select('permission');
 

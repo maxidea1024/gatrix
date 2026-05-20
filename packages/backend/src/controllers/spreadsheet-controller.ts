@@ -154,8 +154,16 @@ export class SpreadsheetController {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.userId || (req as any).user?.id;
-      const userName = (req as any).user?.name || (req as any).user?.username || 'Unknown';
-      const { title, description, sheetData, thumbnail, isPinned, expectedVersion } = req.body;
+      const userName =
+        (req as any).user?.name || (req as any).user?.username || 'Unknown';
+      const {
+        title,
+        description,
+        sheetData,
+        thumbnail,
+        isPinned,
+        expectedVersion,
+      } = req.body;
 
       const existing = await SpreadsheetModel.findById(id);
       if (!existing) {
@@ -168,7 +176,8 @@ export class SpreadsheetController {
       const spreadsheet = await SpreadsheetModel.update(id, {
         title,
         description,
-        sheetData: typeof sheetData === 'string' ? sheetData : JSON.stringify(sheetData),
+        sheetData:
+          typeof sheetData === 'string' ? sheetData : JSON.stringify(sheetData),
         thumbnail,
         isPinned,
         expectedVersion,
@@ -306,13 +315,16 @@ export class SpreadsheetController {
   static async streamEvents(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
     const userId = (req as any).user?.userId || (req as any).user?.id;
-    const userName = (req as any).user?.name || (req as any).user?.username || 'Unknown';
+    const userName =
+      (req as any).user?.name || (req as any).user?.username || 'Unknown';
     const clientId = `ss-${nanoid(10)}`;
 
     // Verify spreadsheet exists
     const existing = await SpreadsheetModel.findById(id);
     if (!existing) {
-      res.status(404).json({ success: false, message: 'Spreadsheet not found' });
+      res
+        .status(404)
+        .json({ success: false, message: 'Spreadsheet not found' });
       return;
     }
 
@@ -353,7 +365,8 @@ export class SpreadsheetController {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.userId || (req as any).user?.id;
-      const userName = (req as any).user?.name || (req as any).user?.username || 'Unknown';
+      const userName =
+        (req as any).user?.name || (req as any).user?.username || 'Unknown';
 
       const collabService = SpreadsheetCollabService.getInstance();
       const result = collabService.acquireLock(id, userId, userName);
@@ -374,7 +387,9 @@ export class SpreadsheetController {
       }
     } catch (error) {
       logger.error('Failed to acquire lock', { error, id: req.params.id });
-      res.status(500).json({ success: false, message: 'Failed to acquire lock' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to acquire lock' });
     }
   }
 
@@ -393,7 +408,9 @@ export class SpreadsheetController {
       res.json({ success: true });
     } catch (error) {
       logger.error('Failed to release lock', { error, id: req.params.id });
-      res.status(500).json({ success: false, message: 'Failed to release lock' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to release lock' });
     }
   }
 
@@ -412,11 +429,15 @@ export class SpreadsheetController {
       if (success) {
         res.json({ success: true });
       } else {
-        res.status(404).json({ success: false, message: 'No active lock found' });
+        res
+          .status(404)
+          .json({ success: false, message: 'No active lock found' });
       }
     } catch (error) {
       logger.error('Failed to process heartbeat', { error, id: req.params.id });
-      res.status(500).json({ success: false, message: 'Failed to process heartbeat' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to process heartbeat' });
     }
   }
 
@@ -432,7 +453,9 @@ export class SpreadsheetController {
       res.json({ success: true, data: shares });
     } catch (error) {
       logger.error('Failed to list shares', { error, id: req.params.id });
-      res.status(500).json({ success: false, message: 'Failed to list shares' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to list shares' });
     }
   }
 
@@ -446,7 +469,9 @@ export class SpreadsheetController {
       const { shareType, targetId, permission } = req.body;
 
       if (!shareType || !permission) {
-        res.status(400).json({ success: false, message: 'Missing shareType or permission' });
+        res
+          .status(400)
+          .json({ success: false, message: 'Missing shareType or permission' });
         return;
       }
 
@@ -457,7 +482,9 @@ export class SpreadsheetController {
         if (targetId.includes('@')) {
           const user = await UserModel.findByEmail(targetId);
           if (!user) {
-            res.status(404).json({ success: false, message: `User not found: ${targetId}` });
+            res
+              .status(404)
+              .json({ success: false, message: `User not found: ${targetId}` });
             return;
           }
           resolvedTargetId = user.id;
@@ -482,7 +509,10 @@ export class SpreadsheetController {
   /**
    * PATCH /:id/shares/:shareId — Update share permission
    */
-  static async updateSharePermission(req: Request, res: Response): Promise<void> {
+  static async updateSharePermission(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const { shareId } = req.params;
       const { permission } = req.body;
@@ -492,7 +522,10 @@ export class SpreadsheetController {
         return;
       }
 
-      const updated = await SpreadsheetShareModel.updatePermission(shareId, permission);
+      const updated = await SpreadsheetShareModel.updatePermission(
+        shareId,
+        permission
+      );
       if (!updated) {
         res.status(404).json({ success: false, message: 'Share not found' });
         return;
@@ -500,7 +533,9 @@ export class SpreadsheetController {
       res.json({ success: true });
     } catch (error) {
       logger.error('Failed to update share permission', { error });
-      res.status(500).json({ success: false, message: 'Failed to update share' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to update share' });
     }
   }
 
@@ -518,7 +553,9 @@ export class SpreadsheetController {
       res.json({ success: true });
     } catch (error) {
       logger.error('Failed to remove share', { error });
-      res.status(500).json({ success: false, message: 'Failed to remove share' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove share' });
     }
   }
 
@@ -535,11 +572,19 @@ export class SpreadsheetController {
         return;
       }
 
-      const items = await SpreadsheetShareModel.findAccessibleByUser(userId, orgId);
+      const items = await SpreadsheetShareModel.findAccessibleByUser(
+        userId,
+        orgId
+      );
       res.json({ success: true, data: { items } });
     } catch (error) {
       logger.error('Failed to list shared spreadsheets', { error });
-      res.status(500).json({ success: false, message: 'Failed to list shared spreadsheets' });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: 'Failed to list shared spreadsheets',
+        });
     }
   }
 
@@ -552,13 +597,17 @@ export class SpreadsheetController {
       const share = await SpreadsheetShareModel.findByToken(token);
 
       if (!share) {
-        res.status(404).json({ success: false, message: 'Share not found or expired' });
+        res
+          .status(404)
+          .json({ success: false, message: 'Share not found or expired' });
         return;
       }
 
       const spreadsheet = await SpreadsheetModel.findById(share.spreadsheetId);
       if (!spreadsheet) {
-        res.status(404).json({ success: false, message: 'Spreadsheet not found' });
+        res
+          .status(404)
+          .json({ success: false, message: 'Spreadsheet not found' });
         return;
       }
 
@@ -571,7 +620,12 @@ export class SpreadsheetController {
       });
     } catch (error) {
       logger.error('Failed to get spreadsheet by share token', { error });
-      res.status(500).json({ success: false, message: 'Failed to access shared spreadsheet' });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: 'Failed to access shared spreadsheet',
+        });
     }
   }
 }

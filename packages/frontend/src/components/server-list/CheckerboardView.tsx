@@ -229,7 +229,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     const gap = 4; // Gap between cells
 
     // Render a single checkerboard cell (shared between grouped grid and ungrouped VirtuosoGrid)
-    const renderCheckerboardCell = (service: ServiceInstance, serviceKey: string) => {
+    const renderCheckerboardCell = (
+      service: ServiceInstance,
+      serviceKey: string
+    ) => {
       const updatedStatus = updatedServiceIds.get(serviceKey);
       const highlightStatus = updatedStatus || service.status;
       const isUpdated = updatedStatus !== undefined;
@@ -331,9 +334,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                     >
                       {t('serverList.table.hostname')}
                     </TableCell>
-                    <TableCell
-                      sx={{ fontWeight: 500, fontSize: '0.75rem' }}
-                    >
+                    <TableCell sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
                       {service.hostname}
                     </TableCell>
                   </TableRow>
@@ -599,9 +600,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                   }}
                 />
               ) : service.status === 'shutting_down' ? (
-                <PowerSettingsNewIcon
-                  sx={{ fontSize: 18, color: 'white' }}
-                />
+                <PowerSettingsNewIcon sx={{ fontSize: 18, color: 'white' }} />
               ) : service.status === 'terminated' ? (
                 <PowerSettingsNewIcon
                   sx={{ fontSize: 18, color: 'white', opacity: 0.7 }}
@@ -912,7 +911,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
             return renderCheckerboardCell(service, serviceKey);
           }}
           components={{
-            List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+            List: React.forwardRef<
+              HTMLDivElement,
+              React.HTMLAttributes<HTMLDivElement>
+            >((props, ref) => (
               <div
                 ref={ref}
                 {...props}
@@ -928,7 +930,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
               />
             )),
             Item: (props: React.HTMLAttributes<HTMLDivElement>) => (
-              <div {...props} style={{ width: cellSize, height: cellSize, ...props.style }} />
+              <div
+                {...props}
+                style={{ width: cellSize, height: cellSize, ...props.style }}
+              />
             ),
           }}
         />

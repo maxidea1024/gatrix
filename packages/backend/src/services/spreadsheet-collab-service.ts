@@ -61,7 +61,9 @@ export class SpreadsheetCollabService {
     // Already locked by same user — extend TTL
     if (existing && existing.userId === userId) {
       existing.expiresAt = new Date(Date.now() + LOCK_TTL_MS);
-      logger.info(`Lock extended for spreadsheet ${spreadsheetId} by ${userId}`);
+      logger.info(
+        `Lock extended for spreadsheet ${spreadsheetId} by ${userId}`
+      );
       return { success: true, lock: existing };
     }
 
@@ -191,9 +193,7 @@ export class SpreadsheetCollabService {
     if (!viewer) return;
 
     viewers.delete(clientId);
-    logger.info(
-      `Viewer ${viewer.userId} left spreadsheet ${spreadsheetId}`
-    );
+    logger.info(`Viewer ${viewer.userId} left spreadsheet ${spreadsheetId}`);
 
     // Release lock if this viewer held it
     const lock = this.locks.get(spreadsheetId);
@@ -265,9 +265,7 @@ export class SpreadsheetCollabService {
 
     this.broadcastToSheet(spreadsheetId, 'presence_update', {
       viewers,
-      lock: lock
-        ? { userId: lock.userId, userName: lock.userName }
-        : null,
+      lock: lock ? { userId: lock.userId, userName: lock.userName } : null,
     });
   }
 

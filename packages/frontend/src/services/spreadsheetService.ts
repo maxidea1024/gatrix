@@ -107,7 +107,11 @@ class SpreadsheetService {
 
   async addShare(
     id: string,
-    data: { shareType: ShareType; targetId?: string; permission: SharePermission }
+    data: {
+      shareType: ShareType;
+      targetId?: string;
+      permission: SharePermission;
+    }
   ): Promise<SpreadsheetShare> {
     const response = await api.post(`${this.basePath}/${id}/shares`, data);
     return response.data;
@@ -130,7 +134,9 @@ class SpreadsheetService {
     return response.data?.items || [];
   }
 
-  async getByShareToken(token: string): Promise<SpreadsheetDetail & { permission: SharePermission }> {
+  async getByShareToken(
+    token: string
+  ): Promise<SpreadsheetDetail & { permission: SharePermission }> {
     const response = await api.get(`/public/spreadsheets/shared/${token}`);
     return response.data;
   }

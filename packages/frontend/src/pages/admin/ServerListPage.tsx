@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-} from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ClusterView from '../../components/server-list/ClusterView';
 import CheckerboardView, {
   StatusStatsDisplay,
@@ -141,9 +136,11 @@ interface ColumnConfig {
   width?: string;
 }
 
-import type { GroupingField, GroupingOption } from '../../components/server-list/types';
+import type {
+  GroupingField,
+  GroupingOption,
+} from '../../components/server-list/types';
 import { TableVirtuoso, VirtuosoGrid } from 'react-virtuoso';
-
 
 interface SortableColumnItemProps {
   column: ColumnConfig;
@@ -1824,7 +1821,11 @@ const ServerListPage: React.FC = () => {
 
   const virtuosoTableComponents = useMemo(
     () => ({
-      Table: (props: React.HTMLAttributes<HTMLTableElement> & { style?: React.CSSProperties }) => (
+      Table: (
+        props: React.HTMLAttributes<HTMLTableElement> & {
+          style?: React.CSSProperties;
+        }
+      ) => (
         <Table
           {...props}
           stickyHeader
@@ -2464,7 +2465,6 @@ const ServerListPage: React.FC = () => {
                 return group.children.flatMap(collectListInstances);
               return group.instances;
             };
-
 
             // Render service cells only (without TableRow wrapper) - used by TableVirtuoso
             const renderServiceRowCells = (
@@ -3564,7 +3564,10 @@ const ServerListPage: React.FC = () => {
                     renderDetailedGridCard(gridDisplayServices[index])
                   }
                   components={{
-                    List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+                    List: React.forwardRef<
+                      HTMLDivElement,
+                      React.HTMLAttributes<HTMLDivElement>
+                    >((props, ref) => (
                       <div
                         ref={ref}
                         {...props}
@@ -4190,7 +4193,9 @@ const ServerListPage: React.FC = () => {
             // No grouping - render virtualized flat grid
             if (groupingLevels.length === 0) {
               if (gridDisplayServices.length === 0) {
-                return <EmptyPagePlaceholder message={t('serverList.noData')} />;
+                return (
+                  <EmptyPagePlaceholder message={t('serverList.noData')} />
+                );
               }
               return (
                 <VirtuosoGrid
@@ -4200,7 +4205,10 @@ const ServerListPage: React.FC = () => {
                     renderServiceCard(gridDisplayServices[index])
                   }
                   components={{
-                    List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+                    List: React.forwardRef<
+                      HTMLDivElement,
+                      React.HTMLAttributes<HTMLDivElement>
+                    >((props, ref) => (
                       <div
                         ref={ref}
                         {...props}

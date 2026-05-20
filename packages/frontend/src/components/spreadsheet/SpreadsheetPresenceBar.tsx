@@ -1,12 +1,22 @@
 import React from 'react';
-import { Box, Avatar, AvatarGroup, Chip, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Avatar,
+  AvatarGroup,
+  Chip,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import {
   Edit as EditIcon,
   Lock as LockIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import type { CollabViewer, CollabLockInfo } from '@/services/spreadsheetCollabService';
+import type {
+  CollabViewer,
+  CollabLockInfo,
+} from '@/services/spreadsheetCollabService';
 
 // ==================== Types ====================
 
@@ -33,9 +43,19 @@ function getInitials(name: string): string {
 /** Generate a consistent color from a userId. */
 function stringToColor(str: string): string {
   const colors = [
-    '#6366f1', '#8b5cf6', '#a855f7', '#ec4899', '#f43f5e',
-    '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6',
-    '#06b6d4', '#3b82f6', '#2563eb',
+    '#6366f1',
+    '#8b5cf6',
+    '#a855f7',
+    '#ec4899',
+    '#f43f5e',
+    '#ef4444',
+    '#f97316',
+    '#eab308',
+    '#22c55e',
+    '#14b8a6',
+    '#06b6d4',
+    '#3b82f6',
+    '#2563eb',
   ];
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

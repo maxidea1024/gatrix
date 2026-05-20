@@ -18,7 +18,10 @@ router.use('/signals', signalRoutes);
 router.use('/surveys', surveyRendererRoutes);
 
 // Public spreadsheet share access (no auth required)
-router.get('/spreadsheets/shared/:token', SpreadsheetController.getByShareToken as any);
+router.get(
+  '/spreadsheets/shared/:token',
+  SpreadsheetController.getByShareToken as any
+);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

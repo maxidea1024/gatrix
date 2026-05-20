@@ -14,10 +14,10 @@ import ExcelJS from 'exceljs';
 
 interface UniverCellData {
   v?: string | number | boolean;
-  t?: number;  // 1=string, 2=number, 3=boolean, 4=force-text
-  f?: string;  // formula
-  s?: string | Record<string, any>;  // style ID (string) or inline style object
-  p?: any;     // rich text (IDocumentData)
+  t?: number; // 1=string, 2=number, 3=boolean, 4=force-text
+  f?: string; // formula
+  s?: string | Record<string, any>; // style ID (string) or inline style object
+  p?: any; // rich text (IDocumentData)
 }
 
 interface UniverMergeRange {
@@ -58,7 +58,8 @@ interface UniverWorkbookData {
  * Values can be: number (0=off, 1=on), object ({s: 0|1}), or boolean.
  */
 function isTruthyStyleValue(val: any): boolean {
-  if (val === undefined || val === null || val === 0 || val === false) return false;
+  if (val === undefined || val === null || val === 0 || val === false)
+    return false;
   if (typeof val === 'number') return val > 0;
   if (typeof val === 'object' && 's' in val) return val.s > 0;
   if (typeof val === 'boolean') return val;
@@ -91,10 +92,21 @@ function univerBorderToExcel(border: any): Partial<ExcelJS.Border> | undefined {
   const style = border.s || border.style;
   const color = univerColorToHex(border.cl || border.color);
   const styleMap: Record<number | string, ExcelJS.BorderStyle> = {
-    1: 'thin', 2: 'medium', 3: 'thick', 4: 'dashed', 5: 'dotted',
-    6: 'double', 7: 'hair', 8: 'mediumDashed', 9: 'dashDot',
-    thin: 'thin', medium: 'medium', thick: 'thick', dashed: 'dashed',
-    dotted: 'dotted', double: 'double',
+    1: 'thin',
+    2: 'medium',
+    3: 'thick',
+    4: 'dashed',
+    5: 'dotted',
+    6: 'double',
+    7: 'hair',
+    8: 'mediumDashed',
+    9: 'dashDot',
+    thin: 'thin',
+    medium: 'medium',
+    thick: 'thick',
+    dashed: 'dashed',
+    dotted: 'dotted',
+    double: 'double',
   };
   return {
     style: styleMap[style] || 'thin',
@@ -102,7 +114,10 @@ function univerBorderToExcel(border: any): Partial<ExcelJS.Border> | undefined {
   };
 }
 
-function univerAlignToExcel(ht: number | undefined, vt: number | undefined): Partial<ExcelJS.Alignment> {
+function univerAlignToExcel(
+  ht: number | undefined,
+  vt: number | undefined
+): Partial<ExcelJS.Alignment> {
   const align: Partial<ExcelJS.Alignment> = {};
   // Horizontal: 0=left, 1=center, 2=right, 3=justify
   if (ht === 0) align.horizontal = 'left';
@@ -121,7 +136,10 @@ function univerAlignToExcel(ht: number | undefined, vt: number | undefined): Par
 /**
  * Export current Univer workbook to an XLSX file download.
  */
-export async function exportToXlsx(univerAPI: any, filename: string): Promise<void> {
+export async function exportToXlsx(
+  univerAPI: any,
+  filename: string
+): Promise<void> {
   const workbook = univerAPI.getActiveWorkbook();
   if (!workbook) {
     throw new Error('No active workbook');
@@ -135,13 +153,19 @@ export async function exportToXlsx(univerAPI: any, filename: string): Promise<vo
 /**
  * Export from raw Univer snapshot JSON (for use outside the editor, e.g. list page).
  */
-export async function exportSnapshotToXlsx(snapshotJson: string, filename: string): Promise<void> {
+export async function exportSnapshotToXlsx(
+  snapshotJson: string,
+  filename: string
+): Promise<void> {
   const snapshot: UniverWorkbookData = JSON.parse(snapshotJson);
   const wb = await univerSnapshotToExcelJS(snapshot);
   await downloadWorkbook(wb, filename);
 }
 
-async function downloadWorkbook(wb: ExcelJS.Workbook, filename: string): Promise<void> {
+async function downloadWorkbook(
+  wb: ExcelJS.Workbook,
+  filename: string
+): Promise<void> {
   const buffer = await wb.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -157,7 +181,9 @@ async function downloadWorkbook(wb: ExcelJS.Workbook, filename: string): Promise
   URL.revokeObjectURL(url);
 }
 
-async function univerSnapshotToExcelJS(data: UniverWorkbookData): Promise<ExcelJS.Workbook> {
+async function univerSnapshotToExcelJS(
+  data: UniverWorkbookData
+): Promise<ExcelJS.Workbook> {
   const wb = new ExcelJS.Workbook();
   const sheets = data.sheets || {};
   const sheetOrder = data.sheetOrder || Object.keys(sheets);
@@ -182,22 +208,26 @@ function convertUniverSheetToExcelJS(
 
   // Column widths
   if (sheet.columnData) {
-    const colIndices = Object.keys(sheet.columnData).map(Number).sort((a, b) => a - b);
+    const colIndices = Object.keys(sheet.columnData)
+      .map(Number)
+      .sort((a, b) => a - b);
     const maxCol = colIndices.length > 0 ? Math.max(...colIndices) : 0;
     for (let i = 0; i <= maxCol; i++) {
       const col = ws.getColumn(i + 1); // ExcelJS is 1-indexed
       const colInfo = sheet.columnData[String(i)];
       if (colInfo?.w) {
         // ExcelJS width is in characters (~7.5px per char)
-        col.width = Math.round(colInfo.w / 7.5 * 10) / 10;
+        col.width = Math.round((colInfo.w / 7.5) * 10) / 10;
       } else if (sheet.defaultColumnWidth) {
-        col.width = Math.round(sheet.defaultColumnWidth / 7.5 * 10) / 10;
+        col.width = Math.round((sheet.defaultColumnWidth / 7.5) * 10) / 10;
       }
     }
   }
 
   // Row heights + cell data
-  const rowIndices = Object.keys(cellData).map(Number).sort((a, b) => a - b);
+  const rowIndices = Object.keys(cellData)
+    .map(Number)
+    .sort((a, b) => a - b);
   for (const r of rowIndices) {
     const row = cellData[String(r)];
     if (!row) continue;
@@ -206,10 +236,13 @@ function convertUniverSheetToExcelJS(
 
     // Row height (Univer uses px, ExcelJS uses points; 1pt ≈ 1.333px)
     if (sheet.rowData?.[String(r)]?.h) {
-      excelRow.height = Math.round(sheet.rowData[String(r)].h! / 1.333 * 10) / 10;
+      excelRow.height =
+        Math.round((sheet.rowData[String(r)].h! / 1.333) * 10) / 10;
     }
 
-    const colIndices = Object.keys(row).map(Number).sort((a, b) => a - b);
+    const colIndices = Object.keys(row)
+      .map(Number)
+      .sort((a, b) => a - b);
     for (const c of colIndices) {
       const uCell = row[String(c)];
       if (!uCell) continue;
@@ -228,9 +261,14 @@ function convertUniverSheetToExcelJS(
         // 대괄호는 외부 참조(External Links: [1]Sheet1!A1)나 표 참조(Table1[Column1])에 사용되는데,
         // 현재 ExcelJS로 내보낼 때 해당 메타데이터를 유지하지 않으므로 엑셀에서 '제거된 레코드' 손상 오류를 발생시킴.
         const stringRemoved = formulaStr.replace(/"[^"]*"/g, '');
-        const hasExternalOrTableRef = stringRemoved.includes('[') && stringRemoved.includes(']');
+        const hasExternalOrTableRef =
+          stringRemoved.includes('[') && stringRemoved.includes(']');
 
-        if (hasExternalOrTableRef && uCell.v !== undefined && uCell.v !== null) {
+        if (
+          hasExternalOrTableRef &&
+          uCell.v !== undefined &&
+          uCell.v !== null
+        ) {
           // 파일 손상을 막기 위해 수식을 제거하고 계산된 결과값만 기록
           if (typeof uCell.v === 'number' || uCell.t === 2) {
             cell.value = Number(uCell.v);
@@ -241,7 +279,10 @@ function convertUniverSheetToExcelJS(
           }
         } else {
           // 정상적인 수식은 그대로 내보냄 (결과값도 함께 내보내면 엑셀에서 최초 로딩 시 계산 오류를 방지함)
-          cell.value = { formula: formulaStr, result: uCell.v } as ExcelJS.CellFormulaValue;
+          cell.value = {
+            formula: formulaStr,
+            result: uCell.v,
+          } as ExcelJS.CellFormulaValue;
         }
         hasContent = true;
       }
@@ -280,7 +321,12 @@ function convertUniverSheetToExcelJS(
   // Merged cells
   if (sheet.mergeData) {
     for (const m of sheet.mergeData) {
-      ws.mergeCells(m.startRow + 1, m.startColumn + 1, m.endRow + 1, m.endColumn + 1);
+      ws.mergeCells(
+        m.startRow + 1,
+        m.startColumn + 1,
+        m.endRow + 1,
+        m.endColumn + 1
+      );
     }
   }
 }
@@ -435,7 +481,8 @@ function excelJSToUniverSnapshot(wb: ExcelJS.Workbook): UniverWorkbookData {
             univerCell.t = 2;
           } else if (typeof val === 'object' && 'richText' in val) {
             // Rich text → plain string
-            univerCell.v = (val as any).richText?.map((rt: any) => rt.text).join('') || '';
+            univerCell.v =
+              (val as any).richText?.map((rt: any) => rt.text).join('') || '';
             univerCell.t = 1;
           } else if (typeof val === 'object') {
             // Fallback: extract result if available, otherwise skip
@@ -462,7 +509,8 @@ function excelJSToUniverSnapshot(wb: ExcelJS.Workbook): UniverWorkbookData {
         }
 
         // Skip truly empty cells (no value, no formula, no style)
-        if (univerCell.v === undefined && !univerCell.f && !univerCell.s) return;
+        if (univerCell.v === undefined && !univerCell.f && !univerCell.s)
+          return;
 
         cellData[String(r)][String(c)] = univerCell;
       });
@@ -539,12 +587,23 @@ function extractCellStyle(cell: ExcelJS.Cell): any {
 
   // Alignment
   if (cell.alignment) {
-    const hMap: Record<string, number> = { left: 0, center: 1, right: 2, justify: 3 };
+    const hMap: Record<string, number> = {
+      left: 0,
+      center: 1,
+      right: 2,
+      justify: 3,
+    };
     const vMap: Record<string, number> = { top: 0, middle: 1, bottom: 2 };
-    if (cell.alignment.horizontal && hMap[cell.alignment.horizontal] !== undefined) {
+    if (
+      cell.alignment.horizontal &&
+      hMap[cell.alignment.horizontal] !== undefined
+    ) {
       style.ht = hMap[cell.alignment.horizontal];
     }
-    if (cell.alignment.vertical && vMap[cell.alignment.vertical] !== undefined) {
+    if (
+      cell.alignment.vertical &&
+      vMap[cell.alignment.vertical] !== undefined
+    ) {
       style.vt = vMap[cell.alignment.vertical];
     }
     if (cell.alignment.wrapText) style.tb = 1;
@@ -555,8 +614,15 @@ function extractCellStyle(cell: ExcelJS.Cell): any {
 
 function excelBorderToUniver(border: Partial<ExcelJS.Border>): any {
   const styleMap: Record<string, number> = {
-    thin: 1, medium: 2, thick: 3, dashed: 4, dotted: 5,
-    double: 6, hair: 7, mediumDashed: 8, dashDot: 9,
+    thin: 1,
+    medium: 2,
+    thick: 3,
+    dashed: 4,
+    dotted: 5,
+    double: 6,
+    hair: 7,
+    mediumDashed: 8,
+    dashDot: 9,
   };
   const result: any = {
     s: styleMap[border.style || 'thin'] || 1,

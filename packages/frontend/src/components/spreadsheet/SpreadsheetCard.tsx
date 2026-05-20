@@ -47,9 +47,18 @@ interface SpreadsheetCardProps {
 }
 
 const ACCENT_COLORS = [
-  '#4285F4', '#34A853', '#EA4335', '#FBBC05',
-  '#8E24AA', '#00ACC1', '#F4511E', '#7CB342',
-  '#5C6BC0', '#26A69A', '#EC407A', '#FFA726',
+  '#4285F4',
+  '#34A853',
+  '#EA4335',
+  '#FBBC05',
+  '#8E24AA',
+  '#00ACC1',
+  '#F4511E',
+  '#7CB342',
+  '#5C6BC0',
+  '#26A69A',
+  '#EC407A',
+  '#FFA726',
 ];
 
 const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
@@ -105,42 +114,106 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
       }}
     >
       <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleMenuClose}>
-        <MenuItem onClick={() => { handleMenuClose(); setTimeout(() => onRename(item), 150); }}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            setTimeout(() => onRename(item), 150);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onTogglePin(item); }}>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onTogglePin(item);
+          }}
+        >
           <ListItemIcon>
-            {item.isPinned ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
+            {item.isPinned ? (
+              <PushPinIcon fontSize="small" />
+            ) : (
+              <PushPinOutlinedIcon fontSize="small" />
+            )}
           </ListItemIcon>
           <ListItemText>
-            {item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}
+            {item.isPinned
+              ? t('common.unpin', 'Unpin')
+              : t('common.pin', 'Pin')}
           </ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onDuplicate(item.id); }}>
-          <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onDuplicate(item.id);
+          }}
+        >
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.duplicate', 'Duplicate')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onShare(item); }}>
-          <ListItemIcon><ShareIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onShare(item);
+          }}
+        >
+          <ListItemIcon>
+            <ShareIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('spreadsheets.share', '공유')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onExportXlsx(item); }}>
-          <ListItemIcon><ExportIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('spreadsheets.exportXlsx', 'Export as XLSX')}</ListItemText>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onExportXlsx(item);
+          }}
+        >
+          <ListItemIcon>
+            <ExportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {t('spreadsheets.exportXlsx', 'Export as XLSX')}
+          </ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onDelete(item); }} sx={{ color: 'error.main' }}>
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onDelete(item);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete', 'Delete')}</ListItemText>
         </MenuItem>
       </Menu>
 
       <Box
         onClick={() => onOpen(item.id)}
-        sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch', cursor: 'pointer' }}
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          cursor: 'pointer',
+        }}
       >
         {/* Header: icon + title + pin & menu */}
-        <Box sx={{ px: 1.5, pt: 1.5, pb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box
+          sx={{
+            px: 1.5,
+            pt: 1.5,
+            pb: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <Avatar
             variant="rounded"
             sx={{
@@ -186,7 +259,9 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                   setTimeout(() => onRenameConfirm?.(), 0);
                 }}
                 fullWidth
-                inputProps={{ style: { fontSize: '0.875rem', fontWeight: 600 } }}
+                inputProps={{
+                  style: { fontSize: '0.875rem', fontWeight: 600 },
+                }}
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
               />
@@ -198,7 +273,10 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                   fontWeight: 600,
                   lineHeight: 1.3,
                   cursor: 'text',
-                  '&:hover': { textDecoration: 'underline', textDecorationColor: 'text.disabled' },
+                  '&:hover': {
+                    textDecoration: 'underline',
+                    textDecorationColor: 'text.disabled',
+                  },
                 }}
               >
                 {item.title}
@@ -208,10 +286,16 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
             {item.isPinned && (
               <PushPinIcon
-                sx={{ fontSize: 16, color: 'primary.main', transform: 'rotate(45deg)', flexShrink: 0, mr: 0.5 }}
+                sx={{
+                  fontSize: 16,
+                  color: 'primary.main',
+                  transform: 'rotate(45deg)',
+                  flexShrink: 0,
+                  mr: 0.5,
+                }}
               />
             )}
-            
+
             {/* ⋮ Menu */}
             <IconButton
               className="ss-card-menu"
@@ -244,7 +328,9 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
             borderColor: 'divider',
             position: 'relative',
             bgcolor: (th) =>
-              th.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              th.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : 'rgba(0,0,0,0.02)',
           }}
         >
           {item.thumbnail ? (
@@ -259,8 +345,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
               sx={{
                 position: 'absolute',
                 inset: 0,
-                backgroundImage:
-                  `linear-gradient(${alpha(accent, 0.1)} 1px, transparent 1px),
+                backgroundImage: `linear-gradient(${alpha(accent, 0.1)} 1px, transparent 1px),
                    linear-gradient(90deg, ${alpha(accent, 0.1)} 1px, transparent 1px)`,
                 backgroundSize: '16px 16px',
                 opacity: 0.8,
@@ -275,8 +360,15 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
             <RelativeTime date={item.updatedAt} variant="caption" />
             {item.createdByName && (
               <>
-                <Typography variant="caption" color="text.disabled">·</Typography>
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ flex: 1, minWidth: 0 }}>
+                <Typography variant="caption" color="text.disabled">
+                  ·
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  noWrap
+                  sx={{ flex: 1, minWidth: 0 }}
+                >
                   {item.createdByName}
                 </Typography>
               </>

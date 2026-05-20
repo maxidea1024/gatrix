@@ -14,15 +14,8 @@ import {
   SimulationLinkDatum,
   ForceLink,
 } from 'd3-force';
-import {
-  Box,
-  Card,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import {
-  Refresh as RefreshIcon,
-} from '@mui/icons-material';
+import { Box, Card, IconButton, Tooltip } from '@mui/material';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { ServiceInstance } from '../../services/serviceDiscoveryService';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import { HEARTBEAT_TTL_SECONDS } from './constants';
@@ -937,9 +930,11 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 const margin = 50;
                 const bothOutside =
                   (sx < viewBox.x - margin && tx < viewBox.x - margin) ||
-                  (sx > viewBox.x + viewBox.width + margin && tx > viewBox.x + viewBox.width + margin) ||
+                  (sx > viewBox.x + viewBox.width + margin &&
+                    tx > viewBox.x + viewBox.width + margin) ||
                   (sy < viewBox.y - margin && ty < viewBox.y - margin) ||
-                  (sy > viewBox.y + viewBox.height + margin && ty > viewBox.y + viewBox.height + margin);
+                  (sy > viewBox.y + viewBox.height + margin &&
+                    ty > viewBox.y + viewBox.height + margin);
                 if (bothOutside) return null;
 
                 // Check if this link's target node has heartbeat
@@ -992,7 +987,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
                 if (node.isCenter) {
                   // Center cluster node - draggable
-                  const centerCount = centerCounts.get(node.groupKey ?? '__all__') ?? services.length;
+                  const centerCount =
+                    centerCounts.get(node.groupKey ?? '__all__') ??
+                    services.length;
 
                   return (
                     <g
@@ -1294,4 +1291,3 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   );
 };
 export default ClusterView;
-
