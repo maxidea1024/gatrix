@@ -81,6 +81,13 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
     ],
   },
 
+  // Org - Spreadsheets
+  {
+    labelKey: 'permissions.category.spreadsheets',
+    scope: SCOPES.ORG,
+    resources: [RESOURCES.SPREADSHEETS],
+  },
+
   // Project - Feature Management
   {
     labelKey: 'permissions.category.featureManagement',

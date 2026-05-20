@@ -271,6 +271,12 @@ const ReleaseFlowTemplatesPage = React.lazy(
 const ImpactMetricsPage = React.lazy(
   () => import('./pages/features/ImpactMetricsPage')
 );
+const SpreadsheetListPage = React.lazy(
+  () => import('./pages/admin/SpreadsheetListPage')
+);
+const SpreadsheetEditorPage = React.lazy(
+  () => import('./pages/admin/SpreadsheetEditorPage')
+);
 
 // Lottie Loading Animation Component
 const LottieLoader: React.FC = () => {
@@ -864,6 +870,14 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="media-assets"
                                           element={<MediaAssetsPage />}
+                                        />
+                                        <Route
+                                          path="spreadsheets"
+                                          element={<SpreadsheetListPage />}
+                                        />
+                                        <Route
+                                          path="spreadsheets/:id"
+                                          element={<SpreadsheetEditorPage />}
                                         />
                                       </Routes>
                                     </EnvironmentAwareLayout>

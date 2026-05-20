@@ -2882,6 +2882,51 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@flatten-js/interval-tree@npm:1.1.3":
+  version: 1.1.3
+  resolution: "@flatten-js/interval-tree@npm:1.1.3"
+  checksum: 10c0/fb2525c4ec14dcd274df6cb41c1ed38c65ffb73abc211042e4572ae76ecead201546d40a6567fb96a80be90e2b39e658d3dbb9835125d8e15ef6774a4dc80a63
+  languageName: node
+  linkType: hard
+
+"@floating-ui/core@npm:^1.7.5":
+  version: 1.7.5
+  resolution: "@floating-ui/core@npm:1.7.5"
+  dependencies:
+    "@floating-ui/utils": "npm:^0.2.11"
+  checksum: 10c0/f9c52205e198b231d63a387b09c659aab08c46a1899e0b0bbe147b8b4f048b546f15ba17cb5d2a471da9534f1883d979425e13e5c4ceee67be63e4b0abd4db5d
+  languageName: node
+  linkType: hard
+
+"@floating-ui/dom@npm:^1.7.4, @floating-ui/dom@npm:^1.7.6":
+  version: 1.7.6
+  resolution: "@floating-ui/dom@npm:1.7.6"
+  dependencies:
+    "@floating-ui/core": "npm:^1.7.5"
+    "@floating-ui/utils": "npm:^0.2.11"
+  checksum: 10c0/5c098e0d7b58c9bc769f276cca1766994c2c9c70c92d091a61bba8b3e9be53c011e0a79a8457fc2fb2f3d91697a26eb52e0a4962ef936dc963b45f58613c212f
+  languageName: node
+  linkType: hard
+
+"@floating-ui/react-dom@npm:^2.0.0":
+  version: 2.1.8
+  resolution: "@floating-ui/react-dom@npm:2.1.8"
+  dependencies:
+    "@floating-ui/dom": "npm:^1.7.6"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 10c0/26260ca4bb23b57c73b824062505abf977a008ce6e0463bdacca74f7e49853c4cd1d2bbf1a77c6caa17fa37dfffda2c6c4cd07a8737ebd7474aaff7818401d75
+  languageName: node
+  linkType: hard
+
+"@floating-ui/utils@npm:^0.2.10, @floating-ui/utils@npm:^0.2.11":
+  version: 0.2.11
+  resolution: "@floating-ui/utils@npm:0.2.11"
+  checksum: 10c0/f4bcea1559bdbb721ecc8e8ead423ac58d6a5b6e70b602cf0810ba6ad4ed1c77211b207faa88b278a9042f0c743133de08a203ed6741c1b6443423332884d5b3
+  languageName: node
+  linkType: hard
+
 "@fortawesome/fontawesome-common-types@npm:6.7.2":
   version: 6.7.2
   resolution: "@fortawesome/fontawesome-common-types@npm:6.7.2"
@@ -3298,6 +3343,11 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.13.1"
     "@typescript-eslint/parser": "npm:^6.13.1"
     "@uiw/react-codemirror": "npm:^4.25.9"
+    "@univerjs/preset-sheets-advanced": "npm:^0.23.0"
+    "@univerjs/preset-sheets-core": "npm:^0.23.0"
+    "@univerjs/preset-sheets-drawing": "npm:^0.23.0"
+    "@univerjs/preset-sheets-filter": "npm:^0.23.0"
+    "@univerjs/presets": "npm:^0.23.0"
     "@vitejs/plugin-react": "npm:^4.0.0"
     "@vitest/ui": "npm:^1.0.4"
     "@xterm/addon-fit": "npm:^0.10.0"
@@ -3340,6 +3390,7 @@ __metadata:
     react-virtuoso: "npm:^4.18.7"
     remark-gfm: "npm:^4.0.1"
     rimraf: "npm:^5.0.5"
+    rxjs: "npm:^7.8.2"
     socket.io-client: "npm:^4.8.1"
     swagger-ui-react: "npm:^5.30.0"
     swr: "npm:^2.2.4"
@@ -3568,7 +3619,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:^1.8.20":
+"@grpc/grpc-js@npm:^1.14.3, @grpc/grpc-js@npm:^1.8.20":
   version: 1.14.3
   resolution: "@grpc/grpc-js@npm:1.14.3"
   dependencies:
@@ -5024,6 +5075,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/ciphers@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@noble/ciphers@npm:2.2.0"
+  checksum: 10c0/56396fa9b2cd7863999d9d70c6cbfcc03db9644cbbac9bb9d383d18f701bee3eb09f36878d8252a763c8d1fb6f0807339e06e2d28f18b14c525133c57c14508d
+  languageName: node
+  linkType: hard
+
+"@noble/ed25519@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@noble/ed25519@npm:3.1.0"
+  checksum: 10c0/6317722130649cf5884eff57d540b36ec1006cf68145b09ff427d88df359a3b12baaaf420aad87b747f49d30c5ae56065bf31e5ebde1a6d59c3ce9d0b6a68fdb
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@noble/hashes@npm:2.2.0"
+  checksum: 10c0/cad8630c504d6b9271984f685cd0af9101b40988fc2dfbe17ccdf068a9941f95cc5c9957d89e9ca4b7ca94c15cb35f93510c5d53a09fbcc83ee503b93d0a1034
+  languageName: node
+  linkType: hard
+
 "@noble/hashes@npm:^1.1.5":
   version: 1.8.0
   resolution: "@noble/hashes@npm:1.8.0"
@@ -5347,6 +5419,609 @@ __metadata:
   version: 1.1.0
   resolution: "@protobufjs/utf8@npm:1.1.0"
   checksum: 10c0/a3fe31fe3fa29aa3349e2e04ee13dc170cc6af7c23d92ad49e3eeaf79b9766264544d3da824dba93b7855bd6a2982fb40032ef40693da98a136d835752beb487
+  languageName: node
+  linkType: hard
+
+"@radix-ui/primitive@npm:1.1.3":
+  version: 1.1.3
+  resolution: "@radix-ui/primitive@npm:1.1.3"
+  checksum: 10c0/88860165ee7066fa2c179f32ffcd3ee6d527d9dcdc0e8be85e9cb0e2c84834be8e3c1a976c74ba44b193f709544e12f54455d892b28e32f0708d89deda6b9f1d
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-arrow@npm:1.1.7":
+  version: 1.1.7
+  resolution: "@radix-ui/react-arrow@npm:1.1.7"
+  dependencies:
+    "@radix-ui/react-primitive": "npm:2.1.3"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/c3b46766238b3ee2a394d8806a5141432361bf1425110c9f0dcf480bda4ebd304453a53f294b5399c6ee3ccfcae6fd544921fd01ddc379cf5942acdd7168664b
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-collection@npm:1.1.7":
+  version: 1.1.7
+  resolution: "@radix-ui/react-collection@npm:1.1.7"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-slot": "npm:1.2.3"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/fa321a7300095508491f75414f02b243f0c3f179dc0728cfd115e2ea9f6f48f1516532b59f526d9ac81bbab63cd98a052074b4703ec0b9428fac945ebabec5fd
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-compose-refs@npm:1.1.2":
+  version: 1.1.2
+  resolution: "@radix-ui/react-compose-refs@npm:1.1.2"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/d36a9c589eb75d634b9b139c80f916aadaf8a68a7c1c4b8c6c6b88755af1a92f2e343457042089f04cc3f23073619d08bb65419ced1402e9d4e299576d970771
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-context@npm:1.1.2":
+  version: 1.1.2
+  resolution: "@radix-ui/react-context@npm:1.1.2"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/cece731f8cc25d494c6589cc681e5c01a93867d895c75889973afa1a255f163c286e390baa7bc028858eaabe9f6b57270d0ca6377356f652c5557c1c7a41ccce
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-dialog@npm:^1.1.15":
+  version: 1.1.15
+  resolution: "@radix-ui/react-dialog@npm:1.1.15"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-dismissable-layer": "npm:1.1.11"
+    "@radix-ui/react-focus-guards": "npm:1.1.3"
+    "@radix-ui/react-focus-scope": "npm:1.1.7"
+    "@radix-ui/react-id": "npm:1.1.1"
+    "@radix-ui/react-portal": "npm:1.1.9"
+    "@radix-ui/react-presence": "npm:1.1.5"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-slot": "npm:1.2.3"
+    "@radix-ui/react-use-controllable-state": "npm:1.2.2"
+    aria-hidden: "npm:^1.2.4"
+    react-remove-scroll: "npm:^2.6.3"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/2f2c88e3c281acaea2fd9b96fa82132d59177d3aa5da2e7c045596fd4028e84e44ac52ac28f4f236910605dd7d9338c2858ba44a9ced2af2e3e523abbfd33014
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-direction@npm:1.1.1, @radix-ui/react-direction@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-direction@npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/7a89d9291f846a3105e45f4df98d6b7a08f8d7b30acdcd253005dc9db107ee83cbbebc9e47a9af1e400bcd47697f1511ceab23a399b0da854488fc7220482ac9
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-dismissable-layer@npm:1.1.11":
+  version: 1.1.11
+  resolution: "@radix-ui/react-dismissable-layer@npm:1.1.11"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-callback-ref": "npm:1.1.1"
+    "@radix-ui/react-use-escape-keydown": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/c825572a64073c4d3853702029979f6658770ffd6a98eabc4984e1dee1b226b4078a2a4dc7003f96475b438985e9b21a58e75f51db74dd06848dcae1f2d395dc
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-dropdown-menu@npm:^2.1.16":
+  version: 2.1.16
+  resolution: "@radix-ui/react-dropdown-menu@npm:2.1.16"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-id": "npm:1.1.1"
+    "@radix-ui/react-menu": "npm:2.1.16"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-controllable-state": "npm:1.2.2"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/8caaa8dd791ccb284568720adafa59855e13860aa29eb20e10a04ba671cbbfa519a4c5d3a339a4d9fb08009eeb1065f4a8b5c3c8ef45e9753161cc560106b935
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-focus-guards@npm:1.1.3":
+  version: 1.1.3
+  resolution: "@radix-ui/react-focus-guards@npm:1.1.3"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/0bab65eb8d7e4f72f685d63de7fbba2450e3cb15ad6a20a16b42195e9d335c576356f5a47cb58d1ffc115393e46d7b14b12c5d4b10029b0ec090861255866985
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-focus-scope@npm:1.1.7":
+  version: 1.1.7
+  resolution: "@radix-ui/react-focus-scope@npm:1.1.7"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-callback-ref": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/8a6071331bdeeb79b223463de75caf759b8ad19339cab838e537b8dbb2db236891a1f4df252445c854d375d43d9d315dfcce0a6b01553a2984ec372bb8f1300e
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-hover-card@npm:^1.1.15":
+  version: 1.1.15
+  resolution: "@radix-ui/react-hover-card@npm:1.1.15"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-dismissable-layer": "npm:1.1.11"
+    "@radix-ui/react-popper": "npm:1.2.8"
+    "@radix-ui/react-portal": "npm:1.1.9"
+    "@radix-ui/react-presence": "npm:1.1.5"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-controllable-state": "npm:1.2.2"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/c44ab88b0c62a3c1bf274b72e5cc3f5a6aea571a52bf2fcb2d471e1336738adabdbd10c26c8e72071cad444704ac28fcf2679d43132b69279564ad689839cf4e
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-id@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-id@npm:1.1.1"
+  dependencies:
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/7d12e76818763d592c331277ef62b197e2e64945307e650bd058f0090e5ae48bbd07691b23b7e9e977901ef4eadcb3e2d5eaeb17a13859083384be83fc1292c7
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-menu@npm:2.1.16":
+  version: 2.1.16
+  resolution: "@radix-ui/react-menu@npm:2.1.16"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-collection": "npm:1.1.7"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-direction": "npm:1.1.1"
+    "@radix-ui/react-dismissable-layer": "npm:1.1.11"
+    "@radix-ui/react-focus-guards": "npm:1.1.3"
+    "@radix-ui/react-focus-scope": "npm:1.1.7"
+    "@radix-ui/react-id": "npm:1.1.1"
+    "@radix-ui/react-popper": "npm:1.2.8"
+    "@radix-ui/react-portal": "npm:1.1.9"
+    "@radix-ui/react-presence": "npm:1.1.5"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-roving-focus": "npm:1.1.11"
+    "@radix-ui/react-slot": "npm:1.2.3"
+    "@radix-ui/react-use-callback-ref": "npm:1.1.1"
+    aria-hidden: "npm:^1.2.4"
+    react-remove-scroll: "npm:^2.6.3"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/27516b2b987fa9181c4da8645000af8f60691866a349d7a46b9505fa7d2e9d92b9e364db4f7305d08e9e57d0e1afc8df8354f8ee3c12aa05c0100c16b0e76c27
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-popover@npm:^1.1.15":
+  version: 1.1.15
+  resolution: "@radix-ui/react-popover@npm:1.1.15"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-dismissable-layer": "npm:1.1.11"
+    "@radix-ui/react-focus-guards": "npm:1.1.3"
+    "@radix-ui/react-focus-scope": "npm:1.1.7"
+    "@radix-ui/react-id": "npm:1.1.1"
+    "@radix-ui/react-popper": "npm:1.2.8"
+    "@radix-ui/react-portal": "npm:1.1.9"
+    "@radix-ui/react-presence": "npm:1.1.5"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-slot": "npm:1.2.3"
+    "@radix-ui/react-use-controllable-state": "npm:1.2.2"
+    aria-hidden: "npm:^1.2.4"
+    react-remove-scroll: "npm:^2.6.3"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/c1c76b5e5985b128d03b621424fb453f769931d497759a1977734d303007da9f970570cf3ea1f6968ab609ab4a97f384168bff056197bd2d3d422abea0e3614b
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-popper@npm:1.2.8":
+  version: 1.2.8
+  resolution: "@radix-ui/react-popper@npm:1.2.8"
+  dependencies:
+    "@floating-ui/react-dom": "npm:^2.0.0"
+    "@radix-ui/react-arrow": "npm:1.1.7"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-callback-ref": "npm:1.1.1"
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+    "@radix-ui/react-use-rect": "npm:1.1.1"
+    "@radix-ui/react-use-size": "npm:1.1.1"
+    "@radix-ui/rect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/48e3f13eac3b8c13aca8ded37d74db17e1bb294da8d69f142ab6b8719a06c3f90051668bed64520bf9f3abdd77b382ce7ce209d056bb56137cecc949b69b421c
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-portal@npm:1.1.9":
+  version: 1.1.9
+  resolution: "@radix-ui/react-portal@npm:1.1.9"
+  dependencies:
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/45b432497c722720c72c493a29ef6085bc84b50eafe79d48b45c553121b63e94f9cdb77a3a74b9c49126f8feb3feee009fe400d48b7759d3552396356b192cd7
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-presence@npm:1.1.5":
+  version: 1.1.5
+  resolution: "@radix-ui/react-presence@npm:1.1.5"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/d0e61d314250eeaef5369983cb790701d667f51734bafd98cf759072755562018052c594e6cdc5389789f4543cb0a4d98f03ff4e8f37338d6b5bf51a1700c1d1
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-primitive@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@radix-ui/react-primitive@npm:2.1.3"
+  dependencies:
+    "@radix-ui/react-slot": "npm:1.2.3"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/fdff9b84913bb4172ef6d3af7442fca5f9bba5f2709cba08950071f819d7057aec3a4a2d9ef44cf9cbfb8014d02573c6884a04cff175895823aaef809ebdb034
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-primitive@npm:2.1.4":
+  version: 2.1.4
+  resolution: "@radix-ui/react-primitive@npm:2.1.4"
+  dependencies:
+    "@radix-ui/react-slot": "npm:1.2.4"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/90d687b222a25975371ed1f9f08648d75237214b8dec4cbaf09ec9ac951339b17421278f1aff2fb7c5672ba8bd03774a94904efdba73805dd5cc947ce5be8c4a
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-roving-focus@npm:1.1.11":
+  version: 1.1.11
+  resolution: "@radix-ui/react-roving-focus@npm:1.1.11"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-collection": "npm:1.1.7"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-direction": "npm:1.1.1"
+    "@radix-ui/react-id": "npm:1.1.1"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-callback-ref": "npm:1.1.1"
+    "@radix-ui/react-use-controllable-state": "npm:1.2.2"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/2cd43339c36e89a3bf1db8aab34b939113dfbde56bf3a33df2d74757c78c9489b847b1962f1e2441c67e41817d120cb6177943e0f655f47bc1ff8e44fd55b1a2
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-separator@npm:^1.1.8":
+  version: 1.1.8
+  resolution: "@radix-ui/react-separator@npm:1.1.8"
+  dependencies:
+    "@radix-ui/react-primitive": "npm:2.1.4"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/92e1353f696a22167c90f2c610b440be1fae3c05128287560914f124eef83d74c06ad25431923f3595032e6d89c23d479c95434390f4c0d9d4a68ec8d563ae0c
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-slot@npm:1.2.3":
+  version: 1.2.3
+  resolution: "@radix-ui/react-slot@npm:1.2.3"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/5913aa0d760f505905779515e4b1f0f71a422350f077cc8d26d1aafe53c97f177fec0e6d7fbbb50d8b5e498aa9df9f707ca75ae3801540c283b26b0136138eef
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-slot@npm:1.2.4, @radix-ui/react-slot@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "@radix-ui/react-slot@npm:1.2.4"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/8b719bb934f1ae5ac0e37214783085c17c2f1080217caf514c1c6cc3d9ca56c7e19d25470b26da79aa6e605ab36589edaade149b76f5fc0666f1063e2fc0a0dc
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-callback-ref@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-use-callback-ref@npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/5f6aff8592dea6a7e46589808912aba3fb3b626cf6edd2b14f01638b61dbbe49eeb9f67cd5601f4c15b2fb547b9a7e825f7c4961acd4dd70176c969ae405f8d8
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-controllable-state@npm:1.2.2":
+  version: 1.2.2
+  resolution: "@radix-ui/react-use-controllable-state@npm:1.2.2"
+  dependencies:
+    "@radix-ui/react-use-effect-event": "npm:0.0.2"
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/f55c4b06e895293aed4b44c9ef26fb24432539f5346fcd6519c7745800535b571058685314e83486a45bf61dc83887e24826490d3068acc317fb0a9010516e63
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-effect-event@npm:0.0.2":
+  version: 0.0.2
+  resolution: "@radix-ui/react-use-effect-event@npm:0.0.2"
+  dependencies:
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/e84ff72a3e76c5ae9c94941028bb4b6472f17d4104481b9eab773deab3da640ecea035e54da9d6f4df8d84c18ef6913baf92b7511bee06930dc58bd0c0add417
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-escape-keydown@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-use-escape-keydown@npm:1.1.1"
+  dependencies:
+    "@radix-ui/react-use-callback-ref": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/bff53be99e940fef1d3c4df7d560e1d9133182e5a98336255d3063327d1d3dd4ec54a95dc5afe15cca4fb6c184f0a956c70de2815578c318cf995a7f9beabaa1
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-layout-effect@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-use-layout-effect@npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/9f98fdaba008dfc58050de60a77670b885792df473cf82c1cef8daee919a5dd5a77d270209f5f0b0abfaac78cb1627396e3ff56c81b735be550409426fe8b040
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-rect@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-use-rect@npm:1.1.1"
+  dependencies:
+    "@radix-ui/rect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/271711404c05c589c8dbdaa748749e7daf44bcc6bffc9ecd910821c3ebca0ee245616cf5b39653ce690f53f875c3836fd3f36f51ab1c628273b6db599eee4864
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-use-size@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-use-size@npm:1.1.1"
+  dependencies:
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/851d09a816f44282e0e9e2147b1b571410174cc048703a50c4fa54d672de994fd1dfff1da9d480ecfd12c77ae8f48d74f01adaf668f074156b8cd0043c6c21d8
+  languageName: node
+  linkType: hard
+
+"@radix-ui/rect@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/rect@npm:1.1.1"
+  checksum: 10c0/0dac4f0f15691199abe6a0e067821ddd9d0349c0c05f39834e4eafc8403caf724106884035ae91bbc826e10367e6a5672e7bec4d4243860fa7649de246b1f60b
   languageName: node
   linkType: hard
 
@@ -8905,6 +9580,1664 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@univerjs-pro/collaboration-client-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/collaboration-client-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/70a92e83a3029c7e62d2686e8e4077f01e51d94a3615e997c11d72c91de858f4fee49dfe304d7ab9cfe1acd50fc9ee4509dfd9c5614405433b7e7456983adf20
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/collaboration-client@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/collaboration-client@npm:0.23.0"
+  dependencies:
+    "@noble/ciphers": "npm:^2.2.0"
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/telemetry": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/53b29a0fdf94397200ec58c23dc4f2a7f7ade47345e99153e4c1bccf7388d10e6d0d83ccbbbc6345fb04079e37ff0609e40765c9a6eb4b84519623480ebaae9f
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/collaboration@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/collaboration@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/data-validation": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-conditional-formatting": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-filter": "npm:0.23.0"
+    "@univerjs/sheets-hyper-link": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    uuid: "npm:^13.0.0"
+  checksum: 10c0/a5efb8071ad00a582faea927cd653612ad41cefc69a3c19d79e3e8540a0e240ab1a23a97fea0ab5589b9e0f8b8e117592a5e42563a475ba25022a4cee13da462
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/docs-exchange-client@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/docs-exchange-client@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/exchange-client": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  checksum: 10c0/97a99b72b46683f4ecf97ea4fa69adcf43248f047ab152b887d003f50a2ab8767424ca5250c905bd468d3a00f54326c900bff9950ee737baed15bea0786030a3
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/docs-print@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/docs-print@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs-pro/print": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  checksum: 10c0/e8b86c6823226a853ed2d973647f85ade51519b5b50f58704e416872c7bf4d217c866ec6930ed229543f91f7ba7ce186fe02add8ce7d1a350a720c4a9032789e
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/edit-history-loader@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/edit-history-loader@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client-ui": "npm:0.23.0"
+    "@univerjs-pro/edit-history-viewer": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs-pro/sheets-chart": "npm:0.23.0"
+    "@univerjs-pro/sheets-chart-ui": "npm:0.23.0"
+    "@univerjs-pro/sheets-pivot": "npm:0.23.0"
+    "@univerjs-pro/sheets-shape": "npm:0.23.0"
+    "@univerjs-pro/sheets-shape-ui": "npm:0.23.0"
+    "@univerjs-pro/sheets-sparkline": "npm:0.23.0"
+    "@univerjs-pro/sheets-sparkline-ui": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/data-validation": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/drawing-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-conditional-formatting": "npm:0.23.0"
+    "@univerjs/sheets-conditional-formatting-ui": "npm:0.23.0"
+    "@univerjs/sheets-data-validation": "npm:0.23.0"
+    "@univerjs/sheets-data-validation-ui": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-drawing-ui": "npm:0.23.0"
+    "@univerjs/sheets-filter": "npm:0.23.0"
+    "@univerjs/sheets-filter-ui": "npm:0.23.0"
+    "@univerjs/sheets-formula": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-hyper-link": "npm:0.23.0"
+    "@univerjs/sheets-hyper-link-ui": "npm:0.23.0"
+    "@univerjs/sheets-numfmt": "npm:0.23.0"
+    "@univerjs/sheets-table": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/39e1f43fa2b666ed49951c5da33d872299883d71df8e52c2447d7c9e40d999068263f787349211c08e43f229802ad16f3c2da2ea8e53b3ab02a5f481d0a63a0a
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/edit-history-viewer@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/edit-history-viewer@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client-ui": "npm:0.23.0"
+    "@univerjs-pro/sheets-chart": "npm:0.23.0"
+    "@univerjs-pro/sheets-pivot": "npm:0.23.0"
+    "@univerjs-pro/sheets-shape": "npm:0.23.0"
+    "@univerjs-pro/sheets-sparkline": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/data-validation": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-conditional-formatting": "npm:0.23.0"
+    "@univerjs/sheets-data-validation": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-filter": "npm:0.23.0"
+    "@univerjs/sheets-table": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/63952b9fd9fb2a34cee992e91cb32fc2072035aa94eb9442fabf2743ab955cae4b008b35c557b30358b7eb7a2b3d852425ff8b108eec9aeedd46a57f689809ec
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/engine-chart@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/engine-chart@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/91bf77e98be1f23eb67909cf696894e3bbb45ccb18bd99cf3c8ba4703a0596553f83325bd5aeccbd9784ed4ff5456351ae434095a0a526d0044c505c63c8693f
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/engine-formula@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/engine-formula@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+  checksum: 10c0/79ad25401249d87af41dc92cfe83804b168300d43b6605c718e1e307a8d2d79a30eb1230129f883fcac18301529d36a7eb22538a5db075c7f8efda8982f3b25d
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/engine-pivot@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/engine-pivot@npm:0.23.0"
+  checksum: 10c0/9158593e4c18975b8b61fa55ecbc3409f8d2315eee3820d9f7797c13bdbee19925f2527c63c648137bf15d0558c802ac3a04adba83ea39df0eb76af68a0bddc0
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/engine-shape@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/engine-shape@npm:0.23.0"
+  checksum: 10c0/6613b02089a90a81ebdf8d4febb92373ae2298417a69cb2779de8d247af90bfbcb94ae252796b5ee05b064ab33f0efb038eaed67d07b402b0ccfa1e58a47dee6
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/exchange-client@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/exchange-client@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+    fflate: "npm:^0.4.8"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/30bf59cd79a3afb352c5f93f9d58f208a58c73b1f6ff8e4f27fe7b204a3665aa1757e657b1d699da8c4ba0133286a9855ebfa0734fec6b2dba1b2a553d6d153c
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/license@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/license@npm:0.23.0"
+  dependencies:
+    "@noble/ed25519": "npm:3.1.0"
+    "@noble/hashes": "npm:2.2.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/5c0528923147e38ecb0364b6b9bcd891dcaf42c93179a7874f5fd42fa9146dfa4dcbe4f6e142d3fe24cfd58e6a13d85b650ee295066183a6a1f3bceb6b7cb023
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/print@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/print@npm:0.23.0"
+  checksum: 10c0/c2f4f58e3f8f1548ebb29223e02fc9e43b0569f27baed6c0b52ba219a43cddfd2376d36b90679ffc5c55a2cfb3041fb4d071450548aa38be173abaf5c49c9907
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-chart-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-chart-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-chart": "npm:0.23.0"
+    "@univerjs-pro/sheets-chart": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-drawing-ui": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/07841b2b3bd7e3600c786da234470e9dd7426a9d67f910605a6a627b9cf9bcba2f35f46f9cb143ff8910307e86331d8ee3374c0e90597bf9a0407de70a3f5410
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-chart@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-chart@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-chart": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/fa66788b82e1318c74dc1ee4b1a3af0951e09998ac6ec2c4e62cb0dd160cd70cf79beb776ea4c136099847026cdd1bb6d4737c5ba15de0139ea8ab58abca7c3b
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-exchange-client@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-exchange-client@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/exchange-client": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  checksum: 10c0/893d904bc090ed558e61b64ea439b730d573be3bbfb4a2656e3408ea1ede2977bf221980236e63afc77f1b5441ca42e1c012db52a441b3daf295f57173db7b0c
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-pivot-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-pivot-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-pivot": "npm:0.23.0"
+    "@univerjs-pro/sheets-pivot": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e4e74319b5aba777f87b16e75295c18394af919f5d478f528f1795be3057294a36a5c9368f7b2d092e2b7ac1fd599c09bbb135cb34c5b9a27df62cdb343a6241
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-pivot@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-pivot@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-pivot": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-filter": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/fd04abb6036bf1064157021ceeedc4b988827465d2783eac91b9fd84077775aab756eaf77ee41e3001cdc0eafa050b908a46a17a8d003540f3b0dddb92e52da7
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-print@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-print@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs-pro/print": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/531430f85ab9f4cff0347c7a96d738ad85a1097dff54e5f10f4da45ab531b34fcee85f13bdd905be2ac12bb8a630260f6499d7345b9afd4bc5d5c9744a9ef574
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-shape-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-shape-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-shape": "npm:0.23.0"
+    "@univerjs-pro/sheets-shape": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/drawing-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-drawing-ui": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/f70728d2c7ab8e073c40797e6707bbce4cf7e62366fa488f878ca72b9015913ca907bb1a7d290b28d82b39373ddd03fa8d7ec1ae5bd5a6a4b0102511a2306b3b
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-shape@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-shape@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-shape": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+  checksum: 10c0/d5fca5db153a09f9037a7f93485819caf899813ca5b6cfaab89ac52adfe5d8e2eaec6528bf0a5c52867c1b5d8b57f35846095d739bf0de150c3bec4915e3f960
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-sparkline-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-sparkline-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/sheets-sparkline": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.1.1"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-graphics": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/08061aef617c35e8d2bd62f8d81fe6df0797ff94df724ee51c1d1a9def2c0f26ee6419d71dfc66d193cd35f40e98cb12493cac94beb3e48155f7c121503a5f64
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/sheets-sparkline@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/sheets-sparkline@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/49e21fe0fae918af4b5d7e73513ab695361ebb247097d867f675439fb67ebf0a9d4cbd21f424bb7527993250a1463639b59f399bf2f161510bc3efec6bf705a9
+  languageName: node
+  linkType: hard
+
+"@univerjs-pro/thread-comment-datasource@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs-pro/thread-comment-datasource@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    "@univerjs/thread-comment-ui": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/1402d93b82a9ac793c999ead2a5840025bc45f15916fc093f76db638440fb507f593a85fbccc59c7b2869be8b3d737073c14d66e8fa72ec32a461c78a1efbfa8
+  languageName: node
+  linkType: hard
+
+"@univerjs/core@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/core@npm:0.23.0"
+  dependencies:
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/themes": "npm:0.23.0"
+    "@wendellhu/redi": "npm:1.1.1"
+    async-lock: "npm:^1.4.1"
+    fast-diff: "npm:1.3.0"
+    kdbush: "npm:^4.0.2"
+    lodash-es: "npm:^4.18.1"
+    nanoid: "npm:5.1.11"
+    numfmt: "npm:3.2.6"
+    ot-json1: "npm:^1.0.2"
+    rbush: "npm:^4.0.1"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ba118bef67ffd07358bc54b0321decc6abf880daa2bd39c70c3b69469280aaabd8ff7afc99eddff0e917a443bf57551ad89df300f914e5aee3bd67872bf2c68e
+  languageName: node
+  linkType: hard
+
+"@univerjs/data-validation@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/data-validation@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/447e48d210397e599e9a98ce9a0cec8e5afb446f721764deeacd7600d903982e998f5e418d1ab31c7373b5674b9d4e39de4b0847ea99278dd43e01f8e7819115
+  languageName: node
+  linkType: hard
+
+"@univerjs/design@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/design@npm:0.23.0"
+  dependencies:
+    "@radix-ui/react-dialog": "npm:^1.1.15"
+    "@radix-ui/react-direction": "npm:^1.1.1"
+    "@radix-ui/react-dropdown-menu": "npm:^2.1.16"
+    "@radix-ui/react-hover-card": "npm:^1.1.15"
+    "@radix-ui/react-popover": "npm:^1.1.15"
+    "@radix-ui/react-separator": "npm:^1.1.8"
+    "@radix-ui/react-slot": "npm:^1.2.4"
+    "@univerjs/icons": "npm:^1.2.0"
+    class-variance-authority: "npm:^0.7.1"
+    clsx: "npm:^2.1.1"
+    react-transition-group: "npm:^4.4.5"
+    sonner: "npm:^2.0.7"
+    tailwind-merge: "npm:2.6.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 10c0/3048d7faf95b51ec7ffd860f45af6f72c8aa7fd03fc734e3ce890c865f0cd21995d584a42a3df85f517d739677bc7aa2a848738a8ac724535d0b835bda680142
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs-drawing-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs-drawing-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-drawing": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/drawing-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/aa7564a5e4e07edc03f740438a97300fb679af9eff1ed20d70843ecdc8b4ac5b57d57685c2e33e4647d93132b5586c4481092261536d83a788f55f5e53d76f4f
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs-drawing@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs-drawing@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+  checksum: 10c0/b196c9e3ad6d21e07db83f3c4a1db8963157192a2100fa494173caaf61ecd31435501fd7f8da729bccf79496ac3d93bb93fc32ab0d117266b668499043b70fac
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs-hyper-link-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs-hyper-link-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-hyper-link": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e67fe5ebb1190bdb4688481c28ae127607c9ac0ecc8e2b7eaf01b0ddce00c67016352b2536cf7a49b0fa718e74c5afc104262563136c58dfecc8af78730baa22
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs-hyper-link@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs-hyper-link@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+  checksum: 10c0/84d167abd652e444864af63765d1357901373a1529dc1c28e60d04cee10e1fc04fe5de86e462f0008b53cf60dbbc3a6d702ff69a0793e9a3d5870cf07b1d9747
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs-thread-comment-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs-thread-comment-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    "@univerjs/thread-comment-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/abcb29d1885891f7b4728c188ec917608901d5460c381ec5b8e3b9eacfe4357934e0aa94f36e59194fcb0804755de84e066a3c16dd0dc1c1f340771ab58bd5ef
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/4c36ef01e8d85977a32a5e87a5db4908d4c535c26a2334fba406154c0d5f9bbb449bad586ec68d365cc6f361349ac673eef01e3d570e4fd269e36d5d99b1b590
+  languageName: node
+  linkType: hard
+
+"@univerjs/docs@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/docs@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/2228573a5c3901963a27017aafc5071a9267db05e4dc47e6cdc4d60417b37cc8c77e136fe07d78c58cc9ff2004fcfb0cd6a07ef7780070f53f81ed081048de78
+  languageName: node
+  linkType: hard
+
+"@univerjs/drawing-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/drawing-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/35fc500902b28bb2d32f9c33a73e8cbad4a253cb520fdcd8ad681ba311b0675dc856419ea8e760639170c583d727698f2c9d0f098ca5bc2d4fdd294243ab7fc1
+  languageName: node
+  linkType: hard
+
+"@univerjs/drawing@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/drawing@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    ot-json1: "npm:^1.0.2"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/393bac37e48fbb97c69ee4d2b272a8b293f4a567a517d8905bfd1a984410998c5371ff986d6a1ee4098ccfd63c4924c771e63558f81aad17c960b35d4e1aa09d
+  languageName: node
+  linkType: hard
+
+"@univerjs/engine-formula@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/engine-formula@npm:0.23.0"
+  dependencies:
+    "@flatten-js/interval-tree": "npm:1.1.3"
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    decimal.js: "npm:^10.6.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/1a3f427fa72644dbd1dbbfb29e28cfd159afe8003ea2f1323dca9886ff4ec78523028787c2f54e5abc079db82fab4ada3557ee566b3f5c0df0f4719e446677c4
+  languageName: node
+  linkType: hard
+
+"@univerjs/engine-render@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/engine-render@npm:0.23.0"
+  dependencies:
+    "@floating-ui/dom": "npm:^1.7.4"
+    "@floating-ui/utils": "npm:^0.2.10"
+    "@univerjs/core": "npm:0.23.0"
+    cjk-regex: "npm:^3.4.0"
+    franc-min: "npm:^6.2.0"
+    opentype.js: "npm:^2.0.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ee0bb66f7b0346cb2751034593ed3ac32cb8f8ce9a69e7aee168555a92019e885e0f63c9c1a82d7118beb17b5b85f26acbfb949d92d9ed62c0b6157aca2dcea9
+  languageName: node
+  linkType: hard
+
+"@univerjs/find-replace@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/find-replace@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ca3121c7039a3ad187cbbdd09cbf31e99888711b14f5babeb687287f178a9917f1ce944f8af995070df77a02f8279170b5894bf4746f93057c5d9c2f8eb0bf0d
+  languageName: node
+  linkType: hard
+
+"@univerjs/icons@npm:^1.1.1, @univerjs/icons@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@univerjs/icons@npm:1.2.0"
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+  checksum: 10c0/421526b29b1e2d5ddedc68b3a078c9bd3521c2b8cd4e243293ce0f036ff8d688427bd01f0bede52ffc09747c25e9d2eed629822483836e12a6ecaa2f6d66002a
+  languageName: node
+  linkType: hard
+
+"@univerjs/network@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/network@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/c0bc30ee3559ccf1fe6b9bc27fd8e536f62969e569f8e6b1eda58811fb6fcb7ec1eed86a200a38b00c535a0784504849ec80a18b2999b71b37b3c454989bcd1b
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-advanced@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-advanced@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/docs-exchange-client": "npm:0.23.0"
+    "@univerjs-pro/docs-print": "npm:0.23.0"
+    "@univerjs-pro/exchange-client": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/5270548e145d1fa45fa8e2ec85425c51b76d9952839827b00cefca8128f5f40c579ec0f8ac5d51f83d5499976d3ff9d976b7c7a2fb5edb650d900a2ee7424dbd
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-collaboration@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-collaboration@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e94505eef1c738fecd1f53d3f64124de64f311a91e71f3ced9e4b2ec779061acb6a6db8d245dacaa4e9bce98bdfbdb0e03fe13ac726a4b097d20428769f6b075
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-core@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-core@npm:0.23.0"
+  dependencies:
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e3e5fa5df8e1c14cf2a00ec02c475c3f087f889cac2c5558ddf4d31b2cdfd16fd2287ad4cef6994380f2838dcc5a2a4bbd9e70b7caeca1d03392fc97d59823a4
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-drawing@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-drawing@npm:0.23.0"
+  dependencies:
+    "@univerjs/docs-drawing": "npm:0.23.0"
+    "@univerjs/docs-drawing-ui": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/drawing-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/65e37abb19eed3d70767450fc2b7ba8ab4aa467d0e9134a0ba3e95f6e0dcc9ce29a607360af3e5f74c42196c24a510e0b9173f0991a2cde72b620b94e8486a86
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-hyper-link@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-hyper-link@npm:0.23.0"
+  dependencies:
+    "@univerjs/docs-hyper-link": "npm:0.23.0"
+    "@univerjs/docs-hyper-link-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/d610824329db7b639b28577143dac186ceabc09bbd589a7d71f91558a6e1cf3d80bf8ecb9e305c4a6da3faef063ad74607a80ebe8353acf4109f8a286fc1544b
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-node-core@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-node-core@npm:0.23.0"
+  dependencies:
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-drawing": "npm:0.23.0"
+    "@univerjs/docs-hyper-link": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/rpc-node": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/56066c7516cc91bfc7eaeb1b5813c452aecb131008e46679f131da8e416980c275497d01ed17dce9414264187b5a7129a9c5c0b6b203addab58333b29e98f2f4
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-docs-thread-comment@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-docs-thread-comment@npm:0.23.0"
+  dependencies:
+    "@univerjs/docs-thread-comment-ui": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    "@univerjs/thread-comment-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/7d20ab6f701a84d2c407d54eaddee13ca15859597d642d8b3babe086044630bea181196bba2d3b82b9dd0949ebbe0c8b47bfe10f25627f230cb672f3d76b0aa1
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-advanced@npm:0.23.0, @univerjs/preset-sheets-advanced@npm:^0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-advanced@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/engine-chart": "npm:0.23.0"
+    "@univerjs-pro/engine-formula": "npm:0.23.0"
+    "@univerjs-pro/engine-shape": "npm:0.23.0"
+    "@univerjs-pro/exchange-client": "npm:0.23.0"
+    "@univerjs-pro/license": "npm:0.23.0"
+    "@univerjs-pro/sheets-chart": "npm:0.23.0"
+    "@univerjs-pro/sheets-chart-ui": "npm:0.23.0"
+    "@univerjs-pro/sheets-exchange-client": "npm:0.23.0"
+    "@univerjs-pro/sheets-pivot": "npm:0.23.0"
+    "@univerjs-pro/sheets-pivot-ui": "npm:0.23.0"
+    "@univerjs-pro/sheets-print": "npm:0.23.0"
+    "@univerjs-pro/sheets-shape": "npm:0.23.0"
+    "@univerjs-pro/sheets-shape-ui": "npm:0.23.0"
+    "@univerjs-pro/sheets-sparkline": "npm:0.23.0"
+    "@univerjs-pro/sheets-sparkline-ui": "npm:0.23.0"
+    "@univerjs/sheets-graphics": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/f12bfeb35797dd5c16290632b2e0d43c1b4311fe5aa82e9f21cf7d534d602ff89e027f37831b3a9c11cf82a659622aad9360bebb96a6fe655e9fce2f263d021a
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-collaboration@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-collaboration@npm:0.23.0"
+  dependencies:
+    "@univerjs-pro/collaboration": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client": "npm:0.23.0"
+    "@univerjs-pro/collaboration-client-ui": "npm:0.23.0"
+    "@univerjs-pro/edit-history-loader": "npm:0.23.0"
+    "@univerjs-pro/edit-history-viewer": "npm:0.23.0"
+    "@univerjs-pro/thread-comment-datasource": "npm:0.23.0"
+    "@univerjs/preset-sheets-advanced": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/64096b65aac53f0964bcf13141e9bf08be0703c5541b74e6b2b4664ce6507957b3c2d54a25d3780b4e110ddb492c01a44a1eb90c79f327da0e65bb0f294b4042
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-conditional-formatting@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-conditional-formatting@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-conditional-formatting": "npm:0.23.0"
+    "@univerjs/sheets-conditional-formatting-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e2d4ae3bdc005ac43641993c992ded9626183085ab7d5e8605a6091149b4becfe53cd2736d3a4517e0ee7ecc35abd314153432d401a52e60f019dac8f0b08e27
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-core@npm:0.23.0, @univerjs/preset-sheets-core@npm:^0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-core@npm:0.23.0"
+  dependencies:
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/network": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-formula": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-numfmt": "npm:0.23.0"
+    "@univerjs/sheets-numfmt-ui": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/3f42b40b14975aab8f24a0374671e52e8be32cfc5c2e634a9205b5495e0a59aa00e66f54e45a05b3df9073ff940449ebc04396409945cbcac346017dc4498533
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-data-validation@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-data-validation@npm:0.23.0"
+  dependencies:
+    "@univerjs/data-validation": "npm:0.23.0"
+    "@univerjs/sheets-data-validation": "npm:0.23.0"
+    "@univerjs/sheets-data-validation-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/74b421ccd4a34423cc965d7848a563dc4c40e5074d3f90e8a40d1b62f99ceb8e0e803b8983fcb0a0ccab0c94e923b4801ba3208af2b34a3c949e5dd8bac56aa9
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-drawing@npm:0.23.0, @univerjs/preset-sheets-drawing@npm:^0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-drawing@npm:0.23.0"
+  dependencies:
+    "@univerjs/docs-drawing": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/drawing-ui": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-drawing-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/871af8cbc75ea4a5f21c9ed172e8c309a2aa45ac64016989208f146df511837b432f8a963f74281b18d42d59b7eae4df9d50177086962ff9ced5bfbe40d91f48
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-filter@npm:0.23.0, @univerjs/preset-sheets-filter@npm:^0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-filter@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-filter": "npm:0.23.0"
+    "@univerjs/sheets-filter-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/5d60c613223d4ba17f4fbfc670fe6aed2039ea1bea9626313c3607e51761875f9154641c50f9b95c3518f5f32cc85eb64a47b3b3334decf981569abb480f30a7
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-find-replace@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-find-replace@npm:0.23.0"
+  dependencies:
+    "@univerjs/find-replace": "npm:0.23.0"
+    "@univerjs/sheets-find-replace": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/10b06852087edd167d3ededf2eeb0e78c19b90e767cbde28ade1f349bdf58fdcd399f2452a785a3522e715ce5557717ca4ef7d4b49aa17d72cbad5229e5c515c
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-hyper-link@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-hyper-link@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-hyper-link": "npm:0.23.0"
+    "@univerjs/sheets-hyper-link-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/0a45d4b295adcb476d17e58e5e1aea12da90fc8e4a7a77c0f79ec1a6f9ed28654c590464260df5cadc87074084dc3a6311e3edead48abf5019a597e73be332f5
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-node-core@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-node-core@npm:0.23.0"
+  dependencies:
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/rpc-node": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-data-validation": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-filter": "npm:0.23.0"
+    "@univerjs/sheets-formula": "npm:0.23.0"
+    "@univerjs/sheets-hyper-link": "npm:0.23.0"
+    "@univerjs/sheets-numfmt": "npm:0.23.0"
+    "@univerjs/sheets-sort": "npm:0.23.0"
+    "@univerjs/sheets-thread-comment": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/110236146d569cd73d98b57623ea10df20168912c4a7441f3dd614736b8f524cb960f2b0df4e91afb954cdacec1da81a53136f613f2f57430aa444411b68c47b
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-note@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-note@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-note": "npm:0.23.0"
+    "@univerjs/sheets-note-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/4a2a3c7c981e1c297eeae95432408dbe0334a87919bd9a924970ad7f1cd998b095a836c763e6c7920d2c66bbe1917dde07489a2eefe9341a8f1edc6bac17af39
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-sort@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-sort@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-sort": "npm:0.23.0"
+    "@univerjs/sheets-sort-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/6dcc290fe2b84d28918bdf31f4cdcac23a183d8a92a43158559a8364ac4ded88c6d1fcdced971725523d7385597e5850bb6d549914ff58a0013f90a3fe2c37a9
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-table@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-table@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-table": "npm:0.23.0"
+    "@univerjs/sheets-table-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ff29f5d6b6d849b6a233f87248e01b5c725b19ee93633c7ae624585eeffe718f5ba29934cb0701d9ff6585d3bad2ef7923ed8d1bf1b88258682f02b7a4f1bce7
+  languageName: node
+  linkType: hard
+
+"@univerjs/preset-sheets-thread-comment@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/preset-sheets-thread-comment@npm:0.23.0"
+  dependencies:
+    "@univerjs/sheets-thread-comment": "npm:0.23.0"
+    "@univerjs/sheets-thread-comment-ui": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    "@univerjs/thread-comment-ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e0fafd4ffdeb295e58e8843fdd3d0ebc4171c42064d4601c9b3e25667a52827446d12bbdfbb2270d87b6277f83c7e8c4f64ef8d5c75f9e8dd71c7858d3965af7
+  languageName: node
+  linkType: hard
+
+"@univerjs/presets@npm:^0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/presets@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/preset-docs-advanced": "npm:0.23.0"
+    "@univerjs/preset-docs-collaboration": "npm:0.23.0"
+    "@univerjs/preset-docs-core": "npm:0.23.0"
+    "@univerjs/preset-docs-drawing": "npm:0.23.0"
+    "@univerjs/preset-docs-hyper-link": "npm:0.23.0"
+    "@univerjs/preset-docs-node-core": "npm:0.23.0"
+    "@univerjs/preset-docs-thread-comment": "npm:0.23.0"
+    "@univerjs/preset-sheets-advanced": "npm:0.23.0"
+    "@univerjs/preset-sheets-collaboration": "npm:0.23.0"
+    "@univerjs/preset-sheets-conditional-formatting": "npm:0.23.0"
+    "@univerjs/preset-sheets-core": "npm:0.23.0"
+    "@univerjs/preset-sheets-data-validation": "npm:0.23.0"
+    "@univerjs/preset-sheets-drawing": "npm:0.23.0"
+    "@univerjs/preset-sheets-filter": "npm:0.23.0"
+    "@univerjs/preset-sheets-find-replace": "npm:0.23.0"
+    "@univerjs/preset-sheets-hyper-link": "npm:0.23.0"
+    "@univerjs/preset-sheets-node-core": "npm:0.23.0"
+    "@univerjs/preset-sheets-note": "npm:0.23.0"
+    "@univerjs/preset-sheets-sort": "npm:0.23.0"
+    "@univerjs/preset-sheets-table": "npm:0.23.0"
+    "@univerjs/preset-sheets-thread-comment": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/82e60e5d96fb7a1c76156515c6ba96e6a4ddff97b2d57d77c7e10dfea540b7e6edd5f69cd36c5bd9ff67b0ba155d0650e69e858feb24822715aa75838c6a1b2e
+  languageName: node
+  linkType: hard
+
+"@univerjs/protocol@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/protocol@npm:0.23.0"
+  dependencies:
+    "@grpc/grpc-js": "npm:^1.14.3"
+  checksum: 10c0/2f4550982ab9ca65602e4d61f935007fa0f51ff093935d21aeed7941a3ea50aee61d69eabd7af17501c4c919fd1c8eafc3f6d360ebefdfd18a0df7518fcd9a34
+  languageName: node
+  linkType: hard
+
+"@univerjs/rpc-node@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/rpc-node@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/582f6786bfea1dbc3b93b4d2367ff8ff9b70d4bc7256b55bfcec75b68298c5d6173d2e4a6f7e89a7950c5c2653dc0c19d0ebc7d12ed493a04ff396b66cf840cc
+  languageName: node
+  linkType: hard
+
+"@univerjs/rpc@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/rpc@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/358d590968813ffc5f2ec7cd8b9359539f8cd35e7c45447ac9c101cb14753fa7b61fed0ab3ee44f78e63e2bcb090c084833acce793eddfabefc5e557a652e8fa
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-conditional-formatting-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-conditional-formatting-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-conditional-formatting": "npm:0.23.0"
+    "@univerjs/sheets-formula": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/5171bf4011f143a16327747f1259617ebf547b237cbccadeb5f7c35e21b92a9b3246ceca25d21b801a828da944f64ea8337e5be9d0828df5de483c29a1972a46
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-conditional-formatting@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-conditional-formatting@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ce31f8995710df3e46065bbd41c26102432db72e1eea9ae1e4bc2f74e8b4ba4e9ff7f6f1c8a41d75f50073bd46a9e727809e8e8eaa8d827c33836758c3d5e174
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-data-validation-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-data-validation-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/data-validation": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-data-validation": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-numfmt": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ba6c04d8e174cfcfc41285e382463fcf76e1aba5b819007a6a98a624a2f790b5ee3e3b708585d89a86f7ac159ebae1b9a037e6e95842ce4f9ca0cabdcfa7ede0
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-data-validation@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-data-validation@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/data-validation": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-formula": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/2512a563bafc97c9af7ddf840b8c555aebe7f341e5e9d0be43c6d387e31b09adb787f8f598af5dbee0f3b36a0f05a8848901c0de48dfce885800eb0d30e658d1
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-drawing-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-drawing-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs-drawing": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/drawing-ui": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-drawing": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/2ff9ebb78260d207fa536a954b854693b06be3f20400bd985476dfdb6ac2c37b5537ae899f41c8b6992653bd1aa4dddae3403d36d1515e8bb196f91f317673bb
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-drawing@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-drawing@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/drawing": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  checksum: 10c0/4fe0c433dc1d025e2a20ab5f1a82d4bacbc091e3c29ad9a7631e9026526ad3c9f8feb4fd5d624430577eb31366886d463eff0b2f9315a234d16af37fd46e9d6e
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-filter-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-filter-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-filter": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/0a51ea25f5e8dabb9c5797c83974065d729453f6963bdc580f78db83cbdbf5712510f202b372f0f30ab6f98ae8e976e4e6d7f7c6e55d7a4a7640f5f3154f44ab
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-filter@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-filter@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/4ff69b76aafc875193ee28f7260d4eaa9510178b56d9925764e98e83d1060dccdce62f9e40440fbf8a4e71c7dfce0ce5f03f3a9bad2e122436cc927225d5ff26
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-find-replace@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-find-replace@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/find-replace": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ac2682660b23a97de78e153fd6ab7281040063be750d0b667d0da6570579a41f6744938b9fbb79e8525e7c28da7eed6abba53718498b872a47013f908ca0336f
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-formula-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-formula-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-formula": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/6673edfe191d014399b4eff9abcd6e6f5138dc052aa8d5cb84666fc2a8074c9acafee6a39bcb1b1629243a33418ec12d6e9e66862c85c3f0c97a9f76d5a9c6cc
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-formula@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-formula@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/3407b4c5342fdb6482b1dc29ba51603244eeb39ac2994de6986faa2ce31c2f581087f8ade31a6adf46a144c8333b85228af67cc9ebce4850249f0b3772d2a4b2
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-graphics@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-graphics@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+  checksum: 10c0/fd0788e767ee761567c28dfb2c5d27734b95a671fe573e745fb82fa433b34c38ade2db02dfa00ee9df9dd1ef4d7ea923719fde67c3bfaf3559e102f0c99efd61
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-hyper-link-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-hyper-link-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-data-validation": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-hyper-link": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/d3c36f80aa5ec79ba95459e619a109599d28d8544b5c34d81e510816726828eb70efb0291578483be21fae7fc4ae2c0790f0c4a1f047aac5fa55e6f11785e85d
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-hyper-link@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-hyper-link@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/24927d46eded5978ad2c6750c56553682a0c3b2513d5a9cc5ede9ba7820dbb8921fafbf52b667816adeddd6d98341382aaf237175255526489a50a1592655757
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-note-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-note-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-note": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/d6d5ea0649b64fa261b23b8256e491260438e88beb969595bbd5e86a5c58fade39d03240296050d2f6af688b917a94339c352372a3c51f2cfa6d0cf497435aa0
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-note@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-note@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/09b7aee99441368db1933e6c8589aa80c277b567d487ead1fe9ef6d0fb89a7b34578c1db0db521e668877a508996b8894504c420192fa6d87e795c0508001811
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-numfmt-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-numfmt-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-numfmt": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/b19d9b6c3e1b108b659dbfd9ba370dc55d74026d11fd6b2aa4679f3e664dd67252c280b72c67283e7bd81d3d465565b231762a548bf950549c0c03592279bc11
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-numfmt@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-numfmt@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/4b718e7bdf28d3b132897703590c5034aec530bf26827bc90537a533f555ce476720e0f01d605eeab01b44b7540d4f1cf27b807d82d81811006442cf2acba9f2
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-sort-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-sort-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-sort": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ddf986ed8028d514b56eb22d91e8a9a5274792044a56d6100cad9cc94684a5da888c5e3f03c13858e02c8c26b5f5757086aeec7e08786efe85c3b08ff06818db
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-sort@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-sort@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  checksum: 10c0/ff599691e999509b672dbaad76d91dc798bfa8b546b7d70e7fad485f2fc59a7e8f2da178a9c301f146fb9271896a5620a4094ab7fc76d903bf3a03804ebc0bf4
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-table-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-table-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-formula-ui": "npm:0.23.0"
+    "@univerjs/sheets-sort": "npm:0.23.0"
+    "@univerjs/sheets-table": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/687ca2dd2a14243ea19d776c25cce6f483fe3e76720682642552fa53ff5293eeaafa6bfaec489d94eb08cc973325526224aa44cefecd46ac2ca98a15a3184880
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-table@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-table@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/11f4c31b152bbc4689577ff0d0a9079bdb34369fb79a19235d19d3f6e0c5357153337b1bb55fc2c9cfeafca4649881b7af26c3cc679c8f2ffbc64f012292d3f3
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-thread-comment-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-thread-comment-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/sheets-thread-comment": "npm:0.23.0"
+    "@univerjs/sheets-ui": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    "@univerjs/thread-comment-ui": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/29d73018b92d743433bb2061ca0dc1370a171776cc013758d21e199fbf4018f2f1bc41e862e29ef814ee2703cb2e3ff3077900fb8eca9787930d0878d30901a5
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-thread-comment@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-thread-comment@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/8d1fb288253cf6aeb0f170caea4c951d4ab80ae84e489ab7c7bb5c6dedc0daa8706abfc894e8ceeb0b2cb72f0d4d3013aa16cda121a025edb7eb0233e8994f0e
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/sheets": "npm:0.23.0"
+    "@univerjs/telemetry": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/1535d404db0d68030ebb6326dd3fde4049287e50c88042fe8d0ea89674d84a6792bff714f05c74e790a9fc7d0eed81909b70a272ced96bde4c3b161fb6960234
+  languageName: node
+  linkType: hard
+
+"@univerjs/sheets@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/sheets@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/engine-formula": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/protocol": "npm:0.23.0"
+    "@univerjs/rpc": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/7c8625f42f511914060703a54db7ba072f6f3dff43bec982b4a20e5118d910721599614288b26c774f13c0a078ad38f48dfb44c76ba7f82dc082e9d31bce114f
+  languageName: node
+  linkType: hard
+
+"@univerjs/telemetry@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/telemetry@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+  checksum: 10c0/67b39bdae4420eec49d4e1460c80fe095378f40f7ce3ead834138e2071bc8753947032b107497d8ca0626853af55cfcf5708cc45015a5b1abfd33a384741faef
+  languageName: node
+  linkType: hard
+
+"@univerjs/themes@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/themes@npm:0.23.0"
+  checksum: 10c0/97e067ba937c93266574a926844f4ca5a7257aea9637e211099bf5e1918a2e77fd4ee5b667d8b789ed6b5a34865cf3f804baae06c80b5c1d7f705aa7f5bd1190
+  languageName: node
+  linkType: hard
+
+"@univerjs/thread-comment-ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/thread-comment-ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/docs-ui": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@univerjs/thread-comment": "npm:0.23.0"
+    "@univerjs/ui": "npm:0.23.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/54ef6a1f112d5b67b4f7df12a12de01d67deb957a4eab4168c5fb552783e9e889046ccdb8a8a0599d602e45b24862e89ba7958d840ddb33e821ac6d3fc4833fe
+  languageName: node
+  linkType: hard
+
+"@univerjs/thread-comment@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/thread-comment@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+  peerDependencies:
+    rxjs: ">=7.0.0"
+  checksum: 10c0/ea59d399ab357afee9d158e5fd91cf5a0c6661ca1c4673ae7e9a32166ebad0523fd82e880de5faaca1f9936dc3423de89273969b3a35737b8cdce393b0b2c8ed
+  languageName: node
+  linkType: hard
+
+"@univerjs/ui@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@univerjs/ui@npm:0.23.0"
+  dependencies:
+    "@univerjs/core": "npm:0.23.0"
+    "@univerjs/design": "npm:0.23.0"
+    "@univerjs/engine-render": "npm:0.23.0"
+    "@univerjs/icons": "npm:^1.2.0"
+    "@wendellhu/redi": "npm:1.1.1"
+    localforage: "npm:^1.10.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    rxjs: ">=7.0.0"
+  checksum: 10c0/e33e132c47ca4d30725801f0b2c8c998ca5625bc911b6365ad2acdb7c1b2b68666a5838449bdccf6ef6c29276f51e182c5d2379c3140ebadcb85c7099b4d6be7
+  languageName: node
+  linkType: hard
+
 "@vitejs/plugin-react@npm:^4.0.0, @vitejs/plugin-react@npm:^4.2.1":
   version: 4.7.0
   resolution: "@vitejs/plugin-react@npm:4.7.0"
@@ -9229,6 +11562,18 @@ __metadata:
   version: 3.5.30
   resolution: "@vue/shared@npm:3.5.30"
   checksum: 10c0/d4fbef44001a9f0e4c07c8a25c2cd0075877579e1c6cc4241c6c0dfc77209bbca592d67c0b581073d648dbbb6659a993c484c899d6070bccee91d0acafc8fa24
+  languageName: node
+  linkType: hard
+
+"@wendellhu/redi@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@wendellhu/redi@npm:1.1.1"
+  peerDependencies:
+    react: ">=16.8.0"
+  peerDependenciesMeta:
+    react:
+      optional: true
+  checksum: 10c0/ea9805ed40b793d84dd5d072de9ffdc6fcecddae66ad93c5485f1f60ccafc076a00f8dcc71ce5df9deb36f195f48d1d96003c993b7dde676f1e4a931900c0efc
   languageName: node
   linkType: hard
 
@@ -9744,6 +12089,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"aria-hidden@npm:^1.2.4":
+  version: 1.2.6
+  resolution: "aria-hidden@npm:1.2.6"
+  dependencies:
+    tslib: "npm:^2.0.0"
+  checksum: 10c0/7720cb539497a9f760f68f98a4b30f22c6767aa0e72fa7d58279f7c164e258fc38b2699828f8de881aab0fc8e9c56d1313a3f1a965046fc0381a554dbc72b54a
+  languageName: node
+  linkType: hard
+
 "aria-query@npm:5.1.3":
   version: 5.1.3
   resolution: "aria-query@npm:5.1.3"
@@ -9932,6 +12286,13 @@ __metadata:
   version: 1.0.0
   resolution: "async-generator-function@npm:1.0.0"
   checksum: 10c0/2c50ef856c543ad500d8d8777d347e3c1ba623b93e99c9263ecc5f965c1b12d2a140e2ab6e43c3d0b85366110696f28114649411cbcd10b452a92a2318394186
+  languageName: node
+  linkType: hard
+
+"async-lock@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "async-lock@npm:1.4.1"
+  checksum: 10c0/f696991c7d894af1dc91abc81cc4f14b3785190a35afb1646d8ab91138238d55cabd83bfdd56c42663a008d72b3dc39493ff83797e550effc577d1ccbde254af
   languageName: node
   linkType: hard
 
@@ -10962,10 +13323,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cjk-regex@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "cjk-regex@npm:3.4.0"
+  dependencies:
+    regexp-util: "npm:^2.0.3"
+    unicode-regex: "npm:^4.2.0"
+  checksum: 10c0/4768abad2302a0f320f594848a4e082303988d2077e804609607b9da464058c04c3dc3077a7beb9fd259fe8be88f9ccc06962f05736391e1bb4b6dfa2ab5ca96
+  languageName: node
+  linkType: hard
+
 "cjs-module-lexer@npm:^1.0.0":
   version: 1.4.3
   resolution: "cjs-module-lexer@npm:1.4.3"
   checksum: 10c0/076b3af85adc4d65dbdab1b5b240fe5b45d44fcf0ef9d429044dd94d19be5589376805c44fb2d4b3e684e5fe6a9b7cf3e426476a6507c45283c5fc6ff95240be
+  languageName: node
+  linkType: hard
+
+"class-variance-authority@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "class-variance-authority@npm:0.7.1"
+  dependencies:
+    clsx: "npm:^2.1.1"
+  checksum: 10c0/0f438cea22131808b99272de0fa933c2532d5659773bfec0c583de7b3f038378996d3350683426b8e9c74a6286699382106d71fbec52f0dd5fbb191792cccb5b
   languageName: node
   linkType: hard
 
@@ -11136,6 +13516,13 @@ __metadata:
   version: 1.15.0
   resolution: "codepage@npm:1.15.0"
   checksum: 10c0/2455b482302cb784b46dea60a8ee83f0c23e794bdd979556bdb107abe681bba722af62a37f5c955ff4efd68fdb9688c3986e719b4fd536c0e06bb25bc82abea3
+  languageName: node
+  linkType: hard
+
+"collapse-white-space@npm:^2.0.0":
+  version: 2.1.0
+  resolution: "collapse-white-space@npm:2.1.0"
+  checksum: 10c0/b2e2800f4ab261e62eb27a1fbe853378296e3a726d6695117ed033e82d61fb6abeae4ffc1465d5454499e237005de9cfc52c9562dc7ca4ac759b9a222ef14453
   languageName: node
   linkType: hard
 
@@ -11952,7 +14339,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decimal.js@npm:^10.4.3":
+"decimal.js@npm:^10.4.3, decimal.js@npm:^10.6.0":
   version: 10.6.0
   resolution: "decimal.js@npm:10.6.0"
   checksum: 10c0/07d69fbcc54167a340d2d97de95f546f9ff1f69d2b45a02fd7a5292412df3cd9eb7e23065e532a318f5474a2e1bccf8392fdf0443ef467f97f3bf8cb0477e5aa
@@ -12173,6 +14560,13 @@ __metadata:
   version: 3.1.0
   resolution: "detect-newline@npm:3.1.0"
   checksum: 10c0/c38cfc8eeb9fda09febb44bcd85e467c970d4e3bf526095394e5a4f18bc26dd0cf6b22c69c1fa9969261521c593836db335c2795218f6d781a512aea2fb8209d
+  languageName: node
+  linkType: hard
+
+"detect-node-es@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "detect-node-es@npm:1.1.0"
+  checksum: 10c0/e562f00de23f10c27d7119e1af0e7388407eb4b06596a25f6d79a360094a109ff285de317f02b090faae093d314cf6e73ac3214f8a5bb3a0def5bece94557fbe
   languageName: node
   linkType: hard
 
@@ -13876,7 +16270,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-diff@npm:^1.3.0":
+"fast-diff@npm:1.3.0, fast-diff@npm:^1.3.0":
   version: 1.3.0
   resolution: "fast-diff@npm:1.3.0"
   checksum: 10c0/5c19af237edb5d5effda008c891a18a585f74bf12953be57923f17a3a4d0979565fc64dbc73b9e20926b9d895f5b690c618cbb969af0cf022e3222471220ad29
@@ -14104,6 +16498,13 @@ __metadata:
   version: 4.2.3
   resolution: "fecha@npm:4.2.3"
   checksum: 10c0/0e895965959cf6a22bb7b00f0bf546f2783836310f510ddf63f463e1518d4c96dec61ab33fdfd8e79a71b4856a7c865478ce2ee8498d560fe125947703c9b1cf
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.4.8":
+  version: 0.4.8
+  resolution: "fflate@npm:0.4.8"
+  checksum: 10c0/29d1eddaaa5deab61b1c6b0d21282adacadbc4d2c01e94d8b1ee784398151673b9c563e53f97a801bc410a1ae55e8de5378114a743430e643e7a0644ba8e5a42
   languageName: node
   linkType: hard
 
@@ -14470,6 +16871,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"franc-min@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "franc-min@npm:6.2.0"
+  dependencies:
+    trigram-utils: "npm:^2.0.0"
+  checksum: 10c0/21c243982b713a7726ffdb185415636c63711e7267be301b6d0607e3533f76771f2396091d9f1ca017f98357e4aa885c0cf4a2c0f90012e138f741cd9cfb5e45
+  languageName: node
+  linkType: hard
+
 "fresh@npm:^2.0.0":
   version: 2.0.0
   resolution: "fresh@npm:2.0.0"
@@ -14695,6 +17105,13 @@ __metadata:
     hasown: "npm:^2.0.2"
     math-intrinsics: "npm:^1.1.0"
   checksum: 10c0/9f4ab0cf7efe0fd2c8185f52e6f637e708f3a112610c88869f8f041bb9ecc2ce44bf285dfdbdc6f4f7c277a5b88d8e94a432374d97cca22f3de7fc63795deb5d
+  languageName: node
+  linkType: hard
+
+"get-nonce@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "get-nonce@npm:1.0.1"
+  checksum: 10c0/2d7df55279060bf0568549e1ffc9b84bc32a32b7541675ca092dce56317cdd1a59a98dcc4072c9f6a980779440139a3221d7486f52c488e69dc0fd27b1efb162
   languageName: node
   linkType: hard
 
@@ -15480,6 +17897,13 @@ __metadata:
   bin:
     image-size: bin/image-size.js
   checksum: 10c0/655204163af06732f483a9fe7cce9dff4a29b7b2e88f5c957a5852e8143fa750f5e54b1955a2ca83de99c5220dbd680002d0d4e09140b01433520f4d5a0b1f4c
+  languageName: node
+  linkType: hard
+
+"immediate@npm:~3.0.5":
+  version: 3.0.6
+  resolution: "immediate@npm:3.0.6"
+  checksum: 10c0/f8ba7ede69bee9260241ad078d2d535848745ff5f6995c7c7cb41cfdc9ccc213f66e10fa5afb881f90298b24a3f7344b637b592beb4f54e582770cdce3f1f039
   languageName: node
   linkType: hard
 
@@ -17039,6 +19463,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"kdbush@npm:^4.0.2":
+  version: 4.1.0
+  resolution: "kdbush@npm:4.1.0"
+  checksum: 10c0/b47c8a27de438df1e60080f73e3793217b4542a62bed7f07c8c29b0bf53359bbdba1e97305e396f7f4d28f98e31ce3fd21500dc3de03a44d8cda71a3d70ff7bb
+  languageName: node
+  linkType: hard
+
 "keyv@npm:^4.5.3, keyv@npm:^4.5.4":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -17205,6 +19636,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lie@npm:3.1.1":
+  version: 3.1.1
+  resolution: "lie@npm:3.1.1"
+  dependencies:
+    immediate: "npm:~3.0.5"
+  checksum: 10c0/d62685786590351b8e407814acdd89efe1cb136f05cb9236c5a97b2efdca1f631d2997310ad2d565c753db7596799870140e4777c9c9b8c44a0f6bf42d1804a1
+  languageName: node
+  linkType: hard
+
 "light-my-request@npm:^5.11.0":
   version: 5.14.0
   resolution: "light-my-request@npm:5.14.0"
@@ -17261,6 +19701,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"localforage@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "localforage@npm:1.10.0"
+  dependencies:
+    lie: "npm:3.1.1"
+  checksum: 10c0/00f19f1f97002e6721587ed5017f502d58faf80dae567d5065d4d1ee0caf0762f40d2e2dba7f0ef7d3f14ee6203242daae9ecad97359bfc10ecff36df11d85a3
+  languageName: node
+  linkType: hard
+
 "locate-character@npm:^3.0.0":
   version: 3.0.0
   resolution: "locate-character@npm:3.0.0"
@@ -17309,6 +19758,13 @@ __metadata:
   version: 4.17.23
   resolution: "lodash-es@npm:4.17.23"
   checksum: 10c0/3150fb6660c14c7a6b5f23bd11597d884b140c0e862a17fdb415aaa5ef7741523182904a6b7929f04e5f60a11edb5a79499eb448734381c99ffb3c4734beeddd
+  languageName: node
+  linkType: hard
+
+"lodash-es@npm:^4.18.1":
+  version: 4.18.1
+  resolution: "lodash-es@npm:4.18.1"
+  checksum: 10c0/35d4dcf87ef07f8d090f409447575800108057e360b445f590d0d25d09e3d1e33a163d2fc100d4d072b0f901d5e2fc533cd7c4bfd8eeb38a06abec693823c8b8
   languageName: node
   linkType: hard
 
@@ -18856,6 +21312,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"n-gram@npm:^2.0.0":
+  version: 2.0.2
+  resolution: "n-gram@npm:2.0.2"
+  checksum: 10c0/72e2cdc8c37c9253b556a0deb9cd26d5ac59a5d7a38b2d2928927e3959bc7d3cb591d766e30309a4c685dbc51330025cb30c5c6518ee516caf3318aed2635f1b
+  languageName: node
+  linkType: hard
+
 "named-placeholders@npm:^1.1.3, named-placeholders@npm:^1.1.6":
   version: 1.1.6
   resolution: "named-placeholders@npm:1.1.6"
@@ -18871,6 +21334,15 @@ __metadata:
   dependencies:
     node-gyp: "npm:latest"
   checksum: 10c0/add28b255a880f705f937b6276550ebc09274e8ea9d0e8f598f286c817aedfba22223844297840e597a478d7264537294f8c1eda0eb33a228b7aee57ecf52d45
+  languageName: node
+  linkType: hard
+
+"nanoid@npm:5.1.11":
+  version: 5.1.11
+  resolution: "nanoid@npm:5.1.11"
+  bin:
+    nanoid: bin/nanoid.js
+  checksum: 10c0/91580d18c29263ac0e871734f0d86e7f906f523f974d3c30fc65354ccf387ccffd606c2a6c28acc2977a3950146347e790ce9e3f514133a48995af5ccdb308ce
   languageName: node
   linkType: hard
 
@@ -19214,6 +21686,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"numfmt@npm:3.2.6":
+  version: 3.2.6
+  resolution: "numfmt@npm:3.2.6"
+  checksum: 10c0/e0ceea02d69ca2912d6dbdab29f9a0f83f197191482a6b6db05658c975cc8b1821bc4c6cb4f54cd810153ec0d05aacf3afc15d5be63e7d218119e9cf099126e9
+  languageName: node
+  linkType: hard
+
 "oauth-sign@npm:~0.9.0":
   version: 0.9.0
   resolution: "oauth-sign@npm:0.9.0"
@@ -19440,6 +21919,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"opentype.js@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "opentype.js@npm:2.0.0"
+  bin:
+    ot: bin/ot
+  checksum: 10c0/85539aca7b99ec10019adcdd2bcc74d0ab2757277f775394826db0fb465c5e075fa67cff83ce30082c990640225c1c678ddd23c1ba1c9580d167335ad5300b91
+  languageName: node
+  linkType: hard
+
 "optionator@npm:^0.9.3":
   version: 0.9.4
   resolution: "optionator@npm:0.9.4"
@@ -19498,6 +21986,24 @@ __metadata:
   bin:
     osx-release: cli.js
   checksum: 10c0/eb8486e2e467bf39a17301128e42fec5d1cf4b902ba93b8ea4b4b048d0a10daff01cf06c60a6e2733d0a894e85ff2d6bf02540949ab226b43b086dfabad0c9da
+  languageName: node
+  linkType: hard
+
+"ot-json1@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "ot-json1@npm:1.0.2"
+  dependencies:
+    ot-text-unicode: "npm:4"
+  checksum: 10c0/c90767cb27e0c41873f7b0972626fc0f7e8ecf82e74c7dce21dec5e859cfaf2c8642b7e0065ac29abe44e36eb61ff979be723495721768b2ce91f2f6f1bfba22
+  languageName: node
+  linkType: hard
+
+"ot-text-unicode@npm:4":
+  version: 4.0.0
+  resolution: "ot-text-unicode@npm:4.0.0"
+  dependencies:
+    unicount: "npm:1.1"
+  checksum: 10c0/1ed497f6ac3693664aa6dca24e520a161d2b45c8a377bb99959ee60465d7074230e8fcd373b4d9dd988bf7b15bb3c0ef645670caaccd6817c3b2ef5cfe429572
   languageName: node
   linkType: hard
 
@@ -20486,6 +22992,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"quickselect@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "quickselect@npm:3.0.0"
+  checksum: 10c0/3a0d33b0ec06841d953accdfd735aa3d8b7922cddd12970544a2c4b0278871280d8f5ba496803600693c1e7b7b2fb57c31d2b14d99132f478888006a1be6e6b7
+  languageName: node
+  linkType: hard
+
 "quill-delta@npm:^3.6.2":
   version: 3.6.3
   resolution: "quill-delta@npm:3.6.3"
@@ -20618,6 +23131,15 @@ __metadata:
     iconv-lite: "npm:~0.4.24"
     unpipe: "npm:~1.0.0"
   checksum: 10c0/449844344fc90547fb994383a494b83300e4f22199f146a79f68d78a199a8f2a923ea9fd29c3be979bfd50291a3884733619ffc15ba02a32e703b612f8d3f74a
+  languageName: node
+  linkType: hard
+
+"rbush@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "rbush@npm:4.0.1"
+  dependencies:
+    quickselect: "npm:^3.0.0"
+  checksum: 10c0/1d3c2e2c8b8111a6bcac0b36348ef55c977bc533a7a7bef44c423e24de531e43749bcf5b939008de69d97d3c6e7cf0e9040cecb4492358e6d562ea85165a1620
   languageName: node
   linkType: hard
 
@@ -20929,6 +23451,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-remove-scroll-bar@npm:^2.3.7":
+  version: 2.3.8
+  resolution: "react-remove-scroll-bar@npm:2.3.8"
+  dependencies:
+    react-style-singleton: "npm:^2.2.2"
+    tslib: "npm:^2.0.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/9a0675c66cbb52c325bdbfaed80987a829c4504cefd8ff2dd3b6b3afc9a1500b8ec57b212e92c1fb654396d07bbe18830a8146fe77677d2a29ce40b5e1f78654
+  languageName: node
+  linkType: hard
+
+"react-remove-scroll@npm:^2.6.3":
+  version: 2.7.2
+  resolution: "react-remove-scroll@npm:2.7.2"
+  dependencies:
+    react-remove-scroll-bar: "npm:^2.3.7"
+    react-style-singleton: "npm:^2.2.3"
+    tslib: "npm:^2.1.0"
+    use-callback-ref: "npm:^1.3.3"
+    use-sidecar: "npm:^1.1.3"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/b5f3315bead75e72853f492c0b51ba8fb4fa09a4534d7fc42d6fcd59ca3e047cf213279ffc1e35b337e314ef5a04cb2b12544c85e0078802271731c27c09e5aa
+  languageName: node
+  linkType: hard
+
 "react-resizable@npm:^3.0.5":
   version: 3.1.3
   resolution: "react-resizable@npm:3.1.3"
@@ -20979,6 +23536,22 @@ __metadata:
     object-assign: "npm:^4.1.0"
     prop-types: "npm:^15.5.8"
   checksum: 10c0/aa142567f2f53748b27729b38fe990e10558e95711ee8c6f7cfca5afab65d35c2f0c286e3d3a8ef3d644ad8958842d99ecbfbb5eda612b15dee4642249303e7a
+  languageName: node
+  linkType: hard
+
+"react-style-singleton@npm:^2.2.2, react-style-singleton@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "react-style-singleton@npm:2.2.3"
+  dependencies:
+    get-nonce: "npm:^1.0.0"
+    tslib: "npm:^2.0.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/841938ff16d16a6b76895f4cb2e1fea957e5fe3b30febbf03a54892dae1c9153f2383e231dea0b3ba41192ad2f2849448fa859caccd288943bce32639e971bee
   languageName: node
   linkType: hard
 
@@ -21215,6 +23788,13 @@ __metadata:
     hastscript: "npm:^9.0.0"
     parse-entities: "npm:^4.0.0"
   checksum: 10c0/7b69a3b525f88de4adae3467f30ff7e80513fa53e65d85656f169ded16e314f471dfa936ccc545ae604e178ee7a108cbd94e6144a5bd541ed8d20626cc75e7b8
+  languageName: node
+  linkType: hard
+
+"regexp-util@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "regexp-util@npm:2.0.3"
+  checksum: 10c0/1eba0b117697662c55fd94acbdb31f0aaf13cdf3a22bd80fb2ef1477d77fc33457d595e353007ad38e74c967fa9e04ff19de0c87403b2bca79d087722bb92f9f
   languageName: node
   linkType: hard
 
@@ -22369,6 +24949,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sonner@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "sonner@npm:2.0.7"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 10c0/6966ab5e892ed6aab579a175e4a24f3b48747f0fc21cb68c3e33cb41caa7a0eebeb098c210545395e47a18d585eb8734ae7dd12d2bd18c8a3294a1ee73f997d9
+  languageName: node
+  linkType: hard
+
 "sort-keys-length@npm:^1.0.0":
   version: 1.0.1
   resolution: "sort-keys-length@npm:1.0.1"
@@ -23158,6 +25748,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tailwind-merge@npm:2.6.0":
+  version: 2.6.0
+  resolution: "tailwind-merge@npm:2.6.0"
+  checksum: 10c0/fc8a5535524de9f4dacf1c16ab298581c7bb757d68a95faaf28942b1c555a619bba9d4c6726fe83986e44973b315410c1a5226e5354c30ba82353bd6d2288fa5
+  languageName: node
+  linkType: hard
+
 "tar-stream@npm:^3.1.7":
   version: 3.1.8
   resolution: "tar-stream@npm:3.1.8"
@@ -23586,6 +26183,16 @@ __metadata:
     node-gyp: "npm:latest"
     node-gyp-build: "npm:^4.8.4"
   checksum: 10c0/28d03778bdd8b4910aa064a9f3478c3e0ee697948282556b11452f6987a721535f4a9a8c528d9c04e0a0e8b759b8372a2118b9f21f5e200b48438a57a18e9977
+  languageName: node
+  linkType: hard
+
+"trigram-utils@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "trigram-utils@npm:2.0.1"
+  dependencies:
+    collapse-white-space: "npm:^2.0.0"
+    n-gram: "npm:^2.0.0"
+  checksum: 10c0/d024dc91a9c0310e75fa68422185e3a32814831971b9e86a2925e74bd1932a30501aa2ac214768f0a545f3db63610ee14b4748ac31532e1bc46c791941d71c6d
   languageName: node
   linkType: hard
 
@@ -24137,6 +26744,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"unicode-regex@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "unicode-regex@npm:4.2.0"
+  dependencies:
+    regexp-util: "npm:^2.0.3"
+  checksum: 10c0/36ad91bdca7919be3110076c3ea37f24663fca6b0dd270127425dfe32e71e2a264eee175a36447aa7add10bbeb9a4080063de1779c4f1d0f60ec124cc8d93e43
+  languageName: node
+  linkType: hard
+
+"unicount@npm:1.1":
+  version: 1.1.0
+  resolution: "unicount@npm:1.1.0"
+  checksum: 10c0/fb1ab7eee275fa16dc3b6cc5aade84a12b776220a64a366e2b78d9fa41d87f0990f852db66b4592a5c64f6a2b458ef65e0459bd2540f4c1e8f9b91f3f20d0866
+  languageName: node
+  linkType: hard
+
 "unified@npm:^11.0.0":
   version: 11.0.5
   resolution: "unified@npm:11.0.5"
@@ -24343,12 +26966,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"use-callback-ref@npm:^1.3.3":
+  version: 1.3.3
+  resolution: "use-callback-ref@npm:1.3.3"
+  dependencies:
+    tslib: "npm:^2.0.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/f887488c6e6075cdad4962979da1714b217bcb1ee009a9e57ce9a844bcfc4c3a99e93983dfc2e5af9e0913824d24e730090ff255e902c516dcb58d2d3837e01c
+  languageName: node
+  linkType: hard
+
 "use-memo-one@npm:^1.1.1":
   version: 1.1.3
   resolution: "use-memo-one@npm:1.1.3"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: 10c0/3d596e65a6b47b2f1818061599738e00daad1f9a9bb4e5ce1f014b20a35b297e50fe4bf1d8c1699ab43ea97f01f84649a736c15ceff96de83bfa696925f6cc6b
+  languageName: node
+  linkType: hard
+
+"use-sidecar@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "use-sidecar@npm:1.1.3"
+  dependencies:
+    detect-node-es: "npm:^1.1.0"
+    tslib: "npm:^2.0.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/161599bf921cfaa41c85d2b01c871975ee99260f3e874c2d41c05890d41170297bdcf314bc5185e7a700de2034ac5b888e3efc8e9f35724f4918f53538d717c9
   languageName: node
   linkType: hard
 

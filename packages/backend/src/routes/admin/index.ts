@@ -63,6 +63,7 @@ import globalNetworkTrafficRoutes from './global-network-traffic';
 import ImpactMetricsController from '../../controllers/impact-metrics-controller';
 import rippleCmsRoutes from './ripple-cms';
 import mediaAssetRoutes from './media-assets';
+import spreadsheetRoutes from './spreadsheets';
 
 const router = express.Router();
 
@@ -563,6 +564,13 @@ router.use(
   '/network',
   requireOrgPermission([P.FEATURES_READ]) as any,
   globalNetworkTrafficRoutes
+);
+
+// Spreadsheets (Org-level, generic spreadsheet tool)
+router.use(
+  '/spreadsheets',
+  requireOrgPermission([P.SPREADSHEETS_READ, P.SPREADSHEETS_UPDATE]) as any,
+  spreadsheetRoutes
 );
 
 export default router;
