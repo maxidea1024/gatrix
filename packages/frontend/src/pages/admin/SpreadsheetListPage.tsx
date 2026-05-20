@@ -51,6 +51,7 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   FileDownload as ExportIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -93,14 +94,6 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({ item, onRename, onTogglePi
         <MenuItem onClick={() => { setAnchorEl(null); onRename(); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={() => { setAnchorEl(null); onTogglePin(); }}>
-          <ListItemIcon>
-            {item.isPinned ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
-          </ListItemIcon>
-          <ListItemText>
-            {item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}
-          </ListItemText>
         </MenuItem>
         <MenuItem onClick={() => { setAnchorEl(null); onDuplicate(); }}>
           <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
@@ -481,10 +474,14 @@ const SpreadsheetListPage: React.FC = () => {
                     onClick={() => handleOpen(item.id)}
                     sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
                   >
-                    <TableCell sx={{ pr: 0 }}>
-                      {item.isPinned && (
-                        <PushPinIcon sx={{ fontSize: 14, color: 'primary.main', transform: 'rotate(45deg)' }} />
-                      )}
+                    <TableCell sx={{ pr: 0 }} onClick={(e) => { e.stopPropagation(); handleTogglePin(item); }}>
+                      <IconButton size="small" sx={{ p: 0.5, color: item.isPinned ? 'primary.main' : 'action.active' }}>
+                        {item.isPinned ? (
+                          <PushPinIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
+                        ) : (
+                          <PushPinOutlinedIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
+                        )}
+                      </IconButton>
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -534,14 +531,21 @@ const SpreadsheetListPage: React.FC = () => {
                       <RelativeTime date={item.updatedAt} variant="caption" />
                     </TableCell>
                     <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                      <SpreadsheetRowMenu
-                        item={item}
-                        onRename={() => { setRenameTarget(item); setRenameValue(item.title); }}
-                        onTogglePin={() => handleTogglePin(item)}
-                        onDuplicate={() => handleDuplicate(item.id)}
-                        onExportXlsx={() => handleExportXlsx(item)}
-                        onDelete={() => setDeleteTarget(item)}
-                      />
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                        <Tooltip title={t('spreadsheets.share', '공유')}>
+                          <IconButton size="small" onClick={() => setShareTarget(item)}>
+                            <ShareIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <SpreadsheetRowMenu
+                          item={item}
+                          onRename={() => { setRenameTarget(item); setRenameValue(item.title); }}
+                          onTogglePin={() => handleTogglePin(item)}
+                          onDuplicate={() => handleDuplicate(item.id)}
+                          onExportXlsx={() => handleExportXlsx(item)}
+                          onDelete={() => setDeleteTarget(item)}
+                        />
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -96,10 +96,8 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
         flexDirection: 'column',
         position: 'relative',
         borderTop: `3px solid ${accent}`,
-        transition: 'box-shadow 0.2s, transform 0.15s',
+        transition: 'none',
         '&:hover': {
-          boxShadow: theme.shadows[6],
-          transform: 'translateY(-2px)',
           '& .ss-card-menu': { opacity: 1 },
         },
       }}
@@ -109,22 +107,12 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onTogglePin(item); }}>
-          <ListItemIcon>
-            {item.isPinned ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
-          </ListItemIcon>
-          <ListItemText>
-            {item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}
-          </ListItemText>
-        </MenuItem>
+
         <MenuItem onClick={() => { handleMenuClose(); onDuplicate(item.id); }}>
           <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
           <ListItemText>{t('common.duplicate', 'Duplicate')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onShare(item); }}>
-          <ListItemIcon><ShareIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('spreadsheets.share', '공유')}</ListItemText>
-        </MenuItem>
+
         <MenuItem onClick={() => { handleMenuClose(); onExportXlsx(item); }}>
           <ListItemIcon><ExportIcon fontSize="small" /></ListItemIcon>
           <ListItemText>{t('spreadsheets.exportXlsx', 'Export as XLSX')}</ListItemText>
@@ -205,12 +193,38 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
               </Typography>
             )}
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-            {item.isPinned && (
-              <PushPinIcon
-                sx={{ fontSize: 16, color: 'primary.main', transform: 'rotate(45deg)', flexShrink: 0, mr: 0.5 }}
-              />
-            )}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {/* Share Button */}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare(item);
+              }}
+              sx={{ width: 28, height: 28, color: 'action.active' }}
+            >
+              <ShareIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+
+            {/* Pin Toggle Button */}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onTogglePin(item);
+              }}
+              sx={{ 
+                width: 28, 
+                height: 28, 
+                color: item.isPinned ? 'primary.main' : 'action.active' 
+              }}
+            >
+              {item.isPinned ? (
+                <PushPinIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+              ) : (
+                <PushPinOutlinedIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+              )}
+            </IconButton>
             
             {/* ⋮ Menu */}
             <IconButton
