@@ -80,7 +80,7 @@ const SharedSpreadsheetPage: React.FC = () => {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <LottieLoader size={80} message={t('spreadsheets.loading', 'Loading spreadsheet...')} />
+        <LottieLoader size={80} />
       </Box>
     );
   }
