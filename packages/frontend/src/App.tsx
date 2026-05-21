@@ -10,6 +10,7 @@ import { CssBaseline, Box, GlobalStyles, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { SnackbarProvider, closeSnackbar } from 'notistack';
 import Lottie from 'lottie-react';
+import LottieLoader from '@/components/common/LottieLoader';
 
 // MUI Date Pickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -281,25 +282,7 @@ const SharedSpreadsheetPage = React.lazy(
   () => import('./pages/shared/SharedSpreadsheetPage')
 );
 
-// Lottie Loading Animation Component
-const LottieLoader: React.FC = () => {
-  const [animData, setAnimData] = React.useState<object | null>(null);
-  React.useEffect(() => {
-    fetch('/animations/loading-dots.json')
-      .then((r) => r.json())
-      .then(setAnimData)
-      .catch(() => {});
-  }, []);
-  if (!animData) return null;
-  return (
-    <Lottie
-      animationData={animData}
-      loop
-      autoplay
-      style={{ width: 120, height: 120 }}
-    />
-  );
-};
+// LottieLoader is now imported from @/components/common/LottieLoader
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {

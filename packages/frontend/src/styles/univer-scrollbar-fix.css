@@ -3,103 +3,52 @@
  * ─────────────────────────
  * Univer injects: * { scrollbar-color: initial; scrollbar-width: initial }
  * This file MUST be imported AFTER Univer CSS to restore our scrollbar styles.
- *
- * This is a SEPARATE file from scrollbar.css because Vite deduplicates
- * CSS imports — if the same file is imported in App.tsx and here,
- * Vite only loads it once (from App.tsx, which is earlier than Univer).
+ * 
+ * [CRITICAL KNOWLEDGE / BUG FIX]
+ * Do NOT use the `scrollbar-color` CSS property in this project!
+ * In Chrome 121+, if `scrollbar-color` is present, Chrome completely ignores all 
+ * `::-webkit-scrollbar` pseudo-element styles (width, border-radius, background-color).
+ * Use only `::-webkit-scrollbar-*` and 8-digit Hex with alpha (e.g., #00000015) for transparency.
  */
 
-html,
-body,
-main,
-section,
-article,
-aside,
-nav,
-ul,
-ol,
-pre,
-table,
-.MuiDrawer-paper {
-  scrollbar-width: thin !important;
+/* ─── Base (light mode) ─── */
+*::-webkit-scrollbar {
+  width: 5px !important;
+  height: 5px !important;
 }
 
-/* Light mode defaults */
-html,
-body,
-main,
-section,
-article,
-aside,
-nav,
-ul,
-ol,
-pre,
-table,
-.MuiDrawer-paper {
-  scrollbar-color: rgba(0, 0, 0, 0.25) transparent !important;
-}
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-main::-webkit-scrollbar,
-section::-webkit-scrollbar,
-aside::-webkit-scrollbar,
-nav::-webkit-scrollbar,
-ul::-webkit-scrollbar,
-ol::-webkit-scrollbar,
-.MuiDrawer-paper::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-main::-webkit-scrollbar-track,
-section::-webkit-scrollbar-track,
-.MuiDrawer-paper::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   background: transparent !important;
 }
 
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-main::-webkit-scrollbar-thumb,
-section::-webkit-scrollbar-thumb,
-.MuiDrawer-paper::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.25) !important;
-  border-radius: 0 !important;
+/* Default: completely invisible */
+*::-webkit-scrollbar-thumb {
+  background-color: transparent !important;
+  border-radius: 4px !important;
 }
 
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover,
-main::-webkit-scrollbar-thumb:hover,
-section::-webkit-scrollbar-thumb:hover,
-.MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.35) !important;
+/* When hovering over the container: show faintly */
+*:hover::-webkit-scrollbar-thumb {
+  background-color: #00000015 !important;
 }
 
-/* Dark mode — uses app's data-theme attribute set by ThemeContext, NOT OS prefers-color-scheme */
-html[data-theme="dark"],
-html[data-theme="dark"] body,
-html[data-theme="dark"] main,
-html[data-theme="dark"] section,
-html[data-theme="dark"] article,
-html[data-theme="dark"] aside,
-html[data-theme="dark"] nav,
-html[data-theme="dark"] ul,
-html[data-theme="dark"] ol,
-html[data-theme="dark"] pre,
-html[data-theme="dark"] table,
-html[data-theme="dark"] .MuiDrawer-paper {
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent !important;
+/* When hovering exactly over the thumb: show a bit stronger */
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #00000030 !important;
 }
 
-html[data-theme="dark"] ::-webkit-scrollbar-thumb,
-html[data-theme="dark"]::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+/* ─── Dark mode ─── */
+/* Default: completely invisible */
+html[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background-color: transparent !important;
 }
 
-html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
-html[data-theme="dark"]::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.15) !important;
+/* When hovering over the container: show faintly */
+html[data-theme="dark"] *:hover::-webkit-scrollbar-thumb {
+  background-color: #ffffff0a !important; /* ~4% white */
+}
+
+/* When hovering exactly over the thumb: show a bit stronger */
+html[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff1a !important; /* ~10% white */
 }
