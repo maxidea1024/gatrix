@@ -48,15 +48,21 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
   const isDark = theme.palette.mode === 'dark';
   const [aboutOpen, setAboutOpen] = useState(false);
 
-  // Determine if a category should navigate directly (single child with path)
+  // Determine if a category should navigate directly (no children to show in sub-panel)
   const isDirectNav = (cat: MenuCategory): boolean => {
-    return !!cat.path && cat.children.length <= 1;
+    return !!cat.path && cat.children.length === 0;
   };
 
   const handleCategoryClick = (cat: MenuCategory) => {
     if (isDirectNav(cat)) {
+      // No children - just navigate, no sub-panel needed
       onDirectNavigate(cat.path!);
+    } else if (cat.path && cat.children.length > 0) {
+      // Has both path and children (e.g. Change Requests) - navigate AND open sub-panel
+      onDirectNavigate(cat.path);
+      onCategorySelect(cat.id);
     } else {
+      // Has children but no direct path - just open sub-panel
       onCategorySelect(cat.id);
     }
   };
