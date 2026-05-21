@@ -1170,7 +1170,7 @@ const ServiceAccountsPage: React.FC = () => {
           />
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('serviceAccounts.accountName')}</TableCell>

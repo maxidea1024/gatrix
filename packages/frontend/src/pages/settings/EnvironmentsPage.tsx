@@ -725,7 +725,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
           />
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ width: 40, p: 0.5 }} />

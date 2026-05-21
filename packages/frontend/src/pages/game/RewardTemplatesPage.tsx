@@ -772,7 +772,7 @@ const RewardTemplatesPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       {visibleColumns.map((column) => {

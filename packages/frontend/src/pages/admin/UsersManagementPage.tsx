@@ -1983,7 +1983,7 @@ const UsersManagementPage: React.FC = () => {
                   pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
                 }}
               >
-                <Table sx={{ tableLayout: 'auto' }}>
+                <Table size="small" sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       <TableCell padding="checkbox">

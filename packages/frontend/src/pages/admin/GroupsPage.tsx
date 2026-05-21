@@ -512,7 +512,7 @@ const GroupsPage: React.FC = () => {
           />
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('rbac.groups.name')}</TableCell>

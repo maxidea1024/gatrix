@@ -388,7 +388,7 @@ const RolesPage: React.FC = () => {
           />
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('rbac.roles.name')}</TableCell>
