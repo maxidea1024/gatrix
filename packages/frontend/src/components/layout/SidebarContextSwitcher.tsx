@@ -416,6 +416,8 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
                   whiteSpace: 'nowrap',
                   display: 'block',
                   opacity: 0.6,
+                  direction: 'rtl',
+                  textAlign: 'left',
                 }}
               >
                 {orgLabel} / {projLabel}
