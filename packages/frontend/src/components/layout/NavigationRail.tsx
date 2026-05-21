@@ -99,7 +99,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           }}
         >
           <img
-            src="/images/gat-mascot.png"
+            src="/images/gat-face.png"
             alt="Gatrix"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
