@@ -47,7 +47,7 @@ function resolveGrafanaUrl(): string | null {
   return null;
 }
 
-export const GrafanaDashboardPage: React.FC = () => {
+export const GrafanaDashboardPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -89,9 +89,11 @@ export const GrafanaDashboardPage: React.FC = () => {
     value: DashboardKey
   ) => {
     setSelectedDashboard(value);
-    const next = new URLSearchParams(searchParams);
-    next.set('dashboard', value);
-    setSearchParams(next, { replace: true });
+    if (!embedded) {
+      const next = new URLSearchParams(searchParams);
+      next.set('dashboard', value);
+      setSearchParams(next, { replace: true });
+    }
   };
 
   return (

@@ -26,6 +26,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Menu as MuiMenu,
 } from '@mui/material';
 import {
   KeyboardArrowDown,
@@ -39,6 +40,7 @@ import {
   BarChart as BarChartIcon,
   Stream as StreamIcon,
   DeleteSweep as InvalidateIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 
 import { useTranslation } from 'react-i18next';
@@ -64,10 +66,13 @@ interface EdgeGroup {
   children?: EdgeGroup[];
 }
 
-const GatrixEdgesPage: React.FC = () => {
+const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+
+  // MoreVert menu state
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
 
   // States
   const [initialLoading, setInitialLoading] = useState(true);
@@ -639,62 +644,53 @@ const GatrixEdgesPage: React.FC = () => {
         <Divider sx={{ my: 2 }} />
 
         {/* On-demand view buttons */}
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={
-              fullJsonLoading === instance.instanceId ? (
-                <CircularProgress size={14} color="inherit" />
+        <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+          <Tooltip title={t('gatrixEdges.cachingInfo')} leaveDelay={0}>
+            <IconButton
+              color="primary"
+              onClick={() => handleViewFullJson(instance)}
+              disabled={fullJsonLoading === instance.instanceId}
+            >
+              {fullJsonLoading === instance.instanceId ? (
+                <CircularProgress size={20} color="inherit" />
               ) : (
-                <CachedIcon fontSize="small" />
-              )
-            }
-            onClick={() => handleViewFullJson(instance)}
-            disabled={fullJsonLoading === instance.instanceId}
-            sx={{ fontSize: '0.75rem', textTransform: 'none' }}
-          >
-            {t('gatrixEdges.cachingInfo')}
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<BarChartIcon fontSize="small" />}
-            onClick={() => handleViewRequestStats(instance)}
-            sx={{ fontSize: '0.75rem', textTransform: 'none' }}
-          >
-            {t('gatrixEdges.requestStats')}
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<StreamIcon fontSize="small" />}
-            onClick={() => handleViewStreamingStats(instance)}
-            sx={{ fontSize: '0.75rem', textTransform: 'none' }}
-          >
-            {t('gatrixEdges.streamingStats')}
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            color="warning"
-            startIcon={
-              cacheInvalidating &&
+                <CachedIcon />
+              )}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('gatrixEdges.requestStats')} leaveDelay={0}>
+            <IconButton
+              color="primary"
+              onClick={() => handleViewRequestStats(instance)}
+            >
+              <BarChartIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('gatrixEdges.streamingStats')} leaveDelay={0}>
+            <IconButton
+              color="primary"
+              onClick={() => handleViewStreamingStats(instance)}
+            >
+              <StreamIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('gatrixEdges.cacheInvalidate')} leaveDelay={0}>
+            <IconButton
+              color="warning"
+              onClick={() => {
+                setCacheInvalidateTarget(instance);
+                setCacheInvalidateDialogOpen(true);
+              }}
+              disabled={cacheInvalidating}
+            >
+              {cacheInvalidating &&
               cacheInvalidateTarget?.instanceId === instance.instanceId ? (
-                <CircularProgress size={14} color="inherit" />
+                <CircularProgress size={20} color="inherit" />
               ) : (
-                <InvalidateIcon fontSize="small" />
-              )
-            }
-            onClick={() => {
-              setCacheInvalidateTarget(instance);
-              setCacheInvalidateDialogOpen(true);
-            }}
-            disabled={cacheInvalidating}
-            sx={{ fontSize: '0.75rem', textTransform: 'none' }}
-          >
-            {t('gatrixEdges.cacheInvalidate')}
-          </Button>
+                <InvalidateIcon />
+              )}
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
     );
@@ -989,160 +985,141 @@ const GatrixEdgesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
+      {/* Compact Grouping Controls */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          py: 1.5,
+          px: 2,
+          mb: 3,
+          bgcolor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.02)'
+              : 'rgba(0,0,0,0.02)',
+          borderRadius: 1,
+        }}
+      >
+        <Typography
+          variant="caption"
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 1.5,
+            fontWeight: 700,
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+            mr: 0.5,
           }}
         >
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                fontWeight: 'bold',
-                mb: 0.5,
-              }}
-            >
-              <DnsIcon />
-              {t('gatrixEdges.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('gatrixEdges.subtitle')}
-            </Typography>
-          </Box>
-          <Button
-            startIcon={
-              isRefreshing ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                <RefreshIcon />
-              )
-            }
-            variant="contained"
-            onClick={() => fetchServices(true)}
-            disabled={initialLoading || isRefreshing}
-          >
-            {t('common.refresh')}
-          </Button>
-        </Box>
+          {t('gatrixEdges.groupBy')}
+        </Typography>
 
-        {/* Compact Grouping Controls - Integrated */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            py: 1.5,
-            px: 2,
-            bgcolor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.02)'
-                : 'rgba(0,0,0,0.02)',
-            borderRadius: 1,
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 700,
-              color: 'text.secondary',
-              textTransform: 'uppercase',
-              letterSpacing: 0.5,
-              mr: 0.5,
+        {groupingLevels.map((level, index) => (
+          <Chip
+            key={index}
+            label={getGroupingLabel(level)}
+            onDelete={() => {
+              const newLevels = [...groupingLevels];
+              newLevels.splice(index, 1);
+              setGroupingLevels(newLevels);
             }}
-          >
-            {t('gatrixEdges.groupBy')}
-          </Typography>
+            size="small"
+            sx={{
+              height: 24,
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              bgcolor: theme.palette.primary.main,
+              color: '#fff',
+              '&:hover': {
+                bgcolor: theme.palette.primary.dark,
+              },
+              '& .MuiChip-deleteIcon': {
+                color: 'rgba(255,255,255,0.7)',
+                fontSize: '16px',
+                '&:hover': {
+                  color: '#fff',
+                },
+              },
+            }}
+          />
+        ))}
 
-          {groupingLevels.map((level, index) => (
-            <Chip
-              key={index}
-              label={getGroupingLabel(level)}
-              onDelete={() => {
-                const newLevels = [...groupingLevels];
-                newLevels.splice(index, 1);
-                setGroupingLevels(newLevels);
+        {groupingLevels.length < 2 && (
+          <FormControl size="small" sx={{ minWidth: 140 }}>
+            <Select
+              value=""
+              displayEmpty
+              onChange={(e: SelectChangeEvent) => {
+                const value = e.target.value as GroupingField;
+                if (value) {
+                  setGroupingLevels([...groupingLevels, value]);
+                }
               }}
-              size="small"
+              renderValue={() => (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 600, color: 'primary.main' }}
+                  >
+                    {t('gatrixEdges.addGroupBy')}
+                  </Typography>
+                </Box>
+              )}
               sx={{
                 height: 24,
                 fontSize: '0.75rem',
-                fontWeight: 600,
-                bgcolor: theme.palette.primary.main,
-                color: '#fff',
-                '&:hover': {
-                  bgcolor: theme.palette.primary.dark,
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'transparent',
                 },
-                '& .MuiChip-deleteIcon': {
-                  color: 'rgba(255,255,255,0.7)',
-                  fontSize: '16px',
-                  '&:hover': {
-                    color: '#fff',
-                  },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'primary.light',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'primary.main',
+                  borderWidth: 1,
+                },
+                '& .MuiSelect-select': {
+                  py: 0.5,
+                  px: 1,
                 },
               }}
-            />
-          ))}
+            >
+              {(['cloudProvider', 'cloudRegion'] as GroupingField[])
+                .filter((option) => !groupingLevels.includes(option))
+                .map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {getGroupingLabel(option)}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        )}
 
-          {groupingLevels.length < 2 && (
-            <FormControl size="small" sx={{ minWidth: 140 }}>
-              <Select
-                value=""
-                displayEmpty
-                onChange={(e: SelectChangeEvent) => {
-                  const value = e.target.value as GroupingField;
-                  if (value) {
-                    setGroupingLevels([...groupingLevels, value]);
-                  }
-                }}
-                renderValue={() => (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontWeight: 600, color: 'primary.main' }}
-                    >
-                      {t('gatrixEdges.addGroupBy')}
-                    </Typography>
-                  </Box>
-                )}
-                sx={{
-                  height: 24,
-                  fontSize: '0.75rem',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'transparent',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'primary.light',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'primary.main',
-                    borderWidth: 1,
-                  },
-                  '& .MuiSelect-select': {
-                    py: 0.5,
-                    px: 1,
-                  },
-                }}
-              >
-                {(['cloudProvider', 'cloudRegion'] as GroupingField[])
-                  .filter((option) => !groupingLevels.includes(option))
-                  .map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {getGroupingLabel(option)}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-          )}
-        </Box>
+        <Box sx={{ flexGrow: 1 }} />
+
+        <IconButton
+          size="small"
+          onClick={(e) => setMoreMenuAnchor(e.currentTarget)}
+        >
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+        <MuiMenu
+          anchorEl={moreMenuAnchor}
+          open={Boolean(moreMenuAnchor)}
+          onClose={() => setMoreMenuAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              setMoreMenuAnchor(null);
+              fetchServices(true);
+            }}
+            disabled={initialLoading || isRefreshing}
+          >
+            <RefreshIcon fontSize="small" sx={{ mr: 1 }} />
+            {t('common.refresh')}
+          </MenuItem>
+        </MuiMenu>
       </Box>
 
       {error && services.length > 0 && (
@@ -1209,21 +1186,18 @@ const GatrixEdgesPage: React.FC = () => {
                     }}
                   >
                     <Box
+                      component="img"
+                      src="/images/gat-face.png"
+                      alt="Gatrix"
                       sx={{
                         width: 48,
                         height: 48,
+                        borderRadius: '50%',
+                        objectFit: 'cover',
                         bgcolor: 'primary.main',
-                        borderRadius: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
+                        p: 0.5,
                       }}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                        G
-                      </Typography>
-                    </Box>
+                    />
                     <Typography variant="h6" fontWeight="bold">
                       Gatrix Core
                     </Typography>
@@ -1299,8 +1273,9 @@ const GatrixEdgesPage: React.FC = () => {
         }}
         maxWidth="xs"
         fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}>
           <InvalidateIcon color="warning" />
           {t('gatrixEdges.cacheInvalidate')}
         </DialogTitle>
@@ -1315,17 +1290,18 @@ const GatrixEdgesPage: React.FC = () => {
               sx={{ mb: 2, fontFamily: 'monospace', fontSize: '0.75rem' }}
             />
           )}
-          <Alert severity="warning" sx={{ mt: 1 }}>
+          <Alert severity="warning" sx={{ mt: 1, borderRadius: 2 }}>
             {t('gatrixEdges.cacheInvalidateWarning')}
           </Alert>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2.5, pt: 1, gap: 1 }}>
           <Button
             onClick={() => {
               setCacheInvalidateDialogOpen(false);
               setCacheInvalidateTarget(null);
             }}
             disabled={cacheInvalidating}
+            sx={{ borderRadius: 2, textTransform: 'none' }}
           >
             {t('common.cancel')}
           </Button>
@@ -1341,6 +1317,7 @@ const GatrixEdgesPage: React.FC = () => {
                 <InvalidateIcon />
               )
             }
+            sx={{ borderRadius: 2, textTransform: 'none' }}
           >
             {t('gatrixEdges.cacheInvalidate')}
           </Button>
@@ -1355,11 +1332,12 @@ const GatrixEdgesPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 0,
+            borderRadius: 3,
             minHeight: '70vh',
             maxHeight: '90vh',
             bgcolor: theme.palette.background.paper,
             backgroundImage: 'none',
+            overflow: 'hidden',
           },
         }}
       >
@@ -1367,19 +1345,18 @@ const GatrixEdgesPage: React.FC = () => {
         <Box
           sx={{
             px: 3,
-            py: 2.5,
+            py: 2,
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            borderBottom: `1px solid ${theme.palette.divider} `,
-            bgcolor: theme.palette.background.default,
+            borderBottom: `1px solid ${theme.palette.divider}`,
           }}
         >
           <Box
             sx={{
               width: 40,
               height: 40,
-              borderRadius: 0,
+              borderRadius: 2,
               bgcolor: theme.palette.primary.main,
               display: 'flex',
               alignItems: 'center',
@@ -1415,7 +1392,7 @@ const GatrixEdgesPage: React.FC = () => {
                   alignItems: 'center',
                   gap: 0.5,
                   bgcolor: theme.palette.action.hover,
-                  borderRadius: 1,
+                  borderRadius: 2,
                   px: 0.5,
                   height: 36,
                 }}
@@ -1491,27 +1468,30 @@ const GatrixEdgesPage: React.FC = () => {
         <Box
           sx={{
             px: 3,
-            py: 2,
-            borderTop: `1px solid ${theme.palette.divider} `,
+            py: 1.5,
+            borderTop: `1px solid ${theme.palette.divider}`,
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
-            bgcolor: theme.palette.background.default,
+            gap: 1,
           }}
         >
-          <Box />
-          {/* Spacer */}
-          <Stack direction="row" spacing={1.5}>
-            <Button startIcon={<CopyIcon />} onClick={handleCopyJson}>
-              {t('common.copy')}
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => setJsonDialogOpen(false)}
-            >
-              {t('common.close')}
-            </Button>
-          </Stack>
+          <Button
+            size="small"
+            startIcon={<CopyIcon />}
+            onClick={handleCopyJson}
+            sx={{ borderRadius: 2, textTransform: 'none' }}
+          >
+            {t('common.copy')}
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => setJsonDialogOpen(false)}
+            sx={{ borderRadius: 2, textTransform: 'none' }}
+          >
+            {t('common.close')}
+          </Button>
         </Box>
       </Dialog>
     </Box>

@@ -83,7 +83,7 @@ const defaultColumns: ColumnConfig[] = [
 
 const EMPTY_TAGS: number[] = [];
 
-const JobsPage: React.FC = () => {
+const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -505,7 +505,8 @@ const JobsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
+      {!embedded && (
       <PageHeader
         icon={<WorkIcon />}
         title={t('jobs.title')}
@@ -522,6 +523,7 @@ const JobsPage: React.FC = () => {
           ) : undefined
         }
       />
+      )}
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
@@ -606,7 +608,7 @@ const JobsPage: React.FC = () => {
                 pointerEvents: loading ? 'none' : 'auto',
               }}
             >
-              <Table sx={{ tableLayout: 'auto' }}>
+              <Table size="small" sx={{ tableLayout: 'auto' }}>
                 <TableHead>
                   <TableRow>
                     {columns

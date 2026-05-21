@@ -1344,7 +1344,7 @@ const FeatureNetworkPage: React.FC = () => {
                 </Box>
                 <Collapse in={showTable}>
                   <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
-                    <Table size="small" stickyHeader>
+                    <Table size="small" stickyHeader sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
                       <TableHead
                         sx={{
                           '& .MuiTableCell-root': {
@@ -1553,7 +1553,7 @@ const FeatureNetworkPage: React.FC = () => {
                 </Box>
                 <Collapse in={showEvalTable}>
                   <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
-                    <Table size="small" stickyHeader>
+                    <Table size="small" stickyHeader sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
                       <TableHead
                         sx={{
                           '& .MuiTableCell-root': {

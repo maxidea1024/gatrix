@@ -158,7 +158,7 @@ const statusIcons: Record<string, React.ReactElement> = {
   delayed: <DelayedIcon fontSize="small" />,
 };
 
-const QueueMonitorPage: React.FC = () => {
+const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
@@ -166,11 +166,14 @@ const QueueMonitorPage: React.FC = () => {
 
   const [stats, setStats] = useState<QueueStats[]>([]);
   const [selectedQueue, setSelectedQueue] = useState<string | null>(
-    searchParams.get('queue') || null
+    !embedded ? searchParams.get('queue') || null : null
   );
   const [activeTab, setActiveTab] = useState(() => {
+    if (embedded) return 0;
     const tabParam = searchParams.get('tab');
-    return tabParam ? parseInt(tabParam, 10) : 0;
+    if (!tabParam) return 0;
+    const parsed = parseInt(tabParam, 10);
+    return Number.isNaN(parsed) ? 0 : parsed;
   });
   const [repeatables, setRepeatables] = useState<RepeatableJob[]>([]);
   const [jobs, setJobs] = useState<QueueJob[]>([]);
@@ -204,13 +207,14 @@ const QueueMonitorPage: React.FC = () => {
 
   const statusTabs = ['completed', 'failed', 'active', 'waiting', 'delayed'];
 
-  // Sync state to URL query params
+  // Sync state to URL query params (skip when embedded to avoid parent tab conflicts)
   useEffect(() => {
+    if (embedded) return;
     const params: Record<string, string> = {};
     if (selectedQueue) params.queue = selectedQueue;
     if (activeTab !== 0) params.tab = String(activeTab);
     setSearchParams(params, { replace: true });
-  }, [selectedQueue, activeTab, setSearchParams]);
+  }, [selectedQueue, activeTab, setSearchParams, embedded]);
 
   // Load queue stats
   const loadStats = useCallback(async () => {
@@ -403,8 +407,9 @@ const QueueMonitorPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {/* Header */}
+      {!embedded && (
       <PageHeader
         icon={<MonitorIcon />}
         title={t('queueMonitor.title')}
@@ -487,6 +492,7 @@ const QueueMonitorPage: React.FC = () => {
           </>
         }
       />
+      )}
 
       <PageContentLoader loading={loading}>
         {stats.length === 0 ? (

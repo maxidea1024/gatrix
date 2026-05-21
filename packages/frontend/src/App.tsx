@@ -9,7 +9,7 @@ import {
 import { CssBaseline, Box, GlobalStyles, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { SnackbarProvider, closeSnackbar } from 'notistack';
-import Lottie from 'lottie-react';
+
 import LottieLoader from '@/components/common/LottieLoader';
 
 // MUI Date Pickers
@@ -190,6 +190,21 @@ const ProjectsPage = React.lazy(() => import('./pages/admin/ProjectsPage'));
 const WorkspacePage = React.lazy(() => import('./pages/admin/WorkspacePage'));
 const WorkspaceTabbedPage = React.lazy(
   () => import('./pages/admin/WorkspaceTabbedPage')
+);
+const SecurityTabbedPage = React.lazy(
+  () => import('./pages/admin/SecurityTabbedPage')
+);
+const ScheduleTabbedPage = React.lazy(
+  () => import('./pages/admin/ScheduleTabbedPage')
+);
+const ServersTabbedPage = React.lazy(
+  () => import('./pages/admin/ServersTabbedPage')
+);
+const MonitoringTabbedPage = React.lazy(
+  () => import('./pages/admin/MonitoringTabbedPage')
+);
+const PlanningTabbedPage = React.lazy(
+  () => import('./pages/game/PlanningTabbedPage')
 );
 
 // Pages - Game
@@ -703,22 +718,27 @@ const AppContent: React.FC = () => {
                                           path="maintenance-templates"
                                           element={<MessageTemplatesPage />}
                                         />
+                                        {/* Schedule Management - Tabbed */}
+                                        <Route
+                                          path="schedule"
+                                          element={<ScheduleTabbedPage />}
+                                        />
                                         <Route
                                           path="scheduler"
-                                          element={<SchedulerPage />}
+                                          element={<Navigate to="/admin/schedule" replace />}
                                         />
                                         <Route
                                           path="whitelist"
-                                          element={<WhitelistPage />}
+                                          element={<Navigate to="/admin/security?tab=whitelist" replace />}
                                         />
 
                                         <Route
                                           path="jobs"
-                                          element={<JobsPage />}
+                                          element={<Navigate to="/admin/schedule?tab=jobs" replace />}
                                         />
                                         <Route
                                           path="queue-monitor"
-                                          element={<QueueMonitorPage />}
+                                          element={<Navigate to="/admin/schedule?tab=queue" replace />}
                                         />
                                         <Route
                                           path="audit-logs"
@@ -736,18 +756,28 @@ const AppContent: React.FC = () => {
                                           path="crashes"
                                           element={<CrashesPage />}
                                         />
+                                        {/* Security - Tabbed */}
+                                        <Route
+                                          path="security"
+                                          element={<SecurityTabbedPage />}
+                                        />
                                         <Route
                                           path="api-tokens"
-                                          element={<ApiTokensPage />}
+                                          element={<Navigate to="/admin/security" replace />}
                                         />
 
+                                        {/* Server Management - Tabbed */}
+                                        <Route
+                                          path="servers"
+                                          element={<ServersTabbedPage />}
+                                        />
                                         <Route
                                           path="server-list"
-                                          element={<ServerListPage />}
+                                          element={<Navigate to="/admin/servers" replace />}
                                         />
                                         <Route
                                           path="server-lifecycle"
-                                          element={<ServerLifecyclePage />}
+                                          element={<Navigate to="/admin/servers?tab=lifecycle" replace />}
                                         />
                                         <Route
                                           path="change-requests"
@@ -757,9 +787,14 @@ const AppContent: React.FC = () => {
                                           path="change-requests/:id"
                                           element={<ChangeRequestDetailPage />}
                                         />
+                                        {/* Monitoring - Tabbed */}
+                                        <Route
+                                          path="monitoring"
+                                          element={<MonitoringTabbedPage />}
+                                        />
                                         <Route
                                           path="grafana-dashboard"
-                                          element={<GrafanaDashboardPage />}
+                                          element={<Navigate to="/admin/monitoring" replace />}
                                         />
                                         <Route
                                           path="open-api"
@@ -772,7 +807,7 @@ const AppContent: React.FC = () => {
 
                                         <Route
                                           path="gatrix-edges"
-                                          element={<GatrixEdgesPage />}
+                                          element={<Navigate to="/admin/servers?tab=edges" replace />}
                                         />
                                         <Route
                                           path="signal-endpoints"
@@ -845,26 +880,14 @@ const AppContent: React.FC = () => {
                                 }
                               />
 
-                              {/* Monitoring Routes */}
+                              {/* Monitoring Routes - Redirect to tabbed page */}
                               <Route
                                 path="/monitoring/logs"
-                                element={
-                                  <ProtectedRoute requiredRoles={['admin']}>
-                                    <MainLayout>
-                                      <LogsPage />
-                                    </MainLayout>
-                                  </ProtectedRoute>
-                                }
+                                element={<Navigate to="/admin/monitoring?tab=logs" replace />}
                               />
                               <Route
                                 path="/monitoring/alerts"
-                                element={
-                                  <ProtectedRoute requiredRoles={['admin']}>
-                                    <MainLayout>
-                                      <AlertsPage />
-                                    </MainLayout>
-                                  </ProtectedRoute>
-                                }
+                                element={<Navigate to="/admin/monitoring?tab=alerts" replace />}
                               />
 
                               {/* Game Routes */}
@@ -933,13 +956,11 @@ const AppContent: React.FC = () => {
                                           />
                                           <Route
                                             path="planning-data"
-                                            element={<PlanningDataPage />}
+                                            element={<PlanningTabbedPage />}
                                           />
                                           <Route
                                             path="planning-data-history"
-                                            element={
-                                              <PlanningDataHistoryPage />
-                                            }
+                                            element={<Navigate to="../planning-data?tab=history" replace />}
                                           />
                                         </Routes>
                                       </EnvironmentAwareLayout>

@@ -1517,31 +1517,55 @@ const ClientVersionsPage: React.FC = () => {
           );
         case 'clientVersion':
           return (
-            <Chip
-              label={clientVersion.clientVersion}
-              size="small"
-              variant="filled"
-              sx={{
-                ...getVersionColorStyle(
-                  clientVersion.clientVersion,
-                  theme.palette.mode === 'dark'
-                ),
-                cursor: 'pointer',
-                fontWeight: 600,
-                borderRadius: '4px',
-                '&:hover': {
-                  opacity: 0.8,
-                  transform: 'scale(1.05)',
-                  boxShadow: 2,
-                },
-                transition: 'all 0.2s ease-in-out',
-              }}
-              onClick={() => {
-                setEditingClientVersion(clientVersion);
-                setIsCopyMode(false);
-                setFormDialogOpen(true);
-              }}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Chip
+                label={clientVersion.clientVersion}
+                size="small"
+                variant="filled"
+                sx={{
+                  ...getVersionColorStyle(
+                    clientVersion.clientVersion,
+                    theme.palette.mode === 'dark'
+                  ),
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  borderRadius: '4px',
+                  '&:hover': {
+                    opacity: 0.8,
+                    transform: 'scale(1.05)',
+                    boxShadow: 2,
+                  },
+                  transition: 'all 0.2s ease-in-out',
+                }}
+                onClick={() => {
+                  setEditingClientVersion(clientVersion);
+                  setIsCopyMode(false);
+                  setFormDialogOpen(true);
+                }}
+              />
+              <Tooltip title={t('common.copy')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboardWithNotification(
+                      clientVersion.clientVersion,
+                      () =>
+                        enqueueSnackbar(t('common.copiedToClipboard'), {
+                          variant: 'success',
+                        }),
+                      () =>
+                        enqueueSnackbar(t('common.copyFailed'), {
+                          variant: 'error',
+                        })
+                    );
+                  }}
+                  sx={{ p: 0.5 }}
+                >
+                  <CopyIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           );
         case 'clientStatus':
           return (

@@ -80,6 +80,7 @@ import serverLifecycleService, {
   ServerLifecycleEvent,
 } from '@/services/serverLifecycleService';
 import DashboardCcuChart from '@/components/admin/DashboardCcuChart';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   formatCompactNumber,
   formatWithCommas,
@@ -887,7 +888,8 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <PageContentLoader loading={permissionsLoading}>
+      <Box sx={{ p: 2 }}>
       {/* Hero Section */}
       <Box
         sx={{
@@ -2475,7 +2477,8 @@ const DashboardPage: React.FC = () => {
             )}
           </Grid>
         )}
-    </Box>
+      </Box>
+    </PageContentLoader>
   );
 };
 

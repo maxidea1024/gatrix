@@ -271,21 +271,9 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.planningData',
         icon: 'Storage',
+        path: '/game/planning-data',
         requiredPermission: P.PLANNING_DATA_READ,
-        children: [
-          {
-            text: 'sidebar.planningDataManagement',
-            icon: 'Storage',
-            path: '/game/planning-data',
-            requiredPermission: P.PLANNING_DATA_READ,
-          },
-          {
-            text: 'sidebar.planningDataHistory',
-            icon: 'History',
-            path: '/game/planning-data-history',
-            requiredPermission: P.PLANNING_DATA_READ,
-          },
-        ],
+        matchPaths: ['/game/planning-data', '/game/planning-data-history'],
       },
       {
         text: 'sidebar.cmsDataManagement',
@@ -396,27 +384,9 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.scheduleManagement',
         icon: 'Schedule',
+        path: '/admin/schedule',
         requiredPermission: P.SCHEDULER_READ,
-        children: [
-          {
-            text: 'sidebar.scheduler',
-            icon: 'Schedule',
-            path: '/admin/scheduler',
-            requiredPermission: P.SCHEDULER_READ,
-          },
-          {
-            text: 'sidebar.jobs',
-            icon: 'Work',
-            path: '/admin/jobs',
-            requiredPermission: P.SCHEDULER_READ,
-          },
-          {
-            text: 'sidebar.queueMonitor',
-            icon: 'Monitor',
-            path: '/admin/queue-monitor',
-            requiredPermission: P.SCHEDULER_READ,
-          },
-        ],
+        matchPaths: ['/admin/schedule', '/admin/scheduler', '/admin/jobs', '/admin/queue-monitor'],
       },
       {
         text: 'sidebar.auditLogs',
@@ -456,71 +426,23 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.security',
         icon: 'Security',
+        path: '/admin/security',
         requiredPermission: P.ADMIN_TOKENS_READ,
-        children: [
-          {
-            text: 'sidebar.apiAccessTokens',
-            icon: 'VpnKey',
-            path: '/admin/api-tokens',
-            requiredPermission: P.ADMIN_TOKENS_READ,
-          },
-          {
-            text: 'sidebar.whitelist',
-            icon: 'Security',
-            path: '/admin/whitelist',
-            requiredPermission: P.IP_WHITELIST_READ,
-          },
-        ],
+        matchPaths: ['/admin/security', '/admin/api-tokens', '/admin/whitelist'],
       },
       {
         text: 'sidebar.serverManagement',
         icon: 'Dns',
+        path: '/admin/servers',
         requiredPermission: P.SERVERS_READ,
-        children: [
-          {
-            text: 'sidebar.serverList',
-            icon: 'Storage',
-            path: '/admin/server-list',
-            requiredPermission: P.SERVERS_READ,
-          },
-          {
-            text: 'sidebar.serverLifecycle',
-            icon: 'History',
-            path: '/admin/server-lifecycle',
-            requiredPermission: P.SERVERS_READ,
-          },
-          {
-            text: 'sidebar.gatrixEdges',
-            icon: 'Dns',
-            path: '/admin/gatrix-edges',
-            requiredPermission: P.SERVERS_READ,
-          },
-        ],
+        matchPaths: ['/admin/servers', '/admin/server-list', '/admin/server-lifecycle', '/admin/gatrix-edges'],
       },
       {
         text: 'sidebar.monitoring',
         icon: 'Monitor',
+        path: '/admin/monitoring',
         requiredPermission: P.MONITORING_READ,
-        children: [
-          {
-            text: 'sidebar.grafana',
-            icon: 'Monitor',
-            path: '/admin/grafana-dashboard',
-            requiredPermission: P.MONITORING_READ,
-          },
-          {
-            text: 'sidebar.logs',
-            icon: 'Monitor',
-            path: '/monitoring/logs',
-            requiredPermission: P.MONITORING_READ,
-          },
-          {
-            text: 'sidebar.alerts',
-            icon: 'Notifications',
-            path: '/monitoring/alerts',
-            requiredPermission: P.MONITORING_READ,
-          },
-        ],
+        matchPaths: ['/admin/monitoring', '/admin/grafana-dashboard', '/monitoring/logs', '/monitoring/alerts'],
       },
       {
         text: 'sidebar.openApi',

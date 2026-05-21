@@ -519,7 +519,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           <Card variant="outlined">
             <CardContent sx={{ p: 0 }}>
               <TableContainer>
-                <Table>
+                <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('ipWhitelist.ipAddress')}</TableCell>

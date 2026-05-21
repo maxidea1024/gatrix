@@ -778,7 +778,7 @@ const EventRow: React.FC<EventRowProps> = ({
   );
 };
 
-const ServerLifecyclePage: React.FC = () => {
+const ServerLifecyclePage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -812,6 +812,7 @@ const ServerLifecyclePage: React.FC = () => {
 
   // Clear URL params after initial load to avoid persisting in URL
   useEffect(() => {
+    if (embedded) return;
     const urlInstanceId = searchParams.get('instanceId');
     if (urlInstanceId) {
       // Clear the URL parameter after applying filter
@@ -1131,12 +1132,14 @@ const ServerLifecyclePage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
+      {!embedded && (
       <PageHeader
         icon={<HistoryIcon />}
         title={t('serverLifecycle.title')}
         subtitle={t('serverLifecycle.subtitle')}
       />
+      )}
 
       {/* Filters */}
       <Box

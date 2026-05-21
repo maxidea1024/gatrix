@@ -1291,10 +1291,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Check category-level path
       if (cat.path && isActivePath(cat.path)) {
         setActiveCategoryId(cat.id);
+        try { localStorage.setItem('railActiveCategoryId', cat.id); } catch {}
         // Direct-nav categories (no children, e.g. dashboard/settings) should close the sub-panel
         const isDirectNav = !!cat.path && cat.children.length === 0;
         if (isDirectNav) {
           setSubPanelOpen(false);
+          try { localStorage.setItem('railSubPanelOpen', 'false'); } catch {}
         }
         return;
       }
@@ -1302,12 +1304,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       for (const item of cat.children) {
         if (item.path && isActivePath(item.path)) {
           setActiveCategoryId(cat.id);
+          try { localStorage.setItem('railActiveCategoryId', cat.id); } catch {}
           return;
         }
         if (item.children) {
           for (const child of item.children) {
             if (child.path && isActivePath(child.path)) {
               setActiveCategoryId(cat.id);
+              try { localStorage.setItem('railActiveCategoryId', cat.id); } catch {}
               return;
             }
           }

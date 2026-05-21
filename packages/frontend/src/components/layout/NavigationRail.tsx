@@ -10,7 +10,7 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
-import { Info as InfoIcon } from '@mui/icons-material';
+import { Info as InfoIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type { MenuCategory } from '@/config/navigation';
 
@@ -109,7 +109,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
       {/* Logo */}
       <Tooltip title="Dashboard" placement="right" arrow>
         <Box
-          onClick={onLogoClick}
+          onClick={(e) => { e.stopPropagation(); onLogoClick(); }}
           sx={{
             width: 40,
             height: 40,
@@ -170,7 +170,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
               arrow
             >
               <Box
-                onClick={() => handleCategoryClick(cat)}
+                onClick={(e) => { e.stopPropagation(); handleCategoryClick(cat); }}
                 sx={{
                   position: 'relative',
                   width: 44,
@@ -287,46 +287,80 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           },
         }}
       >
-        <DialogContent sx={{ textAlign: 'center', py: 5, px: 4 }}>
-          {/* Mascot */}
+        <IconButton
+          onClick={() => setAboutOpen(false)}
+          size="small"
+          sx={{ position: 'absolute', top: 8, right: 8, color: 'text.disabled' }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+        <DialogContent sx={{ textAlign: 'center', py: 4, px: 4 }}>
+          {/* Gaming animation */}
           <Box
             component="img"
-            src="/images/gat-mascot.png"
+            src="/images/gat-gaming.webp"
             alt="Gat"
             sx={{
-              width: 96,
-              height: 96,
-              borderRadius: 3,
+              width: 120,
+              height: 120,
               mx: 'auto',
-              mb: 2.5,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              mb: 1,
+              display: 'block',
             }}
           />
 
+          {/* Typing animation: "I am Gat" */}
+          <Typography
+            variant="body2"
+            sx={{
+              fontFamily: 'monospace',
+              fontWeight: 600,
+              color: 'text.secondary',
+              mb: 3,
+              height: 20,
+              overflow: 'hidden',
+              display: 'inline-block',
+              borderRight: '2px solid',
+              borderColor: 'primary.main',
+              whiteSpace: 'nowrap',
+              animation: `typing 1.5s steps(12) forwards, blink 0.6s step-end infinite`,
+              '@keyframes typing': {
+                '0%': { width: 0 },
+                '100%': { width: '8em' },
+              },
+              '@keyframes blink': {
+                '0%, 100%': { borderColor: 'transparent' },
+                '50%': { borderColor: 'primary.main' },
+              },
+            }}
+          >
+            I am Gat 🐱
+          </Typography>
+
           {/* App name */}
-          <Typography variant="h5" fontWeight={700} gutterBottom>
+          <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
             Gatrix
           </Typography>
 
-          {/* Version */}
+          {/* Version badge */}
           <Typography
-            variant="body2"
-            color="text.secondary"
+            variant="caption"
             sx={{
               fontFamily: 'monospace',
               bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'grey.100',
               display: 'inline-block',
               px: 1.5,
-              py: 0.5,
-              borderRadius: 1,
+              py: 0.25,
+              borderRadius: 2,
               mb: 2,
+              color: 'text.secondary',
             }}
           >
-            v{__APP_VERSION__}
+            {__APP_VERSION__}
           </Typography>
 
           {/* Description */}
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
             {t('about.description', 'Game Operations Management Platform')}
           </Typography>
 

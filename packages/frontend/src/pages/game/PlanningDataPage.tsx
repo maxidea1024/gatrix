@@ -65,7 +65,11 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
 
-const PlanningDataPage: React.FC = () => {
+interface PlanningDataPageProps {
+  embedded?: boolean;
+}
+
+const PlanningDataPage: React.FC<PlanningDataPageProps> = ({ embedded = false }) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -729,45 +733,47 @@ const PlanningDataPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: embedded ? 0 : 2 }}>
       {/* Header */}
-      <PageHeader
-        icon={<StorageIcon />}
-        title={t('planningData.title')}
-        subtitle={t('planningData.subtitle')}
-        actions={
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={loadStats}
-              disabled={loading || rebuilding}
-            >
-              {t('common.refresh')}
-            </Button>
-            {canManage && (
+      {!embedded && (
+        <PageHeader
+          icon={<StorageIcon />}
+          title={t('planningData.title')}
+          subtitle={t('planningData.subtitle')}
+          actions={
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 variant="contained"
-                startIcon={<CloudUploadIcon />}
-                onClick={handleRebuild}
-                disabled={loading}
+                startIcon={<RefreshIcon />}
+                onClick={loadStats}
+                disabled={loading || rebuilding}
               >
-                {t('planningData.uploadData')}
+                {t('common.refresh')}
               </Button>
-            )}
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ height: 32, alignSelf: 'center' }}
-            />
-            <Tooltip title={t('planningData.uploadGuide.title')}>
-              <IconButton onClick={() => setShowGuideDrawer(true)}>
-                <HelpOutlineIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        }
-      />
+              {canManage && (
+                <Button
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={handleRebuild}
+                  disabled={loading}
+                >
+                  {t('planningData.uploadData')}
+                </Button>
+              )}
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ height: 32, alignSelf: 'center' }}
+              />
+              <Tooltip title={t('planningData.uploadGuide.title')}>
+                <IconButton onClick={() => setShowGuideDrawer(true)}>
+                  <HelpOutlineIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          }
+        />
+      )}
 
       {/* Upload Dialog Modal */}
       {showUploadDialog && (

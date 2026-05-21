@@ -30,7 +30,7 @@ function resolveGrafanaUrl(): string | null {
   return null;
 }
 
-const LogsPage: React.FC = () => {
+const LogsPage: React.FC<{ embedded?: boolean }> = () => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
 

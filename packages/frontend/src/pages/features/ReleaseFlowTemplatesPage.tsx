@@ -1813,7 +1813,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
-                <Table>
+                <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
                   <TableHead>
                     <TableRow>
                       {visibleColumns.map((column) => {

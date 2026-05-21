@@ -2424,7 +2424,7 @@ const FeatureFlagsPage: React.FC = () => {
               ) : (
                 <>
                   <TableContainer>
-                    <Table>
+                    <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
                       <TableHead>
                         <TableRow>
                           <TableCell padding="checkbox" sx={{ width: 48 }}>

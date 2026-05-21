@@ -29,7 +29,7 @@ interface MonitoringAlert {
   endsAt?: string | null;
 }
 
-const AlertsPage: React.FC = () => {
+const AlertsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -134,11 +134,13 @@ const AlertsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
+      {!embedded && (
       <PageHeader
         title={t('monitoring.alerts.title')}
         subtitle={t('monitoring.alerts.subtitle')}
       />
+      )}
 
       <Card variant="outlined">
         {loading ? (

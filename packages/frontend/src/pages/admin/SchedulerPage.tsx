@@ -144,7 +144,7 @@ interface CreateScheduleEventData {
   jobDataMap?: { [key: string]: { value: string; type: string } };
 }
 
-const SchedulerPage: React.FC = () => {
+const SchedulerPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const calendarRef = useRef<FullCalendar>(null);
@@ -386,8 +386,9 @@ const SchedulerPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {/* Header */}
+      {!embedded && (
       <PageHeader
         icon={<ScheduleIcon />}
         title={t('scheduler.title')}
@@ -404,6 +405,7 @@ const SchedulerPage: React.FC = () => {
           ) : undefined
         }
       />
+      )}
 
       {/* Calendar */}
       <PageContentLoader loading={loading}>

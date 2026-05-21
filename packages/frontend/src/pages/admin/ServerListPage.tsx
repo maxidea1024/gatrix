@@ -212,7 +212,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
   );
 };
 
-const ServerListPage: React.FC = () => {
+const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -2065,19 +2065,22 @@ const ServerListPage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 3,
-        height: '100%',
+        p: embedded ? 1 : 3,
+        pt: embedded ? 2 : 3,
+        height: embedded ? 'calc(100vh - 180px)' : '100%',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
     >
+      {!embedded && (
       <PageHeader
         icon={<DnsIcon />}
         title={t('serverList.title')}
         subtitle={t('serverList.subtitle')}
       />
+      )}
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3, flexShrink: 0 }}>

@@ -76,7 +76,7 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 
-const WhitelistPage: React.FC = () => {
+const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -105,7 +105,7 @@ const WhitelistPage: React.FC = () => {
 
   // Get initial tab from URL, localStorage, or default to 0
   const getInitialTab = () => {
-    const tabParam = searchParams.get('tab');
+    const tabParam = !embedded ? searchParams.get('tab') : null;
     if (tabParam) {
       const tabIndex = tabNames.indexOf(tabParam);
       if (tabIndex >= 0) {
@@ -263,8 +263,9 @@ const WhitelistPage: React.FC = () => {
     loadWhitelists();
   }, [pageState.page, pageState.limit, debouncedSearch]);
 
-  // Update tab when URL changes (browser back/forward)
+  // Update tab when URL changes (browser back/forward) - skip when embedded
   useEffect(() => {
+    if (embedded) return;
     const tabParam = searchParams.get('tab');
     if (tabParam) {
       const tabIndex = tabNames.indexOf(tabParam);
@@ -273,16 +274,20 @@ const WhitelistPage: React.FC = () => {
         localStorage.setItem('whitelist.lastTab', tabParam);
       }
     }
-  }, [searchParams, currentTab, tabNames]);
+  }, [searchParams, currentTab, tabNames, embedded]);
 
   // Handlers
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     const name = tabNames[newValue];
 
-    // Update URL with new tab (single source of truth)
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('tab', name);
-    setSearchParams(newSearchParams, { replace: true });
+    // When embedded, only update local state (skip URL to avoid parent tab conflicts)
+    if (!embedded) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set('tab', name);
+      setSearchParams(newSearchParams, { replace: true });
+    } else {
+      setCurrentTab(newValue);
+    }
 
     // Persist selection
     localStorage.setItem('whitelist.lastTab', name);
@@ -565,10 +570,11 @@ const WhitelistPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {/* Main Card with Tabs */}
       <Card>
         <CardContent>
+          {!embedded && (
           <PageHeader
             icon={<SecurityIcon />}
             title={t('whitelist.title')}
@@ -583,6 +589,7 @@ const WhitelistPage: React.FC = () => {
               </Button>
             }
           />
+          )}
 
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
             <Tab label={t('whitelist.tabs.account')} />
@@ -684,11 +691,12 @@ const WhitelistPage: React.FC = () => {
                 <Card variant="outlined">
                   <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                     <TableContainer>
-                      <Table>
+                      <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
                         <TableHead>
                           <TableRow>
-                            <TableCell>
+                            <TableCell padding="checkbox">
                               <Checkbox
+                                size="small"
                                 checked={
                                   selectedIds.length > 0 &&
                                   selectedIds.length === whitelists.length
@@ -725,8 +733,9 @@ const WhitelistPage: React.FC = () => {
                               hover
                               selected={selectedIds.includes(whitelist.id)}
                             >
-                              <TableCell>
+                              <TableCell padding="checkbox">
                                 <Checkbox
+                                  size="small"
                                   checked={selectedIds.includes(whitelist.id)}
                                   onChange={() => handleSelectOne(whitelist.id)}
                                 />
@@ -853,24 +862,13 @@ const WhitelistPage: React.FC = () => {
                                 />
                               </TableCell>
                               <TableCell>
-                                <Box>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: 500 }}
-                                  >
-                                    {whitelist.createdByName ||
-                                      t('dashboard.unknown')}
-                                  </Typography>
-                                  {whitelist.createdByEmail && (
-                                    <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                      sx={{ display: 'block' }}
-                                    >
-                                      {whitelist.createdByEmail}
-                                    </Typography>
-                                  )}
-                                </Box>
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 500 }}
+                                >
+                                  {whitelist.createdByName ||
+                                    t('dashboard.unknown')}
+                                </Typography>
                               </TableCell>
                               <TableCell>
                                 <Tooltip

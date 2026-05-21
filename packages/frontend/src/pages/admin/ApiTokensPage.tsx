@@ -1175,7 +1175,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
   );
 };
 
-const ApiTokensPage: React.FC = () => {
+const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { language } = useI18n();
@@ -2083,8 +2083,9 @@ const ApiTokensPage: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ p: 2 }}>
+      <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
         {/* Header */}
+        {!embedded && (
         <PageHeader
           icon={<VpnKeyIcon />}
           title={t('apiTokens.title')}
@@ -2101,7 +2102,7 @@ const ApiTokensPage: React.FC = () => {
             ) : undefined
           }
         />
-
+        )}
         {/* Bulk Actions */}
         {canManage && selectedTokenIds.length > 0 && (
           <Box

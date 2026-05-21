@@ -55,7 +55,11 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
 
-const PlanningDataHistoryPage: React.FC = () => {
+interface PlanningDataHistoryPageProps {
+  embedded?: boolean;
+}
+
+const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({ embedded = false }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -187,25 +191,27 @@ const PlanningDataHistoryPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: embedded ? 0 : 2 }}>
       {/* Header */}
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('planningData.history.title')}
-        subtitle={t('planningData.history.subtitle')}
-        actions={
-          canManage && history.length > 0 ? (
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<DeleteIcon />}
-              onClick={() => setShowResetDialog(true)}
-            >
-              {t('planningData.history.resetAll')}
-            </Button>
-          ) : undefined
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          icon={<HistoryIcon />}
+          title={t('planningData.history.title')}
+          subtitle={t('planningData.history.subtitle')}
+          actions={
+            canManage && history.length > 0 ? (
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={() => setShowResetDialog(true)}
+              >
+                {t('planningData.history.resetAll')}
+              </Button>
+            ) : undefined
+          }
+        />
+      )}
 
       {/* Search Bar */}
       <Box sx={{ mb: 2 }}>
