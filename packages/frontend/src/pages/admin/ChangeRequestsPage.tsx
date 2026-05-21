@@ -838,7 +838,7 @@ const ChangeRequestsPage: React.FC = () => {
                 pointerEvents: isLoading ? 'none' : 'auto',
               }}
             >
-              <Table sx={{ tableLayout: 'auto' }}>
+              <Table size="small" sx={{ tableLayout: 'auto' }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>{t('changeRequest.status')}</TableCell>
