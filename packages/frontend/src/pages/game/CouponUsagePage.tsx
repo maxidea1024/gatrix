@@ -517,36 +517,7 @@ const CouponUsagePage: React.FC = () => {
 
   return (
     <>
-      {/* Header */}
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('coupons.couponUsage.title')}
-        subtitle={t('coupons.couponUsage.subtitle')}
-        actions={
-          <>
-            <Button
-              variant="contained"
-              startIcon={<DownloadIcon />}
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-              disabled={exporting || records.length === 0}
-            >
-              {exporting ? t('common.exporting') : t('common.export')}
-            </Button>
-            <Menu
-              anchorEl={exportMenuAnchor}
-              open={Boolean(exportMenuAnchor)}
-              onClose={() => setExportMenuAnchor(null)}
-            >
-              <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-              <MenuItem onClick={() => handleExport('xlsx')}>
-                Excel (XLSX)
-              </MenuItem>
-            </Menu>
-          </>
-        }
-      />
-
-      {/* Search & Filters */}
+      {/* Search & Filters + Actions */}
       <Box sx={{ mb: 2 }}>
         <Box
           sx={{
@@ -586,19 +557,40 @@ const CouponUsagePage: React.FC = () => {
               refreshDisabled={loading}
               noWrap
               afterFilterAddActions={
-                <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
+                <>
+                  <Tooltip title={t('common.columnSettings')}>
+                    <IconButton
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: 'action.hover' },
+                      }}
+                    >
+                      <ViewColumnIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Button
+                    variant="contained"
+                    startIcon={<DownloadIcon />}
+                    onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+                    disabled={exporting || records.length === 0}
+                    sx={{ whiteSpace: 'nowrap' }}
                   >
-                    <ViewColumnIcon />
-                  </IconButton>
-                </Tooltip>
+                    {exporting ? t('common.exporting') : t('common.export')}
+                  </Button>
+                  <Menu
+                    anchorEl={exportMenuAnchor}
+                    open={Boolean(exportMenuAnchor)}
+                    onClose={() => setExportMenuAnchor(null)}
+                  >
+                    <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+                    <MenuItem onClick={() => handleExport('xlsx')}>
+                      Excel (XLSX)
+                    </MenuItem>
+                  </Menu>
+                </>
               }
             />
           </Box>

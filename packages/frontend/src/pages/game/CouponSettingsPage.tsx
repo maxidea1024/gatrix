@@ -1468,79 +1468,7 @@ const CouponSettingsPage: React.FC = () => {
 
   return (
     <>
-      {/* Header */}
-      <PageHeader
-        icon={<SettingsIcon />}
-        title={t('coupons.couponSettings.title')}
-        subtitle={t('coupons.couponSettings.subtitle')}
-        actions={
-          <>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => {
-                  resetForm();
-                  setOpenForm(true);
-                }}
-              >
-                {t('coupons.couponSettings.createCoupon')}
-              </Button>
-            )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'name', header: t('common.name') },
-                    {
-                      key: 'code',
-                      header: t('coupons.couponSettings.columns.code'),
-                    },
-                    { key: 'type', header: t('common.type') },
-                    { key: 'status', header: t('common.status') },
-                    { key: 'description', header: t('common.description') },
-                    { key: 'startsAt', header: t('common.start') },
-                    { key: 'expiresAt', header: t('common.end') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      sortedItems,
-                      exportColumns,
-                      'coupon-definitions',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-            </Menu>
-          </>
-        }
-      />
-
-      {/* Search & Filters */}
+      {/* Search & Filters + Actions */}
       <Box sx={{ mb: 2 }}>
         <Box
           sx={{
@@ -1580,9 +1508,23 @@ const CouponSettingsPage: React.FC = () => {
               refreshDisabled={loading}
               noWrap={true}
               afterFilterAddActions={
-                <Tooltip title={t('common.columnSettings')}>
+                <>
+                  <Tooltip title={t('common.columnSettings')}>
+                    <IconButton
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: 'action.hover' },
+                      }}
+                    >
+                      <ViewColumnIcon />
+                    </IconButton>
+                  </Tooltip>
                   <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+                    aria-label="more options"
                     sx={{
                       bgcolor: 'background.paper',
                       border: 1,
@@ -1590,9 +1532,65 @@ const CouponSettingsPage: React.FC = () => {
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <MoreVertIcon />
                   </IconButton>
-                </Tooltip>
+                  <Menu
+                    anchorEl={pageMenuAnchor}
+                    open={Boolean(pageMenuAnchor)}
+                    onClose={() => setPageMenuAnchor(null)}
+                  >
+                    <ExportImportMenuItems
+                      onExport={(format) => {
+                        setPageMenuAnchor(null);
+                        const exportColumns: ExportColumn[] = [
+                          { key: 'name', header: t('common.name') },
+                          {
+                            key: 'code',
+                            header: t('coupons.couponSettings.columns.code'),
+                          },
+                          { key: 'type', header: t('common.type') },
+                          { key: 'status', header: t('common.status') },
+                          { key: 'description', header: t('common.description') },
+                          { key: 'startsAt', header: t('common.start') },
+                          { key: 'expiresAt', header: t('common.end') },
+                          { key: 'createdAt', header: t('common.createdAt') },
+                        ];
+                        try {
+                          exportToFile(
+                            sortedItems,
+                            exportColumns,
+                            'coupon-definitions',
+                            format
+                          );
+                          enqueueSnackbar(t('common.exportSuccess'), {
+                            variant: 'success',
+                          });
+                        } catch (err) {
+                          enqueueSnackbar(t('common.exportFailed'), {
+                            variant: 'error',
+                          });
+                        }
+                      }}
+                      onImportClick={() => {
+                        setPageMenuAnchor(null);
+                        setImportDialogOpen(true);
+                      }}
+                    />
+                  </Menu>
+                  {canManage && (
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      onClick={() => {
+                        resetForm();
+                        setOpenForm(true);
+                      }}
+                      sx={{ whiteSpace: 'nowrap' }}
+                    >
+                      {t('coupons.couponSettings.createCoupon')}
+                    </Button>
+                  )}
+                </>
               }
             />
           </Box>
