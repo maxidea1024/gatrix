@@ -105,9 +105,9 @@ const SettingsPage: React.FC = () => {
         </Typography>
       </Box>
 
-      <Card>
+      <Card sx={{ maxWidth: 640 }}>
         <CardContent>
-          <Stack spacing={2} sx={{ maxWidth: 560 }}>
+          <Stack spacing={2}>
             {/* Language */}
             <Autocomplete
               options={supportedLanguages}
