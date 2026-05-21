@@ -262,7 +262,10 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
       {/* About button */}
       <Tooltip title={t('common.about', 'About')} placement="right" arrow>
         <IconButton
-          onClick={(e) => { e.stopPropagation(); setAboutOpen(true); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setAboutOpen(true);
+          }}
           size="small"
           sx={{
             mt: 0.5,
