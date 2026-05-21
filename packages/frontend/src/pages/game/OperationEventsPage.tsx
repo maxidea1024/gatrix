@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { Box, Tab, Tabs, Paper } from '@mui/material';
 import {
-  Settings as SettingsIcon,
-  History as HistoryIcon,
-  ConfirmationNumber as ConfirmationNumberIcon,
+  Whatshot as WhatshotIcon,
+  Celebration as CelebrationIcon,
+  Event as EventIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -12,11 +12,11 @@ import { P } from '@/types/permissions';
 import PageHeader from '@/components/common/PageHeader';
 
 // Lazy-load the actual page contents
-const CouponSettingsPage = React.lazy(
-  () => import('./CouponSettingsPage')
+const HotTimeButtonEventPage = React.lazy(
+  () => import('./HotTimeButtonEventPage')
 );
-const CouponUsagePage = React.lazy(
-  () => import('./CouponUsagePage')
+const LiveEventPage = React.lazy(
+  () => import('./LiveEventPage')
 );
 
 interface TabConfig {
@@ -29,27 +29,26 @@ interface TabConfig {
 
 const TAB_CONFIGS: TabConfig[] = [
   {
-    key: 'settings',
-    labelKey: 'sidebar.couponSettings',
-    icon: <SettingsIcon sx={{ fontSize: 18 }} />,
-    permission: [P.COUPONS_READ],
-    component: CouponSettingsPage,
+    key: 'hottime',
+    labelKey: 'sidebar.hotTimeButtonEvent',
+    icon: <WhatshotIcon sx={{ fontSize: 18 }} />,
+    permission: [P.OPERATION_EVENTS_READ],
+    component: HotTimeButtonEventPage,
   },
   {
-    key: 'usage',
-    labelKey: 'sidebar.couponUsage',
-    icon: <HistoryIcon sx={{ fontSize: 18 }} />,
-    permission: [P.COUPONS_READ],
-    component: CouponUsagePage,
+    key: 'live',
+    labelKey: 'sidebar.liveEvent',
+    icon: <CelebrationIcon sx={{ fontSize: 18 }} />,
+    permission: [P.OPERATION_EVENTS_READ],
+    component: LiveEventPage,
   },
 ];
 
-const CouponsPage: React.FC = () => {
+const OperationEventsPage: React.FC = () => {
   const { t } = useTranslation();
   const { hasPermission } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Filter tabs by permission
   const visibleTabs = useMemo(
     () =>
       TAB_CONFIGS.filter(
@@ -58,7 +57,6 @@ const CouponsPage: React.FC = () => {
     [hasPermission]
   );
 
-  // Get active tab from URL param, default to first visible tab
   const activeTabKey = searchParams.get('tab') || visibleTabs[0]?.key || '';
   const activeTabIndex = Math.max(
     0,
@@ -77,12 +75,13 @@ const CouponsPage: React.FC = () => {
   return (
     <Box sx={{ p: 2 }}>
       <PageHeader
-        icon={<ConfirmationNumberIcon />}
-        title={t('coupons.title')}
-        subtitle={t('coupons.subtitle')}
+        icon={<EventIcon />}
+        title={t('sidebar.operationEvents')}
+        subtitle={t('operationEvents.subtitle', {
+          defaultValue: '핫타임/버튼 이벤트 및 라이브 이벤트를 관리합니다.',
+        })}
       />
 
-      {/* Tabs */}
       <Paper variant="outlined" sx={{ mb: 2 }}>
         <Tabs
           value={activeTabIndex}
@@ -106,7 +105,6 @@ const CouponsPage: React.FC = () => {
         </Tabs>
       </Paper>
 
-      {/* Tab content */}
       <React.Suspense fallback={null}>
         {ActiveComponent && <ActiveComponent />}
       </React.Suspense>
@@ -114,4 +112,4 @@ const CouponsPage: React.FC = () => {
   );
 };
 
-export default CouponsPage;
+export default OperationEventsPage;

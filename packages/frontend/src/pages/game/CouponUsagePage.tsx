@@ -516,7 +516,7 @@ const CouponUsagePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <>
       {/* Header */}
       <PageHeader
         icon={<HistoryIcon />}
@@ -1019,7 +1019,7 @@ const CouponUsagePage: React.FC = () => {
           )}
         </DialogActions>
       </Dialog>
-    </Box>
+    </>
   );
 };
 

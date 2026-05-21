@@ -235,21 +235,8 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.coupons',
         icon: 'ConfirmationNumber',
+        path: '/game/coupons',
         requiredPermission: P.COUPONS_READ,
-        children: [
-          {
-            text: 'sidebar.couponSettings',
-            icon: 'Settings',
-            path: '/game/coupon-settings',
-            requiredPermission: P.COUPONS_READ,
-          },
-          {
-            text: 'sidebar.couponUsage',
-            icon: 'History',
-            path: '/game/coupon-usage',
-            requiredPermission: P.COUPONS_READ,
-          },
-        ],
       },
       {
         text: 'sidebar.surveys',
@@ -279,21 +266,8 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.operationEvents',
         icon: 'Event',
+        path: '/game/operation-events',
         requiredPermission: P.OPERATION_EVENTS_READ,
-        children: [
-          {
-            text: 'sidebar.hotTimeButtonEvent',
-            icon: 'Whatshot',
-            path: '/game/hot-time-button-event',
-            requiredPermission: P.OPERATION_EVENTS_READ,
-          },
-          {
-            text: 'sidebar.liveEvent',
-            icon: 'Celebration',
-            path: '/game/live-event',
-            requiredPermission: P.OPERATION_EVENTS_READ,
-          },
-        ],
       },
       {
         text: 'sidebar.storeProducts',

@@ -1467,7 +1467,7 @@ const CouponSettingsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <>
       {/* Header */}
       <PageHeader
         icon={<SettingsIcon />}
@@ -3955,7 +3955,7 @@ const CouponSettingsPage: React.FC = () => {
           }
         }}
       />
-    </Box>
+    </>
   );
 };
 

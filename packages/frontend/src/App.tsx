@@ -230,6 +230,9 @@ const HotTimeButtonEventPage = React.lazy(
   () => import('./pages/game/HotTimeButtonEventPage')
 );
 const LiveEventPage = React.lazy(() => import('./pages/game/LiveEventPage'));
+const OperationEventsPage = React.lazy(
+  () => import('./pages/game/OperationEventsPage')
+);
 const PlanningDataPage = React.lazy(
   () => import('./pages/game/PlanningDataPage')
 );
@@ -899,20 +902,24 @@ const AppContent: React.FC = () => {
                                             element={<BannerManagementPage />}
                                           />
                                           <Route
+                                            path="operation-events"
+                                            element={<OperationEventsPage />}
+                                          />
+                                          <Route
                                             path="hot-time-button-event"
-                                            element={<HotTimeButtonEventPage />}
+                                            element={<Navigate to="../operation-events?tab=hottime" replace />}
                                           />
                                           <Route
                                             path="coupon-settings"
-                                            element={<CouponSettingsPage />}
+                                            element={<Navigate to="../coupons?tab=settings" replace />}
                                           />
                                           <Route
                                             path="coupon-usage"
-                                            element={<CouponUsagePage />}
+                                            element={<Navigate to="../coupons?tab=usage" replace />}
                                           />
                                           <Route
                                             path="live-event"
-                                            element={<LiveEventPage />}
+                                            element={<Navigate to="../operation-events?tab=live" replace />}
                                           />
                                           <Route
                                             path="planning-data"
