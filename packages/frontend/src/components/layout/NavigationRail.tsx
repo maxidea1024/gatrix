@@ -71,10 +71,9 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
     }
   };
 
-  // When sub-panel is closed, clicking the rail background reopens it
-  const handleRailBackgroundClick = (e: React.MouseEvent) => {
-    // Only trigger if clicking the rail background itself (not an icon)
-    if (e.target === e.currentTarget && !subPanelOpen) {
+  // When sub-panel is closed, clicking anywhere on the rail reopens it
+  const handleRailBackgroundClick = () => {
+    if (!subPanelOpen) {
       onRailClick();
     }
   };
