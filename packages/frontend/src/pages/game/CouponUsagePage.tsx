@@ -21,12 +21,17 @@ import {
   DialogActions,
   LinearProgress,
   Menu,
+  Divider,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   History as HistoryIcon,
   ViewColumn as ViewColumnIcon,
   Download as DownloadIcon,
   ContentCopy as ContentCopyIcon,
+  MoreVert as MoreVertIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
@@ -553,46 +558,68 @@ const CouponUsagePage: React.FC = () => {
               onFilterAdd={handleFilterAdd}
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleFilterChange}
-              onRefresh={load}
-              refreshDisabled={loading}
               noWrap
               afterFilterAddActions={
-                <>
-                  <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <ViewColumnIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Button
-                    variant="contained"
-                    startIcon={<DownloadIcon />}
-                    onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-                    disabled={exporting || records.length === 0}
-                    sx={{ whiteSpace: 'nowrap' }}
+                <Tooltip title={t('common.columnSettings')}>
+                  <IconButton
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
                   >
-                    {exporting ? t('common.exporting') : t('common.export')}
-                  </Button>
-                  <Menu
-                    anchorEl={exportMenuAnchor}
-                    open={Boolean(exportMenuAnchor)}
-                    onClose={() => setExportMenuAnchor(null)}
-                  >
-                    <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-                    <MenuItem onClick={() => handleExport('xlsx')}>
-                      Excel (XLSX)
-                    </MenuItem>
-                  </Menu>
-                </>
+                    <ViewColumnIcon />
+                  </IconButton>
+                </Tooltip>
               }
             />
+          </Box>
+          <Box sx={{ flexShrink: 0 }}>
+            <IconButton
+              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+              aria-label="more options"
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={exportMenuAnchor}
+              open={Boolean(exportMenuAnchor)}
+              onClose={() => setExportMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => handleExport('csv')}
+                disabled={exporting || records.length === 0}
+              >
+                <ListItemIcon><DownloadIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>CSV {t('common.export')}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => handleExport('xlsx')}
+                disabled={exporting || records.length === 0}
+              >
+                <ListItemIcon><DownloadIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>Excel (XLSX) {t('common.export')}</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setExportMenuAnchor(null);
+                  load();
+                }}
+                disabled={loading}
+              >
+                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('common.refresh')}</ListItemText>
+              </MenuItem>
+            </Menu>
           </Box>
         </Box>
       </Box>

@@ -212,6 +212,9 @@ const CouponUsagePage = React.lazy(
 const MediaAssetsPage = React.lazy(
   () => import('./pages/admin/MediaAssetsPage')
 );
+const SurveysTabPage = React.lazy(
+  () => import('./pages/game/SurveysTabPage')
+);
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
 const SurveyLogsPage = React.lazy(() => import('./pages/game/SurveyLogsPage'));
 const SurveyTemplatesPage = React.lazy(
@@ -238,6 +241,9 @@ const PlanningDataPage = React.lazy(
 );
 const PlanningDataHistoryPage = React.lazy(
   () => import('./pages/game/PlanningDataHistoryPage')
+);
+const RippleTabPage = React.lazy(
+  () => import('./pages/admin/RippleTabPage')
 );
 const RippleMonitorPage = React.lazy(
   () => import('./pages/admin/RippleMonitorPage')
@@ -806,12 +812,16 @@ const AppContent: React.FC = () => {
                                           element={<WorkspaceTabbedPage />}
                                         />
                                         <Route
+                                          path="ripple"
+                                          element={<RippleTabPage />}
+                                        />
+                                        <Route
                                           path="ripple-monitor"
-                                          element={<RippleMonitorPage />}
+                                          element={<Navigate to="/admin/ripple?tab=monitor" replace />}
                                         />
                                         <Route
                                           path="ripple-history"
-                                          element={<RippleHistoryPage />}
+                                          element={<Navigate to="/admin/ripple?tab=history" replace />}
                                         />
                                         <Route
                                           path="cms-data"
@@ -879,15 +889,15 @@ const AppContent: React.FC = () => {
                                           />
                                           <Route
                                             path="surveys"
-                                            element={<SurveysPage />}
+                                            element={<SurveysTabPage />}
                                           />
                                           <Route
                                             path="survey-logs"
-                                            element={<SurveyLogsPage />}
+                                            element={<Navigate to="/game/surveys?tab=logs" replace />}
                                           />
                                           <Route
                                             path="survey-templates"
-                                            element={<SurveyTemplatesPage />}
+                                            element={<Navigate to="/game/surveys?tab=templates" replace />}
                                           />
                                           <Route
                                             path="store-products"

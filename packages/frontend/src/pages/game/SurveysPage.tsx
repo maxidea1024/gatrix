@@ -420,18 +420,70 @@ const SurveysPage: React.FC = () => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   return (
-    <Box sx={{ p: 2 }}>
-      <PageHeader
-        icon={<PollIcon />}
-        title={t('surveys.title')}
-        subtitle={t('surveys.subtitle')}
-        actions={
-          <>
+    <>
+
+      {/* Filter Panel */}
+      <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'nowrap',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'center',
+              flexWrap: 'nowrap',
+              flexGrow: 1,
+              minWidth: 0,
+            }}
+          >
+            <SearchTextField
+              placeholder={t('surveys.searchPlaceholder')}
+              value={searchTerm}
+              onChange={setSearchTerm}
+            />
+
+            {/* Dynamic Filter Bar with Column Settings */}
+            <DynamicFilterBar
+              availableFilters={availableFilterDefinitions}
+              activeFilters={activeFilters}
+              onFilterAdd={handleFilterAdd}
+              onFilterRemove={handleFilterRemove}
+              onFilterChange={handleDynamicFilterChange}
+              onOperatorChange={handleOperatorChange}
+              noWrap={true}
+              afterFilterAddActions={
+                <Tooltip title={t('users.columnSettings')}>
+                  <IconButton
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                    }}
+                  >
+                    <ViewColumnIcon />
+                  </IconButton>
+                </Tooltip>
+              }
+            />
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
             {canManage && (
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={handleCreate}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 {t('surveys.createSurvey')}
               </Button>
@@ -439,6 +491,12 @@ const SurveysPage: React.FC = () => {
             <IconButton
               onClick={(e) => setPageMenuAnchor(e.currentTarget)}
               aria-label="more options"
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
             >
               <MoreVertIcon />
             </IconButton>
@@ -453,9 +511,7 @@ const SurveysPage: React.FC = () => {
                   handleConfigOpen();
                 }}
               >
-                <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
-                </ListItemIcon>
+                <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
                 <ListItemText>{t('surveys.config')}</ListItemText>
               </MenuItem>
               <Divider />
@@ -487,67 +543,18 @@ const SurveysPage: React.FC = () => {
                   setImportDialogOpen(true);
                 }}
               />
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  loadSurveys();
+                }}
+                disabled={loading}
+              >
+                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('common.refresh')}</ListItemText>
+              </MenuItem>
             </Menu>
-          </>
-        }
-      />
-
-      {/* Filter Panel */}
-      <Box sx={{ mb: 2 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            flexWrap: 'nowrap',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'center',
-              flexWrap: 'nowrap',
-              flexGrow: 1,
-              minWidth: 0,
-            }}
-          >
-            <SearchTextField
-              placeholder={t('surveys.searchPlaceholder')}
-              value={searchTerm}
-              onChange={setSearchTerm}
-            />
-
-            {/* Dynamic Filter Bar with Column Settings and Refresh Button */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-              onRefresh={loadSurveys}
-              refreshDisabled={loading}
-              noWrap={true}
-              afterFilterAddActions={
-                <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <ViewColumnIcon />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
           </Box>
         </Box>
       </Box>
@@ -982,7 +989,7 @@ const SurveysPage: React.FC = () => {
         onClose={() => setLogsDrawerOpen(false)}
         survey={logsDrawerSurvey}
       />
-    </Box>
+    </>
   );
 };
 

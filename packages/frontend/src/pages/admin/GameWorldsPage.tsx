@@ -1822,7 +1822,7 @@ const GameWorldsPage: React.FC = () => {
   };
 
   return (
-    <Box key={i18n.language} sx={{ p: 3 }}>
+    <Box key={i18n.language} sx={{ p: 2 }}>
       <PageHeader
         icon={<WorldIcon />}
         title={t('gameWorlds.title')}

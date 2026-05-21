@@ -14,11 +14,18 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   History as HistoryIcon,
   ContentCopy as ContentCopyIcon,
   ViewColumn as ViewColumnIcon,
+  Refresh as RefreshIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -67,6 +74,7 @@ const SurveyLogsPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
 
   // Sort state
   const [sortBy, setSortBy] = useState<string>('createdAt');
@@ -568,16 +576,7 @@ const SurveyLogsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('surveys.logs.title', 'Survey Logs')}
-        subtitle={t(
-          'surveys.logs.subtitle',
-          'Participation and reward mail history'
-        )}
-      />
-
+    <>
       <Box sx={{ mb: 2 }}>
         <Box
           sx={{
@@ -611,8 +610,6 @@ const SurveyLogsPage: React.FC = () => {
               onFilterAdd={handleFilterAdd}
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleFilterChange}
-              onRefresh={load}
-              refreshDisabled={loading}
               noWrap
               afterFilterAddActions={
                 <Box
@@ -653,6 +650,36 @@ const SurveyLogsPage: React.FC = () => {
                 </Box>
               }
             />
+          </Box>
+          <Box sx={{ flexShrink: 0 }}>
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  load();
+                }}
+                disabled={loading}
+              >
+                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('common.refresh')}</ListItemText>
+              </MenuItem>
+            </Menu>
           </Box>
         </Box>
       </Box>
@@ -743,7 +770,7 @@ const SurveyLogsPage: React.FC = () => {
         data={detailLog}
         fields={DETAIL_FIELDS}
       />
-    </Box>
+    </>
   );
 };
 

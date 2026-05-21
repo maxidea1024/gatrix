@@ -61,6 +61,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   MoreVert as MoreVertIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import SearchTextField from '../../components/common/SearchTextField';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
@@ -1504,27 +1505,11 @@ const CouponSettingsPage: React.FC = () => {
               onFilterAdd={handleFilterAdd}
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleDynamicFilterChange}
-              onRefresh={load}
-              refreshDisabled={loading}
               noWrap={true}
               afterFilterAddActions={
-                <>
-                  <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <ViewColumnIcon />
-                    </IconButton>
-                  </Tooltip>
+                <Tooltip title={t('common.columnSettings')}>
                   <IconButton
-                    onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-                    aria-label="more options"
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
                       border: 1,
@@ -1532,67 +1517,92 @@ const CouponSettingsPage: React.FC = () => {
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
-                    <MoreVertIcon />
+                    <ViewColumnIcon />
                   </IconButton>
-                  <Menu
-                    anchorEl={pageMenuAnchor}
-                    open={Boolean(pageMenuAnchor)}
-                    onClose={() => setPageMenuAnchor(null)}
-                  >
-                    <ExportImportMenuItems
-                      onExport={(format) => {
-                        setPageMenuAnchor(null);
-                        const exportColumns: ExportColumn[] = [
-                          { key: 'name', header: t('common.name') },
-                          {
-                            key: 'code',
-                            header: t('coupons.couponSettings.columns.code'),
-                          },
-                          { key: 'type', header: t('common.type') },
-                          { key: 'status', header: t('common.status') },
-                          { key: 'description', header: t('common.description') },
-                          { key: 'startsAt', header: t('common.start') },
-                          { key: 'expiresAt', header: t('common.end') },
-                          { key: 'createdAt', header: t('common.createdAt') },
-                        ];
-                        try {
-                          exportToFile(
-                            sortedItems,
-                            exportColumns,
-                            'coupon-definitions',
-                            format
-                          );
-                          enqueueSnackbar(t('common.exportSuccess'), {
-                            variant: 'success',
-                          });
-                        } catch (err) {
-                          enqueueSnackbar(t('common.exportFailed'), {
-                            variant: 'error',
-                          });
-                        }
-                      }}
-                      onImportClick={() => {
-                        setPageMenuAnchor(null);
-                        setImportDialogOpen(true);
-                      }}
-                    />
-                  </Menu>
-                  {canManage && (
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={() => {
-                        resetForm();
-                        setOpenForm(true);
-                      }}
-                      sx={{ whiteSpace: 'nowrap' }}
-                    >
-                      {t('coupons.couponSettings.createCoupon')}
-                    </Button>
-                  )}
-                </>
+                </Tooltip>
               }
             />
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  resetForm();
+                  setOpenForm(true);
+                }}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                {t('coupons.couponSettings.createCoupon')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'name', header: t('common.name') },
+                    {
+                      key: 'code',
+                      header: t('coupons.couponSettings.columns.code'),
+                    },
+                    { key: 'type', header: t('common.type') },
+                    { key: 'status', header: t('common.status') },
+                    { key: 'description', header: t('common.description') },
+                    { key: 'startsAt', header: t('common.start') },
+                    { key: 'expiresAt', header: t('common.end') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      sortedItems,
+                      exportColumns,
+                      'coupon-definitions',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  load();
+                }}
+                disabled={loading}
+              >
+                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>{t('common.refresh')}</ListItemText>
+              </MenuItem>
+            </Menu>
           </Box>
         </Box>
       </Box>

@@ -770,35 +770,28 @@ const RippleHistoryPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 2 }}>
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('ripple.history.title')}
-        subtitle={t('ripple.history.subtitle')}
-        actions={
-          !loading && !noAdmind ? (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant="contained"
-                color="error"
-                size="small"
-                startIcon={<DeleteSweepIcon />}
-                onClick={() => setResetDialogOpen(true)}
-                disabled={!history.length}
-              >
-                {t('ripple.history.reset')}
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<RefreshIcon />}
-                onClick={fetchHistory}
-              >
-                {t('common.refresh')}
-              </Button>
-            </Box>
-          ) : undefined
-        }
-      />
+    <>
+      {!loading && !noAdmind && (
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            startIcon={<DeleteSweepIcon />}
+            onClick={() => setResetDialogOpen(true)}
+            disabled={!history.length}
+          >
+            {t('ripple.history.reset')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<RefreshIcon />}
+            onClick={fetchHistory}
+          >
+            {t('common.refresh')}
+          </Button>
+        </Box>
+      )}
 
       <PageContentLoader loading={loading}>
         {noAdmind ? (
@@ -928,7 +921,7 @@ const RippleHistoryPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </>
   );
 };
 

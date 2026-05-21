@@ -343,93 +343,86 @@ const RippleMonitorPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 2 }}>
-      <PageHeader
-        icon={<RippleIcon />}
-        title={t('ripple.title')}
-        subtitle={t('ripple.subtitle')}
-        actions={
-          !loading && !noAdmind ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {data?.admindUrl && (
-                <>
-                  <Chip
-                    label={data.admindUrl}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      color: 'text.secondary',
-                      borderColor: 'divider',
-                    }}
-                  />
-                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-                </>
-              )}
-              <Button
-                variant="contained"
-                color="warning"
+    <>
+      {!loading && !noAdmind && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, justifyContent: 'flex-end' }}>
+          {data?.admindUrl && (
+            <>
+              <Chip
+                label={data.admindUrl}
                 size="small"
-                startIcon={<AutorenewRounded />}
-                onClick={() => setConfirmRefreshOpen(true)}
-                disabled={!!refreshing}
-              >
-                {refreshing === '**'
-                  ? t('ripple.processing')
-                  : t('ripple.refreshAll')}
-              </Button>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<PlayArrowIcon />}
-                onClick={() => setRefreshDialogOpen(true)}
-              >
-                {t('ripple.refreshPattern')}
-              </Button>
+                variant="outlined"
+                sx={{
+                  color: 'text.secondary',
+                  borderColor: 'divider',
+                }}
+              />
               <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-              <ButtonGroup
-                variant="contained"
-                size="small"
-                sx={{ borderRadius: 1.5, overflow: 'hidden' }}
+            </>
+          )}
+          <Button
+            variant="contained"
+            color="warning"
+            size="small"
+            startIcon={<AutorenewRounded />}
+            onClick={() => setConfirmRefreshOpen(true)}
+            disabled={!!refreshing}
+          >
+            {refreshing === '**'
+              ? t('ripple.processing')
+              : t('ripple.refreshAll')}
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<PlayArrowIcon />}
+            onClick={() => setRefreshDialogOpen(true)}
+          >
+            {t('ripple.refreshPattern')}
+          </Button>
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          <ButtonGroup
+            variant="contained"
+            size="small"
+            sx={{ borderRadius: 1.5, overflow: 'hidden' }}
+          >
+            <Button startIcon={<RefreshIcon />} onClick={fetchStatus}>
+              {t('common.refresh')}
+            </Button>
+            <Button
+              size="small"
+              onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+              sx={{
+                minWidth: 'auto',
+                px: 1,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+              }}
+            >
+              {activeRefreshLabel}
+              <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
+            </Button>
+          </ButtonGroup>
+          <Menu
+            anchorEl={refreshMenuAnchor}
+            open={Boolean(refreshMenuAnchor)}
+            onClose={() => setRefreshMenuAnchor(null)}
+          >
+            {REFRESH_OPTIONS.map((opt) => (
+              <MenuItem
+                key={opt.value}
+                selected={refreshInterval === opt.value}
+                onClick={() => {
+                  handleSetRefreshInterval(opt.value);
+                  setRefreshMenuAnchor(null);
+                }}
               >
-                <Button startIcon={<RefreshIcon />} onClick={fetchStatus}>
-                  {t('common.refresh')}
-                </Button>
-                <Button
-                  size="small"
-                  onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
-                  sx={{
-                    minWidth: 'auto',
-                    px: 1,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  {activeRefreshLabel}
-                  <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
-                </Button>
-              </ButtonGroup>
-              <Menu
-                anchorEl={refreshMenuAnchor}
-                open={Boolean(refreshMenuAnchor)}
-                onClose={() => setRefreshMenuAnchor(null)}
-              >
-                {REFRESH_OPTIONS.map((opt) => (
-                  <MenuItem
-                    key={opt.value}
-                    selected={refreshInterval === opt.value}
-                    onClick={() => {
-                      handleSetRefreshInterval(opt.value);
-                      setRefreshMenuAnchor(null);
-                    }}
-                  >
-                    {opt.label}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          ) : undefined
-        }
-      />
+                {opt.label}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Box>
+      )}
 
       <PageContentLoader loading={loading}>
         {noAdmind ? (
@@ -1545,7 +1538,7 @@ const RippleMonitorPage: React.FC = () => {
         matchedKeys={trackingMatchedKeys}
         onClose={() => setTrackingDialogOpen(false)}
       />
-    </Box>
+    </>
   );
 };
 

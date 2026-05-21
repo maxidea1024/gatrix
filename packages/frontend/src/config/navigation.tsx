@@ -241,27 +241,8 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.surveys',
         icon: 'Poll',
+        path: '/game/surveys',
         requiredPermission: P.SURVEYS_READ,
-        children: [
-          {
-            text: 'sidebar.surveyDefinitions',
-            icon: 'Description',
-            path: '/game/surveys',
-            requiredPermission: P.SURVEYS_READ,
-          },
-          {
-            text: 'sidebar.surveyTemplates',
-            icon: 'Assignment',
-            path: '/game/survey-templates',
-            requiredPermission: P.SURVEYS_UPDATE,
-          },
-          {
-            text: 'sidebar.surveyLogs',
-            icon: 'History',
-            path: '/game/survey-logs',
-            requiredPermission: P.SURVEYS_READ,
-          },
-        ],
       },
       {
         text: 'sidebar.operationEvents',
@@ -409,21 +390,8 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       {
         text: 'sidebar.ripple',
         icon: 'Ripple',
+        path: '/admin/ripple',
         requiredPermission: P.RIPPLE_READ,
-        children: [
-          {
-            text: 'sidebar.rippleMonitor',
-            icon: 'Ripple',
-            path: '/admin/ripple-monitor',
-            requiredPermission: P.RIPPLE_READ,
-          },
-          {
-            text: 'sidebar.rippleHistory',
-            icon: 'History',
-            path: '/admin/ripple-history',
-            requiredPermission: P.RIPPLE_READ,
-          },
-        ],
       },
       {
         text: 'sidebar.scheduleManagement',

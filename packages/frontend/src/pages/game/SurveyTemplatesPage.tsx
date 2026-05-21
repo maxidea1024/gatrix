@@ -192,35 +192,27 @@ const SurveyTemplatesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
+    <>
+      {/* Search + Actions */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
         <Box sx={{ flex: 1 }}>
-          <Typography variant="h5" fontWeight={600}>
-            {t('surveyTemplate.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('surveyTemplate.subtitle')}
-          </Typography>
+          <SearchTextField
+            value={search}
+            onChange={setSearch}
+            placeholder={t('surveyTemplate.searchPlaceholder')}
+          />
         </Box>
         {canEdit && (
           <Button
             variant="contained"
             startIcon={<Add />}
             onClick={handleCreate}
+            sx={{ whiteSpace: 'nowrap' }}
           >
             {t('surveyTemplate.createTemplate')}
           </Button>
         )}
       </Box>
-
-      {/* Search */}
-      <SearchTextField
-        value={search}
-        onChange={setSearch}
-        placeholder={t('surveyTemplate.searchPlaceholder')}
-        sx={{ mb: 3 }}
-      />
 
       {/* Content */}
       <PageContentLoader loading={loading && isInitialLoad.current}>
@@ -425,7 +417,7 @@ const SurveyTemplatesPage: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
-    </Box>
+    </>
   );
 };
 
