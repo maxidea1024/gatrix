@@ -104,7 +104,6 @@ import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
-import SidebarContextSwitcher from '@/components/layout/SidebarContextSwitcher';
 import {
   maintenanceService,
   MaintenanceDetail,
@@ -130,8 +129,8 @@ import mailService from '@/services/mailService';
 import aiChatService from '@/services/aiChatService';
 import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
-
-// Sidebar width is now dynamic
+import NavigationRail, { RAIL_WIDTH } from '@/components/layout/NavigationRail';
+import NavigationSubPanel, { SUBPANEL_WIDTH } from '@/components/layout/NavigationSubPanel';
 
 // Wiggle animation for floating button
 const wiggleAnimation = keyframes`
@@ -248,48 +247,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   });
 
-  // Recent pages collapsed state
-  const [recentPagesCollapsed, setRecentPagesCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem('sidebarRecentPagesCollapsed') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const toggleRecentPagesCollapsed = useCallback(() => {
-    setRecentPagesCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('sidebarRecentPagesCollapsed', String(next));
-      } catch (e) {
-        console.warn('Failed to save recent pages collapsed state:', e);
-      }
-      return next;
-    });
-  }, []);
-
-  // Navigation menu collapsed state
-  const [navMenuCollapsed, setNavMenuCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem('sidebarNavMenuCollapsed') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const toggleNavMenuCollapsed = useCallback(() => {
-    setNavMenuCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('sidebarNavMenuCollapsed', String(next));
-      } catch (e) {
-        console.warn('Failed to save nav menu collapsed state:', e);
-      }
-      return next;
-    });
-  }, []);
-
   // Recent page confirm dialog state
   const [recentPageConfirm, setRecentPageConfirm] = useState<{
     open: boolean;
@@ -298,17 +255,25 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     text?: string;
   }>({ open: false, type: 'clearAll' });
 
-  // Load sidebar state from localStorage
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+  // === Two-Level Rail state ===
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(() => {
     try {
-      const stored = localStorage.getItem('sidebarCollapsed');
-      return stored === 'true';
+      return localStorage.getItem('railActiveCategoryId') || null;
     } catch {
-      return false;
+      return null;
+    }
+  });
+  const [subPanelOpen, setSubPanelOpen] = useState(() => {
+    try {
+      return localStorage.getItem('railSubPanelOpen') !== 'false';
+    } catch {
+      return true;
     }
   });
 
-  const sidebarWidth = 270; // Fixed width
+  // Computed sidebar width for offset calculations
+  const sidebarCollapsed = !subPanelOpen;
+  const sidebarWidth = subPanelOpen ? RAIL_WIDTH + SUBPANEL_WIDTH : RAIL_WIDTH;
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
@@ -1092,24 +1057,65 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleSidebarToggle = () => {
-    const newCollapsed = !sidebarCollapsed;
-    setSidebarCollapsed(newCollapsed);
-    try {
-      localStorage.setItem('sidebarCollapsed', String(newCollapsed));
-    } catch (error) {
-      console.warn('Failed to save sidebar collapsed state:', error);
-    }
-
-    // When expanding the sidebar, ensure the navigation menu is also expanded
-    if (!newCollapsed && navMenuCollapsed) {
-      setNavMenuCollapsed(false);
-      try {
-        localStorage.setItem('sidebarNavMenuCollapsed', 'false');
-      } catch (e) {
-        console.warn('Failed to save nav menu collapsed state:', e);
+  // Rail: category select (toggle sub-panel or switch category)
+  const handleCategorySelect = useCallback(
+    (categoryId: string) => {
+      if (activeCategoryId === categoryId && subPanelOpen) {
+        // Same category clicked again ??close sub-panel
+        setSubPanelOpen(false);
+        try {
+          localStorage.setItem('railSubPanelOpen', 'false');
+        } catch {}
+      } else {
+        // New category or panel was closed ??open sub-panel for this category
+        setActiveCategoryId(categoryId);
+        setSubPanelOpen(true);
+        try {
+          localStorage.setItem('railActiveCategoryId', categoryId);
+          localStorage.setItem('railSubPanelOpen', 'true');
+        } catch {}
       }
-    }
+    },
+    [activeCategoryId, subPanelOpen]
+  );
+
+  // Rail: toggle sub-panel (from SubPanel close button)
+  const handleSubPanelClose = useCallback(() => {
+    setSubPanelOpen(false);
+    try {
+      localStorage.setItem('railSubPanelOpen', 'false');
+    } catch {}
+  }, []);
+
+  // Rail: sub-menu accordion toggle (inside SubPanel)
+  const handleRailToggleSubmenu = useCallback(
+    (key: string, siblingIndices: number[]) => {
+      setExpandedSubmenus((prev) => {
+        const newState = { ...prev };
+        siblingIndices.forEach((i) => {
+          const sibKey = `submenu-${i}`;
+          if (sibKey !== key) newState[sibKey] = false;
+        });
+        newState[key] = !prev[key];
+        try {
+          localStorage.setItem(
+            'sidebarExpandedSubmenus',
+            JSON.stringify(newState)
+          );
+        } catch {}
+        return newState;
+      });
+    },
+    []
+  );
+
+  const handleSidebarToggle = () => {
+    // Toggle sub-panel open/close (for AppBar hamburger button compat)
+    const newOpen = !subPanelOpen;
+    setSubPanelOpen(newOpen);
+    try {
+      localStorage.setItem('railSubPanelOpen', String(newOpen));
+    } catch {}
   };
 
   const handleMaintenanceBannerClick = () => {
@@ -1211,7 +1217,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       if (!menuInfo) return;
 
       setRecentPages((prev) => {
-        // If already in list, don't reorder — just keep it in place
+        // If already in list, don't reorder ??just keep it in place
         if (prev.some((p) => p.path === path)) return prev;
 
         // New page: insert at top, trim to max
@@ -1278,905 +1284,143 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   };
 
-  const renderMenuItem = (item: any, index: number, siblings: any[] = []) => {
-    // If there are submenus
-    if (item.children) {
-      const submenuKey = `submenu-${index}`;
-      const isExpanded = expandedSubmenus[submenuKey];
-      const hasActiveChild = item.children.some((child: any) =>
-        isActivePath(child.path)
-      );
-
-      const toggleSubmenu = () => {
-        setExpandedSubmenus((prev) => {
-          const newState = { ...prev };
-          // Accordion: close sibling submenus at the same level
-          siblings.forEach((_, siblingIndex) => {
-            const siblingKey = `submenu-${siblingIndex}`;
-            if (siblingKey !== submenuKey) {
-              newState[siblingKey] = false;
-            }
-          });
-          newState[submenuKey] = !prev[submenuKey];
-          try {
-            localStorage.setItem(
-              'sidebarExpandedSubmenus',
-              JSON.stringify(newState)
-            );
-          } catch (error) {
-            console.warn('Failed to save expanded submenus:', error);
-          }
-          return newState;
-        });
-      };
-
-      return (
-        <React.Fragment key={index}>
-          {/* Parent menu item - only show when sidebar is expanded */}
-          {!sidebarCollapsed && (
-            <>
-              {/* Parent menu item */}
-              <ListItemButton
-                onClick={toggleSubmenu}
-                sx={{
-                  pl: 4,
-                  pr: 2,
-                  borderRadius: 1,
-                  py: 0.75,
-                  color: theme.palette.text.secondary,
-                  backgroundColor: 'transparent',
-                  '&:hover': {
-                    backgroundColor:
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : 'rgba(0,0,0,0.08)',
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    color: 'inherit',
-                    minWidth: 40,
-                    justifyContent: 'center',
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={t(item.text)}
-                  primaryTypographyProps={{ fontSize: '0.875rem' }}
-                />
-                {isExpanded ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-            </>
-          )}
-
-          {/* Child menu items */}
-          {sidebarCollapsed ? (
-            // When sidebar is collapsed, show child items as icons
-            <List component="div" disablePadding>
-              {/* Divider before first child item when sidebar is collapsed */}
-              <Divider sx={{ my: 0.5 }} />
-
-              {item.children.map((child: any, childIndex: number) => {
-                const isChildActive = isActivePath(child.path);
-
-                return (
-                  <Tooltip
-                    key={childIndex}
-                    title={t(child.text)}
-                    placement="right"
-                    arrow
-                  >
-                    <ListItemButton
-                      onClick={() => openOrNavigate(child.path)}
-                      sx={{
-                        pl: 0,
-                        pr: 0,
-                        borderRadius: 1,
-                        py: 0.75,
-                        my: 0.5,
-                        justifyContent: 'center',
-                        color: isChildActive
-                          ? theme.palette.text.primary
-                          : theme.palette.text.secondary,
-                        backgroundColor: isChildActive
-                          ? `${theme.palette.primary.main}20`
-                          : 'transparent',
-                        '&:hover': {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255,255,255,0.1)'
-                              : 'rgba(0,0,0,0.08)',
-                        },
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{
-                          color: 'inherit',
-                          minWidth: 0,
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {child.icon}
-                      </ListItemIcon>
-                    </ListItemButton>
-                  </Tooltip>
-                );
-              })}
-            </List>
-          ) : (
-            // When sidebar is expanded, show child items with text
-            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              <List
-                component="div"
-                disablePadding
-                sx={{
-                  borderRadius: 1,
-                  ml: 0.5,
-                  mb: 0.5,
-                }}
-              >
-                {item.children.map((child: any, childIndex: number) => {
-                  const isChildActive = isActivePath(child.path);
-
-                  return (
-                    <React.Fragment key={childIndex}>
-                      {child.divider && <Divider sx={{ mx: 2, my: 0.5 }} />}
-                      <ListItemButton
-                        onClick={() => openOrNavigate(child.path)}
-                        sx={{
-                          pl: 6,
-                          pr: 2,
-                          borderRadius: 1,
-                          py: 0.75,
-                          my: 0.5,
-                          color: isChildActive
-                            ? theme.palette.text.primary
-                            : theme.palette.text.secondary,
-                          backgroundColor: isChildActive
-                            ? `${theme.palette.primary.main}20`
-                            : 'transparent',
-                          '&:hover': {
-                            backgroundColor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255,255,255,0.1)'
-                                : 'rgba(0,0,0,0.08)',
-                          },
-                        }}
-                      >
-                        <ListItemIcon
-                          sx={{
-                            color: 'inherit',
-                            minWidth: 40,
-                            justifyContent: 'center',
-                          }}
-                        >
-                          {sidebarCollapsed ? (
-                            <Badge badgeContent={child.badge} color="primary">
-                              {child.icon}
-                            </Badge>
-                          ) : (
-                            child.icon
-                          )}
-                        </ListItemIcon>
-                        {!sidebarCollapsed && (
-                          <>
-                            <ListItemText
-                              primary={t(child.text)}
-                              primaryTypographyProps={{ fontSize: '0.875rem' }}
-                            />
-                            {child.badge && (
-                              <Badge
-                                badgeContent={child.badge}
-                                color="primary"
-                                sx={{
-                                  ml: 1,
-                                  '& .MuiBadge-badge': { fontSize: '0.625rem' },
-                                }}
-                              />
-                            )}
-                          </>
-                        )}
-                      </ListItemButton>
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </Collapse>
-          )}
-        </React.Fragment>
-      );
-    }
-
-    // Regular menu item
-    const isActive = isActivePath(item.path);
-    const menuButton = (
-      <ListItemButton
-        key={index}
-        onClick={() => openOrNavigate(item.path)}
-        sx={{
-          color: isActive
-            ? theme.palette.text.primary
-            : theme.palette.text.secondary,
-          backgroundColor: isActive
-            ? `${theme.palette.primary.main}20`
-            : 'transparent',
-          borderRadius: 1,
-          py: 0.75,
-          my: 0.5,
-          '&:hover': {
-            backgroundColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.1)'
-                : 'rgba(0,0,0,0.08)',
-          },
-          justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-          px: sidebarCollapsed ? 0 : 2,
-          pl: sidebarCollapsed ? 0 : 4,
-        }}
-      >
-        <ListItemIcon
-          sx={{
-            color: 'inherit',
-            minWidth: sidebarCollapsed ? 0 : 40,
-            justifyContent: 'center',
-          }}
-        >
-          {item.icon}
-        </ListItemIcon>
-        {!sidebarCollapsed && (
-          <>
-            <ListItemText
-              primary={t(item.text)}
-              primaryTypographyProps={{ fontSize: '0.875rem' }}
-            />
-            {item.badge && (
-              <Badge
-                badgeContent={item.badge}
-                color={item.badge === 'New' ? 'secondary' : 'primary'}
-                sx={{ '& .MuiBadge-badge': { fontSize: '0.625rem' } }}
-              />
-            )}
-          </>
-        )}
-      </ListItemButton>
-    );
-
-    // Show tooltip only when sidebar is collapsed
-    if (sidebarCollapsed) {
-      return (
-        <Tooltip key={index} title={t(item.text)} placement="right" arrow>
-          {menuButton}
-        </Tooltip>
-      );
-    }
-
-    return menuButton;
-  };
-
-  const drawerContent = (
-    <Box
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        cursor: sidebarCollapsed ? 'pointer' : 'default',
-        transition: 'background-color 0.2s ease',
-        '&:hover': sidebarCollapsed
-          ? {
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.08)'
-                  : 'rgba(0, 0, 0, 0.05)',
-            }
-          : {},
-      }}
-      onClick={(e) => {
-        // Only expand if sidebar is collapsed and click is on background (not on menu items)
-        if (sidebarCollapsed && e.target === e.currentTarget) {
-          handleSidebarToggle();
+  // Auto-select rail category based on current URL
+  useEffect(() => {
+    const categories = getFilteredMenuCategories();
+    for (const cat of categories) {
+      // Check category-level path
+      if (cat.path && isActivePath(cat.path)) {
+        setActiveCategoryId(cat.id);
+        return;
+      }
+      // Check children paths
+      for (const item of cat.children) {
+        if (item.path && isActivePath(item.path)) {
+          setActiveCategoryId(cat.id);
+          return;
         }
-      }}
-    >
-      {/* Logo and toggle button area - Same height as AppBar */}
-      <Box
-        sx={{
-          height: 64,
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: 2,
-        }}
-      >
-        {!sidebarCollapsed && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
-            <Tooltip
-              title={
-                sseConnection.connectionStatus === 'error'
-                  ? t('common.connectionLost')
-                  : ''
-              }
-              placement="bottom"
-              arrow
-            >
-              <Box
-                onClick={() => navigate('/dashboard')}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor:
-                    sseConnection.connectionStatus === 'error'
-                      ? theme.palette.error.main
-                      : theme.palette.primary.main,
-                  transition: 'background-color 0.3s ease',
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  '&:hover': { opacity: 0.8 },
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ color: 'white', fontWeight: 'bold' }}
-                >
-                  G
-                </Typography>
-              </Box>
-            </Tooltip>
-            <SidebarContextSwitcher collapsed={sidebarCollapsed} />
-          </Box>
-        )}
-
-        {sidebarCollapsed && (
-          <Box
-            sx={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <SidebarContextSwitcher collapsed={sidebarCollapsed} />
-          </Box>
-        )}
-      </Box>
-
-      {/* 메뉴 영역 - 스크롤 가능 */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'auto',
-          minHeight: 0,
-        }}
-        onClick={(e) => {
-          // Expand sidebar when clicking on empty space in menu area
-          if (sidebarCollapsed && e.target === e.currentTarget) {
-            handleSidebarToggle();
+        if (item.children) {
+          for (const child of item.children) {
+            if (child.path && isActivePath(child.path)) {
+              setActiveCategoryId(cat.id);
+              return;
+            }
           }
-        }}
-      >
-        {/* Recent Pages Section */}
-        {!sidebarCollapsed && filteredRecentPages.length > 0 && (
-          <Box sx={{ px: 1.5, pt: 1, pb: 0 }}>
-            <Box
-              onClick={toggleRecentPagesCollapsed}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: recentPagesCollapsed ? 0 : 0.75,
-                cursor: 'pointer',
-                userSelect: 'none',
-                borderRadius: 1,
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <AccessTimeIcon
-                  sx={{ fontSize: 12, color: 'text.disabled', opacity: 0.7 }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 600,
-                    color: 'text.disabled',
-                    fontSize: '0.6rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    opacity: 0.8,
-                  }}
-                >
-                  {t('sidebar.recentPages')}
-                </Typography>
-                {recentPagesCollapsed ? (
-                  <ExpandMore
-                    sx={{ fontSize: 14, color: 'text.disabled', opacity: 0.6 }}
-                  />
-                ) : (
-                  <ExpandLess
-                    sx={{ fontSize: 14, color: 'text.disabled', opacity: 0.6 }}
-                  />
-                )}
-              </Box>
-              <Tooltip title={t('sidebar.clearRecentPages')} arrow>
-                <IconButton
-                  className="recent-clear-btn"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setRecentPageConfirm({
-                      open: true,
-                      type: 'clearAll',
-                    });
-                  }}
-                  sx={{
-                    p: 0.25,
-                    opacity: 0.4,
-                    transition: 'opacity 0.15s',
-                    '&:hover': { opacity: 1 },
-                  }}
-                >
-                  <CloseIcon sx={{ fontSize: 12 }} />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Collapse in={!recentPagesCollapsed} timeout={200}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                  mt: 0.5,
-                }}
-              >
-                {filteredRecentPages.map((page) => {
-                  const isActive = isActivePath(page.path);
-                  return (
-                    <Box
-                      key={page.path}
-                      onClick={() => {
-                        expandSidebarForPath(page.path);
-                        navigate(page.path);
-                      }}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        borderRadius: '8px',
-                        py: 0.75,
-                        px: 1.5,
-                        cursor: 'pointer',
-                        color: isActive
-                          ? theme.palette.primary.main
-                          : theme.palette.text.secondary,
-                        bgcolor: isActive
-                          ? theme.palette.mode === 'dark'
-                            ? `${theme.palette.primary.main}20`
-                            : `${theme.palette.primary.main}12`
-                          : 'transparent',
-                        transition: 'all 0.15s ease',
-                        '&:hover': {
-                          bgcolor: isActive
-                            ? theme.palette.mode === 'dark'
-                              ? `${theme.palette.primary.main}28`
-                              : `${theme.palette.primary.main}18`
-                            : theme.palette.mode === 'dark'
-                              ? 'rgba(255,255,255,0.06)'
-                              : 'rgba(0,0,0,0.04)',
-                          '& .recent-page-close': {
-                            opacity: 0.5,
-                          },
-                        },
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: isActive ? 6 : 4,
-                          height: isActive ? 6 : 4,
-                          borderRadius: '50%',
-                          bgcolor: isActive
-                            ? theme.palette.primary.main
-                            : theme.palette.mode === 'dark'
-                              ? 'rgba(255,255,255,0.18)'
-                              : 'rgba(0,0,0,0.12)',
-                          mr: 1.25,
-                          flexShrink: 0,
-                          transition: 'all 0.2s ease',
-                        }}
-                      />
-                      <Typography
-                        variant="body2"
-                        noWrap
-                        title={
-                          page.parentText
-                            ? `${t(page.parentText)} / ${t(page.text)}`
-                            : t(page.text)
-                        }
-                        sx={{
-                          flex: 1,
-                          fontSize: '0.8125rem',
-                          fontWeight: isActive ? 600 : 400,
-                          transition: 'color 0.15s ease',
-                          direction: 'rtl',
-                          textAlign: 'left',
-                          unicodeBidi: 'plaintext',
-                        }}
-                      >
-                        {page.parentText
-                          ? `${t(page.parentText)} / ${t(page.text)}`
-                          : t(page.text)}
-                      </Typography>
-                      <IconButton
-                        className="recent-page-close"
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setRecentPageConfirm({
-                            open: true,
-                            type: 'remove',
-                            path: page.path,
-                            text: page.text,
-                          });
-                        }}
-                        sx={{
-                          p: 0.25,
-                          opacity: 0,
-                          transition: 'opacity 0.15s',
-                          ml: 'auto',
-                        }}
-                      >
-                        <CloseIcon sx={{ fontSize: 11 }} />
-                      </IconButton>
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Collapse>
-            <Divider
-              sx={{
-                mt: recentPagesCollapsed ? 0.75 : 1,
-                mb: 0.5,
-                opacity: 0.5,
-              }}
-            />
-          </Box>
-        )}
+        }
+      }
+    }
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
-        {/* Navigation Menu Section - collapsible */}
-        {!sidebarCollapsed && (
-          <Box
-            onClick={toggleNavMenuCollapsed}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              px: 2,
-              py: 0.75,
-              cursor: 'pointer',
-              userSelect: 'none',
-              '&:hover': {
-                bgcolor: 'action.hover',
-              },
-            }}
-          >
-            {navMenuCollapsed ? (
-              <ExpandMore
-                sx={{ fontSize: 16, color: 'text.disabled', mr: 0.5 }}
-              />
-            ) : (
-              <ExpandLess
-                sx={{ fontSize: 16, color: 'text.disabled', mr: 0.5 }}
-              />
-            )}
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'text.disabled',
-                fontWeight: 600,
-                fontSize: '0.7rem',
-                textTransform: 'uppercase',
-                letterSpacing: 0.5,
-              }}
-            >
-              {t('sidebar.navigation')}
-            </Typography>
-          </Box>
-        )}
-
-        <Collapse in={sidebarCollapsed || !navMenuCollapsed} timeout={200}>
-          <List
-            sx={{ px: 1, flexGrow: 1 }}
-            onClick={(e) => {
-              // Expand sidebar when clicking on empty space in list
-              if (sidebarCollapsed && e.target === e.currentTarget) {
-                handleSidebarToggle();
-              }
-            }}
-          >
-            {/* Menu Categories */}
-            {getFilteredMenuCategories().map((category) => {
-              const categoryKey = `category-${category.id}`;
-              const isExpanded = expandedSubmenus[categoryKey];
-
-              const toggleCategory = () => {
-                const allCategories = getFilteredMenuCategories();
-                if (sidebarCollapsed) {
-                  handleSidebarToggle();
-                  if (!isExpanded) {
-                    setExpandedSubmenus((prev) => {
-                      const newState = { ...prev };
-                      // Accordion: close all other categories
-                      for (const cat of allCategories) {
-                        const key = `category-${cat.id}`;
-                        if (key !== categoryKey) {
-                          newState[key] = false;
-                        }
-                      }
-                      newState[categoryKey] = true;
-                      try {
-                        localStorage.setItem(
-                          'sidebarExpandedSubmenus',
-                          JSON.stringify(newState)
-                        );
-                      } catch (e) {}
-                      return newState;
-                    });
-                  }
-                } else {
-                  setExpandedSubmenus((prev) => {
-                    const isCurrentlyExpanded = prev[categoryKey];
-                    const newState = { ...prev };
-                    // Accordion: close all other categories
-                    for (const cat of allCategories) {
-                      const key = `category-${cat.id}`;
-                      if (key !== categoryKey) {
-                        newState[key] = false;
-                      }
-                    }
-                    newState[categoryKey] = !isCurrentlyExpanded;
-                    try {
-                      localStorage.setItem(
-                        'sidebarExpandedSubmenus',
-                        JSON.stringify(newState)
-                      );
-                    } catch (e) {}
-                    return newState;
-                  });
-                }
-              };
-
-              const hasActiveChild = category.children.some((child) => {
-                if (child.path && isActivePath(child.path)) return true;
-                if (child.children) {
-                  return child.children.some(
-                    (c) => c.path && isActivePath(c.path)
-                  );
-                }
-                return false;
-              });
-
-              // For navigation group (dashboard/settings) it acts as a normal menu, no collapsing
-              const categoryButton = (
-                <ListItemButton
-                  key={category.id}
-                  onClick={
-                    category.path
-                      ? () => openOrNavigate(category.path!)
-                      : toggleCategory
-                  }
-                  sx={{
-                    color: hasActiveChild
-                      ? theme.palette.text.primary
-                      : theme.palette.text.secondary,
-                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                    px: sidebarCollapsed ? 0 : 2,
-                    pl: sidebarCollapsed ? 0 : 2,
-                    borderRadius: 1,
-                    py: 0.75,
-                    my: 0.5,
-                    '&:hover': {
-                      backgroundColor:
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.08)',
-                    },
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      color: 'inherit',
-                      minWidth: sidebarCollapsed ? 0 : 40,
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {sidebarCollapsed ? (
-                      <Badge badgeContent={category.badge} color="primary">
-                        {category.icon}
-                      </Badge>
-                    ) : (
-                      category.icon
-                    )}
-                  </ListItemIcon>
-                  {!sidebarCollapsed && (
-                    <>
-                      <ListItemText
-                        primary={t(category.text)}
-                        primaryTypographyProps={{
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
-                        }}
-                      />
-                      {category.badge && (
-                        <Badge
-                          badgeContent={category.badge}
-                          color="primary"
-                          sx={{
-                            ml: 1,
-                            '& .MuiBadge-badge': { fontSize: '0.625rem' },
-                          }}
-                        />
-                      )}
-                      {!category.path &&
-                        (isExpanded ? <ExpandLess /> : <ExpandMore />)}
-                    </>
-                  )}
-                </ListItemButton>
-              );
-
-              return (
-                <React.Fragment key={category.id}>
-                  {sidebarCollapsed ? (
-                    <Tooltip title={t(category.text)} placement="right" arrow>
-                      {categoryButton}
-                    </Tooltip>
-                  ) : (
-                    categoryButton
-                  )}
-
-                  {/* Submenu items */}
-                  {!category.path && !sidebarCollapsed && (
-                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                      <List
-                        component="div"
-                        disablePadding
-                        sx={{
-                          borderRadius: 1,
-                          ml: 0.5,
-                          mb: 0.5,
-                        }}
-                      >
-                        {category.children.map((item, index, items) => {
-                          const prevItem = index > 0 ? items[index - 1] : null;
-                          const prevHasChildren =
-                            prevItem?.children && prevItem.children.length > 0;
-                          const currentHasChildren =
-                            item.children && item.children.length > 0;
-                          const showDivider =
-                            !currentHasChildren &&
-                            prevHasChildren &&
-                            sidebarCollapsed;
-
-                          return (
-                            <React.Fragment key={index}>
-                              {showDivider && <Divider sx={{ my: 0.5 }} />}
-                              {renderMenuItem(item, index, category.children)}
-                            </React.Fragment>
-                          );
-                        })}
-                      </List>
-                    </Collapse>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </List>
-        </Collapse>
-      </Box>
-
-      {/* Version display - Balanced Minimal */}
-      <Box
-        sx={{
-          p: 2,
-          textAlign: 'center',
-          borderTop: `1px solid ${theme.palette.divider}`,
-          opacity: 0.7,
-          transition: 'all 0.2s',
-          '&:hover': {
-            opacity: 1,
-            bgcolor: 'action.hover',
-          },
-        }}
-      >
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            display: 'block',
-          }}
-        >
-          {sidebarCollapsed
-            ? `${__APP_VERSION__}`
-            : `Gatrix ${__APP_VERSION__}`}
-        </Typography>
-      </Box>
-    </Box>
-  );
+  // Get the currently selected category for the sub-panel
+  const selectedCategory = useMemo(() => {
+    if (!activeCategoryId) return null;
+    const categories = getFilteredMenuCategories();
+    return categories.find((c) => c.id === activeCategoryId) || null;
+  }, [activeCategoryId, getFilteredMenuCategories]);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* Sidebar - Occupies full height (admin only) */}
-      {showSidebar && (
+      {/* Two-Level Rail Navigation (desktop) */}
+      {showSidebar && !isMobile && (
         <Box
           component="nav"
           sx={{
-            width: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+            display: 'flex',
             flexShrink: 0,
+            height: '100vh',
             zIndex: (theme) => theme.zIndex.drawer,
           }}
         >
-          {/* Mobile drawer */}
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true,
-            }}
-            sx={{
-              display: { xs: 'block', md: 'none' },
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: 280,
-                backgroundColor: theme.palette.background.paper,
-                color: theme.palette.text.primary,
-                border: 'none',
-                borderRight: 'none',
-              },
-            }}
-          >
-            {drawerContent}
-          </Drawer>
-
-          {/* Desktop drawer - Full height */}
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: sidebarCollapsed ? 64 : sidebarWidth,
-                transition: 'width 0.3s ease',
-                backgroundColor: theme.palette.background.paper,
-                color: theme.palette.text.primary,
-                position: 'fixed',
-                height: '100vh',
-                top: 0,
-                left: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                border: 'none',
-                borderRight: 'none',
-              },
-            }}
-            open
-          >
-            {drawerContent}
-          </Drawer>
+          <NavigationRail
+            categories={getFilteredMenuCategories()}
+            activeCategoryId={activeCategoryId}
+            onCategorySelect={handleCategorySelect}
+            onDirectNavigate={openOrNavigate}
+            sseConnectionStatus={sseConnection.connectionStatus}
+            onLogoClick={() => navigate('/dashboard')}
+          />
+          <NavigationSubPanel
+            category={selectedCategory}
+            isOpen={subPanelOpen}
+            onClose={handleSubPanelClose}
+            recentPages={filteredRecentPages}
+            onNavigate={openOrNavigate}
+            onRemoveRecent={(path) =>
+              setRecentPageConfirm({
+                open: true,
+                type: 'remove',
+                path,
+                text: filteredRecentPages.find((p) => p.path === path)?.text,
+              })
+            }
+            onClearRecent={() =>
+              setRecentPageConfirm({ open: true, type: 'clearAll' })
+            }
+            isActivePath={isActivePath}
+            expandedSubmenus={expandedSubmenus}
+            onToggleSubmenu={handleRailToggleSubmenu}
+          />
         </Box>
+      )}
+
+      {/* Mobile drawer fallback */}
+      {showSidebar && isMobile && (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: SUBPANEL_WIDTH + RAIL_WIDTH,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              border: 'none',
+            },
+          }}
+        >
+          <Box sx={{ display: 'flex', height: '100%' }}>
+            <NavigationRail
+              categories={getFilteredMenuCategories()}
+              activeCategoryId={activeCategoryId}
+              onCategorySelect={handleCategorySelect}
+              onDirectNavigate={(path) => {
+                openOrNavigate(path);
+                setMobileOpen(false);
+              }}
+              sseConnectionStatus={sseConnection.connectionStatus}
+              onLogoClick={() => {
+                navigate('/dashboard');
+                setMobileOpen(false);
+              }}
+            />
+            <NavigationSubPanel
+              category={selectedCategory}
+              isOpen={true}
+              onClose={() => setMobileOpen(false)}
+              recentPages={filteredRecentPages}
+              onNavigate={(path) => {
+                openOrNavigate(path);
+                setMobileOpen(false);
+              }}
+              onRemoveRecent={(path) =>
+                setRecentPageConfirm({
+                  open: true,
+                  type: 'remove',
+                  path,
+                  text: filteredRecentPages.find((p) => p.path === path)?.text,
+                })
+              }
+              onClearRecent={() =>
+                setRecentPageConfirm({ open: true, type: 'clearAll' })
+              }
+              isActivePath={isActivePath}
+              expandedSubmenus={expandedSubmenus}
+              onToggleSubmenu={handleRailToggleSubmenu}
+            />
+          </Box>
+        </Drawer>
       )}
 
       {/* Right area: AppBar + Main content */}
@@ -2239,7 +1483,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       variant="subtitle2"
                       sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}
                     >
-                      🔧 {t('maintenance.tooltipTitle')}
+                      ?뵩 {t('maintenance.tooltipTitle')}
                     </Typography>
 
                     {/* Status */}
@@ -2387,7 +1631,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         },
                       }}
                     >
-                      💡 {t('maintenance.clickToManageTooltip')}
+                      ?뮕 {t('maintenance.clickToManageTooltip')}
                     </Typography>
                   </Box>
                 }
@@ -2453,7 +1697,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
                       }}
                     >
-                      {maintenanceStatus.status === 'active' ? '🔧' : '📅'}
+                      {maintenanceStatus.status === 'active' ? '?뵩' : '?뱟'}
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                       <Typography
@@ -2545,7 +1789,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                             ? maintenanceStatus.detail.message
                             : maintenanceStatus.detail?.startsAt &&
                                 maintenanceStatus.detail?.endsAt
-                              ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
+                              ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} ??${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
                               : t('maintenance.clickToManageTooltip')}
                         </Typography>
                       ))}
@@ -2699,7 +1943,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             sx={{
               position: 'fixed',
               top: 72,
-              left: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+              left: { xs: 0, md: sidebarWidth },
               right: 0,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               display: 'flex',
