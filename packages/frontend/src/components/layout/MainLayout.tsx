@@ -1291,6 +1291,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Check category-level path
       if (cat.path && isActivePath(cat.path)) {
         setActiveCategoryId(cat.id);
+        // Direct-nav categories (dashboard, settings) should close the sub-panel
+        const isDirectNav = !!cat.path && cat.children.length <= 1;
+        if (isDirectNav) {
+          setSubPanelOpen(false);
+        }
         return;
       }
       // Check children paths

@@ -882,7 +882,7 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <Box sx={{ p: 2 }}>
       {/* Hero Section */}
       <Box
         sx={{
