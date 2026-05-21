@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Tooltip,
   Badge,
   Typography,
+  IconButton,
+  Dialog,
+  DialogContent,
   useTheme,
   alpha,
 } from '@mui/material';
+import { Info as InfoIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type { MenuCategory } from '@/config/navigation';
 
@@ -42,6 +46,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   // Determine if a category should navigate directly (single child with path)
   const isDirectNav = (cat: MenuCategory): boolean => {
@@ -79,31 +84,25 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
         <Box
           onClick={onLogoClick}
           sx={{
-            width: 36,
-            height: 36,
-            backgroundColor:
-              sseConnectionStatus === 'error'
-                ? theme.palette.error.main
-                : theme.palette.primary.main,
-            transition: 'background-color 0.3s ease',
+            width: 40,
+            height: 40,
             borderRadius: 1.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            overflow: 'hidden',
             cursor: 'pointer',
             mb: 1.5,
-            '&:hover': { opacity: 0.85, transform: 'scale(1.05)' },
+            '&:hover': { transform: 'scale(1.08)' },
             '&:active': { transform: 'scale(0.95)' },
-            transitionProperty: 'background-color, opacity, transform',
-            transitionDuration: '0.2s',
+            transition: 'transform 0.2s',
+            border: sseConnectionStatus === 'error'
+              ? `2px solid ${theme.palette.error.main}`
+              : '2px solid transparent',
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}
-          >
-            G
-          </Typography>
+          <img
+            src="/images/gat-mascot.png"
+            alt="Gatrix"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </Box>
       </Tooltip>
 
@@ -135,7 +134,6 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
       >
         {categories.map((cat) => {
           const isActive = activeCategoryId === cat.id;
-          const isDirect = isDirectNav(cat);
 
           return (
             <Tooltip
@@ -232,29 +230,85 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
         })}
       </Box>
 
-      {/* Version at bottom */}
-      <Box
-        sx={{
-          mt: 1,
-          opacity: 0.4,
-          transition: 'opacity 0.2s',
-          '&:hover': { opacity: 0.8 },
-        }}
-      >
-        <Typography
-          variant="caption"
+      {/* About button */}
+      <Tooltip title={t('common.about', 'About')} placement="right" arrow>
+        <IconButton
+          onClick={() => setAboutOpen(true)}
+          size="small"
           sx={{
-            color: 'text.secondary',
-            fontSize: '0.6rem',
-            fontWeight: 600,
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed',
-            letterSpacing: '0.05em',
+            mt: 0.5,
+            mb: 0.5,
+            color: 'text.disabled',
+            transition: 'color 0.2s',
+            '&:hover': { color: 'text.secondary' },
           }}
         >
-          {__APP_VERSION__}
-        </Typography>
-      </Box>
+          <InfoIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+      </Tooltip>
+
+      {/* About Dialog */}
+      <Dialog
+        open={aboutOpen}
+        onClose={() => setAboutOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 5, px: 4 }}>
+          {/* Mascot */}
+          <Box
+            component="img"
+            src="/images/gat-mascot.png"
+            alt="Gat"
+            sx={{
+              width: 96,
+              height: 96,
+              borderRadius: 3,
+              mx: 'auto',
+              mb: 2.5,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            }}
+          />
+
+          {/* App name */}
+          <Typography variant="h5" fontWeight={700} gutterBottom>
+            Gatrix
+          </Typography>
+
+          {/* Version */}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              fontFamily: 'monospace',
+              bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'grey.100',
+              display: 'inline-block',
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 1,
+              mb: 2,
+            }}
+          >
+            v{__APP_VERSION__}
+          </Typography>
+
+          {/* Description */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('about.description', 'Game Operations Management Platform')}
+          </Typography>
+
+          {/* Copyright */}
+          <Typography variant="caption" color="text.disabled">
+            © {new Date().getFullYear()} Gatrix. All rights reserved.
+          </Typography>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
