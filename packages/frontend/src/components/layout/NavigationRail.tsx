@@ -73,7 +73,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
 
   // When sub-panel is closed, clicking anywhere on the rail reopens it
   const handleRailBackgroundClick = () => {
-    if (!subPanelOpen) {
+    if (!subPanelOpen && !aboutOpen) {
       onRailClick();
     }
   };
@@ -262,7 +262,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
       {/* About button */}
       <Tooltip title={t('common.about', 'About')} placement="right" arrow>
         <IconButton
-          onClick={() => setAboutOpen(true)}
+          onClick={(e) => { e.stopPropagation(); setAboutOpen(true); }}
           size="small"
           sx={{
             mt: 0.5,
