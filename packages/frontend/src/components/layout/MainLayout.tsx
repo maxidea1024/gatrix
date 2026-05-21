@@ -1339,8 +1339,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <NavigationRail
             categories={getFilteredMenuCategories()}
             activeCategoryId={activeCategoryId}
+            subPanelOpen={subPanelOpen}
             onCategorySelect={handleCategorySelect}
             onDirectNavigate={openOrNavigate}
+            onRailClick={handleSidebarToggle}
             sseConnectionStatus={sseConnection.connectionStatus}
             onLogoClick={() => navigate('/dashboard')}
           />
@@ -1389,11 +1391,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <NavigationRail
               categories={getFilteredMenuCategories()}
               activeCategoryId={activeCategoryId}
+              subPanelOpen={true}
               onCategorySelect={handleCategorySelect}
               onDirectNavigate={(path) => {
                 openOrNavigate(path);
                 setMobileOpen(false);
               }}
+              onRailClick={() => {}}
               sseConnectionStatus={sseConnection.connectionStatus}
               onLogoClick={() => {
                 navigate('/dashboard');
@@ -1455,8 +1459,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {showSidebar &&
-                (isMobile ? (
+              {showSidebar && isMobile && (
                   <IconButton
                     color="inherit"
                     aria-label="open drawer"
@@ -1466,17 +1469,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   >
                     <MenuIcon />
                   </IconButton>
-                ) : (
-                  <IconButton
-                    color="inherit"
-                    aria-label="toggle sidebar"
-                    edge="start"
-                    onClick={handleSidebarToggle}
-                    sx={{ mr: 1 }}
-                  >
-                    <MenuOpenIcon />
-                  </IconButton>
-                ))}
+                )}
             </Box>
 
             {/* Maintenance banner - Inside AppBar */}

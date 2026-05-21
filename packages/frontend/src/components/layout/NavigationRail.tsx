@@ -22,8 +22,10 @@ export const RAIL_WIDTH = 60;
 interface NavigationRailProps {
   categories: MenuCategory[];
   activeCategoryId: string | null;
+  subPanelOpen: boolean;
   onCategorySelect: (categoryId: string) => void;
   onDirectNavigate: (path: string) => void;
+  onRailClick: () => void;
   sseConnectionStatus: string;
   onLogoClick: () => void;
 }
@@ -38,8 +40,10 @@ interface NavigationRailProps {
 const NavigationRail: React.FC<NavigationRailProps> = ({
   categories,
   activeCategoryId,
+  subPanelOpen,
   onCategorySelect,
   onDirectNavigate,
+  onRailClick,
   sseConnectionStatus,
   onLogoClick,
 }) => {
@@ -67,8 +71,17 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
     }
   };
 
+  // When sub-panel is closed, clicking the rail background reopens it
+  const handleRailBackgroundClick = (e: React.MouseEvent) => {
+    // Only trigger if clicking the rail background itself (not an icon)
+    if (e.target === e.currentTarget && !subPanelOpen) {
+      onRailClick();
+    }
+  };
+
   return (
     <Box
+      onClick={handleRailBackgroundClick}
       sx={{
         width: RAIL_WIDTH,
         flexShrink: 0,
@@ -83,6 +96,15 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
         py: 1,
         position: 'relative',
         zIndex: theme.zIndex.drawer + 1,
+        cursor: subPanelOpen ? 'default' : 'pointer',
+        transition: 'background-color 0.2s ease',
+        ...(!subPanelOpen && {
+          '&:hover': {
+            bgcolor: isDark
+              ? alpha(theme.palette.background.paper, 0.8)
+              : alpha(theme.palette.grey[200], 0.8),
+          },
+        }),
       }}
     >
       {/* Logo */}
