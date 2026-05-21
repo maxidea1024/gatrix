@@ -80,6 +80,11 @@ import serverLifecycleService, {
   ServerLifecycleEvent,
 } from '@/services/serverLifecycleService';
 import DashboardCcuChart from '@/components/admin/DashboardCcuChart';
+import {
+  formatCompactNumber,
+  formatWithCommas,
+  needsCompactTooltip,
+} from '@/utils/numberFormat';
 
 // Stats card component with modern design
 interface StatsCardProps {
@@ -1543,7 +1548,19 @@ const DashboardPage: React.FC = () => {
                                       transition: 'background-color 0.15s',
                                     }}
                                   >
-                                    {item.value}
+                                    {needsCompactTooltip(item.value) ? (
+                                      <Tooltip
+                                        title={formatWithCommas(item.value)}
+                                        arrow
+                                        placement="top"
+                                      >
+                                        <span>
+                                          {formatCompactNumber(item.value)}
+                                        </span>
+                                      </Tooltip>
+                                    ) : (
+                                      item.value
+                                    )}
                                   </Box>
                                 </Box>
                               ))}
