@@ -370,7 +370,7 @@ export const CreateIntegrationPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
         <Box sx={{ flex: 1 }}>

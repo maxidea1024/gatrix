@@ -420,7 +420,7 @@ const SurveysPage: React.FC = () => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<PollIcon />}
         title={t('surveys.title')}

@@ -565,7 +565,7 @@ const WhitelistPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Main Card with Tabs */}
       <Card>
         <CardContent>

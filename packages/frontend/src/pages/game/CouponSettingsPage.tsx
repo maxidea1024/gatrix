@@ -1467,7 +1467,7 @@ const CouponSettingsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<SettingsIcon />}
@@ -2357,7 +2357,7 @@ const CouponSettingsPage: React.FC = () => {
         minWidth={560}
       >
         {/* Body */}
-        <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
+        <Box sx={{ p: 2, overflowY: 'auto', flex: 1 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* Status Checkbox */}
             <Box>
@@ -3101,7 +3101,7 @@ const CouponSettingsPage: React.FC = () => {
         defaultWidth={720}
         minWidth={560}
       >
-        <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
+        <Box sx={{ p: 2, overflowY: 'auto', flex: 1 }}>
           <Stack spacing={2}>
             {/* Statistics Cards – compact, clickable status filter toggles (only for NORMAL type) */}
             {codesSetting?.type !== 'SPECIAL' && (

@@ -20,7 +20,7 @@ const ImpactMetricsPage: React.FC = () => {
   const canManage = hasPermission([P.FEATURES_UPDATE]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<ChartIcon />}
         title={t('impactMetrics.pageTitle')}

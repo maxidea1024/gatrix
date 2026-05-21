@@ -497,7 +497,7 @@ const IngamePopupNoticesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<NotificationsIcon />}

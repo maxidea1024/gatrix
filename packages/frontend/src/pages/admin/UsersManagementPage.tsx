@@ -1798,7 +1798,7 @@ const UsersManagementPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<PeopleIcon />}
         title={t('users.title')}

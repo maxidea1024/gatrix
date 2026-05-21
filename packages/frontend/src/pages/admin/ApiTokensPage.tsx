@@ -2083,7 +2083,7 @@ const ApiTokensPage: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         {/* Header */}
         <PageHeader
           icon={<VpnKeyIcon />}
@@ -2975,7 +2975,7 @@ const ApiTokensPage: React.FC = () => {
         minWidth={400}
         zIndex={1301}
       >
-        <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
+        <Box sx={{ p: 2, flexGrow: 1, overflow: 'auto' }}>
           <Alert severity="error" sx={{ mb: 3 }}>
             {t('apiTokens.deleteWarning')}
           </Alert>
@@ -3076,7 +3076,7 @@ const ApiTokensPage: React.FC = () => {
         minWidth={400}
         zIndex={1301}
       >
-        <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
+        <Box sx={{ p: 2, flexGrow: 1, overflow: 'auto' }}>
           <Alert severity="warning" sx={{ mb: 3 }}>
             {t('apiTokens.regenerateWarning')}
           </Alert>
@@ -3225,7 +3225,7 @@ const ApiTokensPage: React.FC = () => {
           </IconButton>
         </Box>
 
-        <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Box sx={{ p: 2, flexGrow: 1 }}>
           <Alert severity="warning" sx={{ mb: 3 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
               {t('apiTokens.bulkDeleteWarning')}

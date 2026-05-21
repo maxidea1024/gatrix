@@ -882,7 +882,7 @@ const StoreProductsPage: React.FC = () => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<StorefrontIcon />}

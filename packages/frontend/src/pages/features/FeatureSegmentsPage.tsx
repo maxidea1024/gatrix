@@ -580,7 +580,7 @@ const FeatureSegmentsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<SegmentIcon />}
@@ -1068,7 +1068,7 @@ const FeatureSegmentsPage: React.FC = () => {
         storageKey="featureSegmentDrawerWidth"
         defaultWidth={500}
       >
-        <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+        <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
           <Stack spacing={2.5}>
             <Box>
               <FormControlLabel

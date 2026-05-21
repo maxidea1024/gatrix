@@ -803,14 +803,14 @@ export const EditIntegrationPage: React.FC = () => {
 
   if (!integration || !currentProvider) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Alert severity="error">{t('integrations.loadFailed')}</Alert>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
         <Box sx={{ flex: 1 }}>

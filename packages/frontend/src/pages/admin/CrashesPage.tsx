@@ -683,7 +683,7 @@ const CrashesPage: React.FC = () => {
   }, [t, enqueueSnackbar]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<BugReportIcon />}
         title={t('crashes.title')}

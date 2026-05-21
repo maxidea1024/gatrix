@@ -226,14 +226,14 @@ const CustomQueueMonitorPage: React.FC = () => {
 
   if (!user) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Alert severity="error">{t('errors.accessDenied')}</Alert>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <Box
         sx={{
           display: 'flex',

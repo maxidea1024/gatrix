@@ -424,7 +424,7 @@ const ChangeRequestDetailPage: React.FC = () => {
 
   if (error || !cr) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Alert severity="error">{t('common.loadFailed')}</Alert>
       </Box>
     );
@@ -437,7 +437,7 @@ const ChangeRequestDetailPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box sx={{ p: 2, bgcolor: 'background.default', minHeight: '100vh' }}>
       {/* GitHub-style Header */}
       <Box
         sx={{

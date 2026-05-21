@@ -391,7 +391,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200 }}>
+    <Box sx={{ p: 2, maxWidth: 1200 }}>
       {/* Profile Header */}
       <Card sx={{ mb: 3, overflow: 'visible' }}>
         <Box

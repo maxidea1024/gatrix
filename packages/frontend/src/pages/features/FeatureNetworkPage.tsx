@@ -972,7 +972,7 @@ const FeatureNetworkPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<HubIcon />}
         title={t('network.title')}
@@ -1227,7 +1227,7 @@ const FeatureNetworkPage: React.FC = () => {
 
           {/* API Requests Tab */}
           {activeTab === 0 && (
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 2 }}>
               {/* API Summary Cards */}
               <Box
                 sx={{
@@ -1436,7 +1436,7 @@ const FeatureNetworkPage: React.FC = () => {
 
           {/* Flag Evaluations Tab */}
           {activeTab === 1 && (
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 2 }}>
               {/* Evaluation Summary Cards */}
               <Box
                 sx={{

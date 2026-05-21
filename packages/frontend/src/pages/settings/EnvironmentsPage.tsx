@@ -598,7 +598,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
   };
 
   return (
-    <Box sx={embedded ? { pt: 2 } : { p: 3 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       <Box
         sx={{
           display: 'flex',

@@ -53,7 +53,7 @@ export const OpenApiPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.openApi')}
         subtitle={t('openApi.description')}

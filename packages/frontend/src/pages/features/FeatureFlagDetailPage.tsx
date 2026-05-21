@@ -2197,14 +2197,14 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   if (!flag) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Alert severity="error">{t('featureFlags.notFound')}</Alert>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <IconButton onClick={() => navigate('/feature-flags')}>
@@ -4013,7 +4013,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       >
         {editingFlagData && (
           <>
-            <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+            <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
               <Stack spacing={2.5}>
                 {/* Flag Name + Display Name on same row */}
                 <Box
@@ -4253,7 +4253,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         storageKey="featureFlagVariantDrawerWidth"
         defaultWidth={500}
       >
-        <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+        <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
           {editingVariant && (
             <Stack spacing={3}>
               <TextField

@@ -146,7 +146,7 @@ const WorkspaceTabbedPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('workspace.title')}
         subtitle={t('workspace.subtitle')}

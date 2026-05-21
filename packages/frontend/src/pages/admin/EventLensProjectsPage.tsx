@@ -30,7 +30,7 @@ const EventLensProjectsPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<FolderIcon />}
         title={t('eventLens.projects.title')}

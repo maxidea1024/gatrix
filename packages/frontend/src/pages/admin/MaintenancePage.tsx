@@ -578,7 +578,7 @@ const MaintenancePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<BuildIcon />}
         title={t('maintenance.title')}

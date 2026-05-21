@@ -1266,7 +1266,7 @@ const CmsManagementPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<TableChartIcon />}
         title={t('cms.title')}

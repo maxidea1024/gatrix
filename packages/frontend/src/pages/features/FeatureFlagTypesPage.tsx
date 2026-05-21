@@ -145,7 +145,7 @@ const FeatureFlagTypesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box
         sx={{
@@ -276,7 +276,7 @@ const FeatureFlagTypesPage: React.FC = () => {
         storageKey="featureFlagTypeDrawerWidth"
         defaultWidth={400}
       >
-        <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+        <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
           <Stack spacing={3}>
             <Box>
               <Typography variant="subtitle2" gutterBottom>

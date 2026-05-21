@@ -413,7 +413,7 @@ const PlayerConnectionsPage: React.FC = () => {
     REFRESH_OPTIONS.find((o) => o.value === refreshInterval)?.label || 'Off';
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Fullscreen CCU Scoreboard */}
       {scoreboardOpen && (
         <CcuScoreboard

@@ -1697,7 +1697,7 @@ const ClientVersionsPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<WidgetsIcon />}
         title={t('clientVersions.title')}

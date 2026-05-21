@@ -180,14 +180,14 @@ const PlanningDataHistoryPage: React.FC = () => {
 
   if (!canView) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Typography color="error">{t('common.noPermission')}</Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<HistoryIcon />}

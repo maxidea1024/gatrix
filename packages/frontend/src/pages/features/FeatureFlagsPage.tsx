@@ -1789,7 +1789,7 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<FlagIcon />}
@@ -3453,7 +3453,7 @@ const FeatureFlagsPage: React.FC = () => {
         storageKey="featureFlagCreateDrawerWidth"
         defaultWidth={500}
       >
-        <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+        <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
           <Stack spacing={2.5}>
             {/* Flag Name + Display Name on same row */}
             <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>

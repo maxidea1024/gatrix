@@ -134,7 +134,7 @@ const AlertsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('monitoring.alerts.title')}
         subtitle={t('monitoring.alerts.subtitle')}

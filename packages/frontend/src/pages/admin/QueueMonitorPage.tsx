@@ -367,7 +367,7 @@ const QueueMonitorPage: React.FC = () => {
 
   if (!user) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Alert severity="error">{t('errors.accessDenied')}</Alert>
       </Box>
     );
@@ -403,7 +403,7 @@ const QueueMonitorPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <PageHeader
         icon={<MonitorIcon />}

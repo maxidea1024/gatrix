@@ -1113,7 +1113,7 @@ const CrashEventsPage: React.FC = () => {
   }, [isResizing]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<BugReportIcon />}
         title={t('crashes.crashEvents')}

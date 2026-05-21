@@ -505,7 +505,7 @@ const JobsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<WorkIcon />}
         title={t('jobs.title')}

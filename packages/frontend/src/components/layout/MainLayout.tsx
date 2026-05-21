@@ -2148,7 +2148,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           id="main-scroll-container"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: 2,
             backgroundColor: 'background.default',
             overflow: 'auto',
             display: 'flex',
