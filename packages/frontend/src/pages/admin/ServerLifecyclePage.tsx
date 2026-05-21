@@ -778,7 +778,9 @@ const EventRow: React.FC<EventRowProps> = ({
   );
 };
 
-const ServerLifecyclePage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
+const ServerLifecyclePage: React.FC<{ embedded?: boolean }> = ({
+  embedded,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -1134,11 +1136,11 @@ const ServerLifecyclePage: React.FC<{ embedded?: boolean }> = ({ embedded }) => 
   return (
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {!embedded && (
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('serverLifecycle.title')}
-        subtitle={t('serverLifecycle.subtitle')}
-      />
+        <PageHeader
+          icon={<HistoryIcon />}
+          title={t('serverLifecycle.title')}
+          subtitle={t('serverLifecycle.subtitle')}
+        />
       )}
 
       {/* Filters */}

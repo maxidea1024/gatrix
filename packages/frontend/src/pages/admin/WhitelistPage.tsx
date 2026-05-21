@@ -575,20 +575,20 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
       <Card>
         <CardContent>
           {!embedded && (
-          <PageHeader
-            icon={<SecurityIcon />}
-            title={t('whitelist.title')}
-            subtitle={t('whitelist.subtitle')}
-            actions={
-              <Button
-                variant="contained"
-                startIcon={<InfoOutlinedIcon />}
-                onClick={() => setFullInfoDrawerOpen(true)}
-              >
-                {t('whitelist.fullInfo.button')}
-              </Button>
-            }
-          />
+            <PageHeader
+              icon={<SecurityIcon />}
+              title={t('whitelist.title')}
+              subtitle={t('whitelist.subtitle')}
+              actions={
+                <Button
+                  variant="contained"
+                  startIcon={<InfoOutlinedIcon />}
+                  onClick={() => setFullInfoDrawerOpen(true)}
+                >
+                  {t('whitelist.fullInfo.button')}
+                </Button>
+              }
+            />
           )}
 
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
@@ -691,7 +691,10 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 <Card variant="outlined">
                   <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                     <TableContainer>
-                      <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.75 } }}>
+                      <Table
+                        size="small"
+                        sx={{ '& .MuiTableCell-root': { py: 0.75 } }}
+                      >
                         <TableHead>
                           <TableRow>
                             <TableCell padding="checkbox">

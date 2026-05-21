@@ -421,7 +421,6 @@ const SurveysPage: React.FC = () => {
 
   return (
     <>
-
       {/* Filter Panel */}
       <Box sx={{ mb: 2 }}>
         <Box
@@ -477,7 +476,14 @@ const SurveysPage: React.FC = () => {
               }
             />
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+            }}
+          >
             {canManage && (
               <Button
                 variant="contained"
@@ -511,7 +517,9 @@ const SurveysPage: React.FC = () => {
                   handleConfigOpen();
                 }}
               >
-                <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>{t('surveys.config')}</ListItemText>
               </MenuItem>
               <Divider />
@@ -551,7 +559,9 @@ const SurveysPage: React.FC = () => {
                 }}
                 disabled={loading}
               >
-                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>{t('common.refresh')}</ListItemText>
               </MenuItem>
             </Menu>

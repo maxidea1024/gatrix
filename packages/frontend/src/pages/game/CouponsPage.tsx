@@ -12,12 +12,8 @@ import { P } from '@/types/permissions';
 import PageHeader from '@/components/common/PageHeader';
 
 // Lazy-load the actual page contents
-const CouponSettingsPage = React.lazy(
-  () => import('./CouponSettingsPage')
-);
-const CouponUsagePage = React.lazy(
-  () => import('./CouponUsagePage')
-);
+const CouponSettingsPage = React.lazy(() => import('./CouponSettingsPage'));
+const CouponUsagePage = React.lazy(() => import('./CouponUsagePage'));
 
 interface TabConfig {
   key: string;

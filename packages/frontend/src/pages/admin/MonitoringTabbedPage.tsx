@@ -9,9 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import PageHeader from '@/components/common/PageHeader';
 
-const GrafanaDashboardPage = React.lazy(
-  () => import('./GrafanaDashboardPage')
-);
+const GrafanaDashboardPage = React.lazy(() => import('./GrafanaDashboardPage'));
 const LogsPage = React.lazy(() => import('../monitoring/LogsPage'));
 const AlertsPage = React.lazy(() => import('../monitoring/AlertsPage'));
 
@@ -61,8 +59,7 @@ const MonitoringTabbedPage: React.FC = () => {
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab === 'logs' && activeTab !== TAB_LOGS) setActiveTab(TAB_LOGS);
-    if (tab === 'alerts' && activeTab !== TAB_ALERTS)
-      setActiveTab(TAB_ALERTS);
+    if (tab === 'alerts' && activeTab !== TAB_ALERTS) setActiveTab(TAB_ALERTS);
     if ((tab === null || tab === 'grafana') && activeTab !== TAB_GRAFANA)
       setActiveTab(TAB_GRAFANA);
   }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -94,7 +91,10 @@ const MonitoringTabbedPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.monitoring')}
-        subtitle={t('monitoring.subtitle', '시스템 모니터링과 알림을 관리합니다.')}
+        subtitle={t(
+          'monitoring.subtitle',
+          '시스템 모니터링과 알림을 관리합니다.'
+        )}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

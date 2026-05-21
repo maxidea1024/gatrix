@@ -22,7 +22,10 @@ import {
   ChevronLeft as ChevronLeftIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import type { MenuCategory, MenuItem as NavMenuItem } from '@/config/navigation';
+import type {
+  MenuCategory,
+  MenuItem as NavMenuItem,
+} from '@/config/navigation';
 import SidebarContextSwitcher from '@/components/layout/SidebarContextSwitcher';
 
 // Sub-panel width constant - exported for layout calculations
@@ -191,9 +194,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
               ? theme.palette.text.primary
               : theme.palette.text.secondary,
             '&:hover': {
-              bgcolor: isDark
-                ? 'rgba(255,255,255,0.06)'
-                : 'rgba(0,0,0,0.04)',
+              bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
             },
           }}
         >
@@ -310,9 +311,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
             // Slim scrollbar
             '&::-webkit-scrollbar': { width: 4 },
             '&::-webkit-scrollbar-thumb': {
-              bgcolor: isDark
-                ? 'rgba(255,255,255,0.15)'
-                : 'rgba(0,0,0,0.12)',
+              bgcolor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
               borderRadius: 2,
             },
           }}
@@ -349,11 +348,19 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
                   </Typography>
                   {recentCollapsed ? (
                     <ExpandMore
-                      sx={{ fontSize: 13, color: 'text.disabled', opacity: 0.5 }}
+                      sx={{
+                        fontSize: 13,
+                        color: 'text.disabled',
+                        opacity: 0.5,
+                      }}
                     />
                   ) : (
                     <ExpandLess
-                      sx={{ fontSize: 13, color: 'text.disabled', opacity: 0.5 }}
+                      sx={{
+                        fontSize: 13,
+                        color: 'text.disabled',
+                        opacity: 0.5,
+                      }}
                     />
                   )}
                 </Box>

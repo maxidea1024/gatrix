@@ -2075,11 +2075,11 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
       }}
     >
       {!embedded && (
-      <PageHeader
-        icon={<DnsIcon />}
-        title={t('serverList.title')}
-        subtitle={t('serverList.subtitle')}
-      />
+        <PageHeader
+          icon={<DnsIcon />}
+          title={t('serverList.title')}
+          subtitle={t('serverList.subtitle')}
+        />
       )}
 
       {/* Search and Filters */}

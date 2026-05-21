@@ -1523,7 +1523,14 @@ const CouponSettingsPage: React.FC = () => {
               }
             />
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+            }}
+          >
             {canManage && (
               <Button
                 variant="contained"
@@ -1599,7 +1606,9 @@ const CouponSettingsPage: React.FC = () => {
                 }}
                 disabled={loading}
               >
-                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>{t('common.refresh')}</ListItemText>
               </MenuItem>
             </Menu>

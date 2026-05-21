@@ -772,7 +772,9 @@ const RippleHistoryPage: React.FC = () => {
   return (
     <>
       {!loading && !noAdmind && (
-        <Box sx={{ display: 'flex', gap: 1, mb: 2, justifyContent: 'flex-end' }}>
+        <Box
+          sx={{ display: 'flex', gap: 1, mb: 2, justifyContent: 'flex-end' }}
+        >
           <Button
             variant="contained"
             color="error"

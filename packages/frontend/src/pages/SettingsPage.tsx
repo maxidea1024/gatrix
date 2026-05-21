@@ -98,89 +98,89 @@ const SettingsPage: React.FC = () => {
   return (
     <PageContentLoader loading={false}>
       <Box sx={{ p: 2 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          {t('settings.general.title')}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('settings.general.subtitle')}
-        </Typography>
-      </Box>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+            {t('settings.general.title')}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {t('settings.general.subtitle')}
+          </Typography>
+        </Box>
 
-      <Card sx={{ maxWidth: 640 }}>
-        <CardContent>
-          <Stack spacing={2}>
-            {/* Language */}
-            <Autocomplete
-              options={supportedLanguages}
-              getOptionLabel={(opt) => getLanguageDisplayName(opt)}
-              value={language}
-              onChange={(_, v) => v && handleLanguageChange(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t('language.changeLanguage')} />
-              )}
-            />
+        <Card sx={{ maxWidth: 640 }}>
+          <CardContent>
+            <Stack spacing={2}>
+              {/* Language */}
+              <Autocomplete
+                options={supportedLanguages}
+                getOptionLabel={(opt) => getLanguageDisplayName(opt)}
+                value={language}
+                onChange={(_, v) => v && handleLanguageChange(v)}
+                renderInput={(params) => (
+                  <TextField {...params} label={t('language.changeLanguage')} />
+                )}
+              />
 
-            {/* Theme */}
-            <TextField
-              select
-              label={t('theme')}
-              value={mode}
-              onChange={(e) => setTheme(e.target.value as any)}
-            >
-              <MenuItem value="light">Light</MenuItem>
-              <MenuItem value="dark">Dark</MenuItem>
-              <MenuItem value="auto">Auto</MenuItem>
-            </TextField>
+              {/* Theme */}
+              <TextField
+                select
+                label={t('theme')}
+                value={mode}
+                onChange={(e) => setTheme(e.target.value as any)}
+              >
+                <MenuItem value="light">Light</MenuItem>
+                <MenuItem value="dark">Dark</MenuItem>
+                <MenuItem value="auto">Auto</MenuItem>
+              </TextField>
 
-            {/* Timezone */}
-            <Autocomplete
-              options={tzOptions}
-              value={timezone}
-              onChange={(_, v) => v && setTimezone(v)}
-              getOptionLabel={formatTimezone}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Timezone"
-                  placeholder="Search timezone"
-                />
-              )}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box>
-                    <Typography variant="body2">{option}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      UTC{dayjs().tz(option).format('Z')}
-                    </Typography>
-                  </Box>
-                </li>
-              )}
-            />
+              {/* Timezone */}
+              <Autocomplete
+                options={tzOptions}
+                value={timezone}
+                onChange={(_, v) => v && setTimezone(v)}
+                getOptionLabel={formatTimezone}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Timezone"
+                    placeholder="Search timezone"
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <li {...props}>
+                    <Box>
+                      <Typography variant="body2">{option}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        UTC{dayjs().tz(option).format('Z')}
+                      </Typography>
+                    </Box>
+                  </li>
+                )}
+              />
 
-            {/* Datetime format */}
-            <Autocomplete
-              freeSolo
-              options={formatPresets}
-              value={dtFormat}
-              onChange={(_, v) => v && setDtFormat(v)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Datetime Format"
-                  placeholder="e.g. YYYY-MM-DD HH:mm:ss"
-                  onChange={(e) => setDtFormat(e.target.value)}
-                />
-              )}
-            />
+              {/* Datetime format */}
+              <Autocomplete
+                freeSolo
+                options={formatPresets}
+                value={dtFormat}
+                onChange={(_, v) => v && setDtFormat(v)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Datetime Format"
+                    placeholder="e.g. YYYY-MM-DD HH:mm:ss"
+                    onChange={(e) => setDtFormat(e.target.value)}
+                  />
+                )}
+              />
 
-            {/* Preview */}
-            <Typography variant="body2" color="text.secondary">
-              Preview: {preview}
-            </Typography>
-          </Stack>
-        </CardContent>
-      </Card>
+              {/* Preview */}
+              <Typography variant="body2" color="text.secondary">
+                Preview: {preview}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
       </Box>
     </PageContentLoader>
   );

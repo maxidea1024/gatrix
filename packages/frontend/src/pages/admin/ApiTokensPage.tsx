@@ -2086,22 +2086,22 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
       <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
         {/* Header */}
         {!embedded && (
-        <PageHeader
-          icon={<VpnKeyIcon />}
-          title={t('apiTokens.title')}
-          subtitle={t('apiTokens.subtitle')}
-          actions={
-            canManage ? (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={openCreateDialog}
-              >
-                {t('apiTokens.createToken')}
-              </Button>
-            ) : undefined
-          }
-        />
+          <PageHeader
+            icon={<VpnKeyIcon />}
+            title={t('apiTokens.title')}
+            subtitle={t('apiTokens.subtitle')}
+            actions={
+              canManage ? (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={openCreateDialog}
+                >
+                  {t('apiTokens.createToken')}
+                </Button>
+              ) : undefined
+            }
+          />
         )}
         {/* Bulk Actions */}
         {canManage && selectedTokenIds.length > 0 && (

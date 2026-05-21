@@ -507,22 +507,22 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   return (
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {!embedded && (
-      <PageHeader
-        icon={<WorkIcon />}
-        title={t('jobs.title')}
-        subtitle={t('jobs.description')}
-        actions={
-          canManage ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddJob}
-            >
-              {t('jobs.addJob')}
-            </Button>
-          ) : undefined
-        }
-      />
+        <PageHeader
+          icon={<WorkIcon />}
+          title={t('jobs.title')}
+          subtitle={t('jobs.description')}
+          actions={
+            canManage ? (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAddJob}
+              >
+                {t('jobs.addJob')}
+              </Button>
+            ) : undefined
+          }
+        />
       )}
 
       {/* Search and Filters */}

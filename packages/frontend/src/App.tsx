@@ -227,9 +227,7 @@ const CouponUsagePage = React.lazy(
 const MediaAssetsPage = React.lazy(
   () => import('./pages/admin/MediaAssetsPage')
 );
-const SurveysTabPage = React.lazy(
-  () => import('./pages/game/SurveysTabPage')
-);
+const SurveysTabPage = React.lazy(() => import('./pages/game/SurveysTabPage'));
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
 const SurveyLogsPage = React.lazy(() => import('./pages/game/SurveyLogsPage'));
 const SurveyTemplatesPage = React.lazy(
@@ -257,9 +255,7 @@ const PlanningDataPage = React.lazy(
 const PlanningDataHistoryPage = React.lazy(
   () => import('./pages/game/PlanningDataHistoryPage')
 );
-const RippleTabPage = React.lazy(
-  () => import('./pages/admin/RippleTabPage')
-);
+const RippleTabPage = React.lazy(() => import('./pages/admin/RippleTabPage'));
 const RippleMonitorPage = React.lazy(
   () => import('./pages/admin/RippleMonitorPage')
 );
@@ -725,20 +721,40 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="scheduler"
-                                          element={<Navigate to="/admin/schedule" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/schedule"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="whitelist"
-                                          element={<Navigate to="/admin/security?tab=whitelist" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/security?tab=whitelist"
+                                              replace
+                                            />
+                                          }
                                         />
 
                                         <Route
                                           path="jobs"
-                                          element={<Navigate to="/admin/schedule?tab=jobs" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/schedule?tab=jobs"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="queue-monitor"
-                                          element={<Navigate to="/admin/schedule?tab=queue" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/schedule?tab=queue"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="audit-logs"
@@ -763,7 +779,12 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="api-tokens"
-                                          element={<Navigate to="/admin/security" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/security"
+                                              replace
+                                            />
+                                          }
                                         />
 
                                         {/* Server Management - Tabbed */}
@@ -773,11 +794,21 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="server-list"
-                                          element={<Navigate to="/admin/servers" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/servers"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="server-lifecycle"
-                                          element={<Navigate to="/admin/servers?tab=lifecycle" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/servers?tab=lifecycle"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="change-requests"
@@ -794,7 +825,12 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="grafana-dashboard"
-                                          element={<Navigate to="/admin/monitoring" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/monitoring"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="open-api"
@@ -807,7 +843,12 @@ const AppContent: React.FC = () => {
 
                                         <Route
                                           path="gatrix-edges"
-                                          element={<Navigate to="/admin/servers?tab=edges" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/servers?tab=edges"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="signal-endpoints"
@@ -852,11 +893,21 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="ripple-monitor"
-                                          element={<Navigate to="/admin/ripple?tab=monitor" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/ripple?tab=monitor"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="ripple-history"
-                                          element={<Navigate to="/admin/ripple?tab=history" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/ripple?tab=history"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="cms-data"
@@ -883,11 +934,21 @@ const AppContent: React.FC = () => {
                               {/* Monitoring Routes - Redirect to tabbed page */}
                               <Route
                                 path="/monitoring/logs"
-                                element={<Navigate to="/admin/monitoring?tab=logs" replace />}
+                                element={
+                                  <Navigate
+                                    to="/admin/monitoring?tab=logs"
+                                    replace
+                                  />
+                                }
                               />
                               <Route
                                 path="/monitoring/alerts"
-                                element={<Navigate to="/admin/monitoring?tab=alerts" replace />}
+                                element={
+                                  <Navigate
+                                    to="/admin/monitoring?tab=alerts"
+                                    replace
+                                  />
+                                }
                               />
 
                               {/* Game Routes */}
@@ -916,11 +977,21 @@ const AppContent: React.FC = () => {
                                           />
                                           <Route
                                             path="survey-logs"
-                                            element={<Navigate to="/game/surveys?tab=logs" replace />}
+                                            element={
+                                              <Navigate
+                                                to="/game/surveys?tab=logs"
+                                                replace
+                                              />
+                                            }
                                           />
                                           <Route
                                             path="survey-templates"
-                                            element={<Navigate to="/game/surveys?tab=templates" replace />}
+                                            element={
+                                              <Navigate
+                                                to="/game/surveys?tab=templates"
+                                                replace
+                                              />
+                                            }
                                           />
                                           <Route
                                             path="store-products"
@@ -940,19 +1011,39 @@ const AppContent: React.FC = () => {
                                           />
                                           <Route
                                             path="hot-time-button-event"
-                                            element={<Navigate to="../operation-events?tab=hottime" replace />}
+                                            element={
+                                              <Navigate
+                                                to="../operation-events?tab=hottime"
+                                                replace
+                                              />
+                                            }
                                           />
                                           <Route
                                             path="coupon-settings"
-                                            element={<Navigate to="../coupons?tab=settings" replace />}
+                                            element={
+                                              <Navigate
+                                                to="../coupons?tab=settings"
+                                                replace
+                                              />
+                                            }
                                           />
                                           <Route
                                             path="coupon-usage"
-                                            element={<Navigate to="../coupons?tab=usage" replace />}
+                                            element={
+                                              <Navigate
+                                                to="../coupons?tab=usage"
+                                                replace
+                                              />
+                                            }
                                           />
                                           <Route
                                             path="live-event"
-                                            element={<Navigate to="../operation-events?tab=live" replace />}
+                                            element={
+                                              <Navigate
+                                                to="../operation-events?tab=live"
+                                                replace
+                                              />
+                                            }
                                           />
                                           <Route
                                             path="planning-data"
@@ -960,7 +1051,12 @@ const AppContent: React.FC = () => {
                                           />
                                           <Route
                                             path="planning-data-history"
-                                            element={<Navigate to="../planning-data?tab=history" replace />}
+                                            element={
+                                              <Navigate
+                                                to="../planning-data?tab=history"
+                                                replace
+                                              />
+                                            }
                                           />
                                         </Routes>
                                       </EnvironmentAwareLayout>

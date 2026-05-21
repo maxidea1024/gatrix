@@ -136,10 +136,10 @@ const AlertsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   return (
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {!embedded && (
-      <PageHeader
-        title={t('monitoring.alerts.title')}
-        subtitle={t('monitoring.alerts.subtitle')}
-      />
+        <PageHeader
+          title={t('monitoring.alerts.title')}
+          subtitle={t('monitoring.alerts.subtitle')}
+        />
       )}
 
       <Card variant="outlined">

@@ -68,7 +68,10 @@ import SpreadsheetCard from '@/components/spreadsheet/SpreadsheetCard';
 import ShareDialog from '@/components/spreadsheet/ShareDialog';
 import RelativeTime from '@/components/common/RelativeTime';
 import { useDebounce } from '@/hooks/useDebounce';
-import { exportSnapshotToXlsx, importFromXlsx } from '@/utils/spreadsheetExcelUtils';
+import {
+  exportSnapshotToXlsx,
+  importFromXlsx,
+} from '@/utils/spreadsheetExcelUtils';
 import { useListRestoration } from '@/hooks/useListRestoration';
 
 // ─── SpreadsheetRowMenu (list view context menu) ───
@@ -82,7 +85,14 @@ interface RowMenuProps {
   onDelete: () => void;
 }
 
-const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({ item, onRename, onTogglePin, onDuplicate, onExportXlsx, onDelete }) => {
+const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({
+  item,
+  onRename,
+  onTogglePin,
+  onDuplicate,
+  onExportXlsx,
+  onDelete,
+}) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -91,21 +101,56 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({ item, onRename, onTogglePi
       <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)}>
         <MoreVertIcon fontSize="small" />
       </IconButton>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-        <MenuItem onClick={() => { setAnchorEl(null); onRename(); }}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onRename();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { setAnchorEl(null); onDuplicate(); }}>
-          <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onDuplicate();
+          }}
+        >
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.duplicate', 'Duplicate')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { setAnchorEl(null); onExportXlsx(); }}>
-          <ListItemIcon><ExportIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('spreadsheets.exportXlsx', 'Export as XLSX')}</ListItemText>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onExportXlsx();
+          }}
+        >
+          <ListItemIcon>
+            <ExportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {t('spreadsheets.exportXlsx', 'Export as XLSX')}
+          </ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { setAnchorEl(null); onDelete(); }} sx={{ color: 'error.main' }}>
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onDelete();
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete', 'Delete')}</ListItemText>
         </MenuItem>
       </Menu>
@@ -129,8 +174,11 @@ const SpreadsheetListPage: React.FC = () => {
   });
 
   // 복원할 상태를 하나로 묶음
-  const listState = React.useMemo(() => ({ search, viewMode }), [search, viewMode]);
-  
+  const listState = React.useMemo(
+    () => ({ search, viewMode }),
+    [search, viewMode]
+  );
+
   useListRestoration(
     listState,
     (saved) => {
@@ -141,21 +189,31 @@ const SpreadsheetListPage: React.FC = () => {
   );
 
   // Delete confirmation dialog
-  const [deleteTarget, setDeleteTarget] = useState<SpreadsheetListItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SpreadsheetListItem | null>(
+    null
+  );
   // Rename dialog
-  const [renameTarget, setRenameTarget] = useState<SpreadsheetListItem | null>(null);
+  const [renameTarget, setRenameTarget] = useState<SpreadsheetListItem | null>(
+    null
+  );
   const [renameValue, setRenameValue] = useState('');
 
   // Create dropdown
-  const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(null);
+  const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
-  const [importStep, setImportStep] = useState<'reading' | 'parsing' | 'saving' | 'done'>('reading');
+  const [importStep, setImportStep] = useState<
+    'reading' | 'parsing' | 'saving' | 'done'
+  >('reading');
   const [importFileName, setImportFileName] = useState('');
   const [importFileSize, setImportFileSize] = useState('');
 
   // Share dialog
-  const [shareTarget, setShareTarget] = useState<SpreadsheetListItem | null>(null);
+  const [shareTarget, setShareTarget] = useState<SpreadsheetListItem | null>(
+    null
+  );
 
   const loadSpreadsheets = useCallback(async () => {
     try {
@@ -168,9 +226,12 @@ const SpreadsheetListPage: React.FC = () => {
       });
       setItems(result.items);
     } catch (err) {
-      enqueueSnackbar(t('spreadsheets.loadError', 'Failed to load spreadsheets'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        t('spreadsheets.loadError', 'Failed to load spreadsheets'),
+        {
+          variant: 'error',
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -185,9 +246,12 @@ const SpreadsheetListPage: React.FC = () => {
       const created = await spreadsheetService.create();
       navigate(`/admin/spreadsheets/${created.id}`);
     } catch {
-      enqueueSnackbar(t('spreadsheets.createError', 'Failed to create spreadsheet'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        t('spreadsheets.createError', 'Failed to create spreadsheet'),
+        {
+          variant: 'error',
+        }
+      );
     }
   }, [navigate, enqueueSnackbar, t]);
 
@@ -201,11 +265,15 @@ const SpreadsheetListPage: React.FC = () => {
       const newPinned = !item.isPinned;
       // 낙관적 업데이트(Optimistic Update): UI 즉시 갱신 및 정렬
       setItems((prev) => {
-        const updated = prev.map((i) => (i.id === item.id ? { ...i, isPinned: newPinned } : i));
+        const updated = prev.map((i) =>
+          i.id === item.id ? { ...i, isPinned: newPinned } : i
+        );
         return updated.sort((a, b) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+          return (
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
         });
       });
 
@@ -215,11 +283,15 @@ const SpreadsheetListPage: React.FC = () => {
       } catch {
         // 실패 시 롤백
         setItems((prev) => {
-          const updated = prev.map((i) => (i.id === item.id ? { ...i, isPinned: item.isPinned } : i));
+          const updated = prev.map((i) =>
+            i.id === item.id ? { ...i, isPinned: item.isPinned } : i
+          );
           return updated.sort((a, b) => {
             if (a.isPinned && !b.isPinned) return -1;
             if (!a.isPinned && b.isPinned) return 1;
-            return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+            return (
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
           });
         });
         enqueueSnackbar('Failed to update pin', { variant: 'error' });
@@ -232,9 +304,12 @@ const SpreadsheetListPage: React.FC = () => {
     async (id: string) => {
       try {
         await spreadsheetService.duplicate(id);
-        enqueueSnackbar(t('spreadsheets.duplicated', 'Spreadsheet duplicated'), {
-          variant: 'success',
-        });
+        enqueueSnackbar(
+          t('spreadsheets.duplicated', 'Spreadsheet duplicated'),
+          {
+            variant: 'success',
+          }
+        );
         loadSpreadsheets();
       } catch {
         enqueueSnackbar('Failed to duplicate', { variant: 'error' });
@@ -275,7 +350,9 @@ const SpreadsheetListPage: React.FC = () => {
 
     // 낙관적 업데이트
     setItems((prev) =>
-      prev.map((item) => (item.id === target.id ? { ...item, title: newTitle } : item))
+      prev.map((item) =>
+        item.id === target.id ? { ...item, title: newTitle } : item
+      )
     );
 
     try {
@@ -283,7 +360,9 @@ const SpreadsheetListPage: React.FC = () => {
     } catch {
       // 실패 시 원래 이름으로 복원
       setItems((prev) =>
-        prev.map((item) => (item.id === target.id ? { ...item, title: target.title } : item))
+        prev.map((item) =>
+          item.id === target.id ? { ...item, title: target.title } : item
+        )
       );
       enqueueSnackbar('Failed to rename', { variant: 'error' });
     }
@@ -295,13 +374,20 @@ const SpreadsheetListPage: React.FC = () => {
       try {
         const data = await spreadsheetService.getById(item.id);
         if (!data.sheetData) {
-          enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), { variant: 'warning' });
+          enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), {
+            variant: 'warning',
+          });
           return;
         }
         await exportSnapshotToXlsx(data.sheetData, item.title || 'spreadsheet');
-        enqueueSnackbar(t('spreadsheets.exportSuccess', 'Exported successfully'), { variant: 'success' });
+        enqueueSnackbar(
+          t('spreadsheets.exportSuccess', 'Exported successfully'),
+          { variant: 'success' }
+        );
       } catch {
-        enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), { variant: 'error' });
+        enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), {
+          variant: 'error',
+        });
       }
     },
     [enqueueSnackbar, t]
@@ -342,11 +428,16 @@ const SpreadsheetListPage: React.FC = () => {
         setImportStep('done');
         await new Promise((r) => setTimeout(r, 1000));
 
-        enqueueSnackbar(t('spreadsheets.importSuccess', 'Imported successfully'), { variant: 'success' });
+        enqueueSnackbar(
+          t('spreadsheets.importSuccess', 'Imported successfully'),
+          { variant: 'success' }
+        );
         navigate(`/admin/spreadsheets/${created.id}`);
       } catch (err) {
         console.error('XLSX import error:', err);
-        enqueueSnackbar(t('spreadsheets.importError', 'Import failed'), { variant: 'error' });
+        enqueueSnackbar(t('spreadsheets.importError', 'Import failed'), {
+          variant: 'error',
+        });
       } finally {
         setIsImporting(false);
       }
@@ -366,14 +457,20 @@ const SpreadsheetListPage: React.FC = () => {
       <PageHeader
         icon={<GridOnIcon />}
         title={t('spreadsheets.title', 'Spreadsheets')}
-        subtitle={t('spreadsheets.subtitle', 'Create and manage spreadsheets with formulas, filters, and formatting.')}
+        subtitle={t(
+          'spreadsheets.subtitle',
+          'Create and manage spreadsheets with formulas, filters, and formatting.'
+        )}
         actions={
           <>
             <ButtonGroup variant="contained">
               <Button startIcon={<AddIcon />} onClick={handleCreate}>
                 {t('spreadsheets.createNew', 'New Spreadsheet')}
               </Button>
-              <Button size="small" onClick={(e) => setCreateMenuAnchor(e.currentTarget)}>
+              <Button
+                size="small"
+                onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+              >
                 <ArrowDropDownIcon />
               </Button>
             </ButtonGroup>
@@ -384,13 +481,31 @@ const SpreadsheetListPage: React.FC = () => {
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-              <MenuItem onClick={() => { setCreateMenuAnchor(null); handleCreate(); }}>
-                <ListItemIcon><NoteAddIcon fontSize="small" /></ListItemIcon>
-                <ListItemText>{t('spreadsheets.createEmpty', 'Empty spreadsheet')}</ListItemText>
+              <MenuItem
+                onClick={() => {
+                  setCreateMenuAnchor(null);
+                  handleCreate();
+                }}
+              >
+                <ListItemIcon>
+                  <NoteAddIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('spreadsheets.createEmpty', 'Empty spreadsheet')}
+                </ListItemText>
               </MenuItem>
-              <MenuItem onClick={() => { setCreateMenuAnchor(null); fileInputRef.current?.click(); }}>
-                <ListItemIcon><ImportIcon fontSize="small" /></ListItemIcon>
-                <ListItemText>{t('spreadsheets.importXlsx', 'Import XLSX')}</ListItemText>
+              <MenuItem
+                onClick={() => {
+                  setCreateMenuAnchor(null);
+                  fileInputRef.current?.click();
+                }}
+              >
+                <ListItemIcon>
+                  <ImportIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('spreadsheets.importXlsx', 'Import XLSX')}
+                </ListItemText>
               </MenuItem>
             </Menu>
             <input
@@ -406,15 +521,33 @@ const SpreadsheetListPage: React.FC = () => {
 
       {/* Search & View toggle */}
       <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <SearchTextField
-            placeholder={t('spreadsheets.search', 'Search spreadsheets...') as string}
+            placeholder={
+              t('spreadsheets.search', 'Search spreadsheets...') as string
+            }
             value={search}
             onChange={setSearch}
           />
-          <ToggleButtonGroup value={viewMode} exclusive onChange={handleViewModeChange} size="small">
-            <ToggleButton value="grid"><GridViewIcon fontSize="small" /></ToggleButton>
-            <ToggleButton value="list"><ViewListIcon fontSize="small" /></ToggleButton>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            size="small"
+          >
+            <ToggleButton value="grid">
+              <GridViewIcon fontSize="small" />
+            </ToggleButton>
+            <ToggleButton value="list">
+              <ViewListIcon fontSize="small" />
+            </ToggleButton>
           </ToggleButtonGroup>
         </Box>
       </Box>
@@ -423,12 +556,20 @@ const SpreadsheetListPage: React.FC = () => {
       <PageContentLoader loading={loading || search !== debouncedSearch}>
         {items.length === 0 && !debouncedSearch && !search ? (
           <EmptyPagePlaceholder
-            message={t('spreadsheets.emptyDescription', 'Create your first spreadsheet to organize data with formulas, filters, and formatting.')}
+            message={t(
+              'spreadsheets.emptyDescription',
+              'Create your first spreadsheet to organize data with formulas, filters, and formatting.'
+            )}
             onAddClick={handleCreate}
             addButtonLabel={t('spreadsheets.createNew', 'New Spreadsheet')}
           />
         ) : items.length === 0 && debouncedSearch === search && search ? (
-          <EmptyPagePlaceholder message={t('spreadsheets.noResults', 'No spreadsheets match your search.')} />
+          <EmptyPagePlaceholder
+            message={t(
+              'spreadsheets.noResults',
+              'No spreadsheets match your search.'
+            )}
+          />
         ) : viewMode === 'grid' ? (
           <Grid container spacing={2}>
             {items.map((item) => (
@@ -456,14 +597,24 @@ const SpreadsheetListPage: React.FC = () => {
           </Grid>
         ) : (
           /* List view — table style matching ClientVersionsPage */
-          <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
+          <TableContainer
+            component={Paper}
+            variant="outlined"
+            sx={{ borderRadius: 2 }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, width: 40 }} />
-                  <TableCell sx={{ fontWeight: 600 }}>{t('common.title', 'Title')}</TableCell>
-                  <TableCell sx={{ fontWeight: 600, width: 140 }}>{t('common.createdBy', 'Created by')}</TableCell>
-                  <TableCell sx={{ fontWeight: 600, width: 150 }}>{t('common.updatedAt', 'Updated')}</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>
+                    {t('common.title', 'Title')}
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, width: 140 }}>
+                    {t('common.createdBy', 'Created by')}
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, width: 150 }}>
+                    {t('common.updatedAt', 'Updated')}
+                  </TableCell>
                   <TableCell sx={{ fontWeight: 600, width: 50 }} />
                 </TableRow>
               </TableHead>
@@ -473,22 +624,57 @@ const SpreadsheetListPage: React.FC = () => {
                     key={item.id}
                     hover
                     onClick={() => handleOpen(item.id)}
-                    sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:last-child td': { borderBottom: 0 },
+                    }}
                   >
-                    <TableCell sx={{ pr: 0 }} onClick={(e) => { e.stopPropagation(); handleTogglePin(item); }}>
-                      <Tooltip title={item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}>
-                        <IconButton size="small" sx={{ p: 0.5, color: item.isPinned ? 'primary.main' : 'action.active' }}>
+                    <TableCell
+                      sx={{ pr: 0 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTogglePin(item);
+                      }}
+                    >
+                      <Tooltip
+                        title={
+                          item.isPinned
+                            ? t('common.unpin', 'Unpin')
+                            : t('common.pin', 'Pin')
+                        }
+                      >
+                        <IconButton
+                          size="small"
+                          sx={{
+                            p: 0.5,
+                            color: item.isPinned
+                              ? 'primary.main'
+                              : 'action.active',
+                          }}
+                        >
                           {item.isPinned ? (
-                            <PushPinIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
+                            <PushPinIcon
+                              sx={{ fontSize: 16, transform: 'rotate(45deg)' }}
+                            />
                           ) : (
-                            <PushPinOutlinedIcon sx={{ fontSize: 16, transform: 'rotate(45deg)' }} />
+                            <PushPinOutlinedIcon
+                              sx={{ fontSize: 16, transform: 'rotate(45deg)' }}
+                            />
                           )}
                         </IconButton>
                       </Tooltip>
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <GridOnIcon sx={{ fontSize: 18, color: 'action.disabled', flexShrink: 0 }} />
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <GridOnIcon
+                          sx={{
+                            fontSize: 18,
+                            color: 'action.disabled',
+                            flexShrink: 0,
+                          }}
+                        />
                         {renameTarget?.id === item.id ? (
                           <TextField
                             size="small"
@@ -502,7 +688,9 @@ const SpreadsheetListPage: React.FC = () => {
                             }}
                             onBlur={handleRenameConfirm}
                             sx={{ minWidth: 250 }}
-                            inputProps={{ style: { fontSize: '0.875rem', fontWeight: 500 } }}
+                            inputProps={{
+                              style: { fontSize: '0.875rem', fontWeight: 500 },
+                            }}
                           />
                         ) : (
                           <>
@@ -518,12 +706,15 @@ const SpreadsheetListPage: React.FC = () => {
                             <Tooltip title={t('common.rename', 'Rename')}>
                               <IconButton
                                 size="small"
-                                onClick={() => { setRenameTarget(item); setRenameValue(item.title); }}
+                                onClick={() => {
+                                  setRenameTarget(item);
+                                  setRenameValue(item.title);
+                                }}
                                 sx={{
                                   width: 22,
                                   height: 22,
                                   color: 'action.active',
-                                  '&:hover': { color: 'text.primary' }
+                                  '&:hover': { color: 'text.primary' },
                                 }}
                               >
                                 <EditIcon sx={{ fontSize: 14 }} />
@@ -546,16 +737,32 @@ const SpreadsheetListPage: React.FC = () => {
                     <TableCell>
                       <RelativeTime date={item.updatedAt} variant="caption" />
                     </TableCell>
-                    <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                    <TableCell
+                      align="right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          gap: 0.5,
+                        }}
+                      >
                         <Tooltip title={t('spreadsheets.share', '공유')}>
-                          <IconButton size="small" onClick={() => setShareTarget(item)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => setShareTarget(item)}
+                          >
                             <ShareIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                         <SpreadsheetRowMenu
                           item={item}
-                          onRename={() => { setRenameTarget(item); setRenameValue(item.title); }}
+                          onRename={() => {
+                            setRenameTarget(item);
+                            setRenameValue(item.title);
+                          }}
                           onTogglePin={() => handleTogglePin(item)}
                           onDuplicate={() => handleDuplicate(item.id)}
                           onExportXlsx={() => handleExportXlsx(item)}
@@ -573,17 +780,29 @@ const SpreadsheetListPage: React.FC = () => {
 
       {/* Delete Dialog */}
       <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t('spreadsheets.deleteTitle', 'Delete Spreadsheet')}</DialogTitle>
+        <DialogTitle>
+          {t('spreadsheets.deleteTitle', 'Delete Spreadsheet')}
+        </DialogTitle>
         <DialogContent>
           <Typography>
-            {t('spreadsheets.deleteConfirm', 'Are you sure you want to delete "{{title}}"?', {
-              title: deleteTarget?.title,
-            })}
+            {t(
+              'spreadsheets.deleteConfirm',
+              'Are you sure you want to delete "{{title}}"?',
+              {
+                title: deleteTarget?.title,
+              }
+            )}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)}>{t('common.cancel', 'Cancel')}</Button>
-          <Button color="error" variant="contained" onClick={handleDeleteConfirm}>
+          <Button onClick={() => setDeleteTarget(null)}>
+            {t('common.cancel', 'Cancel')}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={handleDeleteConfirm}
+          >
             {t('common.delete', 'Delete')}
           </Button>
         </DialogActions>
@@ -606,15 +825,17 @@ const SpreadsheetListPage: React.FC = () => {
               borderRadius: 3,
               overflow: 'hidden',
               bgcolor: 'background.paper',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05)',
+              boxShadow:
+                '0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05)',
             }}
           >
             {/* Gradient header with file info */}
             <Box
               sx={{
-                background: importStep === 'done'
-                  ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
-                  : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                background:
+                  importStep === 'done'
+                    ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                    : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
                 px: 2.5,
                 py: 2,
                 transition: 'background 0.5s ease',
@@ -633,16 +854,26 @@ const SpreadsheetListPage: React.FC = () => {
                     backdropFilter: 'blur(4px)',
                   }}
                 >
-                  {importStep === 'done'
-                    ? <CheckCircleIcon sx={{ fontSize: 20, color: '#fff' }} />
-                    : <FileIcon sx={{ fontSize: 20, color: '#fff' }} />
-                  }
+                  {importStep === 'done' ? (
+                    <CheckCircleIcon sx={{ fontSize: 20, color: '#fff' }} />
+                  ) : (
+                    <FileIcon sx={{ fontSize: 20, color: '#fff' }} />
+                  )}
                 </Box>
                 <Box sx={{ minWidth: 0, flex: 1 }}>
-                  <Typography variant="body2" noWrap sx={{ fontWeight: 600, color: '#fff', lineHeight: 1.3 }}>
-                    {importStep === 'done' ? t('spreadsheets.importStepDone', '가져오기 완료') : importFileName}
+                  <Typography
+                    variant="body2"
+                    noWrap
+                    sx={{ fontWeight: 600, color: '#fff', lineHeight: 1.3 }}
+                  >
+                    {importStep === 'done'
+                      ? t('spreadsheets.importStepDone', '가져오기 완료')
+                      : importFileName}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.7rem' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.7rem' }}
+                  >
                     {importFileSize}
                   </Typography>
                 </Box>
@@ -668,78 +899,116 @@ const SpreadsheetListPage: React.FC = () => {
 
             {/* Steps */}
             <Box sx={{ px: 2.5, py: 1.75 }}>
-              {(['parsing', 'saving', 'done'] as const).map((step, idx, arr) => {
-                const stepOrder = { parsing: 0, saving: 1, done: 2 };
-                const currentOrder = stepOrder[importStep] ?? 0;
-                const thisOrder = stepOrder[step];
-                const isActive = importStep === step;
-                const isCompleted = currentOrder > thisOrder;
-                const isLast = idx === arr.length - 1;
+              {(['parsing', 'saving', 'done'] as const).map(
+                (step, idx, arr) => {
+                  const stepOrder = { parsing: 0, saving: 1, done: 2 };
+                  const currentOrder = stepOrder[importStep] ?? 0;
+                  const thisOrder = stepOrder[step];
+                  const isActive = importStep === step;
+                  const isCompleted = currentOrder > thisOrder;
+                  const isLast = idx === arr.length - 1;
 
-                const labels: Record<string, string> = {
-                  parsing: t('spreadsheets.importStepParsing', '엑셀 파일 분석'),
-                  saving: t('spreadsheets.importStepSaving', '서버에 저장'),
-                  done: t('spreadsheets.importStepDone', '가져오기 완료'),
-                };
+                  const labels: Record<string, string> = {
+                    parsing: t(
+                      'spreadsheets.importStepParsing',
+                      '엑셀 파일 분석'
+                    ),
+                    saving: t('spreadsheets.importStepSaving', '서버에 저장'),
+                    done: t('spreadsheets.importStepDone', '가져오기 완료'),
+                  };
 
-                return (
-                  <Box key={step} sx={{ display: 'flex', gap: 1.25 }}>
-                    {/* Indicator column with connector line */}
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 20, flexShrink: 0 }}>
+                  return (
+                    <Box key={step} sx={{ display: 'flex', gap: 1.25 }}>
+                      {/* Indicator column with connector line */}
                       <Box
                         sx={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: '50%',
                           display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          ...(isCompleted
-                            ? { bgcolor: 'success.main', color: '#fff' }
-                            : isActive
-                              ? { bgcolor: 'primary.main', color: '#fff', boxShadow: '0 0 0 3px rgba(99,102,241,0.2)' }
-                              : { border: '1.5px solid', borderColor: 'divider', color: 'text.disabled' }),
-                          transition: 'all 0.3s ease',
+                          width: 20,
+                          flexShrink: 0,
                         }}
                       >
-                        {isCompleted ? (
-                          <CheckCircleIcon sx={{ fontSize: 14 }} />
-                        ) : isActive ? (
-                          <CircularProgress size={11} thickness={5} sx={{ color: '#fff' }} />
-                        ) : (
-                          <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: 'text.disabled' }} />
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            ...(isCompleted
+                              ? { bgcolor: 'success.main', color: '#fff' }
+                              : isActive
+                                ? {
+                                    bgcolor: 'primary.main',
+                                    color: '#fff',
+                                    boxShadow: '0 0 0 3px rgba(99,102,241,0.2)',
+                                  }
+                                : {
+                                    border: '1.5px solid',
+                                    borderColor: 'divider',
+                                    color: 'text.disabled',
+                                  }),
+                            transition: 'all 0.3s ease',
+                          }}
+                        >
+                          {isCompleted ? (
+                            <CheckCircleIcon sx={{ fontSize: 14 }} />
+                          ) : isActive ? (
+                            <CircularProgress
+                              size={11}
+                              thickness={5}
+                              sx={{ color: '#fff' }}
+                            />
+                          ) : (
+                            <Box
+                              sx={{
+                                width: 5,
+                                height: 5,
+                                borderRadius: '50%',
+                                bgcolor: 'text.disabled',
+                              }}
+                            />
+                          )}
+                        </Box>
+                        {/* Connector line */}
+                        {!isLast && (
+                          <Box
+                            sx={{
+                              width: 1.5,
+                              flex: 1,
+                              my: 0.25,
+                              borderRadius: 1,
+                              bgcolor: isCompleted ? 'success.main' : 'divider',
+                              transition: 'background-color 0.3s ease',
+                            }}
+                          />
                         )}
                       </Box>
-                      {/* Connector line */}
-                      {!isLast && (
-                        <Box sx={{
-                          width: 1.5,
-                          flex: 1,
-                          my: 0.25,
-                          borderRadius: 1,
-                          bgcolor: isCompleted ? 'success.main' : 'divider',
-                          transition: 'background-color 0.3s ease',
-                        }} />
-                      )}
+                      {/* Label */}
+                      <Box sx={{ pb: isLast ? 0 : 1.25, pt: 0.1 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '0.8rem',
+                            fontWeight: isActive ? 600 : 400,
+                            color: isActive
+                              ? 'text.primary'
+                              : isCompleted
+                                ? 'text.secondary'
+                                : 'text.disabled',
+                            transition: 'all 0.3s',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {labels[step]}
+                        </Typography>
+                      </Box>
                     </Box>
-                    {/* Label */}
-                    <Box sx={{ pb: isLast ? 0 : 1.25, pt: 0.1 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: '0.8rem',
-                          fontWeight: isActive ? 600 : 400,
-                          color: isActive ? 'text.primary' : isCompleted ? 'text.secondary' : 'text.disabled',
-                          transition: 'all 0.3s',
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {labels[step]}
-                      </Typography>
-                    </Box>
-                  </Box>
-                );
-              })}
+                  );
+                }
+              )}
             </Box>
           </Box>
         </Fade>

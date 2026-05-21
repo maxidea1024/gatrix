@@ -69,7 +69,9 @@ interface PlanningDataPageProps {
   embedded?: boolean;
 }
 
-const PlanningDataPage: React.FC<PlanningDataPageProps> = ({ embedded = false }) => {
+const PlanningDataPage: React.FC<PlanningDataPageProps> = ({
+  embedded = false,
+}) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();

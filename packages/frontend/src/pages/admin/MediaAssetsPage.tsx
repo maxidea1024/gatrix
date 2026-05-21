@@ -112,13 +112,17 @@ const MediaAssetsPage: React.FC = () => {
   const debouncedSearch = useDebounce(searchTerm, 400);
 
   // Restore list state
-  const listState = React.useMemo(() => ({ searchTerm, refStatusFilter, page, rowsPerPage }), [searchTerm, refStatusFilter, page, rowsPerPage]);
-  
+  const listState = React.useMemo(
+    () => ({ searchTerm, refStatusFilter, page, rowsPerPage }),
+    [searchTerm, refStatusFilter, page, rowsPerPage]
+  );
+
   useListRestoration(
     listState,
     (saved) => {
       if (saved.searchTerm !== undefined) setSearchTerm(saved.searchTerm);
-      if (saved.refStatusFilter !== undefined) setRefStatusFilter(saved.refStatusFilter);
+      if (saved.refStatusFilter !== undefined)
+        setRefStatusFilter(saved.refStatusFilter);
       if (saved.page !== undefined) setPage(saved.page);
       if (saved.rowsPerPage !== undefined) setRowsPerPage(saved.rowsPerPage);
     },
@@ -251,7 +255,7 @@ const MediaAssetsPage: React.FC = () => {
         { variant: 'success' }
       );
       setBulkDeleteOpen(false);
-      
+
       // 삭제된 항목이 있을 때만 목록 새로고침
       if (result.deleted > 0) {
         loadAssets();

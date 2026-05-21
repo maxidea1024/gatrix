@@ -48,9 +48,18 @@ interface SpreadsheetCardProps {
 }
 
 const ACCENT_COLORS = [
-  '#4285F4', '#34A853', '#EA4335', '#FBBC05',
-  '#8E24AA', '#00ACC1', '#F4511E', '#7CB342',
-  '#5C6BC0', '#26A69A', '#EC407A', '#FFA726',
+  '#4285F4',
+  '#34A853',
+  '#EA4335',
+  '#FBBC05',
+  '#8E24AA',
+  '#00ACC1',
+  '#F4511E',
+  '#7CB342',
+  '#5C6BC0',
+  '#26A69A',
+  '#EC407A',
+  '#FFA726',
 ];
 
 const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
@@ -102,32 +111,78 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
       }}
     >
       <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleMenuClose}>
-        <MenuItem onClick={() => { handleMenuClose(); setTimeout(() => onRename(item), 150); }}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            setTimeout(() => onRename(item), 150);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
         </MenuItem>
 
-        <MenuItem onClick={() => { handleMenuClose(); onDuplicate(item.id); }}>
-          <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onDuplicate(item.id);
+          }}
+        >
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.duplicate', 'Duplicate')}</ListItemText>
         </MenuItem>
 
-        <MenuItem onClick={() => { handleMenuClose(); onExportXlsx(item); }}>
-          <ListItemIcon><ExportIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('spreadsheets.exportXlsx', 'Export as XLSX')}</ListItemText>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onExportXlsx(item);
+          }}
+        >
+          <ListItemIcon>
+            <ExportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {t('spreadsheets.exportXlsx', 'Export as XLSX')}
+          </ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { handleMenuClose(); onDelete(item); }} sx={{ color: 'error.main' }}>
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            onDelete(item);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete', 'Delete')}</ListItemText>
         </MenuItem>
       </Menu>
 
       <Box
         onClick={() => onOpen(item.id)}
-        sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch', cursor: 'pointer' }}
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          cursor: 'pointer',
+        }}
       >
         {/* Header: icon + title + pin & menu */}
-        <Box sx={{ px: 1.5, pt: 1.5, pb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box
+          sx={{
+            px: 1.5,
+            pt: 1.5,
+            pb: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <Avatar
             variant="rounded"
             sx={{
@@ -163,12 +218,21 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                   setTimeout(() => onRenameConfirm?.(), 0);
                 }}
                 fullWidth
-                inputProps={{ style: { fontSize: '0.875rem', fontWeight: 600 } }}
+                inputProps={{
+                  style: { fontSize: '0.875rem', fontWeight: 600 },
+                }}
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
               />
             ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  minWidth: 0,
+                }}
+              >
                 <Typography
                   variant="subtitle2"
                   noWrap
@@ -192,7 +256,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                       height: 22,
                       color: 'action.active',
                       flexShrink: 0,
-                      '&:hover': { color: 'text.primary' }
+                      '&:hover': { color: 'text.primary' },
                     }}
                   >
                     <EditIcon sx={{ fontSize: 14 }} />
@@ -217,27 +281,37 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
             </Tooltip>
 
             {/* Pin Toggle Button */}
-            <Tooltip title={item.isPinned ? t('common.unpin', 'Unpin') : t('common.pin', 'Pin')}>
+            <Tooltip
+              title={
+                item.isPinned
+                  ? t('common.unpin', 'Unpin')
+                  : t('common.pin', 'Pin')
+              }
+            >
               <IconButton
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
                   onTogglePin(item);
                 }}
-                sx={{ 
-                  width: 28, 
-                  height: 28, 
-                  color: item.isPinned ? 'primary.main' : 'action.active' 
+                sx={{
+                  width: 28,
+                  height: 28,
+                  color: item.isPinned ? 'primary.main' : 'action.active',
                 }}
               >
                 {item.isPinned ? (
-                  <PushPinIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+                  <PushPinIcon
+                    sx={{ fontSize: 18, transform: 'rotate(45deg)' }}
+                  />
                 ) : (
-                  <PushPinOutlinedIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+                  <PushPinOutlinedIcon
+                    sx={{ fontSize: 18, transform: 'rotate(45deg)' }}
+                  />
                 )}
               </IconButton>
             </Tooltip>
-            
+
             {/* ⋮ Menu */}
             <IconButton
               className="ss-card-menu"
@@ -269,7 +343,9 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
             borderColor: 'divider',
             position: 'relative',
             bgcolor: (th) =>
-              th.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              th.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : 'rgba(0,0,0,0.02)',
           }}
         >
           {item.thumbnail ? (
@@ -284,8 +360,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
               sx={{
                 position: 'absolute',
                 inset: 0,
-                backgroundImage:
-                  `linear-gradient(${alpha(accent, 0.1)} 1px, transparent 1px),
+                backgroundImage: `linear-gradient(${alpha(accent, 0.1)} 1px, transparent 1px),
                    linear-gradient(90deg, ${alpha(accent, 0.1)} 1px, transparent 1px)`,
                 backgroundSize: '16px 16px',
                 opacity: 0.8,
@@ -296,11 +371,31 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
 
         {/* Footer */}
         <CardContent sx={{ pt: 1, pb: '8px !important', px: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-            <Typography variant="caption" color="text.secondary" noWrap sx={{ flex: 1, textAlign: 'left' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 1,
+            }}
+          >
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              sx={{ flex: 1, textAlign: 'left' }}
+            >
               {item.updatedByName || item.createdByName}
             </Typography>
-            <RelativeTime date={item.updatedAt} variant="caption" sx={{ color: 'text.secondary', flexShrink: 0, textAlign: 'right' }} />
+            <RelativeTime
+              date={item.updatedAt}
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                flexShrink: 0,
+                textAlign: 'right',
+              }}
+            />
           </Box>
         </CardContent>
       </Box>

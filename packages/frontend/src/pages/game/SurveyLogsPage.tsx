@@ -74,7 +74,9 @@ const SurveyLogsPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
 
   // Sort state
   const [sortBy, setSortBy] = useState<string>('createdAt');
@@ -676,7 +678,9 @@ const SurveyLogsPage: React.FC = () => {
                 }}
                 disabled={loading}
               >
-                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>{t('common.refresh')}</ListItemText>
               </MenuItem>
             </Menu>

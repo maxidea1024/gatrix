@@ -598,14 +598,18 @@ const CouponUsagePage: React.FC = () => {
                 onClick={() => handleExport('csv')}
                 disabled={exporting || records.length === 0}
               >
-                <ListItemIcon><DownloadIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <DownloadIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>CSV {t('common.export')}</ListItemText>
               </MenuItem>
               <MenuItem
                 onClick={() => handleExport('xlsx')}
                 disabled={exporting || records.length === 0}
               >
-                <ListItemIcon><DownloadIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <DownloadIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>Excel (XLSX) {t('common.export')}</ListItemText>
               </MenuItem>
               <Divider />
@@ -616,7 +620,9 @@ const CouponUsagePage: React.FC = () => {
                 }}
                 disabled={loading}
               >
-                <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>{t('common.refresh')}</ListItemText>
               </MenuItem>
             </Menu>

@@ -410,88 +410,88 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {/* Header */}
       {!embedded && (
-      <PageHeader
-        icon={<MonitorIcon />}
-        title={t('queueMonitor.title')}
-        subtitle={t('queueMonitor.description')}
-        actions={
-          <>
-            <ButtonGroup variant="contained" size="small">
-              <Button
-                startIcon={<RefreshIcon />}
-                onClick={() => {
-                  loadStats();
-                  loadQueueDetails();
-                }}
+        <PageHeader
+          icon={<MonitorIcon />}
+          title={t('queueMonitor.title')}
+          subtitle={t('queueMonitor.description')}
+          actions={
+            <>
+              <ButtonGroup variant="contained" size="small">
+                <Button
+                  startIcon={<RefreshIcon />}
+                  onClick={() => {
+                    loadStats();
+                    loadQueueDetails();
+                  }}
+                >
+                  {t('common.refresh')}
+                </Button>
+                <Button
+                  size="small"
+                  onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+                >
+                  {refreshInterval === 0
+                    ? 'Off'
+                    : refreshInterval < 60000
+                      ? `${refreshInterval / 1000}s`
+                      : `${refreshInterval / 60000}m`}
+                  <ArrowDropDownIcon sx={{ ml: -0.5, mr: -1 }} />
+                </Button>
+              </ButtonGroup>
+              <Menu
+                anchorEl={refreshMenuAnchor}
+                open={Boolean(refreshMenuAnchor)}
+                onClose={() => setRefreshMenuAnchor(null)}
               >
-                {t('common.refresh')}
-              </Button>
-              <Button
-                size="small"
-                onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
-              >
-                {refreshInterval === 0
-                  ? 'Off'
-                  : refreshInterval < 60000
-                    ? `${refreshInterval / 1000}s`
-                    : `${refreshInterval / 60000}m`}
-                <ArrowDropDownIcon sx={{ ml: -0.5, mr: -1 }} />
-              </Button>
-            </ButtonGroup>
-            <Menu
-              anchorEl={refreshMenuAnchor}
-              open={Boolean(refreshMenuAnchor)}
-              onClose={() => setRefreshMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  handleSetRefreshInterval(0);
-                  setRefreshMenuAnchor(null);
-                }}
-                selected={refreshInterval === 0}
-              >
-                Off
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleSetRefreshInterval(5000);
-                  setRefreshMenuAnchor(null);
-                }}
-                selected={refreshInterval === 5000}
-              >
-                5s
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleSetRefreshInterval(10000);
-                  setRefreshMenuAnchor(null);
-                }}
-                selected={refreshInterval === 10000}
-              >
-                10s
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleSetRefreshInterval(30000);
-                  setRefreshMenuAnchor(null);
-                }}
-                selected={refreshInterval === 30000}
-              >
-                30s
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleSetRefreshInterval(60000);
-                  setRefreshMenuAnchor(null);
-                }}
-                selected={refreshInterval === 60000}
-              >
-                1m
-              </MenuItem>
-            </Menu>
-          </>
-        }
-      />
+                <MenuItem
+                  onClick={() => {
+                    handleSetRefreshInterval(0);
+                    setRefreshMenuAnchor(null);
+                  }}
+                  selected={refreshInterval === 0}
+                >
+                  Off
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleSetRefreshInterval(5000);
+                    setRefreshMenuAnchor(null);
+                  }}
+                  selected={refreshInterval === 5000}
+                >
+                  5s
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleSetRefreshInterval(10000);
+                    setRefreshMenuAnchor(null);
+                  }}
+                  selected={refreshInterval === 10000}
+                >
+                  10s
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleSetRefreshInterval(30000);
+                    setRefreshMenuAnchor(null);
+                  }}
+                  selected={refreshInterval === 30000}
+                >
+                  30s
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleSetRefreshInterval(60000);
+                    setRefreshMenuAnchor(null);
+                  }}
+                  selected={refreshInterval === 60000}
+                >
+                  1m
+                </MenuItem>
+              </Menu>
+            </>
+          }
+        />
       )}
 
       <PageContentLoader loading={loading}>

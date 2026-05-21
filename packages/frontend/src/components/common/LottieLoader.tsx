@@ -7,7 +7,10 @@ export interface LottieLoaderProps {
   message?: string;
 }
 
-export const LottieLoader: React.FC<LottieLoaderProps> = ({ size = 120, message }) => {
+export const LottieLoader: React.FC<LottieLoaderProps> = ({
+  size = 120,
+  message,
+}) => {
   const [animData, setAnimData] = useState<object | null>(null);
 
   useEffect(() => {
@@ -18,13 +21,22 @@ export const LottieLoader: React.FC<LottieLoaderProps> = ({ size = 120, message 
         if (isMounted) setAnimData(data);
       })
       .catch(() => {});
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (!animData) return null;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <Lottie
         animationData={animData}
         loop

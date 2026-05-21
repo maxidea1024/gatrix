@@ -109,7 +109,10 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
       {/* Logo */}
       <Tooltip title="Dashboard" placement="right" arrow>
         <Box
-          onClick={(e) => { e.stopPropagation(); onLogoClick(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onLogoClick();
+          }}
           sx={{
             width: 40,
             height: 40,
@@ -120,9 +123,10 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
             '&:hover': { transform: 'scale(1.08)' },
             '&:active': { transform: 'scale(0.95)' },
             transition: 'transform 0.2s',
-            border: sseConnectionStatus === 'error'
-              ? `2px solid ${theme.palette.error.main}`
-              : '2px solid transparent',
+            border:
+              sseConnectionStatus === 'error'
+                ? `2px solid ${theme.palette.error.main}`
+                : '2px solid transparent',
           }}
         >
           <img
@@ -163,14 +167,12 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           const isActive = activeCategoryId === cat.id;
 
           return (
-            <Tooltip
-              key={cat.id}
-              title={t(cat.text)}
-              placement="right"
-              arrow
-            >
+            <Tooltip key={cat.id} title={t(cat.text)} placement="right" arrow>
               <Box
-                onClick={(e) => { e.stopPropagation(); handleCategoryClick(cat); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCategoryClick(cat);
+                }}
                 sx={{
                   position: 'relative',
                   width: 44,
@@ -290,7 +292,12 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
         <IconButton
           onClick={() => setAboutOpen(false)}
           size="small"
-          sx={{ position: 'absolute', top: 8, right: 8, color: 'text.disabled' }}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            color: 'text.disabled',
+          }}
         >
           <CloseIcon fontSize="small" />
         </IconButton>

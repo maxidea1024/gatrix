@@ -59,7 +59,9 @@ interface PlanningDataHistoryPageProps {
   embedded?: boolean;
 }
 
-const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({ embedded = false }) => {
+const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({
+  embedded = false,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();

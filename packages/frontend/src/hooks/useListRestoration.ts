@@ -28,7 +28,7 @@ export function useListRestoration<T>(
         const parsedState = JSON.parse(savedState);
         onRestore(parsedState);
       }
-      
+
       const savedScroll = sessionStorage.getItem(scrollKey);
       if (savedScroll) {
         pendingScroll.current = parseInt(savedScroll, 10);

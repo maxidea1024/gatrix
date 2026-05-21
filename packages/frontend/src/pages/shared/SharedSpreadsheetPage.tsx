@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Button,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Chip, Button, alpha } from '@mui/material';
 import LottieLoader from '@/components/common/LottieLoader';
 import {
   GridOn as GridOnIcon,
@@ -38,7 +32,8 @@ const SharedSpreadsheetPage: React.FC = () => {
   const { markDirty } = useAutoSave({
     delay: 2000,
     onSave: async () => {
-      if (!spreadsheetId || !getSnapshotRef.current || permission !== 'editor') return;
+      if (!spreadsheetId || !getSnapshotRef.current || permission !== 'editor')
+        return;
       const snapshot = getSnapshotRef.current();
       if (!snapshot) return;
       await spreadsheetService.update(spreadsheetId, { sheetData: snapshot });
@@ -61,14 +56,18 @@ const SharedSpreadsheetPage: React.FC = () => {
         setSpreadsheetId(data.id);
       } catch {
         if (!cancelled) {
-          setError('This shared spreadsheet is not available or the link has expired.');
+          setError(
+            'This shared spreadsheet is not available or the link has expired.'
+          );
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     };
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
   const handleContentChange = useCallback(() => {
@@ -79,7 +78,14 @@ const SharedSpreadsheetPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
         <LottieLoader size={80} />
       </Box>
     );
@@ -87,7 +93,17 @@ const SharedSpreadsheetPage: React.FC = () => {
 
   if (error) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', gap: 2, bgcolor: 'background.default' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          gap: 2,
+          bgcolor: 'background.default',
+        }}
+      >
         <GridOnIcon sx={{ fontSize: 64, color: 'text.disabled' }} />
         <Typography variant="h6" color="text.secondary">
           {error}
@@ -100,7 +116,15 @@ const SharedSpreadsheetPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        overflow: 'hidden',
+        bgcolor: 'background.default',
+      }}
+    >
       {/* Minimal top bar */}
       <Box
         sx={{
@@ -116,14 +140,28 @@ const SharedSpreadsheetPage: React.FC = () => {
         }}
       >
         <GridOnIcon sx={{ fontSize: 22, color: 'primary.main' }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }} noWrap>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 600, flex: 1 }}
+          noWrap
+        >
           {title}
         </Typography>
 
         <Chip
           size="small"
-          icon={permission === 'editor' ? <EditorIcon sx={{ fontSize: '14px !important' }} /> : <ViewerIcon sx={{ fontSize: '14px !important' }} />}
-          label={permission === 'editor' ? t('spreadsheets.editor', '편집자') : t('spreadsheets.viewer', '뷰어')}
+          icon={
+            permission === 'editor' ? (
+              <EditorIcon sx={{ fontSize: '14px !important' }} />
+            ) : (
+              <ViewerIcon sx={{ fontSize: '14px !important' }} />
+            )
+          }
+          label={
+            permission === 'editor'
+              ? t('spreadsheets.editor', '편집자')
+              : t('spreadsheets.viewer', '뷰어')
+          }
           variant="outlined"
           color={permission === 'editor' ? 'primary' : 'default'}
           sx={{

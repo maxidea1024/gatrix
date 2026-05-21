@@ -389,22 +389,22 @@ const SchedulerPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
       {/* Header */}
       {!embedded && (
-      <PageHeader
-        icon={<ScheduleIcon />}
-        title={t('scheduler.title')}
-        subtitle={t('scheduler.subtitle')}
-        actions={
-          canManage ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
-            >
-              {t('scheduler.addEvent')}
-            </Button>
-          ) : undefined
-        }
-      />
+        <PageHeader
+          icon={<ScheduleIcon />}
+          title={t('scheduler.title')}
+          subtitle={t('scheduler.subtitle')}
+          actions={
+            canManage ? (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
+              >
+                {t('scheduler.addEvent')}
+              </Button>
+            ) : undefined
+          }
+        />
       )}
 
       {/* Calendar */}

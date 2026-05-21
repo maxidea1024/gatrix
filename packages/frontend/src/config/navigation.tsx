@@ -386,7 +386,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'Schedule',
         path: '/admin/schedule',
         requiredPermission: P.SCHEDULER_READ,
-        matchPaths: ['/admin/schedule', '/admin/scheduler', '/admin/jobs', '/admin/queue-monitor'],
+        matchPaths: [
+          '/admin/schedule',
+          '/admin/scheduler',
+          '/admin/jobs',
+          '/admin/queue-monitor',
+        ],
       },
       {
         text: 'sidebar.auditLogs',
@@ -428,21 +433,35 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'Security',
         path: '/admin/security',
         requiredPermission: P.ADMIN_TOKENS_READ,
-        matchPaths: ['/admin/security', '/admin/api-tokens', '/admin/whitelist'],
+        matchPaths: [
+          '/admin/security',
+          '/admin/api-tokens',
+          '/admin/whitelist',
+        ],
       },
       {
         text: 'sidebar.serverManagement',
         icon: 'Dns',
         path: '/admin/servers',
         requiredPermission: P.SERVERS_READ,
-        matchPaths: ['/admin/servers', '/admin/server-list', '/admin/server-lifecycle', '/admin/gatrix-edges'],
+        matchPaths: [
+          '/admin/servers',
+          '/admin/server-list',
+          '/admin/server-lifecycle',
+          '/admin/gatrix-edges',
+        ],
       },
       {
         text: 'sidebar.monitoring',
         icon: 'Monitor',
         path: '/admin/monitoring',
         requiredPermission: P.MONITORING_READ,
-        matchPaths: ['/admin/monitoring', '/admin/grafana-dashboard', '/monitoring/logs', '/monitoring/alerts'],
+        matchPaths: [
+          '/admin/monitoring',
+          '/admin/grafana-dashboard',
+          '/monitoring/logs',
+          '/monitoring/alerts',
+        ],
       },
       {
         text: 'sidebar.openApi',

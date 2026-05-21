@@ -40,7 +40,9 @@ import { exportToXlsx, importFromXlsx } from '@/utils/spreadsheetExcelUtils';
 
 // ==================== Save Status Indicator ====================
 
-const SaveStatusIndicator: React.FC<{ status: AutoSaveStatus }> = ({ status }) => {
+const SaveStatusIndicator: React.FC<{ status: AutoSaveStatus }> = ({
+  status,
+}) => {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
@@ -68,7 +70,19 @@ const SaveStatusIndicator: React.FC<{ status: AutoSaveStatus }> = ({ status }) =
   const renderIcon = () => {
     switch (status) {
       case 'pending':
-        return <DotIcon sx={{ fontSize: 10, color: 'warning.main', animation: 'pulse 1.5s ease-in-out infinite', '@keyframes pulse': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.3 } } }} />;
+        return (
+          <DotIcon
+            sx={{
+              fontSize: 10,
+              color: 'warning.main',
+              animation: 'pulse 1.5s ease-in-out infinite',
+              '@keyframes pulse': {
+                '0%, 100%': { opacity: 1 },
+                '50%': { opacity: 0.3 },
+              },
+            }}
+          />
+        );
       case 'saving':
         return <CircularProgress size={12} sx={{ color: 'text.secondary' }} />;
       case 'saved':
@@ -85,7 +99,14 @@ const SaveStatusIndicator: React.FC<{ status: AutoSaveStatus }> = ({ status }) =
   return (
     <Fade in={visible} timeout={300}>
       <Tooltip title={tooltipMap[status]} arrow placement="bottom">
-        <Box sx={{ display: 'flex', alignItems: 'center', mr: 1, cursor: 'default' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mr: 1,
+            cursor: 'default',
+          }}
+        >
           {renderIcon()}
         </Box>
       </Tooltip>
@@ -121,7 +142,11 @@ const SpreadsheetEditorPage: React.FC = () => {
   const [shareOpen, setShareOpen] = useState(false);
 
   // Auto-save
-  const { status: saveStatus, markDirty, saveNow } = useAutoSave({
+  const {
+    status: saveStatus,
+    markDirty,
+    saveNow,
+  } = useAutoSave({
     delay: 2000,
     onSave: async () => {
       if (!id || !getSnapshotRef.current) return;
@@ -145,9 +170,12 @@ const SpreadsheetEditorPage: React.FC = () => {
         setInitialData(data.sheetData);
       } catch {
         if (!cancelled) {
-          enqueueSnackbar(t('spreadsheets.loadError', 'Failed to load spreadsheet'), {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            t('spreadsheets.loadError', 'Failed to load spreadsheet'),
+            {
+              variant: 'error',
+            }
+          );
           navigate('/admin/spreadsheets');
         }
       } finally {
@@ -155,7 +183,9 @@ const SpreadsheetEditorPage: React.FC = () => {
       }
     };
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [id, navigate, enqueueSnackbar, t]);
 
   // Keyboard shortcut: Ctrl+S
@@ -198,22 +228,30 @@ const SpreadsheetEditorPage: React.FC = () => {
         return;
       }
       exportToXlsx(univerAPIRef.current, title || 'spreadsheet');
-      enqueueSnackbar(t('spreadsheets.exportSuccess', 'Exported successfully'), { variant: 'success' });
+      enqueueSnackbar(
+        t('spreadsheets.exportSuccess', 'Exported successfully'),
+        { variant: 'success' }
+      );
     } catch (err) {
       console.error('[SpreadsheetEditor] Export failed:', err);
-      enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), { variant: 'error' });
+      enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), {
+        variant: 'error',
+      });
     }
   }, [title, enqueueSnackbar, t]);
 
   // XLSX Import — file selection
-  const handleImportFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // Reset input so same file can be re-selected
-    e.target.value = '';
-    setPendingImportFile(file);
-    setImportDialogOpen(true);
-  }, []);
+  const handleImportFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      // Reset input so same file can be re-selected
+      e.target.value = '';
+      setPendingImportFile(file);
+      setImportDialogOpen(true);
+    },
+    []
+  );
 
   // XLSX Import — confirmed
   const handleImportConfirm = useCallback(async () => {
@@ -224,11 +262,16 @@ const SpreadsheetEditorPage: React.FC = () => {
       // Save to backend
       await spreadsheetService.update(id, { sheetData: newData });
       // Reload page to re-initialize Univer with new data
-      enqueueSnackbar(t('spreadsheets.importSuccess', 'Imported successfully'), { variant: 'success' });
+      enqueueSnackbar(
+        t('spreadsheets.importSuccess', 'Imported successfully'),
+        { variant: 'success' }
+      );
       window.location.reload();
     } catch (err) {
       console.error('[SpreadsheetEditor] Import failed:', err);
-      enqueueSnackbar(t('spreadsheets.importError', 'Import failed'), { variant: 'error' });
+      enqueueSnackbar(t('spreadsheets.importError', 'Import failed'), {
+        variant: 'error',
+      });
     } finally {
       setPendingImportFile(null);
     }
@@ -236,14 +279,28 @@ const SpreadsheetEditorPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+        }}
+      >
         <LottieLoader size={80} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden',
+      }}
+    >
       {/* Top bar */}
       <Box
         sx={{
@@ -258,7 +315,11 @@ const SpreadsheetEditorPage: React.FC = () => {
         }}
       >
         <Tooltip title={t('common.back', 'Back')}>
-          <IconButton onClick={() => navigate('/admin/spreadsheets')} size="small" sx={{ mr: 1 }}>
+          <IconButton
+            onClick={() => navigate('/admin/spreadsheets')}
+            size="small"
+            sx={{ mr: 1 }}
+          >
             <ArrowBackIcon />
           </IconButton>
         </Tooltip>
@@ -303,14 +364,21 @@ const SpreadsheetEditorPage: React.FC = () => {
 
         {/* Share button */}
         <Tooltip title={t('spreadsheets.share', '공유')}>
-          <IconButton size="small" onClick={() => setShareOpen(true)} sx={{ mr: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={() => setShareOpen(true)}
+            sx={{ mr: 0.5 }}
+          >
             <ShareIcon />
           </IconButton>
         </Tooltip>
 
         {/* More menu (Export/Import) */}
         <Tooltip title={t('common.more', 'More')}>
-          <IconButton size="small" onClick={(e) => setMenuAnchor(e.currentTarget)}>
+          <IconButton
+            size="small"
+            onClick={(e) => setMenuAnchor(e.currentTarget)}
+          >
             <MoreVertIcon />
           </IconButton>
         </Tooltip>
@@ -322,12 +390,25 @@ const SpreadsheetEditorPage: React.FC = () => {
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
           <MenuItem onClick={handleExport}>
-            <ListItemIcon><ExportIcon fontSize="small" /></ListItemIcon>
-            <ListItemText>{t('spreadsheets.exportXlsx', 'Export as XLSX')}</ListItemText>
+            <ListItemIcon>
+              <ExportIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {t('spreadsheets.exportXlsx', 'Export as XLSX')}
+            </ListItemText>
           </MenuItem>
-          <MenuItem onClick={() => { setMenuAnchor(null); fileInputRef.current?.click(); }}>
-            <ListItemIcon><ImportIcon fontSize="small" /></ListItemIcon>
-            <ListItemText>{t('spreadsheets.importXlsx', 'Import XLSX')}</ListItemText>
+          <MenuItem
+            onClick={() => {
+              setMenuAnchor(null);
+              fileInputRef.current?.click();
+            }}
+          >
+            <ListItemIcon>
+              <ImportIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {t('spreadsheets.importXlsx', 'Import XLSX')}
+            </ListItemText>
           </MenuItem>
         </Menu>
         {/* Hidden file input for XLSX import */}
@@ -352,11 +433,22 @@ const SpreadsheetEditorPage: React.FC = () => {
       </Box>
 
       {/* Import confirmation dialog */}
-      <Dialog open={importDialogOpen} onClose={() => { setImportDialogOpen(false); setPendingImportFile(null); }}>
-        <DialogTitle>{t('spreadsheets.importConfirmTitle', 'Import XLSX')}</DialogTitle>
+      <Dialog
+        open={importDialogOpen}
+        onClose={() => {
+          setImportDialogOpen(false);
+          setPendingImportFile(null);
+        }}
+      >
+        <DialogTitle>
+          {t('spreadsheets.importConfirmTitle', 'Import XLSX')}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('spreadsheets.importConfirmMessage', 'This will replace all current data with the imported file. This action cannot be undone. Continue?')}
+            {t(
+              'spreadsheets.importConfirmMessage',
+              'This will replace all current data with the imported file. This action cannot be undone. Continue?'
+            )}
           </DialogContentText>
           {pendingImportFile && (
             <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
@@ -365,10 +457,19 @@ const SpreadsheetEditorPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setImportDialogOpen(false); setPendingImportFile(null); }}>
+          <Button
+            onClick={() => {
+              setImportDialogOpen(false);
+              setPendingImportFile(null);
+            }}
+          >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button onClick={handleImportConfirm} variant="contained" color="primary">
+          <Button
+            onClick={handleImportConfirm}
+            variant="contained"
+            color="primary"
+          >
             {t('spreadsheets.importConfirm', 'Import')}
           </Button>
         </DialogActions>

@@ -130,7 +130,9 @@ import aiChatService from '@/services/aiChatService';
 import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
 import NavigationRail, { RAIL_WIDTH } from '@/components/layout/NavigationRail';
-import NavigationSubPanel, { SUBPANEL_WIDTH } from '@/components/layout/NavigationSubPanel';
+import NavigationSubPanel, {
+  SUBPANEL_WIDTH,
+} from '@/components/layout/NavigationSubPanel';
 
 // Wiggle animation for floating button
 const wiggleAnimation = keyframes`
@@ -256,13 +258,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }>({ open: false, type: 'clearAll' });
 
   // === Two-Level Rail state ===
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem('railActiveCategoryId') || null;
-    } catch {
-      return null;
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(
+    () => {
+      try {
+        return localStorage.getItem('railActiveCategoryId') || null;
+      } catch {
+        return null;
+      }
     }
-  });
+  );
   const [subPanelOpen, setSubPanelOpen] = useState(() => {
     try {
       return localStorage.getItem('railSubPanelOpen') !== 'false';
@@ -1291,12 +1295,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Check category-level path
       if (cat.path && isActivePath(cat.path)) {
         setActiveCategoryId(cat.id);
-        try { localStorage.setItem('railActiveCategoryId', cat.id); } catch {}
+        try {
+          localStorage.setItem('railActiveCategoryId', cat.id);
+        } catch {}
         // Direct-nav categories (no children, e.g. dashboard/settings) should close the sub-panel
         const isDirectNav = !!cat.path && cat.children.length === 0;
         if (isDirectNav) {
           setSubPanelOpen(false);
-          try { localStorage.setItem('railSubPanelOpen', 'false'); } catch {}
+          try {
+            localStorage.setItem('railSubPanelOpen', 'false');
+          } catch {}
         }
         return;
       }
@@ -1304,14 +1312,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       for (const item of cat.children) {
         if (item.path && isActivePath(item.path)) {
           setActiveCategoryId(cat.id);
-          try { localStorage.setItem('railActiveCategoryId', cat.id); } catch {}
+          try {
+            localStorage.setItem('railActiveCategoryId', cat.id);
+          } catch {}
           return;
         }
         if (item.children) {
           for (const child of item.children) {
             if (child.path && isActivePath(child.path)) {
               setActiveCategoryId(cat.id);
-              try { localStorage.setItem('railActiveCategoryId', cat.id); } catch {}
+              try {
+                localStorage.setItem('railActiveCategoryId', cat.id);
+              } catch {}
               return;
             }
           }
@@ -1464,16 +1476,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {showSidebar && isMobile && (
-                  <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    edge="start"
-                    onClick={handleDrawerToggle}
-                    sx={{ mr: 1 }}
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                )}
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 1 }}
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
             </Box>
 
             {/* Maintenance banner - Inside AppBar */}

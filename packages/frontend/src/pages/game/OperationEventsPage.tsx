@@ -15,9 +15,7 @@ import PageHeader from '@/components/common/PageHeader';
 const HotTimeButtonEventPage = React.lazy(
   () => import('./HotTimeButtonEventPage')
 );
-const LiveEventPage = React.lazy(
-  () => import('./LiveEventPage')
-);
+const LiveEventPage = React.lazy(() => import('./LiveEventPage'));
 
 interface TabConfig {
   key: string;

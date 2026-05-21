@@ -10,9 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 import PageHeader from '@/components/common/PageHeader';
 
 const ServerListPage = React.lazy(() => import('./ServerListPage'));
-const ServerLifecyclePage = React.lazy(
-  () => import('./ServerLifecyclePage')
-);
+const ServerLifecyclePage = React.lazy(() => import('./ServerLifecyclePage'));
 const GatrixEdgesPage = React.lazy(() => import('./GatrixEdgesPage'));
 
 const TAB_LIST = 0;
@@ -94,7 +92,10 @@ const ServersTabbedPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.serverManagement')}
-        subtitle={t('servers.subtitle', '서버 인스턴스와 라이프사이클을 관리합니다.')}
+        subtitle={t(
+          'servers.subtitle',
+          '서버 인스턴스와 라이프사이클을 관리합니다.'
+        )}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

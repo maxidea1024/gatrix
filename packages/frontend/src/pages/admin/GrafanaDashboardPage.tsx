@@ -47,7 +47,9 @@ function resolveGrafanaUrl(): string | null {
   return null;
 }
 
-export const GrafanaDashboardPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
+export const GrafanaDashboardPage: React.FC<{ embedded?: boolean }> = ({
+  embedded,
+}) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();

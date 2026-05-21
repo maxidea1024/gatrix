@@ -579,12 +579,10 @@ export class SpreadsheetController {
       res.json({ success: true, data: { items } });
     } catch (error) {
       logger.error('Failed to list shared spreadsheets', { error });
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: 'Failed to list shared spreadsheets',
-        });
+      res.status(500).json({
+        success: false,
+        message: 'Failed to list shared spreadsheets',
+      });
     }
   }
 
@@ -620,12 +618,10 @@ export class SpreadsheetController {
       });
     } catch (error) {
       logger.error('Failed to get spreadsheet by share token', { error });
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: 'Failed to access shared spreadsheet',
-        });
+      res.status(500).json({
+        success: false,
+        message: 'Failed to access shared spreadsheet',
+      });
     }
   }
 }

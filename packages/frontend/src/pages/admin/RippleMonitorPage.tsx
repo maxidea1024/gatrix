@@ -345,7 +345,15 @@ const RippleMonitorPage: React.FC = () => {
   return (
     <>
       {!loading && !noAdmind && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, justifyContent: 'flex-end' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            mb: 2,
+            justifyContent: 'flex-end',
+          }}
+        >
           {data?.admindUrl && (
             <>
               <Chip

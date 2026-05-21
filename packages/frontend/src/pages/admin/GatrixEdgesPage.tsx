@@ -72,7 +72,9 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   // MoreVert menu state
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   // States
   const [initialLoading, setInitialLoading] = useState(true);
@@ -1275,7 +1277,9 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
         fullWidth
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}>
+        <DialogTitle
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}
+        >
           <InvalidateIcon color="warning" />
           {t('gatrixEdges.cacheInvalidate')}
         </DialogTitle>
