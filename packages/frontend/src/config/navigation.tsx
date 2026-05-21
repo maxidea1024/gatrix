@@ -203,23 +203,16 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.GAME_WORLDS_READ,
       },
       {
-        text: 'sidebar.serviceControl',
+        text: 'sidebar.maintenance',
         icon: 'Build',
+        path: '/admin/maintenance',
         requiredPermission: P.MAINTENANCE_READ,
-        children: [
-          {
-            text: 'sidebar.maintenance',
-            icon: 'Build',
-            path: '/admin/maintenance',
-            requiredPermission: P.MAINTENANCE_READ,
-          },
-          {
-            text: 'sidebar.playerConnections',
-            icon: 'People',
-            path: '/admin/player-connections',
-            requiredPermission: P.MAINTENANCE_READ,
-          },
-        ],
+      },
+      {
+        text: 'sidebar.playerConnections',
+        icon: 'People',
+        path: '/admin/player-connections',
+        requiredPermission: P.MAINTENANCE_READ,
       },
       {
         text: 'sidebar.maintenanceTemplates',
