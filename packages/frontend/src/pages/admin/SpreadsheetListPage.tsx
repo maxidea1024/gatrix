@@ -867,7 +867,7 @@ const SpreadsheetListPage: React.FC = () => {
                     sx={{ fontWeight: 600, color: '#fff', lineHeight: 1.3 }}
                   >
                     {importStep === 'done'
-                      ? t('spreadsheets.importStepDone', '가져오기 완료')
+                      ? t('spreadsheets.importStepDone')
                       : importFileName}
                   </Typography>
                   <Typography
@@ -909,12 +909,9 @@ const SpreadsheetListPage: React.FC = () => {
                   const isLast = idx === arr.length - 1;
 
                   const labels: Record<string, string> = {
-                    parsing: t(
-                      'spreadsheets.importStepParsing',
-                      '엑셀 파일 분석'
-                    ),
-                    saving: t('spreadsheets.importStepSaving', '서버에 저장'),
-                    done: t('spreadsheets.importStepDone', '가져오기 완료'),
+                    parsing: t('spreadsheets.importStepParsing'),
+                    saving: t('spreadsheets.importStepSaving'),
+                    done: t('spreadsheets.importStepDone'),
                   };
 
                   return (
