@@ -1320,6 +1320,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 onClick={toggleSubmenu}
                 sx={{
                   pl: 4,
+                  pr: 2,
                   borderRadius: 1,
                   py: 0.75,
                   color: theme.palette.text.secondary,
@@ -1412,7 +1413,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 disablePadding
                 sx={{
                   borderRadius: 1,
-                  mx: 0.5,
+                  ml: 0.5,
                   mb: 0.5,
                 }}
               >
@@ -2051,7 +2052,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         disablePadding
                         sx={{
                           borderRadius: 1,
-                          mx: 0.5,
+                          ml: 0.5,
                           mb: 0.5,
                         }}
                       >
