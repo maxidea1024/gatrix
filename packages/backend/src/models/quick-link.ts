@@ -188,9 +188,7 @@ export class QuickLinkModel {
   static async reorder(userId: string, orderedIds: string[]): Promise<void> {
     try {
       // Verify all IDs belong to this user
-      const existing = await db(TABLE)
-        .where('userId', userId)
-        .select('id');
+      const existing = await db(TABLE).where('userId', userId).select('id');
       const existingIds = new Set(existing.map((r: any) => r.id));
 
       for (const id of orderedIds) {

@@ -93,7 +93,8 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
         // Force reflow so the browser registers the starting state
         el.getBoundingClientRect();
         // Transition smoothly to final position
-        el.style.transition = 'opacity 250ms ease-out, transform 250ms ease-out';
+        el.style.transition =
+          'opacity 250ms ease-out, transform 250ms ease-out';
         el.style.opacity = '1';
         el.style.transform = 'translateY(0)';
       }
@@ -423,7 +424,9 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
                     return (
                       <Box
                         key={page.path}
-                        onClick={() => onNavigate(page.path, { skipRecentUpdate: true })}
+                        onClick={() =>
+                          onNavigate(page.path, { skipRecentUpdate: true })
+                        }
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
@@ -509,9 +512,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
 
           {/* Category header + Menu items with slide-down animation */}
           {category && (
-            <Box
-              ref={menuContentRef}
-            >
+            <Box ref={menuContentRef}>
               <Box sx={{ px: 1.75, pt: 1.25, pb: 0.5 }}>
                 <Typography
                   variant="caption"

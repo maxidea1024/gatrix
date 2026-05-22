@@ -269,7 +269,12 @@ const MuiIconPicker: React.FC<MuiIconPickerProps> = ({
           pb: 1,
         }}
       >
-        <Typography component="span" variant="h6" fontWeight={600} fontSize="1rem">
+        <Typography
+          component="span"
+          variant="h6"
+          fontWeight={600}
+          fontSize="1rem"
+        >
           {t('quickLinks.selectIcon')}
         </Typography>
         <IconButton

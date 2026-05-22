@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Typography,
@@ -145,9 +151,7 @@ const SortableLinkItem: React.FC<SortableLinkItemProps> = ({
         color: theme.palette.text.secondary,
         transition: 'background-color 0.15s ease',
         '&:hover': {
-          bgcolor: isDark
-            ? 'rgba(255,255,255,0.05)'
-            : 'rgba(0,0,0,0.03)',
+          bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
           '& .quick-link-actions': { opacity: 1 },
           '& .quick-link-drag': { opacity: 0.4 },
         },
@@ -249,7 +253,12 @@ const SortableLinkItem: React.FC<SortableLinkItemProps> = ({
           transition: 'opacity 0.15s',
         }}
       >
-        <Tooltip title={t('common.edit')} enterDelay={TOOLTIP_ENTER_DELAY} enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY} slotProps={TOOLTIP_SLOT_PROPS}>
+        <Tooltip
+          title={t('common.edit')}
+          enterDelay={TOOLTIP_ENTER_DELAY}
+          enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+          slotProps={TOOLTIP_SLOT_PROPS}
+        >
           <IconButton
             size="small"
             onClick={(e) => {
@@ -261,7 +270,12 @@ const SortableLinkItem: React.FC<SortableLinkItemProps> = ({
             <EditIcon sx={{ fontSize: 14 }} />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t('common.delete')} enterDelay={TOOLTIP_ENTER_DELAY} enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY} slotProps={TOOLTIP_SLOT_PROPS}>
+        <Tooltip
+          title={t('common.delete')}
+          enterDelay={TOOLTIP_ENTER_DELAY}
+          enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+          slotProps={TOOLTIP_SLOT_PROPS}
+        >
           <IconButton
             size="small"
             onClick={(e) => {
@@ -347,7 +361,14 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
       formIconName !== editingLink.iconName ||
       (formColor || null) !== (editingLink.color || null)
     );
-  }, [editingLink, formTitle, formUrl, formDescription, formIconName, formColor]);
+  }, [
+    editingLink,
+    formTitle,
+    formUrl,
+    formDescription,
+    formIconName,
+    formColor,
+  ]);
 
   // Drag-and-drop sensors
   const sensors = useSensors(
@@ -374,7 +395,10 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
       } catch (error: any) {
         // Revert on failure
         setLinks(links);
-        enqueueSnackbar(error?.message || 'Failed to reorder', { variant: 'error', autoHideDuration: 3000 });
+        enqueueSnackbar(error?.message || 'Failed to reorder', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
       }
     },
     [links, enqueueSnackbar]
@@ -470,7 +494,8 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
       await loadLinks();
     } catch (error: any) {
       const msg =
-        error?.message || (editingLink ? 'Failed to update' : 'Failed to create');
+        error?.message ||
+        (editingLink ? 'Failed to update' : 'Failed to create');
       enqueueSnackbar(msg, { variant: 'error', autoHideDuration: 4000 });
     } finally {
       setSaving(false);
@@ -503,20 +528,26 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
   );
 
   // Click link (open in new tab)
-  const handleLinkClick = useCallback((url: string) => {
-    try {
-      new URL(url); // validate first
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch {
-      enqueueSnackbar(t('quickLinks.invalidUrl'), { variant: 'error', autoHideDuration: 3000 });
-    }
-  }, [enqueueSnackbar, t]);
+  const handleLinkClick = useCallback(
+    (url: string) => {
+      try {
+        new URL(url); // validate first
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch {
+        enqueueSnackbar(t('quickLinks.invalidUrl'), {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      }
+    },
+    [enqueueSnackbar, t]
+  );
 
   // If loading and no links yet, show nothing (avoid layout shift)
   if (loading && links.length === 0) {
@@ -573,7 +604,12 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
                 />
               ))}
           </Box>
-          <Tooltip title={t('sidebar.addQuickLink')} enterDelay={TOOLTIP_ENTER_DELAY} enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY} slotProps={TOOLTIP_SLOT_PROPS}>
+          <Tooltip
+            title={t('sidebar.addQuickLink')}
+            enterDelay={TOOLTIP_ENTER_DELAY}
+            enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+            slotProps={TOOLTIP_SLOT_PROPS}
+          >
             <IconButton
               size="small"
               onClick={(e) => {
@@ -671,7 +707,12 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
             pb: 1,
           }}
         >
-          <Typography component="span" variant="h6" fontWeight={600} fontSize="1rem">
+          <Typography
+            component="span"
+            variant="h6"
+            fontWeight={600}
+            fontSize="1rem"
+          >
             {editingLink
               ? t('quickLinks.editDialog.title')
               : t('quickLinks.createDialog.title')}
@@ -794,7 +835,13 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
             onClick={handleSave}
             variant="contained"
             size="small"
-            disabled={!formTitle.trim() || !formUrl.trim() || !isUrlValid || saving || !hasChanges}
+            disabled={
+              !formTitle.trim() ||
+              !formUrl.trim() ||
+              !isUrlValid ||
+              saving ||
+              !hasChanges
+            }
             sx={{ textTransform: 'none', minWidth: 80 }}
           >
             {saving ? (
@@ -824,7 +871,12 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
         <DialogTitle sx={{ pb: 1 }}>
-          <Typography component="span" variant="h6" fontWeight={600} fontSize="1rem">
+          <Typography
+            component="span"
+            variant="h6"
+            fontWeight={600}
+            fontSize="1rem"
+          >
             {t('quickLinks.confirmDelete')}
           </Typography>
         </DialogTitle>
