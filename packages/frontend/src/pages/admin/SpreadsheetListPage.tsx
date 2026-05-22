@@ -137,9 +137,7 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({
           <ListItemIcon>
             <ExportIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('spreadsheets.exportXlsx')}
-          </ListItemText>
+          <ListItemText>{t('spreadsheets.exportXlsx')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -226,12 +224,9 @@ const SpreadsheetListPage: React.FC = () => {
       });
       setItems(result.items);
     } catch (err) {
-      enqueueSnackbar(
-        t('spreadsheets.loadError'),
-        {
-          variant: 'error',
-        }
-      );
+      enqueueSnackbar(t('spreadsheets.loadError'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -246,12 +241,9 @@ const SpreadsheetListPage: React.FC = () => {
       const created = await spreadsheetService.create();
       navigate(`/admin/spreadsheets/${created.id}`);
     } catch {
-      enqueueSnackbar(
-        t('spreadsheets.createError'),
-        {
-          variant: 'error',
-        }
-      );
+      enqueueSnackbar(t('spreadsheets.createError'), {
+        variant: 'error',
+      });
     }
   }, [navigate, enqueueSnackbar, t]);
 
@@ -304,12 +296,9 @@ const SpreadsheetListPage: React.FC = () => {
     async (id: string) => {
       try {
         await spreadsheetService.duplicate(id);
-        enqueueSnackbar(
-          t('spreadsheets.duplicated'),
-          {
-            variant: 'success',
-          }
-        );
+        enqueueSnackbar(t('spreadsheets.duplicated'), {
+          variant: 'success',
+        });
         loadSpreadsheets();
       } catch {
         enqueueSnackbar('Failed to duplicate', { variant: 'error' });
@@ -380,10 +369,9 @@ const SpreadsheetListPage: React.FC = () => {
           return;
         }
         await exportSnapshotToXlsx(data.sheetData, item.title || 'spreadsheet');
-        enqueueSnackbar(
-          t('spreadsheets.exportSuccess'),
-          { variant: 'success' }
-        );
+        enqueueSnackbar(t('spreadsheets.exportSuccess'), {
+          variant: 'success',
+        });
       } catch {
         enqueueSnackbar(t('spreadsheets.exportError'), {
           variant: 'error',
@@ -428,10 +416,9 @@ const SpreadsheetListPage: React.FC = () => {
         setImportStep('done');
         await new Promise((r) => setTimeout(r, 1000));
 
-        enqueueSnackbar(
-          t('spreadsheets.importSuccess'),
-          { variant: 'success' }
-        );
+        enqueueSnackbar(t('spreadsheets.importSuccess'), {
+          variant: 'success',
+        });
         navigate(`/admin/spreadsheets/${created.id}`);
       } catch (err) {
         console.error('XLSX import error:', err);
@@ -457,8 +444,7 @@ const SpreadsheetListPage: React.FC = () => {
       <PageHeader
         icon={<GridOnIcon />}
         title={t('spreadsheets.title')}
-        subtitle={t(
-          'spreadsheets.subtitle')}
+        subtitle={t('spreadsheets.subtitle')}
         actions={
           <>
             <ButtonGroup variant="contained">
@@ -488,9 +474,7 @@ const SpreadsheetListPage: React.FC = () => {
                 <ListItemIcon>
                   <NoteAddIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>
-                  {t('spreadsheets.createEmpty')}
-                </ListItemText>
+                <ListItemText>{t('spreadsheets.createEmpty')}</ListItemText>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -501,9 +485,7 @@ const SpreadsheetListPage: React.FC = () => {
                 <ListItemIcon>
                   <ImportIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>
-                  {t('spreadsheets.importXlsx')}
-                </ListItemText>
+                <ListItemText>{t('spreadsheets.importXlsx')}</ListItemText>
               </MenuItem>
             </Menu>
             <input
@@ -528,9 +510,7 @@ const SpreadsheetListPage: React.FC = () => {
           }}
         >
           <SearchTextField
-            placeholder={
-              t('spreadsheets.search') as string
-            }
+            placeholder={t('spreadsheets.search') as string}
             value={search}
             onChange={setSearch}
           />
@@ -554,16 +534,12 @@ const SpreadsheetListPage: React.FC = () => {
       <PageContentLoader loading={loading || search !== debouncedSearch}>
         {items.length === 0 && !debouncedSearch && !search ? (
           <EmptyPagePlaceholder
-            message={t(
-              'spreadsheets.emptyDescription')}
+            message={t('spreadsheets.emptyDescription')}
             onAddClick={handleCreate}
             addButtonLabel={t('spreadsheets.createNew')}
           />
         ) : items.length === 0 && debouncedSearch === search && search ? (
-          <EmptyPagePlaceholder
-            message={t(
-              'spreadsheets.noResults')}
-          />
+          <EmptyPagePlaceholder message={t('spreadsheets.noResults')} />
         ) : viewMode === 'grid' ? (
           <Grid container spacing={2}>
             {items.map((item) => (
@@ -632,9 +608,7 @@ const SpreadsheetListPage: React.FC = () => {
                     >
                       <Tooltip
                         title={
-                          item.isPinned
-                            ? t('common.unpin')
-                            : t('common.pin')
+                          item.isPinned ? t('common.unpin') : t('common.pin')
                         }
                       >
                         <IconButton
@@ -774,9 +748,7 @@ const SpreadsheetListPage: React.FC = () => {
 
       {/* Delete Dialog */}
       <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>
-          {t('spreadsheets.deleteTitle')}
-        </DialogTitle>
+        <DialogTitle>{t('spreadsheets.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
             {t(

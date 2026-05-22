@@ -738,15 +738,13 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                             if (result.en) setNameEn(result.en.translatedText);
                             if (result.zh) setNameZh(result.zh.translatedText);
                             setNamesSectionOpen(true);
-                            enqueueSnackbar(
-                              t('common.translateSuccess'),
-                              { variant: 'success' }
-                            );
+                            enqueueSnackbar(t('common.translateSuccess'), {
+                              variant: 'success',
+                            });
                           } catch (err) {
-                            enqueueSnackbar(
-                              t('common.translateFailed'),
-                              { variant: 'error' }
-                            );
+                            enqueueSnackbar(t('common.translateFailed'), {
+                              variant: 'error',
+                            });
                           } finally {
                             setTranslatingName(false);
                           }
@@ -996,15 +994,13 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                             if (result.zh)
                               setDescriptionZh(result.zh.translatedText);
                             setDescSectionOpen(true);
-                            enqueueSnackbar(
-                              t('common.translateSuccess'),
-                              { variant: 'success' }
-                            );
+                            enqueueSnackbar(t('common.translateSuccess'), {
+                              variant: 'success',
+                            });
                           } catch (err) {
-                            enqueueSnackbar(
-                              t('common.translateFailed'),
-                              { variant: 'error' }
-                            );
+                            enqueueSnackbar(t('common.translateFailed'), {
+                              variant: 'error',
+                            });
                           } finally {
                             setTranslatingDesc(false);
                           }

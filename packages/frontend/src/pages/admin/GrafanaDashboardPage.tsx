@@ -151,8 +151,7 @@ export const GrafanaDashboardPage: React.FC<{ embedded?: boolean }> = ({
         ) : (
           <Box sx={{ textAlign: 'center', p: 4 }}>
             <Alert severity="info" sx={{ mb: 2 }}>
-              {t(
-                'grafanaDashboard.notConfigured')}
+              {t('grafanaDashboard.notConfigured')}
             </Alert>
             <Typography variant="body2" color="text.secondary">
               docker-compose.yml 또는 .env 파일에서 VITE_GRAFANA_URL 환경 변수를

@@ -170,12 +170,9 @@ const SpreadsheetEditorPage: React.FC = () => {
         setInitialData(data.sheetData);
       } catch {
         if (!cancelled) {
-          enqueueSnackbar(
-            t('spreadsheets.loadError'),
-            {
-              variant: 'error',
-            }
-          );
+          enqueueSnackbar(t('spreadsheets.loadError'), {
+            variant: 'error',
+          });
           navigate('/admin/spreadsheets');
         }
       } finally {
@@ -228,10 +225,7 @@ const SpreadsheetEditorPage: React.FC = () => {
         return;
       }
       exportToXlsx(univerAPIRef.current, title || 'spreadsheet');
-      enqueueSnackbar(
-        t('spreadsheets.exportSuccess'),
-        { variant: 'success' }
-      );
+      enqueueSnackbar(t('spreadsheets.exportSuccess'), { variant: 'success' });
     } catch (err) {
       console.error('[SpreadsheetEditor] Export failed:', err);
       enqueueSnackbar(t('spreadsheets.exportError'), {
@@ -262,10 +256,7 @@ const SpreadsheetEditorPage: React.FC = () => {
       // Save to backend
       await spreadsheetService.update(id, { sheetData: newData });
       // Reload page to re-initialize Univer with new data
-      enqueueSnackbar(
-        t('spreadsheets.importSuccess'),
-        { variant: 'success' }
-      );
+      enqueueSnackbar(t('spreadsheets.importSuccess'), { variant: 'success' });
       window.location.reload();
     } catch (err) {
       console.error('[SpreadsheetEditor] Import failed:', err);
@@ -393,9 +384,7 @@ const SpreadsheetEditorPage: React.FC = () => {
             <ListItemIcon>
               <ExportIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>
-              {t('spreadsheets.exportXlsx')}
-            </ListItemText>
+            <ListItemText>{t('spreadsheets.exportXlsx')}</ListItemText>
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -406,9 +395,7 @@ const SpreadsheetEditorPage: React.FC = () => {
             <ListItemIcon>
               <ImportIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>
-              {t('spreadsheets.importXlsx')}
-            </ListItemText>
+            <ListItemText>{t('spreadsheets.importXlsx')}</ListItemText>
           </MenuItem>
         </Menu>
         {/* Hidden file input for XLSX import */}
@@ -440,13 +427,10 @@ const SpreadsheetEditorPage: React.FC = () => {
           setPendingImportFile(null);
         }}
       >
-        <DialogTitle>
-          {t('spreadsheets.importConfirmTitle')}
-        </DialogTitle>
+        <DialogTitle>{t('spreadsheets.importConfirmTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t(
-              'spreadsheets.importConfirmMessage')}
+            {t('spreadsheets.importConfirmMessage')}
           </DialogContentText>
           {pendingImportFile && (
             <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>

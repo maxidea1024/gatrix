@@ -92,8 +92,7 @@ const ServersTabbedPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.serverManagement')}
-        subtitle={t(
-          'servers.subtitle')}
+        subtitle={t('servers.subtitle')}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

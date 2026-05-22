@@ -690,9 +690,7 @@ const SurveyLogsPage: React.FC = () => {
 
       <PageContentLoader loading={loading && logs.length === 0}>
         {logs.length === 0 && !loading ? (
-          <EmptyPagePlaceholder
-            message={t('surveys.logs.noRecords')}
-          />
+          <EmptyPagePlaceholder message={t('surveys.logs.noRecords')} />
         ) : (
           <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>

@@ -163,9 +163,7 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            ✦{' '}
-            {t(
-              'rbac.roles.wildcardPermission')}
+            ✦ {t('rbac.roles.wildcardPermission')}
           </Typography>
         </Box>
       )}

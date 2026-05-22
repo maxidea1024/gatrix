@@ -141,9 +141,7 @@ const WhitelistOverview: React.FC = () => {
             size="small"
             sx={{ textTransform: 'none', fontWeight: 600, minWidth: 100 }}
           >
-            {testing
-              ? t('common.testing')
-              : t('whitelist.overview.testButton')}
+            {testing ? t('common.testing') : t('whitelist.overview.testButton')}
           </Button>
         </Box>
       </Card>
@@ -154,13 +152,7 @@ const WhitelistOverview: React.FC = () => {
           <Box sx={{ p: 2.5 }}>
             <Alert
               severity={testResult.isAllowed ? 'success' : 'error'}
-              icon={
-                testResult.isAllowed ? (
-                  <CheckCircleIcon />
-                ) : (
-                  <CancelIcon />
-                )
-              }
+              icon={testResult.isAllowed ? <CheckCircleIcon /> : <CancelIcon />}
               sx={{
                 borderRadius: 1.5,
                 '& .MuiAlert-message': { width: '100%' },
@@ -193,9 +185,7 @@ const WhitelistOverview: React.FC = () => {
                     <Chip
                       key={index}
                       label={`${rule.type === 'account' ? t('whitelist.overview.accountRule') : t('whitelist.overview.ipRule')}: ${rule.rule}`}
-                      color={
-                        rule.type === 'account' ? 'primary' : 'secondary'
-                      }
+                      color={rule.type === 'account' ? 'primary' : 'secondary'}
                       size="small"
                       variant="outlined"
                     />

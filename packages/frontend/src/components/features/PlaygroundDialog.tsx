@@ -1181,8 +1181,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       <TextField
                         fullWidth
                         size="small"
-                        placeholder={t(
-                          'playground.enterArrayValue')}
+                        placeholder={t('playground.enterArrayValue')}
                         value={entry.value}
                         onChange={(e) =>
                           handleUpdateContextEntry(
@@ -1191,8 +1190,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             e.target.value
                           )
                         }
-                        helperText={t(
-                          'playground.arrayHelp')}
+                        helperText={t('playground.arrayHelp')}
                       />
                     );
                   }

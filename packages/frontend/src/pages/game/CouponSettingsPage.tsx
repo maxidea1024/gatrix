@@ -1763,7 +1763,8 @@ const CouponSettingsPage: React.FC = () => {
                                     >
                                       <Tooltip
                                         title={t(
-                                          'coupons.couponSettings.viewUsedCodes')}
+                                          'coupons.couponSettings.viewUsedCodes'
+                                        )}
                                       >
                                         <Chip
                                           size="small"
@@ -3274,28 +3275,21 @@ const CouponSettingsPage: React.FC = () => {
                         minHeight: 32,
                       }}
                     >
-                      {t(
-                        'coupons.couponSettings.exportFiltered')}
+                      {t('coupons.couponSettings.exportFiltered')}
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleExportIssuedCodes('csv', true)}
                       disabled={exportingCodes}
                     >
                       <TableChartIcon sx={{ mr: 1 }} />
-                      CSV (
-                      {t(
-                        'coupons.couponSettings.exportFilterApplied')}
-                      )
+                      CSV ({t('coupons.couponSettings.exportFilterApplied')})
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleExportIssuedCodes('xlsx', true)}
                       disabled={exportingCodes}
                     >
                       <ExcelIcon sx={{ mr: 1 }} />
-                      Excel (
-                      {t(
-                        'coupons.couponSettings.exportFilterApplied')}
-                      )
+                      Excel ({t('coupons.couponSettings.exportFilterApplied')})
                     </MenuItem>
                     <Divider />
                     <MenuItem

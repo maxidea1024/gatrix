@@ -813,7 +813,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           return parsed;
         }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return { isMaintenance: false, status: 'inactive', detail: null };
   });
   const [maintenanceTooltipOpen, setMaintenanceTooltipOpen] = useState(false);
@@ -829,8 +831,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Persist maintenance status to sessionStorage on changes
   useEffect(() => {
     try {
-      sessionStorage.setItem(MAINT_CACHE_KEY, JSON.stringify(maintenanceStatus));
-    } catch { /* ignore */ }
+      sessionStorage.setItem(
+        MAINT_CACHE_KEY,
+        JSON.stringify(maintenanceStatus)
+      );
+    } catch {
+      /* ignore */
+    }
   }, [maintenanceStatus]);
 
   // Track previous environment to detect actual changes
@@ -883,7 +890,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           ) {
             return prev;
           }
-          return { isMaintenance: nextIsMaintenance, status, detail: nextDetail };
+          return {
+            isMaintenance: nextIsMaintenance,
+            status,
+            detail: nextDetail,
+          };
         });
       })
       .catch(() => {
@@ -1594,11 +1605,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <>
                           <Typography
                             variant="caption"
-                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                            sx={{
+                              color: 'rgba(255,255,255,0.5)',
+                              whiteSpace: 'nowrap',
+                            }}
                           >
                             {t('maintenance.tooltipType')}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 500 }}
+                          >
                             {(() => {
                               switch (maintenanceStatus.detail.type) {
                                 case 'emergency':
@@ -1618,7 +1635,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <>
                           <Typography
                             variant="caption"
-                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                            sx={{
+                              color: 'rgba(255,255,255,0.5)',
+                              whiteSpace: 'nowrap',
+                            }}
                           >
                             {t('maintenance.tooltipStartTime')}
                           </Typography>
@@ -1638,7 +1658,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <>
                           <Typography
                             variant="caption"
-                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                            sx={{
+                              color: 'rgba(255,255,255,0.5)',
+                              whiteSpace: 'nowrap',
+                            }}
                           >
                             {t('maintenance.tooltipEndTime')}
                           </Typography>
@@ -1656,36 +1679,42 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       {/* Duration */}
                       {maintenanceStatus.detail?.startsAt &&
                         maintenanceStatus.detail?.endsAt && (
-                        <>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
-                          >
-                            {t('maintenance.tooltipDuration')}
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                            {(() => {
-                              const start = new Date(
-                                maintenanceStatus.detail.startsAt
-                              );
-                              const end = new Date(
-                                maintenanceStatus.detail.endsAt
-                              );
-                              const diffMs = end.getTime() - start.getTime();
-                              const diffHours = Math.floor(
-                                diffMs / (1000 * 60 * 60)
-                              );
-                              const diffMinutes = Math.floor(
-                                (diffMs % (1000 * 60 * 60)) / (1000 * 60)
-                              );
-                              if (diffHours > 0) {
-                                return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
-                              }
-                              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
-                            })()}
-                          </Typography>
-                        </>
-                      )}
+                          <>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: 'rgba(255,255,255,0.5)',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {t('maintenance.tooltipDuration')}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 500 }}
+                            >
+                              {(() => {
+                                const start = new Date(
+                                  maintenanceStatus.detail.startsAt
+                                );
+                                const end = new Date(
+                                  maintenanceStatus.detail.endsAt
+                                );
+                                const diffMs = end.getTime() - start.getTime();
+                                const diffHours = Math.floor(
+                                  diffMs / (1000 * 60 * 60)
+                                );
+                                const diffMinutes = Math.floor(
+                                  (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+                                );
+                                if (diffHours > 0) {
+                                  return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                                }
+                                return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+                              })()}
+                            </Typography>
+                          </>
+                        )}
                     </Box>
 
                     {/* Message */}
@@ -1913,8 +1942,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
               <TimezoneSelector />
 
-              <IconButton onClick={toggleTheme} color="inherit" sx={{ p: 0.75 }}>
-                {isDark ? <LightModeIcon sx={{ fontSize: 20 }} /> : <DarkModeIcon sx={{ fontSize: 20 }} />}
+              <IconButton
+                onClick={toggleTheme}
+                color="inherit"
+                sx={{ p: 0.75 }}
+              >
+                {isDark ? (
+                  <LightModeIcon sx={{ fontSize: 20 }} />
+                ) : (
+                  <DarkModeIcon sx={{ fontSize: 20 }} />
+                )}
               </IconButton>
 
               <LanguageSelector variant="text" size="medium" />
@@ -1930,7 +1967,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               />
 
               <Tooltip title={user?.name || user?.email?.split('@')[0] || ''}>
-                <IconButton onClick={handleUserMenuOpen} color="inherit" sx={{ p: 0.5 }}>
+                <IconButton
+                  onClick={handleUserMenuOpen}
+                  color="inherit"
+                  sx={{ p: 0.5 }}
+                >
                   {user?.avatarUrl && !avatarImageError ? (
                     <Avatar
                       src={user.avatarUrl}

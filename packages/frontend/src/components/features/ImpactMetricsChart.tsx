@@ -1985,8 +1985,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
         onClose={() => setDeleteId(null)}
         onConfirm={handleConfirmDelete}
         title={t('common.deleteConfirm')}
-        message={t(
-          'impactMetrics.deleteConfirmMessage')}
+        message={t('impactMetrics.deleteConfirmMessage')}
         confirmColor="error"
       />
 

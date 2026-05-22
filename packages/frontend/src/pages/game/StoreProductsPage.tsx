@@ -742,13 +742,9 @@ const StoreProductsPage: React.FC = () => {
         projectApiPath,
         resetOverrideProduct.id
       );
-      enqueueSnackbar(
-        t(
-          'storeProducts.resetOverridesSuccess'),
-        {
-          variant: 'success',
-        }
-      );
+      enqueueSnackbar(t('storeProducts.resetOverridesSuccess'), {
+        variant: 'success',
+      });
       await loadProducts();
       loadStats();
     } catch (error: any) {
@@ -1924,9 +1920,7 @@ const StoreProductsPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          {t('storeProducts.resetAllOverrides')}
-        </DialogTitle>
+        <DialogTitle>{t('storeProducts.resetAllOverrides')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {resetOverrideProduct && (

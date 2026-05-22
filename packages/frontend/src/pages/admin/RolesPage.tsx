@@ -611,8 +611,7 @@ const RolesPage: React.FC = () => {
                 color="text.secondary"
                 sx={{ mt: 1, fontSize: '0.8rem' }}
               >
-                {t(
-                  'rbac.roles.wildcardPermissionDesc')}
+                {t('rbac.roles.wildcardPermissionDesc')}
               </Typography>
             </Box>
           ) : (

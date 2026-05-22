@@ -3548,9 +3548,7 @@ const CmsManagementPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          {t('cms.detail.discardChangesTitle')}
-        </DialogTitle>
+        <DialogTitle>{t('cms.detail.discardChangesTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t('cms.detail.discardChangesConfirm')}

@@ -91,8 +91,7 @@ const MonitoringTabbedPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.monitoring')}
-        subtitle={t(
-          'monitoring.subtitle')}
+        subtitle={t('monitoring.subtitle')}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

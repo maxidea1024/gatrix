@@ -373,24 +373,14 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                     }}
                   >
                     <TableCell sx={{ width: 36 }} />
-                    <TableCell>
-                      {t('ripple.tracking.col.handler')}
-                    </TableCell>
-                    <TableCell>
-                      {t('ripple.tracking.col.service')}
-                    </TableCell>
-                    <TableCell>
-                      {t('ripple.tracking.col.hostname')}
-                    </TableCell>
-                    <TableCell>
-                      {t('ripple.tracking.col.instance')}
-                    </TableCell>
+                    <TableCell>{t('ripple.tracking.col.handler')}</TableCell>
+                    <TableCell>{t('ripple.tracking.col.service')}</TableCell>
+                    <TableCell>{t('ripple.tracking.col.hostname')}</TableCell>
+                    <TableCell>{t('ripple.tracking.col.instance')}</TableCell>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}>
                       {t('ripple.tracking.col.result')}
                     </TableCell>
-                    <TableCell>
-                      {t('ripple.tracking.col.message')}
-                    </TableCell>
+                    <TableCell>{t('ripple.tracking.col.message')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -599,9 +589,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             ) : undefined
           }
         >
-          {isPolling
-            ? t('ripple.tracking.tracking')
-            : t('common.close')}
+          {isPolling ? t('ripple.tracking.tracking') : t('common.close')}
         </Button>
       </DialogActions>
     </Dialog>

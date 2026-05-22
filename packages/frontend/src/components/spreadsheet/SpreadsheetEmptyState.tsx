@@ -49,8 +49,7 @@ const SpreadsheetEmptyState: React.FC<SpreadsheetEmptyStateProps> = ({
         color="text.secondary"
         sx={{ maxWidth: 360, textAlign: 'center' }}
       >
-        {t(
-          'spreadsheets.emptyDescription')}
+        {t('spreadsheets.emptyDescription')}
       </Typography>
 
       <Button

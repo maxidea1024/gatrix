@@ -326,8 +326,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
           <SearchTextField
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder={t(
-              'surveys.logsDrawer.searchPlaceholder')}
+            placeholder={t('surveys.logsDrawer.searchPlaceholder')}
             size="small"
           />
 
@@ -335,9 +334,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
           <PageContentLoader loading={loading}>
             {logs.length === 0 ? (
               <Box sx={{ mt: 2 }}>
-                <EmptyPagePlaceholder
-                  message={t('surveys.logs.noRecords')}
-                />
+                <EmptyPagePlaceholder message={t('surveys.logs.noRecords')} />
               </Box>
             ) : (
               <TableContainer component={Paper} variant="outlined">
@@ -378,8 +375,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           direction={sortBy === 'userName' ? sortOrder : 'asc'}
                           onClick={() => handleSort('userName')}
                         >
-                          {t(
-                            'coupons.couponUsage.columns.userName')}
+                          {t('coupons.couponUsage.columns.userName')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -403,8 +399,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           direction={sortBy === 'platform' ? sortOrder : 'asc'}
                           onClick={() => handleSort('platform')}
                         >
-                          {t(
-                            'coupons.couponUsage.columns.platform')}
+                          {t('coupons.couponUsage.columns.platform')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -430,8 +425,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           }
                           onClick={() => handleSort('subchannel')}
                         >
-                          {t(
-                            'coupons.couponUsage.columns.subChannel')}
+                          {t('coupons.couponUsage.columns.subChannel')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell

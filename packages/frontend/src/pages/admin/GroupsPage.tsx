@@ -1023,8 +1023,7 @@ const GroupsPage: React.FC = () => {
                     color="text.secondary"
                     sx={{ mb: 1, fontSize: '0.8rem' }}
                   >
-                    {t(
-                      'rbac.groups.effectivePermissionsDesc')}
+                    {t('rbac.groups.effectivePermissionsDesc')}
                   </Typography>
                   <EffectivePermissionsViewer
                     data={groupEffectivePerms}

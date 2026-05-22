@@ -130,8 +130,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
           {type === 'CONFLICT' && (
             <Box>
               <Typography variant="body1" gutterBottom sx={{ mb: 2 }}>
-                {t(
-                  'changeRequest.conflictDialog.description')}
+                {t('changeRequest.conflictDialog.description')}
               </Typography>
 
               <Stack spacing={2}>
@@ -147,8 +146,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                       }}
                     >
                       <StorageIcon fontSize="small" color="primary" />{' '}
-                      {t(
-                        'changeRequest.conflictDialog.liveData')}
+                      {t('changeRequest.conflictDialog.liveData')}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -182,8 +180,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                       }}
                     >
                       <HistoryIcon fontSize="small" color="info" />{' '}
-                      {t(
-                        'changeRequest.conflictDialog.originalData')}
+                      {t('changeRequest.conflictDialog.originalData')}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -211,8 +208,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
           {type === 'DUPLICATE' && (
             <Box>
               <Typography variant="body1" gutterBottom sx={{ mb: 2 }}>
-                {t(
-                  'changeRequest.duplicateDialog.description')}
+                {t('changeRequest.duplicateDialog.description')}
               </Typography>
               <Paper
                 variant="outlined"
@@ -240,8 +236,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                 variant="body2"
                 sx={{ mt: 2, color: 'text.secondary' }}
               >
-                {t(
-                  'changeRequest.duplicateDialog.guide')}
+                {t('changeRequest.duplicateDialog.guide')}
               </Typography>
             </Box>
           )}

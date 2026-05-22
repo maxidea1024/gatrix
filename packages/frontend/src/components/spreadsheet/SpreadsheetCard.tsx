@@ -144,9 +144,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           <ListItemIcon>
             <ExportIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('spreadsheets.exportXlsx')}
-          </ListItemText>
+          <ListItemText>{t('spreadsheets.exportXlsx')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -282,11 +280,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
 
             {/* Pin Toggle Button */}
             <Tooltip
-              title={
-                item.isPinned
-                  ? t('common.unpin')
-                  : t('common.pin')
-              }
+              title={item.isPinned ? t('common.unpin') : t('common.pin')}
             >
               <IconButton
                 size="small"

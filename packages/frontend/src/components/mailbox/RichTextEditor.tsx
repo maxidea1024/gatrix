@@ -938,10 +938,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       );
 
       if (!videoInfo) {
-        alert(
-          t(
-            'richTextEditor.invalidVideoUrl')
-        );
+        alert(t('richTextEditor.invalidVideoUrl'));
         return;
       }
 
@@ -1732,8 +1729,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-image': t('richTextEditor.image'),
       '.ql-video': t('richTextEditor.video'),
       '.ql-emoji': t('richTextEditor.emoji'),
-      '.ql-pageBackground': t(
-        'richTextEditor.pageBackground'),
+      '.ql-pageBackground': t('richTextEditor.pageBackground'),
       '.ql-clean': t('richTextEditor.clean'),
       '.ql-font .ql-picker-label': t('richTextEditor.font'),
       '.ql-font .ql-picker-item': '', // No tooltip for items
@@ -2429,8 +2425,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t(
-                      'richTextEditor.effectGradientSilver')}
+                    {t('richTextEditor.effectGradientSilver')}
                   </MenuItem>
                   <MenuItem
                     value="gradient-fire"
@@ -2462,8 +2457,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t(
-                      'richTextEditor.effectGradientSunset')}
+                    {t('richTextEditor.effectGradientSunset')}
                   </MenuItem>
                   {/* Animation Effects */}
                   <MenuItem
@@ -2681,26 +2675,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }
               width={350}
               height={400}
-              searchPlaceholder={t(
-                'richTextEditor.emojiSearch')}
+              searchPlaceholder={t('richTextEditor.emojiSearch')}
               previewConfig={{
                 showPreview: false,
               }}
               categories={[
                 {
                   category: Categories.SUGGESTED,
-                  name: t(
-                    'richTextEditor.emojiFrequentlyUsed'),
+                  name: t('richTextEditor.emojiFrequentlyUsed'),
                 },
                 {
                   category: Categories.SMILEYS_PEOPLE,
-                  name: t(
-                    'richTextEditor.emojiSmileysAndPeople'),
+                  name: t('richTextEditor.emojiSmileysAndPeople'),
                 },
                 {
                   category: Categories.ANIMALS_NATURE,
-                  name: t(
-                    'richTextEditor.emojiAnimalsAndNature'),
+                  name: t('richTextEditor.emojiAnimalsAndNature'),
                 },
                 {
                   category: Categories.FOOD_DRINK,
@@ -2708,8 +2698,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 },
                 {
                   category: Categories.TRAVEL_PLACES,
-                  name: t(
-                    'richTextEditor.emojiTravelAndPlaces'),
+                  name: t('richTextEditor.emojiTravelAndPlaces'),
                 },
                 {
                   category: Categories.ACTIVITIES,
@@ -2799,33 +2788,25 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <EmojiIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('richTextEditor.insertEmoji')}
-          </ListItemText>
+          <ListItemText>{t('richTextEditor.insertEmoji')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={insertLink}>
           <ListItemIcon>
             <LinkIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('richTextEditor.insertLink')}
-          </ListItemText>
+          <ListItemText>{t('richTextEditor.insertLink')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={insertImage}>
           <ListItemIcon>
             <ImageIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('richTextEditor.insertImage')}
-          </ListItemText>
+          <ListItemText>{t('richTextEditor.insertImage')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={insertVideo}>
           <ListItemIcon>
             <VideoIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('richTextEditor.insertVideo')}
-          </ListItemText>
+          <ListItemText>{t('richTextEditor.insertVideo')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={formatBold}>
           <ListItemIcon>
@@ -2843,17 +2824,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <UnderlineIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('richTextEditor.underline')}
-          </ListItemText>
+          <ListItemText>{t('richTextEditor.underline')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={clearFormatting}>
           <ListItemIcon>
             <ClearIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t('richTextEditor.clearFormatting')}
-          </ListItemText>
+          <ListItemText>{t('richTextEditor.clearFormatting')}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -2895,9 +2872,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          {t('richTextEditor.insertLink')}
-        </DialogTitle>
+        <DialogTitle>{t('richTextEditor.insertLink')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
             <TextField
@@ -2908,8 +2883,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onChange={(e) => setLinkUrl(e.target.value)}
               fullWidth
               required
-              helperText={t(
-                'richTextEditor.linkUrlHelp')}
+              helperText={t('richTextEditor.linkUrlHelp')}
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && linkUrl) {
                   handleLinkInsert();
@@ -2918,13 +2892,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             />
             <TextField
               label={t('richTextEditor.linkText')}
-              placeholder={t(
-                'richTextEditor.linkTextPlaceholder')}
+              placeholder={t('richTextEditor.linkTextPlaceholder')}
               value={linkText}
               onChange={(e) => setLinkText(e.target.value)}
               fullWidth
-              helperText={t(
-                'richTextEditor.linkTextHelp')}
+              helperText={t('richTextEditor.linkTextHelp')}
               disabled={
                 savedSelectionRef.current &&
                 savedSelectionRef.current.length > 0
@@ -2933,9 +2905,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleLinkDialogClose}>
-            {t('common.cancel')}
-          </Button>
+          <Button onClick={handleLinkDialogClose}>{t('common.cancel')}</Button>
           <Button
             onClick={handleLinkInsert}
             variant="contained"

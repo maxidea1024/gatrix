@@ -89,11 +89,9 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
       });
       loadShares();
     } catch {
-      enqueueSnackbar(
-        t(
-          'spreadsheets.publicLinkCreateFailed'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(t('spreadsheets.publicLinkCreateFailed'), {
+        variant: 'error',
+      });
     } finally {
       setCreatingLink(false);
     }
@@ -105,11 +103,9 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
       await spreadsheetService.removeShare(spreadsheetId, publicShare.id);
       setShares((prev) => prev.filter((s) => s.id !== publicShare.id));
     } catch {
-      enqueueSnackbar(
-        t(
-          'spreadsheets.publicLinkRemoveFailed'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(t('spreadsheets.publicLinkRemoveFailed'), {
+        variant: 'error',
+      });
     }
   }, [publicShare, spreadsheetId, enqueueSnackbar, t]);
 
@@ -134,10 +130,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
       setEmail('');
       loadShares();
     } catch {
-      enqueueSnackbar(
-        t('spreadsheets.shareAddFailed'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(t('spreadsheets.shareAddFailed'), { variant: 'error' });
     } finally {
       setAdding(false);
     }
@@ -155,10 +148,9 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
           prev.map((s) => (s.id === shareId ? { ...s, permission: p } : s))
         );
       } catch {
-        enqueueSnackbar(
-          t('spreadsheets.permissionUpdateFailed'),
-          { variant: 'error' }
-        );
+        enqueueSnackbar(t('spreadsheets.permissionUpdateFailed'), {
+          variant: 'error',
+        });
       }
     },
     [spreadsheetId, enqueueSnackbar, t]
@@ -170,10 +162,9 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
         await spreadsheetService.removeShare(spreadsheetId, shareId);
         setShares((prev) => prev.filter((s) => s.id !== shareId));
       } catch {
-        enqueueSnackbar(
-          t('spreadsheets.shareRemoveFailed'),
-          { variant: 'error' }
-        );
+        enqueueSnackbar(t('spreadsheets.shareRemoveFailed'), {
+          variant: 'error',
+        });
       }
     },
     [spreadsheetId, enqueueSnackbar, t]
@@ -291,9 +282,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {copied
-                      ? t('spreadsheets.copied')
-                      : t('spreadsheets.copy')}
+                    {copied ? t('spreadsheets.copied') : t('spreadsheets.copy')}
                   </Button>
                   <Tooltip title={t('spreadsheets.removePublicLink')}>
                     <IconButton
@@ -345,8 +334,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                   fontWeight: 500,
                 }}
               >
-                {t(
-                  'spreadsheets.addSpecificUser')}
+                {t('spreadsheets.addSpecificUser')}
               </Button>
             ) : (
               <Box sx={{ mt: 2 }}>
@@ -375,8 +363,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
 
                 <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
                   <TextField
-                    placeholder={t(
-                      'spreadsheets.shareEmailPlaceholder')}
+                    placeholder={t('spreadsheets.shareEmailPlaceholder')}
                     size="small"
                     fullWidth
                     value={email}
@@ -422,11 +409,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                       borderRadius: 1.5,
                     }}
                   >
-                    {adding ? (
-                      <CircularProgress size={16} />
-                    ) : (
-                      t('common.add')
-                    )}
+                    {adding ? <CircularProgress size={16} /> : t('common.add')}
                   </Button>
                 </Box>
 
@@ -437,8 +420,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     color="text.disabled"
                     sx={{ py: 2, textAlign: 'center' }}
                   >
-                    {t(
-                      'spreadsheets.noShares')}
+                    {t('spreadsheets.noShares')}
                   </Typography>
                 ) : (
                   userOrgShares.map((share) => (
