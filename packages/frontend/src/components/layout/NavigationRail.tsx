@@ -7,10 +7,15 @@ import {
   IconButton,
   Dialog,
   DialogContent,
+  Divider,
   useTheme,
   alpha,
 } from '@mui/material';
-import { Info as InfoIcon, Close as CloseIcon } from '@mui/icons-material';
+import {
+  Info as InfoIcon,
+  Close as CloseIcon,
+  MenuBook as MenuBookIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type { MenuCategory } from '@/config/navigation';
 
@@ -260,22 +265,25 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
       </Box>
 
       {/* About button */}
-      <Tooltip title={t('common.about', 'About')} placement="right" arrow>
+      <Tooltip title={t('common.about')} placement="right" arrow>
         <IconButton
           onClick={(e) => {
             e.stopPropagation();
             setAboutOpen(true);
           }}
-          size="small"
+          size="medium"
           sx={{
             mt: 0.5,
             mb: 0.5,
             color: 'text.disabled',
-            transition: 'color 0.2s',
-            '&:hover': { color: 'text.secondary' },
+            transition: 'all 0.2s',
+            '&:hover': {
+              color: 'text.secondary',
+              bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+            },
           }}
         >
-          <InfoIcon sx={{ fontSize: 18 }} />
+          <InfoIcon sx={{ fontSize: 22 }} />
         </IconButton>
       </Tooltip>
 
@@ -371,8 +379,56 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
 
           {/* Description */}
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            {t('about.description', 'Game Operations Management Platform')}
+            {t('about.description')}
           </Typography>
+
+          {/* Links */}
+          <Divider sx={{ mb: 2 }} />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 3,
+              mb: 2.5,
+            }}
+          >
+            {[
+              {
+                icon: <MenuBookIcon sx={{ fontSize: 18 }} />,
+                label: t('header.documentation'),
+                href: '/docs',
+              },
+            ].map((link) => (
+              <Box
+                key={link.href}
+                component="a"
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  px: 2,
+                  py: 1,
+                  borderRadius: 2,
+                  color: 'text.secondary',
+                  textDecoration: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  transition: 'all 0.15s',
+                  '&:hover': {
+                    bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'grey.50',
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                {link.icon}
+                {link.label}
+              </Box>
+            ))}
+          </Box>
 
           {/* Copyright */}
           <Typography variant="caption" color="text.disabled">
