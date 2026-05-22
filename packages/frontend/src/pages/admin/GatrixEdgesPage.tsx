@@ -1194,10 +1194,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                       sx={{
                         width: 48,
                         height: 48,
-                        borderRadius: '50%',
                         objectFit: 'cover',
-                        bgcolor: 'primary.main',
-                        p: 0.5,
                       }}
                     />
                     <Typography variant="h6" fontWeight="bold">

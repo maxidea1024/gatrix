@@ -167,13 +167,13 @@ const SurveyLogsPage: React.FC = () => {
     () => [
       {
         key: 'surveyId',
-        label: t('surveys.logs.filters.survey', 'Survey'),
+        label: t('surveys.logs.filters.survey'),
         type: 'select',
         options: surveys.map((s) => ({ value: s.id, label: s.surveyTitle })),
       },
       {
         key: 'action',
-        label: t('surveys.logs.filters.action', 'Action'),
+        label: t('surveys.logs.filters.action'),
         type: 'select',
         options: [
           { value: 'JOINED', label: 'JOINED' },
@@ -182,27 +182,27 @@ const SurveyLogsPage: React.FC = () => {
       },
       {
         key: 'userName',
-        label: t('coupons.couponUsage.columns.userName', 'User Name'),
+        label: t('coupons.couponUsage.columns.userName'),
         type: 'text',
       },
       {
         key: 'platform',
-        label: t('coupons.couponUsage.columns.platform', 'Platform'),
+        label: t('coupons.couponUsage.columns.platform'),
         type: 'text',
       },
       {
         key: 'channel',
-        label: t('coupons.couponUsage.columns.channel', 'Channel'),
+        label: t('coupons.couponUsage.columns.channel'),
         type: 'text',
       },
       {
         key: 'subchannel',
-        label: t('coupons.couponUsage.columns.subChannel', 'Subchannel'),
+        label: t('coupons.couponUsage.columns.subChannel'),
         type: 'text',
       },
       {
         key: 'worldId',
-        label: t('surveys.logs.columns.worldId', 'World'),
+        label: t('surveys.logs.columns.worldId'),
         type: 'text',
       },
     ],
@@ -691,7 +691,7 @@ const SurveyLogsPage: React.FC = () => {
       <PageContentLoader loading={loading && logs.length === 0}>
         {logs.length === 0 && !loading ? (
           <EmptyPagePlaceholder
-            message={t('surveys.logs.noRecords', 'No survey logs found.')}
+            message={t('surveys.logs.noRecords')}
           />
         ) : (
           <Card variant="outlined">

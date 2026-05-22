@@ -612,9 +612,7 @@ const RolesPage: React.FC = () => {
                 sx={{ mt: 1, fontSize: '0.8rem' }}
               >
                 {t(
-                  'rbac.roles.wildcardPermissionDesc',
-                  'This role has unrestricted access to all resources and actions.'
-                )}
+                  'rbac.roles.wildcardPermissionDesc')}
               </Typography>
             </Box>
           ) : (

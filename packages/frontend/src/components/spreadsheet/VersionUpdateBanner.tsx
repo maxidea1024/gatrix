@@ -46,10 +46,10 @@ const VersionUpdateBanner: React.FC<VersionUpdateBannerProps> = ({
               onClick={onRefresh}
               sx={{ fontWeight: 600 }}
             >
-              {t('spreadsheets.refreshNow', 'Refresh now')}
+              {t('spreadsheets.refreshNow')}
             </Button>
             <Button color="inherit" size="small" onClick={onDismiss}>
-              {t('common.dismiss', 'Dismiss')}
+              {t('common.dismiss')}
             </Button>
           </>
         }

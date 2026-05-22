@@ -1400,7 +1400,7 @@ const CrashesPage: React.FC = () => {
           <ListItemIcon>
             <PersonIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('crashes.assignee', 'Assignee')}</ListItemText>
+          <ListItemText>{t('crashes.assignee')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleOpenJiraDialog}>
           <ListItemIcon>
@@ -1441,14 +1441,14 @@ const CrashesPage: React.FC = () => {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>{t('crashes.assignee', 'Assignee')}</DialogTitle>
+        <DialogTitle>{t('crashes.assignee')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
             size="small"
             value={assigneeValue}
             onChange={(e) => setAssigneeValue(e.target.value)}
-            placeholder={t('crashes.assignee', 'Assignee')}
+            placeholder={t('crashes.assignee')}
             sx={{ mt: 1 }}
           />
         </DialogContent>

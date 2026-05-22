@@ -1763,9 +1763,7 @@ const CouponSettingsPage: React.FC = () => {
                                     >
                                       <Tooltip
                                         title={t(
-                                          'coupons.couponSettings.viewUsedCodes',
-                                          '사용된 코드 수 보기'
-                                        )}
+                                          'coupons.couponSettings.viewUsedCodes')}
                                       >
                                         <Chip
                                           size="small"
@@ -2330,7 +2328,7 @@ const CouponSettingsPage: React.FC = () => {
             <ListIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('coupons.couponSettings.viewIssuedCodes', 'View Issued Codes')}
+            {t('coupons.couponSettings.viewIssuedCodes')}
           </ListItemText>
         </MenuItem>
         <Divider />
@@ -3106,7 +3104,7 @@ const CouponSettingsPage: React.FC = () => {
         onClose={() => setOpenCodes(false)}
         title={
           codesSetting?.type === 'SPECIAL'
-            ? (t('coupons.couponUsage.title', 'Coupon Usage') as string)
+            ? (t('coupons.couponUsage.title') as string)
             : (t('coupons.couponSettings.issuedCodesDrawer.title') as string)
         }
         subtitle={
@@ -3277,9 +3275,7 @@ const CouponSettingsPage: React.FC = () => {
                       }}
                     >
                       {t(
-                        'coupons.couponSettings.exportFiltered',
-                        '필터링된 데이터'
-                      )}
+                        'coupons.couponSettings.exportFiltered')}
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleExportIssuedCodes('csv', true)}
@@ -3288,9 +3284,7 @@ const CouponSettingsPage: React.FC = () => {
                       <TableChartIcon sx={{ mr: 1 }} />
                       CSV (
                       {t(
-                        'coupons.couponSettings.exportFilterApplied',
-                        '필터 적용'
-                      )}
+                        'coupons.couponSettings.exportFilterApplied')}
                       )
                     </MenuItem>
                     <MenuItem
@@ -3300,9 +3294,7 @@ const CouponSettingsPage: React.FC = () => {
                       <ExcelIcon sx={{ mr: 1 }} />
                       Excel (
                       {t(
-                        'coupons.couponSettings.exportFilterApplied',
-                        '필터 적용'
-                      )}
+                        'coupons.couponSettings.exportFilterApplied')}
                       )
                     </MenuItem>
                     <Divider />
@@ -3315,7 +3307,7 @@ const CouponSettingsPage: React.FC = () => {
                         minHeight: 32,
                       }}
                     >
-                      {t('coupons.couponSettings.exportAll', '전체 데이터')}
+                      {t('coupons.couponSettings.exportAll')}
                     </MenuItem>
                   </Box>
                 )}
@@ -3326,7 +3318,7 @@ const CouponSettingsPage: React.FC = () => {
                   <TableChartIcon sx={{ mr: 1 }} />
                   CSV
                   {codesStatusFilter !== 'ALL' || debouncedCodesSearch
-                    ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})`
+                    ? ` (${t('coupons.couponSettings.exportAllLabel')})`
                     : ''}
                 </MenuItem>
                 <MenuItem
@@ -3336,7 +3328,7 @@ const CouponSettingsPage: React.FC = () => {
                   <ExcelIcon sx={{ mr: 1 }} />
                   Excel
                   {codesStatusFilter !== 'ALL' || debouncedCodesSearch
-                    ? ` (${t('coupons.couponSettings.exportAllLabel', '전체')})`
+                    ? ` (${t('coupons.couponSettings.exportAllLabel')})`
                     : ''}
                 </MenuItem>
               </Menu>

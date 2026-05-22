@@ -93,9 +93,7 @@ const ServersTabbedPage: React.FC = () => {
       <PageHeader
         title={t('sidebar.serverManagement')}
         subtitle={t(
-          'servers.subtitle',
-          '서버 인스턴스와 라이프사이클을 관리합니다.'
-        )}
+          'servers.subtitle')}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

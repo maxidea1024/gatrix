@@ -20,13 +20,13 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
   const getStageMessage = () => {
     switch (stage) {
       case 'syncing':
-        return t('chat.loading.syncingUser', '사용자 정보를 동기화하는 중...');
+        return t('chat.loading.syncingUser');
       case 'connecting':
-        return t('chat.loading.connecting', '채팅 서버에 연결하는 중...');
+        return t('chat.loading.connecting');
       case 'loading_channels':
-        return t('chat.loading.loadingChannels', '채널 목록을 불러오는 중...');
+        return t('chat.loading.loadingChannels');
       default:
-        return t('chat.loading.initializing', '채팅을 초기화하는 중...');
+        return t('chat.loading.initializing');
     }
   };
 

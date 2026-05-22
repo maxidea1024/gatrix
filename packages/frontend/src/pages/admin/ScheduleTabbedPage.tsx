@@ -91,7 +91,7 @@ const ScheduleTabbedPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.scheduleManagement')}
-        subtitle={t('schedule.subtitle', '스케줄 작업과 큐 상태를 관리합니다.')}
+        subtitle={t('schedule.subtitle')}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

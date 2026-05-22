@@ -120,7 +120,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
+          <ListItemText>{t('common.rename')}</ListItemText>
         </MenuItem>
 
         <MenuItem
@@ -132,7 +132,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.duplicate', 'Duplicate')}</ListItemText>
+          <ListItemText>{t('common.duplicate')}</ListItemText>
         </MenuItem>
 
         <MenuItem
@@ -145,7 +145,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
             <ExportIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('spreadsheets.exportXlsx', 'Export as XLSX')}
+            {t('spreadsheets.exportXlsx')}
           </ListItemText>
         </MenuItem>
         <MenuItem
@@ -158,7 +158,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete', 'Delete')}</ListItemText>
+          <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -243,7 +243,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
                 >
                   {item.title}
                 </Typography>
-                <Tooltip title={t('common.rename', 'Rename')}>
+                <Tooltip title={t('common.rename')}>
                   <IconButton
                     size="small"
                     onClick={(e) => {
@@ -267,7 +267,7 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {/* Share Button */}
-            <Tooltip title={t('spreadsheets.share', 'Share')}>
+            <Tooltip title={t('spreadsheets.share')}>
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -284,8 +284,8 @@ const SpreadsheetCard: React.FC<SpreadsheetCardProps> = ({
             <Tooltip
               title={
                 item.isPinned
-                  ? t('common.unpin', 'Unpin')
-                  : t('common.pin', 'Pin')
+                  ? t('common.unpin')
+                  : t('common.pin')
               }
             >
               <IconButton

@@ -266,11 +266,11 @@ const StoreProductsPage: React.FC = () => {
       },
       {
         key: 'hasOverrides',
-        label: t('storeProducts.hasOverrides', '오버라이드 여부'),
+        label: t('storeProducts.hasOverrides'),
         type: 'select',
         options: [
-          { value: 'true', label: t('common.yes', '있음') },
-          { value: 'false', label: t('common.no', '없음') },
+          { value: 'true', label: t('common.yes') },
+          { value: 'false', label: t('common.no') },
         ],
       },
     ],
@@ -744,9 +744,7 @@ const StoreProductsPage: React.FC = () => {
       );
       enqueueSnackbar(
         t(
-          'storeProducts.resetOverridesSuccess',
-          '오버라이드가 초기화되었습니다'
-        ),
+          'storeProducts.resetOverridesSuccess'),
         {
           variant: 'success',
         }
@@ -1183,7 +1181,7 @@ const StoreProductsPage: React.FC = () => {
                         color="text.secondary"
                         sx={{ whiteSpace: 'nowrap' }}
                       >
-                        {t('storeProducts.statsOverridden', '오버라이드')}{' '}
+                        {t('storeProducts.statsOverridden')}{' '}
                         <strong style={{ color: 'inherit' }}>
                           {productStats.overridden}
                         </strong>
@@ -1815,7 +1813,7 @@ const StoreProductsPage: React.FC = () => {
                 <RestoreOverrideIcon fontSize="small" color="warning" />
               </ListItemIcon>
               <ListItemText>
-                {t('storeProducts.resetAllOverrides', '오버라이드 초기화')}
+                {t('storeProducts.resetAllOverrides')}
                 {' ('}
                 {rowMenuProduct.overriddenFields.length}
                 {')'}
@@ -1927,7 +1925,7 @@ const StoreProductsPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          {t('storeProducts.resetAllOverrides', '오버라이드 초기화')}
+          {t('storeProducts.resetAllOverrides')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -1960,7 +1958,7 @@ const StoreProductsPage: React.FC = () => {
             color="warning"
             onClick={handleResetOverridesConfirm}
           >
-            {t('storeProducts.resetAllOverrides', '오버라이드 초기화')}
+            {t('storeProducts.resetAllOverrides')}
           </Button>
         </DialogActions>
       </Dialog>

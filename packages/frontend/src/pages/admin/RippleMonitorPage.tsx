@@ -475,11 +475,11 @@ const RippleMonitorPage: React.FC = () => {
                             }
                             onClick={() => handleSort('serviceType')}
                           >
-                            {t('ripple.history.column.serviceType', 'Service')}
+                            {t('ripple.history.column.serviceType')}
                           </TableSortLabel>
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700 }} align="right">
-                          {t('ripple.history.column.serverCount', 'Servers')}
+                          {t('ripple.history.column.serverCount')}
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>
                           {t('ripple.dependsOn')}
@@ -507,7 +507,7 @@ const RippleMonitorPage: React.FC = () => {
                           </TableSortLabel>
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>
-                          {t('ripple.history.column.lastAcked', '마지막 전파')}
+                          {t('ripple.history.column.lastAcked')}
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700, width: 32 }} />
                         <TableCell

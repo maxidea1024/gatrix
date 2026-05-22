@@ -91,9 +91,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
     } catch {
       enqueueSnackbar(
         t(
-          'spreadsheets.publicLinkCreateFailed',
-          '공개 링크 생성에 실패했습니다'
-        ),
+          'spreadsheets.publicLinkCreateFailed'),
         { variant: 'error' }
       );
     } finally {
@@ -109,9 +107,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
     } catch {
       enqueueSnackbar(
         t(
-          'spreadsheets.publicLinkRemoveFailed',
-          '공개 링크 해제에 실패했습니다'
-        ),
+          'spreadsheets.publicLinkRemoveFailed'),
         { variant: 'error' }
       );
     }
@@ -139,7 +135,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
       loadShares();
     } catch {
       enqueueSnackbar(
-        t('spreadsheets.shareAddFailed', '공유 추가에 실패했습니다'),
+        t('spreadsheets.shareAddFailed'),
         { variant: 'error' }
       );
     } finally {
@@ -160,7 +156,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
         );
       } catch {
         enqueueSnackbar(
-          t('spreadsheets.permissionUpdateFailed', '권한 변경에 실패했습니다'),
+          t('spreadsheets.permissionUpdateFailed'),
           { variant: 'error' }
         );
       }
@@ -175,7 +171,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
         setShares((prev) => prev.filter((s) => s.id !== shareId));
       } catch {
         enqueueSnackbar(
-          t('spreadsheets.shareRemoveFailed', '공유 제거에 실패했습니다'),
+          t('spreadsheets.shareRemoveFailed'),
           { variant: 'error' }
         );
       }
@@ -234,7 +230,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     lineHeight: 1,
                   }}
                 >
-                  {t('spreadsheets.publicLink', '공개 링크')}
+                  {t('spreadsheets.publicLink')}
                 </Typography>
               </Box>
 
@@ -267,10 +263,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     sx={{ minWidth: 80, fontSize: '0.8rem' }}
                   >
                     <MenuItem value="viewer">
-                      {t('spreadsheets.viewer', '뷰어')}
+                      {t('spreadsheets.viewer')}
                     </MenuItem>
                     <MenuItem value="editor">
-                      {t('spreadsheets.editor', '편집자')}
+                      {t('spreadsheets.editor')}
                     </MenuItem>
                   </Select>
                   <Button
@@ -296,10 +292,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     }}
                   >
                     {copied
-                      ? t('spreadsheets.copied', '복사됨')
-                      : t('spreadsheets.copy', '복사')}
+                      ? t('spreadsheets.copied')
+                      : t('spreadsheets.copy')}
                   </Button>
-                  <Tooltip title={t('spreadsheets.removePublicLink', '해제')}>
+                  <Tooltip title={t('spreadsheets.removePublicLink')}>
                     <IconButton
                       size="small"
                       onClick={handleRemovePublicLink}
@@ -328,7 +324,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     borderRadius: 1.5,
                   }}
                 >
-                  {t('spreadsheets.createLink', '공개 링크 생성')}
+                  {t('spreadsheets.createLink')}
                 </Button>
               )}
             </Box>
@@ -350,9 +346,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                 }}
               >
                 {t(
-                  'spreadsheets.addSpecificUser',
-                  '특정 사용자에게 별도 권한 부여'
-                )}
+                  'spreadsheets.addSpecificUser')}
               </Button>
             ) : (
               <Box sx={{ mt: 2 }}>
@@ -374,7 +368,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                       lineHeight: 1,
                     }}
                   >
-                    {t('spreadsheets.sharedWith', '사용자 공유')}
+                    {t('spreadsheets.sharedWith')}
                   </Typography>
                 </Box>
                 <Typography sx={{ display: 'none' }}></Typography>
@@ -382,9 +376,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                 <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
                   <TextField
                     placeholder={t(
-                      'spreadsheets.shareEmailPlaceholder',
-                      '이메일 주소 입력'
-                    )}
+                      'spreadsheets.shareEmailPlaceholder')}
                     size="small"
                     fullWidth
                     value={email}
@@ -411,10 +403,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     sx={{ minWidth: 80, fontSize: '0.8rem' }}
                   >
                     <MenuItem value="viewer">
-                      {t('spreadsheets.viewer', '뷰어')}
+                      {t('spreadsheets.viewer')}
                     </MenuItem>
                     <MenuItem value="editor">
-                      {t('spreadsheets.editor', '편집자')}
+                      {t('spreadsheets.editor')}
                     </MenuItem>
                   </Select>
                   <Button
@@ -433,7 +425,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     {adding ? (
                       <CircularProgress size={16} />
                     ) : (
-                      t('common.add', '추가')
+                      t('common.add')
                     )}
                   </Button>
                 </Box>
@@ -446,9 +438,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                     sx={{ py: 2, textAlign: 'center' }}
                   >
                     {t(
-                      'spreadsheets.noShares',
-                      '아직 공유된 사용자가 없습니다'
-                    )}
+                      'spreadsheets.noShares')}
                   </Typography>
                 ) : (
                   userOrgShares.map((share) => (
@@ -503,10 +493,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                         sx={{ fontSize: '0.8rem', minWidth: 60 }}
                       >
                         <MenuItem value="viewer">
-                          {t('spreadsheets.viewer', '뷰어')}
+                          {t('spreadsheets.viewer')}
                         </MenuItem>
                         <MenuItem value="editor">
-                          {t('spreadsheets.editor', '편집자')}
+                          {t('spreadsheets.editor')}
                         </MenuItem>
                       </Select>
                       <IconButton

@@ -227,7 +227,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
           }}
         >
           <Typography variant="subtitle1" fontWeight={600}>
-            {t('ripple.tracking.title', 'Ripple 전파 추적')}
+            {t('ripple.tracking.title')}
           </Typography>
         </Box>
         <Box
@@ -344,7 +344,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             align="center"
             sx={{ display: 'block', p: 3 }}
           >
-            {t('ripple.tracking.noEvents', '아직 전파 기록이 없습니다.')}
+            {t('ripple.tracking.noEvents')}
           </Typography>
         ) : (
           <Paper
@@ -374,22 +374,22 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                   >
                     <TableCell sx={{ width: 36 }} />
                     <TableCell>
-                      {t('ripple.tracking.col.handler', 'Handler')}
+                      {t('ripple.tracking.col.handler')}
                     </TableCell>
                     <TableCell>
-                      {t('ripple.tracking.col.service', 'Service')}
+                      {t('ripple.tracking.col.service')}
                     </TableCell>
                     <TableCell>
-                      {t('ripple.tracking.col.hostname', 'Hostname')}
+                      {t('ripple.tracking.col.hostname')}
                     </TableCell>
                     <TableCell>
-                      {t('ripple.tracking.col.instance', 'Instance')}
+                      {t('ripple.tracking.col.instance')}
                     </TableCell>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                      {t('ripple.tracking.col.result', 'Result')}
+                      {t('ripple.tracking.col.result')}
                     </TableCell>
                     <TableCell>
-                      {t('ripple.tracking.col.message', 'Message')}
+                      {t('ripple.tracking.col.message')}
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -542,7 +542,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             color="text.disabled"
                             sx={{ fontSize: '0.75rem' }}
                           >
-                            {t('ripple.tracking.pending', '대기 중')}
+                            {t('ripple.tracking.pending')}
                           </Typography>
                         ) : (
                           <Typography
@@ -575,7 +575,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             color="success.main"
                             sx={{ fontSize: '0.72rem' }}
                           >
-                            {t('ripple.tracking.success', '성공')}
+                            {t('ripple.tracking.success')}
                           </Typography>
                         ) : null}
                       </TableCell>
@@ -600,7 +600,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
           }
         >
           {isPolling
-            ? t('ripple.tracking.tracking', '추적중...')
+            ? t('ripple.tracking.tracking')
             : t('common.close')}
         </Button>
       </DialogActions>

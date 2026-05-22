@@ -940,9 +940,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       if (!videoInfo) {
         alert(
           t(
-            'richTextEditor.invalidVideoUrl',
-            'Invalid video URL. Please use YouTube, Bilibili, or TikTok URL.'
-          )
+            'richTextEditor.invalidVideoUrl')
         );
         return;
       }
@@ -1724,22 +1722,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-header[value="1"]': t('richTextEditor.header1'),
       '.ql-header[value="2"]': t('richTextEditor.header2'),
       '.ql-header[value="3"]': t('richTextEditor.header3'),
-      '.ql-size': t('richTextEditor.size', 'Size'),
+      '.ql-size': t('richTextEditor.size'),
       '.ql-list[value="ordered"]': t('richTextEditor.orderedList'),
       '.ql-list[value="bullet"]': t('richTextEditor.bulletList'),
       '.ql-color': t('richTextEditor.textColor'),
       '.ql-background': t('richTextEditor.backgroundColor'),
-      '.ql-align': t('richTextEditor.align', 'Align'),
+      '.ql-align': t('richTextEditor.align'),
       '.ql-link': t('richTextEditor.link'),
       '.ql-image': t('richTextEditor.image'),
       '.ql-video': t('richTextEditor.video'),
-      '.ql-emoji': t('richTextEditor.emoji', 'Emoji'),
+      '.ql-emoji': t('richTextEditor.emoji'),
       '.ql-pageBackground': t(
-        'richTextEditor.pageBackground',
-        'Page Background'
-      ),
+        'richTextEditor.pageBackground'),
       '.ql-clean': t('richTextEditor.clean'),
-      '.ql-font .ql-picker-label': t('richTextEditor.font', 'Font'),
+      '.ql-font .ql-picker-label': t('richTextEditor.font'),
       '.ql-font .ql-picker-item': '', // No tooltip for items
     };
 
@@ -1879,10 +1875,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Create localized styles for the size picker
   const localizedSizeStyles = useMemo(
     () => `
-    .ql-picker.ql-size .ql-picker-label::before, .ql-picker.ql-size .ql-picker-item::before { content: "${t('richTextEditor.sizeNormal', 'Normal')}" !important; }
-    .ql-picker.ql-size .ql-picker-label[data-value="0.75em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="0.75em"]::before { content: "${t('richTextEditor.sizeSmall', 'Small')}" !important; }
-    .ql-picker.ql-size .ql-picker-label[data-value="1.5em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="1.5em"]::before { content: "${t('richTextEditor.sizeLarge', 'Large')}" !important; }
-    .ql-picker.ql-size .ql-picker-label[data-value="2.5em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="2.5em"]::before { content: "${t('richTextEditor.sizeHuge', 'Huge')}" !important; }
+    .ql-picker.ql-size .ql-picker-label::before, .ql-picker.ql-size .ql-picker-item::before { content: "${t('richTextEditor.sizeNormal')}" !important; }
+    .ql-picker.ql-size .ql-picker-label[data-value="0.75em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="0.75em"]::before { content: "${t('richTextEditor.sizeSmall')}" !important; }
+    .ql-picker.ql-size .ql-picker-label[data-value="1.5em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="1.5em"]::before { content: "${t('richTextEditor.sizeLarge')}" !important; }
+    .ql-picker.ql-size .ql-picker-label[data-value="2.5em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="2.5em"]::before { content: "${t('richTextEditor.sizeHuge')}" !important; }
   `,
     [t]
   );
@@ -2259,86 +2255,86 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     height: 28,
                     '& .MuiSelect-select': { py: 0.5, fontSize: '0.75rem' },
                   }}
-                  title={t('richTextEditor.effect', 'Effect')}
-                  renderValue={() => t('richTextEditor.effect', 'Effect')}
+                  title={t('richTextEditor.effect')}
+                  renderValue={() => t('richTextEditor.effect')}
                 >
                   <MenuItem value="none">
-                    <em>{t('richTextEditor.effectNone', 'None')}</em>
+                    <em>{t('richTextEditor.effectNone')}</em>
                   </MenuItem>
                   {/* Shadow Effects */}
                   <MenuItem
                     value="shadow"
                     sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
                   >
-                    {t('richTextEditor.effectShadow', 'Shadow')}
+                    {t('richTextEditor.effectShadow')}
                   </MenuItem>
                   <MenuItem
                     value="shadow-light"
                     sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
                   >
-                    {t('richTextEditor.effectShadowLight', 'Light Shadow')}
+                    {t('richTextEditor.effectShadowLight')}
                   </MenuItem>
                   <MenuItem
                     value="shadow-hard"
                     sx={{ textShadow: '3px 3px 0 rgba(0,0,0,0.8)' }}
                   >
-                    {t('richTextEditor.effectShadowHard', 'Hard Shadow')}
+                    {t('richTextEditor.effectShadowHard')}
                   </MenuItem>
                   {/* Glow Effects */}
                   <MenuItem
                     value="glow"
                     sx={{ textShadow: '0 0 10px currentColor' }}
                   >
-                    {t('richTextEditor.effectGlow', 'Glow')}
+                    {t('richTextEditor.effectGlow')}
                   </MenuItem>
                   <MenuItem
                     value="glow-blue"
                     sx={{ textShadow: '0 0 10px #00bfff, 0 0 20px #00bfff' }}
                   >
-                    {t('richTextEditor.effectGlowBlue', 'Blue Glow')}
+                    {t('richTextEditor.effectGlowBlue')}
                   </MenuItem>
                   <MenuItem
                     value="glow-gold"
                     sx={{ textShadow: '0 0 10px #ffd700, 0 0 20px #ffd700' }}
                   >
-                    {t('richTextEditor.effectGlowGold', 'Gold Glow')}
+                    {t('richTextEditor.effectGlowGold')}
                   </MenuItem>
                   <MenuItem
                     value="glow-red"
                     sx={{ textShadow: '0 0 10px #ff4444, 0 0 20px #ff4444' }}
                   >
-                    {t('richTextEditor.effectGlowRed', 'Red Glow')}
+                    {t('richTextEditor.effectGlowRed')}
                   </MenuItem>
                   <MenuItem
                     value="glow-green"
                     sx={{ textShadow: '0 0 10px #00ff88, 0 0 20px #00ff88' }}
                   >
-                    {t('richTextEditor.effectGlowGreen', 'Green Glow')}
+                    {t('richTextEditor.effectGlowGreen')}
                   </MenuItem>
                   <MenuItem
                     value="glow-purple"
                     sx={{ textShadow: '0 0 10px #a855f7, 0 0 20px #a855f7' }}
                   >
-                    {t('richTextEditor.effectGlowPurple', 'Purple Glow')}
+                    {t('richTextEditor.effectGlowPurple')}
                   </MenuItem>
                   {/* Outline Effects */}
                   <MenuItem
                     value="outline"
                     sx={{ WebkitTextStroke: '1px currentColor' }}
                   >
-                    {t('richTextEditor.effectOutline', 'Outline')}
+                    {t('richTextEditor.effectOutline')}
                   </MenuItem>
                   <MenuItem
                     value="outline-white"
                     sx={{ WebkitTextStroke: '1px white', color: 'black' }}
                   >
-                    {t('richTextEditor.effectOutlineWhite', 'White Outline')}
+                    {t('richTextEditor.effectOutlineWhite')}
                   </MenuItem>
                   <MenuItem
                     value="outline-black"
                     sx={{ WebkitTextStroke: '1px black' }}
                   >
-                    {t('richTextEditor.effectOutlineBlack', 'Black Outline')}
+                    {t('richTextEditor.effectOutlineBlack')}
                   </MenuItem>
                   {/* 3D Effects */}
                   <MenuItem
@@ -2348,7 +2344,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         '-1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)',
                     }}
                   >
-                    {t('richTextEditor.effectEmboss', 'Emboss')}
+                    {t('richTextEditor.effectEmboss')}
                   </MenuItem>
                   <MenuItem
                     value="engrave"
@@ -2357,7 +2353,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         '1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)',
                     }}
                   >
-                    {t('richTextEditor.effectEngrave', 'Engrave')}
+                    {t('richTextEditor.effectEngrave')}
                   </MenuItem>
                   <MenuItem
                     value="3d"
@@ -2365,13 +2361,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       textShadow: '0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb',
                     }}
                   >
-                    {t('richTextEditor.effect3D', '3D')}
+                    {t('richTextEditor.effect3D')}
                   </MenuItem>
                   <MenuItem
                     value="retro"
                     sx={{ textShadow: '3px 3px 0 #f0f, 6px 6px 0 #0ff' }}
                   >
-                    {t('richTextEditor.effectRetro', 'Retro')}
+                    {t('richTextEditor.effectRetro')}
                   </MenuItem>
                   {/* Neon Effects */}
                   <MenuItem
@@ -2381,7 +2377,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de',
                     }}
                   >
-                    {t('richTextEditor.effectNeon', 'Neon')}
+                    {t('richTextEditor.effectNeon')}
                   </MenuItem>
                   <MenuItem
                     value="neon-cyan"
@@ -2390,7 +2386,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00ffff',
                     }}
                   >
-                    {t('richTextEditor.effectNeonCyan', 'Cyan Neon')}
+                    {t('richTextEditor.effectNeonCyan')}
                   </MenuItem>
                   <MenuItem
                     value="neon-orange"
@@ -2399,7 +2395,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff6b00',
                     }}
                   >
-                    {t('richTextEditor.effectNeonOrange', 'Orange Neon')}
+                    {t('richTextEditor.effectNeonOrange')}
                   </MenuItem>
                   {/* Gradient Effects */}
                   <MenuItem
@@ -2411,7 +2407,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t('richTextEditor.effectGradientRainbow', 'Rainbow')}
+                    {t('richTextEditor.effectGradientRainbow')}
                   </MenuItem>
                   <MenuItem
                     value="gradient-gold"
@@ -2422,7 +2418,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t('richTextEditor.effectGradientGold', 'Gold Gradient')}
+                    {t('richTextEditor.effectGradientGold')}
                   </MenuItem>
                   <MenuItem
                     value="gradient-silver"
@@ -2434,9 +2430,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }}
                   >
                     {t(
-                      'richTextEditor.effectGradientSilver',
-                      'Silver Gradient'
-                    )}
+                      'richTextEditor.effectGradientSilver')}
                   </MenuItem>
                   <MenuItem
                     value="gradient-fire"
@@ -2447,7 +2441,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t('richTextEditor.effectGradientFire', 'Fire Gradient')}
+                    {t('richTextEditor.effectGradientFire')}
                   </MenuItem>
                   <MenuItem
                     value="gradient-ice"
@@ -2458,7 +2452,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t('richTextEditor.effectGradientIce', 'Ice Gradient')}
+                    {t('richTextEditor.effectGradientIce')}
                   </MenuItem>
                   <MenuItem
                     value="gradient-sunset"
@@ -2469,22 +2463,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }}
                   >
                     {t(
-                      'richTextEditor.effectGradientSunset',
-                      'Sunset Gradient'
-                    )}
+                      'richTextEditor.effectGradientSunset')}
                   </MenuItem>
                   {/* Animation Effects */}
                   <MenuItem
                     value="anim-blink"
                     sx={{ animation: 'ql-blink 1s step-end infinite' }}
                   >
-                    {t('richTextEditor.effectAnimBlink', 'Blink')}
+                    {t('richTextEditor.effectAnimBlink')}
                   </MenuItem>
                   <MenuItem
                     value="anim-pulse"
                     sx={{ animation: 'ql-pulse 1.5s ease-in-out infinite' }}
                   >
-                    {t('richTextEditor.effectAnimPulse', 'Pulse')}
+                    {t('richTextEditor.effectAnimPulse')}
                   </MenuItem>
                   <MenuItem
                     value="anim-shake"
@@ -2493,7 +2485,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       display: 'inline-block',
                     }}
                   >
-                    {t('richTextEditor.effectAnimShake', 'Shake')}
+                    {t('richTextEditor.effectAnimShake')}
                   </MenuItem>
                   <MenuItem
                     value="anim-bounce"
@@ -2502,7 +2494,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       display: 'inline-block',
                     }}
                   >
-                    {t('richTextEditor.effectAnimBounce', 'Bounce')}
+                    {t('richTextEditor.effectAnimBounce')}
                   </MenuItem>
                   <MenuItem
                     value="anim-glow-pulse"
@@ -2510,7 +2502,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       animation: 'ql-glow-pulse 1.5s ease-in-out infinite',
                     }}
                   >
-                    {t('richTextEditor.effectAnimGlowPulse', 'Glow Pulse')}
+                    {t('richTextEditor.effectAnimGlowPulse')}
                   </MenuItem>
                   <MenuItem
                     value="anim-float"
@@ -2519,7 +2511,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       display: 'inline-block',
                     }}
                   >
-                    {t('richTextEditor.effectAnimFloat', 'Float')}
+                    {t('richTextEditor.effectAnimFloat')}
                   </MenuItem>
                   <MenuItem
                     value="anim-jelly"
@@ -2528,7 +2520,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       display: 'inline-block',
                     }}
                   >
-                    {t('richTextEditor.effectAnimJelly', 'Jelly')}
+                    {t('richTextEditor.effectAnimJelly')}
                   </MenuItem>
                   <MenuItem
                     value="anim-swing"
@@ -2537,7 +2529,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       display: 'inline-block',
                     }}
                   >
-                    {t('richTextEditor.effectAnimSwing', 'Swing')}
+                    {t('richTextEditor.effectAnimSwing')}
                   </MenuItem>
                   <MenuItem
                     value="anim-heartbeat"
@@ -2546,7 +2538,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       display: 'inline-block',
                     }}
                   >
-                    {t('richTextEditor.effectAnimHeartbeat', 'Heartbeat')}
+                    {t('richTextEditor.effectAnimHeartbeat')}
                   </MenuItem>
                   <MenuItem
                     value="anim-rainbow"
@@ -2559,7 +2551,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       animation: 'ql-rainbow 3s linear infinite',
                     }}
                   >
-                    {t('richTextEditor.effectAnimRainbow', 'Rainbow Wave')}
+                    {t('richTextEditor.effectAnimRainbow')}
                   </MenuItem>
                 </Select>
 
@@ -2605,7 +2597,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 <IconButton
                   size="small"
                   onClick={handleCut}
-                  title={t('common.cut', 'Cut')}
+                  title={t('common.cut')}
                   sx={{ padding: '4px' }}
                 >
                   <CutIcon fontSize="small" />
@@ -2613,7 +2605,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 <IconButton
                   size="small"
                   onClick={handleCopy}
-                  title={t('common.copy', 'Copy')}
+                  title={t('common.copy')}
                   sx={{ padding: '4px' }}
                 >
                   <CopyIcon fontSize="small" />
@@ -2621,7 +2613,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 <IconButton
                   size="small"
                   onClick={handlePaste}
-                  title={t('common.paste', 'Paste')}
+                  title={t('common.paste')}
                   sx={{ padding: '4px' }}
                 >
                   <PasteIcon fontSize="small" />
@@ -2690,9 +2682,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               width={350}
               height={400}
               searchPlaceholder={t(
-                'richTextEditor.emojiSearch',
-                'Search emoji...'
-              )}
+                'richTextEditor.emojiSearch')}
               previewConfig={{
                 showPreview: false,
               }}
@@ -2700,50 +2690,42 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 {
                   category: Categories.SUGGESTED,
                   name: t(
-                    'richTextEditor.emojiFrequentlyUsed',
-                    'Frequently Used'
-                  ),
+                    'richTextEditor.emojiFrequentlyUsed'),
                 },
                 {
                   category: Categories.SMILEYS_PEOPLE,
                   name: t(
-                    'richTextEditor.emojiSmileysAndPeople',
-                    'Smileys & People'
-                  ),
+                    'richTextEditor.emojiSmileysAndPeople'),
                 },
                 {
                   category: Categories.ANIMALS_NATURE,
                   name: t(
-                    'richTextEditor.emojiAnimalsAndNature',
-                    'Animals & Nature'
-                  ),
+                    'richTextEditor.emojiAnimalsAndNature'),
                 },
                 {
                   category: Categories.FOOD_DRINK,
-                  name: t('richTextEditor.emojiFoodAndDrink', 'Food & Drink'),
+                  name: t('richTextEditor.emojiFoodAndDrink'),
                 },
                 {
                   category: Categories.TRAVEL_PLACES,
                   name: t(
-                    'richTextEditor.emojiTravelAndPlaces',
-                    'Travel & Places'
-                  ),
+                    'richTextEditor.emojiTravelAndPlaces'),
                 },
                 {
                   category: Categories.ACTIVITIES,
-                  name: t('richTextEditor.emojiActivities', 'Activities'),
+                  name: t('richTextEditor.emojiActivities'),
                 },
                 {
                   category: Categories.OBJECTS,
-                  name: t('richTextEditor.emojiObjects', 'Objects'),
+                  name: t('richTextEditor.emojiObjects'),
                 },
                 {
                   category: Categories.SYMBOLS,
-                  name: t('richTextEditor.emojiSymbols', 'Symbols'),
+                  name: t('richTextEditor.emojiSymbols'),
                 },
                 {
                   category: Categories.FLAGS,
-                  name: t('richTextEditor.emojiFlags', 'Flags'),
+                  name: t('richTextEditor.emojiFlags'),
                 },
               ]}
             />
@@ -2788,7 +2770,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <CutIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.cut', 'Cut')}</ListItemText>
+          <ListItemText>{t('common.cut')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -2799,7 +2781,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <CopyIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.copy', 'Copy')}</ListItemText>
+          <ListItemText>{t('common.copy')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -2810,7 +2792,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <PasteIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.paste', 'Paste')}</ListItemText>
+          <ListItemText>{t('common.paste')}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem onClick={insertEmoji}>
@@ -2818,7 +2800,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <EmojiIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('richTextEditor.insertEmoji', 'Insert Emoji')}
+            {t('richTextEditor.insertEmoji')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={insertLink}>
@@ -2826,7 +2808,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <LinkIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('richTextEditor.insertLink', 'Insert Link')}
+            {t('richTextEditor.insertLink')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={insertImage}>
@@ -2834,7 +2816,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <ImageIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('richTextEditor.insertImage', 'Insert Image')}
+            {t('richTextEditor.insertImage')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={insertVideo}>
@@ -2842,27 +2824,27 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <VideoIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('richTextEditor.insertVideo', 'Insert Video')}
+            {t('richTextEditor.insertVideo')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={formatBold}>
           <ListItemIcon>
             <BoldIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.bold', 'Bold')}</ListItemText>
+          <ListItemText>{t('richTextEditor.bold')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={formatItalic}>
           <ListItemIcon>
             <ItalicIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.italic', 'Italic')}</ListItemText>
+          <ListItemText>{t('richTextEditor.italic')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={formatUnderline}>
           <ListItemIcon>
             <UnderlineIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('richTextEditor.underline', 'Underline')}
+            {t('richTextEditor.underline')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={clearFormatting}>
@@ -2870,7 +2852,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <ClearIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('richTextEditor.clearFormatting', 'Clear Formatting')}
+            {t('richTextEditor.clearFormatting')}
           </ListItemText>
         </MenuItem>
       </Menu>
@@ -2914,22 +2896,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         fullWidth
       >
         <DialogTitle>
-          {t('richTextEditor.insertLink', 'Insert Link')}
+          {t('richTextEditor.insertLink')}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
             <TextField
               autoFocus
-              label={t('richTextEditor.linkUrl', 'URL')}
+              label={t('richTextEditor.linkUrl')}
               placeholder="https://example.com"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               fullWidth
               required
               helperText={t(
-                'richTextEditor.linkUrlHelp',
-                'Enter the web address (URL)'
-              )}
+                'richTextEditor.linkUrlHelp')}
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && linkUrl) {
                   handleLinkInsert();
@@ -2937,18 +2917,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }}
             />
             <TextField
-              label={t('richTextEditor.linkText', 'Display Text (Optional)')}
+              label={t('richTextEditor.linkText')}
               placeholder={t(
-                'richTextEditor.linkTextPlaceholder',
-                'Text to display'
-              )}
+                'richTextEditor.linkTextPlaceholder')}
               value={linkText}
               onChange={(e) => setLinkText(e.target.value)}
               fullWidth
               helperText={t(
-                'richTextEditor.linkTextHelp',
-                'Leave empty to use URL as text'
-              )}
+                'richTextEditor.linkTextHelp')}
               disabled={
                 savedSelectionRef.current &&
                 savedSelectionRef.current.length > 0
@@ -2958,14 +2934,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleLinkDialogClose}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleLinkInsert}
             variant="contained"
             disabled={!linkUrl}
           >
-            {t('common.insert', 'Insert')}
+            {t('common.insert')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -3811,7 +3787,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      {t('richTextEditor.validatingVideoUrl', 'URL 검증 중...')}
+                      {t('richTextEditor.validatingVideoUrl')}
                     </Typography>
                   </Paper>
                 ) : videoUrl ? (

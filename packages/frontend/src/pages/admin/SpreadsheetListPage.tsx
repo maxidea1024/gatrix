@@ -115,7 +115,7 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.rename', 'Rename')}</ListItemText>
+          <ListItemText>{t('common.rename')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -126,7 +126,7 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('common.duplicate', 'Duplicate')}</ListItemText>
+          <ListItemText>{t('common.duplicate')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -138,7 +138,7 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({
             <ExportIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t('spreadsheets.exportXlsx', 'Export as XLSX')}
+            {t('spreadsheets.exportXlsx')}
           </ListItemText>
         </MenuItem>
         <MenuItem
@@ -151,7 +151,7 @@ const SpreadsheetRowMenu: React.FC<RowMenuProps> = ({
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete', 'Delete')}</ListItemText>
+          <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>
       </Menu>
     </>
@@ -227,7 +227,7 @@ const SpreadsheetListPage: React.FC = () => {
       setItems(result.items);
     } catch (err) {
       enqueueSnackbar(
-        t('spreadsheets.loadError', 'Failed to load spreadsheets'),
+        t('spreadsheets.loadError'),
         {
           variant: 'error',
         }
@@ -247,7 +247,7 @@ const SpreadsheetListPage: React.FC = () => {
       navigate(`/admin/spreadsheets/${created.id}`);
     } catch {
       enqueueSnackbar(
-        t('spreadsheets.createError', 'Failed to create spreadsheet'),
+        t('spreadsheets.createError'),
         {
           variant: 'error',
         }
@@ -305,7 +305,7 @@ const SpreadsheetListPage: React.FC = () => {
       try {
         await spreadsheetService.duplicate(id);
         enqueueSnackbar(
-          t('spreadsheets.duplicated', 'Spreadsheet duplicated'),
+          t('spreadsheets.duplicated'),
           {
             variant: 'success',
           }
@@ -326,7 +326,7 @@ const SpreadsheetListPage: React.FC = () => {
     setItems((prev) => prev.filter((i) => i.id !== targetId));
     try {
       await spreadsheetService.delete(targetId);
-      enqueueSnackbar(t('spreadsheets.deleted', 'Spreadsheet deleted'), {
+      enqueueSnackbar(t('spreadsheets.deleted'), {
         variant: 'success',
       });
     } catch {
@@ -374,18 +374,18 @@ const SpreadsheetListPage: React.FC = () => {
       try {
         const data = await spreadsheetService.getById(item.id);
         if (!data.sheetData) {
-          enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), {
+          enqueueSnackbar(t('spreadsheets.exportError'), {
             variant: 'warning',
           });
           return;
         }
         await exportSnapshotToXlsx(data.sheetData, item.title || 'spreadsheet');
         enqueueSnackbar(
-          t('spreadsheets.exportSuccess', 'Exported successfully'),
+          t('spreadsheets.exportSuccess'),
           { variant: 'success' }
         );
       } catch {
-        enqueueSnackbar(t('spreadsheets.exportError', 'Export failed'), {
+        enqueueSnackbar(t('spreadsheets.exportError'), {
           variant: 'error',
         });
       }
@@ -429,13 +429,13 @@ const SpreadsheetListPage: React.FC = () => {
         await new Promise((r) => setTimeout(r, 1000));
 
         enqueueSnackbar(
-          t('spreadsheets.importSuccess', 'Imported successfully'),
+          t('spreadsheets.importSuccess'),
           { variant: 'success' }
         );
         navigate(`/admin/spreadsheets/${created.id}`);
       } catch (err) {
         console.error('XLSX import error:', err);
-        enqueueSnackbar(t('spreadsheets.importError', 'Import failed'), {
+        enqueueSnackbar(t('spreadsheets.importError'), {
           variant: 'error',
         });
       } finally {
@@ -456,16 +456,14 @@ const SpreadsheetListPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         icon={<GridOnIcon />}
-        title={t('spreadsheets.title', 'Spreadsheets')}
+        title={t('spreadsheets.title')}
         subtitle={t(
-          'spreadsheets.subtitle',
-          'Create and manage spreadsheets with formulas, filters, and formatting.'
-        )}
+          'spreadsheets.subtitle')}
         actions={
           <>
             <ButtonGroup variant="contained">
               <Button startIcon={<AddIcon />} onClick={handleCreate}>
-                {t('spreadsheets.createNew', 'New Spreadsheet')}
+                {t('spreadsheets.createNew')}
               </Button>
               <Button
                 size="small"
@@ -491,7 +489,7 @@ const SpreadsheetListPage: React.FC = () => {
                   <NoteAddIcon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>
-                  {t('spreadsheets.createEmpty', 'Empty spreadsheet')}
+                  {t('spreadsheets.createEmpty')}
                 </ListItemText>
               </MenuItem>
               <MenuItem
@@ -504,7 +502,7 @@ const SpreadsheetListPage: React.FC = () => {
                   <ImportIcon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>
-                  {t('spreadsheets.importXlsx', 'Import XLSX')}
+                  {t('spreadsheets.importXlsx')}
                 </ListItemText>
               </MenuItem>
             </Menu>
@@ -531,7 +529,7 @@ const SpreadsheetListPage: React.FC = () => {
         >
           <SearchTextField
             placeholder={
-              t('spreadsheets.search', 'Search spreadsheets...') as string
+              t('spreadsheets.search') as string
             }
             value={search}
             onChange={setSearch}
@@ -557,18 +555,14 @@ const SpreadsheetListPage: React.FC = () => {
         {items.length === 0 && !debouncedSearch && !search ? (
           <EmptyPagePlaceholder
             message={t(
-              'spreadsheets.emptyDescription',
-              'Create your first spreadsheet to organize data with formulas, filters, and formatting.'
-            )}
+              'spreadsheets.emptyDescription')}
             onAddClick={handleCreate}
-            addButtonLabel={t('spreadsheets.createNew', 'New Spreadsheet')}
+            addButtonLabel={t('spreadsheets.createNew')}
           />
         ) : items.length === 0 && debouncedSearch === search && search ? (
           <EmptyPagePlaceholder
             message={t(
-              'spreadsheets.noResults',
-              'No spreadsheets match your search.'
-            )}
+              'spreadsheets.noResults')}
           />
         ) : viewMode === 'grid' ? (
           <Grid container spacing={2}>
@@ -607,13 +601,13 @@ const SpreadsheetListPage: React.FC = () => {
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, width: 40 }} />
                   <TableCell sx={{ fontWeight: 600 }}>
-                    {t('common.title', 'Title')}
+                    {t('common.title')}
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, width: 140 }}>
-                    {t('common.createdBy', 'Created by')}
+                    {t('common.createdBy')}
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, width: 150 }}>
-                    {t('common.updatedAt', 'Updated')}
+                    {t('common.updatedAt')}
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, width: 50 }} />
                 </TableRow>
@@ -639,8 +633,8 @@ const SpreadsheetListPage: React.FC = () => {
                       <Tooltip
                         title={
                           item.isPinned
-                            ? t('common.unpin', 'Unpin')
-                            : t('common.pin', 'Pin')
+                            ? t('common.unpin')
+                            : t('common.pin')
                         }
                       >
                         <IconButton
@@ -703,7 +697,7 @@ const SpreadsheetListPage: React.FC = () => {
                             >
                               {item.title}
                             </Typography>
-                            <Tooltip title={t('common.rename', 'Rename')}>
+                            <Tooltip title={t('common.rename')}>
                               <IconButton
                                 size="small"
                                 onClick={() => {
@@ -749,7 +743,7 @@ const SpreadsheetListPage: React.FC = () => {
                           gap: 0.5,
                         }}
                       >
-                        <Tooltip title={t('spreadsheets.share', '공유')}>
+                        <Tooltip title={t('spreadsheets.share')}>
                           <IconButton
                             size="small"
                             onClick={() => setShareTarget(item)}
@@ -781,7 +775,7 @@ const SpreadsheetListPage: React.FC = () => {
       {/* Delete Dialog */}
       <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
         <DialogTitle>
-          {t('spreadsheets.deleteTitle', 'Delete Spreadsheet')}
+          {t('spreadsheets.deleteTitle')}
         </DialogTitle>
         <DialogContent>
           <Typography>
@@ -796,14 +790,14 @@ const SpreadsheetListPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteTarget(null)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             color="error"
             variant="contained"
             onClick={handleDeleteConfirm}
           >
-            {t('common.delete', 'Delete')}
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

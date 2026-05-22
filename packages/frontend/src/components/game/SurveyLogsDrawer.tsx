@@ -222,21 +222,21 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
   const statCards = useMemo(
     () => [
       {
-        label: t('surveys.logsDrawer.total', 'Total'),
+        label: t('surveys.logsDrawer.total'),
         value: stats.total,
         filter: 'ALL' as const,
         gradient: 'linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%)',
         shadow: 'rgba(92,107,192,0.4)',
       },
       {
-        label: t('surveys.logsDrawer.joined', 'Joined'),
+        label: t('surveys.logsDrawer.joined'),
         value: stats.joined,
         filter: 'JOINED' as const,
         gradient: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
         shadow: 'rgba(102,187,106,0.4)',
       },
       {
-        label: t('surveys.logsDrawer.sent', 'Sent'),
+        label: t('surveys.logsDrawer.sent'),
         value: stats.sent,
         filter: 'SENT' as const,
         gradient: 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
@@ -250,7 +250,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={t('surveys.logsDrawer.title', 'Participation Logs') as string}
+      title={t('surveys.logsDrawer.title') as string}
       subtitle={survey ? `${survey.surveyTitle}` : ''}
       storageKey="surveyLogsDrawerWidth"
       defaultWidth={720}
@@ -327,9 +327,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
             value={searchTerm}
             onChange={setSearchTerm}
             placeholder={t(
-              'surveys.logsDrawer.searchPlaceholder',
-              'Search by account ID or user name...'
-            )}
+              'surveys.logsDrawer.searchPlaceholder')}
             size="small"
           />
 
@@ -338,7 +336,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
             {logs.length === 0 ? (
               <Box sx={{ mt: 2 }}>
                 <EmptyPagePlaceholder
-                  message={t('surveys.logs.noRecords', 'No survey logs found.')}
+                  message={t('surveys.logs.noRecords')}
                 />
               </Box>
             ) : (
@@ -354,7 +352,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           direction={sortBy === 'action' ? sortOrder : 'asc'}
                           onClick={() => handleSort('action')}
                         >
-                          {t('surveys.logs.columns.action', 'Action')}
+                          {t('surveys.logs.columns.action')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -367,7 +365,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           direction={sortBy === 'accountId' ? sortOrder : 'asc'}
                           onClick={() => handleSort('accountId')}
                         >
-                          {t('surveys.logs.columns.accountId', 'Account ID')}
+                          {t('surveys.logs.columns.accountId')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -381,9 +379,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           onClick={() => handleSort('userName')}
                         >
                           {t(
-                            'coupons.couponUsage.columns.userName',
-                            'User Name'
-                          )}
+                            'coupons.couponUsage.columns.userName')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -394,7 +390,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           direction={sortBy === 'worldId' ? sortOrder : 'asc'}
                           onClick={() => handleSort('worldId')}
                         >
-                          {t('surveys.logs.columns.worldId', 'World')}
+                          {t('surveys.logs.columns.worldId')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -408,9 +404,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           onClick={() => handleSort('platform')}
                         >
                           {t(
-                            'coupons.couponUsage.columns.platform',
-                            'Platform'
-                          )}
+                            'coupons.couponUsage.columns.platform')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -421,7 +415,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           direction={sortBy === 'channel' ? sortOrder : 'asc'}
                           onClick={() => handleSort('channel')}
                         >
-                          {t('coupons.couponUsage.columns.channel', 'Channel')}
+                          {t('coupons.couponUsage.columns.channel')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -437,9 +431,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           onClick={() => handleSort('subchannel')}
                         >
                           {t(
-                            'coupons.couponUsage.columns.subChannel',
-                            'Subchannel'
-                          )}
+                            'coupons.couponUsage.columns.subChannel')}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell
@@ -454,7 +446,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                           }
                           onClick={() => handleSort('createdAt')}
                         >
-                          {t('surveys.logs.columns.createdAt', 'Date')}
+                          {t('surveys.logs.columns.createdAt')}
                         </TableSortLabel>
                       </TableCell>
                     </TableRow>

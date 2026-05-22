@@ -41,7 +41,7 @@ const SpreadsheetEmptyState: React.FC<SpreadsheetEmptyStateProps> = ({
       </Box>
 
       <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
-        {t('spreadsheets.emptyTitle', 'No spreadsheets yet')}
+        {t('spreadsheets.emptyTitle')}
       </Typography>
 
       <Typography
@@ -50,9 +50,7 @@ const SpreadsheetEmptyState: React.FC<SpreadsheetEmptyStateProps> = ({
         sx={{ maxWidth: 360, textAlign: 'center' }}
       >
         {t(
-          'spreadsheets.emptyDescription',
-          'Create your first spreadsheet to start organizing data with formulas, filters, and formatting.'
-        )}
+          'spreadsheets.emptyDescription')}
       </Typography>
 
       <Button
@@ -62,7 +60,7 @@ const SpreadsheetEmptyState: React.FC<SpreadsheetEmptyStateProps> = ({
         size="large"
         sx={{ mt: 1, borderRadius: 2, textTransform: 'none', px: 4 }}
       >
-        {t('spreadsheets.createNew', 'New Spreadsheet')}
+        {t('spreadsheets.createNew')}
       </Button>
     </Box>
   );

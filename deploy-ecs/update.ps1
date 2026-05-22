@@ -85,33 +85,54 @@ function Update-ECSService($svcName, $ver) {
     # Get current task definition
     $currentTaskDef = aws ecs describe-services --cluster $ClusterName --services $ecsServiceName --region $Region --query "services[0].taskDefinition" --output text
 
-    # Get task definition JSON, update image
+    # Get raw JSON for container definitions (avoid PSCustomObject round-trip issues)
+    $containerDefsJson = aws ecs describe-task-definition --task-definition $currentTaskDef --region $Region --query "taskDefinition.containerDefinitions" --output json
     $taskDefJson = aws ecs describe-task-definition --task-definition $currentTaskDef --region $Region --query "taskDefinition" --output json | ConvertFrom-Json
 
-    # Register new task definition with updated image
-    $containerDefs = $taskDefJson.containerDefinitions | ForEach-Object {
-        $_.image = $newImage
-        $_
-    }
+    # Replace image in raw JSON string (all container images point to this service)
+    $oldImagePattern = [regex]::Escape("$EcrRegistry/gatrix-$svcName") + ':[^"]*'
+    $updatedJson = ($containerDefsJson -join "`n") -replace $oldImagePattern, "$EcrRegistry/gatrix-$svcName`:$ver"
 
-    $newTaskDefArn = aws ecs register-task-definition `
-        --family $taskDefJson.family `
-        --container-definitions ($containerDefs | ConvertTo-Json -Depth 10 -Compress) `
-        --cpu $taskDefJson.cpu `
-        --memory $taskDefJson.memory `
-        --network-mode $taskDefJson.networkMode `
-        --requires-compatibilities FARGATE `
-        --execution-role-arn $taskDefJson.executionRoleArn `
-        --task-role-arn $taskDefJson.taskRoleArn `
-        --region $Region `
-        --query "taskDefinition.taskDefinitionArn" `
-        --output text
+    # Write to temp file (UTF-8 without BOM)
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    try {
+        [System.IO.File]::WriteAllText($tempFile, $updatedJson, [System.Text.UTF8Encoding]::new($false))
+
+        $registerArgs = @(
+            "ecs", "register-task-definition",
+            "--family", $taskDefJson.family,
+            "--container-definitions", "file://$tempFile",
+            "--cpu", "$($taskDefJson.cpu)",
+            "--memory", "$($taskDefJson.memory)",
+            "--network-mode", $taskDefJson.networkMode,
+            "--requires-compatibilities", "FARGATE",
+            "--execution-role-arn", $taskDefJson.executionRoleArn,
+            "--task-role-arn", $taskDefJson.taskRoleArn,
+            "--region", $Region,
+            "--query", "taskDefinition.taskDefinitionArn",
+            "--output", "text"
+        )
+        $newTaskDefArn = aws @registerArgs
+        if ($LASTEXITCODE -ne 0) {
+            Show-Error "Failed to register task definition for $svcName"
+            return
+        }
+    } finally {
+        Remove-Item $tempFile -ErrorAction SilentlyContinue
+    }
 
     Show-Info "New task definition: $newTaskDefArn"
 
     # Update service
-    $forceFlag = if ($Force) { "--force-new-deployment" } else { "" }
-    aws ecs update-service --cluster $ClusterName --service $ecsServiceName --task-definition $newTaskDefArn $forceFlag --region $Region | Out-Null
+    $updateArgs = @(
+        "ecs", "update-service",
+        "--cluster", $ClusterName,
+        "--service", $ecsServiceName,
+        "--task-definition", $newTaskDefArn,
+        "--region", $Region
+    )
+    if ($Force) { $updateArgs += "--force-new-deployment" }
+    aws @updateArgs | Out-Null
 
     Show-Success "Update initiated for: $svcName"
 }
@@ -142,9 +163,20 @@ if ($Service) {
 Write-Host ""
 Show-Info "Waiting for services to stabilize..."
 $waitServices = if ($Service) { @("$Prefix-$Service") } else { @("$Prefix-backend", "$Prefix-frontend", "$Prefix-edge") }
+
+# Temporarily allow stderr without terminating (aws ecs wait writes progress to stderr)
+$prevEAP = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
 foreach ($svc in $waitServices) {
-    aws ecs wait services-stable --cluster $ClusterName --services $svc --region $Region 2>&1
+    Show-Info "Waiting for $svc..."
+    aws ecs wait services-stable --cluster $ClusterName --services $svc --region $Region 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Show-Success "$svc is stable"
+    } else {
+        Show-Warn "$svc may not be fully stable yet (check ECS console)"
+    }
 }
+$ErrorActionPreference = $prevEAP
 
 Write-Host ""
 Show-Info "Current service status:"
@@ -154,3 +186,4 @@ foreach ($svc in $waitServices) {
 }
 
 Show-Success "Update completed!"
+

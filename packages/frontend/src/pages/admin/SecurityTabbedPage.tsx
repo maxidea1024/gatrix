@@ -86,9 +86,7 @@ const SecurityTabbedPage: React.FC = () => {
       <PageHeader
         title={t('sidebar.security')}
         subtitle={t(
-          'security.subtitle',
-          'API 토큰과 IP 화이트리스트를 관리합니다.'
-        )}
+          'security.subtitle')}
       />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>

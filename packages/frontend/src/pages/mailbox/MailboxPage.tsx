@@ -548,10 +548,11 @@ const MailboxPage: React.FC = () => {
       sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}
     >
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <MailIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <PageHeader icon={<CreateIcon />} title={t('mailbox.title')} />
+      <PageHeader
+        icon={<MailIcon />}
+        title={t('mailbox.title')}
+        subtitle={t('mailbox.subtitle')}
+        actions={
           <Button
             variant="contained"
             startIcon={<CreateIcon />}
@@ -559,11 +560,8 @@ const MailboxPage: React.FC = () => {
           >
             {t('mailbox.compose')}
           </Button>
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          {t('mailbox.subtitle')}
-        </Typography>
-      </Box>
+        }
+      />
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>

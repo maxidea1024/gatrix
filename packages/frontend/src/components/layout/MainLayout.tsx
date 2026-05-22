@@ -797,12 +797,26 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     window.location.reload();
   }, [navigate]);
 
-  // Maintenance banner state
+  // Maintenance banner state - restore from sessionStorage to survive MainLayout remounts
+  // (remounts happen when navigating between routes using MainLayout vs EnvironmentAwareLayout)
+  const MAINT_CACHE_KEY = 'gatrix_maintenance_status';
   const [maintenanceStatus, setMaintenanceStatus] = useState<{
     isMaintenance: boolean;
     status: MaintenanceStatusType;
     detail: MaintenanceDetail | null;
-  }>({ isMaintenance: false, status: 'inactive', detail: null });
+  }>(() => {
+    try {
+      const cached = sessionStorage.getItem(MAINT_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed.isMaintenance === 'boolean') {
+          return parsed;
+        }
+      }
+    } catch { /* ignore */ }
+    return { isMaintenance: false, status: 'inactive', detail: null };
+  });
+  const [maintenanceTooltipOpen, setMaintenanceTooltipOpen] = useState(false);
   const prevMaintenanceRef = useRef<{
     isMaintenance: boolean;
     status: MaintenanceStatusType;
@@ -812,6 +826,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const maintenanceUpdatedBySSE = useRef(false);
   const maintenanceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Persist maintenance status to sessionStorage on changes
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(MAINT_CACHE_KEY, JSON.stringify(maintenanceStatus));
+    } catch { /* ignore */ }
+  }, [maintenanceStatus]);
+
+  // Track previous environment to detect actual changes
+  const prevEnvironmentIdRef = useRef<string | null>(null);
+  const maintenanceInitialFetchDone = useRef(false);
+
   // Initial load - only for admin users with environment access
   useEffect(() => {
     // Skip maintenance status check for users without environment access or no environment selected
@@ -819,16 +844,25 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       return;
     }
 
-    // Reset refs when environment changes to avoid stale state from previous environment
-    maintenanceUpdatedBySSE.current = false;
-    prevMaintenanceRef.current = null;
+    const isSameEnvironment =
+      prevEnvironmentIdRef.current === currentEnvironmentId;
 
-    // Reset maintenance status immediately when environment changes
-    setMaintenanceStatus({
-      isMaintenance: false,
-      status: 'inactive',
-      detail: null,
-    });
+    // Skip re-fetch if same environment already loaded (SSE keeps it up-to-date)
+    if (isSameEnvironment && maintenanceInitialFetchDone.current) {
+      return;
+    }
+
+    // Reset state only when switching to a different environment
+    if (prevEnvironmentIdRef.current !== null && !isSameEnvironment) {
+      maintenanceUpdatedBySSE.current = false;
+      prevMaintenanceRef.current = null;
+      setMaintenanceStatus({
+        isMaintenance: false,
+        status: 'inactive',
+        detail: null,
+      });
+    }
+    prevEnvironmentIdRef.current = currentEnvironmentId;
 
     let cancelled = false;
     const projectApiPath = getProjectApiPath();
@@ -836,22 +870,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       .getStatus(projectApiPath)
       .then(({ isUnderMaintenance, detail }) => {
         if (cancelled) return;
-        if (maintenanceUpdatedBySSE.current) return; // keep SSE-updated status
-        const status = computeMaintenanceStatus(!!isUnderMaintenance, detail);
-        setMaintenanceStatus({
-          isMaintenance: !!isUnderMaintenance,
-          status,
-          detail: detail || null,
+        if (maintenanceUpdatedBySSE.current) return;
+        maintenanceInitialFetchDone.current = true;
+        const nextIsMaintenance = !!isUnderMaintenance;
+        const status = computeMaintenanceStatus(nextIsMaintenance, detail);
+        const nextDetail = detail || null;
+        setMaintenanceStatus((prev) => {
+          if (
+            prev.isMaintenance === nextIsMaintenance &&
+            prev.status === status &&
+            JSON.stringify(prev.detail) === JSON.stringify(nextDetail)
+          ) {
+            return prev;
+          }
+          return { isMaintenance: nextIsMaintenance, status, detail: nextDetail };
         });
       })
       .catch(() => {
         if (cancelled) return;
         if (maintenanceUpdatedBySSE.current) return;
-        setMaintenanceStatus({
-          isMaintenance: false,
-          status: 'inactive',
-          detail: null,
-        });
+        maintenanceInitialFetchDone.current = true;
+        // Keep existing state on error - don't reset a visible banner
       });
     return () => {
       cancelled = true;
@@ -1123,6 +1162,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const handleMaintenanceBannerClick = () => {
+    setMaintenanceTooltipOpen(false);
     navigate('/admin/maintenance');
   };
 
@@ -1221,10 +1261,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       if (!menuInfo) return;
 
       setRecentPages((prev) => {
-        // If already in list, don't reorder ??just keep it in place
-        if (prev.some((p) => p.path === path)) return prev;
+        // Already at the top — skip re-render entirely
+        if (prev.length > 0 && prev[0].path === path) return prev;
 
-        // New page: insert at top, trim to max
+        // Remove if already in list (will be re-inserted at top)
+        const filtered = prev.filter((p) => p.path !== path);
+
+        // Insert at top, trim to max
         const updated = [
           {
             path,
@@ -1232,7 +1275,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             parentText: menuInfo.parentText,
             iconName: menuInfo.iconName,
           },
-          ...prev,
+          ...filtered,
         ].slice(0, MAX_RECENT_PAGES);
         try {
           localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(updated));
@@ -1275,15 +1318,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return recentPages.filter((page) => findMenuItemByPath(page.path) !== null);
   }, [recentPages, findMenuItemByPath]);
 
-  const openOrNavigate = (path: string) => {
+  const openOrNavigate = (
+    path: string,
+    options?: { skipRecentUpdate?: boolean }
+  ) => {
     if (path === '/logout') {
       handleLogoutClick();
     } else if (/^https?:\/\//i.test(path)) {
       window.open(path, '_blank', 'noopener,noreferrer');
     } else {
-      // flushSync ensures the recent pages list updates in the same render
-      // as the navigation, so the new item appears already selected
-      flushSync(() => addRecentPage(path));
+      if (!options?.skipRecentUpdate) {
+        flushSync(() => addRecentPage(path));
+      }
       navigate(path);
     }
   };
@@ -1425,8 +1471,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               isOpen={true}
               onClose={() => setMobileOpen(false)}
               recentPages={filteredRecentPages}
-              onNavigate={(path) => {
-                openOrNavigate(path);
+              onNavigate={(path, options) => {
+                openOrNavigate(path, options);
                 setMobileOpen(false);
               }}
               onRemoveRecent={(path) =>
@@ -1464,14 +1510,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             backgroundColor: theme.palette.background.paper,
             color: theme.palette.text.primary,
             boxShadow: 'none',
-            borderBottom: 'none',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
             zIndex: (theme) => theme.zIndex.appBar,
           }}
         >
           <Toolbar
             sx={{
               justifyContent: 'space-between',
-              minHeight: 64,
+              minHeight: '63px !important',
+              px: { xs: 1, sm: 2 },
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -1492,35 +1540,36 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {maintenanceStatus.isMaintenance && (
               <Tooltip
                 title={
-                  <Box sx={{ p: 1.5, minWidth: 300 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}
+                  <Box sx={{ minWidth: 280, maxWidth: 320 }}>
+                    {/* Header with accent bar */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        p: 1.5,
+                        pb: 1,
+                        borderBottom: '1px solid rgba(255,255,255,0.1)',
+                      }}
                     >
-                      ?뵩 {t('maintenance.tooltipTitle')}
-                    </Typography>
-
-                    {/* Status */}
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 1, display: 'flex', alignItems: 'center' }}
-                    >
-                      <strong style={{ minWidth: '60px' }}>
-                        {t('maintenance.tooltipStatus')}:
-                      </strong>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}
+                      >
+                        {t('maintenance.tooltipTitle')}
+                      </Typography>
                       <Box
-                        component="span"
                         sx={{
-                          ml: 1,
                           px: 1,
                           py: 0.25,
-                          borderRadius: 1,
-                          backgroundColor: getMaintenanceStatusDisplay(
+                          borderRadius: 0.75,
+                          bgcolor: getMaintenanceStatusDisplay(
                             maintenanceStatus.status
                           ).color,
-                          color: 'white',
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
+                          color: '#fff',
+                          fontSize: '0.675rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
                         }}
                       >
                         {t(
@@ -1528,136 +1577,184 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                             .label
                         )}
                       </Box>
-                    </Typography>
+                    </Box>
 
-                    {/* Type */}
-                    {maintenanceStatus.detail?.type && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: '60px' }}>
-                          {t('maintenance.tooltipType')}:
-                        </strong>{' '}
-                        {(() => {
-                          switch (maintenanceStatus.detail.type) {
-                            case 'emergency':
-                              return t('maintenance.emergencyLabel');
-                            case 'regular':
-                              return t('maintenance.regularLabel');
-                            default:
-                              return t('maintenance.immediateStartLabel');
-                          }
-                        })()}
-                      </Typography>
-                    )}
-
-                    {/* Start time */}
-                    {maintenanceStatus.detail?.startsAt && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: '60px' }}>
-                          {t('maintenance.tooltipStartTime')}:
-                        </strong>{' '}
-                        {formatDateTimeDetailed(
-                          maintenanceStatus.detail.startsAt
-                        )}
-                      </Typography>
-                    )}
-
-                    {/* End time */}
-                    {maintenanceStatus.detail?.endsAt && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: '60px' }}>
-                          {t('maintenance.tooltipEndTime')}:
-                        </strong>{' '}
-                        {formatDateTimeDetailed(
-                          maintenanceStatus.detail.endsAt
-                        )}
-                      </Typography>
-                    )}
-
-                    {/* Duration */}
-                    {maintenanceStatus.detail?.startsAt &&
-                      maintenanceStatus.detail?.endsAt && (
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                          <strong style={{ minWidth: '60px' }}>
-                            {t('maintenance.tooltipDuration')}:
-                          </strong>{' '}
-                          {(() => {
-                            const start = new Date(
-                              maintenanceStatus.detail.startsAt
-                            );
-                            const end = new Date(
-                              maintenanceStatus.detail.endsAt
-                            );
-                            const diffMs = end.getTime() - start.getTime();
-                            const diffHours = Math.floor(
-                              diffMs / (1000 * 60 * 60)
-                            );
-                            const diffMinutes = Math.floor(
-                              (diffMs % (1000 * 60 * 60)) / (1000 * 60)
-                            );
-
-                            if (diffHours > 0) {
-                              return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
-                            } else {
-                              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
-                            }
-                          })()}
-                        </Typography>
+                    {/* Info rows */}
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto 1fr',
+                        gap: '6px 12px',
+                        p: 1.5,
+                        fontSize: '0.8rem',
+                      }}
+                    >
+                      {/* Type */}
+                      {maintenanceStatus.detail?.type && (
+                        <>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                          >
+                            {t('maintenance.tooltipType')}
+                          </Typography>
+                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                            {(() => {
+                              switch (maintenanceStatus.detail.type) {
+                                case 'emergency':
+                                  return t('maintenance.emergencyLabel');
+                                case 'regular':
+                                  return t('maintenance.regularLabel');
+                                default:
+                                  return t('maintenance.immediateStartLabel');
+                              }
+                            })()}
+                          </Typography>
+                        </>
                       )}
+
+                      {/* Start time */}
+                      {maintenanceStatus.detail?.startsAt && (
+                        <>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                          >
+                            {t('maintenance.tooltipStartTime')}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 500, fontFamily: 'monospace' }}
+                          >
+                            {formatDateTimeDetailed(
+                              maintenanceStatus.detail.startsAt
+                            )}
+                          </Typography>
+                        </>
+                      )}
+
+                      {/* End time */}
+                      {maintenanceStatus.detail?.endsAt && (
+                        <>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                          >
+                            {t('maintenance.tooltipEndTime')}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 500, fontFamily: 'monospace' }}
+                          >
+                            {formatDateTimeDetailed(
+                              maintenanceStatus.detail.endsAt
+                            )}
+                          </Typography>
+                        </>
+                      )}
+
+                      {/* Duration */}
+                      {maintenanceStatus.detail?.startsAt &&
+                        maintenanceStatus.detail?.endsAt && (
+                        <>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}
+                          >
+                            {t('maintenance.tooltipDuration')}
+                          </Typography>
+                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                            {(() => {
+                              const start = new Date(
+                                maintenanceStatus.detail.startsAt
+                              );
+                              const end = new Date(
+                                maintenanceStatus.detail.endsAt
+                              );
+                              const diffMs = end.getTime() - start.getTime();
+                              const diffHours = Math.floor(
+                                diffMs / (1000 * 60 * 60)
+                              );
+                              const diffMinutes = Math.floor(
+                                (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+                              );
+                              if (diffHours > 0) {
+                                return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                              }
+                              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            })()}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
 
                     {/* Message */}
                     {maintenanceStatus.detail?.message && (
-                      <Typography variant="body2" sx={{ mb: 1.5 }}>
-                        <strong style={{ minWidth: '60px' }}>
-                          {t('maintenance.tooltipMessage')}:
-                        </strong>
-                        <Box
-                          component="div"
+                      <Box
+                        sx={{
+                          mx: 1.5,
+                          mb: 1,
+                          p: 1,
+                          bgcolor: 'rgba(255,255,255,0.06)',
+                          borderRadius: 1,
+                          borderLeft: '2px solid rgba(255,255,255,0.2)',
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
                           sx={{
-                            mt: 0.5,
-                            p: 1,
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            borderRadius: 1,
-                            fontStyle: 'italic',
-                            maxWidth: '250px',
                             wordBreak: 'break-word',
+                            lineHeight: 1.5,
+                            display: 'block',
                           }}
                         >
                           {maintenanceStatus.detail.message}
-                        </Box>
-                      </Typography>
+                        </Typography>
+                      </Box>
                     )}
 
-                    <Typography
-                      variant="caption"
+                    {/* Footer CTA */}
+                    <Box
                       onClick={handleMaintenanceBannerClick}
                       sx={{
-                        fontStyle: 'italic',
-                        opacity: 0.8,
                         display: 'flex',
                         alignItems: 'center',
-                        mt: 1,
-                        pt: 1,
-                        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                        justifyContent: 'center',
+                        gap: 0.5,
+                        py: 1,
+                        mx: 1.5,
+                        mb: 1,
+                        borderRadius: 1,
+                        bgcolor: 'rgba(255,255,255,0.08)',
                         cursor: 'pointer',
+                        transition: 'background-color 0.15s',
                         '&:hover': {
-                          opacity: 1,
-                          textDecoration: 'underline',
+                          bgcolor: 'rgba(255,255,255,0.15)',
                         },
                       }}
                     >
-                      ?뮕 {t('maintenance.clickToManageTooltip')}
-                    </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+                      >
+                        {t('maintenance.clickToManageTooltip')}
+                      </Typography>
+                    </Box>
                   </Box>
                 }
                 arrow
                 placement="bottom"
                 enterDelay={500}
                 leaveDelay={300}
+                open={maintenanceTooltipOpen}
+                onOpen={() => setMaintenanceTooltipOpen(true)}
+                onClose={() => setMaintenanceTooltipOpen(false)}
               >
                 <Box
                   onClick={handleMaintenanceBannerClick}
                   sx={{
-                    mx: 2,
+                    ml: 0.5,
+                    mr: 2,
                     flex: 1,
                     display: 'flex',
                     alignItems: 'center',
@@ -1711,7 +1808,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
                       }}
                     >
-                      {maintenanceStatus.status === 'active' ? '?뵩' : '?뱟'}
+                      {maintenanceStatus.status === 'active' ? '🔧' : '⏳'}
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                       <Typography
@@ -1813,67 +1910,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </Tooltip>
             )}
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {/* Chat button - visible for users with chat permission */}
-              {hasPermission(P.CHAT_ACCESS) && (
-                <Tooltip title={t('sidebar.chat')}>
-                  <IconButton color="inherit" onClick={() => navigate('/chat')}>
-                    <ChatIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-
-              <Tooltip title={t('mailbox.title')}>
-                <IconButton
-                  color="inherit"
-                  onClick={() => navigate('/mailbox')}
-                >
-                  <Badge badgeContent={unreadMailCount} color="error">
-                    <MailIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-
-              {/* Divider */}
-              <Box
-                sx={{
-                  width: '1px',
-                  height: '24px',
-                  bgcolor:
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.2)',
-                  mx: 1,
-                }}
-              />
-
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
               <TimezoneSelector />
 
-              {/* Divider */}
-              <Box
-                sx={{
-                  width: '1px',
-                  height: '24px',
-                  bgcolor:
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.2)',
-                  mx: 1,
-                }}
-              />
-
-              {/* Documentation button */}
-              <Tooltip title={t('header.documentation')}>
-                <IconButton
-                  color="inherit"
-                  onClick={() => window.open('/docs', '_blank')}
-                >
-                  <MenuBookIcon />
-                </IconButton>
-              </Tooltip>
-
-              <IconButton onClick={toggleTheme} color="inherit">
-                {isDark ? <LightModeIcon /> : <DarkModeIcon />}
+              <IconButton onClick={toggleTheme} color="inherit" sx={{ p: 0.75 }}>
+                {isDark ? <LightModeIcon sx={{ fontSize: 20 }} /> : <DarkModeIcon sx={{ fontSize: 20 }} />}
               </IconButton>
 
               <LanguageSelector variant="text" size="medium" />
@@ -1882,27 +1923,24 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <Box
                 sx={{
                   width: '1px',
-                  height: '24px',
-                  bgcolor:
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.2)',
-                  mx: 1,
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
                 }}
               />
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton onClick={handleUserMenuOpen} color="inherit">
+              <Tooltip title={user?.name || user?.email?.split('@')[0] || ''}>
+                <IconButton onClick={handleUserMenuOpen} color="inherit" sx={{ p: 0.5 }}>
                   {user?.avatarUrl && !avatarImageError ? (
                     <Avatar
                       src={user.avatarUrl}
                       alt={user.name || user.email}
                       sx={{
-                        width: 32,
-                        height: 32,
+                        width: 28,
+                        height: 28,
+                        fontSize: '0.8rem',
                       }}
                       onError={() => {
-                        // Replace with AccountCircle icon when image load fails
                         setAvatarImageError(true);
                       }}
                     >
@@ -1911,30 +1949,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   ) : (
                     <AccountCircle
                       sx={{
-                        width: 32,
-                        height: 32,
+                        width: 28,
+                        height: 28,
                         color: 'inherit',
                       }}
                     />
                   )}
                 </IconButton>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    display: { xs: 'none', sm: 'block' },
-                    color: 'inherit',
-                    fontWeight: 500,
-                    maxWidth: 150,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                  }}
-                  onClick={handleUserMenuOpen}
-                >
-                  {user?.name || user?.email?.split('@')[0] || ''}
-                </Typography>
-              </Box>
+              </Tooltip>
             </Box>
           </Toolbar>
         </AppBar>

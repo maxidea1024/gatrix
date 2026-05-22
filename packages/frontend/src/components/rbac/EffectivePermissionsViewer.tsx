@@ -130,7 +130,7 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
         color="text.secondary"
         sx={{ textAlign: 'center', py: 2 }}
       >
-        {t('rbac.roles.noPermissions', 'No permissions')}
+        {t('rbac.roles.noPermissions')}
       </Typography>
     );
   }
@@ -145,7 +145,7 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
         {t('rbac.roles.ownPermission')}: {data.own.length} &nbsp;|&nbsp;
         {t('rbac.roles.inheritedPermission')}: {data.inherited.length}{' '}
         &nbsp;|&nbsp;
-        {t('common.total', 'Total')}: {totalCount}
+        {t('common.total')}: {totalCount}
       </Typography>
 
       {hasWildcard && (
@@ -165,9 +165,7 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             ✦{' '}
             {t(
-              'rbac.roles.wildcardPermission',
-              'All Permissions (Wildcard *:*)'
-            )}
+              'rbac.roles.wildcardPermission')}
           </Typography>
         </Box>
       )}

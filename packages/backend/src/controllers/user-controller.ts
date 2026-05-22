@@ -5,6 +5,7 @@ import { ChatServerService } from '../services/chat-server-service';
 import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { UserModel } from '../models/user';
+import { QuickLinkModel } from '../models/quick-link';
 import Joi from 'joi';
 import { UserOnboardingService } from '../services/user-onboarding-service';
 import { permissionService } from '../services/permission-service';
@@ -543,6 +544,139 @@ export class UserController {
           userId,
           permissions,
         },
+      });
+    }
+  );
+
+  // ==================== Quick Links ====================
+
+  static getQuickLinks = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      const links = await QuickLinkModel.findByUserId(req.user.userId);
+
+      res.json({
+        success: true,
+        data: { links },
+      });
+    }
+  );
+
+  static createQuickLink = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      const schema = Joi.object({
+        title: Joi.string().min(1).max(100).required(),
+        url: Joi.string().min(1).max(2048).required(),
+        description: Joi.string().max(255).optional().allow('', null),
+        iconName: Joi.string().max(50).optional().default('Link'),
+        color: Joi.string().max(20).optional().allow('', null),
+      });
+
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const link = await QuickLinkModel.create({
+        userId: req.user.userId,
+        ...value,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: { link },
+        message: 'Quick link created successfully',
+      });
+    }
+  );
+
+  static updateQuickLink = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      const { id } = req.params;
+      if (!id) {
+        throw new GatrixError('Quick link ID is required', 400);
+      }
+
+      const schema = Joi.object({
+        title: Joi.string().min(1).max(100).optional(),
+        url: Joi.string().min(1).max(2048).optional(),
+        description: Joi.string().max(255).optional().allow('', null),
+        iconName: Joi.string().max(50).optional(),
+        color: Joi.string().max(20).optional().allow('', null),
+      });
+
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const link = await QuickLinkModel.update(id, req.user.userId, value);
+      if (!link) {
+        throw new GatrixError('Quick link not found', 404);
+      }
+
+      res.json({
+        success: true,
+        data: { link },
+        message: 'Quick link updated successfully',
+      });
+    }
+  );
+
+  static deleteQuickLink = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      const { id } = req.params;
+      if (!id) {
+        throw new GatrixError('Quick link ID is required', 400);
+      }
+
+      const deleted = await QuickLinkModel.delete(id, req.user.userId);
+      if (!deleted) {
+        throw new GatrixError('Quick link not found', 404);
+      }
+
+      res.json({
+        success: true,
+        message: 'Quick link deleted successfully',
+      });
+    }
+  );
+
+  static reorderQuickLinks = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      const schema = Joi.object({
+        orderedIds: Joi.array().items(Joi.string()).min(1).required(),
+      });
+
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      await QuickLinkModel.reorder(req.user.userId, value.orderedIds);
+
+      res.json({
+        success: true,
+        message: 'Quick links reordered successfully',
       });
     }
   );

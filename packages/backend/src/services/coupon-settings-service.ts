@@ -871,9 +871,9 @@ export class CouponSettingsService {
     const limit = Math.min(query.limit || 1000, 10000);
 
     const buildQuery = () => {
-      const q = db('g_coupons').where('settingId', settingId);
-      if (query.search) q.where('code', 'like', `%${query.search}%`);
-      if (query.status) q.where('status', query.status);
+      const q = db('g_coupons').where('g_coupons.settingId', settingId);
+      if (query.search) q.where('g_coupons.code', 'like', `%${query.search}%`);
+      if (query.status) q.where('g_coupons.status', query.status);
       return q;
     };
 

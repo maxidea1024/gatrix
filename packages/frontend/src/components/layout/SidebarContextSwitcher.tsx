@@ -467,7 +467,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
       >
         {/* Organisation */}
         <SelectionList
-          title={t('sidebar.context.organisation', 'Organisation')}
+          title={t('sidebar.context.organisation')}
           items={organisations}
           getKey={(o) => o.id}
           getLabel={(o) => o.displayName || o.orgName}
@@ -487,7 +487,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
 
         {/* Project */}
         <SelectionList
-          title={t('sidebar.context.project', 'Project')}
+          title={t('sidebar.context.project')}
           items={orgProjects}
           getKey={(p) => p.id}
           getLabel={(p) => p.displayName || p.projectName}
@@ -507,7 +507,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
 
         {/* Environment */}
         <SelectionList
-          title={t('sidebar.context.environment', 'Environment')}
+          title={t('sidebar.context.environment')}
           items={environments}
           getKey={(e) => e.environmentId}
           getLabel={(e) => e.displayName || e.environmentName}

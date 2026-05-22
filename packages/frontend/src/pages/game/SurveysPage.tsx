@@ -887,7 +887,7 @@ const SurveysPage: React.FC = () => {
           <ListItemIcon>
             <HistoryIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('surveys.viewLogs', 'View Logs')}</ListItemText>
+          <ListItemText>{t('surveys.viewLogs')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {

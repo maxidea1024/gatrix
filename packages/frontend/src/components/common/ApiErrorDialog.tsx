@@ -89,9 +89,9 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
       >
         {type === 'LOCKED' ? <LockIcon /> : <WarningIcon />}
         {type === 'LOCKED'
-          ? t('errors.RESOURCE_LOCKED_TITLE', 'Resource Locked')
+          ? t('errors.RESOURCE_LOCKED_TITLE')
           : type === 'DUPLICATE'
-            ? t('errors.DUPLICATE_ENTRY_TITLE', 'Duplicate Entry')
+            ? t('errors.DUPLICATE_ENTRY_TITLE')
             : t('errors.CR_DATA_CONFLICT')}
       </DialogTitle>
       <DialogContent>
@@ -131,9 +131,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
             <Box>
               <Typography variant="body1" gutterBottom sx={{ mb: 2 }}>
                 {t(
-                  'changeRequest.conflictDialog.description',
-                  'The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption.'
-                )}
+                  'changeRequest.conflictDialog.description')}
               </Typography>
 
               <Stack spacing={2}>
@@ -150,9 +148,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                     >
                       <StorageIcon fontSize="small" color="primary" />{' '}
                       {t(
-                        'changeRequest.conflictDialog.liveData',
-                        'Current Live Data'
-                      )}
+                        'changeRequest.conflictDialog.liveData')}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -187,9 +183,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                     >
                       <HistoryIcon fontSize="small" color="info" />{' '}
                       {t(
-                        'changeRequest.conflictDialog.originalData',
-                        'Data When Request Created'
-                      )}
+                        'changeRequest.conflictDialog.originalData')}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -218,9 +212,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
             <Box>
               <Typography variant="body1" gutterBottom sx={{ mb: 2 }}>
                 {t(
-                  'changeRequest.duplicateDialog.description',
-                  'A record with the same unique identifier already exists. This usually happens when the data you are trying to merge has already been added to the live server.'
-                )}
+                  'changeRequest.duplicateDialog.description')}
               </Typography>
               <Paper
                 variant="outlined"
@@ -249,9 +241,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                 sx={{ mt: 2, color: 'text.secondary' }}
               >
                 {t(
-                  'changeRequest.duplicateDialog.guide',
-                  'Please check the existing data on the live server and delete or modify this change request.'
-                )}
+                  'changeRequest.duplicateDialog.guide')}
               </Typography>
             </Box>
           )}

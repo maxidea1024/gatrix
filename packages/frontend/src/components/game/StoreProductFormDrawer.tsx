@@ -718,7 +718,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     size="small"
                     placeholder={t('storeProducts.productNameHelp')}
                   />
-                  <Tooltip title={t('common.aiTranslate', 'AI 번역')}>
+                  <Tooltip title={t('common.aiTranslate')}>
                     <span>
                       <IconButton
                         size="small"
@@ -739,12 +739,12 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                             if (result.zh) setNameZh(result.zh.translatedText);
                             setNamesSectionOpen(true);
                             enqueueSnackbar(
-                              t('common.translateSuccess', '번역 완료'),
+                              t('common.translateSuccess'),
                               { variant: 'success' }
                             );
                           } catch (err) {
                             enqueueSnackbar(
-                              t('common.translateFailed', '번역 실패'),
+                              t('common.translateFailed'),
                               { variant: 'error' }
                             );
                           } finally {
@@ -973,7 +973,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     size="small"
                     placeholder={t('storeProducts.descriptionHelp')}
                   />
-                  <Tooltip title={t('common.aiTranslate', 'AI 번역')}>
+                  <Tooltip title={t('common.aiTranslate')}>
                     <span>
                       <IconButton
                         size="small"
@@ -997,12 +997,12 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                               setDescriptionZh(result.zh.translatedText);
                             setDescSectionOpen(true);
                             enqueueSnackbar(
-                              t('common.translateSuccess', '번역 완료'),
+                              t('common.translateSuccess'),
                               { variant: 'success' }
                             );
                           } catch (err) {
                             enqueueSnackbar(
-                              t('common.translateFailed', '번역 실패'),
+                              t('common.translateFailed'),
                               { variant: 'error' }
                             );
                           } finally {

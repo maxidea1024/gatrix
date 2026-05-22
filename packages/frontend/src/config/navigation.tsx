@@ -184,7 +184,7 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-  // Game Management
+  // Game Management (Core)
   {
     id: 'game-management',
     text: 'sidebar.gameManagement',
@@ -203,23 +203,29 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.GAME_WORLDS_READ,
       },
       {
-        text: 'sidebar.maintenance',
-        icon: 'Build',
-        path: '/admin/maintenance',
-        requiredPermission: P.MAINTENANCE_READ,
+        text: 'sidebar.planningData',
+        icon: 'Storage',
+        path: '/game/planning-data',
+        requiredPermission: P.PLANNING_DATA_READ,
+        matchPaths: ['/game/planning-data', '/game/planning-data-history'],
+        divider: true,
       },
       {
-        text: 'sidebar.playerConnections',
-        icon: 'People',
-        path: '/admin/player-connections',
-        requiredPermission: P.MAINTENANCE_READ,
+        text: 'sidebar.cmsDataManagement',
+        icon: 'TableChart',
+        path: '/admin/cms-data',
+        requiredPermission: P.CMS_DATA_READ,
       },
-      {
-        text: 'sidebar.maintenanceTemplates',
-        icon: 'TextFields',
-        path: '/admin/maintenance-templates',
-        requiredPermission: P.MAINTENANCE_TEMPLATES_READ,
-      },
+    ],
+  },
+
+  // Live Operations (Service Ops + Promotion + Content)
+  {
+    id: 'live-operations',
+    text: 'sidebar.liveOperations',
+    icon: 'RocketLaunch',
+    children: [
+      // Service operations
       {
         text: 'sidebar.serviceNotices',
         icon: 'Announcement',
@@ -233,16 +239,24 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.INGAME_POPUPS_READ,
       },
       {
+        text: 'sidebar.playerConnections',
+        icon: 'People',
+        path: '/admin/player-connections',
+        requiredPermission: P.MAINTENANCE_READ,
+      },
+      {
+        text: 'sidebar.maintenance',
+        icon: 'Build',
+        path: '/admin/maintenance',
+        requiredPermission: P.MAINTENANCE_READ,
+      },
+      // Promotion & engagement
+      {
         text: 'sidebar.coupons',
         icon: 'ConfirmationNumber',
         path: '/game/coupons',
         requiredPermission: P.COUPONS_READ,
-      },
-      {
-        text: 'sidebar.surveys',
-        icon: 'Poll',
-        path: '/game/surveys',
-        requiredPermission: P.SURVEYS_READ,
+        divider: true,
       },
       {
         text: 'sidebar.operationEvents',
@@ -263,23 +277,25 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.REWARD_TEMPLATES_READ,
       },
       {
+        text: 'sidebar.surveys',
+        icon: 'Poll',
+        path: '/game/surveys',
+        requiredPermission: P.SURVEYS_READ,
+      },
+      // Content management
+      {
         text: 'sidebar.banners',
         icon: 'ViewCarousel',
         path: '/game/banners',
         requiredPermission: P.BANNERS_READ,
+        divider: true,
       },
       {
-        text: 'sidebar.planningData',
-        icon: 'Storage',
-        path: '/game/planning-data',
-        requiredPermission: P.PLANNING_DATA_READ,
-        matchPaths: ['/game/planning-data', '/game/planning-data-history'],
-      },
-      {
-        text: 'sidebar.cmsDataManagement',
-        icon: 'TableChart',
-        path: '/admin/cms-data',
-        requiredPermission: P.CMS_DATA_READ,
+        text: 'sidebar.maintenanceTemplates',
+        icon: 'TextFields',
+        path: '/admin/maintenance-templates',
+        requiredPermission: P.MAINTENANCE_TEMPLATES_READ,
+        divider: true,
       },
     ],
   },
@@ -290,23 +306,20 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     text: 'sidebar.featureFlagsCategory',
     icon: 'Flag',
     children: [
+      // Core
       {
         text: 'sidebar.featureFlags',
         icon: 'Flag',
         path: '/feature-flags',
         requiredPermission: P.FEATURES_READ,
       },
-      {
-        text: 'releaseFlow.templates',
-        icon: 'Layers',
-        path: '/feature-flags/templates',
-        requiredPermission: P.RELEASE_FLOWS_READ,
-      },
+      // Targeting & configuration
       {
         text: 'sidebar.featureSegments',
         icon: 'People',
         path: '/feature-flags/segments',
         requiredPermission: P.SEGMENTS_READ,
+        divider: true,
       },
       {
         text: 'sidebar.featureContextFields',
@@ -321,10 +334,18 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.FEATURES_READ,
       },
       {
+        text: 'releaseFlow.templates',
+        icon: 'Layers',
+        path: '/feature-flags/templates',
+        requiredPermission: P.RELEASE_FLOWS_READ,
+      },
+      // Automation & analytics
+      {
         text: 'sidebar.actionSets',
         icon: 'SmartToy',
         path: '/admin/actions',
         requiredPermission: P.ACTIONS_READ,
+        divider: true,
       },
       {
         text: 'sidebar.signalEndpoints',
@@ -337,18 +358,19 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'Hub',
         path: '/feature-flags/network',
         requiredPermission: P.FEATURES_READ,
-      },
-      {
-        text: 'sidebar.unknownFlags',
-        icon: 'HelpOutline',
-        path: '/feature-flags/unknown',
-        requiredPermission: P.UNKNOWN_FLAGS_READ,
+        divider: true,
       },
       {
         text: 'sidebar.impactMetrics',
         icon: 'ShowChart',
         path: '/feature-flags/impact-metrics',
         requiredPermission: P.IMPACT_METRICS_READ,
+      },
+      {
+        text: 'sidebar.unknownFlags',
+        icon: 'HelpOutline',
+        path: '/feature-flags/unknown',
+        requiredPermission: P.UNKNOWN_FLAGS_READ,
       },
     ],
   },
@@ -369,53 +391,23 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-  // Admin Panel
+  // Tools
   {
-    id: 'admin-panel',
-    text: 'sidebar.adminPanel',
-    icon: 'AdminPanelSettings',
+    id: 'tools',
+    text: 'sidebar.tools',
+    icon: 'Construction',
     children: [
       {
-        text: 'sidebar.ripple',
-        icon: 'Ripple',
-        path: '/admin/ripple',
-        requiredPermission: P.RIPPLE_READ,
+        text: 'sidebar.chat',
+        icon: 'Chat',
+        path: '/chat',
+        requiredPermission: P.CHAT_ACCESS,
       },
       {
-        text: 'sidebar.scheduleManagement',
-        icon: 'Schedule',
-        path: '/admin/schedule',
-        requiredPermission: P.SCHEDULER_READ,
-        matchPaths: [
-          '/admin/schedule',
-          '/admin/scheduler',
-          '/admin/jobs',
-          '/admin/queue-monitor',
-        ],
-      },
-      {
-        text: 'sidebar.auditLogs',
-        icon: 'History',
-        path: '/admin/audit-logs',
-        requiredPermission: P.AUDIT_LOGS_READ,
-      },
-      {
-        text: 'sidebar.realtimeEvents',
-        icon: 'Timeline',
-        path: '/admin/realtime-events',
-        requiredPermission: P.REALTIME_EVENTS_READ,
-      },
-      {
-        text: 'sidebar.crashes',
-        icon: 'BugReport',
-        path: '/admin/crashes',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
-      {
-        text: 'sidebar.crashEvents',
-        icon: 'BugReport',
-        path: '/admin/crash-events',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        text: 'mailbox.title',
+        icon: 'Mail',
+        path: '/mailbox',
+        divider: true,
       },
       {
         text: 'sidebar.spreadsheets',
@@ -428,17 +420,16 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'Image',
         path: '/admin/media-assets',
       },
-      {
-        text: 'sidebar.security',
-        icon: 'Security',
-        path: '/admin/security',
-        requiredPermission: P.ADMIN_TOKENS_READ,
-        matchPaths: [
-          '/admin/security',
-          '/admin/api-tokens',
-          '/admin/whitelist',
-        ],
-      },
+    ],
+  },
+
+  // Admin Panel
+  {
+    id: 'admin-panel',
+    text: 'sidebar.adminPanel',
+    icon: 'AdminPanelSettings',
+    children: [
+      // Infrastructure
       {
         text: 'sidebar.serverManagement',
         icon: 'Dns',
@@ -462,6 +453,63 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
           '/monitoring/logs',
           '/monitoring/alerts',
         ],
+      },
+      {
+        text: 'sidebar.scheduleManagement',
+        icon: 'Schedule',
+        path: '/admin/schedule',
+        requiredPermission: P.SCHEDULER_READ,
+        matchPaths: [
+          '/admin/schedule',
+          '/admin/scheduler',
+          '/admin/jobs',
+          '/admin/queue-monitor',
+        ],
+      },
+      {
+        text: 'sidebar.ripple',
+        icon: 'Ripple',
+        path: '/admin/ripple',
+        requiredPermission: P.RIPPLE_READ,
+      },
+      // Audit & events
+      {
+        text: 'sidebar.auditLogs',
+        icon: 'History',
+        path: '/admin/audit-logs',
+        requiredPermission: P.AUDIT_LOGS_READ,
+        divider: true,
+      },
+      {
+        text: 'sidebar.realtimeEvents',
+        icon: 'Timeline',
+        path: '/admin/realtime-events',
+        requiredPermission: P.REALTIME_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.crashes',
+        icon: 'BugReport',
+        path: '/admin/crashes',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.crashEvents',
+        icon: 'BugReport',
+        path: '/admin/crash-events',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      // Security & settings
+      {
+        text: 'sidebar.security',
+        icon: 'Security',
+        path: '/admin/security',
+        requiredPermission: P.ADMIN_TOKENS_READ,
+        matchPaths: [
+          '/admin/security',
+          '/admin/api-tokens',
+          '/admin/whitelist',
+        ],
+        divider: true,
       },
       {
         text: 'sidebar.openApi',

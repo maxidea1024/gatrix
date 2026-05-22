@@ -1182,9 +1182,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         fullWidth
                         size="small"
                         placeholder={t(
-                          'playground.enterArrayValue',
-                          'e.g., val1, val2, val3'
-                        )}
+                          'playground.enterArrayValue')}
                         value={entry.value}
                         onChange={(e) =>
                           handleUpdateContextEntry(
@@ -1194,9 +1192,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           )
                         }
                         helperText={t(
-                          'playground.arrayHelp',
-                          'Comma separated values'
-                        )}
+                          'playground.arrayHelp')}
                       />
                     );
                   }

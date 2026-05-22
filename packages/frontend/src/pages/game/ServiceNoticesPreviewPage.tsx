@@ -196,8 +196,8 @@ const ServiceNoticesPreviewPage: React.FC = () => {
     };
   }, []);
 
-  // Load active notices
   useEffect(() => {
+    if (!projectApiPath) return;
     const loadNotices = async () => {
       try {
         console.log('[ServiceNoticesPreview] Starting to load notices...');
@@ -272,7 +272,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
     };
 
     loadNotices();
-  }, []);
+  }, [projectApiPath]);
 
   // Mark notice as read when selected
   const handleNoticeSelect = (notice: ServiceNotice) => {
@@ -496,7 +496,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                 sx={{
                   px: 2.5,
                   py: 1.5,
-                  minHeight: '80px', // Match the height of right title section (increased by 4px total)
+                  minHeight: '64px',
                   display: 'flex',
                   alignItems: 'center',
                   bgcolor:
@@ -603,7 +603,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
               sx={{
                 px: 2.5,
                 py: 1.5,
-                minHeight: '80px',
+                minHeight: '64px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',

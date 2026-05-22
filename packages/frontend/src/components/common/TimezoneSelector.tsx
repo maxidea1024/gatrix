@@ -105,15 +105,9 @@ const TimezoneSelector: React.FC = () => {
             fontFamily: 'monospace',
             fontSize: '0.75rem',
             color: theme.palette.text.primary,
-            borderColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.3)'
-                : 'rgba(0, 0, 0, 0.23)',
-            backgroundColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(0, 0, 0, 0.02)',
-            borderRadius: 2,
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            borderRadius: 1,
             cursor: 'pointer',
             '& .MuiChip-icon': {
               fontSize: '0.875rem',
@@ -122,12 +116,12 @@ const TimezoneSelector: React.FC = () => {
             '&:hover': {
               backgroundColor:
                 theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : 'rgba(0, 0, 0, 0.05)',
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'rgba(0, 0, 0, 0.04)',
               borderColor:
                 theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.5)'
-                  : 'rgba(0, 0, 0, 0.4)',
+                  ? 'rgba(255, 255, 255, 0.3)'
+                  : 'rgba(0, 0, 0, 0.23)',
               '& .MuiChip-label': {
                 color: theme.palette.text.primary,
               },

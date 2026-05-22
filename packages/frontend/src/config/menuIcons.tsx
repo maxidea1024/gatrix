@@ -67,6 +67,9 @@ import {
   Description as DescriptionIcon,
   GridOn as GridOnIcon,
   Image as ImageIcon,
+  Tune as TuneIcon,
+  RocketLaunch as RocketLaunchIcon,
+  Construction as ConstructionIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 
@@ -134,6 +137,9 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Description: <DescriptionIcon />,
   GridOn: <GridOnIcon />,
   Image: <ImageIcon />,
+  Tune: <TuneIcon />,
+  RocketLaunch: <RocketLaunchIcon />,
+  Construction: <ConstructionIcon />,
   Ripple: <RippleIcon />,
 };
 

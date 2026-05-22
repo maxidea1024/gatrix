@@ -25,4 +25,35 @@ router.put(
   UserController.updateCurrentUser
 );
 
+// Quick Links (self-service, per-user)
+router.get(
+  '/me/quick-links',
+  generalLimiter as any,
+  UserController.getQuickLinks
+);
+
+router.post(
+  '/me/quick-links',
+  generalLimiter as any,
+  UserController.createQuickLink
+);
+
+router.put(
+  '/me/quick-links/reorder',
+  generalLimiter as any,
+  UserController.reorderQuickLinks
+);
+
+router.put(
+  '/me/quick-links/:id',
+  generalLimiter as any,
+  UserController.updateQuickLink
+);
+
+router.delete(
+  '/me/quick-links/:id',
+  generalLimiter as any,
+  UserController.deleteQuickLink
+);
+
 export default router;

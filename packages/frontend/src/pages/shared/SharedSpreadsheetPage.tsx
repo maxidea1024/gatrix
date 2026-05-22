@@ -109,7 +109,7 @@ const SharedSpreadsheetPage: React.FC = () => {
           {error}
         </Typography>
         <Button variant="outlined" onClick={() => navigate('/login')}>
-          {t('common.login', 'Login')}
+          {t('common.login')}
         </Button>
       </Box>
     );
@@ -159,8 +159,8 @@ const SharedSpreadsheetPage: React.FC = () => {
           }
           label={
             permission === 'editor'
-              ? t('spreadsheets.editor', '편집자')
-              : t('spreadsheets.viewer', '뷰어')
+              ? t('spreadsheets.editor')
+              : t('spreadsheets.viewer')
           }
           variant="outlined"
           color={permission === 'editor' ? 'primary' : 'default'}

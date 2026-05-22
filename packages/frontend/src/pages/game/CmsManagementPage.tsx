@@ -3549,7 +3549,7 @@ const CmsManagementPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          {t('cms.detail.discardChangesTitle', 'Unsaved Changes')}
+          {t('cms.detail.discardChangesTitle')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -3568,7 +3568,7 @@ const CmsManagementPage: React.FC = () => {
               setDiscardConfirmOpen(false);
             }}
           >
-            {t('common.confirm', 'Confirm')}
+            {t('common.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

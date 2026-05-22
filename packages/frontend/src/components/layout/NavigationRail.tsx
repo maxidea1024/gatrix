@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import GatRunnerGame from './GatRunnerGame';
 import {
   Box,
   Tooltip,
@@ -56,6 +57,23 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [gameOpen, setGameOpen] = useState(false);
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleCatImageClick = useCallback(() => {
+    clickCountRef.current++;
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    if (clickCountRef.current >= 5) {
+      clickCountRef.current = 0;
+      setAboutOpen(false);
+      setGameOpen(true);
+      return;
+    }
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 1500);
+  }, []);
 
   // Determine if a category should navigate directly (no children to show in sub-panel)
   const isDirectNav = (cat: MenuCategory): boolean => {
@@ -313,17 +331,21 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           <CloseIcon fontSize="small" />
         </IconButton>
         <DialogContent sx={{ textAlign: 'center', py: 4, px: 4 }}>
-          {/* Gaming animation */}
+          {/* Gaming animation - click 5 times for easter egg! */}
           <Box
             component="img"
             src="/images/gat-gaming.webp"
             alt="Gat"
+            onClick={handleCatImageClick}
             sx={{
               width: 120,
               height: 120,
               mx: 'auto',
               mb: 1,
               display: 'block',
+              cursor: 'pointer',
+              transition: 'transform 0.1s',
+              '&:active': { transform: 'scale(0.95)' },
             }}
           />
 
@@ -436,6 +458,9 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           </Typography>
         </DialogContent>
       </Dialog>
+
+      {/* Easter Egg: Gat Runner Game */}
+      <GatRunnerGame open={gameOpen} onClose={() => setGameOpen(false)} />
     </Box>
   );
 };

@@ -342,6 +342,12 @@ const FirstVisitGuard: React.FC<{ children: React.ReactNode }> = ({
     return <>{children}</>;
   }
 
+  // Always allow public routes (shared links, previews, etc.)
+  const publicPrefixes = ['/shared/', '/service-notices-preview'];
+  if (publicPrefixes.some((p) => location.pathname.startsWith(p))) {
+    return <>{children}</>;
+  }
+
   // Skip check for authenticated users (they should go where they want)
   if (isAuthenticated) {
     return <>{children}</>;
@@ -435,6 +441,15 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
   const { isLoading } = useAuth();
 
   if (isLoading) {
+    // Skip loading screen for public routes that don't need auth
+    const publicPrefixes = ['/shared/', '/service-notices-preview'];
+    const isPublicRoute = publicPrefixes.some((p) =>
+      window.location.pathname.startsWith(p)
+    );
+    if (isPublicRoute) {
+      return <>{children}</>;
+    }
+
     return (
       <Box
         sx={{

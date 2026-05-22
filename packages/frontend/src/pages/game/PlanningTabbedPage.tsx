@@ -87,13 +87,10 @@ const PlanningTabbedPage: React.FC = () => {
     <Box sx={{ p: 2 }}>
       <PageHeader
         title={t('sidebar.planningData')}
-        subtitle={t(
-          'planningData.subtitle',
-          '기획 데이터를 관리하고 이력을 확인합니다.'
-        )}
+        subtitle={t('planningData.subtitle')}
       />
 
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 0 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs
           value={activeTab}
           onChange={handleTabChange}

@@ -83,7 +83,7 @@ const SpreadsheetPresenceBar: React.FC<SpreadsheetPresenceBarProps> = ({
       {isLockedByMe && (
         <Chip
           icon={<EditIcon sx={{ fontSize: 14 }} />}
-          label={t('spreadsheets.editing', 'Editing')}
+          label={t('spreadsheets.editing')}
           size="small"
           color="success"
           variant="outlined"

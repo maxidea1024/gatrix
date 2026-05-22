@@ -55,7 +55,7 @@ const KeyValuePage: React.FC = () => {
   const canManage = hasPermission([P.SYSTEM_SETTINGS_UPDATE]);
 
   const [items, setItems] = useState<VarItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VarItem | null>(null);
   const [isDuplicateMode, setIsDuplicateMode] = useState(false);
@@ -300,7 +300,7 @@ const KeyValuePage: React.FC = () => {
         <Card variant="outlined">
           <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
-              <Table>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>{t('settings.kv.key')}</TableCell>

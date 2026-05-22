@@ -1024,9 +1024,7 @@ const GroupsPage: React.FC = () => {
                     sx={{ mb: 1, fontSize: '0.8rem' }}
                   >
                     {t(
-                      'rbac.groups.effectivePermissionsDesc',
-                      'Permissions that members of this group will receive from assigned roles.'
-                    )}
+                      'rbac.groups.effectivePermissionsDesc')}
                   </Typography>
                   <EffectivePermissionsViewer
                     data={groupEffectivePerms}

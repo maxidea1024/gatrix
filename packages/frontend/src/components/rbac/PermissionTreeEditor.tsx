@@ -28,7 +28,7 @@ const permLabel = (t: any, perm: string): string => {
 };
 
 // Extract resource display name using localization key
-// e.g. resource "users" -> t('rbac.resource.users', 'users')
+// e.g. resource "users" -> t('rbac.resource.users')
 const getResourceLabel = (t: any, resource: string): string => {
   // Try dedicated resource label key first
   const key = `rbac.resource.${resource}`;
