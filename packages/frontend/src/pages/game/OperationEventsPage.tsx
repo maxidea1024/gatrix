@@ -76,7 +76,7 @@ const OperationEventsPage: React.FC = () => {
         icon={<EventIcon />}
         title={t('sidebar.operationEvents')}
         subtitle={t('operationEvents.subtitle', {
-          defaultValue: '핫타임/버튼 이벤트 및 라이브 이벤트를 관리합니다.',
+          defaultValue: '핫타임버프 이벤트 및 라이브 이벤트를 관리합니다.',
         })}
       />
 
