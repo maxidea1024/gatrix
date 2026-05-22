@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Box, Chip, Typography, Skeleton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Reward } from '../../services/surveyService';
@@ -30,129 +30,136 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
   } = usePlanningData();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const [rewardTypeMap, setRewardTypeMap] = useState<
-    Map<number, RewardTypeInfo>
-  >(new Map());
-  const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(
-    new Map()
-  );
-  const [loading, setLoading] = useState(true);
+  const [loadedTemplateRewards, setLoadedTemplateRewards] = useState<Reward[] | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const [displayRewards, setDisplayRewards] = useState<Reward[]>([]);
 
-  // Set display rewards from props or load from template
+  // Synchronously parse rewards if provided as a prop
+  const displayRewards = useMemo<Reward[] | null>(() => {
+    if (!rewards || rewards.length === 0) return null;
+    return rewards.map((reward: any) => ({
+      rewardType: String(
+        reward.type !== undefined ? reward.type : reward.rewardType
+      ),
+      itemId: String(
+        reward.id !== undefined
+          ? reward.id
+          : reward.itemId
+            ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
+            : 0
+      ),
+      quantity: reward.quantity,
+      type: reward.type !== undefined ? reward.type : reward.rewardType,
+      id:
+        reward.id !== undefined
+          ? reward.id
+          : reward.itemId
+            ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
+            : 0,
+    }));
+  }, [rewards]);
+
+  // Load rewards from template asynchronously only if rewards prop is not provided
   useEffect(() => {
-    const loadRewards = async () => {
-      try {
-        // If rewards are provided, use them
-        if (rewards && rewards.length > 0) {
-          // Convert from backend format (rewardType, itemId) to frontend format (type, id)
-          const convertedRewards: Reward[] = rewards.map((reward: any) => ({
-            rewardType: String(
-              reward.type !== undefined ? reward.type : reward.rewardType
-            ),
-            itemId: String(
-              reward.id !== undefined
-                ? reward.id
-                : reward.itemId
-                  ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
-                  : 0
-            ),
-            quantity: reward.quantity,
-            type: reward.type !== undefined ? reward.type : reward.rewardType,
-            id:
-              reward.id !== undefined
-                ? reward.id
-                : reward.itemId
-                  ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
-                  : 0,
-          }));
-          setDisplayRewards(convertedRewards);
-          return;
-        }
+    if (rewards && rewards.length > 0) {
+      setLoadedTemplateRewards(null);
+      return;
+    }
 
-        // If no rewards but rewardTemplateId is provided, load from template
-        if (rewardTemplateId) {
-          const template = await rewardTemplateService.getRewardTemplateById(
-            projectApiPath,
-            rewardTemplateId
+    if (!rewardTemplateId) {
+      setLoadedTemplateRewards([]);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchTemplate = async () => {
+      try {
+        const template = await rewardTemplateService.getRewardTemplateById(
+          projectApiPath,
+          rewardTemplateId
+        );
+        if (!isMounted) return;
+        if (
+          template &&
+          template.rewardItems &&
+          Array.isArray(template.rewardItems)
+        ) {
+          const convertedRewards: Reward[] = template.rewardItems.map(
+            (item: any) => ({
+              rewardType: String(item.rewardType || item.type || 0),
+              itemId: String(item.itemId || item.id || 0),
+              quantity: item.quantity || 0,
+              type: item.rewardType || item.type || 0,
+              id: item.itemId || item.id || 0,
+            })
           );
-          if (
-            template &&
-            template.rewardItems &&
-            Array.isArray(template.rewardItems)
-          ) {
-            const convertedRewards: Reward[] = template.rewardItems.map(
-              (item: any) => ({
-                rewardType: String(item.rewardType || item.type || 0),
-                itemId: String(item.itemId || item.id || 0),
-                quantity: item.quantity || 0,
-                type: item.rewardType || item.type || 0,
-                id: item.itemId || item.id || 0,
-              })
-            );
-            setDisplayRewards(convertedRewards);
-          } else {
-            setDisplayRewards([]);
-          }
+          setLoadedTemplateRewards(convertedRewards);
         } else {
-          setDisplayRewards([]);
+          setLoadedTemplateRewards([]);
         }
       } catch (error) {
-        console.error('Failed to load rewards:', error);
-        setDisplayRewards([]);
+        console.error('Failed to load rewards from template:', error);
+        if (isMounted) {
+          setLoadedTemplateRewards([]);
+        }
       }
     };
 
-    loadRewards();
-  }, [rewards, rewardTemplateId]);
+    fetchTemplate();
+    return () => {
+      isMounted = false;
+    };
+  }, [rewards, rewardTemplateId, projectApiPath]);
 
-  // Build reward type map from context
-  useEffect(() => {
+  // Resolve active rewards list
+  const resolvedRewards = useMemo<Reward[]>(() => {
+    if (displayRewards !== null) {
+      return displayRewards;
+    }
+    return loadedTemplateRewards || [];
+  }, [displayRewards, loadedTemplateRewards]);
+
+  // Build reward type map synchronously from context
+  const rewardTypeMap = useMemo(() => {
+    const typeMap = new Map<number, RewardTypeInfo>();
     if (rewardTypes && rewardTypes.length > 0) {
-      const typeMap = new Map<number, RewardTypeInfo>();
       rewardTypes.forEach((type) => {
         typeMap.set(type.value, type);
       });
-      setRewardTypeMap(typeMap);
     }
+    return typeMap;
   }, [rewardTypes]);
 
-  // Build reward items map from context lookup data
-  useEffect(() => {
-    if (displayRewards && displayRewards.length > 0) {
-      const itemsMap = new Map<string, RewardItem>();
-
-      // Get unique reward types
-      const uniqueTypes = [
-        ...new Set(displayRewards.map((r) => parseInt(r.type))),
+  // Build reward items map synchronously from context lookup data
+  const rewardItemsMap = useMemo(() => {
+    const itemsMap = new Map<string, RewardItem>();
+    if (resolvedRewards && resolvedRewards.length > 0 && rewardLookup) {
+      // Get unique reward types with explicit typing
+      const uniqueTypes: number[] = [
+        ...new Set(
+          resolvedRewards.map((r) => parseInt(r.type || r.rewardType || '0'))
+        ),
       ];
 
       // Extract items from reward lookup data if available
-      if (rewardLookup) {
-        uniqueTypes.forEach((rewardType) => {
-          const rewardTypeData = rewardLookup[rewardType];
-          if (rewardTypeData?.items && Array.isArray(rewardTypeData.items)) {
-            rewardTypeData.items.forEach((item) => {
-              itemsMap.set(`${rewardType}_${item.id}`, item);
-            });
-          }
-        });
-      }
-
-      setRewardItemsMap(itemsMap);
-      setLoading(false);
-    } else if (
-      !contextLoading &&
-      displayRewards &&
-      displayRewards.length === 0
-    ) {
-      setLoading(false);
+      uniqueTypes.forEach((rewardType) => {
+        const rewardTypeData = rewardLookup[rewardType];
+        if (rewardTypeData?.items && Array.isArray(rewardTypeData.items)) {
+          rewardTypeData.items.forEach((item) => {
+            itemsMap.set(`${rewardType}_${item.id}`, item);
+          });
+        }
+      });
     }
-  }, [rewardLookup, displayRewards, contextLoading]);
+    return itemsMap;
+  }, [rewardLookup, resolvedRewards]);
+
+  // Determine if context lookup or template fetch is loading
+  const isLookupLoading = contextLoading && !rewardLookup;
+  const isTemplateLoading = rewardTemplateId && !rewards && loadedTemplateRewards === null;
+  const isComponentLoading = isLookupLoading || isTemplateLoading;
 
   // No rewards
-  if (!displayRewards || displayRewards.length === 0) {
+  if (!isComponentLoading && resolvedRewards.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
         {t('surveys.noRewards')}
@@ -161,20 +168,21 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
   }
 
   // Loading state
-  if (loading) {
+  if (isComponentLoading) {
+    const skeletonCount = resolvedRewards.length > 0
+      ? Math.min(resolvedRewards.length, maxDisplay)
+      : maxDisplay;
     return (
       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-        {[...Array(Math.min(displayRewards.length, maxDisplay))].map(
-          (_, idx) => (
-            <Skeleton
-              key={idx}
-              variant="rectangular"
-              width={120}
-              height={24}
-              sx={{ borderRadius: 1 }}
-            />
-          )
-        )}
+        {[...Array(skeletonCount)].map((_, idx) => (
+          <Skeleton
+            key={idx}
+            variant="rectangular"
+            width={120}
+            height={24}
+            sx={{ borderRadius: 1 }}
+          />
+        ))}
       </Box>
     );
   }
@@ -234,9 +242,9 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 
   // Display rewards
   const rewardsToDisplay = showAll
-    ? displayRewards
-    : displayRewards.slice(0, maxDisplay);
-  const hasMore = displayRewards.length > maxDisplay;
+    ? resolvedRewards
+    : resolvedRewards.slice(0, maxDisplay);
+  const hasMore = resolvedRewards.length > maxDisplay;
 
   // Darker orange color (15% darker than #ff9800)
   const orangeColor = '#d98200';
