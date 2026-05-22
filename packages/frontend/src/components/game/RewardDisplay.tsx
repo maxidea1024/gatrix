@@ -30,7 +30,9 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
   } = usePlanningData();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const [loadedTemplateRewards, setLoadedTemplateRewards] = useState<Reward[] | null>(null);
+  const [loadedTemplateRewards, setLoadedTemplateRewards] = useState<
+    Reward[] | null
+  >(null);
   const [showAll, setShowAll] = useState(false);
 
   // Synchronously parse rewards if provided as a prop
@@ -155,7 +157,8 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 
   // Determine if context lookup or template fetch is loading
   const isLookupLoading = contextLoading && !rewardLookup;
-  const isTemplateLoading = rewardTemplateId && !rewards && loadedTemplateRewards === null;
+  const isTemplateLoading =
+    rewardTemplateId && !rewards && loadedTemplateRewards === null;
   const isComponentLoading = isLookupLoading || isTemplateLoading;
 
   // No rewards
@@ -169,9 +172,10 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 
   // Loading state
   if (isComponentLoading) {
-    const skeletonCount = resolvedRewards.length > 0
-      ? Math.min(resolvedRewards.length, maxDisplay)
-      : maxDisplay;
+    const skeletonCount =
+      resolvedRewards.length > 0
+        ? Math.min(resolvedRewards.length, maxDisplay)
+        : maxDisplay;
     return (
       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
         {[...Array(skeletonCount)].map((_, idx) => (
