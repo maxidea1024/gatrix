@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -27,6 +27,7 @@ import type {
   MenuItem as NavMenuItem,
 } from '@/config/navigation';
 import SidebarContextSwitcher from '@/components/layout/SidebarContextSwitcher';
+import QuickLinksSection from '@/components/layout/QuickLinksSection';
 
 // Sub-panel width constant - exported for layout calculations
 export const SUBPANEL_WIDTH = 220;
@@ -44,7 +45,7 @@ interface NavigationSubPanelProps {
   onClose: () => void;
   // Recent pages
   recentPages: RecentPageEntry[];
-  onNavigate: (path: string) => void;
+  onNavigate: (path: string, options?: { skipRecentUpdate?: boolean }) => void;
   onRemoveRecent: (path: string) => void;
   onClearRecent: () => void;
   // Menu state
@@ -74,6 +75,32 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
+
+  // Smooth slide-down transition for menu items on category change
+  const menuContentRef = useRef<HTMLDivElement>(null);
+  const prevCategoryIdRef = useRef<string | null>(category?.id ?? null);
+
+  useEffect(() => {
+    const currentId = category?.id ?? null;
+    if (currentId !== prevCategoryIdRef.current && currentId !== null) {
+      prevCategoryIdRef.current = currentId;
+      const el = menuContentRef.current;
+      if (el) {
+        // Start from invisible + slightly above
+        el.style.transition = 'none';
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-4px)';
+        // Force reflow so the browser registers the starting state
+        el.getBoundingClientRect();
+        // Transition smoothly to final position
+        el.style.transition = 'opacity 250ms ease-out, transform 250ms ease-out';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }
+    } else {
+      prevCategoryIdRef.current = currentId;
+    }
+  }, [category?.id]);
 
   // Recent pages collapsed state
   const [recentCollapsed, setRecentCollapsed] = useState(() => {
@@ -396,7 +423,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
                     return (
                       <Box
                         key={page.path}
-                        onClick={() => onNavigate(page.path)}
+                        onClick={() => onNavigate(page.path, { skipRecentUpdate: true })}
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
@@ -412,7 +439,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
                               ? alpha(theme.palette.primary.main, 0.12)
                               : alpha(theme.palette.primary.main, 0.08)
                             : 'transparent',
-                          transition: 'all 0.15s ease',
+                          transition: 'background-color 0.15s ease',
                           '&:hover': {
                             bgcolor: isActive
                               ? isDark
@@ -480,32 +507,39 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
             </Box>
           )}
 
-          {/* Category header */}
+          {/* Category header + Menu items with slide-down animation */}
           {category && (
-            <Box sx={{ px: 1.75, pt: 1.25, pb: 0.5 }}>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 700,
-                  color: 'text.disabled',
-                  fontSize: '0.6rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                }}
-              >
-                {t(category.text)}
-              </Typography>
+            <Box
+              ref={menuContentRef}
+            >
+              <Box sx={{ px: 1.75, pt: 1.25, pb: 0.5 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    color: 'text.disabled',
+                    fontSize: '0.6rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  {t(category.text)}
+                </Typography>
+              </Box>
+
+              <List component="nav" disablePadding sx={{ pb: 1 }}>
+                {category.children.map((item, index) =>
+                  renderMenuItem(item, index, category.children)
+                )}
+              </List>
             </Box>
           )}
+        </Box>
 
-          {/* Menu items */}
-          {category && (
-            <List component="nav" disablePadding sx={{ pb: 1 }}>
-              {category.children.map((item, index) =>
-                renderMenuItem(item, index, category.children)
-              )}
-            </List>
-          )}
+        {/* Quick Links - fixed at bottom, outside scroll area with bottom padding */}
+        <Box sx={{ flexShrink: 0, pb: 2.5 }}>
+          <Divider sx={{ mx: 1.5, opacity: 0.5 }} />
+          <QuickLinksSection />
         </Box>
       </Box>
     </Box>
