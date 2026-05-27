@@ -33,7 +33,6 @@ import {
   Tabs,
   Tab,
   Chip,
-  Divider,
   keyframes,
 } from '@mui/material';
 import {
@@ -64,6 +63,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 
 // Register Chart.js components
 ChartJS.register(
@@ -999,214 +999,71 @@ const FeatureNetworkPage: React.FC = () => {
       />
 
       {/* Filters */}
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 3,
-            flexWrap: 'wrap',
-            alignItems: 'stretch',
-          }}
-        >
-          {/* Organization Toggle */}
-          {allOrgs.length > 1 && (
-            <>
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: 'block', mb: 0.5 }}
-                >
-                  {t('common.organization')}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                  {allOrgs.map((org) => (
-                    <Chip
-                      key={org.id}
-                      label={org.name}
-                      size="small"
-                      onClick={() => {
-                        if (selectedOrgIds.includes(org.id)) {
-                          setSelectedOrgIds(
-                            selectedOrgIds.filter((o) => o !== org.id)
-                          );
-                        } else {
-                          setSelectedOrgIds([...selectedOrgIds, org.id]);
-                        }
-                      }}
-                      color={
-                        selectedOrgIds.includes(org.id) ? 'primary' : 'default'
-                      }
-                      variant={
-                        selectedOrgIds.includes(org.id) ? 'filled' : 'outlined'
-                      }
-                      sx={{ borderRadius: '16px' }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-              <Divider orientation="vertical" flexItem />
-            </>
-          )}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          mb: 3,
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Organization */}
+        {allOrgs.length > 1 && (
+          <MultiSelectFilterChip
+            label={t('common.organization')}
+            options={allOrgs.map((org) => ({ value: org.id, label: org.name }))}
+            selected={selectedOrgIds}
+            onChange={setSelectedOrgIds}
+          />
+        )}
 
-          {/* Project Toggle */}
-          {filteredProjects.length > 1 && (
-            <>
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: 'block', mb: 0.5 }}
-                >
-                  {t('common.project')}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                  {filteredProjects.map((proj) => (
-                    <Chip
-                      key={proj.id}
-                      label={proj.name}
-                      size="small"
-                      onClick={() => {
-                        if (selectedProjectIds.includes(proj.id)) {
-                          setSelectedProjectIds(
-                            selectedProjectIds.filter((p) => p !== proj.id)
-                          );
-                        } else {
-                          setSelectedProjectIds([
-                            ...selectedProjectIds,
-                            proj.id,
-                          ]);
-                        }
-                      }}
-                      color={
-                        selectedProjectIds.includes(proj.id)
-                          ? 'primary'
-                          : 'default'
-                      }
-                      variant={
-                        selectedProjectIds.includes(proj.id)
-                          ? 'filled'
-                          : 'outlined'
-                      }
-                      sx={{ borderRadius: '16px' }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-              <Divider orientation="vertical" flexItem />
-            </>
-          )}
+        {/* Project */}
+        {filteredProjects.length > 1 && (
+          <MultiSelectFilterChip
+            label={t('common.project')}
+            options={filteredProjects.map((proj) => ({ value: proj.id, label: proj.name }))}
+            selected={selectedProjectIds}
+            onChange={setSelectedProjectIds}
+          />
+        )}
 
-          {/* Environment Toggle */}
-          <Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: 'block', mb: 0.5 }}
-            >
-              {t('network.environment')}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              {filteredEnvs.map((env) => (
-                <Chip
-                  key={env.environmentId}
-                  label={env.environmentName || env.environmentId}
-                  size="small"
-                  onClick={() => {
-                    if (selectedEnvironments.includes(env.environmentId)) {
-                      setSelectedEnvironments(
-                        selectedEnvironments.filter(
-                          (e) => e !== env.environmentId
-                        )
-                      );
-                    } else {
-                      setSelectedEnvironments([
-                        ...selectedEnvironments,
-                        env.environmentId,
-                      ]);
-                    }
-                  }}
-                  color={
-                    selectedEnvironments.includes(env.environmentId)
-                      ? 'primary'
-                      : 'default'
-                  }
-                  variant={
-                    selectedEnvironments.includes(env.environmentId)
-                      ? 'filled'
-                      : 'outlined'
-                  }
-                  sx={{ borderRadius: '16px' }}
-                />
-              ))}
-            </Box>
-          </Box>
+        {/* Environment */}
+        <MultiSelectFilterChip
+          label={t('network.environment')}
+          options={filteredEnvs.map((env) => ({
+            value: env.environmentId,
+            label: env.environmentName || env.environmentId,
+          }))}
+          selected={selectedEnvironments}
+          onChange={setSelectedEnvironments}
+        />
 
-          <Divider orientation="vertical" flexItem />
+        {/* Application */}
+        <MultiSelectFilterChip
+          label={t('network.application')}
+          options={applications.map((app) => ({ value: app, label: app }))}
+          selected={selectedApps}
+          onChange={setSelectedApps}
+          hideWhenEmpty
+        />
 
-          {/* Application Toggle */}
-          {applications.length > 0 && (
-            <>
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: 'block', mb: 0.5 }}
-                >
-                  {t('network.application')}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                  {applications.map((app) => (
-                    <Chip
-                      key={app}
-                      label={app}
-                      size="small"
-                      onClick={() => {
-                        if (selectedApps.includes(app)) {
-                          setSelectedApps(
-                            selectedApps.filter((a) => a !== app)
-                          );
-                        } else {
-                          setSelectedApps([...selectedApps, app]);
-                        }
-                      }}
-                      color={selectedApps.includes(app) ? 'primary' : 'default'}
-                      variant={
-                        selectedApps.includes(app) ? 'filled' : 'outlined'
-                      }
-                      sx={{ borderRadius: '16px' }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-              <Divider orientation="vertical" flexItem />
-            </>
-          )}
-
-          {/* Time Range */}
-          <Box sx={{ ml: 'auto' }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: 'block', mb: 0.5 }}
-            >
-              {t('network.timeRange')}
-            </Typography>
-            <ToggleButtonGroup
-              value={timeRange}
-              exclusive
-              onChange={handleTimeRangeChange}
-              size="small"
-            >
-              {TIME_RANGE_OPTIONS.map((option) => (
-                <ToggleButton key={option.value} value={option.value}>
-                  {t(option.label)}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
-          </Box>
+        {/* Time Range */}
+        <Box sx={{ ml: 'auto' }}>
+          <ToggleButtonGroup
+            value={timeRange}
+            exclusive
+            onChange={handleTimeRangeChange}
+            size="small"
+          >
+            {TIME_RANGE_OPTIONS.map((option) => (
+              <ToggleButton key={option.value} value={option.value}>
+                {t(option.label)}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
         </Box>
-      </Paper>
+      </Box>
 
       {/* Tabs */}
       <PageContentLoader loading={loading}>
