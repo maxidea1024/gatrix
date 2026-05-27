@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
   Box,
-  Chip,
   Popover,
   TextField,
   Checkbox,
@@ -123,57 +122,86 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
 
   return (
     <>
-      <Chip
-        label={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography
-              component="span"
-              sx={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: 'text.secondary',
-              }}
-            >
-              {label}
-            </Typography>
-            <Typography
-              component="span"
-              sx={{
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                color: noneSelected ? 'error.main' : 'primary.main',
-              }}
-            >
-              {summaryText}
-            </Typography>
-            <ExpandMoreIcon
-              sx={{
-                fontSize: 16,
-                color: 'text.secondary',
-                transition: 'transform 0.2s',
-                transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-              }}
-            />
-          </Box>
-        }
+      <Box
         onClick={handleOpen}
-        size={size}
         sx={{
-          height: '30px',
-          bgcolor: open ? 'rgba(25, 118, 210, 0.1)' : 'background.paper',
+          display: 'inline-flex',
+          alignItems: 'center',
+          height: '32px',
+          borderRadius: '4px',
           border: '1px solid',
           borderColor: open ? 'primary.main' : 'divider',
+          bgcolor: open ? 'action.hover' : 'background.paper',
           cursor: 'pointer',
           transition: 'all 0.15s',
+          overflow: 'hidden',
           '&:hover': {
             borderColor: 'primary.main',
-            bgcolor: 'rgba(25, 118, 210, 0.06)',
-          },
-          '& .MuiChip-label': {
-            px: 1,
+            bgcolor: 'action.hover',
           },
         }}
-      />
+      >
+        {/* Label section */}
+        <Box
+          sx={{
+            px: 1,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)',
+            borderRight: '1px solid',
+            borderRightColor: 'divider',
+          }}
+        >
+          <Typography
+            component="span"
+            sx={{
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              color: 'text.secondary',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
+        {/* Value section */}
+        <Box
+          sx={{
+            px: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
+          <Typography
+            component="span"
+            sx={{
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              color: noneSelected ? 'error.main' : 'text.primary',
+              whiteSpace: 'nowrap',
+              maxWidth: 200,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {summaryText}
+          </Typography>
+          <ExpandMoreIcon
+            sx={{
+              fontSize: 14,
+              color: 'text.disabled',
+              transition: 'transform 0.2s',
+              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+              ml: -0.25,
+            }}
+          />
+        </Box>
+      </Box>
 
       <Popover
         open={open}
