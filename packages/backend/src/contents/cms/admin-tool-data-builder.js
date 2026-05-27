@@ -2205,8 +2205,62 @@ function generateUIListData(cmsDir, loctab = {}) {
   uiListData.battleBuffs = extractList('BattleBuff', 'battleBuffs', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.battleBuffs.length} battle buffs`);
 
-  // 23. WorldBuff (월드 버프)
-  uiListData.worldBuffs = extractList('WorldBuff', 'worldBuffs', ['type'], loctab);
+  // 23. WorldBuff (월드 버프) — custom build with formatted description
+  const worldBuffTable = loadTable('WorldBuff');
+  if (worldBuffTable && worldBuffTable.WorldBuff) {
+    const worldBuffList = [];
+    for (const [key, item] of Object.entries(worldBuffTable.WorldBuff)) {
+      if (!item || !item.id || key.startsWith(':')) continue;
+
+      let nameKr = item.name || `WorldBuff ${item.id}`;
+      const atIdx = nameKr.indexOf('@');
+      if (atIdx !== -1) nameKr = nameKr.substring(0, atIdx).trim();
+
+      // Format description from desc + descFormats
+      let description = '';
+      if (item.desc && item.descFormats) {
+        const formatValues = item.descFormats
+          .filter((f) => f && (f.Type === 1 || f.Type === 2))
+          .map((f) => {
+            if (f.Type === 1 && f.Text) {
+              let text = f.Text;
+              const ai = text.indexOf('@');
+              if (ai !== -1) text = text.substring(0, ai).trim();
+              return text;
+            }
+            if (f.Type === 2 && f.Val !== undefined) {
+              // Show as percentage if < 1, otherwise as number
+              return String(f.Val);
+            }
+            return '';
+          });
+        description = stringFormat(item.desc, formatValues);
+        // Strip Korean particle markers like |hpp(...) , |ha(...) etc.
+        description = description.replace(/\|[a-z]+\([^)]*\)/g, '');
+        // Strip game client tags like [[D]], [[CR]], [[/]], etc.
+        description = description.replace(/\[\[[^\]]*\]\]/g, '');
+        // Remove @ comments
+        const descAtIdx = description.indexOf('@');
+        if (descAtIdx !== -1) description = description.substring(0, descAtIdx).trim();
+        description = description.trim();
+      }
+
+      worldBuffList.push({
+        id: item.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        type: item.type,
+        groupNo: item.groupNo,
+        description,
+      });
+    }
+    worldBuffList.sort((a, b) => a.id - b.id);
+    uiListData.worldBuffs = worldBuffList;
+  } else {
+    uiListData.worldBuffs = [];
+  }
   console.log(`   ✅ Loaded ${uiListData.worldBuffs.length} world buffs`);
 
   // 24. EventMission (이벤트 미션) - EventTask에서 설명 가져오기

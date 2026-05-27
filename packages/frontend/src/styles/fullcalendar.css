@@ -174,7 +174,7 @@
 /* event 내부의 시간/제목 텍스트 스타일 */
 .fc .fc-event .fc-event-title,
 .fc .fc-event .fc-event-time {
-  color: var(--fc-event-text-color, #111);
+  color: inherit;
   font-weight: 600;
   letter-spacing: 0.1px;
 }

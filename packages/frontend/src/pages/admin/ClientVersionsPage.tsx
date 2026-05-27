@@ -2794,7 +2794,7 @@ const ClientVersionsPage: React.FC = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                 {t('users.columnSettings')}
               </Typography>
-              <Button size="small" onClick={handleResetColumns} color="warning">
+              <Button size="small" onClick={handleResetColumns}>
                 {t('common.reset')}
               </Button>
             </Box>

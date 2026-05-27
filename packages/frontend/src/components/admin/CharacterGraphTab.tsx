@@ -397,7 +397,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     }
   }, [refreshKey, loadHistory]);
 
-  // Build chart data — with per-world breakdown
+  // Build chart data — with per-world breakdown and gap filling
   const chartData = useMemo(() => {
     if (records.length === 0) return { labels: [], datasets: [] };
 
@@ -409,13 +409,66 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       groups.get(key)!.push(r);
     });
 
-    const totalRecords = groups.get('__total__') || [];
-    const labels = totalRecords.map((r) => {
-      const d = new Date(r.recordedAt);
-      return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-    });
+    // Generate full time axis from date range
+    // Match backend downsampling: ≤7D=10min, ≤30D=30min, >30D=60min
+    const { from, to } = getDateRange();
+    const rangeHours = (to.getTime() - from.getTime()) / (1000 * 60 * 60);
+    const intervalMinutes = rangeHours > 24 * 30 ? 60 : rangeHours > 24 * 7 ? 30 : 10;
+
+    const allLabels: string[] = [];
+    const current = new Date(from);
+    current.setMinutes(Math.floor(current.getMinutes() / intervalMinutes) * intervalMinutes, 0, 0);
+    while (current <= to) {
+      allLabels.push(
+        `${String(current.getMonth() + 1).padStart(2, '0')}/${String(current.getDate()).padStart(2, '0')} ${String(current.getHours()).padStart(2, '0')}:${String(current.getMinutes()).padStart(2, '0')}`
+      );
+
+      current.setMinutes(current.getMinutes() + intervalMinutes);
+    }
+
+    // Helper: fill gaps for a record set across the full time axis
+    // totalCharacters carry-forwards; newCharacters defaults to 0
+    const fillGaps = (
+      recs: CharacterHistoryRecord[],
+      isTotal: boolean
+    ): (number | null)[] => {
+      // Build a map of timestamp -> value
+      const valueMap = new Map<string, number>();
+      recs.forEach((r) => {
+        const d = new Date(r.recordedAt);
+        const mins = Math.floor(d.getMinutes() / intervalMinutes) * intervalMinutes;
+        d.setMinutes(mins, 0, 0);
+        const label = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        const val = isTotal ? r.totalCharacters : r.newCharacters;
+        // Keep max value per bucket
+        valueMap.set(label, Math.max(valueMap.get(label) ?? 0, val));
+      });
+
+      if (displayMode === 'total') {
+        // Carry forward: fill gaps with last known value
+        let lastVal: number | null = null;
+        return allLabels.map((label) => {
+          if (valueMap.has(label)) {
+            lastVal = valueMap.get(label)!;
+            return lastVal;
+          }
+          return lastVal; // null before first data point, carry forward after
+        });
+      } else {
+        // New characters: fill gaps with 0 (only after first data point)
+        let hasStarted = false;
+        return allLabels.map((label) => {
+          if (valueMap.has(label)) {
+            hasStarted = true;
+            return valueMap.get(label)!;
+          }
+          return hasStarted ? 0 : null;
+        });
+      }
+    };
 
     const datasets: any[] = [];
+    const totalRecords = groups.get('__total__') || [];
 
     // Total line
     if (totalRecords.length > 0) {
@@ -424,9 +477,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
         label: isTotal
           ? t('playerConnections.character.totalCharacters')
           : t('playerConnections.character.newCharacters'),
-        data: totalRecords.map((r) =>
-          isTotal ? r.totalCharacters : r.newCharacters
-        ),
+        data: fillGaps(totalRecords, isTotal),
         borderColor: '#1976d2',
         backgroundColor: 'rgba(25,118,210,0.15)',
         borderWidth: 3,
@@ -446,7 +497,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       const isTotal = displayMode === 'total';
       datasets.push({
         label: recs[0]?.worldName || key,
-        data: recs.map((r) => (isTotal ? r.totalCharacters : r.newCharacters)),
+        data: fillGaps(recs, isTotal),
         borderColor: c.border,
         backgroundColor: c.bg,
         borderWidth: 1.5,
@@ -459,13 +510,14 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       colorIdx++;
     });
 
-    return { labels, datasets };
-  }, [records, t, displayMode]);
+    return { labels: allLabels, datasets };
+  }, [records, t, displayMode, getDateRange]);
 
   const chartOptions = useMemo(
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: false as const,
       plugins: {
         legend: { display: showLegend, position: 'top' as const },
         tooltip: {
@@ -493,6 +545,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           beginAtZero: true,
           grid: { color: 'rgba(0,0,0,0.05)' },
           ticks: {
+            precision: 0,
             callback: (value: any) =>
               typeof value === 'number' ? value.toLocaleString() : value,
           },

@@ -493,6 +493,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: false as const,
       plugins: {
         legend: { display: showLegend, position: 'top' as const },
         tooltip: { mode: 'index' as const, intersect: false },

@@ -26,6 +26,7 @@ router.get('/character/latest', PlayerConnectionsController.getCharacterLatest);
 router.get('/login-queue', PlayerConnectionsController.getLoginQueue);
 
 // Connected users
+router.get('/users/snapshot', PlayerConnectionsController.getUsersSnapshot);
 router.get('/users', PlayerConnectionsController.getConnectedUsers);
 
 // All players (DB query via admind)

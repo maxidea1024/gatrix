@@ -493,7 +493,7 @@ export class PlanningDataService {
       logger.debug(`HotTimeBuff lookup data (${lang}) not found`, {
         environmentId,
       });
-      return {};
+      return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read HotTimeBuff lookup data', {
         error,

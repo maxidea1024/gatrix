@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -14,8 +14,20 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   CircularProgress,
+  Collapse,
+  Paper,
+  Tooltip,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
-import { Add, Close } from '@mui/icons-material';
+import {
+  Add,
+  Close,
+  PostAdd,
+  Delete,
+  ExpandMore,
+  ExpandLess,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
   SurveyTemplate,
@@ -23,6 +35,9 @@ import {
   QuestionType,
   TemplateSettings,
   TemplateLocales,
+  SurveyPage,
+  questionsToPages,
+  pagesToQuestions,
 } from '@/services/surveyTemplateService';
 import QuestionBlockEditor from './QuestionBlockEditor';
 import QuestionTypeMenu from './QuestionTypeMenu';
@@ -66,9 +81,10 @@ const SurveyBuilderDialog: React.FC<Props> = ({
   const { t, i18n } = useTranslation();
   const [title, setTitle] = useState(template?.title || '');
   const [description, setDescription] = useState(template?.description || '');
-  const [questions, setQuestions] = useState<Question[]>(
-    template?.questions || []
-  );
+  // Welcome/ending are 1-per-survey, managed as nullable single items
+  const [welcomeBlock, setWelcomeBlock] = useState<Question | null>(null);
+  const [endingBlock, setEndingBlock] = useState<Question | null>(null);
+  const [pages, setPages] = useState<SurveyPage[]>([]);
   const [settings, setSettings] = useState<TemplateSettings>(
     template?.settings || {}
   );
@@ -79,6 +95,23 @@ const SurveyBuilderDialog: React.FC<Props> = ({
   const [editLocale, setEditLocale] = useState(i18n.language || 'ko');
   const [saving, setSaving] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [menuTargetPageId, setMenuTargetPageId] = useState<string | null>(null);
+  const [collapsedPages, setCollapsedPages] = useState<Set<string>>(new Set());
+
+  const togglePageCollapse = (pageId: string) => {
+    setCollapsedPages((prev) => {
+      const next = new Set(prev);
+      if (next.has(pageId)) {
+        next.delete(pageId);
+      } else {
+        next.add(pageId);
+      }
+      return next;
+    });
+  };
+
+  // Dirty-tracking: snapshot initial state to detect changes
+  const initialSnapshot = useRef<string>('');
 
   // Splitter
   const containerRef = useRef<HTMLDivElement>(null);
@@ -141,22 +174,70 @@ const SurveyBuilderDialog: React.FC<Props> = ({
   // Reset state when template changes
   React.useEffect(() => {
     if (open) {
-      setTitle(template?.title || '');
-      setDescription(template?.description || '');
-      setQuestions(template?.questions || []);
-      setSettings(template?.settings || {});
-      setLocales(template?.locales || {});
+      const t0 = template?.title || '';
+      const d0 = template?.description || '';
+      const q0 = template?.questions || [];
+      const s0 = template?.settings || {};
+      const l0 = template?.locales || {};
+      setTitle(t0);
+      setDescription(d0);
+
+      // Split questions into welcome/ending + pages
+      const wBlock = q0.find((q) => q.type === 'welcome') || null;
+      const eBlock = q0.find((q) => q.type === 'ending') || null;
+      const p0 = questionsToPages(q0);
+      setWelcomeBlock(wBlock);
+      setEndingBlock(eBlock);
+      setPages(p0);
+
+      setSettings(s0);
+      setLocales(l0);
       setActiveTab(0);
       setEditLocale(i18n.language || 'ko');
+      // Snapshot uses the same round-trip as allQuestions so dirty-check
+      // won't false-positive from pageId being stamped by pagesToQuestions.
+      const cBlocks = [wBlock, eBlock].filter(Boolean) as Question[];
+      const roundTripped = pagesToQuestions(p0, cBlocks);
+      initialSnapshot.current = JSON.stringify({
+        description: d0,
+        questions: roundTripped,
+        settings: s0,
+        locales: l0,
+      });
     }
   }, [open, template, i18n.language]);
+
+  // Compute flat questions for dirty-check and preview
+  const contentBlocks = useMemo(
+    () => [welcomeBlock, endingBlock].filter(Boolean) as Question[],
+    [welcomeBlock, endingBlock]
+  );
+
+  const allQuestions = useMemo(
+    () => pagesToQuestions(pages, contentBlocks),
+    [pages, contentBlocks]
+  );
+
+  const isDirty = useMemo(() => {
+    if (!initialSnapshot.current) return false;
+    return (
+      JSON.stringify({
+        description,
+        questions: allQuestions,
+        settings,
+        locales,
+      }) !== initialSnapshot.current
+    );
+  }, [description, allQuestions, settings, locales]);
+
+  // ==================== Question Handlers ====================
 
   const addQuestion = (type: QuestionType) => {
     const newQ: Question = {
       id: genId(),
       type,
       title: { [editLocale]: '' },
-      required: type !== 'welcome' && type !== 'ending',
+      required: true,
       options: ['single_choice', 'multiple_choice', 'dropdown'].includes(type)
         ? [
             { id: genId(), label: { [editLocale]: '' } },
@@ -174,46 +255,151 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                 ? { maxLength: 2000 }
                 : undefined,
     };
-    setQuestions((prev) => [...prev, newQ]);
+
+    // Add to specific page or last page
+    const targetPageId = menuTargetPageId || pages[pages.length - 1]?.id;
+    if (!targetPageId) return;
+
+    setPages((prev) =>
+      prev.map((page) =>
+        page.id === targetPageId
+          ? { ...page, questions: [...page.questions, newQ] }
+          : page
+      )
+    );
   };
 
-  const updateQuestion = (idx: number, updated: Question) => {
-    setQuestions((prev) => prev.map((q, i) => (i === idx ? updated : q)));
+  const updateQuestionInPage = (
+    pageId: string,
+    qIdx: number,
+    updated: Question
+  ) => {
+    setPages((prev) =>
+      prev.map((page) =>
+        page.id === pageId
+          ? {
+              ...page,
+              questions: page.questions.map((q, i) =>
+                i === qIdx ? updated : q
+              ),
+            }
+          : page
+      )
+    );
   };
 
-  const deleteQuestion = (idx: number) => {
-    setQuestions((prev) => prev.filter((_, i) => i !== idx));
+  const deleteQuestionInPage = (pageId: string, qIdx: number) => {
+    setPages((prev) =>
+      prev.map((page) =>
+        page.id === pageId
+          ? {
+              ...page,
+              questions: page.questions.filter((_, i) => i !== qIdx),
+            }
+          : page
+      )
+    );
   };
 
-  const duplicateQuestion = (idx: number) => {
-    const source = questions[idx];
-    const dup: Question = {
-      ...JSON.parse(JSON.stringify(source)),
-      id: genId(),
-    };
-    if (dup.options) {
-      dup.options = dup.options.map((o: any) => ({ ...o, id: genId() }));
+  const duplicateQuestionInPage = (pageId: string, qIdx: number) => {
+    setPages((prev) =>
+      prev.map((page) => {
+        if (page.id !== pageId) return page;
+        const source = page.questions[qIdx];
+        const dup: Question = {
+          ...JSON.parse(JSON.stringify(source)),
+          id: genId(),
+        };
+        if (dup.options) {
+          dup.options = dup.options.map((o: any) => ({ ...o, id: genId() }));
+        }
+        const next = [...page.questions];
+        next.splice(qIdx + 1, 0, dup);
+        return { ...page, questions: next };
+      })
+    );
+  };
+
+  // ==================== Welcome/Ending Handlers ====================
+
+  const toggleWelcome = () => {
+    if (welcomeBlock) {
+      setWelcomeBlock(null);
+    } else {
+      setWelcomeBlock({
+        id: genId(),
+        type: 'welcome',
+        title: { [editLocale]: '' },
+        required: false,
+      });
     }
-    setQuestions((prev) => {
-      const next = [...prev];
-      next.splice(idx + 1, 0, dup);
-      return next;
+  };
+
+  const toggleEnding = () => {
+    if (endingBlock) {
+      setEndingBlock(null);
+    } else {
+      setEndingBlock({
+        id: genId(),
+        type: 'ending',
+        title: { [editLocale]: '' },
+        required: false,
+      });
+    }
+  };
+
+  // ==================== Page Handlers ====================
+
+  const addPage = () => {
+    setPages((prev) => [...prev, { id: genId(), questions: [] }]);
+  };
+
+  const deletePage = (pageId: string) => {
+    setPages((prev) => {
+      const filtered = prev.filter((p) => p.id !== pageId);
+      // Always keep at least one page
+      if (filtered.length === 0) {
+        return [{ id: genId(), questions: [] }];
+      }
+      return filtered;
     });
   };
+
+  // ==================== Save ====================
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave({ title, description, questions, settings, locales });
+      await onSave({
+        title,
+        description,
+        questions: allQuestions,
+        settings,
+        locales,
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  const hasQuestions = questions.some(
-    (q) => q.type !== 'welcome' && q.type !== 'ending'
+  const isEditMode = Boolean(template);
+  const hasQuestions = pages.some((p) => p.questions.length > 0);
+  const allQuestionsHaveTitle = pages.every((p) =>
+    p.questions.every((q) => {
+      const vals = Object.values(q.title || {});
+      return vals.some((v) => v.trim().length > 0);
+    })
   );
-  const isValid = title.trim().length > 0 && hasQuestions;
+  const isValid = title.trim().length > 0 && hasQuestions && allQuestionsHaveTitle;
+
+  // Compute question numbering across pages
+  const getQuestionNumber = (pageIdx: number, qIdx: number): number => {
+    let num = 0;
+    for (let i = 0; i < pageIdx; i++) {
+      num += pages[i].questions.length;
+    }
+    return num + qIdx;
+  };
 
   return (
     <Dialog
@@ -273,10 +459,15 @@ const SurveyBuilderDialog: React.FC<Props> = ({
               <Box sx={{ p: 2 }}>
                 <TextField
                   fullWidth
-                  autoFocus
+                  autoFocus={!isEditMode}
+                  disabled={isEditMode}
                   label={t('surveyTemplate.templateName')}
                   placeholder={t('surveyTemplate.templateNamePlaceholder')}
-                  helperText={t('surveyTemplate.templateNameHelp')}
+                  helperText={
+                    isEditMode
+                      ? t('surveyTemplate.templateNameReadonly')
+                      : t('surveyTemplate.templateNameHelp')
+                  }
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -322,35 +513,275 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                   </Typography>
                 </Box>
 
-                {/* Question Blocks */}
-                {questions.map((q, idx) => (
-                  <QuestionBlockEditor
-                    key={q.id}
-                    question={q}
-                    locale={editLocale}
-                    index={idx}
-                    onChange={(updated) => updateQuestion(idx, updated)}
-                    onDelete={() => deleteQuestion(idx)}
-                    onDuplicate={() => duplicateQuestion(idx)}
-                  />
-                ))}
-
-                {/* Add Question Button */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={(e) => setMenuAnchor(e.currentTarget)}
-                    sx={{ borderRadius: 2, px: 4, py: 1.5 }}
+                {/* Welcome/Ending toggles */}
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 1.5, mb: 2, borderRadius: 2 }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      flexWrap: 'wrap',
+                    }}
                   >
-                    {t('surveyTemplate.addQuestion')}
-                  </Button>
-                </Box>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={Boolean(welcomeBlock)}
+                          onChange={toggleWelcome}
+                          size="small"
+                        />
+                      }
+                      label={
+                        <Typography variant="body2">
+                          {t('surveyTemplate.questionTypes.welcome')}
+                        </Typography>
+                      }
+                    />
+                    {welcomeBlock && (
+                      <TextField
+                        size="small"
+                        placeholder={t('surveyTemplate.questionTitlePlaceholder')}
+                        value={welcomeBlock.title?.[editLocale] || ''}
+                        onChange={(e) =>
+                          setWelcomeBlock({
+                            ...welcomeBlock,
+                            title: {
+                              ...welcomeBlock.title,
+                              [editLocale]: e.target.value,
+                            },
+                          })
+                        }
+                        sx={{ flex: 1, minWidth: 200 }}
+                      />
+                    )}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      mt: 1,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={Boolean(endingBlock)}
+                          onChange={toggleEnding}
+                          size="small"
+                        />
+                      }
+                      label={
+                        <Typography variant="body2">
+                          {t('surveyTemplate.questionTypes.ending')}
+                        </Typography>
+                      }
+                    />
+                    {endingBlock && (
+                      <TextField
+                        size="small"
+                        placeholder={t('surveyTemplate.questionTitlePlaceholder')}
+                        value={endingBlock.title?.[editLocale] || ''}
+                        onChange={(e) =>
+                          setEndingBlock({
+                            ...endingBlock,
+                            title: {
+                              ...endingBlock.title,
+                              [editLocale]: e.target.value,
+                            },
+                          })
+                        }
+                        sx={{ flex: 1, minWidth: 200 }}
+                      />
+                    )}
+                  </Box>
+                </Paper>
+
+                {/* Pages with questions */}
+                {pages.map((page, pageIdx) => (
+                  <Box key={page.id} sx={{ mb: 2 }}>
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        borderRadius: 2,
+                        borderColor: 'primary.light',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {/* Page Header */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          px: 1,
+                          py: 0.75,
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(144,202,249,0.08)'
+                              : 'primary.50',
+                          borderBottom: collapsedPages.has(page.id)
+                            ? 0
+                            : 1,
+                          borderColor: 'primary.light',
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                        }}
+                        onClick={() => togglePageCollapse(page.id)}
+                      >
+                        <IconButton size="small" sx={{ p: 0.25 }}>
+                          {collapsedPages.has(page.id) ? (
+                            <ExpandMore fontSize="small" color="primary" />
+                          ) : (
+                            <ExpandLess fontSize="small" color="primary" />
+                          )}
+                        </IconButton>
+                        <Typography
+                          variant="subtitle2"
+                          fontWeight={700}
+                          color="primary.main"
+                          sx={{ flexShrink: 0 }}
+                        >
+                          {t('surveyTemplate.pageNumber', {
+                            number: pageIdx + 1,
+                          }) || `Page ${pageIdx + 1}`}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                        >
+                          ({page.questions.length})
+                        </Typography>
+                        <Box sx={{ flex: 1 }} />
+                        <Tooltip
+                          title={
+                            t('surveyTemplate.addQuestion') || 'Add Question'
+                          }
+                        >
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setMenuTargetPageId(page.id);
+                              setMenuAnchor(e.currentTarget);
+                              // Auto-expand if collapsed
+                              setCollapsedPages((prev) => {
+                                const next = new Set(prev);
+                                next.delete(page.id);
+                                return next;
+                              });
+                            }}
+                          >
+                            <Add fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        {pages.length > 1 && (
+                          <Tooltip
+                            title={
+                              t('surveyTemplate.deletePage') || 'Delete Page'
+                            }
+                          >
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deletePage(page.id);
+                              }}
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+
+                      {/* Questions in this page — collapsible */}
+                      <Collapse in={!collapsedPages.has(page.id)}>
+                        <Box sx={{ p: 1.5 }}>
+                          {page.questions.length === 0 ? (
+                            <Box
+                              sx={{
+                                py: 3,
+                                textAlign: 'center',
+                                border: '2px dashed',
+                                borderColor: 'divider',
+                                borderRadius: 2,
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.disabled"
+                              >
+                                {t('surveyTemplate.emptyPage') ||
+                                  '이 페이지에 질문을 추가하세요'}
+                              </Typography>
+                            </Box>
+                          ) : (
+                            page.questions.map((q, qIdx) => (
+                              <QuestionBlockEditor
+                                key={q.id}
+                                question={q}
+                                locale={editLocale}
+                                index={getQuestionNumber(pageIdx, qIdx)}
+                                onChange={(updated) =>
+                                  updateQuestionInPage(
+                                    page.id,
+                                    qIdx,
+                                    updated
+                                  )
+                                }
+                                onDelete={() =>
+                                  deleteQuestionInPage(page.id, qIdx)
+                                }
+                                onDuplicate={() =>
+                                  duplicateQuestionInPage(page.id, qIdx)
+                                }
+                              />
+                            ))
+                          )}
+                        </Box>
+                        {/* Bottom add-question button for accessibility */}
+                        {page.questions.length > 0 && (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                              pb: 1,
+                            }}
+                          >
+                            <Button
+                              size="small"
+                              startIcon={<Add />}
+                              onClick={(e) => {
+                                setMenuTargetPageId(page.id);
+                                setMenuAnchor(e.currentTarget);
+                              }}
+                              sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                              }}
+                            >
+                              {t('surveyTemplate.addQuestion')}
+                            </Button>
+                          </Box>
+                        )}
+                      </Collapse>
+                    </Paper>
+                  </Box>
+                ))}
 
                 <QuestionTypeMenu
                   anchorEl={menuAnchor}
                   open={Boolean(menuAnchor)}
-                  onClose={() => setMenuAnchor(null)}
+                  onClose={() => {
+                    setMenuAnchor(null);
+                    setMenuTargetPageId(null);
+                  }}
                   onSelect={addQuestion}
                 />
               </Box>
@@ -368,6 +799,30 @@ const SurveyBuilderDialog: React.FC<Props> = ({
               </Box>
             )}
           </Box>
+
+          {/* Sticky footer — outside scroll area */}
+          {activeTab === 0 && (
+            <Box
+              sx={{
+                flexShrink: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                py: 1.5,
+                borderTop: 1,
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+              }}
+            >
+              <Button
+                variant="contained"
+                startIcon={<PostAdd />}
+                onClick={addPage}
+                sx={{ borderRadius: 2, px: 3, py: 1 }}
+              >
+                {t('surveyTemplate.addPage') || '페이지 추가'}
+              </Button>
+            </Box>
+          )}
         </Box>
 
         {/* Splitter */}
@@ -430,7 +885,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
             <SurveyPreview
               title={title}
               description={description}
-              questions={questions}
+              questions={allQuestions}
               settings={settings}
               locales={locales}
               locale={editLocale}
@@ -444,7 +899,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!isValid || saving}
+          disabled={!isValid || saving || (isEditMode && !isDirty)}
           startIcon={saving ? <CircularProgress size={16} /> : undefined}
         >
           {saving

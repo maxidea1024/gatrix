@@ -736,6 +736,7 @@ const FeatureNetworkPage: React.FC = () => {
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: false as const,
       plugins: {
         legend: {
           display: chartGroupBy !== 'all',

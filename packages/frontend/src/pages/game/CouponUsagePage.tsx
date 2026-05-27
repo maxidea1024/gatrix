@@ -580,12 +580,6 @@ const CouponUsagePage: React.FC = () => {
             <IconButton
               onClick={(e) => setExportMenuAnchor(e.currentTarget)}
               aria-label="more options"
-              sx={{
-                bgcolor: 'background.paper',
-                border: 1,
-                borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
-              }}
             >
               <MoreVertIcon />
             </IconButton>

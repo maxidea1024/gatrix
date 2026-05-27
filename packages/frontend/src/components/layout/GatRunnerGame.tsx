@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface GatRunnerGameProps {
   open: boolean;
@@ -375,11 +376,14 @@ function obsHitbox(type: ObsType) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const GatRunnerGame: React.FC<GatRunnerGameProps> = ({ open, onClose }) => {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   // Store onClose in ref to avoid useEffect re-runs when parent re-renders
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const stateRef = useRef({
     catY: GY, velY: 0, jumping: false, jumpCount: 0,
@@ -547,19 +551,20 @@ const GatRunnerGame: React.FC<GatRunnerGameProps> = ({ open, onClose }) => {
       }
 
       // ── Overlays ──
+      const tr = tRef.current;
       if (!s.started) {
         ctx.fillStyle = 'rgba(0,0,0,0.35)';
         ctx.fillRect(0, 0, W, H);
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 22px "Inter", sans-serif';
-        ctx.fillText('Gat Runner', W / 2, H / 2 - 24);
+        ctx.fillText(tr('gatRunner.title'), W / 2, H / 2 - 24);
         ctx.font = '13px "Inter", sans-serif';
         ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.fillText('\uCE58\uC988\uB97C \uD6D4\uCE5C \uC950\uB97C \uC7A1\uC544\uB77C!', W / 2, H / 2 + 4);
+        ctx.fillText(tr('gatRunner.subtitle'), W / 2, H / 2 + 4);
         ctx.font = '12px "Inter", sans-serif';
         ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.fillText('Space / \u2191 / Click', W / 2, H / 2 + 28);
+        ctx.fillText(tr('gatRunner.controls'), W / 2, H / 2 + 28);
       }
 
       if (s.gameOver) {
@@ -568,16 +573,16 @@ const GatRunnerGame: React.FC<GatRunnerGameProps> = ({ open, onClose }) => {
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 24px "Inter", sans-serif';
-        ctx.fillText('GAME OVER', W / 2, H / 2 - 16);
+        ctx.fillText(tr('gatRunner.gameOver'), W / 2, H / 2 - 16);
         ctx.font = '14px "Inter", sans-serif';
-        ctx.fillText(`Score: ${Math.floor(s.score)}`, W / 2, H / 2 + 12);
+        ctx.fillText(tr('gatRunner.score', { score: Math.floor(s.score) }), W / 2, H / 2 + 12);
         ctx.font = '12px "Inter", sans-serif';
         if (s.gameOverCooldown > 0) {
           ctx.fillStyle = 'rgba(255,255,255,0.4)';
           ctx.fillText(`${Math.ceil(s.gameOverCooldown / 60)}...`, W / 2, H / 2 + 36);
         } else {
           ctx.fillStyle = 'rgba(255,255,255,0.7)';
-          ctx.fillText('Space / Click to Retry', W / 2, H / 2 + 36);
+          ctx.fillText(tr('gatRunner.retry'), W / 2, H / 2 + 36);
         }
       }
 
@@ -627,7 +632,7 @@ const GatRunnerGame: React.FC<GatRunnerGameProps> = ({ open, onClose }) => {
           textAlign: 'center', py: 0.75, bgcolor: '#2d2d2d',
           color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', fontFamily: 'monospace',
         }}>
-          SPACE / ↑ / CLICK TO JUMP • ESC TO EXIT
+          {t('gatRunner.controlsFooter')}
         </Box>
       </Box>
     </Box>
