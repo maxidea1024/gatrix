@@ -599,11 +599,15 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             sx={{
               height: 'auto',
               minHeight: '32px',
-              bgcolor: 'rgba(25, 118, 210, 0.04)',
-              border: '1.5px solid',
-              borderColor: 'primary.main',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '4px',
               cursor: 'pointer',
-              transition: 'all 0.2s',
+              transition: 'all 0.15s',
               '& .MuiChip-label': {
                 display: 'block',
                 whiteSpace: 'normal',
@@ -618,9 +622,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 },
               },
               '&:hover': {
-                borderColor: 'primary.dark',
-                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.15)',
-                transform: 'translateY(-1px)',
+                borderColor: 'primary.main',
               },
             }}
           />
@@ -661,26 +663,27 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           onDelete={() => handleRemoveFilter(filter.key)}
           sx={{
             height: '32px',
-            bgcolor: 'rgba(25, 118, 210, 0.08)',
-            color: 'primary.main',
-            border: '1.5px solid',
-            borderColor: 'primary.main',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)',
+            color: 'text.primary',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: '4px',
             fontWeight: 600,
-            transition: 'all 0.2s',
+            transition: 'all 0.15s',
             cursor: 'pointer',
             '&:hover': {
-              borderColor: 'primary.dark',
-              boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
-              transform: 'translateY(-1px)',
+              borderColor: 'primary.main',
             },
             '& .MuiChip-icon': {
-              color: 'primary.main',
+              color: 'text.secondary',
             },
             '& .MuiChip-deleteIcon': {
-              color: 'primary.main',
+              color: 'text.disabled',
               '&:hover': {
                 color: 'error.main',
-                bgcolor: 'rgba(211, 47, 47, 0.1)',
               },
             },
           }}
@@ -696,13 +699,14 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           display: 'inline-flex',
           alignItems: 'center',
           px: 1.5,
-          py: 0.75,
+          py: 0.5,
           gap: 1,
           minHeight: '32px',
-          border: '1.5px solid',
-          borderColor: 'primary.main',
-          borderRadius: '16px',
-          bgcolor: 'rgba(25, 118, 210, 0.08)',
+          borderRadius: '4px',
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.04)',
         }}
       >
         <Box

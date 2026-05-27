@@ -1015,6 +1015,7 @@ const FeatureNetworkPage: React.FC = () => {
             options={allOrgs.map((org) => ({ value: org.id, label: org.name }))}
             selected={selectedOrgIds}
             onChange={setSelectedOrgIds}
+            emptyMeansAll
           />
         )}
 
@@ -1025,6 +1026,7 @@ const FeatureNetworkPage: React.FC = () => {
             options={filteredProjects.map((proj) => ({ value: proj.id, label: proj.name }))}
             selected={selectedProjectIds}
             onChange={setSelectedProjectIds}
+            emptyMeansAll
           />
         )}
 

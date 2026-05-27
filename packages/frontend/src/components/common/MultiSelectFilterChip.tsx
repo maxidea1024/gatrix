@@ -37,6 +37,8 @@ interface MultiSelectFilterChipProps {
   searchThreshold?: number;
   /** If true, chip is hidden when options list is empty */
   hideWhenEmpty?: boolean;
+  /** If true, empty selection is treated as 'All' instead of 'None' (e.g. org/project where no filter = all) */
+  emptyMeansAll?: boolean;
 }
 
 /**
@@ -54,14 +56,15 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
   popoverMinWidth = 220,
   searchThreshold = 8,
   hideWhenEmpty = false,
+  emptyMeansAll = false,
 }) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchText, setSearchText] = useState('');
   const open = Boolean(anchorEl);
 
-  const allSelected = selected.length === options.length && options.length > 0;
   const noneSelected = selected.length === 0;
+  const allSelected = (selected.length === options.length && options.length > 0) || (emptyMeansAll && noneSelected);
 
   // Summary: show selected item names (max 2) + overflow count
   const MAX_VISIBLE_LABELS = 2;
