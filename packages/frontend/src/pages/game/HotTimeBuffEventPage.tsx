@@ -658,16 +658,19 @@ const HotTimeBuffEventPage: React.FC = () => {
         textColor = isDark ? '#999' : '#666';
       }
 
+      const eventName = row.cmsItem.name || `HotTimeBuff #${row.cmsId}`;
+      const eventDesc = row.cmsItem.worldBuffNames?.join(', ') || '';
+
       return {
         id: String(row.cmsId),
-        title: row.cmsItem.name || `HotTimeBuff #${row.cmsId}`,
+        title: `${row.cmsId}: ${eventName}`,
         start: startStr?.substring(0, 10),
         end: endExclusive,
         allDay: true,
         backgroundColor: bgColor,
         borderColor,
         textColor,
-        extendedProps: { row },
+        extendedProps: { row, desc: eventDesc },
       };
     });
   }, [filteredRows, isDark]);
