@@ -61,9 +61,6 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
   const [searchText, setSearchText] = useState('');
   const open = Boolean(anchorEl);
 
-  // Don't render if no options and hideWhenEmpty
-  if (hideWhenEmpty && options.length === 0) return null;
-
   const allSelected = selected.length === options.length && options.length > 0;
   const noneSelected = selected.length === 0;
 
@@ -82,6 +79,9 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
       opt.label.toLowerCase().includes(lower)
     );
   }, [options, searchText]);
+
+  // Don't render if no options and hideWhenEmpty (AFTER all hooks)
+  if (hideWhenEmpty && options.length === 0) return null;
 
   const handleToggle = (value: string) => {
     if (selected.includes(value)) {
