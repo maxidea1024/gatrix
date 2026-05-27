@@ -64,12 +64,24 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
   const allSelected = selected.length === options.length && options.length > 0;
   const noneSelected = selected.length === 0;
 
-  // Summary text for chip label
-  const summaryText = allSelected
-    ? t('common.all', 'All')
-    : noneSelected
-      ? t('common.none', 'None')
-      : `${selected.length}/${options.length}`;
+  // Summary: show selected item names (max 2) + overflow count
+  const MAX_VISIBLE_LABELS = 2;
+  const summaryText = useMemo(() => {
+    if (allSelected) return t('common.all', 'All');
+    if (noneSelected) return t('common.none', 'None');
+
+    // Find labels for selected values (preserve option order)
+    const selectedLabels = options
+      .filter((opt) => selected.includes(opt.value))
+      .map((opt) => opt.label);
+
+    const visible = selectedLabels.slice(0, MAX_VISIBLE_LABELS);
+    const overflow = selectedLabels.length - visible.length;
+
+    return overflow > 0
+      ? `${visible.join(', ')} +${overflow}`
+      : visible.join(', ');
+  }, [allSelected, noneSelected, selected, options, t]);
 
   // Filtered options by search
   const filteredOptions = useMemo(() => {
