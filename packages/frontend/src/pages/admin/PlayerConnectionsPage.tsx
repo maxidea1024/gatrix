@@ -295,14 +295,17 @@ const PlayerConnectionsPage: React.FC = () => {
   }, [loadCcu]);
 
   // Auto-refresh (only for Overview and CCU Graph tabs, not Player List)
+  // Force 10s interval when scoreboard (전광판) is open
   useEffect(() => {
-    if (refreshInterval > 0 && activeTab < 4) {
+    if (scoreboardOpen) {
+      intervalRef.current = setInterval(loadCcu, 10000);
+    } else if (refreshInterval > 0 && activeTab < 4) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [refreshInterval, loadCcu, activeTab]);
+  }, [refreshInterval, loadCcu, activeTab, scoreboardOpen]);
 
   const handleTabChange = (_: React.SyntheticEvent, val: number) => {
     setActiveTab(val);

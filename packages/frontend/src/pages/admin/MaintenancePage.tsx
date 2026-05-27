@@ -589,12 +589,6 @@ const MaintenancePage: React.FC = () => {
           {/* 좌측 Settings 영역 */}
           <Card
             sx={{
-              borderColor: (theme) =>
-                isMaintenance
-                  ? theme.palette.error.main
-                  : theme.palette.success.main,
-              borderWidth: 1,
-              borderStyle: 'solid',
               flex: 1,
               maxWidth: 800,
             }}

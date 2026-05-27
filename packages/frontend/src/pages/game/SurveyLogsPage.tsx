@@ -682,8 +682,8 @@ const SurveyLogsPage: React.FC = () => {
         </Box>
       </Box>
 
-      <PageContentLoader loading={loading && logs.length === 0}>
-        {logs.length === 0 && !loading ? (
+      <PageContentLoader loading={!filtersInitialized || (loading && logs.length === 0)}>
+        {logs.length === 0 && !loading && filtersInitialized ? (
           <EmptyPagePlaceholder message={t('surveys.logs.noRecords')} />
         ) : (
           <Card variant="outlined">
