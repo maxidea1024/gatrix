@@ -399,7 +399,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({
         }}
       >
         {/* Basic Info */}
-        <Paper variant="outlined" sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography
             variant="subtitle2"
             sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
@@ -598,7 +598,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({
         </Paper>
 
         {/* RBAC Role Assignment */}
-        <Paper variant="outlined" sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography
             variant="subtitle2"
             sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
@@ -667,7 +667,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({
                       </Typography>
                       {isSelected && (
                         <Chip
-                          label="??
+                          label="✓"
                           size="small"
                           color="primary"
                           sx={{ height: 20, ml: 'auto' }}
@@ -1219,12 +1219,13 @@ const ServiceAccountsPage: React.FC = () => {
                           />
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            ??                          </Typography>
+                            —
+                          </Typography>
                         )}
                       </TableCell>
                       <TableCell align="center">
                         <Chip
-                          label={account.tokens?.length || '??}
+                          label={account.tokens?.length || '–'}
                           size="small"
                           variant="outlined"
                           icon={<ShieldIcon sx={{ fontSize: 14 }} />}

@@ -159,7 +159,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
           gap: 3,
         }}
       >
-        <Paper variant="outlined" sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography
             variant="subtitle2"
             sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}

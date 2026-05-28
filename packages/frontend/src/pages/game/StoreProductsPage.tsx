@@ -1575,7 +1575,8 @@ const StoreProductsPage: React.FC = () => {
                                     variant="body2"
                                     color="text.disabled"
                                   >
-                                    ??                                  </Typography>
+                                    —
+                                  </Typography>
                                 )}
                               </TableCell>
                             );

@@ -207,7 +207,7 @@ const GroupsPage: React.FC = () => {
       )
     : groups;
 
-  // ?€?€?€ Dialog handlers ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // â”€â”€â”€ Dialog handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const openCreateDialog = () => {
     setDialogMode('create');
@@ -319,7 +319,7 @@ const GroupsPage: React.FC = () => {
     }
   };
 
-  // ?€?€?€ Member management (buffered) ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // â”€â”€â”€ Member management (buffered) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleAddMember = () => {
     if (!selectedUserId) return;
@@ -343,7 +343,7 @@ const GroupsPage: React.FC = () => {
     }
   };
 
-  // ?€?€?€ Role management (buffered) ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // â”€â”€â”€ Role management (buffered) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleAddRole = () => {
     if (!selectedRoleId) return;
@@ -793,7 +793,7 @@ const GroupsPage: React.FC = () => {
       <ResizableDrawer
         open={detailDialogOpen}
         onClose={() => setDetailDialogOpen(false)}
-        title={`${selectedGroup?.groupName || ''} ??${t('rbac.groups.detail')}`}
+        title={`${selectedGroup?.groupName || ''} â€” ${t('rbac.groups.detail')}`}
         storageKey="groupDetailDrawerWidth"
         defaultWidth={550}
         minWidth={400}

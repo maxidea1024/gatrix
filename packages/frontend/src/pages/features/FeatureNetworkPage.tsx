@@ -1087,7 +1087,7 @@ const FeatureNetworkPage: React.FC = () => {
 
           {/* API Requests Tab */}
           {activeTab === 0 && (
-            <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+            <Box sx={{ p: 2 }}>
               {/* API Summary Cards */}
               <Box
                 sx={{
@@ -1300,7 +1300,7 @@ const FeatureNetworkPage: React.FC = () => {
 
           {/* Flag Evaluations Tab */}
           {activeTab === 1 && (
-            <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+            <Box sx={{ p: 2 }}>
               {/* Evaluation Summary Cards */}
               <Box
                 sx={{

@@ -58,7 +58,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         alignItems: 'center',
         mb: 1,
         pb: 1,
-        height: 40,
+        minHeight: 40,
         borderBottom: 1,
         borderColor: 'divider',
       }}

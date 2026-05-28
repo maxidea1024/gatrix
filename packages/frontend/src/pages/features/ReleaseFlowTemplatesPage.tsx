@@ -257,7 +257,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
         </Tabs>
 
         {/* Tab Content */}
-        <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Box sx={{ p: 2 }}>
           {/* General Tab */}
           {activeTab === 0 && (
             <Stack spacing={2}>
@@ -852,7 +852,7 @@ const MilestoneSection: React.FC<MilestoneSectionProps> = ({
 
       {/* Collapsible content */}
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Box sx={{ p: 2 }}>
           <Stack spacing={2}>
             {milestone.strategies.map((strategy, sIdx) => (
               <StrategyEditor

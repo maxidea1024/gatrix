@@ -323,7 +323,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
         }}
       >
         {/* Basic Information */}
-        <Paper variant="outlined" sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography
             variant="subtitle2"
             sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
@@ -402,7 +402,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           </Box>
         </Paper>
 
-        <Paper variant="outlined" sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography
             variant="subtitle2"
             sx={{ fontWeight: 600, color: 'primary.main', mb: 2 }}

@@ -241,16 +241,16 @@ const MessageTemplatesPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   // Pagination
-  const [page, setPage] = useState(0); // SimplePagination?� 0-based
+  const [page, setPage] = useState(0); // SimplePagination은 0-based
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // Filter
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Debouncing??Search??(500ms 지??
+  // Debouncing된 Search어 (500ms 지연)
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  // ?�적 Filter Status (localStorage?�서 복원)
+  // 동적 Filter Status (localStorage에서 복원)
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
     try {
       const saved = localStorage.getItem('messageTemplatesPage.activeFilters');
@@ -261,7 +261,7 @@ const MessageTemplatesPage: React.FC = () => {
   });
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // ?�적 Filter?�서 �?추출 (useMemo�?참조 ?�정??
+  // 동적 Filter에서 값 추출 (useMemo로 참조 안정화)
   const isEnabledFilter = useMemo(() => {
     const filter = activeFilters.find((f) => f.key === 'isEnabled');
     return filter?.value as boolean | boolean[] | undefined;
@@ -283,7 +283,7 @@ const MessageTemplatesPage: React.FC = () => {
     return filter?.operator;
   }, [activeFilters]);
 
-  // Filter�?문자?�로 변?�하???�존??배열??Used
+  // Filter를 문자열로 변환하여 의존성 배열에 Used
   const isEnabledFilterString = useMemo(
     () =>
       Array.isArray(isEnabledFilter)
@@ -295,7 +295,8 @@ const MessageTemplatesPage: React.FC = () => {
   );
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
-  // ?�택 관??  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  // 선택 관련
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -324,7 +325,7 @@ const MessageTemplatesPage: React.FC = () => {
     setActionMenuTarget(null);
   };
 
-  // ?�그 관??Status
+  // 태그 관련 Status
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedTemplateForTags, setSelectedTemplateForTags] =
@@ -420,7 +421,8 @@ const MessageTemplatesPage: React.FC = () => {
     })
   );
 
-  // Form ?�드 ref??  const nameFieldRef = useRef<HTMLInputElement>(null);
+  // Form 필드 ref들
+  const nameFieldRef = useRef<HTMLInputElement>(null);
   const defaultMessageFieldRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -471,7 +473,7 @@ const MessageTemplatesPage: React.FC = () => {
     t,
   ]);
 
-  // ?�그 로딩
+  // 태그 로딩
   const loadTags = useCallback(async () => {
     try {
       const tags = await tagService.list(projectApiPath);
@@ -486,7 +488,7 @@ const MessageTemplatesPage: React.FC = () => {
     loadTags();
   }, [load, loadTags]);
 
-  // ?�적 Filter ?�의
+  // 동적 Filter 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
@@ -517,7 +519,8 @@ const MessageTemplatesPage: React.FC = () => {
     [t, allTags]
   );
 
-  // ?�적 Filter ?�들??  const handleFilterAdd = (filter: ActiveFilter) => {
+  // 동적 Filter 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
     setPage(0);
   };
@@ -543,11 +546,13 @@ const MessageTemplatesPage: React.FC = () => {
     );
   };
 
-  // ?�이지 변�??�들??  const handlePageChange = useCallback((_: unknown, newPage: number) => {
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((_: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 
-  // ?�이지 ?�기 변�??�들??  const handleRowsPerPageChange = useCallback(
+  // 페이지 크기 변경 핸들러
+  const handleRowsPerPageChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newRowsPerPage = parseInt(event.target.value, 10);
       setRowsPerPage(newRowsPerPage);
@@ -556,7 +561,8 @@ const MessageTemplatesPage: React.FC = () => {
     []
   );
 
-  // ?�택 관???�들??  const handleSelectAll = useCallback(
+  // 선택 관련 핸들러
+  const handleSelectAll = useCallback(
     (checked: boolean) => {
       setSelectAll(checked);
       if (checked) {
@@ -575,7 +581,7 @@ const MessageTemplatesPage: React.FC = () => {
           ? [...prev, id]
           : prev.filter((selectedId) => selectedId !== id);
 
-        // ?�체 ?�택 Update state
+        // 전체 선택 Update state
         const availableIds = items
           .filter((item) => item.id)
           .map((item) => item.id!);
@@ -589,7 +595,7 @@ const MessageTemplatesPage: React.FC = () => {
     [items]
   );
 
-  // ?�괄 Delete
+  // 일괄 Delete
   const handleBulkDelete = useCallback(() => {
     if (selectedIds.length === 0) return;
     setBulkDeleteDialogOpen(true);
@@ -636,7 +642,8 @@ const MessageTemplatesPage: React.FC = () => {
     [selectedIds, t, enqueueSnackbar, closeSnackbar, load]
   );
 
-  // ?�괄 Used 가??불�? 변�?  const handleBulkToggleAvailability = useCallback(
+  // 일괄 Used 가능/불가 변경
+  const handleBulkToggleAvailability = useCallback(
     async (isEnabled: boolean) => {
       if (selectedIds.length === 0) return;
 
@@ -841,7 +848,7 @@ const MessageTemplatesPage: React.FC = () => {
       setFullEditingData(null);
       await load();
     } catch (error: any) {
-      // Handle duplicate name error - ??가지 ?�류 구조 All 처리
+      // Handle duplicate name error - 두 가지 오류 구조 All 처리
       const status = error?.response?.status || error?.status;
       const errorData = error?.response?.data?.error || error?.error;
 
@@ -1066,7 +1073,7 @@ const MessageTemplatesPage: React.FC = () => {
               flex: 1,
             }}
           >
-            {/* Search 컨트롤을 �??�으�??�동?�고 개선 */}
+            {/* Search 컨트롤을 맨 앞으로 이동하고 개선 */}
             <SearchTextField
               placeholder={t('messageTemplates.searchPlaceholderDetailed')}
               value={searchQuery}
@@ -1110,7 +1117,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ?�괄 ?�업 ?�바 */}
+      {/* 일괄 작업 툴바 */}
       {selectedIds.length > 0 && (
         <Card
           sx={{
@@ -1318,7 +1325,8 @@ const MessageTemplatesPage: React.FC = () => {
         minWidth={500}
         zIndex={1300}
         onEntered={() => {
-          // Drawer가 ?�린 ???�름 ?�드???�커??          setTimeout(() => {
+          // Drawer가 열린 후 이름 필드에 포커스
+          setTimeout(() => {
             nameFieldRef.current?.focus();
           }, 100);
         }}
@@ -1359,7 +1367,7 @@ const MessageTemplatesPage: React.FC = () => {
                 {t('messageTemplates.availabilityHelp')}
               </Typography>
             </Box>
-            {/* ?�국??메시지 ?�력 컴포?�트 */}
+            {/* 다국어 메시지 입력 컴포넌트 */}
             <MultiLanguageMessageInput
               defaultMessage={form.defaultMessage || ''}
               onDefaultMessageChange={(message) =>
@@ -1396,7 +1404,8 @@ const MessageTemplatesPage: React.FC = () => {
                     message: l.message,
                   })),
                 }));
-                // Translation Results가 ?�으�??�동?�로 ?�국??지??Active??                const hasNonEmptyLocales = locales.some(
+                // Translation Results가 있으면 자동으로 다국어 지원 Active화
+                const hasNonEmptyLocales = locales.some(
                   (l) => l.message && l.message.trim() !== ''
                 );
                 if (hasNonEmptyLocales && !form.supportsMultiLanguage) {
@@ -1411,7 +1420,7 @@ const MessageTemplatesPage: React.FC = () => {
               translateTooltip={t('maintenance.translateTooltip')}
             />
 
-            {/* ?�그 ?�택 */}
+            {/* 태그 선택 */}
             <TagSelector
               value={form.tags || []}
               onChange={(tags) => setForm((prev) => ({ ...prev, tags }))}
@@ -1472,7 +1481,7 @@ const MessageTemplatesPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* ?�괄 Delete Confirm Dialog */}
+      {/* 일괄 Delete Confirm Dialog */}
       <Dialog
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
@@ -1500,7 +1509,7 @@ const MessageTemplatesPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* ?�그 관�?Dialog */}
+      {/* 태그 관리 Dialog */}
       <Dialog
         open={tagDialogOpen}
         onClose={() => setTagDialogOpen(false)}
