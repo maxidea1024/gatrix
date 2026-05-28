@@ -142,21 +142,41 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               fontSize: '0.78rem',
               px: 1.5,
               py: 0.375,
-              minHeight: 30,
+              minHeight: 28,
               borderRadius: 1.5,
               lineHeight: 1.4,
+              boxShadow: 'none',
+              letterSpacing: '0.01em',
+              '&:hover': { boxShadow: 'none' },
+              '&.MuiButton-contained': {
+                bgcolor: 'text.primary',
+                color: 'background.paper',
+                '&:hover': {
+                  bgcolor: 'text.secondary',
+                  boxShadow: 'none',
+                },
+              },
+              '&.MuiButton-outlined': {
+                borderWidth: 1,
+                borderColor: 'divider',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: 'text.secondary',
+                  bgcolor: 'action.hover',
+                },
+              },
               '& .MuiButton-startIcon': {
                 mr: 0.5,
-                '& .MuiSvgIcon-root': { fontSize: '0.95rem' },
+                '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
               },
               '& .MuiButton-endIcon': {
                 ml: 0.25,
-                '& .MuiSvgIcon-root': { fontSize: '0.95rem' },
+                '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
               },
             },
             '& > .MuiIconButton-root': {
               p: 0.5,
-              '& .MuiSvgIcon-root': { fontSize: '1.15rem' },
+              '& .MuiSvgIcon-root': { fontSize: '1.1rem' },
             },
           }}
         >
