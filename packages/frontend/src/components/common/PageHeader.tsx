@@ -1,8 +1,8 @@
 /**
  * PageHeader Component
  *
- * Compact page header with icon, title, inline subtitle and optional actions.
- * Title and subtitle are placed on the same line to maximize content area.
+ * Compact page header with icon, title, inline subtitle, optional tabs and actions.
+ * Title, subtitle, tabs and actions are placed on the same line to maximize content area.
  * Ensures consistent styling across all admin and feature pages.
  */
 
@@ -13,6 +13,7 @@ interface PageHeaderProps {
   icon?: React.ReactNode;
   title: string;
   subtitle?: string;
+  tabs?: React.ReactNode;
   actions?: React.ReactNode;
 }
 
@@ -20,6 +21,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   icon,
   title,
   subtitle,
+  tabs,
   actions,
 }) => {
   return (
@@ -29,15 +31,20 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         mb: 1.5,
+        pb: 1,
         minHeight: 40,
+        borderBottom: 1,
+        borderColor: 'divider',
       }}
     >
+      {/* Left: icon + title + subtitle */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           gap: 1,
           minWidth: 0,
+          flexShrink: 1,
           overflow: 'hidden',
         }}
       >
@@ -92,16 +99,42 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </>
         )}
       </Box>
-      {actions && (
+
+      {/* Right: tabs + actions */}
+      {(tabs || actions) && (
         <Box
           sx={{
             display: 'flex',
-            gap: 1,
+            gap: 0.75,
             alignItems: 'center',
             flexShrink: 0,
             ml: 2,
+            // Compact action buttons globally
+            '& .MuiButton-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.78rem',
+              px: 1.5,
+              py: 0.375,
+              minHeight: 30,
+              borderRadius: 1.5,
+              lineHeight: 1.4,
+              '& .MuiButton-startIcon': {
+                mr: 0.5,
+                '& .MuiSvgIcon-root': { fontSize: '0.95rem' },
+              },
+              '& .MuiButton-endIcon': {
+                ml: 0.25,
+                '& .MuiSvgIcon-root': { fontSize: '0.95rem' },
+              },
+            },
+            '& .MuiIconButton-root': {
+              p: 0.5,
+              '& .MuiSvgIcon-root': { fontSize: '1.15rem' },
+            },
           }}
         >
+          {tabs}
           {actions}
         </Box>
       )}
