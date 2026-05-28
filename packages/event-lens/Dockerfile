@@ -35,7 +35,7 @@ COPY packages/evaluator/package.json ./packages/evaluator/
 ENV CYPRESS_INSTALL_BINARY=0
 
 # Install dependencies (Yarn 4 syntax)
-RUN yarn install
+RUN YARN_NODE_LINKER=node-modules yarn install
 
 # Builder stage
 FROM base AS builder

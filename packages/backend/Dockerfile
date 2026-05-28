@@ -32,7 +32,7 @@ COPY packages/storage/package.json ./packages/storage/
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
 
-RUN yarn install
+RUN YARN_NODE_LINKER=node-modules yarn install
 
 # Rebuild the source code only when needed
 FROM base AS builder
