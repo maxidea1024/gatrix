@@ -187,6 +187,7 @@ const LogoutPage: React.FC = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Button
           variant="contained"
+          color="primary"
           size="large"
           onClick={handleLogout}
           disabled={isLoggingOut}
@@ -200,19 +201,7 @@ const LogoutPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-            color: 'white',
-            '&:hover': {
-              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
-            },
-            '&:disabled': {
-              background: theme.palette.action.disabledBackground,
-              color: theme.palette.action.disabled,
-            },
-            borderRadius: 2,
-            textTransform: 'none',
             fontSize: '1rem',
-            fontWeight: 600,
           }}
         >
           {isLoggingOut
@@ -228,21 +217,7 @@ const LogoutPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: 'rgba(255, 255, 255, 0.85)',
-            textTransform: 'none',
             fontSize: '1rem',
-            fontWeight: 600,
-            borderRadius: 2,
-            '&:hover': {
-              borderColor: 'rgba(255, 255, 255, 0.5)',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              color: 'white',
-            },
-            '&:disabled': {
-              borderColor: 'rgba(255, 255, 255, 0.15)',
-              color: 'rgba(255, 255, 255, 0.3)',
-            },
           }}
         >
           {t('common.cancel')}

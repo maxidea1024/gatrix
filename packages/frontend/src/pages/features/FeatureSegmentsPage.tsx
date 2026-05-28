@@ -580,7 +580,7 @@ const FeatureSegmentsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<SegmentIcon />}
@@ -643,7 +643,7 @@ const FeatureSegmentsPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
+                  <IconButton size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -652,7 +652,7 @@ const FeatureSegmentsPage: React.FC = () => {
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <ViewColumnIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               }

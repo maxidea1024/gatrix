@@ -20,7 +20,6 @@ import {
   Stack,
   Divider,
   Paper,
-  Tooltip,
   alpha,
   useTheme,
 } from '@mui/material';
@@ -212,27 +211,20 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 4,
+          borderRadius: 3,
           minHeight: 600,
           maxHeight: '90vh',
           overflow: 'hidden',
-          background:
-            theme.palette.mode === 'dark'
-              ? `linear-gradient(to bottom, ${alpha(theme.palette.background.paper, 0.95)}, ${theme.palette.background.paper})`
-              : theme.palette.background.paper,
         },
       }}
     >
       {/* Header with gradient */}
       <DialogTitle
         sx={{
-          background:
-            theme.palette.mode === 'dark'
-              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`
-              : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
-          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          pb: 2.5,
-          pt: 2.5,
+          borderBottom: `1px solid`,
+          borderColor: 'divider',
+          pb: 2,
+          pt: 2,
         }}
       >
         <Box
@@ -242,25 +234,15 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
         >
           <Box>
             <Typography
-              variant="h5"
-              fontWeight="700"
+              variant="h6"
+              fontWeight="600"
               gutterBottom
-              sx={{
-                background:
-                  theme.palette.mode === 'dark'
-                    ? `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`
-                    : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
             >
               {t('mailbox.compose')}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ fontWeight: 500 }}
             >
               {t('mailbox.composeSubtitle')}
             </Typography>
@@ -268,13 +250,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           <IconButton
             onClick={handleClose}
             size="small"
-            sx={{
-              mt: -0.5,
-              '&:hover': {
-                backgroundColor: alpha(theme.palette.error.main, 0.1),
-                color: 'error.main',
-              },
-            }}
+            sx={{ mt: -0.5 }}
           >
             <CloseIcon />
           </IconButton>
@@ -283,29 +259,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
 
       {/* Content */}
       <DialogContent sx={{ pt: 3, pb: 2 }}>
-        <Box sx={{ mb: 2 }} />
-        <Stack spacing={3}>
+        <Stack spacing={2.5}>
           {/* Recipients - Multiple selection with modern styling */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.background.default, 0.4)
-                  : alpha(theme.palette.primary.main, 0.02),
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: alpha(theme.palette.primary.main, 0.3),
-                backgroundColor:
-                  theme.palette.mode === 'dark'
-                    ? alpha(theme.palette.background.default, 0.6)
-                    : alpha(theme.palette.primary.main, 0.04),
-              },
-            }}
-          >
+          <Box>
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
             >
@@ -433,7 +389,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                 userSearchQuery ? t('chat.noUsersFound') : t('chat.searchUsers')
               }
             />
-          </Paper>
+          </Box>
 
           {/* Subject and Priority in one row */}
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -511,18 +467,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           <Divider sx={{ my: 1 }} />
 
           {/* Rich Text Content with modern styling */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.background.default, 0.4)
-                  : alpha(theme.palette.primary.main, 0.02),
-            }}
-          >
+          <Box>
             <Typography
               variant="subtitle2"
               gutterBottom
@@ -537,25 +482,11 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
               placeholder={t('mailbox.contentPlaceholder')}
               minHeight={200}
             />
-          </Paper>
+          </Box>
 
-          <Divider sx={{ my: 1 }} />
-
-          {/* Translation Controls with modern styling */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.5,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.background.default, 0.4)
-                  : alpha(theme.palette.info.main, 0.03),
-            }}
-          >
+          <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <TranslateIcon sx={{ color: 'info.main', fontSize: 20 }} />
+              <TranslateIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
               <Typography variant="subtitle2" fontWeight="600">
                 {t('mailbox.translation')}
               </Typography>
@@ -568,15 +499,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                 flexWrap: 'wrap',
               }}
             >
-              <FormControl
-                sx={{
-                  minWidth: 150,
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: theme.palette.background.paper,
-                  },
-                }}
-                size="small"
-              >
+              <FormControl size="small" sx={{ minWidth: 150 }}>
                 <InputLabel>{t('mailbox.translateTo')}</InputLabel>
                 <Select
                   value={translationLanguage}
@@ -593,7 +516,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
 
               {!translationEnabled ? (
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   startIcon={
                     translating ? (
                       <CircularProgress size={16} color="inherit" />
@@ -603,12 +526,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                   }
                   onClick={handleTranslate}
                   disabled={translating || !content.trim()}
-                  sx={{
-                    background: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
-                    '&:hover': {
-                      background: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${theme.palette.info.main} 100%)`,
-                    },
-                  }}
+                  size="small"
                 >
                   {translating
                     ? t('mailbox.translating')
@@ -617,7 +535,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
               ) : (
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={
                       translating ? (
                         <CircularProgress size={16} color="inherit" />
@@ -627,25 +545,23 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                     }
                     onClick={handleRetranslate}
                     disabled={translating}
-                    sx={{
-                      background: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
-                    }}
+                    size="small"
                   >
                     {translating
                       ? t('mailbox.translating')
                       : t('mailbox.retranslate')}
                   </Button>
                   <Button
-                    variant="contained"
-                    color="secondary"
+                    variant="text"
                     onClick={handleCancelTranslation}
+                    size="small"
                   >
                     {t('mailbox.cancelTranslation')}
                   </Button>
                 </Box>
               )}
             </Box>
-          </Paper>
+          </Box>
 
           {/* Translated Content */}
           {translationEnabled && (
@@ -678,30 +594,19 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
         </Stack>
       </DialogContent>
 
-      {/* Footer with gradient */}
+      {/* Footer */}
       <DialogActions
         sx={{
-          borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          background:
-            theme.palette.mode === 'dark'
-              ? alpha(theme.palette.background.default, 0.4)
-              : alpha(theme.palette.primary.main, 0.02),
+          borderTop: '1px solid',
+          borderColor: 'divider',
           px: 3,
-          py: 2.5,
-          gap: 1.5,
+          py: 2,
+          gap: 1,
         }}
       >
         <Button
           onClick={handleClose}
           disabled={sending}
-          size="large"
-          sx={{
-            fontWeight: 600,
-            '&:hover': {
-              backgroundColor: alpha(theme.palette.error.main, 0.1),
-              color: 'error.main',
-            },
-          }}
         >
           {t('common.cancel')}
         </Button>
@@ -721,23 +626,6 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
               <SendIcon />
             )
           }
-          size="large"
-          sx={{
-            fontWeight: 600,
-            px: 4,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-            '&:hover': {
-              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-              boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-              transform: 'translateY(-1px)',
-            },
-            '&:disabled': {
-              background: theme.palette.action.disabledBackground,
-              boxShadow: 'none',
-            },
-            transition: 'all 0.2s',
-          }}
         >
           {sending ? t('mailbox.sending') : t('mailbox.send')}
         </Button>

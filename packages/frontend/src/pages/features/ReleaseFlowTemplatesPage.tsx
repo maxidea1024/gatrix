@@ -1701,7 +1701,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<TemplateIcon />}
@@ -1762,7 +1762,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
+                  <IconButton size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -1771,7 +1771,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <ViewColumnIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               }

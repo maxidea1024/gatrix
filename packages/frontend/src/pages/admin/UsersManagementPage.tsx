@@ -1798,7 +1798,7 @@ const UsersManagementPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<PeopleIcon />}
         title={t('users.title')}
@@ -1859,7 +1859,7 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('users.columnSettings')}>
-              <IconButton
+              <IconButton size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   bgcolor: 'background.paper',
@@ -1870,7 +1870,7 @@ const UsersManagementPage: React.FC = () => {
                   },
                 }}
               >
-                <ViewColumnIcon />
+                <ViewColumnIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>

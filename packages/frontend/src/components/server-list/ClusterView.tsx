@@ -303,11 +303,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         return next;
       });
 
-      // Reset ping gauge: update lastHeartbeatTime for new heartbeats
+      // Reset ping gauge: update lastHeartbeatTime and immediately reset progress
       const now = Date.now();
       setLastHeartbeatTime((prev) => {
         const next = new Map(prev);
         newHeartbeatNodes.forEach((id) => next.set(id, now));
+        return next;
+      });
+      // Immediately reset pingProgress to 0 for these nodes (instant jump, no wind-back)
+      setPingProgress((prev) => {
+        const next = new Map(prev);
+        newHeartbeatNodes.forEach((id) => next.set(id, 0));
         return next;
       });
 
@@ -324,15 +330,23 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     prevHeartbeatRef.current = new Set(heartbeatIds);
   }, [heartbeatIds]);
 
-  // Update ping progress every 1000ms (was 100ms - reduced to lower CPU overhead)
+  // Refs for stable interval access (avoids recreating interval on every heartbeat)
+  const servicesRef = useRef(services);
+  servicesRef.current = services;
+  const lastHeartbeatTimeRef = useRef(lastHeartbeatTime);
+  lastHeartbeatTimeRef.current = lastHeartbeatTime;
+
+  // Update ping progress every 1000ms using refs to avoid interval recreation
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
-      setPingProgress((prev) => {
+      const currentServices = servicesRef.current;
+      const currentLastHeartbeat = lastHeartbeatTimeRef.current;
+      setPingProgress(() => {
         const next = new Map<string, number>();
-        services.forEach((service) => {
+        currentServices.forEach((service) => {
           const serviceKey = `${service.labels.service}-${service.instanceId}`;
-          const lastTime = lastHeartbeatTime.get(serviceKey);
+          const lastTime = currentLastHeartbeat.get(serviceKey);
           if (lastTime) {
             const elapsed = (now - lastTime) / 1000; // seconds
             const progress = Math.min(elapsed / HEARTBEAT_TTL_SECONDS, 1);
@@ -344,10 +358,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         });
         return next;
       });
-    }, 1000);
+    }, 200);
 
     return () => clearInterval(interval);
-  }, [services, lastHeartbeatTime]);
+  }, []); // Empty deps - interval created once, reads from refs
 
   // Initialize simulation once
   useEffect(() => {
@@ -1092,7 +1106,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 const progress = pingProgress.get(serviceKey) || 0;
                 const pingGaugeRadius = nodeRadius + 6;
                 const circumference = 2 * Math.PI * pingGaugeRadius;
-                const strokeDasharray = `${progress * circumference} ${circumference}`;
+                const strokeDashoffset = circumference * (1 - progress);
                 // Color transitions from green (0%) to yellow (50%) to red (100%)
                 // When progress is 0 (or very small), make it transparent
                 const pingGaugeColor =
@@ -1222,9 +1236,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       )}
                     </circle>
 
-                    {/* Ping gauge - circular progress indicator (only for normal states) */}
+                    {/* Ping gauge - circular progress indicator (only after first heartbeat) */}
                     {(service.status === 'ready' ||
-                      service.status === 'initializing') && (
+                      service.status === 'initializing') &&
+                      lastHeartbeatTime.has(serviceKey) && (
                       <>
                         <circle
                           r={pingGaugeRadius}
@@ -1237,12 +1252,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                           fill="none"
                           stroke={pingGaugeColor}
                           strokeWidth="3"
-                          strokeDasharray={strokeDasharray}
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
                           strokeLinecap="round"
                           transform="rotate(-90)"
-                          style={{
-                            transition: 'stroke 0.3s ease-out',
-                          }}
                         />
                       </>
                     )}

@@ -118,6 +118,7 @@ import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
+import ColumnSettingsDialog from '@/components/common/ColumnSettingsDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import {
   showChangeRequestCreatedToast,
@@ -985,7 +986,7 @@ const MessageTemplatesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<TextFieldsIcon />}
         title={t('messageTemplates.title')}
@@ -1100,7 +1101,7 @@ const MessageTemplatesPage: React.FC = () => {
 
               {/* Column Settings Button */}
               <Tooltip title={t('users.columnSettings')}>
-                <IconButton
+                <IconButton size="small"
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
                     bgcolor: 'background.paper',
@@ -1109,7 +1110,7 @@ const MessageTemplatesPage: React.FC = () => {
                     '&:hover': { bgcolor: 'action.hover' },
                   }}
                 >
-                  <ViewColumnIcon />
+                  <ViewColumnIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -1540,57 +1541,17 @@ const MessageTemplatesPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Column Settings Popover */}
-      <Popover
-        open={Boolean(columnSettingsAnchor)}
+      {/* Column Settings */}
+      <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        hideBackdrop
-        disableScrollLock
-      >
-        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
-          <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mb: 1,
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t('users.columnSettings')}
-              </Typography>
-              <Button size="small" onClick={handleResetColumns} color="warning">
-                {t('common.reset')}
-              </Button>
-            </Box>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleColumnDragEnd}
-              modifiers={[restrictToVerticalAxis]}
-            >
-              <SortableContext
-                items={columns.map((col) => col.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <List dense disablePadding>
-                  {columns.map((column) => (
-                    <SortableColumnItem
-                      key={column.id}
-                      column={column}
-                      onToggleVisibility={handleToggleColumnVisibility}
-                    />
-                  ))}
-                </List>
-              </SortableContext>
-            </DndContext>
-          </Box>
-        </ClickAwayListener>
-      </Popover>
+        columns={columns}
+        onColumnsChange={(newColumns) => {
+          setColumns(newColumns);
+          localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+        }}
+        onReset={handleResetColumns}
+      />
 
       {/* Import Dialog */}
       <ImportDialog

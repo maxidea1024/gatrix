@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box, Tab, Tabs, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import {
   Whatshot as WhatshotIcon,
   Celebration as CelebrationIcon,
@@ -10,6 +10,9 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import PageHeader from '@/components/common/PageHeader';
+import SegmentedTabs, {
+  SegmentedTabItem,
+} from '@/components/common/SegmentedTabs';
 
 // Lazy-load the actual page contents
 const HotTimeBuffEventPage = React.lazy(
@@ -61,47 +64,38 @@ const OperationEventsPage: React.FC = () => {
     visibleTabs.findIndex((t) => t.key === activeTabKey)
   );
 
-  const handleTabChange = (_: React.SyntheticEvent, newIndex: number) => {
-    const tab = visibleTabs[newIndex];
-    if (tab) {
-      setSearchParams({ tab: tab.key }, { replace: true });
-    }
+  const handleSegmentChange = (key: string) => {
+    setSearchParams({ tab: key }, { replace: true });
   };
+
+  const segmentItems: SegmentedTabItem[] = useMemo(
+    () =>
+      visibleTabs.map((tab) => ({
+        key: tab.key,
+        label: t(tab.labelKey),
+        icon: tab.icon,
+      })),
+    [visibleTabs, t]
+  );
 
   const ActiveComponent = visibleTabs[activeTabIndex]?.component;
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<EventIcon />}
         title={t('sidebar.operationEvents')}
         subtitle={t('operationEvents.subtitle', {
           defaultValue: '핫타임버프 이벤트 및 라이브 이벤트를 관리합니다.',
         })}
+        tabs={
+          <SegmentedTabs
+            items={segmentItems}
+            value={activeTabKey}
+            onChange={handleSegmentChange}
+          />
+        }
       />
-
-      <Paper variant="outlined" sx={{ mb: 2 }}>
-        <Tabs
-          value={activeTabIndex}
-          onChange={handleTabChange}
-          sx={{
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 600,
-              minHeight: 44,
-            },
-          }}
-        >
-          {visibleTabs.map((tab) => (
-            <Tab
-              key={tab.key}
-              icon={tab.icon}
-              iconPosition="start"
-              label={t(tab.labelKey)}
-            />
-          ))}
-        </Tabs>
-      </Paper>
 
       <React.Suspense fallback={null}>
         {ActiveComponent && <ActiveComponent />}

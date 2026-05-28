@@ -1249,7 +1249,7 @@ export default function AllCharactersTab({
 
         {/* Column settings button */}
         <Tooltip title={t('common.columnSettings')}>
-          <IconButton
+          <IconButton size="small"
             onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
             sx={{
               bgcolor: 'background.paper',
@@ -1258,7 +1258,7 @@ export default function AllCharactersTab({
               '&:hover': { bgcolor: 'action.hover' },
             }}
           >
-            <ViewColumnIcon />
+            <ViewColumnIcon fontSize="small" />
           </IconButton>
         </Tooltip>
 

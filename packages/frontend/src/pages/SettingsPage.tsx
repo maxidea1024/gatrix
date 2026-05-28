@@ -25,6 +25,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 dayjs.extend(utc);
 dayjs.extend(dayjsTimezone);
@@ -97,15 +98,11 @@ const SettingsPage: React.FC = () => {
 
   return (
     <PageContentLoader loading={false}>
-      <Box sx={{ p: 2 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {t('settings.general.title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('settings.general.subtitle')}
-          </Typography>
-        </Box>
+      <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+        <PageHeader
+          title={t('settings.general.title')}
+          subtitle={t('settings.general.subtitle')}
+        />
 
         <Card sx={{ maxWidth: 640 }}>
           <CardContent>

@@ -664,7 +664,7 @@ const AuditLogsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<HistoryIcon />}
         title={t('auditLogs.title')}
@@ -726,7 +726,7 @@ const AuditLogsPage: React.FC = () => {
 
           {/* Column Settings Button */}
           <Tooltip title={t('users.columnSettings')}>
-            <IconButton
+            <IconButton size="small"
               onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
               sx={{
                 bgcolor: 'background.paper',
@@ -735,7 +735,7 @@ const AuditLogsPage: React.FC = () => {
                 '&:hover': { bgcolor: 'action.hover' },
               }}
             >
-              <ViewColumnIcon />
+              <ViewColumnIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>

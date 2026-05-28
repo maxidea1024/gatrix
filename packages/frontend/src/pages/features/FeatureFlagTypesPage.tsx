@@ -38,6 +38,7 @@ import api from '../../services/api';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { getFlagTypeIconByName } from '../../utils/flagTypeIcons';
 import PageContentLoader from '../../components/common/PageContentLoader';
+import PageHeader from '../../components/common/PageHeader';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
@@ -145,31 +146,13 @@ const FeatureFlagTypesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h5"
-            fontWeight={600}
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <DefaultIcon color="primary" />
-            {t('featureFlags.flagTypes')}
-          </Typography>
-          <Typography color="text.secondary" variant="body2">
-            {t('featureFlags.flagTypesDescription')}
-          </Typography>
-        </Box>
-      </Box>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+      <PageHeader
+        icon={<DefaultIcon />}
+        title={t('featureFlags.flagTypes')}
+        subtitle={t('featureFlags.flagTypesDescription')}
+        onRefresh={loadTypes}
+      />
 
       {/* Types Table */}
       <PageContentLoader loading={loading}>

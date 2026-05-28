@@ -571,7 +571,7 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>
-                <IconButton
+                <IconButton size="small"
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
                     bgcolor: 'background.paper',
@@ -582,7 +582,7 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     },
                   }}
                 >
-                  <ViewColumnIcon />
+                  <ViewColumnIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>

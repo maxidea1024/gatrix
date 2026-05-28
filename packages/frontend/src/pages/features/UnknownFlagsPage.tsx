@@ -59,6 +59,7 @@ import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useDebounce } from '../../hooks/useDebounce';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 import SearchTextField from '@/components/common/SearchTextField';
 import SimplePagination from '../../components/common/SimplePagination';
 
@@ -553,39 +554,13 @@ const UnknownFlagsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h5"
-            fontWeight={600}
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <UnknownIcon color="warning" />
-            {t('featureFlags.unknownFlags')} ({filteredFlags.length})
-            <HelpTip title={t('featureFlags.unknownFlagsInfo')}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {t('featureFlags.unknownFlagsTypes')}
-              </Typography>
-              <ul>
-                <li>{t('featureFlags.unknownFlagsMissing')}</li>
-                <li>{t('featureFlags.unknownFlagsInvalid')}</li>
-              </ul>
-            </HelpTip>
-          </Typography>
-          <Typography color="text.secondary" variant="body2">
-            {t('featureFlags.unknownFlagsDescription')}
-          </Typography>
-        </Box>
-      </Box>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+      <PageHeader
+        icon={<UnknownIcon />}
+        title={`${t('featureFlags.unknownFlags')} (${filteredFlags.length})`}
+        subtitle={t('featureFlags.unknownFlagsDescription')}
+        onRefresh={loadFlags}
+      />
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
@@ -624,7 +599,7 @@ const UnknownFlagsPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
+                  <IconButton size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -633,7 +608,7 @@ const UnknownFlagsPage: React.FC = () => {
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <ViewColumnIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               }

@@ -1721,7 +1721,7 @@ const ClientVersionsPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<WidgetsIcon />}
         title={t('clientVersions.title')}
@@ -1733,7 +1733,7 @@ const ClientVersionsPage: React.FC = () => {
                 <>
                   <Button
                     variant="contained"
-                    color="primary"
+                    size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
                       setEditingClientVersion(null);
@@ -1745,7 +1745,7 @@ const ClientVersionsPage: React.FC = () => {
                   </Button>
                   <Button
                     variant="contained"
-                    color="primary"
+                    size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
                       setBulkFormDialogOpen(true);
@@ -1872,7 +1872,7 @@ const ClientVersionsPage: React.FC = () => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('users.columnSettings')}>
-              <IconButton
+              <IconButton size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   bgcolor: 'background.paper',
@@ -1883,7 +1883,7 @@ const ClientVersionsPage: React.FC = () => {
                   },
                 }}
               >
-                <ViewColumnIcon />
+                <ViewColumnIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>

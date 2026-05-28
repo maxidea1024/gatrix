@@ -143,7 +143,7 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* Current Status Display */}
           <Box
-            sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 0 }}
+            sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}
           >
             <Typography variant="subtitle2" gutterBottom>
               {t('chat.currentStatus')}
@@ -176,7 +176,7 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
                     selected={selectedStatus === option.value}
                     onClick={() => setSelectedStatus(option.value)}
                     sx={{
-                      borderRadius: 0,
+                      borderRadius: 1,
                       mb: 0.5,
                     }}
                   >
@@ -228,7 +228,7 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
                   p: 1,
                   border: 1,
                   borderColor: 'divider',
-                  borderRadius: 0,
+                  borderRadius: 1,
                   cursor: 'text',
                   minHeight: 40,
                   display: 'flex',

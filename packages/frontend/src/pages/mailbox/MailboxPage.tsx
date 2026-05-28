@@ -29,8 +29,7 @@ import {
   Autocomplete,
   Avatar,
   ListItemAvatar,
-  Tabs,
-  Tab,
+
   Stack,
   ToggleButtonGroup,
   ToggleButton,
@@ -75,6 +74,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTheme } from '../../contexts/ThemeContext';
 import ComposeMailDialog from '@/components/mailbox/ComposeMailDialog';
 import PageHeader from '@/components/common/PageHeader';
+import SegmentedTabs from '@/components/common/SegmentedTabs';
 
 const MailboxPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -545,13 +545,28 @@ const MailboxPage: React.FC = () => {
 
   return (
     <Box
-      sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}
+      sx={{ height: '100%', display: 'flex', flexDirection: 'column', px: 2, pb: 2, pt: 1.5 }}
     >
       {/* Header */}
       <PageHeader
         icon={<MailIcon />}
         title={t('mailbox.title')}
         subtitle={t('mailbox.subtitle')}
+        tabs={
+          <SegmentedTabs
+            items={[
+              { key: 'received', label: t('mailbox.receivedMails'), icon: <InboxIcon sx={{ fontSize: 18 }} /> },
+              { key: 'sent', label: t('mailbox.sentMails'), icon: <MailIcon sx={{ fontSize: 18 }} /> },
+            ]}
+            value={currentTab}
+            onChange={(key) => {
+              setCurrentTab(key as 'sent' | 'received');
+              setCurrentPage(1);
+              setSelectedMail(null);
+              setSelectedMailIds([]);
+            }}
+          />
+        }
         actions={
           <Button
             variant="contained"
@@ -562,22 +577,6 @@ const MailboxPage: React.FC = () => {
           </Button>
         }
       />
-
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs
-          value={currentTab}
-          onChange={(_, newValue) => {
-            setCurrentTab(newValue);
-            setCurrentPage(1);
-            setSelectedMail(null);
-            setSelectedMailIds([]);
-          }}
-        >
-          <Tab label={t('mailbox.receivedMails')} value="received" />
-          <Tab label={t('mailbox.sentMails')} value="sent" />
-        </Tabs>
-      </Box>
 
       {/* Toolbar */}
       {selectedMailIds.length > 0 && (

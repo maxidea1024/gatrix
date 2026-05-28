@@ -1,5 +1,9 @@
 # Base stage
 FROM node:22-alpine AS base
+
+# Allow Corepack to download package managers without interactive prompt
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
 RUN apk add --no-cache libc6-compat dumb-init
 WORKDIR /app
 
@@ -30,7 +34,7 @@ COPY packages/evaluator/package.json ./packages/evaluator/
 ENV CYPRESS_INSTALL_BINARY=0
 
 # Install dependencies (Yarn 4 syntax)
-RUN yarn install
+RUN YARN_NODE_LINKER=node-modules yarn install
 
 # Builder stage
 FROM base AS builder

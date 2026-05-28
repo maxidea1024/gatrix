@@ -221,6 +221,7 @@ const ServiceNoticesPage: React.FC = () => {
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
     { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
+    { id: 'tabTitle', labelKey: 'serviceNotices.tabTitle', visible: true },
     { id: 'isPinned', labelKey: 'serviceNotices.isPinned', visible: true },
     {
       id: 'currentlyVisible',
@@ -640,7 +641,7 @@ const ServiceNoticesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<AnnouncementIcon />}
@@ -791,7 +792,7 @@ const ServiceNoticesPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
+                  <IconButton size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -802,7 +803,7 @@ const ServiceNoticesPage: React.FC = () => {
                       },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <ViewColumnIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               }
@@ -842,12 +843,13 @@ const ServiceNoticesPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
-                <Table>
+                <Table size="small" sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
+                            size="small"
                             checked={
                               notices.length > 0 &&
                               selectedIds.length === notices.length
@@ -857,6 +859,7 @@ const ServiceNoticesPage: React.FC = () => {
                               selectedIds.length < notices.length
                             }
                             onChange={handleSelectAll}
+                            sx={{ p: 0.5 }}
                           />
                         </TableCell>
                       )}
@@ -884,6 +887,7 @@ const ServiceNoticesPage: React.FC = () => {
                             sortDirection={
                               orderBy === sortProperty ? order : false
                             }
+                            sx={{ whiteSpace: 'nowrap', py: 1 }}
                           >
                             {isSortable ? (
                               <TableSortLabel
@@ -934,10 +938,12 @@ const ServiceNoticesPage: React.FC = () => {
                     {notices.map((notice) => (
                       <TableRow key={notice.id} hover>
                         {canManage && (
-                          <TableCell padding="checkbox">
+                          <TableCell padding="checkbox" sx={{ py: 1 }}>
                             <Checkbox
+                              size="small"
                               checked={selectedIds.includes(notice.id)}
                               onChange={() => handleSelectOne(notice.id)}
+                              sx={{ p: 0.5 }}
                             />
                           </TableCell>
                         )}
@@ -1031,7 +1037,7 @@ const ServiceNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'category') {
                             return (
-                              <TableCell key={column.id}>
+                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
                                 <Chip
                                   label={t(
                                     `serviceNotices.categories.${notice.category}`
@@ -1042,40 +1048,31 @@ const ServiceNoticesPage: React.FC = () => {
                               </TableCell>
                             );
                           }
+                          if (column.id === 'tabTitle') {
+                            return (
+                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
+                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                  {notice.tabTitle || '-'}
+                                </Typography>
+                              </TableCell>
+                            );
+                          }
                           if (column.id === 'title') {
                             return (
-                              <TableCell key={column.id}>
-                                <Box
+                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
+                                <Typography
+                                  variant="body2"
                                   sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline',
+                                    },
                                   }}
+                                  onClick={() => handleEdit(notice)}
                                 >
-                                  <Box>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
-                                        fontWeight: 500,
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                          textDecoration: 'underline',
-                                        },
-                                      }}
-                                      onClick={() => handleEdit(notice)}
-                                    >
-                                      {notice.tabTitle || notice.title}
-                                    </Typography>
-                                    {notice.tabTitle && (
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                      >
-                                        {notice.title}
-                                      </Typography>
-                                    )}
-                                  </Box>
-                                </Box>
+                                  {notice.title}
+                                </Typography>
                               </TableCell>
                             );
                           }
@@ -1159,46 +1156,49 @@ const ServiceNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'period') {
                             return (
-                              <TableCell key={column.id}>
-                                <Tooltip
-                                  title={
-                                    notice.startDate
-                                      ? formatDateTimeDetailed(notice.startDate)
-                                      : t('serviceNotices.startImmediately')
-                                  }
-                                >
-                                  <Typography variant="caption" display="block">
-                                    {notice.startDate
-                                      ? formatRelativeTime(
-                                          notice.startDate,
-                                          undefined,
-                                          language
-                                        )
-                                      : t('serviceNotices.startImmediately')}
-                                  </Typography>
-                                </Tooltip>
-                                <Tooltip
-                                  title={
-                                    notice.endDate
-                                      ? formatDateTimeDetailed(notice.endDate)
-                                      : t('serviceNotices.permanent')
-                                  }
-                                >
-                                  <Typography
-                                    variant="caption"
-                                    display="block"
-                                    color="text.secondary"
+                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Tooltip
+                                    title={
+                                      notice.startDate
+                                        ? formatDateTimeDetailed(notice.startDate)
+                                        : t('serviceNotices.startImmediately')
+                                    }
                                   >
-                                    ~{' '}
-                                    {notice.endDate
-                                      ? formatRelativeTime(
-                                          notice.endDate,
-                                          undefined,
-                                          language
-                                        )
-                                      : t('serviceNotices.permanent')}
+                                    <Typography variant="caption">
+                                      {notice.startDate
+                                        ? formatRelativeTime(
+                                            notice.startDate,
+                                            undefined,
+                                            language
+                                          )
+                                        : t('serviceNotices.startImmediately')}
+                                    </Typography>
+                                  </Tooltip>
+                                  <Typography variant="caption" color="text.secondary">
+                                    ~
                                   </Typography>
-                                </Tooltip>
+                                  <Tooltip
+                                    title={
+                                      notice.endDate
+                                        ? formatDateTimeDetailed(notice.endDate)
+                                        : t('serviceNotices.permanent')
+                                    }
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {notice.endDate
+                                        ? formatRelativeTime(
+                                            notice.endDate,
+                                            undefined,
+                                            language
+                                          )
+                                        : t('serviceNotices.permanent')}
+                                    </Typography>
+                                  </Tooltip>
+                                </Box>
                               </TableCell>
                             );
                           }

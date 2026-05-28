@@ -271,7 +271,7 @@ const MediaAssetsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<ImageIcon />}
         title={t('mediaAssets.title')}

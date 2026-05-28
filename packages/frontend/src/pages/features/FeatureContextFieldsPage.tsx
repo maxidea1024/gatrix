@@ -32,8 +32,7 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
-  Tabs,
-  Tab,
+
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -80,6 +79,7 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import SvgIcon from '@mui/material/SvgIcon';
 import PageHeader from '@/components/common/PageHeader';
+import SegmentedTabs from '@/components/common/SegmentedTabs';
 import DiscoveredContextFieldsTab from '../../components/features/DiscoveredContextFieldsTab';
 
 // Trim option value → localization key mapping
@@ -791,12 +791,22 @@ const FeatureContextFieldsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<ContextIcon />}
         title={t('featureFlags.contextFields')}
         subtitle={t('featureFlags.contextFieldsDescription')}
+        tabs={
+          <SegmentedTabs
+            items={[
+              { key: 'defined', label: t('contextFieldUsage.definedTab') },
+              { key: 'discovered', label: t('contextFieldUsage.discoveredTab') },
+            ]}
+            value={activeTab === 0 ? 'defined' : 'discovered'}
+            onChange={(key) => setActiveTab(key === 'defined' ? 0 : 1)}
+          />
+        }
         actions={
           <>
             {canManage && activeTab === 0 && (
@@ -810,17 +820,8 @@ const FeatureContextFieldsPage: React.FC = () => {
             )}
           </>
         }
+        onRefresh={loadFields}
       />
-
-      {/* Tabs */}
-      <Tabs
-        value={activeTab}
-        onChange={(_, newValue) => setActiveTab(newValue)}
-        sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
-      >
-        <Tab label={t('contextFieldUsage.definedTab')} />
-        <Tab label={t('contextFieldUsage.discoveredTab')} />
-      </Tabs>
 
       {/* Discovered Tab */}
       {activeTab === 1 && (
@@ -887,7 +888,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                 noWrap={true}
                 afterFilterAddActions={
                   <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
+                    <IconButton size="small"
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
                         bgcolor: 'background.paper',
@@ -896,7 +897,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                         '&:hover': { bgcolor: 'action.hover' },
                       }}
                     >
-                      <ViewColumnIcon />
+                      <ViewColumnIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 }

@@ -5,7 +5,6 @@ import {
   Box,
   Typography,
   Card,
-  Paper,
   TableContainer,
   Table,
   TableHead,
@@ -14,8 +13,7 @@ import {
   TableBody,
   Chip,
   Button,
-  Tabs,
-  Tab,
+  Paper,
   Tooltip,
   Dialog,
   DialogTitle,
@@ -49,6 +47,7 @@ import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDra
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 import PageHeader from '@/components/common/PageHeader';
+import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
@@ -651,33 +650,33 @@ const ChangeRequestsPage: React.FC = () => {
 
   // Tab state controlled by URL param
   const [searchParams, setSearchParams] = useSearchParams();
-  const statusFilters: (ChangeRequestStatus | undefined)[] = [
-    undefined,
-    'draft',
-    'open',
-    'approved',
-    'applied',
-    'rejected',
-    'conflict',
-  ];
+  const STATUS_KEYS = ['all', 'draft', 'open', 'approved', 'applied', 'rejected', 'conflict'] as const;
+  type StatusKey = (typeof STATUS_KEYS)[number];
+  const statusKeyToFilter: Record<StatusKey, ChangeRequestStatus | undefined> = {
+    all: undefined,
+    draft: 'draft',
+    open: 'open',
+    approved: 'approved',
+    applied: 'applied',
+    rejected: 'rejected',
+    conflict: 'conflict',
+  };
 
   // Initialize/Get tab value from URL
-  const tabValue = useMemo(() => {
+  const activeStatusKey: StatusKey = useMemo(() => {
     const statusParam = searchParams.get('status');
-    if (statusParam) {
-      const index = statusFilters.indexOf(statusParam as ChangeRequestStatus);
-      if (index !== -1) return index;
+    if (statusParam && STATUS_KEYS.includes(statusParam as StatusKey)) {
+      return statusParam as StatusKey;
     }
-    return 0;
+    return 'all';
   }, [searchParams]);
 
   // Update URL when tab changes
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    const status = statusFilters[newValue];
-    if (status) {
-      setSearchParams({ status });
-    } else {
+  const handleSegmentChange = (key: string) => {
+    if (key === 'all') {
       setSearchParams({});
+    } else {
+      setSearchParams({ status: key });
     }
     setPage(0);
   };
@@ -702,7 +701,7 @@ const ChangeRequestsPage: React.FC = () => {
     setSelectedChangeRequestId(null);
   }, []);
 
-  const statusFilter = statusFilters[tabValue];
+  const statusFilter = statusKeyToFilter[activeStatusKey];
 
   // SWR fetcher
   const fetcher = useCallback(async () => {
@@ -751,11 +750,21 @@ const ChangeRequestsPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<CampaignIcon />}
         title={t('changeRequest.title')}
         subtitle={t('changeRequest.subtitle')}
+        tabs={
+          <SegmentedTabs
+            items={STATUS_KEYS.map((key) => ({
+              key,
+              label: t(`changeRequest.tabs.${key}`) + (stats?.[key as keyof typeof stats] ? ` (${stats[key as keyof typeof stats]})` : ''),
+            }))}
+            value={activeStatusKey}
+            onChange={handleSegmentChange}
+          />
+        }
         actions={
           <Button
             variant="contained"
@@ -766,54 +775,6 @@ const ChangeRequestsPage: React.FC = () => {
           </Button>
         }
       />
-
-      {/* Status Tabs */}
-      <Paper variant="outlined" sx={{ mb: 3 }}>
-        <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab
-            label={
-              t('changeRequest.tabs.all') +
-              (stats?.all ? ` (${stats.all})` : '')
-            }
-          />
-          <Tab
-            label={
-              t('changeRequest.tabs.draft') +
-              (stats?.draft ? ` (${stats.draft})` : '')
-            }
-          />
-          <Tab
-            label={
-              t('changeRequest.tabs.open') +
-              (stats?.open ? ` (${stats.open})` : '')
-            }
-          />
-          <Tab
-            label={
-              t('changeRequest.tabs.approved') +
-              (stats?.approved ? ` (${stats.approved})` : '')
-            }
-          />
-          <Tab
-            label={
-              t('changeRequest.tabs.applied') +
-              (stats?.applied ? ` (${stats.applied})` : '')
-            }
-          />
-          <Tab
-            label={
-              t('changeRequest.tabs.rejected') +
-              (stats?.rejected ? ` (${stats.rejected})` : '')
-            }
-          />
-          <Tab
-            label={
-              t('changeRequest.tabs.conflict') +
-              (stats?.conflict ? ` (${stats.conflict})` : '')
-            }
-          />
-        </Tabs>
-      </Paper>
 
       <PageContentLoader loading={isLoading && !data}>
         {/* Draft tab: auto-open the single draft CR in drawer instead of showing a list */}
