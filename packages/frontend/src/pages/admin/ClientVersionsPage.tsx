@@ -1733,7 +1733,6 @@ const ClientVersionsPage: React.FC = () => {
                 <>
                   <Button
                     variant="contained"
-                    color="primary"
                     size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
@@ -1746,7 +1745,6 @@ const ClientVersionsPage: React.FC = () => {
                   </Button>
                   <Button
                     variant="contained"
-                    color="primary"
                     size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
