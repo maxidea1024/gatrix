@@ -146,25 +146,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               borderRadius: 1.5,
               lineHeight: 1.4,
               boxShadow: 'none',
-              letterSpacing: '0.01em',
               '&:hover': { boxShadow: 'none' },
-              '&.MuiButton-contained': {
-                bgcolor: 'text.primary',
-                color: 'background.paper',
-                '&:hover': {
-                  bgcolor: 'text.secondary',
-                  boxShadow: 'none',
-                },
-              },
-              '&.MuiButton-outlined': {
-                borderWidth: 1,
-                borderColor: 'divider',
-                color: 'text.primary',
-                '&:hover': {
-                  borderColor: 'text.secondary',
-                  bgcolor: 'action.hover',
-                },
-              },
               '& .MuiButton-startIcon': {
                 mr: 0.5,
                 '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
