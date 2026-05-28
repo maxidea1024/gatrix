@@ -2303,9 +2303,33 @@ const FeatureFlagDetailPage: React.FC = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                {t('featureFlags.flagDetails')}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="subtitle2" fontWeight={600}>
+                  {t('featureFlags.flagDetails')}
+                </Typography>
+                {canManage && !isCreating && (
+                  <Tooltip title={t('common.edit')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setEditingFlagData({
+                          displayName: flag.displayName || '',
+                          description: flag.description || '',
+                          impressionDataEnabled: flag.impressionDataEnabled,
+                          tags: flag.tags || [],
+                        });
+                        const matchingTags = (flag.tags || [])
+                          .map((tagName) => allTags.find((t) => t.name === tagName))
+                          .filter((t): t is Tag => !!t);
+                        setEditTagSelection(matchingTags);
+                        setEditFlagDialogOpen(true);
+                      }}
+                    >
+                      <EditIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {flag.flagName}
               </Typography>
@@ -2569,30 +2593,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                           ? t('featureFlags.unmarkStale')
                           : t('featureFlags.markStale')}
                       </Button>
-                      <Button
-                        variant="contained"
-                        onClick={() => {
-                          setEditingFlagData({
-                            displayName: flag.displayName || '',
-                            description: flag.description || '',
-                            impressionDataEnabled: flag.impressionDataEnabled,
-                            tags: flag.tags || [],
-                          });
 
-                          const matchingTags = (flag.tags || [])
-                            .map((tagName) =>
-                              allTags.find((t) => t.name === tagName)
-                            )
-                            .filter((t): t is Tag => !!t);
-                          setEditTagSelection(matchingTags);
-
-                          setEditFlagDialogOpen(true);
-                        }}
-                        size="small"
-                        sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
-                      >
-                        {t('common.edit')}
-                      </Button>
                       {flag.isArchived && (
                         <Button
                           variant="contained"
