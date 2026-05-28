@@ -1882,7 +1882,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           />
 
           {/* Divider */}
-          <Box sx={{ width: 1, height: 24, bgcolor: theme.palette.divider }} />
+          <Box sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }} />
           {/* Time Range Picker */}
           <ToggleButtonGroup
             size="small"
@@ -1913,7 +1913,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           </ToggleButtonGroup>
 
           {/* Divider */}
-          <Box sx={{ width: 1, height: 24, bgcolor: theme.palette.divider }} />
+          <Box sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }} />
 
           {/* Auto-Refresh Selector */}
           <FormControl size="small" sx={{ minWidth: 80 }}>
@@ -1972,7 +1972,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           </Tooltip>
 
           {/* Divider */}
-          <Box sx={{ width: 1, height: 24, bgcolor: theme.palette.divider }} />
+          <Box sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }} />
 
           {/* Auto-arrange */}
           {canManage && (
