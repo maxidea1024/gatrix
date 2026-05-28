@@ -173,6 +173,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: false as const,
       plugins: {
         legend: {
           display: showLegend,

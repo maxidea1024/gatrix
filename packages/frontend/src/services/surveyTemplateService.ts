@@ -43,6 +43,7 @@ export interface Question {
   required?: boolean;
   options?: QuestionOption[];
   settings?: QuestionSettings;
+  pageId?: string;
 }
 
 export interface TemplateSettings {
@@ -63,6 +64,70 @@ export interface TemplateLocales {
     thankYou?: string;
     requiredError?: string;
   };
+}
+
+export interface SurveyPage {
+  id: string;
+  title?: LocalizedString;
+  questions: Question[];
+}
+
+// ==================== Page Helpers ====================
+
+/**
+ * Convert flat questions array (from DB) into structured pages.
+ * Questions without pageId are grouped into a single default page.
+ */
+export function questionsToPages(questions: Question[]): SurveyPage[] {
+  const regularQuestions = questions.filter(
+    (q) => q.type !== 'welcome' && q.type !== 'ending'
+  );
+
+  // Group by pageId preserving order
+  const pageMap = new Map<string, { questions: Question[]; order: number }>();
+  let pageOrder = 0;
+
+  for (const q of regularQuestions) {
+    const pid = q.pageId || '__default__';
+    if (!pageMap.has(pid)) {
+      pageMap.set(pid, { questions: [], order: pageOrder++ });
+    }
+    pageMap.get(pid)!.questions.push(q);
+  }
+
+  // If no regular questions, create one empty default page with stable ID
+  if (pageMap.size === 0) {
+    return [{ id: 'page-default-0', questions: [] }];
+  }
+
+  // Convert map to sorted array
+  // Use a deterministic ID for __default__ to avoid dirty-tracking issues
+  const pages: SurveyPage[] = Array.from(pageMap.entries())
+    .sort((a, b) => a[1].order - b[1].order)
+    .map(([pid, data], idx) => ({
+      id: pid === '__default__' ? `page-default-${idx}` : pid,
+      questions: data.questions,
+    }));
+
+  return pages;
+}
+
+/**
+ * Flatten structured pages back into a flat questions array for saving.
+ * Stamps each question with its pageId. Welcome/ending blocks are prepended/appended.
+ */
+export function pagesToQuestions(
+  pages: SurveyPage[],
+  contentBlocks: Question[]
+): Question[] {
+  const welcome = contentBlocks.filter((q) => q.type === 'welcome');
+  const ending = contentBlocks.filter((q) => q.type === 'ending');
+
+  const pageQuestions = pages.flatMap((page) =>
+    page.questions.map((q) => ({ ...q, pageId: page.id }))
+  );
+
+  return [...welcome, ...pageQuestions, ...ending];
 }
 
 export interface SurveyTemplate {

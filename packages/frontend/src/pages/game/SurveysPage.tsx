@@ -497,12 +497,6 @@ const SurveysPage: React.FC = () => {
             <IconButton
               onClick={(e) => setPageMenuAnchor(e.currentTarget)}
               aria-label="more options"
-              sx={{
-                bgcolor: 'background.paper',
-                border: 1,
-                borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
-              }}
             >
               <MoreVertIcon />
             </IconButton>

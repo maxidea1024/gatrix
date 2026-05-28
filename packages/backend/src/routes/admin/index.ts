@@ -46,6 +46,7 @@ import dataManagementRoutes from './data-management';
 import bannerRoutes from './banners';
 import cmsCashShopRoutes from './cms-cash-shop';
 import serverLifecycleRoutes from './server-lifecycle';
+import operationEventRoutes from './operation-events';
 import changeRequestRoutes from './change-requests';
 import featureRoutes from './features';
 import platformDefaultsRoutes from './platform-defaults';
@@ -433,6 +434,16 @@ projectRouter.use(
   '/cms/cash-shop',
   requireEnvPermission([P.STORE_PRODUCTS_READ, P.STORE_PRODUCTS_UPDATE]) as any,
   cmsCashShopRoutes
+);
+
+// Operation Events (HotTimeBuff overrides, etc.)
+projectRouter.use(
+  '/operation-events',
+  requireEnvPermission([
+    P.OPERATION_EVENTS_READ,
+    P.OPERATION_EVENTS_UPDATE,
+  ]) as any,
+  operationEventRoutes
 );
 
 // Server Lifecycle Events

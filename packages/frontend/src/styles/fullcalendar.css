@@ -1,9 +1,33 @@
-/* Minimal fallback styles to avoid missing CSS errors in Vite */
+/* Toolbar layout */
 .fc .fc-toolbar-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
 }
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 0.8em;
+}
+/* Button group: add gap between buttons */
+.fc .fc-button-group {
+  gap: 4px;
+}
+.fc .fc-button-group > .fc-button {
+  border-radius: 6px !important;
+}
+/* General button styling */
 .fc .fc-button {
-  padding: 4px 8px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 6px;
+  text-transform: none;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+.fc .fc-button:focus {
+  box-shadow: none;
+}
+/* Today button spacing */
+.fc .fc-today-button {
+  margin-left: 8px !important;
 }
 .fc-theme-standard .fc-scrollgrid {
   border-color: rgba(0, 0, 0, 0.12);
@@ -174,7 +198,7 @@
 /* event 내부의 시간/제목 텍스트 스타일 */
 .fc .fc-event .fc-event-title,
 .fc .fc-event .fc-event-time {
-  color: var(--fc-event-text-color, #111);
+  color: inherit;
   font-weight: 600;
   letter-spacing: 0.1px;
 }

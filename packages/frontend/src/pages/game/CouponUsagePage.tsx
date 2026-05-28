@@ -80,7 +80,7 @@ const CouponUsagePage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // export state
   const [exporting, setExporting] = useState(false);
@@ -580,12 +580,6 @@ const CouponUsagePage: React.FC = () => {
             <IconButton
               onClick={(e) => setExportMenuAnchor(e.currentTarget)}
               aria-label="more options"
-              sx={{
-                bgcolor: 'background.paper',
-                border: 1,
-                borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
-              }}
             >
               <MoreVertIcon />
             </IconButton>

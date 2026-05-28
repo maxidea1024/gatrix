@@ -313,21 +313,66 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     }
   }, [refreshKey, loadHistory]);
 
-  // Build chart data
+  // Build chart data with gap filling
   const chartData = useMemo(() => {
     if (records.length === 0) return { labels: [], datasets: [] };
 
-    const labels = records.map((r) => {
+    // Generate full time axis from date range
+    // Match backend downsampling: ≤7D=10min, ≤30D=30min, >30D=60min
+    const { from, to } = getDateRange();
+    const rangeHours = (to.getTime() - from.getTime()) / (1000 * 60 * 60);
+    const intervalMinutes = rangeHours > 24 * 30 ? 60 : rangeHours > 24 * 7 ? 30 : 10;
+
+    const allLabels: string[] = [];
+    const current = new Date(from);
+    current.setMinutes(Math.floor(current.getMinutes() / intervalMinutes) * intervalMinutes, 0, 0);
+    while (current <= to) {
+      allLabels.push(
+        `${String(current.getMonth() + 1).padStart(2, '0')}/${String(current.getDate()).padStart(2, '0')} ${String(current.getHours()).padStart(2, '0')}:${String(current.getMinutes()).padStart(2, '0')}`
+      );
+      current.setMinutes(current.getMinutes() + intervalMinutes);
+    }
+
+    // Build maps of label -> value for each metric
+    const totalMap = new Map<string, number>();
+    const newMap = new Map<string, number>();
+    records.forEach((r) => {
       const d = new Date(r.recordedAt);
-      return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const mins = Math.floor(d.getMinutes() / intervalMinutes) * intervalMinutes;
+      d.setMinutes(mins, 0, 0);
+      const label = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      totalMap.set(label, Math.max(totalMap.get(label) ?? 0, r.totalPlayers));
+      newMap.set(label, Math.max(newMap.get(label) ?? 0, r.newPlayers));
     });
+
+    // Fill gaps: totalPlayers carry-forwards, newPlayers defaults to 0
+    const fillTotal = (): (number | null)[] => {
+      let lastVal: number | null = null;
+      return allLabels.map((label) => {
+        if (totalMap.has(label)) {
+          lastVal = totalMap.get(label)!;
+          return lastVal;
+        }
+        return lastVal;
+      });
+    };
+    const fillNew = (): (number | null)[] => {
+      let hasStarted = false;
+      return allLabels.map((label) => {
+        if (newMap.has(label)) {
+          hasStarted = true;
+          return newMap.get(label)!;
+        }
+        return hasStarted ? 0 : null;
+      });
+    };
 
     const datasets: any[] = [];
 
     if (displayMode === 'all' || displayMode === 'total') {
       datasets.push({
         label: t('playerConnections.player.totalPlayers'),
-        data: records.map((r) => r.totalPlayers),
+        data: fillTotal(),
         borderColor: '#1976d2',
         backgroundColor: 'rgba(25,118,210,0.15)',
         borderWidth: 3,
@@ -343,7 +388,7 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     if (displayMode === 'all' || displayMode === 'new') {
       datasets.push({
         label: t('playerConnections.player.newPlayers'),
-        data: records.map((r) => r.newPlayers),
+        data: fillNew(),
         borderColor: '#4caf50',
         backgroundColor: 'rgba(76,175,80,0.15)',
         borderWidth: 2,
@@ -356,13 +401,14 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       });
     }
 
-    return { labels, datasets };
-  }, [records, t, displayMode]);
+    return { labels: allLabels, datasets };
+  }, [records, t, displayMode, getDateRange]);
 
   const chartOptions = useMemo(
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: false as const,
       plugins: {
         legend: { display: showLegend, position: 'top' as const },
         tooltip: {
@@ -391,6 +437,7 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           grid: { color: 'rgba(0,0,0,0.05)' },
           position: 'left' as const,
           ticks: {
+            precision: 0,
             callback: (value: any) =>
               typeof value === 'number' ? value.toLocaleString() : value,
           },
@@ -402,6 +449,7 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
                 grid: { drawOnChartArea: false },
                 position: 'right' as const,
                 ticks: {
+                  precision: 0,
                   callback: (value: any) =>
                     typeof value === 'number' ? value.toLocaleString() : value,
                 },

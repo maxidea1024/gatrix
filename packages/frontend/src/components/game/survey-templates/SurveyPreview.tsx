@@ -15,6 +15,8 @@ import {
   Rating,
   Select,
   Slider,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from '@mui/material';
@@ -34,6 +36,8 @@ import {
   Question,
   TemplateSettings,
   TemplateLocales,
+  SurveyPage,
+  questionsToPages,
 } from '@/services/surveyTemplateService';
 
 interface Props {
@@ -67,6 +71,7 @@ const SurveyPreview: React.FC<Props> = ({
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [viewMode, setViewMode] = useState<ViewMode>('mobile');
   const [displayMode, setDisplayMode] = useState<DisplayMode>('scroll');
+  const [scrollPageIdx, setScrollPageIdx] = useState(0);
 
   const visibleQuestions = questions.filter(
     (q) => q.type !== 'welcome' && q.type !== 'ending'
@@ -74,12 +79,22 @@ const SurveyPreview: React.FC<Props> = ({
   const welcomeQ = questions.find((q) => q.type === 'welcome');
   const endingQ = questions.find((q) => q.type === 'ending');
 
-  // All slides: welcome + questions + ending
-  const slides: ('welcome' | Question | 'ending')[] = [];
-  if (welcomeQ) slides.push('welcome');
-  visibleQuestions.forEach((q) => slides.push(q));
-  if (endingQ) slides.push('ending');
-  if (slides.length === 0) slides.push('welcome');
+  // Group visible questions into pages
+  const questionPages: SurveyPage[] = React.useMemo(
+    () => questionsToPages(questions),
+    [questions]
+  );
+
+  // Slides: welcome + pages + ending
+  type SlideItem = 'welcome' | SurveyPage | 'ending';
+  const slides: SlideItem[] = React.useMemo(() => {
+    const s: SlideItem[] = [];
+    if (welcomeQ) s.push('welcome');
+    questionPages.forEach((p) => s.push(p));
+    if (endingQ) s.push('ending');
+    if (s.length === 0) s.push('welcome');
+    return s;
+  }, [welcomeQ, endingQ, questionPages]);
 
   const getLocText = (obj?: Record<string, string>): string => {
     if (!obj) return '';
@@ -313,131 +328,189 @@ const SurveyPreview: React.FC<Props> = ({
     );
   };
 
-  const renderScrollMode = () => (
-    <Card elevation={0}>
-      <CardContent sx={{ p: 3 }}>
-        {/* Welcome */}
-        {welcomeQ && getLocText(welcomeQ.title) && (
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Typography variant="h5" fontWeight={700} gutterBottom>
-              {getLocText(welcomeQ.title)}
-            </Typography>
-            {welcomeQ.description && getLocText(welcomeQ.description) && (
-              <Typography variant="body1" color="text.secondary">
-                {getLocText(welcomeQ.description)}
+  const renderScrollMode = () => {
+    // Clamp scrollPageIdx to valid range
+    const pageIdx = Math.min(scrollPageIdx, questionPages.length - 1);
+    const activePage = questionPages[pageIdx >= 0 ? pageIdx : 0];
+
+    return (
+      <Card elevation={0}>
+        <CardContent sx={{ p: 3 }}>
+          {/* Welcome */}
+          {welcomeQ && getLocText(welcomeQ.title) && (
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Typography variant="h5" fontWeight={700} gutterBottom>
+                {getLocText(welcomeQ.title)}
               </Typography>
-            )}
-          </Box>
+              {welcomeQ.description && getLocText(welcomeQ.description) && (
+                <Typography variant="body1" color="text.secondary">
+                  {getLocText(welcomeQ.description)}
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          {/* Page tabs (show when multiple pages exist) */}
+          {questionPages.length > 1 && (
+            <Tabs
+              value={pageIdx}
+              onChange={(_, v) => setScrollPageIdx(v)}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+            >
+              {questionPages.map((p, i) => (
+                <Tab
+                  key={p.id}
+                  label={
+                    t('surveyTemplate.pageNumber', { number: i + 1 }) ||
+                    `Page ${i + 1}`
+                  }
+                />
+              ))}
+            </Tabs>
+          )}
+
+          {/* Selected page's questions */}
+          {activePage &&
+            activePage.questions.map((q, idx) => (
+              <Box key={q.id} sx={{ mb: 3 }}>
+                {idx > 0 && <Divider sx={{ mb: 3 }} />}
+                {renderQuestion(q)}
+              </Box>
+            ))}
+
+          {/* Submit */}
+          {visibleQuestions.length > 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mt: 3,
+                pt: 2,
+                borderTop: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Button
+                variant="contained"
+                endIcon={<Send />}
+                size="large"
+                color="success"
+                sx={{ px: 6, borderRadius: 3 }}
+              >
+                {btnText.submit}
+              </Button>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderSlideMode = () => {
+    const current = slides[currentSlide];
+    const totalSlides = slides.length;
+
+    const renderSlideContent = () => {
+      if (current === 'welcome') return renderWelcome();
+      if (current === 'ending') return renderEnding();
+      // current is a SurveyPage — render all its questions
+      const page = current as SurveyPage;
+      return (
+        <Box>
+          {questionPages.length > 1 && (
+            <Typography
+              variant="caption"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mb: 2, display: 'block' }}
+            >
+              {t('surveyTemplate.pageNumber', {
+                number: questionPages.indexOf(page) + 1,
+              }) || `Page ${questionPages.indexOf(page) + 1}`}
+            </Typography>
+          )}
+          {page.questions.map((q, idx) => (
+            <Box key={q.id} sx={{ mb: 3 }}>
+              {idx > 0 && <Divider sx={{ mb: 3 }} />}
+              {renderQuestion(q)}
+            </Box>
+          ))}
+        </Box>
+      );
+    };
+
+    return (
+      <>
+        {/* Progress bar */}
+        {settings?.showProgressBar !== false && (
+          <LinearProgress
+            variant="determinate"
+            value={
+              totalSlides > 1
+                ? ((currentSlide + 1) / totalSlides) * 100
+                : 0
+            }
+            sx={{ height: 3 }}
+          />
         )}
 
-        {/* All questions */}
-        {visibleQuestions.map((q, idx) => (
-          <Box key={q.id} sx={{ mb: 3 }}>
-            {idx > 0 && <Divider sx={{ mb: 3 }} />}
-            {renderQuestion(q)}
-          </Box>
-        ))}
+        {/* Content */}
+        <Card elevation={0}>
+          <CardContent sx={{ p: 3, minHeight: 300 }}>
+            {renderSlideContent()}
+          </CardContent>
+        </Card>
 
-        {/* Submit */}
-        {visibleQuestions.length > 0 && (
+        {/* Navigation */}
+        {current !== 'welcome' && current !== 'ending' && (
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'center',
-              mt: 3,
-              pt: 2,
+              justifyContent: 'space-between',
+              p: 2,
               borderTop: '1px solid',
               borderColor: 'divider',
             }}
           >
             <Button
-              variant="contained"
-              endIcon={<Send />}
-              size="large"
-              color="success"
-              sx={{ px: 6, borderRadius: 3 }}
+              startIcon={<NavigateBefore />}
+              onClick={() => setCurrentSlide((p) => Math.max(0, p - 1))}
+              disabled={currentSlide === 0}
+              size="small"
             >
-              {btnText.submit}
+              {btnText.prev}
             </Button>
+            {currentSlide < totalSlides - 1 ? (
+              <Button
+                variant="contained"
+                endIcon={<NavigateNext />}
+                onClick={() =>
+                  setCurrentSlide((p) => Math.min(totalSlides - 1, p + 1))
+                }
+                size="small"
+              >
+                {btnText.next}
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                endIcon={<Send />}
+                onClick={() => {
+                  if (endingQ) setCurrentSlide(totalSlides - 1);
+                }}
+                size="small"
+                color="success"
+              >
+                {btnText.submit}
+              </Button>
+            )}
           </Box>
         )}
-      </CardContent>
-    </Card>
-  );
-
-  const renderSlideMode = () => (
-    <>
-      {/* Progress bar */}
-      {settings?.showProgressBar !== false && (
-        <LinearProgress
-          variant="determinate"
-          value={progress}
-          sx={{ height: 3 }}
-        />
-      )}
-
-      {/* Content */}
-      <Card elevation={0}>
-        <CardContent sx={{ p: 3, minHeight: 300 }}>
-          {current === 'welcome' ||
-          (typeof current === 'object' && current.type === 'welcome')
-            ? renderWelcome()
-            : current === 'ending' ||
-                (typeof current === 'object' && current.type === 'ending')
-              ? renderEnding()
-              : typeof current === 'object'
-                ? renderQuestion(current)
-                : renderWelcome()}
-        </CardContent>
-      </Card>
-
-      {/* Navigation */}
-      {current !== 'welcome' && current !== 'ending' && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            p: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Button
-            startIcon={<NavigateBefore />}
-            onClick={() => setCurrentSlide((p) => Math.max(0, p - 1))}
-            disabled={currentSlide === 0}
-            size="small"
-          >
-            {btnText.prev}
-          </Button>
-          {currentSlide < totalSlides - 1 ? (
-            <Button
-              variant="contained"
-              endIcon={<NavigateNext />}
-              onClick={() =>
-                setCurrentSlide((p) => Math.min(totalSlides - 1, p + 1))
-              }
-              size="small"
-            >
-              {btnText.next}
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              endIcon={<Send />}
-              onClick={() => {
-                if (endingQ) setCurrentSlide(totalSlides - 1);
-              }}
-              size="small"
-              color="success"
-            >
-              {btnText.submit}
-            </Button>
-          )}
-        </Box>
-      )}
-    </>
-  );
+      </>
+    );
+  };
 
   return (
     <Box>

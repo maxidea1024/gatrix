@@ -895,6 +895,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const lineChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: false as const,
     interaction: {
       mode: 'index' as const,
       intersect: false,
@@ -1299,6 +1300,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
               const doughnutOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false as const,
                 cutout: '60%',
                 plugins: {
                   legend: {

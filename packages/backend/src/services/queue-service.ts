@@ -265,6 +265,53 @@ export class QueueService {
             'Repeatable job already exists: context-field-usage:flush'
           );
         }
+
+        // Register connected users cache polling job (every 15 seconds)
+        const CONNECTED_USERS_POLL_INTERVAL = parseInt(
+          process.env.CONNECTED_USERS_POLL_INTERVAL_MS || '15000',
+          10
+        );
+        const existingConnectedUsersPoll = repeatables.find(
+          (r) => r.name === 'connected-users:poll'
+        );
+        if (existingConnectedUsersPoll) {
+          const existingEvery = parseInt(
+            String((existingConnectedUsersPoll as any).every || '0'),
+            10
+          );
+          if (existingEvery !== CONNECTED_USERS_POLL_INTERVAL) {
+            logger.warn(
+              `connected-users:poll has wrong interval (${existingEvery}ms), re-registering with ${CONNECTED_USERS_POLL_INTERVAL}ms`
+            );
+            await this.removeRepeatable(
+              'scheduler',
+              existingConnectedUsersPoll.key
+            );
+            await this.addJob(
+              'scheduler',
+              'connected-users:poll',
+              {},
+              { repeat: { every: CONNECTED_USERS_POLL_INTERVAL } }
+            );
+            logger.info(
+              `Re-registered repeatable job: connected-users:poll (every ${CONNECTED_USERS_POLL_INTERVAL}ms)`
+            );
+          } else {
+            logger.info(
+              'Repeatable job already exists: connected-users:poll'
+            );
+          }
+        } else {
+          await this.addJob(
+            'scheduler',
+            'connected-users:poll',
+            {},
+            { repeat: { every: CONNECTED_USERS_POLL_INTERVAL } }
+          );
+          logger.info(
+            `Registered repeatable job: connected-users:poll (every ${CONNECTED_USERS_POLL_INTERVAL}ms)`
+          );
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }

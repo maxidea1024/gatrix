@@ -46,10 +46,6 @@ interface Props {
 
 const CATEGORIES = [
   {
-    labelKey: 'content',
-    types: ['welcome', 'ending'] as QuestionType[],
-  },
-  {
     labelKey: 'choice',
     types: ['single_choice', 'multiple_choice', 'dropdown'] as QuestionType[],
   },

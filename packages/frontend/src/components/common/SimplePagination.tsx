@@ -49,9 +49,13 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
     onPageChange(event, pageNumber); // Convert 1-based to 0-based
   };
 
-  const handleRowsPerPageChange = (event: SelectChangeEvent<number>) => {
-    // Always pass the event to the handler
-    onRowsPerPageChange(event as any);
+  const handleRowsPerPageChange = (event: SelectChangeEvent<string>) => {
+    // Create a synthetic event with numeric value for callers expecting Number(e.target.value)
+    const numericValue = Number(event.target.value);
+    const syntheticEvent = {
+      target: { value: numericValue },
+    };
+    onRowsPerPageChange(syntheticEvent as any);
   };
 
   return (
@@ -85,7 +89,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FormControl size="small" variant="outlined">
               <Select
-                value={rowsPerPage}
+                value={String(rowsPerPage)}
                 onChange={handleRowsPerPageChange}
                 sx={{
                   minWidth: 80,
@@ -101,7 +105,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
                 }}
               >
                 {rowsPerPageOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
+                  <MenuItem key={option} value={String(option)}>
                     {option}
                   </MenuItem>
                 ))}

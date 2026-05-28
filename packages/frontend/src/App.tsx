@@ -242,8 +242,8 @@ const StoreProductsPage = React.lazy(
 const BannerManagementPage = React.lazy(
   () => import('./pages/game/BannerManagementPage')
 );
-const HotTimeButtonEventPage = React.lazy(
-  () => import('./pages/game/HotTimeButtonEventPage')
+const HotTimeBuffEventPage = React.lazy(
+  () => import('./pages/game/HotTimeBuffEventPage')
 );
 const LiveEventPage = React.lazy(() => import('./pages/game/LiveEventPage'));
 const OperationEventsPage = React.lazy(

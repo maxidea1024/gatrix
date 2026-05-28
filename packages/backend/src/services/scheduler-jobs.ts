@@ -194,6 +194,16 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
       logger.info('subscriber:poll completed', { jobId: job.id });
     },
 
+    'connected-users:poll': async (job) => {
+      const { connectedUsersCacheService } =
+        await import('./connected-users-cache-service');
+      await connectedUsersCacheService.pollAll();
+      logger.debug('connected-users:poll completed', {
+        jobId: job.id,
+        cachedTotal: connectedUsersCacheService.getCachedTotal(),
+      });
+    },
+
     'context-field-usage:flush': async (job) => {
       const { processContextFieldUsageFlushJob } =
         await import('./context-field-usage-service');

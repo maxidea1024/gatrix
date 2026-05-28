@@ -332,7 +332,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
 
           {/* Table Area */}
           <PageContentLoader loading={loading}>
-            {logs.length === 0 ? (
+            {logs.length === 0 && !loading ? (
               <Box sx={{ mt: 2 }}>
                 <EmptyPagePlaceholder message={t('surveys.logs.noRecords')} />
               </Box>

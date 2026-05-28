@@ -9,6 +9,7 @@ import { CcuHistoryModel } from '../models/ccu-history';
 import { PlayerHistoryModel } from '../models/player-history';
 import { CharacterHistoryModel } from '../models/character-history';
 import serviceDiscoveryService from '../services/service-discovery-service';
+import { connectedUsersCacheService } from '../services/connected-users-cache-service';
 
 const logger = createLogger('PlayerConnectionsController');
 
@@ -290,11 +291,36 @@ export class PlayerConnectionsController {
 
   /**
    * GET /users
-   * Query connected user data from admind gatrix API.
+   * Query connected user data.
+   * Uses in-memory cache (refreshed every 15s) for search/sort/pagination.
+   * Falls back to direct admind proxy if cache is not yet warmed up.
    */
   static getConnectedUsers = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { page, limit, worldId, search, sortBy, sortDesc } = req.query;
+
+      // ── Try cache first ──────────────────────────────────────────────
+      const cached = connectedUsersCacheService.getUsers({
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+        worldId: worldId ? String(worldId) : undefined,
+        search: search ? String(search) : undefined,
+        sortBy: sortBy ? String(sortBy) : undefined,
+        sortDesc: sortDesc !== undefined ? sortDesc === 'true' : undefined,
+      });
+
+      if (cached) {
+        res.json({
+          success: true,
+          data: cached,
+        });
+        return;
+      }
+
+      // ── Fallback: direct admind proxy (cache not ready yet) ──────────
+      logger.info(
+        'Connected users cache not ready, falling back to direct admind query'
+      );
 
       const admindUrl = await getAdmindApiUrl(req.environmentId);
 
@@ -354,6 +380,33 @@ export class PlayerConnectionsController {
           }
         );
       }
+    }
+  );
+
+  /**
+   * GET /users/snapshot
+   * Returns the full cached snapshot for bulk export.
+   * No admind round-trip — served entirely from cache.
+   */
+  static getUsersSnapshot = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const snapshot = connectedUsersCacheService.getSnapshot();
+
+      if (!snapshot) {
+        throw new GatrixError(
+          'Connected users cache is not yet available. Please try again shortly.',
+          503
+        );
+      }
+
+      res.json({
+        success: true,
+        data: {
+          users: snapshot.users,
+          total: snapshot.users.length,
+          cachedAt: snapshot.cachedAt,
+        },
+      });
     }
   );
 

@@ -12,8 +12,8 @@ import { P } from '@/types/permissions';
 import PageHeader from '@/components/common/PageHeader';
 
 // Lazy-load the actual page contents
-const HotTimeButtonEventPage = React.lazy(
-  () => import('./HotTimeButtonEventPage')
+const HotTimeBuffEventPage = React.lazy(
+  () => import('./HotTimeBuffEventPage')
 );
 const LiveEventPage = React.lazy(() => import('./LiveEventPage'));
 
@@ -28,10 +28,10 @@ interface TabConfig {
 const TAB_CONFIGS: TabConfig[] = [
   {
     key: 'hottime',
-    labelKey: 'sidebar.hotTimeButtonEvent',
+    labelKey: 'sidebar.hotTimeBuffEvent',
     icon: <WhatshotIcon sx={{ fontSize: 18 }} />,
     permission: [P.OPERATION_EVENTS_READ],
-    component: HotTimeButtonEventPage,
+    component: HotTimeBuffEventPage,
   },
   {
     key: 'live',

@@ -286,7 +286,7 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
           }}
           onClick={() => setShowAll(true)}
         >
-          +{displayRewards.length - maxDisplay} {t('surveys.moreRewards')}
+          +{resolvedRewards.length - maxDisplay} {t('surveys.moreRewards')}
         </Typography>
       )}
       {showAll && hasMore && (

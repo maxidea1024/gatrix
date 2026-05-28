@@ -657,12 +657,6 @@ const SurveyLogsPage: React.FC = () => {
             <IconButton
               onClick={(e) => setPageMenuAnchor(e.currentTarget)}
               aria-label="more options"
-              sx={{
-                bgcolor: 'background.paper',
-                border: 1,
-                borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
-              }}
             >
               <MoreVertIcon />
             </IconButton>
@@ -688,8 +682,8 @@ const SurveyLogsPage: React.FC = () => {
         </Box>
       </Box>
 
-      <PageContentLoader loading={loading && logs.length === 0}>
-        {logs.length === 0 && !loading ? (
+      <PageContentLoader loading={!filtersInitialized || (loading && logs.length === 0)}>
+        {logs.length === 0 && !loading && filtersInitialized ? (
           <EmptyPagePlaceholder message={t('surveys.logs.noRecords')} />
         ) : (
           <Card variant="outlined">
