@@ -9,8 +9,7 @@ import {
   Stack,
   TextField,
   MenuItem,
-  Tabs,
-  Tab,
+
   Button,
   Switch,
   FormControlLabel,
@@ -31,6 +30,8 @@ import aiChatService, {
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
+import SegmentedTabs from '@/components/common/SegmentedTabs';
 
 // Lazy-loaded tab pages
 const SystemConsolePage = React.lazy(
@@ -53,11 +54,11 @@ const SystemSettingsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Tabs - read from URL query parameter
-  const tabFromUrl = searchParams.get('tab');
-  const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
-  const [tab, setTab] = useState(
-    initialTab >= 0 && initialTab <= 6 ? initialTab : 0
+  const TAB_KEYS = ['network', 'kv', 'ai', 'data', 'integrations', 'sdks', 'console'] as const;
+  type TabKey = (typeof TAB_KEYS)[number];
+  const tabFromUrl = searchParams.get('tab') as TabKey | null;
+  const [tab, setTab] = useState<TabKey>(
+    tabFromUrl && TAB_KEYS.includes(tabFromUrl) ? tabFromUrl : 'network'
   );
 
   // Network settings (admindUrl only — admindApiUrl removed, uses service discovery)
@@ -117,7 +118,7 @@ const SystemSettingsPage: React.FC = () => {
 
   // Load AI settings
   useEffect(() => {
-    if (tab === 2) {
+    if (tab === 'ai') {
       (async () => {
         try {
           setAiSettingsLoading(true);
@@ -179,36 +180,34 @@ const SystemSettingsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          {t('settings.systemSettings')}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('settings.subtitle')}
-        </Typography>
-      </Box>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+      <PageHeader
+        title={t('settings.systemSettings')}
+        subtitle={t('settings.subtitle')}
+        tabs={
+          <SegmentedTabs
+            items={[
+              { key: 'network', label: t('settings.network.title') },
+              { key: 'kv', label: t('settings.kv.title') },
+              { key: 'ai', label: t('aiChat.settings.title') },
+              { key: 'data', label: t('sidebar.dataManagement') },
+              { key: 'integrations', label: t('integrations.title') },
+              { key: 'sdks', label: t('integrations.sdks.title') },
+              { key: 'console', label: t('sidebar.console') },
+            ]}
+            value={tab}
+            onChange={(key) => {
+              setTab(key as TabKey);
+              setSearchParams({ tab: key });
+            }}
+          />
+        }
+      />
 
       <Card>
         <CardContent>
-          <Tabs
-            value={tab}
-            onChange={(_, v) => {
-              setTab(v);
-              setSearchParams({ tab: v.toString() });
-            }}
-            sx={{ mb: 2 }}
-          >
-            <Tab label={t('settings.network.title')} />
-            <Tab label={t('settings.kv.title')} />
-            <Tab label={t('aiChat.settings.title')} />
-            <Tab label={t('sidebar.dataManagement')} />
-            <Tab label={t('integrations.title')} />
-            <Tab label={t('integrations.sdks.title')} />
-            <Tab label={t('sidebar.console')} />
-          </Tabs>
 
-          {tab === 0 && (
+          {tab === 'network' && (
             <>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t('settings.network.subtitle')}
@@ -247,9 +246,9 @@ const SystemSettingsPage: React.FC = () => {
             </>
           )}
 
-          {tab === 1 && <KeyValuePage />}
+          {tab === 'kv' && <KeyValuePage />}
 
-          {tab === 2 && (
+          {tab === 'ai' && (
             <>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t('aiChat.settings.enabledDescription')}
@@ -383,7 +382,7 @@ const SystemSettingsPage: React.FC = () => {
             </>
           )}
 
-          {tab === 3 && (
+          {tab === 'data' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>
@@ -395,7 +394,7 @@ const SystemSettingsPage: React.FC = () => {
             </Suspense>
           )}
 
-          {tab === 4 && (
+          {tab === 'integrations' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>
@@ -407,7 +406,7 @@ const SystemSettingsPage: React.FC = () => {
             </Suspense>
           )}
 
-          {tab === 5 && (
+          {tab === 'sdks' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>
@@ -419,7 +418,7 @@ const SystemSettingsPage: React.FC = () => {
             </Suspense>
           )}
 
-          {tab === 6 && (
+          {tab === 'console' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>

@@ -3,11 +3,26 @@
  *
  * Compact page header with icon, title, inline subtitle, optional tabs and actions.
  * Title, subtitle, tabs and actions are placed on the same line to maximize content area.
+ * When `onRefresh` is provided, a MoreVert menu with a Refresh item is rendered at the end.
  * Ensures consistent styling across all admin and feature pages.
  */
 
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+} from '@mui/material';
+import {
+  MoreVert as MoreVertIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface PageHeaderProps {
   icon?: React.ReactNode;
@@ -15,6 +30,10 @@ interface PageHeaderProps {
   subtitle?: string;
   tabs?: React.ReactNode;
   actions?: React.ReactNode;
+  /** Additional items to render inside the MoreVert menu, above the refresh option. */
+  menuItems?: React.ReactNode;
+  /** When provided, a MoreVert menu with Refresh is rendered at the end of the header. */
+  onRefresh?: () => void;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -23,14 +42,21 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle,
   tabs,
   actions,
+  menuItems,
+  onRefresh,
 }) => {
+  const { t } = useTranslation();
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const showRightSection = tabs || actions || onRefresh;
+
   return (
     <Box
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        mb: 1.5,
+        mb: 1,
         pb: 1,
         minHeight: 40,
         borderBottom: 1,
@@ -100,8 +126,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         )}
       </Box>
 
-      {/* Right: tabs + actions */}
-      {(tabs || actions) && (
+      {/* Right: tabs + actions + context menu */}
+      {showRightSection && (
         <Box
           sx={{
             display: 'flex',
@@ -128,7 +154,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 '& .MuiSvgIcon-root': { fontSize: '0.95rem' },
               },
             },
-            '& .MuiIconButton-root': {
+            '& > .MuiIconButton-root': {
               p: 0.5,
               '& .MuiSvgIcon-root': { fontSize: '1.15rem' },
             },
@@ -136,6 +162,37 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         >
           {tabs}
           {actions}
+          {onRefresh && (
+            <>
+              <IconButton
+                onClick={(e) => setMenuAnchor(e.currentTarget)}
+                size="small"
+              >
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => setMenuAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                {menuItems}
+                {menuItems && <Divider />}
+                <MenuItem
+                  onClick={() => {
+                    onRefresh();
+                    setMenuAnchor(null);
+                  }}
+                >
+                  <ListItemIcon>
+                    <RefreshIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t('common.refresh')}</ListItemText>
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Box>
       )}
     </Box>
