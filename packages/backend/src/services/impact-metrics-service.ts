@@ -73,6 +73,8 @@ class ImpactMetricsService {
   private registry: any | null = null;
   private promClient: any | null = null;
   private registeredMetrics: Map<string, any> = new Map();
+  private metricTypeCache = new Map<string, { type: string; cachedAt: number }>();
+  private static METRIC_TYPE_CACHE_TTL = 5 * 60 * 1000;
   private prometheusUrl: string;
 
   constructor() {
@@ -291,12 +293,16 @@ class ImpactMetricsService {
     // We should detect if it already has the prefix or not, or if we should prepend it.
     // For now, let's assume if we are allowing ANY prometheus metric, we shouldn't force prefix.
 
+    // Look up metric type to use appropriate PromQL functions (e.g. gauge vs counter)
+    const metricType = await this.lookupMetricType(series);
+
     const promqlQuery = this.buildPromQL(
       series,
       aggregationMode,
       labels,
       range,
-      groupBy
+      groupBy,
+      metricType
     );
 
     // Calculate time range (custom from/to overrides range-based calculation)
@@ -343,10 +349,10 @@ class ImpactMetricsService {
       const result = data.data?.result || [];
       const transformedSeries: TimeSeriesSeries[] = result.map((r: any) => ({
         metric: r.metric || {},
-        data: (r.values || []).map((v: any) => [
-          Number(v[0]),
-          parseFloat(v[1]),
-        ]),
+        data: (r.values || []).map((v: any) => {
+          const val = parseFloat(v[1]);
+          return [Number(v[0]), isNaN(val) ? 0 : val];
+        }),
       }));
 
       return {
@@ -385,11 +391,15 @@ class ImpactMetricsService {
       : METRIC_PREFIX + metricName;
     // Wait, if I change getAvailableMetrics to return full names, then I shouldn't prepend prefix blindly.
 
+    const metricType = await this.lookupMetricType(effectiveName);
+
     const promqlQuery = this.buildPromQL(
       effectiveName,
       aggregationMode,
       labels,
-      timeRange || 'hour'
+      timeRange || 'hour',
+      undefined,
+      metricType
     );
 
     try {
@@ -548,6 +558,34 @@ class ImpactMetricsService {
   }
 
   /**
+   * Look up the type of a metric from Prometheus metadata API (cached)
+   */
+  private async lookupMetricType(metricName: string): Promise<string | undefined> {
+    const cached = this.metricTypeCache.get(metricName);
+    if (cached && Date.now() - cached.cachedAt < ImpactMetricsService.METRIC_TYPE_CACHE_TTL) {
+      return cached.type;
+    }
+
+    try {
+      const url = new URL(`${this.prometheusUrl}/api/v1/metadata`);
+      url.searchParams.set('metric', metricName);
+
+      const response = await fetch(url.toString());
+      const data: any = await response.json();
+
+      if (data.status === 'success' && data.data?.[metricName]) {
+        const type = data.data[metricName][0]?.type || 'unknown';
+        this.metricTypeCache.set(metricName, { type, cachedAt: Date.now() });
+        return type;
+      }
+    } catch (error) {
+      logger.debug('Failed to lookup metric type for: ' + metricName);
+    }
+
+    return undefined;
+  }
+
+  /**
    * Build PromQL query based on parameters
    */
   private buildPromQL(
@@ -555,7 +593,8 @@ class ImpactMetricsService {
     aggregationMode?: string,
     labels?: Record<string, string[]>,
     range?: string,
-    groupBy?: string[]
+    groupBy?: string[],
+    metricType?: string
   ): string {
     // Build label selector
     let labelSelector = '';
@@ -583,40 +622,63 @@ class ImpactMetricsService {
     // If metricName already has "gatrix_" or looks like a system metric, use it as is.
     // Just use metricName as passed.
 
+    const isGauge = metricType === 'gauge';
+
     switch (aggregationMode) {
       case 'rps':
-        query = `rate(${metricName}${labelSelector}[${rangeStr}])`;
-        if (byClause) query = `sum${byClause}(${query})`;
+        if (isGauge) {
+          // rate() is meaningless for gauges; use avg_over_time instead
+          query = `avg_over_time(${metricName}${labelSelector}[${rangeStr}])`;
+          if (byClause) query = `avg${byClause}(${query})`;
+        } else {
+          query = `rate(${metricName}${labelSelector}[${rangeStr}])`;
+          if (byClause) query = `sum${byClause}(${query})`;
+        }
         break;
       case 'avg':
         query = `avg_over_time(${metricName}${labelSelector}[${rangeStr}])`;
         if (byClause) query = `avg${byClause}(${query})`;
         break;
       case 'sum':
-        query = `increase(${metricName}${labelSelector}[${rangeStr}])`;
-        if (byClause) query = `sum${byClause}(${query})`;
+        if (isGauge) {
+          // increase() produces NaN on gauge decreases; use max_over_time instead
+          query = `max_over_time(${metricName}${labelSelector}[${rangeStr}])`;
+          if (byClause) query = `sum${byClause}(${query})`;
+        } else {
+          query = `increase(${metricName}${labelSelector}[${rangeStr}])`;
+          if (byClause) query = `sum${byClause}(${query})`;
+        }
         break;
-      case 'p50':
+      case 'p50': {
         // For histograms, we need to aggregate by le and groupBy
         // sum by (le, ...groupBy) (rate(...))
         const histBy =
           groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
         query = `histogram_quantile(0.50, sum by (le${histBy}) (rate(${metricName}_bucket${labelSelector}[${rangeStr}])))`;
         break;
-      case 'p95':
+      }
+      case 'p95': {
         const histBy95 =
           groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
         query = `histogram_quantile(0.95, sum by (le${histBy95}) (rate(${metricName}_bucket${labelSelector}[${rangeStr}])))`;
         break;
-      case 'p99':
+      }
+      case 'p99': {
         const histBy99 =
           groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
         query = `histogram_quantile(0.99, sum by (le${histBy99}) (rate(${metricName}_bucket${labelSelector}[${rangeStr}])))`;
         break;
+      }
       case 'count':
       default:
-        query = `increase(${metricName}${labelSelector}[${rangeStr}])`;
-        if (byClause) query = `sum${byClause}(${query})`;
+        if (isGauge) {
+          // increase() produces NaN on gauge decreases; use avg_over_time instead
+          query = `avg_over_time(${metricName}${labelSelector}[${rangeStr}])`;
+          if (byClause) query = `avg${byClause}(${query})`;
+        } else {
+          query = `increase(${metricName}${labelSelector}[${rangeStr}])`;
+          if (byClause) query = `sum${byClause}(${query})`;
+        }
         break;
     }
 

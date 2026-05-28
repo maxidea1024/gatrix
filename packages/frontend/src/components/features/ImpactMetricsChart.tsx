@@ -151,16 +151,16 @@ const DEFAULT_H = 3;
 const MIN_W = 3;
 const MIN_H = 2;
 
-// Colors for multiple series
+// Colors for multiple series – Grafana-inspired curated palette
 const SERIES_COLORS = [
-  { border: '#2196f3', bg: 'rgba(33, 150, 243, 0.4)' },
-  { border: '#4caf50', bg: 'rgba(76, 175, 80, 0.4)' },
-  { border: '#ff9800', bg: 'rgba(255, 152, 0, 0.4)' },
-  { border: '#f44336', bg: 'rgba(244, 67, 54, 0.4)' },
-  { border: '#9c27b0', bg: 'rgba(156, 39, 176, 0.4)' },
-  { border: '#00bcd4', bg: 'rgba(0, 188, 212, 0.4)' },
-  { border: '#607d8b', bg: 'rgba(96, 125, 139, 0.4)' },
-  { border: '#e91e63', bg: 'rgba(233, 30, 99, 0.4)' },
+  { border: '#5794F2', bg: 'rgba(87, 148, 242, 0.45)' },
+  { border: '#73BF69', bg: 'rgba(115, 191, 105, 0.45)' },
+  { border: '#FADE2A', bg: 'rgba(250, 222, 42, 0.35)' },
+  { border: '#F2495C', bg: 'rgba(242, 73, 92, 0.45)' },
+  { border: '#B877D9', bg: 'rgba(184, 119, 217, 0.45)' },
+  { border: '#FF9830', bg: 'rgba(255, 152, 48, 0.45)' },
+  { border: '#8AB8FF', bg: 'rgba(138, 184, 255, 0.40)' },
+  { border: '#FF6EB4', bg: 'rgba(255, 110, 180, 0.40)' },
 ];
 
 // ==================== Single Chart Panel ====================
@@ -290,6 +290,20 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     });
     const sorted = Array.from(allTimestamps).sort((a, b) => a - b);
 
+    // Downsample for bar charts – too many bars causes canvas anti-aliasing artifacts
+    const MAX_BAR_POINTS = 80;
+    const shouldDownsample =
+      localChartType === 'bar' && sorted.length > MAX_BAR_POINTS;
+    const bucketSize = shouldDownsample
+      ? Math.ceil(sorted.length / MAX_BAR_POINTS)
+      : 1;
+    const displayTimestamps = shouldDownsample
+      ? Array.from(
+          { length: Math.ceil(sorted.length / bucketSize) },
+          (_, i) => sorted[i * bucketSize]
+        )
+      : sorted;
+
     const locale =
       i18n.language === 'ko'
         ? 'ko-KR'
@@ -314,7 +328,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
       });
     };
 
-    const labels = sorted.map(formatLabel);
+    const labels = displayTimestamps.map(formatLabel);
     const datasets = seriesData.series.map((s, idx) => {
       const color = SERIES_COLORS[idx % SERIES_COLORS.length];
       const tsMap = new Map(s.data.map(([ts, val]) => [ts, val]));
@@ -338,18 +352,50 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         }
       }
 
+      // Compute data values – average buckets when downsampling
+      const data = shouldDownsample
+        ? displayTimestamps.map((_, bucketIdx) => {
+            const start = bucketIdx * bucketSize;
+            const end = Math.min(start + bucketSize, sorted.length);
+            let sum = 0;
+            let count = 0;
+            for (let i = start; i < end; i++) {
+              const val = tsMap.get(sorted[i]);
+              if (val != null && !Number.isNaN(val)) {
+                sum += val;
+                count++;
+              }
+            }
+            return count > 0 ? sum / count : 0;
+          })
+        : displayTimestamps.map((ts) => {
+            const val = tsMap.get(ts);
+            if (val === undefined || val === null || Number.isNaN(val)) {
+              return localChartType === 'bar' ? 0 : null;
+            }
+            return val;
+          });
+
       return {
         label,
-        data: sorted.map((ts) => tsMap.get(ts) ?? null),
+        data,
         borderColor: color.border,
         backgroundColor:
-          localChartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
-        borderWidth: 2,
-        tension: 0.3,
-        pointRadius: isExpanded ? 2 : 1,
-        pointHoverRadius: 4,
+          localChartType === 'line'
+            ? color.bg.replace('0.45', '0.08')
+            : color.bg,
+        borderWidth: localChartType === 'bar' ? 0 : 2,
+        tension: 0.4,
+        pointRadius: isExpanded ? 1.5 : 0,
+        pointHoverRadius: 5,
+        pointBackgroundColor: color.border,
         fill: localChartType === 'area',
-        spanGaps: true,
+        spanGaps: localChartType !== 'bar',
+        ...(localChartType === 'bar' && {
+          barPercentage: 1.0,
+          categoryPercentage: 1.0,
+          borderRadius: 0,
+        }),
       };
     });
 
@@ -361,62 +407,108 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
       responsive: true,
       maintainAspectRatio: false,
       animation: false as const,
-      interaction: { mode: 'index' as const, intersect: false },
+      interaction: {
+        mode: 'index' as const,
+        intersect: false,
+      },
+      hover: {
+        mode: 'index' as const,
+        intersect: false,
+      },
       plugins: {
         legend: {
           display: true,
           position: 'bottom' as const,
           labels: {
-            color: theme.palette.text.primary,
+            color: theme.palette.text.secondary,
             usePointStyle: true,
-            padding: isExpanded ? 16 : 12,
-            font: { size: isExpanded ? 13 : 12 },
-            boxWidth: 10,
+            pointStyle: 'circle',
+            padding: isExpanded ? 18 : 14,
+            font: { size: isExpanded ? 12 : 11, family: 'inherit' },
+            boxWidth: 8,
+            boxHeight: 8,
           },
         },
         tooltip: {
-          backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
+          enabled: true,
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(24, 27, 31, 0.95)'
+              : 'rgba(255, 255, 255, 0.97)',
           titleColor: theme.palette.text.primary,
+          titleFont: { size: 12, weight: 'bold' as const },
           bodyColor: theme.palette.text.secondary,
-          borderColor: theme.palette.divider,
+          bodyFont: { size: 12 },
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.1)'
+              : 'rgba(0,0,0,0.08)',
           borderWidth: 1,
-          cornerRadius: 6,
+          cornerRadius: 8,
+          padding: { top: 8, bottom: 8, left: 12, right: 12 },
+          displayColors: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          boxPadding: 4,
+          usePointStyle: true,
           callbacks: {
             label: (ctx: any) => {
               const val = ctx.parsed?.y;
               if (val === null || val === undefined) return '';
-              return `${ctx.dataset.label}: ${typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : val}`;
+              return ` ${ctx.dataset.label}: ${typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : val}`;
             },
           },
         },
       },
       scales: {
         x: {
+          border: {
+            display: false,
+          },
           grid: {
+            display: true,
             color:
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.05)',
+                ? 'rgba(255,255,255,0.04)'
+                : 'rgba(0,0,0,0.04)',
+            lineWidth: 1,
           },
           ticks: {
             color: theme.palette.text.secondary,
-            font: { size: isExpanded ? 11 : 10 },
+            font: { size: isExpanded ? 11 : 10, family: 'inherit' },
             maxRotation: 0,
             autoSkip: true,
             maxTicksLimit: isExpanded ? 16 : 8,
+            padding: 4,
           },
         },
         y: {
           beginAtZero: true,
+          border: {
+            display: false,
+          },
           grid: {
+            display: true,
             color:
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.05)',
+                ? 'rgba(255,255,255,0.04)'
+                : 'rgba(0,0,0,0.04)',
+            lineWidth: 1,
           },
           ticks: {
             color: theme.palette.text.secondary,
-            font: { size: isExpanded ? 11 : 10 },
+            font: { size: isExpanded ? 11 : 10, family: 'inherit' },
+            padding: 8,
+            callback: (value: any) => {
+              if (typeof value !== 'number') return value;
+              if (Math.abs(value) >= 1_000_000)
+                return (value / 1_000_000).toFixed(1) + 'M';
+              if (Math.abs(value) >= 1_000)
+                return (value / 1_000).toFixed(1) + 'K';
+              return value.toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+              });
+            },
           },
         },
       },
@@ -761,7 +853,21 @@ const ChartPreviewPanel: React.FC<{
       });
     };
 
-    const labels = sorted.map(formatLabel);
+    // Downsample for bar charts
+    const MAX_BAR_POINTS = 80;
+    const shouldDownsample =
+      chartType === 'bar' && sorted.length > MAX_BAR_POINTS;
+    const bucketSize = shouldDownsample
+      ? Math.ceil(sorted.length / MAX_BAR_POINTS)
+      : 1;
+    const displayTimestamps = shouldDownsample
+      ? Array.from(
+          { length: Math.ceil(sorted.length / bucketSize) },
+          (_, i) => sorted[i * bucketSize]
+        )
+      : sorted;
+
+    const labels = displayTimestamps.map(formatLabel);
     const datasets = seriesData.series.map((s, idx) => {
       const color = SERIES_COLORS[idx % SERIES_COLORS.length];
       const tsMap = new Map(s.data.map(([ts, val]) => [ts, val]));
@@ -785,18 +891,49 @@ const ChartPreviewPanel: React.FC<{
         }
       }
 
+      const data = shouldDownsample
+        ? displayTimestamps.map((_, bucketIdx) => {
+            const start = bucketIdx * bucketSize;
+            const end = Math.min(start + bucketSize, sorted.length);
+            let sum = 0;
+            let count = 0;
+            for (let i = start; i < end; i++) {
+              const val = tsMap.get(sorted[i]);
+              if (val != null && !Number.isNaN(val)) {
+                sum += val;
+                count++;
+              }
+            }
+            return count > 0 ? sum / count : 0;
+          })
+        : displayTimestamps.map((ts) => {
+            const val = tsMap.get(ts);
+            if (val === undefined || val === null || Number.isNaN(val)) {
+              return chartType === 'bar' ? 0 : null;
+            }
+            return val;
+          });
+
       return {
         label,
-        data: sorted.map((ts) => tsMap.get(ts) ?? null),
+        data,
         borderColor: color.border,
         backgroundColor:
-          chartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
-        borderWidth: 2,
-        tension: 0.3,
-        pointRadius: 1,
-        pointHoverRadius: 4,
+          chartType === 'line'
+            ? color.bg.replace('0.45', '0.08')
+            : color.bg,
+        borderWidth: chartType === 'bar' ? 0 : 2,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointBackgroundColor: color.border,
         fill: chartType === 'area',
-        spanGaps: true,
+        spanGaps: chartType !== 'bar',
+        ...(chartType === 'bar' && {
+          barPercentage: 1.0,
+          categoryPercentage: 1.0,
+          borderRadius: 0,
+        }),
       };
     });
 
@@ -809,61 +946,97 @@ const ChartPreviewPanel: React.FC<{
       maintainAspectRatio: false,
       animation: false as const,
       interaction: { mode: 'index' as const, intersect: false },
+      hover: { mode: 'index' as const, intersect: false },
       plugins: {
         legend: {
           display: true,
           position: 'bottom' as const,
           labels: {
-            color: theme.palette.text.primary,
+            color: theme.palette.text.secondary,
             usePointStyle: true,
-            padding: 12,
-            font: { size: 11 },
-            boxWidth: 10,
+            pointStyle: 'circle',
+            padding: 14,
+            font: { size: 11, family: 'inherit' },
+            boxWidth: 8,
+            boxHeight: 8,
           },
         },
         tooltip: {
-          backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
+          enabled: true,
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(24, 27, 31, 0.95)'
+              : 'rgba(255, 255, 255, 0.97)',
           titleColor: theme.palette.text.primary,
+          titleFont: { size: 12, weight: 'bold' as const },
           bodyColor: theme.palette.text.secondary,
-          borderColor: theme.palette.divider,
+          bodyFont: { size: 12 },
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.1)'
+              : 'rgba(0,0,0,0.08)',
           borderWidth: 1,
-          cornerRadius: 6,
+          cornerRadius: 8,
+          padding: { top: 8, bottom: 8, left: 12, right: 12 },
+          displayColors: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          boxPadding: 4,
+          usePointStyle: true,
           callbacks: {
             label: (ctx: any) => {
               const val = ctx.parsed?.y;
               if (val === null || val === undefined) return '';
-              return `${ctx.dataset.label}: ${typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : val}`;
+              return ` ${ctx.dataset.label}: ${typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : val}`;
             },
           },
         },
       },
       scales: {
         x: {
+          border: { display: false },
           grid: {
+            display: true,
             color:
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.05)',
+                ? 'rgba(255,255,255,0.04)'
+                : 'rgba(0,0,0,0.04)',
+            lineWidth: 1,
           },
           ticks: {
             color: theme.palette.text.secondary,
-            font: { size: 10 },
+            font: { size: 10, family: 'inherit' },
             maxRotation: 0,
             autoSkip: true,
             maxTicksLimit: 8,
+            padding: 4,
           },
         },
         y: {
           beginAtZero: true,
+          border: { display: false },
           grid: {
+            display: true,
             color:
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.05)',
+                ? 'rgba(255,255,255,0.04)'
+                : 'rgba(0,0,0,0.04)',
+            lineWidth: 1,
           },
           ticks: {
             color: theme.palette.text.secondary,
-            font: { size: 10 },
+            font: { size: 10, family: 'inherit' },
+            padding: 8,
+            callback: (value: any) => {
+              if (typeof value !== 'number') return value;
+              if (Math.abs(value) >= 1_000_000)
+                return (value / 1_000_000).toFixed(1) + 'M';
+              if (Math.abs(value) >= 1_000)
+                return (value / 1_000).toFixed(1) + 'K';
+              return value.toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+              });
+            },
           },
         },
       },
@@ -1936,19 +2109,12 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             borderColor: 'divider',
           }}
         >
-          <IconButton onClick={() => setExpandedConfig(null)} sx={{ mr: 1.5 }}>
-            <CloseIcon />
-          </IconButton>
           <Typography variant="h6" fontWeight={700} sx={{ flex: 1 }}>
             {expandedConfig?.title || t('impactMetrics.expandedView')}
           </Typography>
-          <Button
-            variant="contained"
-            onClick={() => setExpandedConfig(null)}
-            size="small"
-          >
-            {t('common.close')}
-          </Button>
+          <IconButton onClick={() => setExpandedConfig(null)} size="small">
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
         <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
           {expandedConfig && (
