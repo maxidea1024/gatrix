@@ -1100,7 +1100,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 const progress = pingProgress.get(serviceKey) || 0;
                 const pingGaugeRadius = nodeRadius + 6;
                 const circumference = 2 * Math.PI * pingGaugeRadius;
-                const strokeDasharray = `${progress * circumference} ${circumference}`;
+                const strokeDashoffset = circumference * (1 - progress);
                 // Color transitions from green (0%) to yellow (50%) to red (100%)
                 // When progress is 0 (or very small), make it transparent
                 const pingGaugeColor =
@@ -1245,11 +1245,12 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                           fill="none"
                           stroke={pingGaugeColor}
                           strokeWidth="3"
-                          strokeDasharray={strokeDasharray}
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
                           strokeLinecap="round"
                           transform="rotate(-90)"
                           style={{
-                            transition: 'stroke 0.3s ease-out',
+                            transition: 'stroke-dashoffset 1s linear, stroke 0.5s ease-out',
                           }}
                         />
                       </>
