@@ -140,11 +140,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.78rem',
-              padding: '3px 12px',
               minHeight: 28,
               lineHeight: 1.4,
               boxShadow: 'none',
               '&:hover': { boxShadow: 'none' },
+              // Override all MUI size variants
+              '&.MuiButton-sizeMedium, &.MuiButton-sizeSmall, &.MuiButton-sizeLarge': {
+                padding: '3px 12px',
+                fontSize: '0.78rem',
+              },
               '& .MuiButton-startIcon': {
                 mr: 0.5,
                 '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
