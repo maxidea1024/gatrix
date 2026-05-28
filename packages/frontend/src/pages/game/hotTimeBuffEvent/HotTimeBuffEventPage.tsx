@@ -1261,6 +1261,8 @@ const HotTimeBuffEventPage: React.FC = () => {
             </Box>
           </Popover>
 
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
           {/* Date range filter toggle */}
           <Tooltip title={t('hotTimeBuffEvent.filterDateRangeHint')}>
             <IconButton
