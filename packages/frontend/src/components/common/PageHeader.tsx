@@ -146,8 +146,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               '&:hover': { boxShadow: 'none' },
               // Override all MUI size variants
               '&.MuiButton-sizeMedium, &.MuiButton-sizeSmall, &.MuiButton-sizeLarge': {
-                padding: '3px 12px',
-                fontSize: '0.78rem',
+                padding: '3px 12px !important',
               },
               '& .MuiButton-startIcon': {
                 mr: 0.5,

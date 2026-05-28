@@ -1734,6 +1734,7 @@ const ClientVersionsPage: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
                       setEditingClientVersion(null);
@@ -1746,6 +1747,7 @@ const ClientVersionsPage: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
                       setBulkFormDialogOpen(true);
