@@ -135,7 +135,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             alignItems: 'center',
             flexShrink: 0,
             ml: 2,
-            // Compact action buttons globally
+            // Compact action buttons globally (exclude ButtonGroup children to preserve joined look)
             '& .MuiButton-root': {
               textTransform: 'none',
               fontWeight: 600,
@@ -143,7 +143,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               px: 1.5,
               py: 0.375,
               minHeight: 28,
-              borderRadius: 1.5,
               lineHeight: 1.4,
               boxShadow: 'none',
               '&:hover': { boxShadow: 'none' },
@@ -155,6 +154,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 ml: 0.25,
                 '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
               },
+            },
+            // borderRadius only for standalone buttons (not inside ButtonGroup)
+            '& .MuiButton-root:not(.MuiButtonGroup-grouped)': {
+              borderRadius: 1.5,
             },
             '& > .MuiIconButton-root': {
               p: 0.5,
