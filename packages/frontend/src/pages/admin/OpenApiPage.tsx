@@ -92,7 +92,7 @@ export const OpenApiPage: React.FC = () => {
       <Card
         variant="outlined"
         sx={{
-          mb: 2,
+          mb: 1,
           borderLeft: `4px solid ${current.borderColor}`,
           backgroundColor: current.bgColor,
         }}
