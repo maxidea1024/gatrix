@@ -2548,13 +2548,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                 {canManage && !isCreating && (
                   <>
                     <Divider />
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 0.75 }}>
                       <Button
                         variant="contained"
-                        startIcon={<ArchiveIcon />}
                         onClick={handleArchiveClick}
                         size="small"
-                        sx={{ flex: 1 }}
+                        sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
                       >
                         {flag.isArchived
                           ? t('featureFlags.revive')
@@ -2562,10 +2561,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       </Button>
                       <Button
                         variant="contained"
-                        startIcon={<StaleIcon />}
                         onClick={handleStaleClick}
                         size="small"
-                        sx={{ flex: 1 }}
+                        sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
                       >
                         {flag.stale
                           ? t('featureFlags.unmarkStale')
@@ -2573,7 +2571,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                       </Button>
                       <Button
                         variant="contained"
-                        startIcon={<EditIcon />}
                         onClick={() => {
                           setEditingFlagData({
                             displayName: flag.displayName || '',
@@ -2592,7 +2589,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                           setEditFlagDialogOpen(true);
                         }}
                         size="small"
-                        sx={{ flex: 1 }}
+                        sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
                       >
                         {t('common.edit')}
                       </Button>
@@ -2600,10 +2597,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                         <Button
                           variant="contained"
                           color="error"
-                          startIcon={<DeleteIcon />}
                           onClick={() => setDeleteDialogOpen(true)}
                           size="small"
-                          sx={{ flex: 1 }}
+                          sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
                         >
                           {t('common.delete')}
                         </Button>
