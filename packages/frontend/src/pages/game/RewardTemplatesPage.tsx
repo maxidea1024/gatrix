@@ -706,7 +706,7 @@ const RewardTemplatesPage: React.FC = () => {
               onOperatorChange={handleOperatorChange}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
+                  <IconButton size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -717,7 +717,7 @@ const RewardTemplatesPage: React.FC = () => {
                       },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <ViewColumnIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               }

@@ -726,7 +726,7 @@ const AuditLogsPage: React.FC = () => {
 
           {/* Column Settings Button */}
           <Tooltip title={t('users.columnSettings')}>
-            <IconButton
+            <IconButton size="small"
               onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
               sx={{
                 bgcolor: 'background.paper',
@@ -735,7 +735,7 @@ const AuditLogsPage: React.FC = () => {
                 '&:hover': { bgcolor: 'action.hover' },
               }}
             >
-              <ViewColumnIcon />
+              <ViewColumnIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>

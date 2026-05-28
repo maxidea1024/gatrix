@@ -1035,7 +1035,7 @@ const StoreProductsPage: React.FC = () => {
                   }}
                 >
                   <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
+                    <IconButton size="small"
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
                         bgcolor: 'background.paper',
@@ -1046,7 +1046,7 @@ const StoreProductsPage: React.FC = () => {
                         },
                       }}
                     >
-                      <ViewColumnIcon />
+                      <ViewColumnIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                   <Box

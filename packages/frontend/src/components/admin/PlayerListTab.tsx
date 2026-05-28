@@ -914,7 +914,7 @@ const PlayerListTab: React.FC<Props> = ({
         </FormControl>
 
         <Tooltip title={t('common.columnSettings')}>
-          <IconButton
+          <IconButton size="small"
             onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
             sx={{
               bgcolor: 'background.paper',

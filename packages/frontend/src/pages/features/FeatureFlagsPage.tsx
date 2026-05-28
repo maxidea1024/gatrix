@@ -1951,7 +1951,7 @@ const FeatureFlagsPage: React.FC = () => {
                       title={t('common.columnSettings')}
                       disableFocusListener
                     >
-                      <IconButton
+                      <IconButton size="small"
                         onClick={(e) =>
                           setColumnSettingsAnchor(e.currentTarget)
                         }
@@ -1962,7 +1962,7 @@ const FeatureFlagsPage: React.FC = () => {
                           '&:hover': { bgcolor: 'action.hover' },
                         }}
                       >
-                        <ViewColumnIcon />
+                        <ViewColumnIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   )}

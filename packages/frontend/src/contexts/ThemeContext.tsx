@@ -204,6 +204,13 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 4,
+          },
+        },
+      },
       MuiButton: {
         defaultProps: {
           variant: 'contained',

@@ -1859,7 +1859,7 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('users.columnSettings')}>
-              <IconButton
+              <IconButton size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   bgcolor: 'background.paper',
@@ -1870,7 +1870,7 @@ const UsersManagementPage: React.FC = () => {
                   },
                 }}
               >
-                <ViewColumnIcon />
+                <ViewColumnIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>

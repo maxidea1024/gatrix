@@ -1762,7 +1762,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
+                  <IconButton size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -1771,7 +1771,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
-                    <ViewColumnIcon />
+                    <ViewColumnIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               }

@@ -2150,7 +2150,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('common.columnSettings')}>
-              <IconButton
+              <IconButton size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   ml: 1,
@@ -2162,7 +2162,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   },
                 }}
               >
-                <ViewColumnIcon />
+                <ViewColumnIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>

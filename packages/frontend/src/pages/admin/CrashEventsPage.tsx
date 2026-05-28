@@ -1187,7 +1187,7 @@ const CrashEventsPage: React.FC = () => {
 
           {/* Column Settings Button */}
           <Tooltip title={t('crashes.columnSettings')}>
-            <IconButton
+            <IconButton size="small"
               onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
               sx={{
                 ml: 1,
@@ -1199,7 +1199,7 @@ const CrashEventsPage: React.FC = () => {
                 },
               }}
             >
-              <ViewColumnIcon />
+              <ViewColumnIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>
