@@ -303,11 +303,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         return next;
       });
 
-      // Reset ping gauge: update lastHeartbeatTime for new heartbeats
+      // Reset ping gauge: update lastHeartbeatTime and immediately reset progress
       const now = Date.now();
       setLastHeartbeatTime((prev) => {
         const next = new Map(prev);
         newHeartbeatNodes.forEach((id) => next.set(id, now));
+        return next;
+      });
+      // Immediately reset pingProgress to 0 for these nodes (instant jump, no wind-back)
+      setPingProgress((prev) => {
+        const next = new Map(prev);
+        newHeartbeatNodes.forEach((id) => next.set(id, 0));
         return next;
       });
 
@@ -352,7 +358,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         });
         return next;
       });
-    }, 1000);
+    }, 200);
 
     return () => clearInterval(interval);
   }, []); // Empty deps - interval created once, reads from refs
@@ -1249,9 +1255,6 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                           strokeDashoffset={strokeDashoffset}
                           strokeLinecap="round"
                           transform="rotate(-90)"
-                          style={{
-                            transition: 'stroke-dashoffset 1s linear, stroke 0.5s ease-out',
-                          }}
                         />
                       </>
                     )}
