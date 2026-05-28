@@ -560,7 +560,7 @@ const MailboxPage: React.FC = () => {
             ]}
             value={currentTab}
             onChange={(key) => {
-              setCurrentTab(key);
+              setCurrentTab(key as 'sent' | 'received');
               setCurrentPage(1);
               setSelectedMail(null);
               setSelectedMailIds([]);

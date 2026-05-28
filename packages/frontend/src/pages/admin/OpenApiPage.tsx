@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/common/PageHeader';
 import SegmentedTabs, {
-  type SegmentItem,
+  SegmentedTabItem,
 } from '@/components/common/SegmentedTabs';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
@@ -33,7 +33,7 @@ export const OpenApiPage: React.FC = () => {
     []
   );
 
-  const segmentItems: SegmentItem[] = [
+  const segmentItems: SegmentedTabItem[] = [
     { key: 'admin', label: 'Admin API' },
     { key: 'server', label: 'Server SDK API' },
     { key: 'client', label: 'Client SDK API' },
