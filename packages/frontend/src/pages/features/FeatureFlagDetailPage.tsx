@@ -2548,68 +2548,67 @@ const FeatureFlagDetailPage: React.FC = () => {
                 {canManage && !isCreating && (
                   <>
                     <Divider />
-                    <Button
-                      variant="contained"
-                      color={flag.isArchived ? 'success' : 'warning'}
-                      startIcon={<ArchiveIcon />}
-                      onClick={handleArchiveClick}
-                      fullWidth
-                      size="small"
-                    >
-                      {flag.isArchived
-                        ? t('featureFlags.revive')
-                        : t('featureFlags.archive')}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color={flag.stale ? 'info' : 'secondary'}
-                      startIcon={<StaleIcon />}
-                      onClick={handleStaleClick}
-                      fullWidth
-                      size="small"
-                    >
-                      {flag.stale
-                        ? t('featureFlags.unmarkStale')
-                        : t('featureFlags.markStale')}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<EditIcon />}
-                      onClick={() => {
-                        setEditingFlagData({
-                          displayName: flag.displayName || '',
-                          description: flag.description || '',
-                          impressionDataEnabled: flag.impressionDataEnabled,
-                          tags: flag.tags || [],
-                        });
-
-                        const matchingTags = (flag.tags || [])
-                          .map((tagName) =>
-                            allTags.find((t) => t.name === tagName)
-                          )
-                          .filter((t): t is Tag => !!t);
-                        setEditTagSelection(matchingTags);
-
-                        setEditFlagDialogOpen(true);
-                      }}
-                      fullWidth
-                      size="small"
-                    >
-                      {t('common.edit')}
-                    </Button>
-                    {flag.isArchived && (
+                    <Box sx={{ display: 'flex', gap: 1 }}>
                       <Button
                         variant="contained"
-                        color="error"
-                        startIcon={<DeleteIcon />}
-                        onClick={() => setDeleteDialogOpen(true)}
-                        fullWidth
+                        startIcon={<ArchiveIcon />}
+                        onClick={handleArchiveClick}
                         size="small"
+                        sx={{ flex: 1 }}
                       >
-                        {t('common.delete')}
+                        {flag.isArchived
+                          ? t('featureFlags.revive')
+                          : t('featureFlags.archive')}
                       </Button>
-                    )}
+                      <Button
+                        variant="contained"
+                        startIcon={<StaleIcon />}
+                        onClick={handleStaleClick}
+                        size="small"
+                        sx={{ flex: 1 }}
+                      >
+                        {flag.stale
+                          ? t('featureFlags.unmarkStale')
+                          : t('featureFlags.markStale')}
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<EditIcon />}
+                        onClick={() => {
+                          setEditingFlagData({
+                            displayName: flag.displayName || '',
+                            description: flag.description || '',
+                            impressionDataEnabled: flag.impressionDataEnabled,
+                            tags: flag.tags || [],
+                          });
+
+                          const matchingTags = (flag.tags || [])
+                            .map((tagName) =>
+                              allTags.find((t) => t.name === tagName)
+                            )
+                            .filter((t): t is Tag => !!t);
+                          setEditTagSelection(matchingTags);
+
+                          setEditFlagDialogOpen(true);
+                        }}
+                        size="small"
+                        sx={{ flex: 1 }}
+                      >
+                        {t('common.edit')}
+                      </Button>
+                      {flag.isArchived && (
+                        <Button
+                          variant="contained"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => setDeleteDialogOpen(true)}
+                          size="small"
+                          sx={{ flex: 1 }}
+                        >
+                          {t('common.delete')}
+                        </Button>
+                      )}
+                    </Box>
                   </>
                 )}
               </Stack>
