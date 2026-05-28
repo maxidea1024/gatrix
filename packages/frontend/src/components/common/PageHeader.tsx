@@ -1,7 +1,8 @@
 /**
  * PageHeader Component
  *
- * Unified page header with icon, title, subtitle and optional actions.
+ * Compact page header with icon, title, inline subtitle and optional actions.
+ * Title and subtitle are placed on the same line to maximize content area.
  * Ensures consistent styling across all admin and feature pages.
  */
 
@@ -26,38 +27,81 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        mb: 3,
+        alignItems: 'center',
+        mb: 1.5,
+        minHeight: 40,
       }}
     >
-      <Box>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          minWidth: 0,
+          overflow: 'hidden',
+        }}
+      >
+        {icon && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              flexShrink: 0,
+              '& .MuiSvgIcon-root': { color: 'inherit', fontSize: '1.25rem' },
+            }}
+          >
+            {icon}
+          </Box>
+        )}
         <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          variant="h6"
+          sx={{
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            lineHeight: 1.4,
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
         >
-          {icon && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                color: 'text.primary',
-                '& .MuiSvgIcon-root': { color: 'inherit' },
-              }}
-            >
-              {icon}
-            </Box>
-          )}
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="body2" color="text.secondary">
-            {subtitle}
-          </Typography>
+          <>
+            <Box
+              sx={{
+                width: '1px',
+                height: 16,
+                bgcolor: 'divider',
+                flexShrink: 0,
+                mx: 0.5,
+              }}
+            />
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '0.8rem',
+              }}
+            >
+              {subtitle}
+            </Typography>
+          </>
         )}
       </Box>
       {actions && (
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            alignItems: 'center',
+            flexShrink: 0,
+            ml: 2,
+          }}
+        >
           {actions}
         </Box>
       )}
