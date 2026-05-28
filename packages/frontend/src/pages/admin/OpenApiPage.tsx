@@ -2,9 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Api as ApiIcon } from '@mui/icons-material';
 import {
   Box,
-  Paper,
-  Tabs,
-  Tab,
   Typography,
   Card,
   CardContent,
@@ -14,36 +11,19 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/common/PageHeader';
+import SegmentedTabs, {
+  type SegmentItem,
+} from '@/components/common/SegmentedTabs';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`api-tabpanel-${index}`}
-      aria-labelledby={`api-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
-    </div>
-  );
-}
+type TabKey = 'admin' | 'server' | 'client';
 
 export const OpenApiPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [tabValue, setTabValue] = useState(0);
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) =>
-    setTabValue(newValue);
+  const [tab, setTab] = useState<TabKey>('admin');
+
   const specs = useMemo(
     () => ({
       admin: createAdminApiSpec(),
@@ -53,143 +33,89 @@ export const OpenApiPage: React.FC = () => {
     []
   );
 
+  const segmentItems: SegmentItem[] = [
+    { key: 'admin', label: 'Admin API' },
+    { key: 'server', label: 'Server SDK API' },
+    { key: 'client', label: 'Client SDK API' },
+  ];
+
+  const tabConfig: Record<TabKey, { chips: { label: string; color: 'error' | 'primary' | 'success' | 'warning' }[]; description: string; borderColor: string; bgColor: string; spec: any }> = {
+    admin: {
+      chips: [
+        { label: t('openApi.adminOnly'), color: 'error' },
+        { label: t('openApi.authRequired'), color: 'warning' },
+      ],
+      description: t('openApi.adminDescription'),
+      borderColor: theme.palette.error.main,
+      bgColor: 'rgba(244, 67, 54, 0.05)',
+      spec: specs.admin,
+    },
+    server: {
+      chips: [
+        { label: t('openApi.serverSdk'), color: 'primary' },
+        { label: t('openApi.apiTokenRequired'), color: 'warning' },
+      ],
+      description: t('openApi.serverSdkDescription'),
+      borderColor: theme.palette.primary.main,
+      bgColor: 'rgba(33, 150, 243, 0.05)',
+      spec: specs.server,
+    },
+    client: {
+      chips: [
+        { label: t('openApi.clientSdk'), color: 'success' },
+        { label: t('openApi.apiTokenRequired'), color: 'warning' },
+      ],
+      description: t('openApi.clientSdkDescription'),
+      borderColor: theme.palette.success.main,
+      bgColor: 'rgba(76, 175, 80, 0.05)',
+      spec: specs.client,
+    },
+  };
+
+  const current = tabConfig[tab];
+
   return (
     <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<ApiIcon />}
         title={t('sidebar.openApi')}
         subtitle={t('openApi.description')}
+        tabs={
+          <SegmentedTabs
+            items={segmentItems}
+            value={tab}
+            onChange={(key) => setTab(key as TabKey)}
+          />
+        }
       />
-      <Paper sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          aria-label="API documentation tabs"
-          sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            backgroundColor: 'background.paper',
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontSize: '0.95rem',
-              fontWeight: 500,
-              minHeight: 48,
-            },
-          }}
-        >
-          <Tab
-            label="Admin API"
-            id="api-tab-0"
-            aria-controls="api-tabpanel-0"
-          />
-          <Tab
-            label="Server SDK API"
-            id="api-tab-1"
-            aria-controls="api-tabpanel-1"
-          />
-          <Tab
-            label="Client SDK API"
-            id="api-tab-2"
-            aria-controls="api-tabpanel-2"
-          />
-        </Tabs>
-        <TabPanel value={tabValue} index={0}>
-          <Box sx={{ p: 2 }}>
-            <Card
-              sx={{
-                mb: 2,
-                backgroundColor: 'rgba(244, 67, 54, 0.05)',
-                borderLeft: `4px solid ${theme.palette.error.main}`,
-              }}
-            >
-              <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                  <Chip
-                    label={t('openApi.adminOnly')}
-                    color="error"
-                    size="small"
-                    variant="outlined"
-                  />
-                  <Chip
-                    label={t('openApi.authRequired')}
-                    color="warning"
-                    size="small"
-                    variant="outlined"
-                  />
-                </Stack>
-                <Typography variant="body2" color="text.secondary">
-                  {t('openApi.adminDescription')}
-                </Typography>
-              </CardContent>
-            </Card>
-            <SwaggerUIWrapper spec={specs.admin} />
-          </Box>
-        </TabPanel>
-        <TabPanel value={tabValue} index={1}>
-          <Box sx={{ p: 2 }}>
-            <Card
-              sx={{
-                mb: 2,
-                backgroundColor: 'rgba(33, 150, 243, 0.05)',
-                borderLeft: `4px solid ${theme.palette.primary.main}`,
-              }}
-            >
-              <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                  <Chip
-                    label={t('openApi.serverSdk')}
-                    color="primary"
-                    size="small"
-                    variant="outlined"
-                  />
-                  <Chip
-                    label={t('openApi.apiTokenRequired')}
-                    color="warning"
-                    size="small"
-                    variant="outlined"
-                  />
-                </Stack>
-                <Typography variant="body2" color="text.secondary">
-                  {t('openApi.serverSdkDescription')}
-                </Typography>
-              </CardContent>
-            </Card>
-            <SwaggerUIWrapper spec={specs.server} />
-          </Box>
-        </TabPanel>
-        <TabPanel value={tabValue} index={2}>
-          <Box sx={{ p: 2 }}>
-            <Card
-              sx={{
-                mb: 2,
-                backgroundColor: 'rgba(76, 175, 80, 0.05)',
-                borderLeft: `4px solid ${theme.palette.success.main}`,
-              }}
-            >
-              <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                  <Chip
-                    label={t('openApi.clientSdk')}
-                    color="success"
-                    size="small"
-                    variant="outlined"
-                  />
-                  <Chip
-                    label={t('openApi.apiTokenRequired')}
-                    color="warning"
-                    size="small"
-                    variant="outlined"
-                  />
-                </Stack>
-                <Typography variant="body2" color="text.secondary">
-                  {t('openApi.clientSdkDescription')}
-                </Typography>
-              </CardContent>
-            </Card>
-            <SwaggerUIWrapper spec={specs.client} />
-          </Box>
-        </TabPanel>
-      </Paper>
+
+      <Card
+        variant="outlined"
+        sx={{
+          mb: 2,
+          borderLeft: `4px solid ${current.borderColor}`,
+          backgroundColor: current.bgColor,
+        }}
+      >
+        <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+            {current.chips.map((chip) => (
+              <Chip
+                key={chip.label}
+                label={chip.label}
+                color={chip.color}
+                size="small"
+                variant="outlined"
+              />
+            ))}
+          </Stack>
+          <Typography variant="body2" color="text.secondary">
+            {current.description}
+          </Typography>
+        </CardContent>
+      </Card>
+
+      <SwaggerUIWrapper spec={current.spec} />
     </Box>
   );
 };

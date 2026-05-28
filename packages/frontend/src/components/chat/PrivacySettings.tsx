@@ -58,8 +58,12 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({
     discoverableByName: true,
     requireFriendRequest: false,
   });
+  const [savedSettings, setSavedSettings] = useState<PrivacySettingsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const isDirty = savedSettings !== null &&
+    JSON.stringify(settings) !== JSON.stringify(savedSettings);
 
   // 현재 Load settings
   const loadSettings = async () => {
@@ -75,6 +79,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({
         const data = await response.json();
         if (data.success) {
           setSettings(data.data);
+          setSavedSettings(data.data);
         }
       }
     } catch (error) {
@@ -350,7 +355,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({
         <Button
           variant="contained"
           onClick={saveSettings}
-          disabled={loading || saving}
+          disabled={loading || saving || !isDirty}
           startIcon={saving ? <CircularProgress size={16} /> : null}
         >
           {saving ? t('chat.privacySaving') : t('chat.privacySaveSettings')}
