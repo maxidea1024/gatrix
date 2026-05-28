@@ -1236,9 +1236,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       )}
                     </circle>
 
-                    {/* Ping gauge - circular progress indicator (only for normal states) */}
+                    {/* Ping gauge - circular progress indicator (only after first heartbeat) */}
                     {(service.status === 'ready' ||
-                      service.status === 'initializing') && (
+                      service.status === 'initializing') &&
+                      lastHeartbeatTime.has(serviceKey) && (
                       <>
                         <circle
                           r={pingGaugeRadius}
