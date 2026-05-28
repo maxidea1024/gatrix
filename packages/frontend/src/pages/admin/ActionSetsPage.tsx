@@ -716,6 +716,7 @@ const ActionSetsPage: React.FC = () => {
     <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
+        icon={<SmartToyIcon />}
         title={t('actionSets.title')}
         subtitle={t('actionSets.subtitle')}
         actions={

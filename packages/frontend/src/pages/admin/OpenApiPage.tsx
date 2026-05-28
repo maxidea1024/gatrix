@@ -1,3 +1,4 @@
+import { Api as ApiIcon } from '@mui/icons-material';
 import React, { useState, useMemo } from 'react';
 import {
   Box,
@@ -54,8 +55,8 @@ export const OpenApiPage: React.FC = () => {
 
   return (
     <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
-      <PageHeader
-        title={t('sidebar.openApi')}
+              icon={<ApiIcon />}
+{t('sidebar.openApi')}
         subtitle={t('openApi.description')}
       />
       <Paper sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}>

@@ -48,6 +48,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { ChatProvider, useChat } from '../../contexts/ChatContext';
+import PageHeader from '@/components/common/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
 import ChannelList from '../../components/chat/ChannelList';
@@ -503,8 +504,9 @@ const ChatPageContent: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        px: 3,
-        py: 3,
+        px: 2,
+        pb: 2,
+        pt: 1.5,
       }}
       onContextMenu={(e) => {
         // Disable right-click in chat content area
@@ -512,14 +514,11 @@ const ChatPageContent: React.FC = () => {
         return false;
       }}
     >
-      {/* Header */}
-      <Box sx={{ mb: 3, flexShrink: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
-            {t('chat.title')}
-          </Typography>
-          {/* 웹소켓 연결 Status */}
+      <PageHeader
+        icon={<ChatIcon />}
+        title={t('chat.title')}
+        subtitle={t('chat.subtitle')}
+        actions={
           <Tooltip
             title={
               state.isConnected ? t('chat.connected') : t('chat.disconnected')
@@ -528,35 +527,24 @@ const ChatPageContent: React.FC = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {state.isConnected ? (
-                <ConnectedIcon
-                  sx={{
-                    color: 'success.main',
-                    fontSize: 28,
-                  }}
-                />
+                <ConnectedIcon sx={{ color: 'success.main', fontSize: 18 }} />
               ) : (
-                <DisconnectedIcon
-                  sx={{
-                    color: 'error.main',
-                    fontSize: 28,
-                  }}
-                />
+                <DisconnectedIcon sx={{ color: 'error.main', fontSize: 18 }} />
               )}
             </Box>
           </Tooltip>
-        </Box>
-        <Typography variant="body1" color="text.secondary">
-          {t('chat.subtitle')}
-        </Typography>
-      </Box>
+        }
+      />
 
       {/* Main Chat Interface - 깜빡임 방지를 위해 Fade 제거 */}
       <Paper
+        variant="outlined"
         sx={{
           flex: 1,
           display: 'flex',
-          minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
+          minHeight: 0,
           overflow: 'hidden',
+          borderRadius: 2,
         }}
       >
         {/* Channel List Sidebar */}

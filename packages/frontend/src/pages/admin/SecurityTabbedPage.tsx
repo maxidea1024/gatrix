@@ -74,6 +74,7 @@ const SecurityTabbedPage: React.FC = () => {
   return (
     <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
+        icon={<SecurityIcon />}
         title={t('sidebar.security')}
         subtitle={t('security.subtitle')}
         tabs={

@@ -545,7 +545,7 @@ const MailboxPage: React.FC = () => {
 
   return (
     <Box
-      sx={{ height: '100%', display: 'flex', flexDirection: 'column', px: 3, pb: 3, pt: 1.5 }}
+      sx={{ height: '100%', display: 'flex', flexDirection: 'column', px: 2, pb: 2, pt: 1.5 }}
     >
       {/* Header */}
       <PageHeader

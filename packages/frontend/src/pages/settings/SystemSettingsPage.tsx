@@ -1,3 +1,4 @@
+import { Settings as SettingsIcon } from '@mui/icons-material';
 import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
@@ -182,6 +183,7 @@ const SystemSettingsPage: React.FC = () => {
   return (
     <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
+        icon={<SettingsIcon />}
         title={t('settings.systemSettings')}
         subtitle={t('settings.subtitle')}
         tabs={
