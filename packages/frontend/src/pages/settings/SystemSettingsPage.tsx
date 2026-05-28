@@ -204,7 +204,9 @@ const SystemSettingsPage: React.FC = () => {
         }
       />
 
-      <Card>
+      <Card sx={{
+        ...(['network', 'kv', 'ai'].includes(tab) ? { maxWidth: 720 } : {}),
+      }}>
         <CardContent>
 
           {tab === 'network' && (
