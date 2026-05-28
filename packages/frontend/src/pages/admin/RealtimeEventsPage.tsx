@@ -842,22 +842,12 @@ const RealtimeEventsPage: React.FC = () => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: 'background.default',
         overflow: 'hidden',
-        p: 3,
+        px: 2,
+        pb: 2,
+        pt: 1.5,
       }}
     >
-      {/* Header */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 2,
-          borderRadius: 1,
-          bgcolor: 'background.paper',
-          flexShrink: 0,
-        }}
-      >
         <PageHeader
           icon={<TimelineIcon />}
           title={t('realtimeEvents.title')}
@@ -966,7 +956,6 @@ const RealtimeEventsPage: React.FC = () => {
             onOperatorChange={handleOperatorChange}
           />
         </Box>
-      </Paper>
 
       {/* Main Content */}
       <PageContentLoader
