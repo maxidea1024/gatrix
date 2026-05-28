@@ -421,7 +421,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handleCancelLeave} color="primary">
+          <Button variant="contained" onClick={handleCancelLeave}>
             {t('common.cancel')}
           </Button>
           <Button

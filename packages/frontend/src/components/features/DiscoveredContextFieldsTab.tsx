@@ -1074,7 +1074,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={() => setEditDrawerOpen(false)}>
+          <Button onClick={() => setEditDrawerOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

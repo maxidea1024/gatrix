@@ -1453,7 +1453,7 @@ const CrashesPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAssigneeDialogOpen(false)}>
+          <Button onClick={() => setAssigneeDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button variant="text" onClick={handleSaveAssignee}>
@@ -1481,7 +1481,7 @@ const CrashesPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setJiraDialogOpen(false)}>
+          <Button onClick={() => setJiraDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button variant="text" onClick={handleSaveJira}>

@@ -1427,7 +1427,7 @@ const MaintenancePage: React.FC = () => {
                     </Button>
                   )}
                   <Button
-                    variant="text"
+                    variant="contained"
                     onClick={() => setEditMode((v) => !v)}
                     sx={{ width: 140 }}
                   >
@@ -1886,7 +1886,7 @@ const MaintenancePage: React.FC = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button variant="text" onClick={() => setConfirmOpen(false)}>
+              <Button variant="contained" onClick={() => setConfirmOpen(false)}>
                 {t('common.cancel')}
               </Button>
               <Button

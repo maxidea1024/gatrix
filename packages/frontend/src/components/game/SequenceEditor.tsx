@@ -734,7 +734,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>
+          <Button onClick={() => setEmptyFrameCountDialogOpen(null)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

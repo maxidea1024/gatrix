@@ -1668,7 +1668,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           </Paper>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleDialogClose}>{t('common.cancel')}</Button>
+          <Button onClick={handleDialogClose} variant="contained">{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handleDialogApply}
@@ -1915,7 +1915,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>
+          <Button onClick={() => setEmptyFrameCountDialogOpen(null)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

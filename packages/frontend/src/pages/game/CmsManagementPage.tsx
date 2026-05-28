@@ -1878,7 +1878,7 @@ const CmsManagementPage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUploadOpen(false)}>
+          <Button onClick={() => setUploadOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -3255,7 +3255,7 @@ const CmsManagementPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUnsyncedDialogOpen(false)}>
+          <Button onClick={() => setUnsyncedDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -3466,7 +3466,7 @@ const CmsManagementPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button variant="text"
+          <Button variant="contained"
             onClick={() => setRollbackOpen(false)}
             sx={{ borderRadius: 2 }}
           >
@@ -3525,7 +3525,7 @@ const CmsManagementPage: React.FC = () => {
           ) : null}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRefreshConfirmOpen(false)}>
+          <Button onClick={() => setRefreshConfirmOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -3555,7 +3555,7 @@ const CmsManagementPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDiscardConfirmOpen(false)}>
+          <Button onClick={() => setDiscardConfirmOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

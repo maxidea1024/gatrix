@@ -1117,7 +1117,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               bgcolor: 'background.paper',
             }}
           >
-            <Button onClick={onClose} disabled={saving}>
+            <Button onClick={onClose} disabled={saving} variant="contained">
               {t('common.cancel')}
             </Button>
             <Button
@@ -1158,7 +1158,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmResetAllOpen(false)}>
+          <Button onClick={() => setConfirmResetAllOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmResetAll} color="warning" variant="text">

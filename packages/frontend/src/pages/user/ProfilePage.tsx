@@ -507,7 +507,7 @@ const ProfilePage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, mt: { xs: 2, sm: 2 } }}>
               {isEditing ? (
                 <>
-                  <Button variant="text" onClick={handleEditToggle}>
+                  <Button variant="contained" onClick={handleEditToggle}>
                     {t('common.cancel')}
                   </Button>
                   <Button
@@ -997,7 +997,7 @@ const ProfilePage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handlePasswordDialogClose}>
+          <Button variant="contained" onClick={handlePasswordDialogClose}>
             {t('common.cancel')}
           </Button>
           <Button

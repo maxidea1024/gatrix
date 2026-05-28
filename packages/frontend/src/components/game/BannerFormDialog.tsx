@@ -882,7 +882,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           bgcolor: 'background.paper',
         }}
       >
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <ChangeRequestSubmitButtons
           action={isEditing ? 'update' : 'create'}
           requiresApproval={requiresApproval}

@@ -3330,7 +3330,7 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text"
+          <Button variant="contained"
             onClick={() => {
               setArchiveConfirmOpen(false);
               handleActionMenuClear();
@@ -3376,7 +3376,7 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text"
+          <Button variant="contained"
             onClick={() => {
               setStaleConfirmOpen(false);
               handleActionMenuClear();
@@ -3426,7 +3426,7 @@ const FeatureFlagsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCloneDialogOpen(false)}>
+          <Button onClick={() => setCloneDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -4011,7 +4011,7 @@ const FeatureFlagsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="text"
+          <Button variant="contained"
             onClick={() => setCreateDialogOpen(false)}
             disabled={creating}
           >
@@ -4195,7 +4195,7 @@ const FeatureFlagsPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="text"
+          <Button variant="contained"
             onClick={() => {
               setImportDialogOpen(false);
               setImportData('');

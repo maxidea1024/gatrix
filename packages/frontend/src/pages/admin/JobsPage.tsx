@@ -858,8 +858,7 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
         >
           <Button
             onClick={() => setDeleteDialogOpen(false)}
-            variant="text"
-            color="inherit"
+            variant="contained"
           >
             {t('common.cancel')}
           </Button>

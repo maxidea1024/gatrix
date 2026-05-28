@@ -145,8 +145,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               height: '28px !important',
               lineHeight: '1 !important',
               padding: '2px 10px !important',
-              boxShadow: 'none !important',
-              '&:hover': { boxShadow: 'none !important' },
               '& .MuiButton-startIcon': {
                 mr: 0.5,
                 '& .MuiSvgIcon-root': { fontSize: '0.85rem !important' },

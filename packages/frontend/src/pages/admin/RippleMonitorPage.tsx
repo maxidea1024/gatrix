@@ -1432,7 +1432,7 @@ const RippleMonitorPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmRefreshOpen(false)}>
+          <Button onClick={() => setConfirmRefreshOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -1483,7 +1483,7 @@ const RippleMonitorPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRefreshDialogOpen(false)}>
+          <Button onClick={() => setRefreshDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -1521,7 +1521,7 @@ const RippleMonitorPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRowRefreshConfirmOpen(false)}>
+          <Button onClick={() => setRowRefreshConfirmOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

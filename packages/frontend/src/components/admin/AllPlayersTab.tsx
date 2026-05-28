@@ -1594,7 +1594,7 @@ export default function AllPlayersTab({
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handleCancelExport} size="small">
+          <Button variant="contained" onClick={handleCancelExport} size="small">
             {t('common.cancel')}
           </Button>
         </DialogActions>

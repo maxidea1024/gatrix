@@ -917,7 +917,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDialogOpen(false)} disabled={saving}>
+          <Button onClick={() => setDialogOpen(false)} disabled={saving} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -957,7 +957,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -1222,7 +1222,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setMemberDrawerOpen(false)}>
+          <Button onClick={() => setMemberDrawerOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

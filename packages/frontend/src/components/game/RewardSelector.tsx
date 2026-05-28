@@ -358,7 +358,7 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => setShowModeChangeWarning(false)}>
+          <Button variant="contained" onClick={() => setShowModeChangeWarning(false)}>
             {t('common.cancel')}
           </Button>
           <Button

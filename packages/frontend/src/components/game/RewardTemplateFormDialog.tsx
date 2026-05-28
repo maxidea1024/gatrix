@@ -499,7 +499,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={onClose} disabled={saving}>
+          <Button onClick={onClose} disabled={saving} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

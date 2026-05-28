@@ -264,7 +264,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button
           onClick={handleSave}
           variant="contained"
@@ -383,7 +383,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
       <DialogActions>
         {!createdToken ? (
           <>
-            <Button onClick={onClose}>{t('common.cancel')}</Button>
+            <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
             <Button
               onClick={handleCreate}
               variant="contained"
@@ -427,7 +427,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
         <Typography>{message}</Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button onClick={onConfirm} color="error" variant="contained">
           {t('common.delete')}
         </Button>

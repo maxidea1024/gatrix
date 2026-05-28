@@ -3466,6 +3466,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@gatrix/gatrix-cocoscreator-client-sdk@workspace:packages/sdks/client-sdks/gatrix-cocoscreator-client-sdk":
+  version: 0.0.0-use.local
+  resolution: "@gatrix/gatrix-cocoscreator-client-sdk@workspace:packages/sdks/client-sdks/gatrix-cocoscreator-client-sdk"
+  dependencies:
+    "@types/jest": "npm:^29.5.11"
+    "@types/node": "npm:^20.11.0"
+    jest: "npm:^29.7.0"
+    ts-jest: "npm:^29.1.2"
+    typescript: "npm:^5.3.3"
+  languageName: unknown
+  linkType: soft
+
 "@gatrix/gatrix-js-client-sdk@workspace:*, @gatrix/gatrix-js-client-sdk@workspace:packages/sdks/client-sdks/gatrix-js-client-sdk":
   version: 0.0.0-use.local
   resolution: "@gatrix/gatrix-js-client-sdk@workspace:packages/sdks/client-sdks/gatrix-js-client-sdk"

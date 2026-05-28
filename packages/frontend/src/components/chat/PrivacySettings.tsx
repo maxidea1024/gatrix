@@ -349,7 +349,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} disabled={saving}>
+        <Button onClick={onClose} disabled={saving} variant="contained">
           {t('common.cancel')}
         </Button>
         <Button

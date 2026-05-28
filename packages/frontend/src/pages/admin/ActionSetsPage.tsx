@@ -503,7 +503,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button
           onClick={handleSave}
           variant="contained"
@@ -541,7 +541,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button onClick={onConfirm} color="error" variant="contained">
           {t('common.delete')}
         </Button>

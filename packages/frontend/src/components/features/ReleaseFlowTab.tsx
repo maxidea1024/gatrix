@@ -1724,14 +1724,13 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button variant="text"
+          <Button variant="contained"
             onClick={() => {
               setShowApplyDialog(false);
               // If no plan exists, go back to the original view
               if (!plan) onPlanDeleted?.();
             }}
             disabled={applying}
-            color="inherit"
           >
             {t('common.cancel')}
           </Button>

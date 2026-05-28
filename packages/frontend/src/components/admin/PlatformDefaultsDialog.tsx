@@ -202,7 +202,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSave}

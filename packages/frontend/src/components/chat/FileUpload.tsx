@@ -252,7 +252,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => setLocationDialog(false)}>
+          <Button variant="contained" onClick={() => setLocationDialog(false)}>
             {t('common.cancel')}
           </Button>
         </DialogActions>

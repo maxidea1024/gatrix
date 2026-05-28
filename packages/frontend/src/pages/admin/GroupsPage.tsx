@@ -740,7 +740,7 @@ const GroupsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDialogOpen(false)} disabled={saving}>
+          <Button onClick={() => setDialogOpen(false)} disabled={saving} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -775,7 +775,7 @@ const GroupsPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} disabled={saving}>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={saving} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -1045,7 +1045,7 @@ const GroupsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDetailDialogOpen(false)}>
+          <Button onClick={() => setDetailDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

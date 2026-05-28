@@ -2384,7 +2384,7 @@ const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
         <Button onClick={onReset} color="warning">
           {t('common.reset')}
         </Button>
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button
           onClick={handleSave}
           variant="contained"

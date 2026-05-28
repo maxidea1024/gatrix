@@ -211,6 +211,19 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      MuiButtonGroup: {
+        styleOverrides: {
+          contained: {
+            boxShadow: mode === 'dark' 
+              ? '0 3px 0 rgba(0,0,0,0.5)'
+              : '0 3px 0 rgba(0,0,0,0.15)',
+            '&:active': {
+              boxShadow: 'none !important',
+              transform: 'translateY(3px)',
+            },
+          },
+        },
+      },
       MuiButton: {
         defaultProps: {
           variant: 'contained',

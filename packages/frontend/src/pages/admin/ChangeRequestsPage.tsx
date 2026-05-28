@@ -488,7 +488,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => setSubmitDialogOpen(false)}>
+          <Button variant="contained" onClick={() => setSubmitDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -525,7 +525,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => setRejectDialogOpen(false)}>
+          <Button variant="contained" onClick={() => setRejectDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button onClick={handleReject} color="error" disabled={actionLoading}>
@@ -564,7 +564,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => setReopenDialogOpen(false)}>
+          <Button variant="contained" onClick={() => setReopenDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button

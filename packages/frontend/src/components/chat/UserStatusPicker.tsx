@@ -252,7 +252,7 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleCancel}>{t('common.cancel')}</Button>
+        <Button onClick={handleCancel} variant="contained">{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSave}

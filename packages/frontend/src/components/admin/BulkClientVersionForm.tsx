@@ -1222,7 +1222,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="text" onClick={handleClose} disabled={loading}>
+          <Button variant="contained" onClick={handleClose} disabled={loading}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons

@@ -370,7 +370,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={onClose}>{t('common.cancel')}</Button>
+          <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
           <Button
             variant="contained"
             color="warning"

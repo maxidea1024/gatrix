@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as os from 'os';
 import { Logger } from '../utils/logger';
 
 /**
@@ -17,13 +18,14 @@ export interface CacheStorageProvider {
  */
 export class FileCacheStorageProvider implements CacheStorageProvider {
   private storageDir: string;
+  private dirReady: Promise<void>;
 
   constructor(
     private logger: Logger,
     storagePath?: string
   ) {
-    this.storageDir = storagePath || path.join(process.cwd(), '.gatrix_cache');
-    this.initDir();
+    this.storageDir = storagePath || path.join(os.tmpdir(), 'gatrix_cache');
+    this.dirReady = this.initDir();
   }
 
   private async initDir() {
@@ -39,6 +41,7 @@ export class FileCacheStorageProvider implements CacheStorageProvider {
 
   async save(key: string, value: string): Promise<void> {
     try {
+      await this.dirReady;
       const filePath = this.getFilePath(key);
       await fs.writeFile(filePath, value, 'utf8');
     } catch (error: any) {

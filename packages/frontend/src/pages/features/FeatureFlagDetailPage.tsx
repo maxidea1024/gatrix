@@ -3829,7 +3829,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     }}
                   >
                     <Button
-                      variant="text"
+                      variant="contained"
                       onClick={() => {
                         if (originalFlag) {
                           setFlag((prev) =>
@@ -3984,7 +3984,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Typography>{t('featureFlags.deleteStrategyDescription')}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handleCloseDeleteStrategyConfirm}>
+          <Button variant="contained" onClick={handleCloseDeleteStrategyConfirm}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -4159,7 +4159,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 justifyContent: 'flex-end',
               }}
             >
-              <Button onClick={() => setEditFlagDialogOpen(false)}>
+              <Button onClick={() => setEditFlagDialogOpen(false)} variant="contained">
                 {t('common.cancel')}
               </Button>
               <Button
@@ -4298,7 +4298,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={() => setVariantDialogOpen(false)}>
+          <Button onClick={() => setVariantDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button variant="text" onClick={handleSaveVariants}>
@@ -4346,7 +4346,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setLinkDialogOpen(false)}>
+          <Button onClick={() => setLinkDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -4381,7 +4381,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setArchiveConfirmOpen(false)}>
+          <Button onClick={() => setArchiveConfirmOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button
@@ -4420,7 +4420,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setStaleConfirmOpen(false)}>
+          <Button onClick={() => setStaleConfirmOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

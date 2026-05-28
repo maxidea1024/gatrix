@@ -1217,7 +1217,7 @@ const MailboxPage: React.FC = () => {
           <Typography>{t('mailbox.deleteConfirmMessage')}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel}>{t('common.cancel')}</Button>
+          <Button onClick={handleDeleteCancel} variant="contained">{t('common.cancel')}</Button>
           <Button
             onClick={handleDeleteConfirm}
             color="error"
@@ -1244,7 +1244,7 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleBulkDeleteCancel}>{t('common.cancel')}</Button>
+          <Button onClick={handleBulkDeleteCancel} variant="contained">{t('common.cancel')}</Button>
           <Button
             onClick={handleBulkDeleteConfirm}
             color="error"
@@ -1279,7 +1279,7 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handleEmptyMailboxCancel}>
+          <Button variant="contained" onClick={handleEmptyMailboxCancel}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -1313,7 +1313,7 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handleMarkAllAsReadCancel}>
+          <Button variant="contained" onClick={handleMarkAllAsReadCancel}>
             {t('common.cancel')}
           </Button>
           <Button

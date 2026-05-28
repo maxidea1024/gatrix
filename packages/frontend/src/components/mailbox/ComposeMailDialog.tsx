@@ -604,7 +604,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           gap: 1,
         }}
       >
-        <Button variant="text"
+        <Button variant="contained"
           onClick={handleClose}
           disabled={sending}
         >

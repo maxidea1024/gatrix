@@ -1312,7 +1312,7 @@ const FeatureSegmentsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="text" onClick={() => setEditDialogOpen(false)}>
+          <Button variant="contained" onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons

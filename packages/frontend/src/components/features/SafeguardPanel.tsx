@@ -968,7 +968,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>
+          <Button onClick={() => setDialogOpen(false)} variant="contained">
             {t('common.cancel')}
           </Button>
           <Button

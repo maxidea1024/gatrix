@@ -2230,11 +2230,10 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                       variant="contained"
                       onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
                       sx={{
-                        height: 24,
+                        height: 28,
                         minWidth: 'auto',
                         px: 1,
-                        fontSize: '0.65rem',
-                        borderStyle: 'dashed',
+                        fontSize: '0.75rem',
                       }}
                     >
                       {t('serverList.grouping.add')}
@@ -4335,7 +4334,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={handleCleanupCancel} color="primary">
+          <Button variant="contained" onClick={handleCleanupCancel}>
             {t('common.cancel')}
           </Button>
           <Button

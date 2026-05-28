@@ -1401,7 +1401,7 @@ const ChartConfigDialog: React.FC<{
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!metricName}>
           {initialValues ? t('common.update') : t('common.add')}
         </Button>

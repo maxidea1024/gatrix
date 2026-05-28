@@ -895,7 +895,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 1.5 }}>
-        <Button onClick={onClose}>{t('Cancel')}</Button>
+        <Button onClick={onClose} variant="contained">{t('Cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSave}

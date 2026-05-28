@@ -296,7 +296,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('common.cancel')}</Button>
+        <Button onClick={handleClose} variant="contained">{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleImport}

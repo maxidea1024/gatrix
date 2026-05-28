@@ -532,7 +532,7 @@ const JobForm: React.FC<JobFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button onClick={onCancel} variant="contained">{t('common.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
@@ -785,7 +785,7 @@ const JobForm: React.FC<JobFormProps> = ({
         <Box
           sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}
         >
-          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button onClick={onCancel} variant="contained">{t('common.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"

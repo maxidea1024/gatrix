@@ -734,7 +734,7 @@ const IngamePopupNoticeFormDialog: React.FC<
           justifyContent: 'flex-end',
         }}
       >
-        <Button variant="text" onClick={onClose} disabled={submitting}>
+        <Button variant="contained" onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
         <ChangeRequestSubmitButtons

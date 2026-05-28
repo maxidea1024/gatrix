@@ -466,7 +466,7 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
         ) : null}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+        <Button onClick={onClose} disabled={loading} variant="contained">
           {t('storeProducts.syncCancel')}
         </Button>
         <Button
