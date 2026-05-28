@@ -19,7 +19,7 @@ import {
   ExpandMore,
   Close as CloseIcon,
   AccessTime as AccessTimeIcon,
-  ChevronLeft as ChevronLeftIcon,
+  KeyboardDoubleArrowLeft as KeyboardDoubleArrowLeftIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -326,7 +326,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
                 '&:hover': { opacity: 1 },
               }}
             >
-              <ChevronLeftIcon sx={{ fontSize: 18 }} />
+              <KeyboardDoubleArrowLeftIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
         </Box>
