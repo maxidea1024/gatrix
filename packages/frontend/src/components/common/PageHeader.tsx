@@ -58,7 +58,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         alignItems: 'center',
         mb: 1,
         pb: 1,
-        minHeight: 40,
+        height: 40,
         borderBottom: 1,
         borderColor: 'divider',
       }}
@@ -135,35 +135,37 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             alignItems: 'center',
             flexShrink: 0,
             ml: 2,
-            // Compact action buttons globally (exclude ButtonGroup children to preserve joined look)
+            // Compact action buttons globally
             '& .MuiButton-root': {
               textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '0.78rem',
-              minHeight: 28,
-              lineHeight: 1.4,
-              boxShadow: 'none',
-              '&:hover': { boxShadow: 'none' },
-              // Override all MUI size variants
-              '&.MuiButton-sizeMedium, &.MuiButton-sizeSmall, &.MuiButton-sizeLarge': {
-                padding: '3px 12px !important',
-              },
+              fontWeight: '600 !important',
+              fontSize: '0.78rem !important',
+              minHeight: '28px !important',
+              maxHeight: '28px !important',
+              height: '28px !important',
+              lineHeight: '1 !important',
+              padding: '2px 10px !important',
+              boxShadow: 'none !important',
+              '&:hover': { boxShadow: 'none !important' },
               '& .MuiButton-startIcon': {
                 mr: 0.5,
-                '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
+                '& .MuiSvgIcon-root': { fontSize: '0.85rem !important' },
               },
               '& .MuiButton-endIcon': {
                 ml: 0.25,
-                '& .MuiSvgIcon-root': { fontSize: '0.9rem' },
+                '& .MuiSvgIcon-root': { fontSize: '0.85rem !important' },
               },
             },
             // borderRadius only for standalone buttons (not inside ButtonGroup)
             '& .MuiButton-root:not(.MuiButtonGroup-grouped)': {
               borderRadius: 1.5,
             },
-            '& > .MuiIconButton-root': {
-              p: 0.5,
-              '& .MuiSvgIcon-root': { fontSize: '1.1rem' },
+            // Compact IconButtons (VertMore, etc.) — match button height
+            '& .MuiIconButton-root': {
+              width: '28px !important',
+              height: '28px !important',
+              padding: '4px !important',
+              '& .MuiSvgIcon-root': { fontSize: '1rem !important' },
             },
           }}
         >

@@ -53,7 +53,7 @@ export const OpenApiPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         title={t('sidebar.openApi')}
         subtitle={t('openApi.description')}
@@ -92,7 +92,7 @@ export const OpenApiPage: React.FC = () => {
           />
         </Tabs>
         <TabPanel value={tabValue} index={0}>
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
             <Card
               sx={{
                 mb: 2,
@@ -124,7 +124,7 @@ export const OpenApiPage: React.FC = () => {
           </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
             <Card
               sx={{
                 mb: 2,
@@ -156,7 +156,7 @@ export const OpenApiPage: React.FC = () => {
           </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={2}>
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
             <Card
               sx={{
                 mb: 2,

@@ -1789,7 +1789,7 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<FlagIcon />}
@@ -2024,10 +2024,10 @@ const FeatureFlagsPage: React.FC = () => {
                           return val ? 'true' : 'false';
                         if (typeof val === 'object') {
                           const str = JSON.stringify(val);
-                          return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                          return str.length > 40 ? str.slice(0, 40) + '?? : str;
                         }
                         const str = String(val);
-                        return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                        return str.length > 40 ? str.slice(0, 40) + '?? : str;
                       };
                       // Get the most recent lastSeenAt across all environments
                       const lastSeen =
@@ -2190,7 +2190,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   noWrap
                                   sx={{ flex: 1, minWidth: 0 }}
                                 >
-                                  — {flag.description}
+                                  ??{flag.description}
                                 </Typography>
                               )}
                             </Box>
@@ -2356,7 +2356,7 @@ const FeatureFlagsPage: React.FC = () => {
                                 disableFocusListener
                               >
                                 <Chip
-                                  label="📊"
+                                  label="?��"
                                   size="small"
                                   variant="outlined"
                                   sx={{
@@ -2383,7 +2383,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   noWrap
                                   sx={{ fontSize: '0.7rem' }}
                                 >
-                                  ⚡ {formatRelativeTime(lastSeen)}
+                                  ??{formatRelativeTime(lastSeen)}
                                 </Typography>
                               </Tooltip>
                             )}
@@ -3742,7 +3742,7 @@ const FeatureFlagsPage: React.FC = () => {
             )}
 
             {/* Value Settings Group */}
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Paper variant="outlined" sx={{ px: 2, pb: 2, pt: 1.5 }}>
               <Stack spacing={2}>
                 {/* Value Type */}
                 <Box>

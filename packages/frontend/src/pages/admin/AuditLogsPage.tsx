@@ -184,7 +184,7 @@ const AuditLogsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
 
-  // 페이지 State management (localStorage 연동)
+  // ?�이지 State management (localStorage ?�동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -229,16 +229,16 @@ const AuditLogsPage: React.FC = () => {
   const [dateRangePreset, setDateRangePreset] =
     useState<DateRangePreset>('last7d');
 
-  // Filters - localStorage에서 복원
+  // Filters - localStorage?�서 복원
   const [userFilter, setUserFilter] = useState<string>(
     pageState.filters?.user || ''
   );
 
-  // 동적 Filter Status
+  // ?�적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // Debouncing된 Search어 (500ms 지연)
+  // Debouncing??Search??(500ms 지??
   const debouncedUserFilter = useDebounce(userFilter, 500);
 
   // Column configuration
@@ -389,7 +389,7 @@ const AuditLogsPage: React.FC = () => {
 
   // Handlers
   const handlePageChange = (event: unknown, newPage: number) => {
-    updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
+    updatePage(newPage + 1); // MUI??0부???�작, ?�리??1부???�작
   };
 
   const handleRowsPerPageChange = (
@@ -411,7 +411,7 @@ const AuditLogsPage: React.FC = () => {
     loadAuditLogs();
   };
 
-  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
+  // ?�이지 로드 ??pageState.filters?�서 activeFilters 복원
   useEffect(() => {
     if (filtersInitialized) return;
 
@@ -664,7 +664,7 @@ const AuditLogsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<HistoryIcon />}
         title={t('auditLogs.title')}
@@ -1439,7 +1439,7 @@ const AuditLogsPage: React.FC = () => {
 
               <SimplePagination
                 count={total}
-                page={pageState.page - 1} // MUI는 0부터 시작
+                page={pageState.page - 1} // MUI??0부???�작
                 rowsPerPage={pageState.limit}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

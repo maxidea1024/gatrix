@@ -352,7 +352,7 @@ const RolesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<ShieldIcon />}
@@ -587,7 +587,7 @@ const RolesPage: React.FC = () => {
           />
 
           {formPermissions.includes('*:*') ? (
-            /* Wildcard role — no need for granular permission editing */
+            /* Wildcard role ??no need for granular permission editing */
             <Box>
               <Divider sx={{ mb: 1 }} />
               <Box
@@ -603,7 +603,7 @@ const RolesPage: React.FC = () => {
                 }}
               >
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  ✦ {t('rbac.roles.wildcardPermission')}
+                  ??{t('rbac.roles.wildcardPermission')}
                 </Typography>
               </Box>
               <Typography
@@ -674,7 +674,7 @@ const RolesPage: React.FC = () => {
                     disabled={!selectedParentRoleId}
                     onClick={() => {
                       if (!selectedParentRoleId) return;
-                      // Buffer locally — do not call server
+                      // Buffer locally ??do not call server
                       if (
                         pendingInheritanceRemoves.includes(selectedParentRoleId)
                       ) {
@@ -754,7 +754,7 @@ const RolesPage: React.FC = () => {
                 })()}
               </Box>
 
-              {/* Effective Permissions — reflects current form state */}
+              {/* Effective Permissions ??reflects current form state */}
               <Box>
                 <Divider sx={{ mb: 1 }} />
                 <Typography

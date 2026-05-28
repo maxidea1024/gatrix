@@ -295,7 +295,7 @@ const PlayerConnectionsPage: React.FC = () => {
   }, [loadCcu]);
 
   // Auto-refresh (only for Overview and CCU Graph tabs, not Player List)
-  // Force 10s interval when scoreboard (ì „ê´‘íŒ) is open
+  // Force 10s interval when scoreboard (?„ê´‘?? is open
   useEffect(() => {
     if (scoreboardOpen) {
       intervalRef.current = setInterval(loadCcu, 10000);
@@ -416,7 +416,7 @@ const PlayerConnectionsPage: React.FC = () => {
     REFRESH_OPTIONS.find((o) => o.value === refreshInterval)?.label || 'Off';
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Fullscreen CCU Scoreboard */}
       {scoreboardOpen && (
         <CcuScoreboard
@@ -466,7 +466,7 @@ const PlayerConnectionsPage: React.FC = () => {
         />
       )}
 
-      {/* Page-level transition overlay to cover countdownâ†’CCU gap */}
+      {/* Page-level transition overlay to cover countdown?’CCU gap */}
       {transitionOverlay && (
         <Box
           sx={{
@@ -579,7 +579,7 @@ const PlayerConnectionsPage: React.FC = () => {
                 />
               </Box>
 
-              {/* Custom DateTimePicker â€” shown when no preset matches or explicitly custom */}
+              {/* Custom DateTimePicker ??shown when no preset matches or explicitly custom */}
               {(!ddayDate || isCustomMode) && (
                 <Box sx={{ mt: 2 }}>
                   <LocalizedDateTimePicker
@@ -703,79 +703,79 @@ const PlayerConnectionsPage: React.FC = () => {
                 label: t('playerConnections.scoreboard.bgPreset.calmSunset'),
                 type: 'youtube',
                 url: 'aSk-D86aOtc',
-                emoji: 'ðŸŒ…',
+                emoji: '?Œ…',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.galaxy'),
                 type: 'youtube',
                 url: 'TNMOlAGvQZc',
-                emoji: 'ðŸŒŒ',
+                emoji: '?ŒŒ',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.galleonSunset'),
                 type: 'image',
                 url: '/images/bg_galleon_sunset.png',
-                emoji: 'ðŸ–¼ï¸',
+                emoji: '?–¼ï¸?,
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.navalBattle'),
                 type: 'image',
                 url: '/images/bg_naval_battle.png',
-                emoji: 'âš”ï¸',
+                emoji: '?”ï¸',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.tradingPort'),
                 type: 'image',
                 url: '/images/bg_trading_port.png',
-                emoji: 'ðŸ›ï¸',
+                emoji: '?›ï¸?,
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.voyageHorizon'),
                 type: 'image',
                 url: '/images/bg_voyage_horizon.png',
-                emoji: 'â›µ',
+                emoji: '??,
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.tradeFleet'),
                 type: 'image',
                 url: '/images/bg_trade_fleet.png',
-                emoji: 'ðŸš¢',
+                emoji: '?š¢',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.dawnHarbor'),
                 type: 'image',
                 url: '/images/bg_dawn_harbor.png',
-                emoji: 'ðŸŒ„',
+                emoji: '?Œ„',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.pirateBattle'),
                 type: 'image',
                 url: '/images/bg_pirate_battle.png',
-                emoji: 'ðŸ´â€â˜ ï¸',
+                emoji: '?´?â˜ ï¸?,
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.seagullVoyage'),
                 type: 'image',
                 url: '/images/bg_seagull_voyage.png',
-                emoji: 'ðŸ•Šï¸',
+                emoji: '?•Šï¸?,
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.stormPassage'),
                 type: 'image',
                 url: '/images/bg_storm_passage.png',
-                emoji: 'â›ˆï¸',
+                emoji: '?ˆï¸',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.goldenTrade'),
                 type: 'image',
                 url: '/images/bg_golden_trade.png',
-                emoji: 'ðŸ’°',
+                emoji: '?’°',
               },
               {
                 label: t('playerConnections.scoreboard.bgPreset.spiceRoute'),
                 type: 'image',
                 url: '/images/bg_spice_route.png',
-                emoji: 'ðŸï¸',
+                emoji: '?ï¸?,
               },
             ];
             return (
@@ -866,7 +866,7 @@ const PlayerConnectionsPage: React.FC = () => {
                   mt: 1,
                 }}
               >
-                ðŸŒŠ{' '}
+                ?ŒŠ{' '}
                 {t(
                   'playerConnections.scoreboard.bgSettings.slideshowLandscapes'
                 )}{' '}
@@ -940,8 +940,7 @@ const PlayerConnectionsPage: React.FC = () => {
                               fontWeight: 700,
                             }}
                           >
-                            âœ“
-                          </Typography>
+                            ??                          </Typography>
                         </Box>
                       )}
                     </Box>
@@ -959,7 +958,7 @@ const PlayerConnectionsPage: React.FC = () => {
                   mt: 1.5,
                 }}
               >
-                ðŸ‘¤{' '}
+                ?‘¤{' '}
                 {t(
                   'playerConnections.scoreboard.bgSettings.slideshowPortraits'
                 )}{' '}
@@ -1033,8 +1032,7 @@ const PlayerConnectionsPage: React.FC = () => {
                               fontWeight: 700,
                             }}
                           >
-                            âœ“
-                          </Typography>
+                            ??                          </Typography>
                         </Box>
                       )}
                     </Box>
@@ -2114,7 +2112,7 @@ const PlayerConnectionsPage: React.FC = () => {
                   {worldSortBy === 'name'
                     ? t('playerConnections.sort.byName')
                     : t('playerConnections.sort.byCount')}
-                  {worldSortDir === 'asc' ? ' â†‘' : ' â†“'}
+                  {worldSortDir === 'asc' ? ' ?? : ' ??}
                 </Button>
                 <Menu
                   anchorEl={sortMenuAnchor}
@@ -2131,8 +2129,7 @@ const PlayerConnectionsPage: React.FC = () => {
                       setSortMenuAnchor(null);
                     }}
                   >
-                    {t('playerConnections.sort.byName')} â†‘
-                  </MenuItem>
+                    {t('playerConnections.sort.byName')} ??                  </MenuItem>
                   <MenuItem
                     selected={worldSortBy === 'name' && worldSortDir === 'desc'}
                     onClick={() => {
@@ -2143,8 +2140,7 @@ const PlayerConnectionsPage: React.FC = () => {
                       setSortMenuAnchor(null);
                     }}
                   >
-                    {t('playerConnections.sort.byName')} â†“
-                  </MenuItem>
+                    {t('playerConnections.sort.byName')} ??                  </MenuItem>
                   <Divider />
                   <MenuItem
                     selected={
@@ -2158,8 +2154,7 @@ const PlayerConnectionsPage: React.FC = () => {
                       setSortMenuAnchor(null);
                     }}
                   >
-                    {t('playerConnections.sort.byCount')} â†“
-                  </MenuItem>
+                    {t('playerConnections.sort.byCount')} ??                  </MenuItem>
                   <MenuItem
                     selected={worldSortBy === 'count' && worldSortDir === 'asc'}
                     onClick={() => {
@@ -2170,8 +2165,7 @@ const PlayerConnectionsPage: React.FC = () => {
                       setSortMenuAnchor(null);
                     }}
                   >
-                    {t('playerConnections.sort.byCount')} â†‘
-                  </MenuItem>
+                    {t('playerConnections.sort.byCount')} ??                  </MenuItem>
                 </Menu>
               </Box>
               <Grid container spacing={1.5}>
@@ -2336,7 +2330,7 @@ const PlayerConnectionsPage: React.FC = () => {
         </PageContentLoader>
       )}
 
-      {/* Tab 1: CCU Graph â€” persist once mounted to avoid flicker */}
+      {/* Tab 1: CCU Graph ??persist once mounted to avoid flicker */}
       {projectApiPath && (
         <Box sx={{ display: activeTab === 1 ? 'block' : 'none' }}>
           <CcuGraphTab
@@ -2346,7 +2340,7 @@ const PlayerConnectionsPage: React.FC = () => {
         </Box>
       )}
 
-      {/* Tab 2: Player Graph â€” persist once mounted */}
+      {/* Tab 2: Player Graph ??persist once mounted */}
       {projectApiPath && (
         <Box sx={{ display: activeTab === 2 ? 'block' : 'none' }}>
           <PlayerGraphTab
@@ -2356,7 +2350,7 @@ const PlayerConnectionsPage: React.FC = () => {
         </Box>
       )}
 
-      {/* Tab 3: Character Graph â€” persist once mounted */}
+      {/* Tab 3: Character Graph ??persist once mounted */}
       {projectApiPath && (
         <Box sx={{ display: activeTab === 3 ? 'block' : 'none' }}>
           <CharacterGraphTab
@@ -2471,7 +2465,7 @@ const PlayerConnectionsPage: React.FC = () => {
             />
           )}
 
-          {/* Impact Summary â€” only for all/world */}
+          {/* Impact Summary ??only for all/world */}
           {kickType !== 'user' &&
             (() => {
               const isAll = kickType === 'all';

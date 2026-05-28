@@ -106,8 +106,7 @@ const MaintenancePage: React.FC = () => {
 
   const [endsAt, setEndsAt] = useState<Dayjs | null>(null);
   const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
-  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // 유예시간 (분) - Default values 5분
-
+  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // ?�예?�간 (�? - Default values 5�?
   // Input mode
   const [inputMode, setInputMode] = useState<'direct' | 'template' | ''>(
     'direct'
@@ -302,7 +301,7 @@ const MaintenancePage: React.FC = () => {
         const status = computeMaintenanceStatus(!!isUnderMaintenance, detail);
         setMaintenanceStatus(status);
         setCurrentMaintenanceDetail(detail);
-        // 점검 중일 때만 Existing Settings을 불러옴 (SSE)
+        // ?��? 중일 ?�만 Existing Settings??불러??(SSE)
         if (detail && !!isUnderMaintenance) {
           setType(detail.type);
           setStartsAt(
@@ -327,7 +326,7 @@ const MaintenancePage: React.FC = () => {
             d.push({ lang: 'zh', message: detail.localeMessages.zh });
           setLocales(d as any);
         } else {
-          // 점검 중이 아니면 깨끗한 Status로 Initialization
+          // ?��? 중이 ?�니�?깨끗??Status�?Initialization
           setType('regular');
           setStartsAt(null);
           setEndsAt(null);
@@ -338,11 +337,11 @@ const MaintenancePage: React.FC = () => {
     },
   });
 
-  // 시간 Validation 함수
+  // ?�간 Validation ?�수
   const validateMaintenanceTime = () => {
     const now = dayjs();
 
-    // 종료 시간이 과거인 경우: 에러
+    // 종료 ?�간??과거??경우: ?�러
     if (endsAt && endsAt.isBefore(now)) {
       enqueueSnackbar(t('maintenance.validationEndTimeInPast'), {
         variant: 'error',
@@ -351,12 +350,12 @@ const MaintenancePage: React.FC = () => {
       return { valid: false };
     }
 
-    // 시작 시간이 Settings되지 않았고 종료 시간만 설정된 경우 (즉시 시작)
+    // ?�작 ?�간??Settings?��? ?�았�?종료 ?�간�??�정??경우 (즉시 ?�작)
     if (!startsAt && endsAt) {
-      // 즉시 시작이므로 현재 시간부터 종료 시간까지의 기간 계산
+      // 즉시 ?�작?��?�??�재 ?�간부??종료 ?�간까�???기간 계산
       const duration = endsAt.diff(now, 'minute');
 
-      // 최소 5분 Validation
+      // 최소 5�?Validation
       if (duration < 5) {
         enqueueSnackbar(
           t('maintenance.validationMinDuration', {
@@ -368,7 +367,7 @@ const MaintenancePage: React.FC = () => {
         return { valid: false };
       }
 
-      // 유예시간 Validation (kickExistingPlayers가 Active화된 경우)
+      // ?�예?�간 Validation (kickExistingPlayers가 Active?�된 경우)
       if (kickExistingPlayers && kickDelayMinutes >= duration) {
         enqueueSnackbar(
           t('maintenance.validationGracePeriodExceedsDuration', {
@@ -383,9 +382,9 @@ const MaintenancePage: React.FC = () => {
       return { valid: true };
     }
 
-    // 시작 시간이 Settings된 경우
+    // ?�작 ?�간??Settings??경우
     if (startsAt) {
-      // 종료 시간이 시작 시간보다 이른지 Confirm
+      // 종료 ?�간???�작 ?�간보다 ?�른지 Confirm
       if (endsAt && endsAt.isBefore(startsAt)) {
         enqueueSnackbar(t('maintenance.validationEndBeforeStart'), {
           variant: 'error',
@@ -394,11 +393,11 @@ const MaintenancePage: React.FC = () => {
         return { valid: false };
       }
 
-      // 종료 시간이 Settings된 경우 기간 Validation
+      // 종료 ?�간??Settings??경우 기간 Validation
       if (endsAt) {
         const duration = endsAt.diff(startsAt, 'minute');
 
-        // 최소 5분 Validation
+        // 최소 5�?Validation
         if (duration < 5) {
           enqueueSnackbar(
             t('maintenance.validationMinDuration', { duration }),
@@ -410,7 +409,7 @@ const MaintenancePage: React.FC = () => {
           return { valid: false };
         }
 
-        // 유예시간 Validation (kickExistingPlayers가 Active화된 경우)
+        // ?�예?�간 Validation (kickExistingPlayers가 Active?�된 경우)
         if (kickExistingPlayers && kickDelayMinutes >= duration) {
           enqueueSnackbar(
             t('maintenance.validationGracePeriodExceedsDuration', {
@@ -427,14 +426,14 @@ const MaintenancePage: React.FC = () => {
     return { valid: true };
   };
 
-  // 시작 시간이 과거인지 Confirm하는 Helper function
+  // ?�작 ?�간??과거?��? Confirm?�는 Helper function
   const isStartTimeInPast = (): boolean => {
     if (!startsAt) return false;
     return startsAt.isBefore(dayjs());
   };
 
   const startMaintenance = async () => {
-    // 시간 Validation
+    // ?�간 Validation
     const validation = validateMaintenanceTime();
     if (!validation.valid) {
       return;
@@ -511,7 +510,7 @@ const MaintenancePage: React.FC = () => {
   };
 
   const updateMaintenance = async () => {
-    // 시간 Validation
+    // ?�간 Validation
     const validation = validateMaintenanceTime();
     if (!validation.valid) {
       return;
@@ -578,7 +577,7 @@ const MaintenancePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<BuildIcon />}
         title={t('maintenance.title')}
@@ -586,7 +585,7 @@ const MaintenancePage: React.FC = () => {
       />
       <PageContentLoader loading={isLoading}>
         <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-          {/* 좌측 Settings 영역 */}
+          {/* 좌측 Settings ?�역 */}
           <Card
             sx={{
               flex: 1,
@@ -680,7 +679,7 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           </Box>
 
-                          {/* 점검 기간 */}
+                          {/* ?��? 기간 */}
                           <Box component="tr">
                             <Box
                               component="td"
@@ -840,7 +839,7 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           )}
 
-                          {/* 강제종료 옵션 */}
+                          {/* 강제종료 ?�션 */}
                           <Box component="tr">
                             <Box
                               component="td"
@@ -870,7 +869,7 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           </Box>
 
-                          {/* Settings자 정보 */}
+                          {/* Settings???�보 */}
                           {currentMaintenanceDetail?.updatedBy && (
                             <Box component="tr">
                               <Box
@@ -898,7 +897,7 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           )}
 
-                          {/* Settings 시간 */}
+                          {/* Settings ?�간 */}
                           {currentMaintenanceDetail?.updatedAt && (
                             <Box component="tr">
                               <Box
@@ -1048,7 +1047,7 @@ const MaintenancePage: React.FC = () => {
                           flexWrap: 'wrap',
                         }}
                       >
-                        {/* 체크박스 영역 */}
+                        {/* 체크박스 ?�역 */}
                         <Box sx={{ flex: '0 0 auto' }}>
                           <FormControlLabel
                             control={
@@ -1075,7 +1074,7 @@ const MaintenancePage: React.FC = () => {
                           </Typography>
                         </Box>
 
-                        {/* 유예시간 Settings 영역 */}
+                        {/* ?�예?�간 Settings ?�역 */}
                         {kickExistingPlayers && (
                           <Box sx={{ flex: '0 0 auto', minWidth: 250 }}>
                             <TextField
@@ -1119,7 +1118,7 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     </Box>
 
-                    {/* 구분선 */}
+                    {/* 구분??*/}
                     <Box sx={{ width: '100%', my: 5 }}>
                       <Box
                         sx={{
@@ -1207,9 +1206,9 @@ const MaintenancePage: React.FC = () => {
                                     ?.locales || []
                                 ).map((l) => {
                                   const langLabels = {
-                                    ko: '한국어',
-                                    en: '영어',
-                                    zh: '중국어',
+                                    ko: '?�국??,
+                                    en: '?�어',
+                                    zh: '중국??,
                                   };
                                   return (
                                     <Box
@@ -1264,7 +1263,7 @@ const MaintenancePage: React.FC = () => {
                         onSupportsMultiLanguageChange={(supports) => {
                           setSupportsMultiLanguage(supports);
                           if (supports) {
-                            // 모든 언어 자동 추가
+                            // 모든 ?�어 ?�동 추�?
                             const allLangs = [
                               { lang: 'ko' as const, message: '' },
                               { lang: 'en' as const, message: '' },
@@ -1292,8 +1291,7 @@ const MaintenancePage: React.FC = () => {
                               message: l.message,
                             }))
                           );
-                          // Translation Results가 있으면 자동으로 다국어 지원 Active화
-                          const hasNonEmptyLocales = newLocales.some(
+                          // Translation Results가 ?�으�??�동?�로 ?�국??지??Active??                          const hasNonEmptyLocales = newLocales.some(
                             (l) => l.message && l.message.trim() !== ''
                           );
                           if (hasNonEmptyLocales && !supportsMultiLanguage) {
@@ -1312,12 +1310,12 @@ const MaintenancePage: React.FC = () => {
                   </>
                 )}
 
-                {/* Actions는 우측 영역으로 이동 */}
+                {/* Actions???�측 ?�역?�로 ?�동 */}
               </Stack>
             </CardContent>
           </Card>
 
-          {/* 우측 액션 버튼 영역 */}
+          {/* ?�측 ?�션 버튼 ?�역 */}
           {canManage && (
             <Box
               sx={{
@@ -1335,7 +1333,7 @@ const MaintenancePage: React.FC = () => {
                   size="large"
                   startIcon={<PlayArrowIcon />}
                   onClick={() => {
-                    // 시간 Validation 먼저 실행
+                    // ?�간 Validation 먼�? ?�행
                     const validation = validateMaintenanceTime();
                     if (!validation.valid) {
                       return;
@@ -1370,7 +1368,7 @@ const MaintenancePage: React.FC = () => {
                       color="primary"
                       size="large"
                       onClick={() => {
-                        // 시간 Validation 먼저 실행
+                        // ?�간 Validation 먼�? ?�행
                         const validation = validateMaintenanceTime();
                         if (!validation.valid) {
                           return;
@@ -1531,7 +1529,7 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     </Box>
 
-                    {/* 점검 기간 */}
+                    {/* ?��? 기간 */}
                     <Box component="tr">
                       <Box
                         component="td"
@@ -1639,7 +1637,7 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     )}
 
-                    {/* 강제종료 옵션 */}
+                    {/* 강제종료 ?�션 */}
                     <Box component="tr">
                       <Box
                         component="td"
@@ -1703,7 +1701,7 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     )}
 
-                    {/* Settings자 정보 (Dialog에서는 현재 Used자) */}
+                    {/* Settings???�보 (Dialog?�서???�재 Used?? */}
                     {user && (
                       <Box component="tr">
                         <Box

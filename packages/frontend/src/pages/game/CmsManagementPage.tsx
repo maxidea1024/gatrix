@@ -111,7 +111,7 @@ const computeDiffInWorker = (
   });
 };
 
-/** Lightweight unified-diff renderer â€” accepts pre-computed patch text */
+/** Lightweight unified-diff renderer ??accepts pre-computed patch text */
 const LightDiff: React.FC<{
   patchText: string;
   dark?: boolean;
@@ -664,7 +664,7 @@ const CmsManagementPage: React.FC = () => {
     );
   };
 
-  // â”€â”€ Upload Handler â”€â”€
+  // ?€?€ Upload Handler ?€?€
   const handleUpload = async () => {
     if (!uploadTableName.trim() || !uploadComment.trim() || !uploadData.trim())
       return;
@@ -718,7 +718,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Detail Drawer â”€â”€
+  // ?€?€ Detail Drawer ?€?€
   const openDetail = async (tableName: string) => {
     setDetailTableName(tableName);
     setDetailOpen(true);
@@ -802,7 +802,7 @@ const CmsManagementPage: React.FC = () => {
     if (newTab === 1 && !propagationLoaded) fetchPropagation();
   };
 
-  // â”€â”€ Start editing a version (inline) â”€â”€
+  // ?€?€ Start editing a version (inline) ?€?€
   const executeStartEditing = async (version: number) => {
     setEditingVersion(version);
     setEditorComment('');
@@ -836,7 +836,7 @@ const CmsManagementPage: React.FC = () => {
     executeStartEditing(version);
   };
 
-  // â”€â”€ Fetch version data (with cache) â”€â”€
+  // ?€?€ Fetch version data (with cache) ?€?€
   const fetchVersionData = async (
     tableName: string,
     version: number
@@ -855,7 +855,7 @@ const CmsManagementPage: React.FC = () => {
     return result.data;
   };
 
-  // â”€â”€ Data Viewer Handler â”€â”€
+  // ?€?€ Data Viewer Handler ?€?€
   const viewVersionData = async (version: number) => {
     if (viewingVersion === version) {
       setViewingVersion(null);
@@ -880,7 +880,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Toggle history entry (preserves viewMode) â”€â”€
+  // ?€?€ Toggle history entry (preserves viewMode) ?€?€
   const toggleHistoryEntry = async (version: number, prevVersion?: number) => {
     if (viewingVersion === version) {
       // Close
@@ -889,7 +889,7 @@ const CmsManagementPage: React.FC = () => {
       setDiffPatchText('');
       return;
     }
-    // Open â€” always clear stale diff when switching versions
+    // Open ??always clear stale diff when switching versions
     setViewingVersion(version);
     setDiffPatchText('');
     setViewingDataLoading(true);
@@ -914,7 +914,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Switch to diff mode (try server-stored patch, fallback to worker) â”€â”€
+  // ?€?€ Switch to diff mode (try server-stored patch, fallback to worker) ?€?€
   const switchToDiff = async (version: number, prevVersion: number) => {
     setViewMode('diff');
     setDiffLoading(true);
@@ -957,7 +957,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Save Handler (editor tab) â”€â”€
+  // ?€?€ Save Handler (editor tab) ?€?€
   const handleSave = async (withRefresh: boolean) => {
     if (!detailTableName || !editorData.trim()) return;
     setEditorSaving(true);
@@ -1017,7 +1017,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Force Refresh (no data change) â”€â”€
+  // ?€?€ Force Refresh (no data change) ?€?€
   const handleForceRefresh = async () => {
     if (!detailTableName) return;
     try {
@@ -1050,7 +1050,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Bulk Refresh â”€â”€
+  // ?€?€ Bulk Refresh ?€?€
   const handleBulkRefresh = async () => {
     if (selectedTables.size === 0) return;
     try {
@@ -1079,7 +1079,7 @@ const CmsManagementPage: React.FC = () => {
     setSelectedTables(new Set());
   };
 
-  // â”€â”€ Refresh All Unsynced â”€â”€
+  // ?€?€ Refresh All Unsynced ?€?€
   const openUnsyncedDialog = () => {
     const unsyncedTables = tables.filter(
       (tbl) => tbl.runtime && !tbl.runtime.synced
@@ -1120,7 +1120,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Rollback Handler â”€â”€
+  // ?€?€ Rollback Handler ?€?€
   const confirmRollback = async (tableName: string, version: number) => {
     setRollbackTableName(tableName);
     setRollbackVersion(version);
@@ -1187,7 +1187,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ Refresh single table â”€â”€
+  // ?€?€ Refresh single table ?€?€
   const handleRefreshTable = async (tableName: string) => {
     try {
       const projectApiPath = getProjectApiPath();
@@ -1250,7 +1250,7 @@ const CmsManagementPage: React.FC = () => {
     }
   };
 
-  // â”€â”€ File upload handler â”€â”€
+  // ?€?€ File upload handler ?€?€
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1266,7 +1266,7 @@ const CmsManagementPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       <PageHeader
         icon={<TableChartIcon />}
         title={t('cms.title')}
@@ -1606,8 +1606,7 @@ const CmsManagementPage: React.FC = () => {
                                 variant="caption"
                                 color="text.disabled"
                               >
-                                â€”
-                              </Typography>
+                                ??                              </Typography>
                             )}
                           </TableCell>
                           <TableCell>
@@ -1673,7 +1672,7 @@ const CmsManagementPage: React.FC = () => {
                                   })}
                                 >
                                   <Chip
-                                    label={`v${table.runtime.loadedVersion} â‰  v${table.version}`}
+                                    label={`v${table.runtime.loadedVersion} ??v${table.version}`}
                                     size="small"
                                     color="warning"
                                     variant="filled"
@@ -1698,8 +1697,7 @@ const CmsManagementPage: React.FC = () => {
                                 variant="caption"
                                 color="text.disabled"
                               >
-                                â€”
-                              </Typography>
+                                ??                              </Typography>
                             )}
                           </TableCell>
                           <TableCell>
@@ -1723,7 +1721,7 @@ const CmsManagementPage: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             <Typography variant="caption">
-                              {table.uploadedBy || 'â€”'}
+                              {table.uploadedBy || '??}
                             </Typography>
                           </TableCell>
                           <TableCell>
@@ -1738,7 +1736,7 @@ const CmsManagementPage: React.FC = () => {
                                 whiteSpace: 'nowrap',
                               }}
                             >
-                              {table.comment || 'â€”'}
+                              {table.comment || '??}
                             </Typography>
                           </TableCell>
                           <TableCell align="center" sx={{ px: 0 }}>
@@ -1944,7 +1942,7 @@ const CmsManagementPage: React.FC = () => {
             <Tab label={t('cms.detail.tabRipple')} />
           </Tabs>
 
-          {/* â”€â”€ Tab 0: History (Timeline) â”€â”€ */}
+          {/* ?€?€ Tab 0: History (Timeline) ?€?€ */}
           {detailTab === 0 && (
             <Box
               sx={{
@@ -1960,8 +1958,8 @@ const CmsManagementPage: React.FC = () => {
                 </Box>
               ) : historyData?.history?.length ? (
                 <>
-                  {/* â”€â”€ Inline Editor used to be here â”€â”€ */}
-                  {/* â”€â”€ Active (current) version â”€â”€ */}
+                  {/* ?€?€ Inline Editor used to be here ?€?€ */}
+                  {/* ?€?€ Active (current) version ?€?€ */}
                   {(() => {
                     const active = historyData.history[0];
                     const isViewing = viewingVersion === active.version;
@@ -2054,7 +2052,7 @@ const CmsManagementPage: React.FC = () => {
                                     fontSize: '0.72rem',
                                   }}
                                 >
-                                  {active.uploadedBy || 'â€”'}
+                                  {active.uploadedBy || '??}
                                 </Typography>
                                 <Typography
                                   variant="caption"
@@ -2236,7 +2234,7 @@ const CmsManagementPage: React.FC = () => {
                                       fontSize: '0.68rem',
                                     }}
                                   >
-                                    v{prevVersion} â†’ v{active.version}
+                                    v{prevVersion} ??v{active.version}
                                   </Typography>
                                 )}
                               </Box>
@@ -2287,7 +2285,7 @@ const CmsManagementPage: React.FC = () => {
                     );
                   })()}
 
-                  {/* â”€â”€ Past versions â”€â”€ */}
+                  {/* ?€?€ Past versions ?€?€ */}
                   {historyData.history.length > 1 && (
                     <>
                       <Box
@@ -2319,7 +2317,7 @@ const CmsManagementPage: React.FC = () => {
                             : undefined;
                           return (
                             <React.Fragment key={entry.version}>
-                              {/* â”€â”€ Commit-style row â”€â”€ */}
+                              {/* ?€?€ Commit-style row ?€?€ */}
                               <Box
                                 onClick={() =>
                                   toggleHistoryEntry(entry.version, prevVersion)
@@ -2411,7 +2409,7 @@ const CmsManagementPage: React.FC = () => {
                                         fontSize: '0.72rem',
                                       }}
                                     >
-                                      {entry.uploadedBy || 'â€”'}
+                                      {entry.uploadedBy || '??}
                                     </Typography>
                                     <Typography
                                       variant="caption"
@@ -2520,7 +2518,7 @@ const CmsManagementPage: React.FC = () => {
                                 </Box>
                               </Box>
 
-                              {/* â”€â”€ Expanded panel: Data / Diff toggle â”€â”€ */}
+                              {/* ?€?€ Expanded panel: Data / Diff toggle ?€?€ */}
                               {isViewing &&
                                 editingVersion !== entry.version && (
                                   <Box
@@ -2539,7 +2537,7 @@ const CmsManagementPage: React.FC = () => {
                                       py: 1.5,
                                     }}
                                   >
-                                    {/* Mode toggle â€” always visible for consistency */}
+                                    {/* Mode toggle ??always visible for consistency */}
                                     <Box
                                       sx={{
                                         display: 'flex',
@@ -2607,7 +2605,7 @@ const CmsManagementPage: React.FC = () => {
                                               fontSize: '0.68rem',
                                             }}
                                           >
-                                            v{prevVersion} â†’ v{entry.version}
+                                            v{prevVersion} ??v{entry.version}
                                           </Typography>
                                         )}
                                     </Box>
@@ -2677,7 +2675,7 @@ const CmsManagementPage: React.FC = () => {
             </Box>
           )}
 
-          {/* â”€â”€ Tab 1: Propagation â”€â”€ */}
+          {/* ?€?€ Tab 1: Propagation ?€?€ */}
           {detailTab === 1 && (
             <Box sx={{ p: 2, flex: 1, minHeight: 0, overflowY: 'auto' }}>
               {propagationLoading ? (
@@ -2730,7 +2728,7 @@ const CmsManagementPage: React.FC = () => {
                         };
                         return (
                           <React.Fragment key={reqId}>
-                            {/* Commit-style row â€” matches history tab */}
+                            {/* Commit-style row ??matches history tab */}
                             <Box
                               onClick={toggleExpanded}
                               sx={{
@@ -2931,7 +2929,7 @@ const CmsManagementPage: React.FC = () => {
                                               fontSize: '0.72rem',
                                             }}
                                           >
-                                            {evt.serviceType || 'â€”'}
+                                            {evt.serviceType || '??}
                                           </Typography>
                                         </TableCell>
                                         <TableCell sx={{ py: 0.4 }}>
@@ -3155,7 +3153,7 @@ const CmsManagementPage: React.FC = () => {
                         </TableCell>
                         <TableCell align="center">
                           <Chip
-                            label={`v${tbl.runtime!.loadedVersion} â†’ v${tbl.version}`}
+                            label={`v${tbl.runtime!.loadedVersion} ??v${tbl.version}`}
                             size="small"
                             color="warning"
                             variant="filled"
@@ -3297,7 +3295,7 @@ const CmsManagementPage: React.FC = () => {
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ px: 3 }}>
-          {/* Version Flow â€” compact inline */}
+          {/* Version Flow ??compact inline */}
           <Box
             sx={{
               display: 'flex',

@@ -257,7 +257,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
         </Tabs>
 
         {/* Tab Content */}
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
           {/* General Tab */}
           {activeTab === 0 && (
             <Stack spacing={2}>
@@ -852,7 +852,7 @@ const MilestoneSection: React.FC<MilestoneSectionProps> = ({
 
       {/* Collapsible content */}
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
           <Stack spacing={2}>
             {milestone.strategies.map((strategy, sIdx) => (
               <StrategyEditor
@@ -1701,7 +1701,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
       {/* Header */}
       <PageHeader
         icon={<TemplateIcon />}
