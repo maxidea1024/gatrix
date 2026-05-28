@@ -1,5 +1,9 @@
 # Base stage
 FROM node:22-alpine AS base
+
+# Allow Corepack to download package managers without interactive prompt
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 

@@ -10,6 +10,7 @@
 #   -p, --push                Push images to registry
 #   -l, --latest              Also tag and push as "latest"
 #   -s, --service <name>      Service to build (can be used multiple times)
+#   -nc, --no-cache           Build without Docker cache
 #   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
@@ -18,6 +19,7 @@ $ErrorActionPreference = "Stop"
 $Tag = "latest"
 $Push = $false
 $TagLatest = $false
+$NoCache = $false
 $TargetServices = @()
 
 # Show help function
@@ -31,6 +33,7 @@ function Show-Help {
     Write-Host "  -p, --push                Push images to registry"
     Write-Host "  -l, --latest              Also tag and push as 'latest'"
     Write-Host "  -s, --service <name>      Service to build (repeatable)"
+    Write-Host "  -nc, --no-cache           Build without Docker cache"
     Write-Host "  -h, --help                Show help"
     Write-Host ""
     Write-Host "Available services: backend, frontend, edge"
@@ -56,6 +59,10 @@ while ($i -lt $args.Count) {
         }
         { $_ -eq "-l" -or $_ -eq "--latest" } {
             $TagLatest = $true
+            $i += 1
+        }
+        { $_ -eq "-nc" -or $_ -eq "--no-cache" } {
+            $NoCache = $true
             $i += 1
         }
         { $_ -eq "-s" -or $_ -eq "--service" } {
@@ -145,7 +152,10 @@ foreach ($serviceName in $servicesToBuild.Keys) {
     Push-Location $rootDir
     try {
         # Build with version tag
-        docker build -f $dockerfile -t $imageName --build-arg APP_VERSION=$Tag .
+        $buildArgs = @("-f", $dockerfile, "-t", $imageName, "--build-arg", "APP_VERSION=$Tag")
+        if ($NoCache) { $buildArgs += "--no-cache" }
+        $buildArgs += "."
+        docker build @buildArgs
         if ($LASTEXITCODE -ne 0) { throw "Docker build failed for $serviceName" }
         
         # Also tag as latest if requested
