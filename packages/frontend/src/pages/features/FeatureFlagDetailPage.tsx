@@ -3829,7 +3829,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     }}
                   >
                     <Button
-                      variant="contained"
+                      variant="text"
                       onClick={() => {
                         if (originalFlag) {
                           setFlag((prev) =>
@@ -3984,7 +3984,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Typography>{t('featureFlags.deleteStrategyDescription')}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteStrategyConfirm}>
+          <Button variant="text" onClick={handleCloseDeleteStrategyConfirm}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -4048,6 +4048,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {!editingFlagData.description && (
                     <Button
+                      variant="text"
                       size="small"
                       onClick={() =>
                         setEditingFlagData({
@@ -4066,6 +4067,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   )}
                   {!editingFlagData.tags?.length && (
                     <Button
+                      variant="text"
                       size="small"
                       onClick={() =>
                         setEditingFlagData({
@@ -4161,7 +4163,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 {t('common.cancel')}
               </Button>
               <Button
-                variant="contained"
+                variant="text"
                 onClick={async () => {
                   if (!flag || !editingFlagData) return;
                   try {
@@ -4299,7 +4301,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Button onClick={() => setVariantDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={handleSaveVariants}>
+          <Button variant="text" onClick={handleSaveVariants}>
             {t('common.update')}
           </Button>
         </Box>
@@ -4348,7 +4350,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSaveLink}
             disabled={!editingLink.url}
           >
@@ -4383,7 +4385,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color={flag?.isArchived ? 'success' : 'warning'}
             onClick={handleArchiveConfirm}
           >
@@ -4422,7 +4424,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color={flag?.stale ? 'info' : 'secondary'}
             onClick={handleStaleConfirm}
           >

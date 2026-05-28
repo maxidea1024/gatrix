@@ -2381,7 +2381,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() =>
               setRecentPageConfirm({ open: false, type: 'clearAll' })
             }

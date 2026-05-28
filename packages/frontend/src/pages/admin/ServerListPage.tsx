@@ -4335,7 +4335,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCleanupCancel} color="primary">
+          <Button variant="text" onClick={handleCleanupCancel} color="primary">
             {t('common.cancel')}
           </Button>
           <Button
@@ -4887,7 +4887,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             {bulkHealthCheckSelected.size} / {bulkHealthCheckResults.length}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Button
+            <Button variant="text"
               onClick={handleBulkHealthCheckClose}
               disabled={bulkHealthCheckRunning}
             >

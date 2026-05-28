@@ -1683,7 +1683,7 @@ const HotTimeBuffEventPage: React.FC = () => {
             <Button onClick={() => setApplyConfirmOpen(false)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="contained" onClick={handleApply} autoFocus>
+            <Button variant="text" onClick={handleApply} autoFocus>
               {t('hotTimeBuffEvent.applyChanges')}
             </Button>
           </DialogActions>
@@ -1705,7 +1705,7 @@ const HotTimeBuffEventPage: React.FC = () => {
               {t('common.cancel')}
             </Button>
             <Button
-              variant="contained"
+              variant="text"
               color="warning"
               onClick={handleReset}
               autoFocus

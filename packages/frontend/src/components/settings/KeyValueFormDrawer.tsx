@@ -581,7 +581,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} disabled={submitting}>
+        <Button variant="text" onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
         <Button

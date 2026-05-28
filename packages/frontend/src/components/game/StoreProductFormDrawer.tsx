@@ -1121,7 +1121,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               {t('common.cancel')}
             </Button>
             <Button
-              variant="contained"
+              variant="text"
               onClick={handleSave}
               disabled={
                 saving || !productId.trim() || (!!product?.id && !isDirty)
@@ -1161,7 +1161,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
           <Button onClick={() => setConfirmResetAllOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={confirmResetAll} color="warning" variant="contained">
+          <Button onClick={confirmResetAll} color="warning" variant="text">
             {t('storeProducts.resetAllOverrides')}
           </Button>
         </DialogActions>

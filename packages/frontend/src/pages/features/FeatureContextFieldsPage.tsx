@@ -1875,7 +1875,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                 bgcolor: 'background.paper',
               }}
             >
-              <Button onClick={() => setEditDialogOpen(false)}>
+              <Button variant="text" onClick={() => setEditDialogOpen(false)}>
                 {canManage ? t('common.cancel') : t('common.close')}
               </Button>
               {canManage && (

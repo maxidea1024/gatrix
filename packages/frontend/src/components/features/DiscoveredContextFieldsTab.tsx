@@ -1078,7 +1078,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleEditSave}
             disabled={
               editDescription === (editingField?.description || '') &&

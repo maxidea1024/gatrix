@@ -136,7 +136,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button
+          <Button variant="text"
             onClick={onCancel}
             disabled={loading}
             sx={{ color: 'text.secondary' }}
@@ -211,7 +211,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       />
 
       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-        <Button
+        <Button variant="text"
           onClick={onCancel}
           disabled={loading}
           sx={{ color: 'text.secondary' }}

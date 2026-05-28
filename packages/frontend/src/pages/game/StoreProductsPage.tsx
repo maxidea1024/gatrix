@@ -1939,7 +1939,7 @@ const StoreProductsPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setResetOverrideConfirmOpen(false);
               setResetOverrideProduct(null);

@@ -229,7 +229,7 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+        <Button variant="text" onClick={onClose} disabled={loading}>
           {t('common.cancel')}
         </Button>
         <ChangeRequestSubmitButtons

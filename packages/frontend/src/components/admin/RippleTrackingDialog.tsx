@@ -580,7 +580,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
       <DialogActions sx={{ px: 1.5, py: 1 }}>
         <Button
           onClick={onClose}
-          variant="contained"
+          variant="text"
           size="small"
           color="primary"
           startIcon={

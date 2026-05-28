@@ -49,7 +49,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           {cancelText || t('common.cancel')}
         </Button>
         <Button
-          variant="contained"
+          variant="text"
           color={confirmColor}
           onClick={onConfirm}
           disabled={loading}

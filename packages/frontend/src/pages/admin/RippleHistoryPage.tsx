@@ -904,7 +904,7 @@ const RippleHistoryPage: React.FC = () => {
           </Alert>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button
+          <Button variant="text"
             onClick={() => setResetDialogOpen(false)}
             disabled={resetting}
           >

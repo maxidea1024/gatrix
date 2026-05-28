@@ -834,7 +834,7 @@ const SchedulerPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
               {t('common.cancel')}
             </Button>
 
-            <Button variant="contained" onClick={handleSave} disabled={saving}>
+            <Button variant="text" onClick={handleSave} disabled={saving}>
               {saving
                 ? t('common.saving')
                 : editingEvent

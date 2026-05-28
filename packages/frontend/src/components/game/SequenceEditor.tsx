@@ -738,7 +738,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={() => {
               const input = document.getElementById(
                 'empty-frame-count-list'

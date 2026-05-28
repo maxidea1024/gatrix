@@ -210,7 +210,7 @@ const LogoutPage: React.FC = () => {
         </Button>
 
         <Button
-          variant="outlined"
+          variant="text"
           size="large"
           onClick={handleCancel}
           disabled={isLoggingOut}

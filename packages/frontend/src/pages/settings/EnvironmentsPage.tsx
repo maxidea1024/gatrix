@@ -1259,7 +1259,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleCreateEnvironment}
             disabled={
               !newEnv.displayName ||
@@ -1412,7 +1412,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={handleDeleteEnvironment}
             disabled={
@@ -1674,7 +1674,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleUpdateEnvironment}
             disabled={!editEnv.displayName || updating || !isEditDirty}
           >

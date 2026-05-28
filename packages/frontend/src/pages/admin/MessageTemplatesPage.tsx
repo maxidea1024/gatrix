@@ -1441,7 +1441,7 @@ const MessageTemplatesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDialogOpen(false)} disabled={saving}>
+          <Button variant="text" onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1470,7 +1470,7 @@ const MessageTemplatesPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1498,7 +1498,7 @@ const MessageTemplatesPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1529,7 +1529,7 @@ const MessageTemplatesPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setTagDialogOpen(false)}>
+          <Button variant="text" onClick={() => setTagDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button

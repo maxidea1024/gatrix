@@ -744,7 +744,7 @@ const GroupsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSave}
             disabled={saving || !formData.groupName.trim() || !isEditDirty}
           >
@@ -779,7 +779,7 @@ const GroupsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={handleDelete}
             disabled={saving}
@@ -1049,7 +1049,7 @@ const GroupsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSaveDetail}
             disabled={saving || !hasDetailChanges}
           >

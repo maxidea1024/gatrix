@@ -485,7 +485,7 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="contained" color="inherit" size="small" onClick={closeDrawer}>
+          <Button variant="text" color="inherit" size="small" onClick={closeDrawer}>
             {t('common.cancel')}
           </Button>
           <Button variant="contained" size="small" onClick={commitDrawerDraft} disabled={!drawerIsDirty}>

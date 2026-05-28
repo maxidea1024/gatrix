@@ -1015,7 +1015,7 @@ const IngamePopupNoticesPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1041,7 +1041,7 @@ const IngamePopupNoticesPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons

@@ -1111,7 +1111,7 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setDeleteWarningOpen(false);
               setDeleteWarningTarget(null);

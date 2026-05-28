@@ -2468,7 +2468,7 @@ const UsersManagementPage: React.FC = () => {
           <Button onClick={handleCloseAddUserDialog}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleCreateUser} variant="contained">
+          <Button onClick={handleCreateUser} variant="text">
             {t('common.add')}
           </Button>
         </Box>
@@ -2540,7 +2540,7 @@ const UsersManagementPage: React.FC = () => {
             onClick={() =>
               setConfirmDialog((prev) => ({ ...prev, open: false }))
             }
-            variant="contained"
+            variant="text"
             disabled={confirmDialogLoading}
           >
             {t('common.cancel')}
@@ -2665,7 +2665,7 @@ const UsersManagementPage: React.FC = () => {
               })
             }
             color="inherit"
-            variant="contained"
+            variant="text"
           >
             {t('common.cancel')}
           </Button>
@@ -2898,7 +2898,7 @@ const UsersManagementPage: React.FC = () => {
             <>
               <Button
                 onClick={handlePromoteCancel}
-                variant="contained"
+                variant="text"
                 disabled={promoteDialog.loading}
               >
                 {t('common.cancel')}
@@ -3279,7 +3279,7 @@ const UsersManagementPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
+          <Button variant="text"
             onClick={() => setEditUserDialog({ open: false, user: null })}
           >
             {t('common.cancel')}
@@ -3826,7 +3826,7 @@ const UsersManagementPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkActionDialogOpen(false)}
-            variant="contained"
+            variant="text"
           >
             {t('common.cancel')}
           </Button>

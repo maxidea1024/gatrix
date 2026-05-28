@@ -3330,7 +3330,7 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setArchiveConfirmOpen(false);
               handleActionMenuClear();
@@ -3376,7 +3376,7 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setStaleConfirmOpen(false);
               handleActionMenuClear();
@@ -3430,7 +3430,7 @@ const FeatureFlagsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleCloneConfirm}
             disabled={cloning || !cloneNewName.trim()}
           >
@@ -3535,6 +3535,7 @@ const FeatureFlagsPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               {!showCreateDescription && !newFlag.description && (
                 <Button
+                  variant="text"
                   size="small"
                   onClick={() => setShowCreateDescription(true)}
                   sx={{
@@ -3548,6 +3549,7 @@ const FeatureFlagsPage: React.FC = () => {
               )}
               {!showCreateTags && !newFlag.tags?.length && (
                 <Button
+                  variant="text"
                   size="small"
                   onClick={() => setShowCreateTags(true)}
                   sx={{
@@ -4009,7 +4011,7 @@ const FeatureFlagsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button
+          <Button variant="text"
             onClick={() => setCreateDialogOpen(false)}
             disabled={creating}
           >
@@ -4193,7 +4195,7 @@ const FeatureFlagsPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setImportDialogOpen(false);
               setImportData('');

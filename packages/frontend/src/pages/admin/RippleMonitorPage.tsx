@@ -1436,7 +1436,7 @@ const RippleMonitorPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={handleConfirmFullRefresh}
           >
@@ -1487,7 +1487,7 @@ const RippleMonitorPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color={refreshCascade ? 'error' : 'warning'}
             onClick={handleCustomRefresh}
             disabled={!refreshPattern.trim()}
@@ -1525,7 +1525,7 @@ const RippleMonitorPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color={rowRefreshCascade ? 'error' : 'warning'}
             onClick={() => {
               if (rowRefreshKey)

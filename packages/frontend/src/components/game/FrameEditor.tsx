@@ -1919,7 +1919,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={() => {
               const input = document.getElementById(
                 'empty-frame-count'

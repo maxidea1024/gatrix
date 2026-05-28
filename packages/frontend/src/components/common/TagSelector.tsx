@@ -449,7 +449,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           </Stack>
           {/* Actions */}
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <Button
+            <Button variant="text"
               size="small"
               onClick={() => setCreateAnchor(null)}
               disabled={creating}
@@ -534,7 +534,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
               </Stack>
               {/* Actions */}
               <Stack direction="row" spacing={1} justifyContent="flex-end">
-                <Button
+                <Button variant="text"
                   size="small"
                   onClick={() => {
                     setEditAnchor(null);
@@ -580,7 +580,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
               {t('tags.confirmDeleteMessage', { name: deletingTag.name })}
             </Typography>
             <Stack direction="row" spacing={1} justifyContent="flex-end">
-              <Button
+              <Button variant="text"
                 size="small"
                 onClick={() => {
                   setDeleteAnchor(null);

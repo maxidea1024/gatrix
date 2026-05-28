@@ -503,7 +503,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSave}
             disabled={saving || !isFormValid || (!!template?.id && !isDirty)}
           >

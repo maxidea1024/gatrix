@@ -796,7 +796,7 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={copying}>
+        <Button variant="text" onClick={handleClose} disabled={copying}>
           {t('common.close')}
         </Button>
         {!result && (

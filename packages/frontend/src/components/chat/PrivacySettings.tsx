@@ -353,7 +353,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({
           {t('common.cancel')}
         </Button>
         <Button
-          variant="contained"
+          variant="text"
           onClick={saveSettings}
           disabled={loading || saving || !isDirty}
           startIcon={saving ? <CircularProgress size={16} /> : null}

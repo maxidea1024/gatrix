@@ -191,7 +191,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
 
           <Button
             onClick={onClose}
-            variant="contained"
+            variant="text"
             sx={{
               flex: 1,
               borderColor: 'grey.300',

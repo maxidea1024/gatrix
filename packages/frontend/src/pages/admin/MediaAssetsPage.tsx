@@ -840,7 +840,7 @@ const MediaAssetsPage: React.FC = () => {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setDetailAsset(null)}>
+              <Button variant="text" onClick={() => setDetailAsset(null)}>
                 {t('common.close')}
               </Button>
             </DialogActions>
@@ -881,7 +881,7 @@ const MediaAssetsPage: React.FC = () => {
                 {t('common.cancel')}
               </Button>
               <Button
-                variant="contained"
+                variant="text"
                 color="error"
                 onClick={handleDelete}
                 disabled={deleting}
@@ -913,7 +913,7 @@ const MediaAssetsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() => setBulkDeleteOpen(false)}
             disabled={bulkDeleting}
           >

@@ -921,7 +921,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSave}
             disabled={
               saving ||
@@ -961,7 +961,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={handleDelete}
             disabled={saving}
@@ -1226,7 +1226,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleApplyMembers}
             disabled={memberApplying || !hasPendingMemberChanges}
           >

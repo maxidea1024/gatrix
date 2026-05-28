@@ -1016,7 +1016,7 @@ const CouponUsagePage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           {exporting ? (
-            <Button
+            <Button variant="text"
               onClick={() => {
                 exportAbortControllerRef.current?.abort();
               }}
@@ -1025,7 +1025,7 @@ const CouponUsagePage: React.FC = () => {
               {t('common.cancel')}
             </Button>
           ) : (
-            <Button
+            <Button variant="text"
               onClick={() => {
                 setExportSuccess(false);
                 setExportError(null);

@@ -1369,7 +1369,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={onClose} disabled={saving}>
+          <Button variant="text" onClick={onClose} disabled={saving}>
             {readonly ? t('common.close') : t('common.cancel')}
           </Button>
           {!readonly && (

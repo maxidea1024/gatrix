@@ -249,7 +249,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="inherit">
+        <Button variant="text" onClick={onClose} color="inherit">
           {t('common.close')}
         </Button>
         {(type === 'DUPLICATE' || type === 'CONFLICT') && onDelete && (

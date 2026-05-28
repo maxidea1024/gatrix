@@ -761,7 +761,7 @@ const SpreadsheetListPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)}>
+          <Button variant="text" onClick={() => setDeleteTarget(null)}>
             {t('common.cancel')}
           </Button>
           <Button

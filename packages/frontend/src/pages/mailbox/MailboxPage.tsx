@@ -1279,7 +1279,7 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEmptyMailboxCancel}>
+          <Button variant="text" onClick={handleEmptyMailboxCancel}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -1313,7 +1313,7 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleMarkAllAsReadCancel}>
+          <Button variant="text" onClick={handleMarkAllAsReadCancel}>
             {t('common.cancel')}
           </Button>
           <Button

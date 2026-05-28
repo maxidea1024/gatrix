@@ -1917,7 +1917,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 {t('common.cancel')}
                               </Button>
                               <Button
-                                variant="contained"
+                                variant="text"
                                 startIcon={
                                   isSubmitting ? (
                                     <CircularProgress size={16} />

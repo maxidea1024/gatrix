@@ -1062,7 +1062,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} disabled={submitting}>
+        <Button variant="text" onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
         <ChangeRequestSubmitButtons

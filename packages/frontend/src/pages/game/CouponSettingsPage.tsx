@@ -3080,7 +3080,7 @@ const CouponSettingsPage: React.FC = () => {
             gap: 1,
           }}
         >
-          <Button onClick={() => setOpenForm(false)}>
+          <Button variant="text" onClick={() => setOpenForm(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -3744,7 +3744,7 @@ const CouponSettingsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel} color="inherit">
+          <Button variant="text" onClick={handleDeleteCancel} color="inherit">
             {t('common.cancel')}
           </Button>
           <Button
@@ -3880,7 +3880,7 @@ const CouponSettingsPage: React.FC = () => {
             </Button>
           ) : exportError ? (
             <>
-              <Button
+              <Button variant="text"
                 onClick={() => {
                   setExportError(null);
                   setExportProgress(0);

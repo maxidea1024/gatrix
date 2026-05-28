@@ -1296,7 +1296,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           </Alert>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, pt: 1, gap: 1 }}>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setCacheInvalidateDialogOpen(false);
               setCacheInvalidateTarget(null);
@@ -1487,7 +1487,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           </Button>
           <Button
             size="small"
-            variant="contained"
+            variant="text"
             onClick={() => setJsonDialogOpen(false)}
             sx={{ borderRadius: 2, textTransform: 'none' }}
           >

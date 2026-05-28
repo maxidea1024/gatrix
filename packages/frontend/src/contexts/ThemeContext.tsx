@@ -294,6 +294,20 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      // Dialog action buttons: first button (cancel) should be text, not contained
+      MuiDialogActions: {
+        styleOverrides: {
+          root: {
+            '& .MuiButton-root:not([class*="MuiButton-contained"])': {
+              boxShadow: 'none',
+              backgroundColor: 'transparent',
+              '&:active': {
+                transform: 'none',
+              },
+            },
+          },
+        },
+      },
       MuiPagination: {
         styleOverrides: {
           root: {

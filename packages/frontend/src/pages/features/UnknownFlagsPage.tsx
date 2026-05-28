@@ -881,7 +881,7 @@ const UnknownFlagsPage: React.FC = () => {
           <DialogContentText>{dialogContent.message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseConfirmDialog}>
+          <Button variant="text" onClick={handleCloseConfirmDialog}>
             {t('common.cancel')}
           </Button>
           <Button

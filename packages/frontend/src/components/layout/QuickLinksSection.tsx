@@ -824,7 +824,7 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
+          <Button variant="text"
             onClick={closeDialog}
             size="small"
             sx={{ textTransform: 'none' }}
@@ -888,7 +888,7 @@ const QuickLinksSection: React.FC<QuickLinksSectionProps> = ({
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
+          <Button variant="text"
             onClick={() => setDeleteConfirm(null)}
             size="small"
             sx={{ textTransform: 'none' }}

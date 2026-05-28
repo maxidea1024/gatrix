@@ -1164,7 +1164,7 @@ const PlayerConnectionsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             disabled={
               bgType === 'slideshow' ? slideshowImages.length === 0 : false
             }
@@ -2618,7 +2618,7 @@ const PlayerConnectionsPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setKickOpen(false);
               setKickConfirmText('');
@@ -2954,7 +2954,7 @@ const PlayerConnectionsPage: React.FC = () => {
           ) : null}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setSyncDialogOpen(false)} disabled={syncing}>
+          <Button variant="text" onClick={() => setSyncDialogOpen(false)} disabled={syncing}>
             {t('common.cancel')}
           </Button>
           {syncPreviewData && syncPreviewData.staleCount > 0 && (

@@ -872,7 +872,7 @@ const WorkspacePage: React.FC<WorkspacePageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleCreate}
             disabled={
               saving ||
@@ -944,7 +944,7 @@ const WorkspacePage: React.FC<WorkspacePageProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSaveEdit}
             disabled={saving || !isEditDirty}
           >
@@ -1098,7 +1098,7 @@ const WorkspacePage: React.FC<WorkspacePageProps> = ({
             {t('common.close')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleApplyMembers}
             disabled={!isMembersDirty || applyingMembers}
           >

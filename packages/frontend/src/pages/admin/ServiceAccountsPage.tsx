@@ -844,7 +844,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
             </Button>
           </>
         ) : (
-          <Button onClick={onClose} variant="contained">
+          <Button onClick={onClose} variant="text">
             {t('common.close')}
           </Button>
         )}

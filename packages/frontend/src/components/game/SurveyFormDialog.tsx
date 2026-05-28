@@ -1019,7 +1019,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} disabled={submitting}>
+        <Button variant="text" onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
         <ChangeRequestSubmitButtons

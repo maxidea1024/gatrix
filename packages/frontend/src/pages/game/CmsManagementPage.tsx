@@ -1882,7 +1882,7 @@ const CmsManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleUpload}
             disabled={
               uploading ||
@@ -3259,7 +3259,7 @@ const CmsManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={handleRefreshSelectedUnsynced}
             disabled={unsyncedRefreshing || unsyncedSelected.size === 0}
@@ -3466,7 +3466,7 @@ const CmsManagementPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button
+          <Button variant="text"
             onClick={() => setRollbackOpen(false)}
             sx={{ borderRadius: 2 }}
           >
@@ -3529,7 +3529,7 @@ const CmsManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="warning"
             onClick={() => {
               handleRefreshTable(refreshConfirmTableName);
@@ -3559,7 +3559,7 @@ const CmsManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={() => {
               if (pendingDiscardAction) pendingDiscardAction();

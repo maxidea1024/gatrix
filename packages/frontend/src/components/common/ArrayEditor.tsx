@@ -767,7 +767,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           <Button onClick={() => setResizeDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleResize} variant="contained">
+          <Button onClick={handleResize} variant="text">
             {t('common.ok')}
           </Button>
         </DialogActions>
@@ -861,7 +861,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           <Button onClick={() => setFillDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleFill} variant="contained">
+          <Button onClick={handleFill} variant="text">
             {t('common.ok')}
           </Button>
         </DialogActions>
@@ -885,7 +885,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setObjectEditorOpen(false)}>
+          <Button variant="text" onClick={() => setObjectEditorOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button

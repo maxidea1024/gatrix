@@ -1171,7 +1171,7 @@ const LoginPage: React.FC = () => {
           )}
           <Button
             fullWidth
-            variant="contained"
+            variant="text"
             onClick={() => setLockedDialogOpen(false)}
             sx={{
               color: 'rgba(255, 255, 255, 0.7)',

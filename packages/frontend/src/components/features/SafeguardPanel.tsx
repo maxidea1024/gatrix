@@ -972,7 +972,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSave}
             disabled={!metricName.trim()}
           >

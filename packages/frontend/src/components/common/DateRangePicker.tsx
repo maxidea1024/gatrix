@@ -668,7 +668,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               bgcolor: 'background.default',
             }}
           >
-            <Button
+            <Button variant="text"
               size="small"
               onClick={handleCustomCancel}
               sx={{ textTransform: 'none' }}

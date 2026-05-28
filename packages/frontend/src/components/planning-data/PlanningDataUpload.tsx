@@ -757,7 +757,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
         </DialogContent>
         <DialogActions>
           <Button
-            variant="contained"
+            variant="text"
             onClick={() => {
               setShowAlreadyUpToDateDialog(false);
               if (onClose) onClose();
@@ -1128,7 +1128,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
         </DialogContent>
         <DialogActions>
           <Button
-            variant="contained"
+            variant="text"
             onClick={() => setShowPreviewDialog(false)}
           >
             {t('common.cancel') || 'Cancel'}

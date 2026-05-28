@@ -163,7 +163,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
           bgcolor: 'background.paper',
         }}
       >
-        <Button onClick={onClose} disabled={submitting}>
+        <Button variant="text" onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
         <Button

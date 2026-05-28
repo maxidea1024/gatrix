@@ -837,7 +837,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button
+          <Button variant="text"
             onClick={() => {
               setAddDialog(false);
               setEditDialog(false);
@@ -885,7 +885,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDialog(false)}>
+          <Button variant="text" onClick={() => setBulkDialog(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -908,7 +908,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           <Typography>{confirmDialog.message}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() =>
               setConfirmDialog((prev) => ({ ...prev, open: false }))
             }

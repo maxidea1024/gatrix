@@ -2449,7 +2449,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           >
             {t('apiTokens.copyToken')}
           </Button>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setViewTokenDialogOpen(false);
               setViewTokenValue('');
@@ -2711,7 +2711,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setCreateDialogOpen(false)}>
+          <Button variant="text" onClick={() => setCreateDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -2946,7 +2946,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setEditDialogOpen(false)}>
+          <Button variant="text" onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -3050,7 +3050,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -3326,7 +3326,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeBulkDeleteDrawer} variant="contained">
+          <Button onClick={closeBulkDeleteDrawer} variant="text">
             {t('common.cancel')}
           </Button>
           <Button

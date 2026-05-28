@@ -1599,7 +1599,7 @@ export default function AllCharactersTab({
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelExport} size="small">
+          <Button variant="text" onClick={handleCancelExport} size="small">
             {t('common.cancel')}
           </Button>
         </DialogActions>

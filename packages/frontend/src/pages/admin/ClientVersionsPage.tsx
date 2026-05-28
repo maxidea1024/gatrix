@@ -2192,7 +2192,7 @@ const ClientVersionsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -2485,7 +2485,7 @@ const ClientVersionsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setBulkStatusDialogOpen(false)}>
+          <Button variant="text" onClick={() => setBulkStatusDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -2604,7 +2604,7 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button variant="text" onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           {requiresApproval && hasPermission([P.CHANGE_REQUESTS_SKIP]) && (
@@ -2751,7 +2751,7 @@ const ClientVersionsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setTagDialogOpen(false)} variant="contained">
+          <Button onClick={() => setTagDialogOpen(false)} variant="text">
             {t('common.cancel')}
           </Button>
           <Button

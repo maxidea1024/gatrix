@@ -439,7 +439,7 @@ const SpreadsheetEditorPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button
+          <Button variant="text"
             onClick={() => {
               setImportDialogOpen(false);
               setPendingImportFile(null);

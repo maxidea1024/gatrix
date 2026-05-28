@@ -801,7 +801,7 @@ const RolesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             onClick={handleSave}
             disabled={saving || !formData.roleName.trim() || !isEditDirty}
           >
@@ -844,7 +844,7 @@ const RolesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
             onClick={handleDelete}
             disabled={saving}
