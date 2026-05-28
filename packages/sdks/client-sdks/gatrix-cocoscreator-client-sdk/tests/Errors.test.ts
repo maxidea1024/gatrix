@@ -1,4 +1,8 @@
-import { GatrixFeatureError, GatrixFeatureErrorCode, GatrixError } from '../src/errors';
+import {
+  GatrixFeatureError,
+  GatrixFeatureErrorCode,
+  GatrixError,
+} from '../src/errors';
 
 describe('GatrixError', () => {
   it('should create an error with a message', () => {
@@ -51,7 +55,11 @@ describe('GatrixFeatureError', () => {
     });
 
     it('typeMismatch', () => {
-      const error = GatrixFeatureError.typeMismatch('myFlag', 'boolean', 'string');
+      const error = GatrixFeatureError.typeMismatch(
+        'myFlag',
+        'boolean',
+        'string'
+      );
       expect(error.code).toBe(GatrixFeatureErrorCode.TYPE_MISMATCH);
       expect(error.flagName).toBe('myFlag');
       expect(error.details).toEqual({ expected: 'boolean', actual: 'string' });

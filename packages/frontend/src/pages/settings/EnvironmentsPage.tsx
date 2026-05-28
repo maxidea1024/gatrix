@@ -1255,7 +1255,11 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={handleCloseAddDialog} disabled={creating} variant="contained">
+          <Button
+            onClick={handleCloseAddDialog}
+            disabled={creating}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1408,7 +1412,11 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} disabled={deleting} variant="contained">
+          <Button
+            onClick={handleCloseDeleteDialog}
+            disabled={deleting}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1670,7 +1678,11 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={handleCloseEditDialog} disabled={updating} variant="contained">
+          <Button
+            onClick={handleCloseEditDialog}
+            disabled={updating}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button

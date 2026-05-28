@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   Box,
   Typography,
@@ -134,7 +140,9 @@ const HotTimeBuffEventPage: React.FC = () => {
     try {
       const saved = localStorage.getItem(ROWS_PER_PAGE_KEY);
       return saved ? Number(saved) : 20;
-    } catch { return 20; }
+    } catch {
+      return 20;
+    }
   });
 
   // View mode: table or calendar
@@ -206,7 +214,9 @@ const HotTimeBuffEventPage: React.FC = () => {
   const [moreEventsRows, setMoreEventsRows] = useState<RowData[]>([]);
 
   // All world buffs from planning data
-  const [allWorldBuffs, setAllWorldBuffs] = useState<Map<number, { name: string; desc: string }>>(new Map());
+  const [allWorldBuffs, setAllWorldBuffs] = useState<
+    Map<number, { name: string; desc: string }>
+  >(new Map());
 
   // Game worlds for worldId selector
   const [gameWorlds, setGameWorlds] = useState<GameWorld[]>([]);
@@ -217,15 +227,31 @@ const HotTimeBuffEventPage: React.FC = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as ColumnConfig[];
-        const merged = parsed.map((s) => DEFAULT_COLUMNS.find((d) => d.id === s.id) ? { ...DEFAULT_COLUMNS.find((d) => d.id === s.id)!, visible: s.visible } : s);
+        const merged = parsed.map((s) =>
+          DEFAULT_COLUMNS.find((d) => d.id === s.id)
+            ? {
+                ...DEFAULT_COLUMNS.find((d) => d.id === s.id)!,
+                visible: s.visible,
+              }
+            : s
+        );
         const savedIds = new Set(parsed.map((c) => c.id));
-        return [...merged, ...DEFAULT_COLUMNS.filter((d) => !savedIds.has(d.id))];
-      } catch { return DEFAULT_COLUMNS; }
+        return [
+          ...merged,
+          ...DEFAULT_COLUMNS.filter((d) => !savedIds.has(d.id)),
+        ];
+      } catch {
+        return DEFAULT_COLUMNS;
+      }
     }
     return DEFAULT_COLUMNS;
   });
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
-  const visibleColumns = useMemo(() => columns.filter((c) => c.visible), [columns]);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
+  const visibleColumns = useMemo(
+    () => columns.filter((c) => c.visible),
+    [columns]
+  );
 
   // DnD sensors for column reordering
   const sensors = useSensors(
@@ -240,7 +266,10 @@ const HotTimeBuffEventPage: React.FC = () => {
         const oldIdx = prev.findIndex((c) => c.id === active.id);
         const newIdx = prev.findIndex((c) => c.id === over.id);
         const next = arrayMove(prev, oldIdx, newIdx);
-        localStorage.setItem(COLUMN_STORAGE_KEY, JSON.stringify(next.map((c) => ({ id: c.id, visible: c.visible }))));
+        localStorage.setItem(
+          COLUMN_STORAGE_KEY,
+          JSON.stringify(next.map((c) => ({ id: c.id, visible: c.visible })))
+        );
         return next;
       });
     }
@@ -248,8 +277,13 @@ const HotTimeBuffEventPage: React.FC = () => {
 
   const toggleColumnVisibility = useCallback((id: string) => {
     setColumns((prev) => {
-      const next = prev.map((c) => c.id === id ? { ...c, visible: !c.visible } : c);
-      localStorage.setItem(COLUMN_STORAGE_KEY, JSON.stringify(next.map((c) => ({ id: c.id, visible: c.visible }))));
+      const next = prev.map((c) =>
+        c.id === id ? { ...c, visible: !c.visible } : c
+      );
+      localStorage.setItem(
+        COLUMN_STORAGE_KEY,
+        JSON.stringify(next.map((c) => ({ id: c.id, visible: c.visible })))
+      );
       return next;
     });
   }, []);
@@ -257,39 +291,45 @@ const HotTimeBuffEventPage: React.FC = () => {
   // Dynamic filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  const filterDefinitions: FilterDefinition[] = useMemo(() => [
-    {
-      key: 'status',
-      label: t('hotTimeBuffEvent.status'),
-      type: 'multiselect',
-      operator: 'any_of',
-      allowOperatorToggle: false,
-      options: [
-        { value: 'dirty', label: t('hotTimeBuffEvent.filterDirty') },
-        { value: 'saved', label: t('hotTimeBuffEvent.filterSaved') },
-        { value: 'default', label: t('hotTimeBuffEvent.filterDefault') },
-      ],
-    },
-    {
-      key: 'enabled',
-      label: t('hotTimeBuffEvent.enabled'),
-      type: 'multiselect',
-      operator: 'any_of',
-      allowOperatorToggle: false,
-      options: [
-        { value: 'enabled', label: t('hotTimeBuffEvent.filterEnabled') },
-        { value: 'disabled', label: t('hotTimeBuffEvent.filterDisabled') },
-      ],
-    },
-    {
-      key: 'world',
-      label: t('hotTimeBuffEvent.colWorld'),
-      type: 'multiselect',
-      operator: 'any_of',
-      allowOperatorToggle: false,
-      options: gameWorlds.map((w) => ({ value: w.worldId, label: w.worldId + (w.name ? ` (${w.name})` : '') })),
-    },
-  ], [t, gameWorlds]);
+  const filterDefinitions: FilterDefinition[] = useMemo(
+    () => [
+      {
+        key: 'status',
+        label: t('hotTimeBuffEvent.status'),
+        type: 'multiselect',
+        operator: 'any_of',
+        allowOperatorToggle: false,
+        options: [
+          { value: 'dirty', label: t('hotTimeBuffEvent.filterDirty') },
+          { value: 'saved', label: t('hotTimeBuffEvent.filterSaved') },
+          { value: 'default', label: t('hotTimeBuffEvent.filterDefault') },
+        ],
+      },
+      {
+        key: 'enabled',
+        label: t('hotTimeBuffEvent.enabled'),
+        type: 'multiselect',
+        operator: 'any_of',
+        allowOperatorToggle: false,
+        options: [
+          { value: 'enabled', label: t('hotTimeBuffEvent.filterEnabled') },
+          { value: 'disabled', label: t('hotTimeBuffEvent.filterDisabled') },
+        ],
+      },
+      {
+        key: 'world',
+        label: t('hotTimeBuffEvent.colWorld'),
+        type: 'multiselect',
+        operator: 'any_of',
+        allowOperatorToggle: false,
+        options: gameWorlds.map((w) => ({
+          value: w.worldId,
+          label: w.worldId + (w.name ? ` (${w.name})` : ''),
+        })),
+      },
+    ],
+    [t, gameWorlds]
+  );
 
   const handleFilterAdd = useCallback((filter: ActiveFilter) => {
     setActiveFilters((prev) => [...prev, filter]);
@@ -302,23 +342,33 @@ const HotTimeBuffEventPage: React.FC = () => {
   }, []);
 
   const handleDynamicFilterChange = useCallback((key: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => f.key === key ? { ...f, value } : f));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, value } : f))
+    );
     setPage(0);
   }, []);
 
-  const handleOperatorChange = useCallback((key: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters((prev) => prev.map((f) => f.key === key ? { ...f, operator } : f));
-    setPage(0);
-  }, []);
+  const handleOperatorChange = useCallback(
+    (key: string, operator: 'any_of' | 'include_all') => {
+      setActiveFilters((prev) =>
+        prev.map((f) => (f.key === key ? { ...f, operator } : f))
+      );
+      setPage(0);
+    },
+    []
+  );
 
   /** Format world buff label: "ID: name — desc" (truncated if long) */
-  const formatWorldBuffLabel = useCallback((id: number, info?: { name: string; desc: string } | null) => {
-    const name = info?.name || `WorldBuff #${id}`;
-    const desc = info?.desc;
-    if (!desc) return `${id}: ${name}`;
-    const truncated = desc.length > 40 ? desc.substring(0, 40) + '…' : desc;
-    return `${id}: ${name} — ${truncated}`;
-  }, []);
+  const formatWorldBuffLabel = useCallback(
+    (id: number, info?: { name: string; desc: string } | null) => {
+      const name = info?.name || `WorldBuff #${id}`;
+      const desc = info?.desc;
+      if (!desc) return `${id}: ${name}`;
+      const truncated = desc.length > 40 ? desc.substring(0, 40) + '…' : desc;
+      return `${id}: ${name} — ${truncated}`;
+    },
+    []
+  );
 
   // --------------- Data loading ---------------
   const loadData = useCallback(async () => {
@@ -370,7 +420,10 @@ const HotTimeBuffEventPage: React.FC = () => {
         for (const item of items) {
           (item.worldBuffId || []).forEach((id: number, i: number) => {
             if (!buffMap.has(id)) {
-              buffMap.set(id, { name: item.worldBuffNames?.[i] || `WorldBuff #${id}`, desc: '' });
+              buffMap.set(id, {
+                name: item.worldBuffNames?.[i] || `WorldBuff #${id}`,
+                desc: '',
+              });
             }
           });
         }
@@ -379,7 +432,8 @@ const HotTimeBuffEventPage: React.FC = () => {
 
       // Load game worlds for worldId selector
       try {
-        const worldResult = await gameWorldService.getGameWorlds(projectApiPath);
+        const worldResult =
+          await gameWorldService.getGameWorlds(projectApiPath);
         setGameWorlds(worldResult.worlds || []);
       } catch {
         // Non-fatal: world selector will be empty
@@ -423,7 +477,8 @@ const HotTimeBuffEventPage: React.FC = () => {
       const todayDayBit = 1 << new Date().getDay(); // Sun=0..Sat=6
       result = result.filter((r) => {
         const override = r.localOverride || r.savedOverride;
-        const dayOfWeek = override?.bitFlagDayOfWeekOverride ?? r.cmsItem.bitFlagDayOfWeek;
+        const dayOfWeek =
+          override?.bitFlagDayOfWeekOverride ?? r.cmsItem.bitFlagDayOfWeek;
         return (dayOfWeek & todayDayBit) !== 0;
       });
     }
@@ -435,7 +490,9 @@ const HotTimeBuffEventPage: React.FC = () => {
         (r) =>
           (r.cmsItem.name || '').toLowerCase().includes(term) ||
           String(r.cmsId).includes(term) ||
-          (r.localOverride?.worldIds || []).some(wid => wid.toLowerCase().includes(term)) ||
+          (r.localOverride?.worldIds || []).some((wid) =>
+            wid.toLowerCase().includes(term)
+          ) ||
           r.cmsItem.worldBuffNames?.some((n) => n.toLowerCase().includes(term))
       );
     }
@@ -449,7 +506,8 @@ const HotTimeBuffEventPage: React.FC = () => {
         result = result.filter((r) => {
           if (vals.has('dirty') && r.isDirty) return true;
           if (vals.has('saved') && !r.isDirty && r.savedOverride) return true;
-          if (vals.has('default') && !r.isDirty && !r.savedOverride) return true;
+          if (vals.has('default') && !r.isDirty && !r.savedOverride)
+            return true;
           return false;
         });
       } else if (filter.key === 'enabled') {
@@ -485,18 +543,24 @@ const HotTimeBuffEventPage: React.FC = () => {
   // --------------- Calendar view helpers ---------------
   const getCalendarLocale = useCallback(() => {
     switch (i18n.language) {
-      case 'en': return enLocale;
-      case 'zh': return zhLocale;
-      default: return koLocale;
+      case 'en':
+        return enLocale;
+      case 'zh':
+        return zhLocale;
+      default:
+        return koLocale;
     }
   }, [i18n.language]);
 
-  const getCalendarButtonText = useCallback(() => ({
-    today: t('hotTimeBuffEvent.calToday'),
-    month: t('hotTimeBuffEvent.calMonth'),
-    week: t('hotTimeBuffEvent.calWeek'),
-    day: t('hotTimeBuffEvent.calDay'),
-  }), [t]);
+  const getCalendarButtonText = useCallback(
+    () => ({
+      today: t('hotTimeBuffEvent.calToday'),
+      month: t('hotTimeBuffEvent.calMonth'),
+      week: t('hotTimeBuffEvent.calWeek'),
+      day: t('hotTimeBuffEvent.calDay'),
+    }),
+    [t]
+  );
 
   /** Convert filteredRows to FullCalendar events */
   const calendarEvents = useMemo(() => {
@@ -507,7 +571,8 @@ const HotTimeBuffEventPage: React.FC = () => {
       const startStr = override?.startDateOverride || row.cmsItem.startDate;
       const endStr = override?.endDateOverride || row.cmsItem.endDate;
       const isEnabled = override?.enabled !== false;
-      const dayOfWeek = override?.bitFlagDayOfWeekOverride ?? row.cmsItem.bitFlagDayOfWeek;
+      const dayOfWeek =
+        override?.bitFlagDayOfWeekOverride ?? row.cmsItem.bitFlagDayOfWeek;
       const startHour = override?.startHourOverride ?? row.cmsItem.startHour;
       const endHour = override?.endHourOverride ?? row.cmsItem.endHour;
 
@@ -608,7 +673,10 @@ const HotTimeBuffEventPage: React.FC = () => {
 
   // Current row for drawer
   const drawerRow = useMemo(
-    () => (drawerRowKey !== null ? rows.find((r) => String(r.cmsId) === drawerRowKey) : null),
+    () =>
+      drawerRowKey !== null
+        ? rows.find((r) => String(r.cmsId) === drawerRowKey)
+        : null,
     [rows, drawerRowKey]
   );
 
@@ -621,12 +689,9 @@ const HotTimeBuffEventPage: React.FC = () => {
   }, [drawerRow, drawerDraft]);
 
   // --------------- Drawer field handlers ---------------
-  const updateDraft = useCallback(
-    (field: string, value: any) => {
-      setDrawerDraft((prev) => (prev ? { ...prev, [field]: value } : prev));
-    },
-    []
-  );
+  const updateDraft = useCallback((field: string, value: any) => {
+    setDrawerDraft((prev) => (prev ? { ...prev, [field]: value } : prev));
+  }, []);
 
   const toggleDraftDayBit = useCallback(
     (bit: number) => {
@@ -766,7 +831,9 @@ const HotTimeBuffEventPage: React.FC = () => {
       await Promise.all(promises);
 
       enqueueSnackbar(
-        t('hotTimeBuffEvent.applySuccess', { count: toUpsert.length + toDelete.length }),
+        t('hotTimeBuffEvent.applySuccess', {
+          count: toUpsert.length + toDelete.length,
+        }),
         { variant: 'success' }
       );
       await loadData();
@@ -782,10 +849,7 @@ const HotTimeBuffEventPage: React.FC = () => {
     // resetTarget is just the cmsId
     const cmsId = Number(resetTarget);
     try {
-      await operationEventService.deleteHottimeOverride(
-        projectApiPath,
-        cmsId
-      );
+      await operationEventService.deleteHottimeOverride(projectApiPath, cmsId);
       enqueueSnackbar(t('hotTimeBuffEvent.resetSuccess'), {
         variant: 'success',
       });
@@ -841,15 +905,25 @@ const HotTimeBuffEventPage: React.FC = () => {
                   width: col.width,
                   fontWeight: 600,
                   ...(col.id === 'edit' ? { px: 0.5 } : {}),
-                  ...(col.id === 'name' || col.id === 'worldBuffs' ? { minWidth: col.id === 'name' ? 180 : 140 } : {}),
+                  ...(col.id === 'name' || col.id === 'worldBuffs'
+                    ? { minWidth: col.id === 'name' ? 180 : 140 }
+                    : {}),
                 }}
-                align={col.id === 'edit' || col.id === 'enabled' || col.id === 'liveStatus' ? 'center' : 'left'}
+                align={
+                  col.id === 'edit' ||
+                  col.id === 'enabled' ||
+                  col.id === 'liveStatus'
+                    ? 'center'
+                    : 'left'
+                }
               >
                 {col.id === 'edit' ? (
                   <Tooltip title={t('hotTimeBuffEvent.override')}>
                     <span>✎</span>
                   </Tooltip>
-                ) : t(col.label)}
+                ) : (
+                  t(col.label)
+                )}
               </TableCell>
             ))}
           </TableRow>
@@ -858,8 +932,7 @@ const HotTimeBuffEventPage: React.FC = () => {
           {paginatedRows.map((row, idx) => {
             const override = row.localOverride || row.savedOverride;
             const cms = row.cmsItem;
-            const eStartDate =
-              override?.startDateOverride || cms.startDate;
+            const eStartDate = override?.startDateOverride || cms.startDate;
             const eEndDate = override?.endDateOverride || cms.endDate;
             const eStartHour = override?.startHourOverride ?? cms.startHour;
             const eEndHour = override?.endHourOverride ?? cms.endHour;
@@ -882,7 +955,9 @@ const HotTimeBuffEventPage: React.FC = () => {
                       sx={{ height: 20, minWidth: 32, fontSize: '0.7rem' }}
                     />
                   ) : (
-                    <Typography variant="body2" color="text.disabled">—</Typography>
+                    <Typography variant="body2" color="text.disabled">
+                      —
+                    </Typography>
                   );
                 case 'cmsId':
                   return (
@@ -894,7 +969,11 @@ const HotTimeBuffEventPage: React.FC = () => {
                   const wids = (override || row.savedOverride)?.worldIds;
                   if (!wids || wids.length === 0) {
                     return (
-                      <Typography variant="body2" color="text.disabled" fontSize="0.75rem">
+                      <Typography
+                        variant="body2"
+                        color="text.disabled"
+                        fontSize="0.75rem"
+                      >
                         {t('hotTimeBuffEvent.global')}
                       </Typography>
                     );
@@ -947,27 +1026,33 @@ const HotTimeBuffEventPage: React.FC = () => {
                     const todayStr = now.toISOString().substring(0, 10);
                     const sd = eStartDate ? eStartDate.substring(0, 10) : null;
                     const ed = eEndDate ? eEndDate.substring(0, 10) : null;
-                    const inDate = (!sd || todayStr >= sd) && (!ed || todayStr <= ed);
+                    const inDate =
+                      (!sd || todayStr >= sd) && (!ed || todayStr <= ed);
                     const inDay = (eDayOfWeek & (1 << now.getDay())) !== 0;
-                    const inHour = eStartHour <= now.getHours() && now.getHours() < eEndHour;
+                    const inHour =
+                      eStartHour <= now.getHours() && now.getHours() < eEndHour;
                     isLive = inDate && inDay && inHour;
                   }
                   return (
                     <Chip
-                      label={eEnabled
-                        ? t('hotTimeBuffEvent.statusActive')
-                        : t('hotTimeBuffEvent.statusInactive')}
+                      label={
+                        eEnabled
+                          ? t('hotTimeBuffEvent.statusActive')
+                          : t('hotTimeBuffEvent.statusInactive')
+                      }
                       size="small"
                       color={eEnabled ? 'success' : 'default'}
                       variant={eEnabled ? 'filled' : 'outlined'}
                       sx={{
                         height: 22,
                         fontSize: '0.75rem',
-                        ...(eEnabled && !isLive ? {
-                          bgcolor: 'rgba(46,125,50,0.25)',
-                          color: 'success.light',
-                          '& .MuiChip-label': { fontWeight: 500 },
-                        } : {}),
+                        ...(eEnabled && !isLive
+                          ? {
+                              bgcolor: 'rgba(46,125,50,0.25)',
+                              color: 'success.light',
+                              '& .MuiChip-label': { fontWeight: 500 },
+                            }
+                          : {}),
                       }}
                     />
                   );
@@ -983,11 +1068,16 @@ const HotTimeBuffEventPage: React.FC = () => {
                     const todayStr = now.toISOString().substring(0, 10);
                     const currentHour = now.getHours();
                     const todayDayBit = 1 << now.getDay();
-                    const startDate = eStartDate ? eStartDate.substring(0, 10) : null;
+                    const startDate = eStartDate
+                      ? eStartDate.substring(0, 10)
+                      : null;
                     const endDate = eEndDate ? eEndDate.substring(0, 10) : null;
-                    const inDateRange = (!startDate || todayStr >= startDate) && (!endDate || todayStr <= endDate);
+                    const inDateRange =
+                      (!startDate || todayStr >= startDate) &&
+                      (!endDate || todayStr <= endDate);
                     const inDayOfWeek = (eDayOfWeek & todayDayBit) !== 0;
-                    const inHourRange = eStartHour <= currentHour && currentHour < eEndHour;
+                    const inHourRange =
+                      eStartHour <= currentHour && currentHour < eEndHour;
                     if (!inDateRange) {
                       liveReason = t('hotTimeBuffEvent.liveOutOfDate');
                     } else if (!inDayOfWeek) {
@@ -1000,7 +1090,11 @@ const HotTimeBuffEventPage: React.FC = () => {
                   }
                   return (
                     <Chip
-                      label={liveActive ? t('hotTimeBuffEvent.liveActive') : liveReason}
+                      label={
+                        liveActive
+                          ? t('hotTimeBuffEvent.liveActive')
+                          : liveReason
+                      }
                       size="small"
                       color={liveActive ? 'success' : 'default'}
                       sx={{ height: 22, fontSize: '0.7rem' }}
@@ -1028,7 +1122,8 @@ const HotTimeBuffEventPage: React.FC = () => {
                 case 'level':
                   return (
                     <Typography variant="body2" fontSize="0.8rem">
-                      {override?.minLvOverride ?? cms.minLv}~{override?.maxLvOverride ?? cms.maxLv}
+                      {override?.minLvOverride ?? cms.minLv}~
+                      {override?.maxLvOverride ?? cms.maxLv}
                     </Typography>
                   );
                 case 'dayOfWeek':
@@ -1038,29 +1133,43 @@ const HotTimeBuffEventPage: React.FC = () => {
                     </Typography>
                   );
                 case 'worldBuffs': {
-                  const activeIds: number[] = override?.worldBuffIdOverride || cms.worldBuffId || [];
+                  const activeIds: number[] =
+                    override?.worldBuffIdOverride || cms.worldBuffId || [];
                   const allIds: number[] = cms.worldBuffId || [];
                   const mergedIds = [...new Set([...allIds, ...activeIds])];
                   const cmsBuffIds = cms.worldBuffId || [];
-                  const overrideIds = override?.worldBuffIdOverride || cmsBuffIds;
+                  const overrideIds =
+                    override?.worldBuffIdOverride || cmsBuffIds;
                   const cmsTotal = cmsBuffIds.length;
-                  const cmsActive = overrideIds.filter((id) => cmsBuffIds.includes(id)).length;
-                  const extraActive = overrideIds.filter((id) => !cmsBuffIds.includes(id)).length;
+                  const cmsActive = overrideIds.filter((id) =>
+                    cmsBuffIds.includes(id)
+                  ).length;
+                  const extraActive = overrideIds.filter(
+                    (id) => !cmsBuffIds.includes(id)
+                  ).length;
                   return (
                     <Tooltip
                       title={
                         <Box sx={{ maxWidth: 520, overflow: 'hidden' }}>
-                          <Table size="small" sx={{
-                            tableLayout: 'fixed',
-                            width: '100%',
-                            '& td, & th': {
-                              border: '1px solid rgba(255,255,255,0.15)',
-                              px: 0.8, py: 0.4, fontSize: '0.72rem', color: 'inherit',
-                            },
-                            '& th': {
-                              fontWeight: 700, bgcolor: 'rgba(255,255,255,0.08)', whiteSpace: 'nowrap',
-                            },
-                          }}>
+                          <Table
+                            size="small"
+                            sx={{
+                              tableLayout: 'fixed',
+                              width: '100%',
+                              '& td, & th': {
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                px: 0.8,
+                                py: 0.4,
+                                fontSize: '0.72rem',
+                                color: 'inherit',
+                              },
+                              '& th': {
+                                fontWeight: 700,
+                                bgcolor: 'rgba(255,255,255,0.08)',
+                                whiteSpace: 'nowrap',
+                              },
+                            }}
+                          >
                             <colgroup>
                               <col style={{ width: 28 }} />
                               <col style={{ width: 36 }} />
@@ -1070,11 +1179,20 @@ const HotTimeBuffEventPage: React.FC = () => {
                             </colgroup>
                             <TableHead>
                               <TableRow>
-                                <TableCell component="th" align="center"></TableCell>
-                                <TableCell component="th">{t('hotTimeBuffEvent.buffSource')}</TableCell>
+                                <TableCell
+                                  component="th"
+                                  align="center"
+                                ></TableCell>
+                                <TableCell component="th">
+                                  {t('hotTimeBuffEvent.buffSource')}
+                                </TableCell>
                                 <TableCell component="th">ID</TableCell>
-                                <TableCell component="th">{t('hotTimeBuffEvent.buffName')}</TableCell>
-                                <TableCell component="th">{t('hotTimeBuffEvent.buffDesc')}</TableCell>
+                                <TableCell component="th">
+                                  {t('hotTimeBuffEvent.buffName')}
+                                </TableCell>
+                                <TableCell component="th">
+                                  {t('hotTimeBuffEvent.buffDesc')}
+                                </TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -1082,21 +1200,65 @@ const HotTimeBuffEventPage: React.FC = () => {
                                 const isActive = activeIds.includes(id);
                                 const isCms = cmsBuffIds.includes(id);
                                 const info = allWorldBuffs.get(id);
-                                const wbIdx = cms.worldBuffId?.indexOf(id) ?? -1;
-                                const name = info?.name || (wbIdx >= 0 ? cms.worldBuffNames?.[wbIdx] : null) || `#${id}`;
+                                const wbIdx =
+                                  cms.worldBuffId?.indexOf(id) ?? -1;
+                                const name =
+                                  info?.name ||
+                                  (wbIdx >= 0
+                                    ? cms.worldBuffNames?.[wbIdx]
+                                    : null) ||
+                                  `#${id}`;
                                 const desc = info?.desc || '';
-                                const truncDesc = desc.length > 30 ? desc.substring(0, 30) + '…' : desc;
+                                const truncDesc =
+                                  desc.length > 30
+                                    ? desc.substring(0, 30) + '…'
+                                    : desc;
                                 return (
-                                  <TableRow key={id} sx={{ opacity: isActive ? 1 : 0.45 }}>
-                                    <TableCell align="center" sx={{ fontSize: '0.8rem' }}>
+                                  <TableRow
+                                    key={id}
+                                    sx={{ opacity: isActive ? 1 : 0.45 }}
+                                  >
+                                    <TableCell
+                                      align="center"
+                                      sx={{ fontSize: '0.8rem' }}
+                                    >
                                       {isActive ? '✅' : '⬜'}
                                     </TableCell>
-                                    <TableCell sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}>
-                                      {isCms ? 'CMS' : t('hotTimeBuffEvent.buffAdded')}
+                                    <TableCell
+                                      sx={{
+                                        fontSize: '0.65rem',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
+                                      {isCms
+                                        ? 'CMS'
+                                        : t('hotTimeBuffEvent.buffAdded')}
                                     </TableCell>
-                                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{id}</TableCell>
-                                    <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    <TableCell
+                                      sx={{
+                                        fontFamily: 'monospace',
+                                        fontSize: '0.7rem',
+                                      }}
+                                    >
+                                      {id}
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
+                                      {name}
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        color: 'rgba(255,255,255,0.65)',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
                                       {truncDesc || '—'}
                                     </TableCell>
                                   </TableRow>
@@ -1112,14 +1274,19 @@ const HotTimeBuffEventPage: React.FC = () => {
                         tooltip: {
                           sx: {
                             bgcolor: 'grey.900',
-                            border: '1px solid', borderColor: 'grey.700',
-                            borderRadius: 1.5, p: 0.5, maxWidth: 540,
+                            border: '1px solid',
+                            borderColor: 'grey.700',
+                            borderRadius: 1.5,
+                            p: 0.5,
+                            maxWidth: 540,
                           },
                         },
                         arrow: { sx: { color: 'grey.900' } },
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
                         <Chip
                           label={`${cmsActive}/${cmsTotal}`}
                           size="small"
@@ -1132,7 +1299,11 @@ const HotTimeBuffEventPage: React.FC = () => {
                             size="small"
                             color="info"
                             variant="filled"
-                            sx={{ height: 20, fontSize: '0.65rem', '& .MuiChip-label': { px: 0.5 } }}
+                            sx={{
+                              height: 20,
+                              fontSize: '0.65rem',
+                              '& .MuiChip-label': { px: 0.5 },
+                            }}
                           />
                         )}
                       </Box>
@@ -1164,7 +1335,13 @@ const HotTimeBuffEventPage: React.FC = () => {
                 {visibleColumns.map((col) => (
                   <TableCell
                     key={col.id}
-                    align={col.id === 'edit' || col.id === 'enabled' || col.id === 'liveStatus' ? 'center' : 'left'}
+                    align={
+                      col.id === 'edit' ||
+                      col.id === 'enabled' ||
+                      col.id === 'liveStatus'
+                        ? 'center'
+                        : 'left'
+                    }
                   >
                     {renderCell(col.id)}
                   </TableCell>
@@ -1229,11 +1406,24 @@ const HotTimeBuffEventPage: React.FC = () => {
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           >
             <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1,
+                }}
+              >
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                   {t('users.columnSettings')}
                 </Typography>
-                <Button size="small" onClick={() => { setColumns(DEFAULT_COLUMNS); localStorage.removeItem(COLUMN_STORAGE_KEY); }}>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setColumns(DEFAULT_COLUMNS);
+                    localStorage.removeItem(COLUMN_STORAGE_KEY);
+                  }}
+                >
                   {t('common.reset')}
                 </Button>
               </Box>
@@ -1273,7 +1463,9 @@ const HotTimeBuffEventPage: React.FC = () => {
                 border: 1,
                 borderColor: showOnlyInPeriod ? 'primary.main' : 'divider',
                 borderRadius: 1,
-                color: showOnlyInPeriod ? 'primary.contrastText' : 'action.active',
+                color: showOnlyInPeriod
+                  ? 'primary.contrastText'
+                  : 'action.active',
                 '&:hover': {
                   bgcolor: showOnlyInPeriod ? 'primary.dark' : 'action.hover',
                 },
@@ -1289,13 +1481,19 @@ const HotTimeBuffEventPage: React.FC = () => {
               onClick={() => handleToggleDayFilter(!showOnlyMatchingDay)}
               size="small"
               sx={{
-                bgcolor: showOnlyMatchingDay ? 'primary.main' : 'background.paper',
+                bgcolor: showOnlyMatchingDay
+                  ? 'primary.main'
+                  : 'background.paper',
                 border: 1,
                 borderColor: showOnlyMatchingDay ? 'primary.main' : 'divider',
                 borderRadius: 1,
-                color: showOnlyMatchingDay ? 'primary.contrastText' : 'action.active',
+                color: showOnlyMatchingDay
+                  ? 'primary.contrastText'
+                  : 'action.active',
                 '&:hover': {
-                  bgcolor: showOnlyMatchingDay ? 'primary.dark' : 'action.hover',
+                  bgcolor: showOnlyMatchingDay
+                    ? 'primary.dark'
+                    : 'action.hover',
                 },
               }}
             >
@@ -1306,22 +1504,40 @@ const HotTimeBuffEventPage: React.FC = () => {
           <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
           {/* View mode toggle: table ↔ calendar */}
-          <Tooltip title={viewMode === 'table' ? t('hotTimeBuffEvent.calendarView') : t('hotTimeBuffEvent.tableView')}>
+          <Tooltip
+            title={
+              viewMode === 'table'
+                ? t('hotTimeBuffEvent.calendarView')
+                : t('hotTimeBuffEvent.tableView')
+            }
+          >
             <IconButton
-              onClick={() => handleSetViewMode(viewMode === 'table' ? 'calendar' : 'table')}
+              onClick={() =>
+                handleSetViewMode(viewMode === 'table' ? 'calendar' : 'table')
+              }
               size="small"
               sx={{
-                bgcolor: viewMode === 'calendar' ? 'primary.main' : 'background.paper',
+                bgcolor:
+                  viewMode === 'calendar' ? 'primary.main' : 'background.paper',
                 border: 1,
-                borderColor: viewMode === 'calendar' ? 'primary.main' : 'divider',
+                borderColor:
+                  viewMode === 'calendar' ? 'primary.main' : 'divider',
                 borderRadius: 1,
-                color: viewMode === 'calendar' ? 'primary.contrastText' : 'action.active',
+                color:
+                  viewMode === 'calendar'
+                    ? 'primary.contrastText'
+                    : 'action.active',
                 '&:hover': {
-                  bgcolor: viewMode === 'calendar' ? 'primary.dark' : 'action.hover',
+                  bgcolor:
+                    viewMode === 'calendar' ? 'primary.dark' : 'action.hover',
                 },
               }}
             >
-              {viewMode === 'table' ? <CalendarMonthIcon fontSize="small" /> : <TableChartIcon fontSize="small" />}
+              {viewMode === 'table' ? (
+                <CalendarMonthIcon fontSize="small" />
+              ) : (
+                <TableChartIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
 
@@ -1341,7 +1557,13 @@ const HotTimeBuffEventPage: React.FC = () => {
                 textField: {
                   size: 'small',
                   sx: { width: 160, ml: 0.5 },
-                  inputProps: { style: { paddingTop: 6, paddingBottom: 6, fontSize: '0.8rem' } },
+                  inputProps: {
+                    style: {
+                      paddingTop: 6,
+                      paddingBottom: 6,
+                      fontSize: '0.8rem',
+                    },
+                  },
                 },
               }}
             />
@@ -1390,9 +1612,7 @@ const HotTimeBuffEventPage: React.FC = () => {
           filteredRows.length === 0 && !loading ? (
             <EmptyPagePlaceholder
               message={
-                searchTerm
-                  ? t('common.noSearchResults')
-                  : t('common.noData')
+                searchTerm ? t('common.noSearchResults') : t('common.noData')
               }
             />
           ) : (
@@ -1418,7 +1638,14 @@ const HotTimeBuffEventPage: React.FC = () => {
         ) : (
           // --- Calendar View ---
           <Card variant="outlined" sx={{ overflow: 'visible' }}>
-            <CardContent sx={{ p: 2, overflow: 'hidden', '& .fc-event': { cursor: 'pointer' }, '& .fc-more-link': { cursor: 'pointer' } }}>
+            <CardContent
+              sx={{
+                p: 2,
+                overflow: 'hidden',
+                '& .fc-event': { cursor: 'pointer' },
+                '& .fc-more-link': { cursor: 'pointer' },
+              }}
+            >
               <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, interactionPlugin]}
@@ -1435,19 +1662,27 @@ const HotTimeBuffEventPage: React.FC = () => {
                 dayMaxEvents={4}
                 eventDisplay="block"
                 eventContent={(arg) => {
-                  const row = arg.event.extendedProps.row as RowData | undefined;
+                  const row = arg.event.extendedProps.row as
+                    | RowData
+                    | undefined;
                   if (!row) return { domNodes: [] };
                   const cms = row.cmsItem;
                   const ovr = row.localOverride || row.savedOverride;
-                  const evStartDate = formatDateShort(ovr?.startDateOverride || cms.startDate);
-                  const evEndDate = formatDateShort(ovr?.endDateOverride || cms.endDate);
+                  const evStartDate = formatDateShort(
+                    ovr?.startDateOverride || cms.startDate
+                  );
+                  const evEndDate = formatDateShort(
+                    ovr?.endDateOverride || cms.endDate
+                  );
                   const evStartHour = ovr?.startHourOverride ?? cms.startHour;
                   const evEndHour = ovr?.endHourOverride ?? cms.endHour;
-                  const evDayOfWeek = ovr?.bitFlagDayOfWeekOverride ?? cms.bitFlagDayOfWeek;
+                  const evDayOfWeek =
+                    ovr?.bitFlagDayOfWeekOverride ?? cms.bitFlagDayOfWeek;
                   const evIsEnabled = ovr?.enabled !== false;
                   const minLv = ovr?.minLvOverride ?? cms.minLv;
                   const maxLv = ovr?.maxLvOverride ?? cms.maxLv;
-                  const activeIds: number[] = ovr?.worldBuffIdOverride ?? cms.worldBuffId ?? [];
+                  const activeIds: number[] =
+                    ovr?.worldBuffIdOverride ?? cms.worldBuffId ?? [];
                   return (
                     <Tooltip
                       arrow
@@ -1457,38 +1692,82 @@ const HotTimeBuffEventPage: React.FC = () => {
                         tooltip: {
                           sx: {
                             bgcolor: 'grey.900',
-                            border: '1px solid', borderColor: 'grey.700',
-                            borderRadius: 1.5, p: 1, maxWidth: 460,
+                            border: '1px solid',
+                            borderColor: 'grey.700',
+                            borderRadius: 1.5,
+                            p: 1,
+                            maxWidth: 460,
                           },
                         },
                       }}
                       title={
                         <Box>
-                          <Typography variant="caption" fontWeight={700} sx={{ display: 'block', mb: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            fontWeight={700}
+                            sx={{ display: 'block', mb: 0.5 }}
+                          >
                             {cms.name || `HotTimeBuff #${row.cmsId}`}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: 'grey.400' }}>
-                            {evStartDate} ~ {evEndDate} | {evStartHour}~{evEndHour}h | Lv {minLv}~{maxLv}
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'grey.400' }}
+                          >
+                            {evStartDate} ~ {evEndDate} | {evStartHour}~
+                            {evEndHour}h | Lv {minLv}~{maxLv}
                           </Typography>
-                          <Typography variant="caption" sx={{ display: 'block', color: 'grey.400' }}>
-                            {t('hotTimeBuffEvent.dayOfWeek')}: {formatDayOfWeek(evDayOfWeek, t)} | {evIsEnabled ? t('hotTimeBuffEvent.liveActive') : t('hotTimeBuffEvent.liveDisabled')}
+                          <Typography
+                            variant="caption"
+                            sx={{ display: 'block', color: 'grey.400' }}
+                          >
+                            {t('hotTimeBuffEvent.dayOfWeek')}:{' '}
+                            {formatDayOfWeek(evDayOfWeek, t)} |{' '}
+                            {evIsEnabled
+                              ? t('hotTimeBuffEvent.liveActive')
+                              : t('hotTimeBuffEvent.liveDisabled')}
                           </Typography>
                           {activeIds.length > 0 && (
-                            <Box sx={{ mt: 0.5, borderTop: '1px solid', borderColor: 'grey.700', pt: 0.5 }}>
-                              <Typography variant="caption" sx={{ color: 'grey.400', fontWeight: 600 }}>
-                                {t('hotTimeBuffEvent.worldBuffList')} ({activeIds.length})
+                            <Box
+                              sx={{
+                                mt: 0.5,
+                                borderTop: '1px solid',
+                                borderColor: 'grey.700',
+                                pt: 0.5,
+                              }}
+                            >
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'grey.400', fontWeight: 600 }}
+                              >
+                                {t('hotTimeBuffEvent.worldBuffList')} (
+                                {activeIds.length})
                               </Typography>
                               {activeIds.slice(0, 5).map((id) => {
                                 const info = allWorldBuffs.get(id);
                                 return (
-                                  <Typography key={id} variant="caption" sx={{ display: 'block', color: 'grey.300', fontSize: '0.65rem' }}>
+                                  <Typography
+                                    key={id}
+                                    variant="caption"
+                                    sx={{
+                                      display: 'block',
+                                      color: 'grey.300',
+                                      fontSize: '0.65rem',
+                                    }}
+                                  >
                                     #{id} {info?.name || ''}
                                   </Typography>
                                 );
                               })}
                               {activeIds.length > 5 && (
-                                <Typography variant="caption" sx={{ color: 'grey.500', fontSize: '0.65rem' }}>
-                                  +{activeIds.length - 5} {t('hotTimeBuffEvent.more')}
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: 'grey.500',
+                                    fontSize: '0.65rem',
+                                  }}
+                                >
+                                  +{activeIds.length - 5}{' '}
+                                  {t('hotTimeBuffEvent.more')}
                                 </Typography>
                               )}
                             </Box>
@@ -1496,15 +1775,17 @@ const HotTimeBuffEventPage: React.FC = () => {
                         </Box>
                       }
                     >
-                      <Box sx={{
-                        px: 0.5,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        fontSize: '0.7rem',
-                        lineHeight: 1.6,
-                        cursor: 'pointer',
-                      }}>
+                      <Box
+                        sx={{
+                          px: 0.5,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          fontSize: '0.7rem',
+                          lineHeight: 1.6,
+                          cursor: 'pointer',
+                        }}
+                      >
                         {arg.event.title}
                       </Box>
                     </Tooltip>
@@ -1522,11 +1803,15 @@ const HotTimeBuffEventPage: React.FC = () => {
                 nowIndicator={true}
                 datesSet={(info) => {
                   const d = info.view.currentStart;
-                  setCalendarMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+                  setCalendarMonth(
+                    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+                  );
                 }}
                 moreLinkClick={(info) => {
                   const dateStr = info.date.toISOString().substring(0, 10);
-                  const dayRows = info.allSegs.map((seg: any) => seg.event.extendedProps.row as RowData).filter(Boolean);
+                  const dayRows = info.allSegs
+                    .map((seg: any) => seg.event.extendedProps.row as RowData)
+                    .filter(Boolean);
                   setMoreEventsDate(dateStr);
                   setMoreEventsRows(dayRows);
                   setMoreEventsOpen(true);
@@ -1536,7 +1821,9 @@ const HotTimeBuffEventPage: React.FC = () => {
               {filteredRows.length === 0 && !loading && (
                 <Box sx={{ py: 4, textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary">
-                    {searchTerm ? t('common.noSearchResults') : t('common.noData')}
+                    {searchTerm
+                      ? t('common.noSearchResults')
+                      : t('common.noData')}
                   </Typography>
                 </Box>
               )}
@@ -1552,34 +1839,146 @@ const HotTimeBuffEventPage: React.FC = () => {
           fullWidth
         >
           <DialogTitle sx={{ pb: 1 }}>
-            {moreEventsDate} — {moreEventsRows.length} {t('hotTimeBuffEvent.events')}
+            {moreEventsDate} — {moreEventsRows.length}{' '}
+            {t('hotTimeBuffEvent.events')}
           </DialogTitle>
           <DialogContent sx={{ px: 2, pb: 1 }}>
-            <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1, maxHeight: 480 }}>
-              <Table size="small" stickyHeader sx={{ '& td, & th': { borderRight: 1, borderColor: 'divider', '&:last-child': { borderRight: 0 } } }}>
+            <TableContainer
+              sx={{
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                maxHeight: 480,
+              }}
+            >
+              <Table
+                size="small"
+                stickyHeader
+                sx={{
+                  '& td, & th': {
+                    borderRight: 1,
+                    borderColor: 'divider',
+                    '&:last-child': { borderRight: 0 },
+                  },
+                }}
+              >
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', width: 75, whiteSpace: 'nowrap', bgcolor: 'background.paper' }}>ID</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', minWidth: 140, bgcolor: 'background.paper' }}>{t('hotTimeBuffEvent.buffName')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', whiteSpace: 'nowrap', width: 95, bgcolor: 'background.paper' }}>{t('hotTimeBuffEvent.startDate')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', whiteSpace: 'nowrap', width: 95, bgcolor: 'background.paper' }}>{t('hotTimeBuffEvent.endDate')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', whiteSpace: 'nowrap', width: 65, bgcolor: 'background.paper' }}>{t('hotTimeBuffEvent.hours')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', whiteSpace: 'nowrap', width: 60, bgcolor: 'background.paper' }}>Lv</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', whiteSpace: 'nowrap', width: 60, bgcolor: 'background.paper' }}>{t('hotTimeBuffEvent.dayOfWeek')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', minWidth: 100, bgcolor: 'background.paper' }}>{t('hotTimeBuffEvent.worldBuffs')}</TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        width: 75,
+                        whiteSpace: 'nowrap',
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      ID
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        minWidth: 140,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      {t('hotTimeBuffEvent.buffName')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        whiteSpace: 'nowrap',
+                        width: 95,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      {t('hotTimeBuffEvent.startDate')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        whiteSpace: 'nowrap',
+                        width: 95,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      {t('hotTimeBuffEvent.endDate')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        whiteSpace: 'nowrap',
+                        width: 65,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      {t('hotTimeBuffEvent.hours')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        whiteSpace: 'nowrap',
+                        width: 60,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      Lv
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        whiteSpace: 'nowrap',
+                        width: 60,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      {t('hotTimeBuffEvent.dayOfWeek')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                        minWidth: 100,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      {t('hotTimeBuffEvent.worldBuffs')}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {moreEventsRows.map((row) => {
                     const cms = row.cmsItem;
                     const override = row.localOverride || row.savedOverride;
-                    const startD = (override?.startDateOverride || cms.startDate)?.substring(0, 10) || '—';
-                    const endD = (override?.endDateOverride || cms.endDate)?.substring(0, 10) || '—';
+                    const startD =
+                      (override?.startDateOverride || cms.startDate)?.substring(
+                        0,
+                        10
+                      ) || '—';
+                    const endD =
+                      (override?.endDateOverride || cms.endDate)?.substring(
+                        0,
+                        10
+                      ) || '—';
                     const sH = override?.startHourOverride ?? cms.startHour;
                     const eH = override?.endHourOverride ?? cms.endHour;
-                    const dayBits = override?.bitFlagDayOfWeekOverride ?? cms.bitFlagDayOfWeek;
-                    const dayStr = dayBits === 127 ? t('hotTimeBuffEvent.dayAll')
-                      : DAY_BITS.filter((d) => dayBits & (1 << d.bit)).map((d) => t(`hotTimeBuffEvent.${d.key}`).charAt(0)).join('');
+                    const dayBits =
+                      override?.bitFlagDayOfWeekOverride ??
+                      cms.bitFlagDayOfWeek;
+                    const dayStr =
+                      dayBits === 127
+                        ? t('hotTimeBuffEvent.dayAll')
+                        : DAY_BITS.filter((d) => dayBits & (1 << d.bit))
+                            .map((d) =>
+                              t(`hotTimeBuffEvent.${d.key}`).charAt(0)
+                            )
+                            .join('');
                     return (
                       <TableRow
                         key={row.cmsId}
@@ -1590,28 +1989,72 @@ const HotTimeBuffEventPage: React.FC = () => {
                           openDrawer(row);
                         }}
                       >
-                        <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{row.cmsId}</TableCell>
-                        <TableCell sx={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <TableCell
+                          sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}
+                        >
+                          {row.cmsId}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            maxWidth: 180,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           <Tooltip title={cms.name || ''} placement="top">
-                            <Typography variant="body2" noWrap sx={{ fontSize: '0.75rem' }}>
+                            <Typography
+                              variant="body2"
+                              noWrap
+                              sx={{ fontSize: '0.75rem' }}
+                            >
                               {cms.name || `HotTimeBuff #${row.cmsId}`}
                             </Typography>
                           </Tooltip>
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{startD}</TableCell>
-                        <TableCell sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{endD}</TableCell>
-                        <TableCell sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
+                        <TableCell
+                          sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                        >
+                          {startD}
+                        </TableCell>
+                        <TableCell
+                          sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                        >
+                          {endD}
+                        </TableCell>
+                        <TableCell
+                          sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                        >
                           {sH}~{eH}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
+                        <TableCell
+                          sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                        >
                           {cms.minLv}–{cms.maxLv}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
+                        <TableCell
+                          sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                        >
                           {dayStr}
                         </TableCell>
-                        <TableCell sx={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'text.secondary' }}>
-                          <Tooltip title={cms.worldBuffNames?.join(', ') || '—'} placement="top">
-                            <Typography variant="body2" noWrap sx={{ fontSize: '0.7rem' }}>
+                        <TableCell
+                          sx={{
+                            maxWidth: 140,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            color: 'text.secondary',
+                          }}
+                        >
+                          <Tooltip
+                            title={cms.worldBuffNames?.join(', ') || '—'}
+                            placement="top"
+                          >
+                            <Typography
+                              variant="body2"
+                              noWrap
+                              sx={{ fontSize: '0.7rem' }}
+                            >
                               {cms.worldBuffNames?.join(', ') || '—'}
                             </Typography>
                           </Tooltip>
@@ -1624,7 +2067,9 @@ const HotTimeBuffEventPage: React.FC = () => {
             </TableContainer>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setMoreEventsOpen(false)}>{t('common.close')}</Button>
+            <Button onClick={() => setMoreEventsOpen(false)}>
+              {t('common.close')}
+            </Button>
           </DialogActions>
         </Dialog>
 
@@ -1680,7 +2125,10 @@ const HotTimeBuffEventPage: React.FC = () => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setApplyConfirmOpen(false)} variant="contained">
+            <Button
+              onClick={() => setApplyConfirmOpen(false)}
+              variant="contained"
+            >
               {t('common.cancel')}
             </Button>
             <Button variant="text" onClick={handleApply} autoFocus>
@@ -1701,7 +2149,10 @@ const HotTimeBuffEventPage: React.FC = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setResetConfirmOpen(false)} variant="contained">
+            <Button
+              onClick={() => setResetConfirmOpen(false)}
+              variant="contained"
+            >
               {t('common.cancel')}
             </Button>
             <Button

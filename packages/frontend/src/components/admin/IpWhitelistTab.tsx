@@ -837,7 +837,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setAddDialog(false);
               setEditDialog(false);
@@ -908,7 +909,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           <Typography>{confirmDialog.message}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() =>
               setConfirmDialog((prev) => ({ ...prev, open: false }))
             }

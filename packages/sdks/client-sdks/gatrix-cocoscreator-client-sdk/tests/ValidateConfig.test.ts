@@ -15,15 +15,21 @@ describe('validateConfig', () => {
 
   describe('required fields', () => {
     it('should throw if apiUrl is missing', () => {
-      expect(() => validateConfig({ ...validConfig, apiUrl: '' })).toThrow(GatrixError);
+      expect(() => validateConfig({ ...validConfig, apiUrl: '' })).toThrow(
+        GatrixError
+      );
     });
 
     it('should throw if apiToken is missing', () => {
-      expect(() => validateConfig({ ...validConfig, apiToken: '' })).toThrow(GatrixError);
+      expect(() => validateConfig({ ...validConfig, apiToken: '' })).toThrow(
+        GatrixError
+      );
     });
 
     it('should throw if appName is missing', () => {
-      expect(() => validateConfig({ ...validConfig, appName: '' })).toThrow(GatrixError);
+      expect(() => validateConfig({ ...validConfig, appName: '' })).toThrow(
+        GatrixError
+      );
     });
   });
 
@@ -65,7 +71,10 @@ describe('validateConfig', () => {
 
     it('should reject refreshInterval > 86400', () => {
       expect(() =>
-        validateConfig({ ...validConfig, features: { refreshInterval: 100000 } })
+        validateConfig({
+          ...validConfig,
+          features: { refreshInterval: 100000 },
+        })
       ).toThrow(GatrixError);
     });
 

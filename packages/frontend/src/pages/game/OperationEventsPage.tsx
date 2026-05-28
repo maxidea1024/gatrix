@@ -15,9 +15,7 @@ import SegmentedTabs, {
 } from '@/components/common/SegmentedTabs';
 
 // Lazy-load the actual page contents
-const HotTimeBuffEventPage = React.lazy(
-  () => import('./HotTimeBuffEventPage')
-);
+const HotTimeBuffEventPage = React.lazy(() => import('./HotTimeBuffEventPage'));
 const LiveEventPage = React.lazy(() => import('./LiveEventPage'));
 
 interface TabConfig {

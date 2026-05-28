@@ -445,7 +445,9 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">
+          {t('common.cancel')}
+        </Button>
         <Button
           variant="contained"
           onClick={handleSelect}

@@ -459,7 +459,8 @@ const SurveysPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('users.columnSettings')}>
-                  <IconButton size="small"
+                  <IconButton
+                    size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',

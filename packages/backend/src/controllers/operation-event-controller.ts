@@ -154,9 +154,7 @@ export class OperationEventController {
             .first();
 
           if (existing) {
-            await trx(TABLE)
-              .where({ id: existing.id })
-              .update(data);
+            await trx(TABLE).where({ id: existing.id }).update(data);
           } else {
             await trx(TABLE).insert({ id: ulid(), ...data });
           }
@@ -232,9 +230,7 @@ export class OperationEventController {
 
       const userEmail = req.user?.email || req.user?.name || 'unknown';
 
-      const deleted = await db(TABLE)
-        .where({ environmentId, cmsId })
-        .del();
+      const deleted = await db(TABLE).where({ environmentId, cmsId }).del();
 
       // Publish SDK event (override=null signals removal)
       await pubSubService.publishEvent(

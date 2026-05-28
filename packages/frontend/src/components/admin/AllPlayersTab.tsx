@@ -1244,7 +1244,8 @@ export default function AllPlayersTab({
 
         {/* Column settings button */}
         <Tooltip title={t('common.columnSettings')}>
-          <IconButton size="small"
+          <IconButton
+            size="small"
             onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
             sx={{
               bgcolor: 'background.paper',

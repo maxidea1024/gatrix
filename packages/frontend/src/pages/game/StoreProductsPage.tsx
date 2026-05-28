@@ -1035,7 +1035,8 @@ const StoreProductsPage: React.FC = () => {
                   }}
                 >
                   <Tooltip title={t('common.columnSettings')}>
-                    <IconButton size="small"
+                    <IconButton
+                      size="small"
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
                         bgcolor: 'background.paper',
@@ -1939,7 +1940,8 @@ const StoreProductsPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setResetOverrideConfirmOpen(false);
               setResetOverrideProduct(null);

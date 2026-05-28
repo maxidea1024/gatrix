@@ -1724,7 +1724,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setShowApplyDialog(false);
               // If no plan exists, go back to the original view

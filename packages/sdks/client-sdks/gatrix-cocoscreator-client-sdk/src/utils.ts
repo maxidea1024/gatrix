@@ -84,7 +84,9 @@ export function computeEtag(flags: any[], contextHash: string): string {
     '|' +
     sortedFlags
       .map((f) => {
-        const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+        const variantPart = f.variant
+          ? `${f.variant.name}:${f.variant.enabled}`
+          : 'no-variant';
         return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
       })
       .join('|');

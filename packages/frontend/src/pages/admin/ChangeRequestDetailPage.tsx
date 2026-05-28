@@ -1184,7 +1184,8 @@ const ChangeRequestDetailPage: React.FC = () => {
                         justifyContent: 'flex-end',
                       }}
                     >
-                      <Button variant="contained"
+                      <Button
+                        variant="contained"
                         onClick={() => setShowSubmitForm(false)}
                         disabled={actionLoading}
                       >

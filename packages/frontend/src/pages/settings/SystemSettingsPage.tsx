@@ -10,7 +10,6 @@ import {
   Stack,
   TextField,
   MenuItem,
-
   Button,
   Switch,
   FormControlLabel,
@@ -55,7 +54,15 @@ const SystemSettingsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const TAB_KEYS = ['network', 'kv', 'ai', 'data', 'integrations', 'sdks', 'console'] as const;
+  const TAB_KEYS = [
+    'network',
+    'kv',
+    'ai',
+    'data',
+    'integrations',
+    'sdks',
+    'console',
+  ] as const;
   type TabKey = (typeof TAB_KEYS)[number];
   const tabFromUrl = searchParams.get('tab') as TabKey | null;
   const [tab, setTab] = useState<TabKey>(
@@ -206,11 +213,12 @@ const SystemSettingsPage: React.FC = () => {
         }
       />
 
-      <Card sx={{
-        ...(['network', 'ai'].includes(tab) ? { maxWidth: 720 } : {}),
-      }}>
+      <Card
+        sx={{
+          ...(['network', 'ai'].includes(tab) ? { maxWidth: 720 } : {}),
+        }}
+      >
         <CardContent>
-
           {tab === 'network' && (
             <>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

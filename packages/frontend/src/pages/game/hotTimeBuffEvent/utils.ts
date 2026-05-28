@@ -2,7 +2,10 @@ import { HotTimeBuffOverride } from '@/services/operationEventService';
 import { DAY_BITS } from './types';
 
 /** Format bitFlagDayOfWeek into comma-separated day names */
-export function formatDayOfWeek(bitFlag: number, t: (k: string) => string): string {
+export function formatDayOfWeek(
+  bitFlag: number,
+  t: (k: string) => string
+): string {
   if (bitFlag === 127) return t('hotTimeBuffEvent.dayAll');
   return DAY_BITS.filter((d) => bitFlag & (1 << d.bit))
     .map((d) => t(`hotTimeBuffEvent.${d.key}`))
@@ -16,7 +19,9 @@ export function formatDateShort(dateStr: string | undefined | null): string {
 }
 
 /** Normalize worldIds: null and [] are both "global" */
-export function normalizeWorldIds(ids: string[] | null | undefined): string | null {
+export function normalizeWorldIds(
+  ids: string[] | null | undefined
+): string | null {
   if (!ids || ids.length === 0) return null;
   return JSON.stringify([...ids].sort());
 }

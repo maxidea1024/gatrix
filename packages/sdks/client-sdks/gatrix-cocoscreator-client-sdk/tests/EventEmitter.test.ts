@@ -143,7 +143,9 @@ describe('EventEmitter', () => {
   describe('error handling', () => {
     it('should not throw if listener throws', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      emitter.on('test', () => { throw new Error('boom'); });
+      emitter.on('test', () => {
+        throw new Error('boom');
+      });
       expect(() => emitter.emit('test')).not.toThrow();
       consoleSpy.mockRestore();
     });

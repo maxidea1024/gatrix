@@ -830,7 +830,11 @@ const SchedulerPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
             <Box sx={{ flexGrow: 1 }} />
 
-            <Button onClick={() => setDialogOpen(false)} disabled={saving} variant="contained">
+            <Button
+              onClick={() => setDialogOpen(false)}
+              disabled={saving}
+              variant="contained"
+            >
               {t('common.cancel')}
             </Button>
 

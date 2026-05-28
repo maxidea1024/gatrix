@@ -233,25 +233,14 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           justifyContent="space-between"
         >
           <Box>
-            <Typography
-              variant="h6"
-              fontWeight="600"
-              gutterBottom
-            >
+            <Typography variant="h6" fontWeight="600" gutterBottom>
               {t('mailbox.compose')}
             </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-            >
+            <Typography variant="body2" color="text.secondary">
               {t('mailbox.composeSubtitle')}
             </Typography>
           </Box>
-          <IconButton
-            onClick={handleClose}
-            size="small"
-            sx={{ mt: -0.5 }}
-          >
+          <IconButton onClick={handleClose} size="small" sx={{ mt: -0.5 }}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -604,10 +593,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           gap: 1,
         }}
       >
-        <Button variant="contained"
-          onClick={handleClose}
-          disabled={sending}
-        >
+        <Button variant="contained" onClick={handleClose} disabled={sending}>
           {t('common.cancel')}
         </Button>
         <Button

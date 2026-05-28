@@ -868,7 +868,10 @@ const WorkspacePage: React.FC<WorkspacePageProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setCreateDrawerOpen(false)} variant="contained">
+          <Button
+            onClick={() => setCreateDrawerOpen(false)}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button

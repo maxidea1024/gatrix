@@ -2150,7 +2150,8 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('common.columnSettings')}>
-              <IconButton size="small"
+              <IconButton
+                size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   ml: 1,
@@ -2449,7 +2450,8 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           >
             {t('apiTokens.copyToken')}
           </Button>
-          <Button variant="text"
+          <Button
+            variant="text"
             onClick={() => {
               setViewTokenDialogOpen(false);
               setViewTokenValue('');
@@ -2711,7 +2713,10 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained" onClick={() => setCreateDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setCreateDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -3050,7 +3055,10 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained" onClick={() => setDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -3167,7 +3175,9 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeRegenerateDialog} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={closeRegenerateDialog} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleRegenerate}
             color="primary"

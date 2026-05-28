@@ -58,11 +58,13 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({
     discoverableByName: true,
     requireFriendRequest: false,
   });
-  const [savedSettings, setSavedSettings] = useState<PrivacySettingsData | null>(null);
+  const [savedSettings, setSavedSettings] =
+    useState<PrivacySettingsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const isDirty = savedSettings !== null &&
+  const isDirty =
+    savedSettings !== null &&
     JSON.stringify(settings) !== JSON.stringify(savedSettings);
 
   // 현재 Load settings

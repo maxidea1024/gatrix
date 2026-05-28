@@ -81,7 +81,9 @@ export class EventEmitter {
     if (!callback) {
       delete this.events[event];
     } else {
-      this.events[event] = this.events[event].filter((l) => l.callback !== callback);
+      this.events[event] = this.events[event].filter(
+        (l) => l.callback !== callback
+      );
     }
     return this;
   }
@@ -108,7 +110,9 @@ export class EventEmitter {
     if (!callback) {
       this.anyListeners = [];
     } else {
-      this.anyListeners = this.anyListeners.filter((l) => l.callback !== callback);
+      this.anyListeners = this.anyListeners.filter(
+        (l) => l.callback !== callback
+      );
     }
     return this;
   }

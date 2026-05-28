@@ -877,7 +877,11 @@ const MediaAssetsPage: React.FC = () => {
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setDeleteTarget(null)} disabled={deleting} variant="contained">
+              <Button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                variant="contained"
+              >
                 {t('common.cancel')}
               </Button>
               <Button
@@ -913,7 +917,8 @@ const MediaAssetsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => setBulkDeleteOpen(false)}
             disabled={bulkDeleting}
           >

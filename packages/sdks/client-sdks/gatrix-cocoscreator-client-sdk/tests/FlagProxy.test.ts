@@ -1,21 +1,39 @@
 import { FlagProxy } from '../src/flag-proxy';
 import { VariationProvider } from '../src/variation-provider';
-import { EvaluatedFlag, Variant, ValueType, VariationResult } from '../src/types';
+import {
+  EvaluatedFlag,
+  Variant,
+  ValueType,
+  VariationResult,
+} from '../src/types';
 
-function createMockProvider(flags: Map<string, EvaluatedFlag>): VariationProvider {
+function createMockProvider(
+  flags: Map<string, EvaluatedFlag>
+): VariationProvider {
   const lookup = (name: string) => flags.get(name);
 
   return {
-    isEnabledInternal: jest.fn((name: string) => lookup(name)?.enabled ?? false),
-    getVariantInternal: jest.fn((name: string) => lookup(name)?.variant ?? { name: '$missing', enabled: false }),
+    isEnabledInternal: jest.fn(
+      (name: string) => lookup(name)?.enabled ?? false
+    ),
+    getVariantInternal: jest.fn(
+      (name: string) =>
+        lookup(name)?.variant ?? { name: '$missing', enabled: false }
+    ),
     hasFlagInternal: jest.fn((name: string) => flags.has(name)),
-    getValueTypeInternal: jest.fn((name: string) => lookup(name)?.valueType ?? 'none'),
+    getValueTypeInternal: jest.fn(
+      (name: string) => lookup(name)?.valueType ?? 'none'
+    ),
     getVersionInternal: jest.fn((name: string) => lookup(name)?.version ?? 0),
     getReasonInternal: jest.fn((name: string) => lookup(name)?.reason),
-    getImpressionDataInternal: jest.fn((name: string) => lookup(name)?.impressionData ?? false),
+    getImpressionDataInternal: jest.fn(
+      (name: string) => lookup(name)?.impressionData ?? false
+    ),
     getRawFlagInternal: jest.fn((name: string) => lookup(name)),
 
-    variationInternal: jest.fn((name: string, fb: string) => lookup(name)?.variant.name ?? fb),
+    variationInternal: jest.fn(
+      (name: string, fb: string) => lookup(name)?.variant.name ?? fb
+    ),
     boolVariationInternal: jest.fn((name: string, fb: boolean) => {
       const f = lookup(name);
       if (!f || f.valueType !== 'boolean') return fb;
@@ -37,10 +55,30 @@ function createMockProvider(flags: Map<string, EvaluatedFlag>): VariationProvide
       return f.variant.value;
     }),
 
-    boolVariationDetailsInternal: jest.fn((name: string, fb: boolean) => ({ value: fb, reason: 'test', flagExists: flags.has(name), enabled: false })),
-    stringVariationDetailsInternal: jest.fn((name: string, fb: string) => ({ value: fb, reason: 'test', flagExists: flags.has(name), enabled: false })),
-    numberVariationDetailsInternal: jest.fn((name: string, fb: number) => ({ value: fb, reason: 'test', flagExists: flags.has(name), enabled: false })),
-    jsonVariationDetailsInternal: jest.fn((name: string, fb: any) => ({ value: fb, reason: 'test', flagExists: flags.has(name), enabled: false })),
+    boolVariationDetailsInternal: jest.fn((name: string, fb: boolean) => ({
+      value: fb,
+      reason: 'test',
+      flagExists: flags.has(name),
+      enabled: false,
+    })),
+    stringVariationDetailsInternal: jest.fn((name: string, fb: string) => ({
+      value: fb,
+      reason: 'test',
+      flagExists: flags.has(name),
+      enabled: false,
+    })),
+    numberVariationDetailsInternal: jest.fn((name: string, fb: number) => ({
+      value: fb,
+      reason: 'test',
+      flagExists: flags.has(name),
+      enabled: false,
+    })),
+    jsonVariationDetailsInternal: jest.fn((name: string, fb: any) => ({
+      value: fb,
+      reason: 'test',
+      flagExists: flags.has(name),
+      enabled: false,
+    })),
 
     boolVariationOrThrowInternal: jest.fn((name: string) => {
       const f = lookup(name);
@@ -119,13 +157,19 @@ describe('FlagProxy', () => {
     it('should delegate enabled to provider', () => {
       const proxy = new FlagProxy(provider, 'test-flag');
       expect(proxy.enabled).toBe(true);
-      expect(provider.isEnabledInternal).toHaveBeenCalledWith('test-flag', true);
+      expect(provider.isEnabledInternal).toHaveBeenCalledWith(
+        'test-flag',
+        true
+      );
     });
 
     it('should delegate variant to provider', () => {
       const proxy = new FlagProxy(provider, 'test-flag');
       const variant = proxy.variant;
-      expect(provider.getVariantInternal).toHaveBeenCalledWith('test-flag', true);
+      expect(provider.getVariantInternal).toHaveBeenCalledWith(
+        'test-flag',
+        true
+      );
     });
 
     it('should delegate valueType to provider', () => {
@@ -149,33 +193,53 @@ describe('FlagProxy', () => {
     it('should delegate variation', () => {
       const proxy = new FlagProxy(provider, 'test-flag');
       proxy.variation('fallback');
-      expect(provider.variationInternal).toHaveBeenCalledWith('test-flag', 'fallback', true);
+      expect(provider.variationInternal).toHaveBeenCalledWith(
+        'test-flag',
+        'fallback',
+        true
+      );
     });
 
     it('should delegate boolVariation', () => {
       const proxy = new FlagProxy(provider, 'bool-flag');
       const result = proxy.boolVariation(false);
-      expect(provider.boolVariationInternal).toHaveBeenCalledWith('bool-flag', false, true);
+      expect(provider.boolVariationInternal).toHaveBeenCalledWith(
+        'bool-flag',
+        false,
+        true
+      );
       expect(result).toBe(true);
     });
 
     it('should delegate stringVariation', () => {
       const proxy = new FlagProxy(provider, 'test-flag');
       const result = proxy.stringVariation('default');
-      expect(provider.stringVariationInternal).toHaveBeenCalledWith('test-flag', 'default', true);
+      expect(provider.stringVariationInternal).toHaveBeenCalledWith(
+        'test-flag',
+        'default',
+        true
+      );
       expect(result).toBe('hello');
     });
 
     it('should delegate numberVariation', () => {
       const proxy = new FlagProxy(provider, 'test-flag');
       proxy.numberVariation(0);
-      expect(provider.numberVariationInternal).toHaveBeenCalledWith('test-flag', 0, true);
+      expect(provider.numberVariationInternal).toHaveBeenCalledWith(
+        'test-flag',
+        0,
+        true
+      );
     });
 
     it('should delegate jsonVariation', () => {
       const proxy = new FlagProxy(provider, 'test-flag');
       proxy.jsonVariation({});
-      expect(provider.jsonVariationInternal).toHaveBeenCalledWith('test-flag', {}, true);
+      expect(provider.jsonVariationInternal).toHaveBeenCalledWith(
+        'test-flag',
+        {},
+        true
+      );
     });
   });
 
@@ -183,7 +247,10 @@ describe('FlagProxy', () => {
     it('should delegate boolVariationOrThrow', () => {
       const proxy = new FlagProxy(provider, 'bool-flag');
       proxy.boolVariationOrThrow();
-      expect(provider.boolVariationOrThrowInternal).toHaveBeenCalledWith('bool-flag', true);
+      expect(provider.boolVariationOrThrowInternal).toHaveBeenCalledWith(
+        'bool-flag',
+        true
+      );
     });
 
     it('should throw for non-existent flags', () => {

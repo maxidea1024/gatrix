@@ -26,7 +26,10 @@ export class WatchFlagGroup {
    * Watch a flag for realtime changes and add to this group.
    * Returns this group for chaining.
    */
-  watchRealtimeFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): this {
+  watchRealtimeFlag(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>
+  ): this {
     const unsubscribe = this.client.watchRealtimeFlag(flagName, callback);
     this.unsubscribers.push(unsubscribe);
     return this;
@@ -40,7 +43,10 @@ export class WatchFlagGroup {
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): this {
-    const unsubscribe = this.client.watchRealtimeFlagWithInitialState(flagName, callback);
+    const unsubscribe = this.client.watchRealtimeFlagWithInitialState(
+      flagName,
+      callback
+    );
     this.unsubscribers.push(unsubscribe);
     return this;
   }
@@ -49,7 +55,10 @@ export class WatchFlagGroup {
    * Watch a flag for synced changes and add to this group.
    * Returns this group for chaining.
    */
-  watchSyncedFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): this {
+  watchSyncedFlag(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>
+  ): this {
     const unsubscribe = this.client.watchSyncedFlag(flagName, callback);
     this.unsubscribers.push(unsubscribe);
     return this;
@@ -63,7 +72,10 @@ export class WatchFlagGroup {
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): this {
-    const unsubscribe = this.client.watchSyncedFlagWithInitialState(flagName, callback);
+    const unsubscribe = this.client.watchSyncedFlagWithInitialState(
+      flagName,
+      callback
+    );
     this.unsubscribers.push(unsubscribe);
     return this;
   }

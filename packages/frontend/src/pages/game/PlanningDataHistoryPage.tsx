@@ -1102,7 +1102,8 @@ const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setShowResetDialog(false);
               setResetConfirmText('');

@@ -116,7 +116,9 @@ export class ConnectedUsersCacheService {
    * Query the cache with search / sort / pagination.
    * Returns null if the cache has never been populated (caller should fallback).
    */
-  getUsers(params: ConnectedUsersQueryParams): ConnectedUsersQueryResult | null {
+  getUsers(
+    params: ConnectedUsersQueryParams
+  ): ConnectedUsersQueryResult | null {
     if (!this.isWarmedUp) return null;
 
     const page = Math.max(1, params.page ?? 1);
@@ -173,7 +175,10 @@ export class ConnectedUsersCacheService {
    * Return the full cached snapshot (for export).
    * Callers receive the same array reference — do NOT mutate.
    */
-  getSnapshot(): { users: CachedConnectedUser[]; cachedAt: string | null } | null {
+  getSnapshot(): {
+    users: CachedConnectedUser[];
+    cachedAt: string | null;
+  } | null {
     if (!this.isWarmedUp) return null;
     return { users: this.cachedUsers, cachedAt: this.cachedAt };
   }

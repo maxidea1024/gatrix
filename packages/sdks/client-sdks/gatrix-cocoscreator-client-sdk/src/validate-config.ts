@@ -30,12 +30,22 @@ export function validateConfig(config: GatrixClientConfig): void {
   if (feat) {
     // refreshInterval: positive number, in seconds
     if (feat.refreshInterval !== undefined) {
-      validatePositiveNumber(feat.refreshInterval, 'features.refreshInterval', 1, 86400);
+      validatePositiveNumber(
+        feat.refreshInterval,
+        'features.refreshInterval',
+        1,
+        86400
+      );
     }
 
     // metricsInterval: positive number, in seconds
     if (feat.metricsInterval !== undefined) {
-      validatePositiveNumber(feat.metricsInterval, 'features.metricsInterval', 1, 86400);
+      validatePositiveNumber(
+        feat.metricsInterval,
+        'features.metricsInterval',
+        1,
+        86400
+      );
     }
 
     // metricsIntervalInitial: non-negative number, in seconds
@@ -50,7 +60,12 @@ export function validateConfig(config: GatrixClientConfig): void {
 
     // cacheTtlSeconds: non-negative number
     if (feat.cacheTtlSeconds !== undefined) {
-      validatePositiveNumber(feat.cacheTtlSeconds, 'features.cacheTtlSeconds', 0, 2592000); // max 30 days
+      validatePositiveNumber(
+        feat.cacheTtlSeconds,
+        'features.cacheTtlSeconds',
+        0,
+        2592000
+      ); // max 30 days
     }
 
     // fetchRetryOptions
@@ -58,7 +73,12 @@ export function validateConfig(config: GatrixClientConfig): void {
       const retry = feat.fetchRetryOptions;
 
       if (retry.timeout !== undefined) {
-        validatePositiveNumber(retry.timeout, 'features.fetchRetryOptions.timeout', 1000, 120000);
+        validatePositiveNumber(
+          retry.timeout,
+          'features.fetchRetryOptions.timeout',
+          1000,
+          120000
+        );
       }
 
       if (retry.initialBackoff !== undefined) {
@@ -71,7 +91,12 @@ export function validateConfig(config: GatrixClientConfig): void {
       }
 
       if (retry.maxBackoff !== undefined) {
-        validatePositiveNumber(retry.maxBackoff, 'features.fetchRetryOptions.maxBackoff', 1, 600);
+        validatePositiveNumber(
+          retry.maxBackoff,
+          'features.fetchRetryOptions.maxBackoff',
+          1,
+          600
+        );
       }
 
       if (
@@ -115,8 +140,13 @@ export function validateConfig(config: GatrixClientConfig): void {
 
     // WebSocket config
     if (streaming.websocket) {
-      if (streaming.websocket.url !== undefined && !isValidUrl(streaming.websocket.url)) {
-        throw new GatrixError('Invalid config: streaming.websocket.url must be a valid URL');
+      if (
+        streaming.websocket.url !== undefined &&
+        !isValidUrl(streaming.websocket.url)
+      ) {
+        throw new GatrixError(
+          'Invalid config: streaming.websocket.url must be a valid URL'
+        );
       }
       if (streaming.websocket.reconnectBase !== undefined) {
         validatePositiveNumber(
@@ -160,13 +190,18 @@ export function validateConfig(config: GatrixClientConfig): void {
       throw new GatrixError('Invalid config: cacheKeyPrefix must be a string');
     }
     if (config.features.cacheKeyPrefix.length > 100) {
-      throw new GatrixError('Invalid config: cacheKeyPrefix must be <= 100 characters');
+      throw new GatrixError(
+        'Invalid config: cacheKeyPrefix must be <= 100 characters'
+      );
     }
   }
 
   // customHeaders: must be Record<string, string>
   if (config.customHeaders !== undefined) {
-    if (typeof config.customHeaders !== 'object' || config.customHeaders === null) {
+    if (
+      typeof config.customHeaders !== 'object' ||
+      config.customHeaders === null
+    ) {
       throw new GatrixError('Invalid config: customHeaders must be an object');
     }
     for (const [key, value] of Object.entries(config.customHeaders)) {
@@ -189,13 +224,22 @@ function validateRequiredString(value: unknown, fieldName: string): void {
     throw new GatrixError(`${fieldName} must be a string, got ${typeof value}`);
   }
   if (value.trim() !== value) {
-    throw new GatrixError(`${fieldName} must not have leading or trailing whitespace`);
+    throw new GatrixError(
+      `${fieldName} must not have leading or trailing whitespace`
+    );
   }
 }
 
-function validatePositiveNumber(value: unknown, fieldName: string, min: number, max: number): void {
+function validatePositiveNumber(
+  value: unknown,
+  fieldName: string,
+  min: number,
+  max: number
+): void {
   if (typeof value !== 'number' || isNaN(value)) {
-    throw new GatrixError(`Invalid config: ${fieldName} must be a number, got ${typeof value}`);
+    throw new GatrixError(
+      `Invalid config: ${fieldName} must be a number, got ${typeof value}`
+    );
   }
   if (value < min || value > max) {
     throw new GatrixError(

@@ -39,7 +39,9 @@ export interface HotTimeBuffDrawerProps {
   gameWorlds: GameWorld[];
   allWorldBuffs: Map<number, { name: string; desc: string }>;
   updateDraft: (field: string, value: any) => void;
-  setDrawerDraft: React.Dispatch<React.SetStateAction<HotTimeBuffOverride | null>>;
+  setDrawerDraft: React.Dispatch<
+    React.SetStateAction<HotTimeBuffOverride | null>
+  >;
   setDrawerExtraBuffIds?: React.Dispatch<React.SetStateAction<number[]>>;
   toggleDraftDayBit: (bit: number) => void;
   toggleDraftWorldBuff: (id: number) => void;
@@ -48,7 +50,10 @@ export interface HotTimeBuffDrawerProps {
   resetDrawerDraft?: () => void;
   commitDrawerDraft: () => void;
   closeDrawer: () => void;
-  formatWorldBuffLabel: (id: number, info?: { name: string; desc: string } | null) => string;
+  formatWorldBuffLabel: (
+    id: number,
+    info?: { name: string; desc: string } | null
+  ) => string;
 }
 
 const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
@@ -80,11 +85,19 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
   const dayBits = draft.bitFlagDayOfWeekOverride ?? cms.bitFlagDayOfWeek;
   const activeWorldBuffIds = draft.worldBuffIdOverride || cms.worldBuffId || [];
   const cmsBuffIds = cms.worldBuffId || [];
-  const savedExtraIds = (drawerRow.savedOverride?.worldBuffIdOverride || [])
-    .filter((id) => !cmsBuffIds.includes(id));
-  const localExtraIds = (draft.worldBuffIdOverride || [])
-    .filter((id) => !cmsBuffIds.includes(id));
-  const extraBuffIds = [...new Set([...savedExtraIds, ...localExtraIds, ...(drawerExtraBuffIds || [])])];
+  const savedExtraIds = (
+    drawerRow.savedOverride?.worldBuffIdOverride || []
+  ).filter((id) => !cmsBuffIds.includes(id));
+  const localExtraIds = (draft.worldBuffIdOverride || []).filter(
+    (id) => !cmsBuffIds.includes(id)
+  );
+  const extraBuffIds = [
+    ...new Set([
+      ...savedExtraIds,
+      ...localExtraIds,
+      ...(drawerExtraBuffIds || []),
+    ]),
+  ];
 
   const hasOverrideValues =
     draft.enabled === false ||
@@ -164,7 +177,11 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
         {/* World selector */}
         {gameWorlds.length > 0 && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ mb: 0.5 }}
+            >
               {t('hotTimeBuffEvent.colWorld')}
             </Typography>
             <FormControlLabel
@@ -175,7 +192,10 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
                     if (checked) {
                       updateDraft('worldIds', null);
                     } else {
-                      updateDraft('worldIds', draft.worldIds?.length ? [...draft.worldIds] : []);
+                      updateDraft(
+                        'worldIds',
+                        draft.worldIds?.length ? [...draft.worldIds] : []
+                      );
                     }
                   }}
                   disabled={!canManage}
@@ -190,11 +210,20 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
               sx={{ mb: 0.5 }}
             />
             {Array.isArray(draft.worldIds) && (
-              <Box sx={{
-                display: 'flex', flexWrap: 'wrap', gap: 0, pl: 1,
-                maxHeight: 200, overflowY: 'auto',
-                border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1,
-              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 0,
+                  pl: 1,
+                  maxHeight: 200,
+                  overflowY: 'auto',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  p: 1,
+                }}
+              >
                 {gameWorlds.map((w) => (
                   <FormControlLabel
                     key={w.worldId}
@@ -214,7 +243,8 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
                     }
                     label={
                       <Typography variant="body2" fontSize="0.8rem">
-                        {w.worldId}{w.name ? ` (${w.name})` : ''}
+                        {w.worldId}
+                        {w.name ? ` (${w.name})` : ''}
                       </Typography>
                     }
                     sx={{ minWidth: '45%', mr: 0 }}
@@ -245,7 +275,9 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
             label={t('hotTimeBuffEvent.startDate')}
             type="date"
             value={draft.startDateOverride?.substring(0, 10) || ''}
-            onChange={(e) => updateDraft('startDateOverride', e.target.value || null)}
+            onChange={(e) =>
+              updateDraft('startDateOverride', e.target.value || null)
+            }
             size="small"
             fullWidth
             disabled={!canManage}
@@ -255,7 +287,9 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
             label={t('hotTimeBuffEvent.endDate')}
             type="date"
             value={draft.endDateOverride?.substring(0, 10) || ''}
-            onChange={(e) => updateDraft('endDateOverride', e.target.value || null)}
+            onChange={(e) =>
+              updateDraft('endDateOverride', e.target.value || null)
+            }
             size="small"
             fullWidth
             disabled={!canManage}
@@ -264,17 +298,31 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
         </Box>
         <Box sx={{ mb: 2, px: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            {t('hotTimeBuffEvent.startHour')} ~ {t('hotTimeBuffEvent.endHour')}: {draft.startHourOverride ?? cms.startHour} ~ {draft.endHourOverride ?? cms.endHour}{t('hotTimeBuffEvent.hourUnit')}
+            {t('hotTimeBuffEvent.startHour')} ~ {t('hotTimeBuffEvent.endHour')}:{' '}
+            {draft.startHourOverride ?? cms.startHour} ~{' '}
+            {draft.endHourOverride ?? cms.endHour}
+            {t('hotTimeBuffEvent.hourUnit')}
           </Typography>
           <Slider
-            value={[draft.startHourOverride ?? cms.startHour, draft.endHourOverride ?? cms.endHour]}
+            value={[
+              draft.startHourOverride ?? cms.startHour,
+              draft.endHourOverride ?? cms.endHour,
+            ]}
             onChange={(_, val) => {
               const [s, e] = val as number[];
               updateDraft('startHourOverride', s);
               updateDraft('endHourOverride', e);
             }}
-            min={0} max={24} step={1}
-            marks={[{ value: 0, label: '0' }, { value: 6, label: '6' }, { value: 12, label: '12' }, { value: 18, label: '18' }, { value: 24, label: '24' }]}
+            min={0}
+            max={24}
+            step={1}
+            marks={[
+              { value: 0, label: '0' },
+              { value: 6, label: '6' },
+              { value: 12, label: '12' },
+              { value: 18, label: '18' },
+              { value: 24, label: '24' },
+            ]}
             valueLabelDisplay="auto"
             disabled={!canManage}
             size="small"
@@ -282,17 +330,30 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
         </Box>
         <Box sx={{ mb: 2, px: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            {t('hotTimeBuffEvent.minLv')} ~ {t('hotTimeBuffEvent.maxLv')}: {draft.minLvOverride ?? cms.minLv} ~ {draft.maxLvOverride ?? cms.maxLv}
+            {t('hotTimeBuffEvent.minLv')} ~ {t('hotTimeBuffEvent.maxLv')}:{' '}
+            {draft.minLvOverride ?? cms.minLv} ~{' '}
+            {draft.maxLvOverride ?? cms.maxLv}
           </Typography>
           <Slider
-            value={[draft.minLvOverride ?? cms.minLv ?? 1, draft.maxLvOverride ?? cms.maxLv ?? 200]}
+            value={[
+              draft.minLvOverride ?? cms.minLv ?? 1,
+              draft.maxLvOverride ?? cms.maxLv ?? 200,
+            ]}
             onChange={(_, val) => {
               const [min, max] = val as number[];
               updateDraft('minLvOverride', min);
               updateDraft('maxLvOverride', max);
             }}
-            min={1} max={200} step={1}
-            marks={[{ value: 1, label: '1' }, { value: 50, label: '50' }, { value: 100, label: '100' }, { value: 150, label: '150' }, { value: 200, label: '200' }]}
+            min={1}
+            max={200}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 50, label: '50' },
+              { value: 100, label: '100' },
+              { value: 150, label: '150' },
+              { value: 200, label: '200' },
+            ]}
             valueLabelDisplay="auto"
             disabled={!canManage}
             size="small"
@@ -325,30 +386,60 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
         <Divider sx={{ my: 2 }} />
 
         {/* World buff checkboxes */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1,
+          }}
+        >
           <Typography variant="subtitle2" color="text.secondary">
-            {t('hotTimeBuffEvent.worldBuffList')} (CMS: {cms.worldBuffId?.length || 0}{extraBuffIds.length > 0 ? ` + ${t('hotTimeBuffEvent.buffAdded')}: ${extraBuffIds.length}` : ''})
+            {t('hotTimeBuffEvent.worldBuffList')} (CMS:{' '}
+            {cms.worldBuffId?.length || 0}
+            {extraBuffIds.length > 0
+              ? ` + ${t('hotTimeBuffEvent.buffAdded')}: ${extraBuffIds.length}`
+              : ''}
+            )
           </Typography>
           {canManage && (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Button size="small" variant="text" onClick={selectAllWorldBuffs}>
                 {t('hotTimeBuffEvent.selectAll')}
               </Button>
-              <Button size="small" variant="text" onClick={deselectAllWorldBuffs}>
+              <Button
+                size="small"
+                variant="text"
+                onClick={deselectAllWorldBuffs}
+              >
                 {t('hotTimeBuffEvent.deselectAll')}
               </Button>
             </Box>
           )}
         </Box>
-        <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+        <TableContainer
+          sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}
+        >
           <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox" sx={{ width: 42 }} />
-                <TableCell sx={{ width: 56, fontWeight: 600, fontSize: '0.75rem' }}>{t('hotTimeBuffEvent.buffSource')}</TableCell>
-                <TableCell sx={{ width: 90, fontWeight: 600, fontSize: '0.75rem' }}>ID</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>{t('hotTimeBuffEvent.buffName')}</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>{t('hotTimeBuffEvent.buffDesc')}</TableCell>
+                <TableCell
+                  sx={{ width: 56, fontWeight: 600, fontSize: '0.75rem' }}
+                >
+                  {t('hotTimeBuffEvent.buffSource')}
+                </TableCell>
+                <TableCell
+                  sx={{ width: 90, fontWeight: 600, fontSize: '0.75rem' }}
+                >
+                  ID
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                  {t('hotTimeBuffEvent.buffName')}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                  {t('hotTimeBuffEvent.buffDesc')}
+                </TableCell>
                 {canManage && extraBuffIds.length > 0 && (
                   <TableCell sx={{ width: 40 }} />
                 )}
@@ -358,25 +449,73 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
               {(cms.worldBuffId || []).map((wbId, i) => {
                 const checked = activeWorldBuffIds.includes(wbId);
                 const buffInfo = allWorldBuffs.get(wbId);
-                const name = buffInfo?.name || cms.worldBuffNames?.[i] || `WorldBuff #${wbId}`;
+                const name =
+                  buffInfo?.name ||
+                  cms.worldBuffNames?.[i] ||
+                  `WorldBuff #${wbId}`;
                 const desc = buffInfo?.desc || '';
                 return (
                   <TableRow key={wbId} sx={{ opacity: checked ? 1 : 0.5 }}>
                     <TableCell padding="checkbox">
-                      <Checkbox size="small" checked={checked} onChange={() => toggleDraftWorldBuff(wbId)} disabled={!canManage} />
+                      <Checkbox
+                        size="small"
+                        checked={checked}
+                        onChange={() => toggleDraftWorldBuff(wbId)}
+                        disabled={!canManage}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Chip label="CMS" size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
+                      <Chip
+                        label="CMS"
+                        size="small"
+                        variant="outlined"
+                        sx={{ height: 20, fontSize: '0.65rem' }}
+                      />
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>{wbId}</TableCell>
-                    <TableCell sx={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {wbId}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        maxWidth: 160,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       <Tooltip title={name} placement="top">
-                        <Typography variant="body2" noWrap sx={{ fontSize: '0.8rem' }}>{name}</Typography>
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{ fontSize: '0.8rem' }}
+                        >
+                          {name}
+                        </Typography>
                       </Tooltip>
                     </TableCell>
-                    <TableCell sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'text.secondary' }}>
+                    <TableCell
+                      sx={{
+                        maxWidth: 240,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        color: 'text.secondary',
+                      }}
+                    >
                       <Tooltip title={desc || '—'} placement="top">
-                        <Typography variant="body2" noWrap sx={{ fontSize: '0.75rem' }}>{desc || '—'}</Typography>
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{ fontSize: '0.75rem' }}
+                        >
+                          {desc || '—'}
+                        </Typography>
                       </Tooltip>
                     </TableCell>
                     {canManage && extraBuffIds.length > 0 && <TableCell />}
@@ -389,27 +528,80 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
                 const desc = buffInfo?.desc || '';
                 const checked = activeWorldBuffIds.includes(wbId);
                 return (
-                  <TableRow key={wbId} sx={{ bgcolor: 'action.hover', opacity: checked ? 1 : 0.5 }}>
+                  <TableRow
+                    key={wbId}
+                    sx={{ bgcolor: 'action.hover', opacity: checked ? 1 : 0.5 }}
+                  >
                     <TableCell padding="checkbox">
-                      <Checkbox size="small" checked={checked} disabled={!canManage} onChange={() => toggleDraftWorldBuff(wbId)} />
+                      <Checkbox
+                        size="small"
+                        checked={checked}
+                        disabled={!canManage}
+                        onChange={() => toggleDraftWorldBuff(wbId)}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Chip label={t('hotTimeBuffEvent.buffAdded')} size="small" color="info" variant="filled" sx={{ height: 20, fontSize: '0.65rem' }} />
+                      <Chip
+                        label={t('hotTimeBuffEvent.buffAdded')}
+                        size="small"
+                        color="info"
+                        variant="filled"
+                        sx={{ height: 20, fontSize: '0.65rem' }}
+                      />
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>{wbId}</TableCell>
-                    <TableCell sx={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {wbId}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        maxWidth: 160,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       <Tooltip title={name} placement="top">
-                        <Typography variant="body2" noWrap sx={{ fontSize: '0.8rem' }}>{name}</Typography>
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{ fontSize: '0.8rem' }}
+                        >
+                          {name}
+                        </Typography>
                       </Tooltip>
                     </TableCell>
-                    <TableCell sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'text.secondary' }}>
+                    <TableCell
+                      sx={{
+                        maxWidth: 240,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        color: 'text.secondary',
+                      }}
+                    >
                       <Tooltip title={desc || '—'} placement="top">
-                        <Typography variant="body2" noWrap sx={{ fontSize: '0.75rem' }}>{desc || '—'}</Typography>
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{ fontSize: '0.75rem' }}
+                        >
+                          {desc || '—'}
+                        </Typography>
                       </Tooltip>
                     </TableCell>
                     {canManage && (
                       <TableCell sx={{ px: 0.5 }}>
-                        <IconButton size="small" color="error" onClick={() => toggleDraftWorldBuff(wbId)}>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => toggleDraftWorldBuff(wbId)}
+                        >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
@@ -422,39 +614,55 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
         </TableContainer>
 
         {/* Add new world buff via selector */}
-        {canManage && (() => {
-          const availableOptions = Array.from(allWorldBuffs.entries())
-            .filter(([id]) => !activeWorldBuffIds.includes(id))
-            .map(([id, info]) => ({ id, label: formatWorldBuffLabel(id, info) }));
-          if (availableOptions.length === 0) return null;
-          return (
-            <Autocomplete
-              options={availableOptions}
-              getOptionLabel={(opt) => opt.label}
-              size="small"
-              sx={{ mt: 1 }}
-              renderInput={(params) => (
-                <TextField {...params} placeholder={t('hotTimeBuffEvent.addWorldBuff')} size="small" />
-              )}
-              onChange={(_, val) => {
-                if (val) {
-                  setDrawerDraft((prev) => {
-                    if (!prev) return prev;
-                    const current = prev.worldBuffIdOverride || [...(cms.worldBuffId || [])];
-                    return { ...prev, worldBuffIdOverride: [...current, val.id] };
-                  });
-                  if (!(cms.worldBuffId || []).includes(val.id) && setDrawerExtraBuffIds) {
-                    setDrawerExtraBuffIds((prev) =>
-                      prev.includes(val.id) ? prev : [...prev, val.id]
-                    );
+        {canManage &&
+          (() => {
+            const availableOptions = Array.from(allWorldBuffs.entries())
+              .filter(([id]) => !activeWorldBuffIds.includes(id))
+              .map(([id, info]) => ({
+                id,
+                label: formatWorldBuffLabel(id, info),
+              }));
+            if (availableOptions.length === 0) return null;
+            return (
+              <Autocomplete
+                options={availableOptions}
+                getOptionLabel={(opt) => opt.label}
+                size="small"
+                sx={{ mt: 1 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={t('hotTimeBuffEvent.addWorldBuff')}
+                    size="small"
+                  />
+                )}
+                onChange={(_, val) => {
+                  if (val) {
+                    setDrawerDraft((prev) => {
+                      if (!prev) return prev;
+                      const current = prev.worldBuffIdOverride || [
+                        ...(cms.worldBuffId || []),
+                      ];
+                      return {
+                        ...prev,
+                        worldBuffIdOverride: [...current, val.id],
+                      };
+                    });
+                    if (
+                      !(cms.worldBuffId || []).includes(val.id) &&
+                      setDrawerExtraBuffIds
+                    ) {
+                      setDrawerExtraBuffIds((prev) =>
+                        prev.includes(val.id) ? prev : [...prev, val.id]
+                      );
+                    }
                   }
-                }
-              }}
-              value={null}
-              blurOnSelect
-            />
-          );
-        })()}
+                }}
+                value={null}
+                blurOnSelect
+              />
+            );
+          })()}
 
         {/* Reset override */}
         {canManage && hasOverrideValues && resetDrawerDraft && (
@@ -488,7 +696,12 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
           <Button variant="contained" size="small" onClick={closeDrawer}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" size="small" onClick={commitDrawerDraft} disabled={!drawerIsDirty}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={commitDrawerDraft}
+            disabled={!drawerIsDirty}
+          >
             {t('hotTimeBuffEvent.update')}
           </Button>
         </Box>

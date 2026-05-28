@@ -1101,7 +1101,8 @@ const MessageTemplatesPage: React.FC = () => {
 
               {/* Column Settings Button */}
               <Tooltip title={t('users.columnSettings')}>
-                <IconButton size="small"
+                <IconButton
+                  size="small"
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
                     bgcolor: 'background.paper',
@@ -1441,7 +1442,11 @@ const MessageTemplatesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained" onClick={() => setDialogOpen(false)} disabled={saving}>
+          <Button
+            variant="contained"
+            onClick={() => setDialogOpen(false)}
+            disabled={saving}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1470,7 +1475,10 @@ const MessageTemplatesPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1498,7 +1506,10 @@ const MessageTemplatesPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setBulkDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1548,7 +1559,10 @@ const MessageTemplatesPage: React.FC = () => {
         columns={columns}
         onColumnsChange={(newColumns) => {
           setColumns(newColumns);
-          localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+          localStorage.setItem(
+            'messageTemplatesColumns',
+            JSON.stringify(newColumns)
+          );
         }}
         onReset={handleResetColumns}
       />

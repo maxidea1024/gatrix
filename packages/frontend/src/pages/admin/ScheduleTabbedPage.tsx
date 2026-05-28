@@ -44,8 +44,7 @@ const ScheduleTabbedPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab: TabKey =
-    (searchParams.get('tab') as TabKey) || 'scheduler';
+  const activeTab: TabKey = (searchParams.get('tab') as TabKey) || 'scheduler';
 
   const handleSegmentChange = useCallback(
     (key: string) => {

@@ -1044,7 +1044,8 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button variant="contained"
+                <Button
+                  variant="contained"
                   onClick={() => {
                     setSelectedWhitelist(null);
                     setAddDialog(false);
@@ -1120,7 +1121,10 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button variant="contained" onClick={() => setBulkDialog(false)}>
+                <Button
+                  variant="contained"
+                  onClick={() => setBulkDialog(false)}
+                >
                   {t('common.cancel')}
                 </Button>
                 <Button
@@ -1145,7 +1149,8 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 <Typography>{confirmDialog.message}</Typography>
               </DialogContent>
               <DialogActions>
-                <Button variant="contained"
+                <Button
+                  variant="contained"
                   onClick={() =>
                     setConfirmDialog((prev) => ({ ...prev, open: false }))
                   }

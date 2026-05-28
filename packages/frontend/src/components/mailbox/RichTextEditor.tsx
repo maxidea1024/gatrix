@@ -2905,7 +2905,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleLinkDialogClose} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={handleLinkDialogClose} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleLinkInsert}
             variant="contained"
@@ -3515,7 +3517,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleImageDialogClose} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={handleImageDialogClose} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleImageInsert}
             variant="contained"
@@ -3806,7 +3810,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleVideoDialogClose} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={handleVideoDialogClose} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleVideoInsert}
             variant="contained"

@@ -87,9 +87,12 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
     border: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : '#EAEAEA',
     borderHover: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : '#D4D4D4',
     borderFocus: mode === 'dark' ? '#818cf8' : '#6C5FC7',
-    hoverBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.03)',
-    activeBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
-    stripeBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : 'rgba(0, 0, 0, 0.015)',
+    hoverBg:
+      mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.03)',
+    activeBg:
+      mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
+    stripeBg:
+      mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : 'rgba(0, 0, 0, 0.015)',
     drawerBg: mode === 'dark' ? '#171717' : '#FAFAFA',
     inputBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
     theadBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#FAFAFA',
@@ -214,9 +217,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiButtonGroup: {
         styleOverrides: {
           contained: {
-            boxShadow: mode === 'dark' 
-              ? '0 3px 0 rgba(0,0,0,0.5)'
-              : '0 3px 0 rgba(0,0,0,0.15)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 3px 0 rgba(0,0,0,0.5)'
+                : '0 3px 0 rgba(0,0,0,0.15)',
             '&:active': {
               boxShadow: 'none !important',
               transform: 'translateY(3px)',
@@ -237,9 +241,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             border: 'none',
             transition: 'all 0.1s ease-in-out',
             // Tactile bottom shadow elevation
-            boxShadow: mode === 'dark' 
-              ? '0 3px 0 rgba(0,0,0,0.5)'
-              : '0 3px 0 rgba(0,0,0,0.15)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 3px 0 rgba(0,0,0,0.5)'
+                : '0 3px 0 rgba(0,0,0,0.15)',
             '&:active': {
               boxShadow: 'none !important',
               transform: 'translateY(3px)',
@@ -260,45 +265,49 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
           containedPrimary: {
             // Stronger bottom shadow for primary button
-            boxShadow: mode === 'dark' 
-              ? '0 3px 0 #312A66' 
-              : '0 3px 0 #4A42B0',
+            boxShadow: mode === 'dark' ? '0 3px 0 #312A66' : '0 3px 0 #4A42B0',
             '&:hover': {
-              boxShadow: mode === 'dark' 
-                ? '0 3px 0 #2A2459' 
-                : '0 3px 0 #3D3692',
+              boxShadow:
+                mode === 'dark' ? '0 3px 0 #2A2459' : '0 3px 0 #3D3692',
             },
           },
           containedSecondary: {
             backgroundColor: mode === 'dark' ? '#3F3B55' : '#FFFFFF',
             color: mode === 'dark' ? '#EBEAED' : '#2B2836',
-            boxShadow: mode === 'dark'
-              ? '0 3px 0 rgba(0,0,0,0.3)'
-              : '0 3px 0 rgba(0,0,0,0.15)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 3px 0 rgba(0,0,0,0.3)'
+                : '0 3px 0 rgba(0,0,0,0.15)',
             '&:hover': {
               backgroundColor: mode === 'dark' ? '#534E6B' : '#F9F9FB',
-              boxShadow: mode === 'dark'
-                ? '0 3px 0 rgba(0,0,0,0.4)'
-                : '0 3px 0 rgba(0,0,0,0.2)',
+              boxShadow:
+                mode === 'dark'
+                  ? '0 3px 0 rgba(0,0,0,0.4)'
+                  : '0 3px 0 rgba(0,0,0,0.2)',
             },
           },
           outlined: {
-            backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#FFFFFF',
+            backgroundColor:
+              mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#FFFFFF',
             color: txt.primary,
-            boxShadow: mode === 'dark'
-              ? '0 3px 0 rgba(0,0,0,0.3)'
-              : '0 3px 0 rgba(0,0,0,0.15)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 3px 0 rgba(0,0,0,0.3)'
+                : '0 3px 0 rgba(0,0,0,0.15)',
             '&:hover': {
-              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#F9F9FB',
-              boxShadow: mode === 'dark'
-                ? '0 3px 0 rgba(0,0,0,0.4)'
-                : '0 3px 0 rgba(0,0,0,0.2)',
+              backgroundColor:
+                mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#F9F9FB',
+              boxShadow:
+                mode === 'dark'
+                  ? '0 3px 0 rgba(0,0,0,0.4)'
+                  : '0 3px 0 rgba(0,0,0,0.2)',
             },
           },
           text: {
             boxShadow: 'none',
             '&:hover': {
-              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+              backgroundColor:
+                mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
             },
             '&:active': {
               boxShadow: 'none !important',
@@ -408,14 +417,16 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         },
         styleOverrides: {
           paper: {
-            boxShadow: mode === 'dark' 
-              ? '0 8px 24px rgba(0,0,0,0.6)' 
-              : '0 8px 24px rgba(0,0,0,0.12)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 8px 24px rgba(0,0,0,0.6)'
+                : '0 8px 24px rgba(0,0,0,0.12)',
             border: `1px solid ${colors.border}`,
           },
           root: {
             '& .MuiBackdrop-root': {
-              backgroundColor: mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(28,25,43,0.3)',
+              backgroundColor:
+                mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(28,25,43,0.3)',
               backdropFilter: 'blur(2px)',
               WebkitBackdropFilter: 'blur(2px)',
             },
@@ -426,7 +437,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '&:not(.MuiSelect-root) .MuiBackdrop-root': {
-              backgroundColor: mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(28,25,43,0.3)',
+              backgroundColor:
+                mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(28,25,43,0.3)',
               backdropFilter: 'blur(2px)',
               WebkitBackdropFilter: 'blur(2px)',
             },
@@ -466,9 +478,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         },
         styleOverrides: {
           paper: {
-            boxShadow: mode === 'dark' 
-              ? '0 4px 16px rgba(0,0,0,0.5)' 
-              : '0 4px 16px rgba(0,0,0,0.1)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 4px 16px rgba(0,0,0,0.5)'
+                : '0 4px 16px rgba(0,0,0,0.1)',
             border: `1px solid ${colors.border}`,
           },
         },
@@ -507,9 +520,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         },
         styleOverrides: {
           paper: {
-            boxShadow: mode === 'dark' 
-              ? '0 4px 16px rgba(0,0,0,0.5)' 
-              : '0 4px 16px rgba(0,0,0,0.1)',
+            boxShadow:
+              mode === 'dark'
+                ? '0 4px 16px rgba(0,0,0,0.5)'
+                : '0 4px 16px rgba(0,0,0,0.1)',
             border: `1px solid ${colors.border}`,
           },
         },

@@ -73,7 +73,10 @@ class ImpactMetricsService {
   private registry: any | null = null;
   private promClient: any | null = null;
   private registeredMetrics: Map<string, any> = new Map();
-  private metricTypeCache = new Map<string, { type: string; cachedAt: number }>();
+  private metricTypeCache = new Map<
+    string,
+    { type: string; cachedAt: number }
+  >();
   private static METRIC_TYPE_CACHE_TTL = 5 * 60 * 1000;
   private prometheusUrl: string;
 
@@ -560,9 +563,14 @@ class ImpactMetricsService {
   /**
    * Look up the type of a metric from Prometheus metadata API (cached)
    */
-  private async lookupMetricType(metricName: string): Promise<string | undefined> {
+  private async lookupMetricType(
+    metricName: string
+  ): Promise<string | undefined> {
     const cached = this.metricTypeCache.get(metricName);
-    if (cached && Date.now() - cached.cachedAt < ImpactMetricsService.METRIC_TYPE_CACHE_TTL) {
+    if (
+      cached &&
+      Date.now() - cached.cachedAt < ImpactMetricsService.METRIC_TYPE_CACHE_TTL
+    ) {
       return cached.type;
     }
 

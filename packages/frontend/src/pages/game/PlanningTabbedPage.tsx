@@ -44,8 +44,7 @@ const PlanningTabbedPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab: TabKey =
-    (searchParams.get('tab') as TabKey) || 'data';
+  const activeTab: TabKey = (searchParams.get('tab') as TabKey) || 'data';
 
   const handleSegmentChange = useCallback(
     (key: string) => {

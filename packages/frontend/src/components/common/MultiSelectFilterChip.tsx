@@ -64,7 +64,9 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
   const open = Boolean(anchorEl);
 
   const noneSelected = selected.length === 0;
-  const allSelected = (selected.length === options.length && options.length > 0) || (emptyMeansAll && noneSelected);
+  const allSelected =
+    (selected.length === options.length && options.length > 0) ||
+    (emptyMeansAll && noneSelected);
 
   // Summary: show selected item names (max 2) + overflow count
   const MAX_VISIBLE_LABELS = 2;
@@ -89,9 +91,7 @@ const MultiSelectFilterChip: React.FC<MultiSelectFilterChipProps> = ({
   const filteredOptions = useMemo(() => {
     if (!searchText) return options;
     const lower = searchText.toLowerCase();
-    return options.filter((opt) =>
-      opt.label.toLowerCase().includes(lower)
-    );
+    return options.filter((opt) => opt.label.toLowerCase().includes(lower));
   }, [options, searchText]);
 
   // Don't render if no options and hideWhenEmpty (AFTER all hooks)

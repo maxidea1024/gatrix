@@ -777,7 +777,8 @@ export const CreateIntegrationWizard: React.FC<
       <DialogActions
         sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}
       >
-        <Button variant="contained"
+        <Button
+          variant="contained"
           onClick={activeStep === 0 || initialProvider ? onClose : handleBack}
           disabled={saving}
         >

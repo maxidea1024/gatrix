@@ -1532,7 +1532,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained" onClick={handleClose} disabled={isSubmitting || loading}>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            disabled={isSubmitting || loading}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons

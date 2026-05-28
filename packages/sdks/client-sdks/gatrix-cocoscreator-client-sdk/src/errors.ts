@@ -106,7 +106,11 @@ export class GatrixFeatureError extends GatrixError {
   /**
    * Create a type mismatch error
    */
-  static typeMismatch(flagName: string, expected: string, actual: string): GatrixFeatureError {
+  static typeMismatch(
+    flagName: string,
+    expected: string,
+    actual: string
+  ): GatrixFeatureError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.TYPE_MISMATCH,
       `Flag "${flagName}" type mismatch: expected ${expected}, got ${actual}`,

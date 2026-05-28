@@ -32,7 +32,6 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
-
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -801,7 +800,10 @@ const FeatureContextFieldsPage: React.FC = () => {
           <SegmentedTabs
             items={[
               { key: 'defined', label: t('contextFieldUsage.definedTab') },
-              { key: 'discovered', label: t('contextFieldUsage.discoveredTab') },
+              {
+                key: 'discovered',
+                label: t('contextFieldUsage.discoveredTab'),
+              },
             ]}
             value={activeTab === 0 ? 'defined' : 'discovered'}
             onChange={(key) => setActiveTab(key === 'defined' ? 0 : 1)}
@@ -888,7 +890,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                 noWrap={true}
                 afterFilterAddActions={
                   <Tooltip title={t('common.columnSettings')}>
-                    <IconButton size="small"
+                    <IconButton
+                      size="small"
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
                         bgcolor: 'background.paper',
@@ -1875,7 +1878,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                 bgcolor: 'background.paper',
               }}
             >
-              <Button variant="contained" onClick={() => setEditDialogOpen(false)}>
+              <Button
+                variant="contained"
+                onClick={() => setEditDialogOpen(false)}
+              >
                 {canManage ? t('common.cancel') : t('common.close')}
               </Button>
               {canManage && (

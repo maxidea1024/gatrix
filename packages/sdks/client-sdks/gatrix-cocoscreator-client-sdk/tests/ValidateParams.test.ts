@@ -22,33 +22,69 @@ describe('validateAll', () => {
   });
 
   it('should validate string type', () => {
-    expect(() => validateAll([{ param: 'name', value: 'valid', type: 'string' }])).not.toThrow();
-    expect(() => validateAll([{ param: 'name', value: '', type: 'string' }])).toThrow();
-    expect(() => validateAll([{ param: 'name', value: '  ', type: 'string' }])).toThrow();
-    expect(() => validateAll([{ param: 'name', value: 123, type: 'string' }])).toThrow();
-    expect(() => validateAll([{ param: 'name', value: null, type: 'string' }])).toThrow();
+    expect(() =>
+      validateAll([{ param: 'name', value: 'valid', type: 'string' }])
+    ).not.toThrow();
+    expect(() =>
+      validateAll([{ param: 'name', value: '', type: 'string' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'name', value: '  ', type: 'string' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'name', value: 123, type: 'string' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'name', value: null, type: 'string' }])
+    ).toThrow();
   });
 
   it('should validate number type', () => {
-    expect(() => validateAll([{ param: 'count', value: 42, type: 'number' }])).not.toThrow();
-    expect(() => validateAll([{ param: 'count', value: 0, type: 'number' }])).not.toThrow();
-    expect(() => validateAll([{ param: 'count', value: NaN, type: 'number' }])).toThrow();
-    expect(() => validateAll([{ param: 'count', value: 'not-a-number', type: 'number' }])).toThrow();
-    expect(() => validateAll([{ param: 'count', value: null, type: 'number' }])).toThrow();
+    expect(() =>
+      validateAll([{ param: 'count', value: 42, type: 'number' }])
+    ).not.toThrow();
+    expect(() =>
+      validateAll([{ param: 'count', value: 0, type: 'number' }])
+    ).not.toThrow();
+    expect(() =>
+      validateAll([{ param: 'count', value: NaN, type: 'number' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'count', value: 'not-a-number', type: 'number' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'count', value: null, type: 'number' }])
+    ).toThrow();
   });
 
   it('should validate boolean type', () => {
-    expect(() => validateAll([{ param: 'flag', value: true, type: 'boolean' }])).not.toThrow();
-    expect(() => validateAll([{ param: 'flag', value: false, type: 'boolean' }])).not.toThrow();
-    expect(() => validateAll([{ param: 'flag', value: 'true', type: 'boolean' }])).toThrow();
-    expect(() => validateAll([{ param: 'flag', value: null, type: 'boolean' }])).toThrow();
+    expect(() =>
+      validateAll([{ param: 'flag', value: true, type: 'boolean' }])
+    ).not.toThrow();
+    expect(() =>
+      validateAll([{ param: 'flag', value: false, type: 'boolean' }])
+    ).not.toThrow();
+    expect(() =>
+      validateAll([{ param: 'flag', value: 'true', type: 'boolean' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'flag', value: null, type: 'boolean' }])
+    ).toThrow();
   });
 
   it('should validate array type', () => {
-    expect(() => validateAll([{ param: 'items', value: [1, 2], type: 'array' }])).not.toThrow();
-    expect(() => validateAll([{ param: 'items', value: [], type: 'array' }])).toThrow();
-    expect(() => validateAll([{ param: 'items', value: 'not-array', type: 'array' }])).toThrow();
-    expect(() => validateAll([{ param: 'items', value: null, type: 'array' }])).toThrow();
+    expect(() =>
+      validateAll([{ param: 'items', value: [1, 2], type: 'array' }])
+    ).not.toThrow();
+    expect(() =>
+      validateAll([{ param: 'items', value: [], type: 'array' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'items', value: 'not-array', type: 'array' }])
+    ).toThrow();
+    expect(() =>
+      validateAll([{ param: 'items', value: null, type: 'array' }])
+    ).toThrow();
   });
 
   it('should aggregate multiple errors into one', () => {

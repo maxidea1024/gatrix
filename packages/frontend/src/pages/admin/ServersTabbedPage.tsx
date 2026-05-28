@@ -44,8 +44,7 @@ const ServersTabbedPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab: TabKey =
-    (searchParams.get('tab') as TabKey) || 'list';
+  const activeTab: TabKey = (searchParams.get('tab') as TabKey) || 'list';
 
   const handleSegmentChange = useCallback(
     (key: string) => {

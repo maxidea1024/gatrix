@@ -1508,7 +1508,8 @@ const CouponSettingsPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton size="small"
+                  <IconButton
+                    size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -3880,7 +3881,8 @@ const CouponSettingsPage: React.FC = () => {
             </Button>
           ) : exportError ? (
             <>
-              <Button variant="contained"
+              <Button
+                variant="contained"
                 onClick={() => {
                   setExportError(null);
                   setExportProgress(0);

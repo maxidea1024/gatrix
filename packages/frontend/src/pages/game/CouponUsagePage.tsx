@@ -561,7 +561,8 @@ const CouponUsagePage: React.FC = () => {
               noWrap
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
-                  <IconButton size="small"
+                  <IconButton
+                    size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -1016,7 +1017,8 @@ const CouponUsagePage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           {exporting ? (
-            <Button variant="contained"
+            <Button
+              variant="contained"
               onClick={() => {
                 exportAbortControllerRef.current?.abort();
               }}
@@ -1024,7 +1026,8 @@ const CouponUsagePage: React.FC = () => {
               {t('common.cancel')}
             </Button>
           ) : (
-            <Button variant="text"
+            <Button
+              variant="text"
               onClick={() => {
                 setExportSuccess(false);
                 setExportError(null);

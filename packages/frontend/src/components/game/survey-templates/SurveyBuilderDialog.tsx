@@ -390,7 +390,8 @@ const SurveyBuilderDialog: React.FC<Props> = ({
       return vals.some((v) => v.trim().length > 0);
     })
   );
-  const isValid = title.trim().length > 0 && hasQuestions && allQuestionsHaveTitle;
+  const isValid =
+    title.trim().length > 0 && hasQuestions && allQuestionsHaveTitle;
 
   // Compute question numbering across pages
   const getQuestionNumber = (pageIdx: number, qIdx: number): number => {
@@ -543,7 +544,9 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                     {welcomeBlock && (
                       <TextField
                         size="small"
-                        placeholder={t('surveyTemplate.questionTitlePlaceholder')}
+                        placeholder={t(
+                          'surveyTemplate.questionTitlePlaceholder'
+                        )}
                         value={welcomeBlock.title?.[editLocale] || ''}
                         onChange={(e) =>
                           setWelcomeBlock({
@@ -584,7 +587,9 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                     {endingBlock && (
                       <TextField
                         size="small"
-                        placeholder={t('surveyTemplate.questionTitlePlaceholder')}
+                        placeholder={t(
+                          'surveyTemplate.questionTitlePlaceholder'
+                        )}
                         value={endingBlock.title?.[editLocale] || ''}
                         onChange={(e) =>
                           setEndingBlock({
@@ -624,9 +629,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                             theme.palette.mode === 'dark'
                               ? 'rgba(144,202,249,0.08)'
                               : 'primary.50',
-                          borderBottom: collapsedPages.has(page.id)
-                            ? 0
-                            : 1,
+                          borderBottom: collapsedPages.has(page.id) ? 0 : 1,
                           borderColor: 'primary.light',
                           cursor: 'pointer',
                           userSelect: 'none',
@@ -650,10 +653,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                             number: pageIdx + 1,
                           }) || `Page ${pageIdx + 1}`}
                         </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                        >
+                        <Typography variant="caption" color="text.secondary">
                           ({page.questions.length})
                         </Typography>
                         <Box sx={{ flex: 1 }} />
@@ -713,10 +713,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                                 borderRadius: 2,
                               }}
                             >
-                              <Typography
-                                variant="body2"
-                                color="text.disabled"
-                              >
+                              <Typography variant="body2" color="text.disabled">
                                 {t('surveyTemplate.emptyPage') ||
                                   '이 페이지에 질문을 추가하세요'}
                               </Typography>
@@ -729,11 +726,7 @@ const SurveyBuilderDialog: React.FC<Props> = ({
                                 locale={editLocale}
                                 index={getQuestionNumber(pageIdx, qIdx)}
                                 onChange={(updated) =>
-                                  updateQuestionInPage(
-                                    page.id,
-                                    qIdx,
-                                    updated
-                                  )
+                                  updateQuestionInPage(page.id, qIdx, updated)
                                 }
                                 onDelete={() =>
                                   deleteQuestionInPage(page.id, qIdx)
@@ -895,7 +888,9 @@ const SurveyBuilderDialog: React.FC<Props> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 1.5 }}>
-        <Button onClick={onClose} variant="contained">{t('Cancel')}</Button>
+        <Button onClick={onClose} variant="contained">
+          {t('Cancel')}
+        </Button>
         <Button
           variant="contained"
           onClick={handleSave}

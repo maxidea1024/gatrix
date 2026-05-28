@@ -637,7 +637,8 @@ const SurveyLogsPage: React.FC = () => {
                     size="small"
                   />
                   <Tooltip title={t('common.columnSettings')}>
-                    <IconButton size="small"
+                    <IconButton
+                      size="small"
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
                         bgcolor: 'background.paper',
@@ -682,7 +683,9 @@ const SurveyLogsPage: React.FC = () => {
         </Box>
       </Box>
 
-      <PageContentLoader loading={!filtersInitialized || (loading && logs.length === 0)}>
+      <PageContentLoader
+        loading={!filtersInitialized || (loading && logs.length === 0)}
+      >
         {logs.length === 0 && !loading && filtersInitialized ? (
           <EmptyPagePlaceholder message={t('surveys.logs.noRecords')} />
         ) : (

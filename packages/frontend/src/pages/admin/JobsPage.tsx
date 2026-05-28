@@ -571,7 +571,8 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>
-                <IconButton size="small"
+                <IconButton
+                  size="small"
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
                     bgcolor: 'background.paper',
@@ -785,10 +786,7 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setHistoryDialogOpen(false)}
-            variant="text"
-          >
+          <Button onClick={() => setHistoryDialogOpen(false)} variant="text">
             {t('common.close')}
           </Button>
         </Box>

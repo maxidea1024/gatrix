@@ -20,7 +20,14 @@ const SortableColumnItem: React.FC<{
   onToggle: (id: string) => void;
 }> = ({ column, onToggle }) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: column.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -33,11 +40,19 @@ const SortableColumnItem: React.FC<{
       dense
       secondaryAction={
         <IconButton size="small" onClick={() => onToggle(column.id)}>
-          {column.visible ? <VisibilityIcon fontSize="small" /> : <VisibilityOffIcon fontSize="small" />}
+          {column.visible ? (
+            <VisibilityIcon fontSize="small" />
+          ) : (
+            <VisibilityOffIcon fontSize="small" />
+          )}
         </IconButton>
       }
     >
-      <ListItemIcon sx={{ minWidth: 28, cursor: 'grab' }} {...attributes} {...listeners}>
+      <ListItemIcon
+        sx={{ minWidth: 28, cursor: 'grab' }}
+        {...attributes}
+        {...listeners}
+      >
         <DragIndicatorIcon fontSize="small" color="action" />
       </ListItemIcon>
       <ListItemText

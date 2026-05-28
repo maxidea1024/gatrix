@@ -4886,7 +4886,8 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             {bulkHealthCheckSelected.size} / {bulkHealthCheckResults.length}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Button variant="text"
+            <Button
+              variant="text"
               onClick={handleBulkHealthCheckClose}
               disabled={bulkHealthCheckRunning}
             >

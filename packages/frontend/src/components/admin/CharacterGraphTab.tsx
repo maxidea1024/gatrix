@@ -413,11 +413,16 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     // Match backend downsampling: ≤7D=10min, ≤30D=30min, >30D=60min
     const { from, to } = getDateRange();
     const rangeHours = (to.getTime() - from.getTime()) / (1000 * 60 * 60);
-    const intervalMinutes = rangeHours > 24 * 30 ? 60 : rangeHours > 24 * 7 ? 30 : 10;
+    const intervalMinutes =
+      rangeHours > 24 * 30 ? 60 : rangeHours > 24 * 7 ? 30 : 10;
 
     const allLabels: string[] = [];
     const current = new Date(from);
-    current.setMinutes(Math.floor(current.getMinutes() / intervalMinutes) * intervalMinutes, 0, 0);
+    current.setMinutes(
+      Math.floor(current.getMinutes() / intervalMinutes) * intervalMinutes,
+      0,
+      0
+    );
     while (current <= to) {
       allLabels.push(
         `${String(current.getMonth() + 1).padStart(2, '0')}/${String(current.getDate()).padStart(2, '0')} ${String(current.getHours()).padStart(2, '0')}:${String(current.getMinutes()).padStart(2, '0')}`
@@ -436,7 +441,8 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       const valueMap = new Map<string, number>();
       recs.forEach((r) => {
         const d = new Date(r.recordedAt);
-        const mins = Math.floor(d.getMinutes() / intervalMinutes) * intervalMinutes;
+        const mins =
+          Math.floor(d.getMinutes() / intervalMinutes) * intervalMinutes;
         d.setMinutes(mins, 0, 0);
         const label = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         const val = isTotal ? r.totalCharacters : r.newCharacters;

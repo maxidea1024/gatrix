@@ -1453,7 +1453,10 @@ const CrashesPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAssigneeDialogOpen(false)} variant="contained">
+          <Button
+            onClick={() => setAssigneeDialogOpen(false)}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button variant="text" onClick={handleSaveAssignee}>

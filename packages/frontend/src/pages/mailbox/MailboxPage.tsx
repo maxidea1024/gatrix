@@ -29,7 +29,6 @@ import {
   Autocomplete,
   Avatar,
   ListItemAvatar,
-
   Stack,
   ToggleButtonGroup,
   ToggleButton,
@@ -545,7 +544,14 @@ const MailboxPage: React.FC = () => {
 
   return (
     <Box
-      sx={{ height: '100%', display: 'flex', flexDirection: 'column', px: 2, pb: 2, pt: 1.5 }}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        px: 2,
+        pb: 2,
+        pt: 1.5,
+      }}
     >
       {/* Header */}
       <PageHeader
@@ -555,8 +561,16 @@ const MailboxPage: React.FC = () => {
         tabs={
           <SegmentedTabs
             items={[
-              { key: 'received', label: t('mailbox.receivedMails'), icon: <InboxIcon sx={{ fontSize: 18 }} /> },
-              { key: 'sent', label: t('mailbox.sentMails'), icon: <MailIcon sx={{ fontSize: 18 }} /> },
+              {
+                key: 'received',
+                label: t('mailbox.receivedMails'),
+                icon: <InboxIcon sx={{ fontSize: 18 }} />,
+              },
+              {
+                key: 'sent',
+                label: t('mailbox.sentMails'),
+                icon: <MailIcon sx={{ fontSize: 18 }} />,
+              },
             ]}
             value={currentTab}
             onChange={(key) => {
@@ -1217,7 +1231,9 @@ const MailboxPage: React.FC = () => {
           <Typography>{t('mailbox.deleteConfirmMessage')}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={handleDeleteCancel} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleDeleteConfirm}
             color="error"
@@ -1244,7 +1260,9 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleBulkDeleteCancel} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={handleBulkDeleteCancel} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleBulkDeleteConfirm}
             color="error"

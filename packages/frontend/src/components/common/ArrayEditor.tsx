@@ -764,7 +764,10 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResizeDialogOpen(false)} variant="contained">
+          <Button
+            onClick={() => setResizeDialogOpen(false)}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button onClick={handleResize} variant="text">
@@ -885,7 +888,10 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setObjectEditorOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setObjectEditorOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button

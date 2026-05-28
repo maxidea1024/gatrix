@@ -1913,7 +1913,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 mt: 2,
                               }}
                             >
-                              <Button onClick={() => setSubmitMode(false)} variant="contained">
+                              <Button
+                                onClick={() => setSubmitMode(false)}
+                                variant="contained"
+                              >
                                 {t('common.cancel')}
                               </Button>
                               <Button

@@ -439,7 +439,9 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={onClose} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             color="primary"

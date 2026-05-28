@@ -18,7 +18,11 @@ export type {
 export type { GatrixContext } from './context';
 
 // Configuration types
-export type { FetchRetryOptions, FeaturesConfig, GatrixClientConfig } from './config';
+export type {
+  FetchRetryOptions,
+  FeaturesConfig,
+  GatrixClientConfig,
+} from './config';
 
 // Streaming types
 export type {

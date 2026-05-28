@@ -27,7 +27,10 @@ export function truncateToMinute(isoString: string): string {
  * Build context query parameters onto a UrlBuilder for GET eval requests.
  * Applies currentTime truncation automatically.
  */
-export function buildContextQueryParams(url: UrlBuilder, context: GatrixContext): void {
+export function buildContextQueryParams(
+  url: UrlBuilder,
+  context: GatrixContext
+): void {
   const topLevelFields: (keyof GatrixContext)[] = [
     'appName',
     'userId',

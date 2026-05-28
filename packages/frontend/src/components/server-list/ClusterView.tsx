@@ -1240,25 +1240,25 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                     {(service.status === 'ready' ||
                       service.status === 'initializing') &&
                       lastHeartbeatTime.has(serviceKey) && (
-                      <>
-                        <circle
-                          r={pingGaugeRadius}
-                          fill="none"
-                          stroke="rgba(128,128,128,0.3)"
-                          strokeWidth="3"
-                        />
-                        <circle
-                          r={pingGaugeRadius}
-                          fill="none"
-                          stroke={pingGaugeColor}
-                          strokeWidth="3"
-                          strokeDasharray={circumference}
-                          strokeDashoffset={strokeDashoffset}
-                          strokeLinecap="round"
-                          transform="rotate(-90)"
-                        />
-                      </>
-                    )}
+                        <>
+                          <circle
+                            r={pingGaugeRadius}
+                            fill="none"
+                            stroke="rgba(128,128,128,0.3)"
+                            strokeWidth="3"
+                          />
+                          <circle
+                            r={pingGaugeRadius}
+                            fill="none"
+                            stroke={pingGaugeColor}
+                            strokeWidth="3"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            strokeLinecap="round"
+                            transform="rotate(-90)"
+                          />
+                        </>
+                      )}
 
                     {/* Shine effect */}
                     <ellipse

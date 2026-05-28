@@ -1023,7 +1023,10 @@ const FeatureNetworkPage: React.FC = () => {
         {filteredProjects.length > 1 && (
           <MultiSelectFilterChip
             label={t('common.project')}
-            options={filteredProjects.map((proj) => ({ value: proj.id, label: proj.name }))}
+            options={filteredProjects.map((proj) => ({
+              value: proj.id,
+              label: proj.name,
+            }))}
             selected={selectedProjectIds}
             onChange={setSelectedProjectIds}
             emptyMeansAll

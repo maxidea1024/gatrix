@@ -96,7 +96,10 @@ export class HttpAbortError extends Error {
  * @param opts   Request options
  * @returns      Promise resolving to an HttpResponse
  */
-export function httpRequest(url: string, opts: HttpRequestOptions = {}): Promise<HttpResponse> {
+export function httpRequest(
+  url: string,
+  opts: HttpRequestOptions = {}
+): Promise<HttpResponse> {
   const {
     method = 'GET',
     headers = {},

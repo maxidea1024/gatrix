@@ -42,8 +42,7 @@ const SecurityTabbedPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab: TabKey =
-    (searchParams.get('tab') as TabKey) || 'tokens';
+  const activeTab: TabKey = (searchParams.get('tab') as TabKey) || 'tokens';
 
   const handleSegmentChange = useCallback(
     (key: string) => {

@@ -1,10 +1,20 @@
-import { uuidv4, deepClone, contextString, djb2Hash, computeContextHash, computeEtag, isEqualFlag } from '../src/utils';
+import {
+  uuidv4,
+  deepClone,
+  contextString,
+  djb2Hash,
+  computeContextHash,
+  computeEtag,
+  isEqualFlag,
+} from '../src/utils';
 import { EvaluatedFlag } from '../src/types';
 
 describe('uuidv4', () => {
   it('should generate a valid v4 UUID format', () => {
     const uuid = uuidv4();
-    expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(uuid).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    );
   });
 
   it('should generate unique values', () => {
@@ -76,7 +86,10 @@ describe('contextString', () => {
   });
 
   it('should include properties', () => {
-    const result = contextString({ userId: '1', properties: { platform: 'ios' } });
+    const result = contextString({
+      userId: '1',
+      properties: { platform: 'ios' },
+    });
     expect(result).toContain('platform');
     expect(result).toContain('ios');
   });
@@ -158,19 +171,29 @@ describe('isEqualFlag', () => {
 
   it('should return false when variant name differs', () => {
     const a = makeFlag();
-    const b = makeFlag({ variant: { name: 'v2', enabled: true, value: 'hello' } });
+    const b = makeFlag({
+      variant: { name: 'v2', enabled: true, value: 'hello' },
+    });
     expect(isEqualFlag(a, b)).toBe(false);
   });
 
   it('should return false when variant value differs', () => {
     const a = makeFlag();
-    const b = makeFlag({ variant: { name: 'v1', enabled: true, value: 'world' } });
+    const b = makeFlag({
+      variant: { name: 'v1', enabled: true, value: 'world' },
+    });
     expect(isEqualFlag(a, b)).toBe(false);
   });
 
   it('should use JSON compare for json valueType', () => {
-    const a = makeFlag({ valueType: 'json', variant: { name: 'v1', enabled: true, value: { key: 'val' } } });
-    const b = makeFlag({ valueType: 'json', variant: { name: 'v1', enabled: true, value: { key: 'val' } } });
+    const a = makeFlag({
+      valueType: 'json',
+      variant: { name: 'v1', enabled: true, value: { key: 'val' } },
+    });
+    const b = makeFlag({
+      valueType: 'json',
+      variant: { name: 'v1', enabled: true, value: { key: 'val' } },
+    });
     expect(isEqualFlag(a, b)).toBe(true);
   });
 

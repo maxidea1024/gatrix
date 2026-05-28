@@ -44,8 +44,7 @@ const MonitoringTabbedPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab: TabKey =
-    (searchParams.get('tab') as TabKey) || 'grafana';
+  const activeTab: TabKey = (searchParams.get('tab') as TabKey) || 'grafana';
 
   const handleSegmentChange = useCallback(
     (key: string) => {

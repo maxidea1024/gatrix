@@ -917,7 +917,9 @@ const StrategyEditDrawer: React.FC<StrategyEditDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={handleClose} variant="contained">{t('common.cancel')}</Button>
+          <Button onClick={handleClose} variant="contained">
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={onSave}

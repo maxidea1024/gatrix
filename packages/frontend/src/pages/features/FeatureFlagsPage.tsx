@@ -1951,7 +1951,8 @@ const FeatureFlagsPage: React.FC = () => {
                       title={t('common.columnSettings')}
                       disableFocusListener
                     >
-                      <IconButton size="small"
+                      <IconButton
+                        size="small"
                         onClick={(e) =>
                           setColumnSettingsAnchor(e.currentTarget)
                         }
@@ -3330,7 +3331,8 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setArchiveConfirmOpen(false);
               handleActionMenuClear();
@@ -3376,7 +3378,8 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setStaleConfirmOpen(false);
               handleActionMenuClear();
@@ -4011,7 +4014,8 @@ const FeatureFlagsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => setCreateDialogOpen(false)}
             disabled={creating}
           >
@@ -4195,7 +4199,8 @@ const FeatureFlagsPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => {
               setImportDialogOpen(false);
               setImportData('');

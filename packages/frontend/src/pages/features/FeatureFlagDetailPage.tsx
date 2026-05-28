@@ -2303,7 +2303,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  mb: 0.5,
+                }}
+              >
                 <Typography variant="subtitle2" fontWeight={600}>
                   {t('featureFlags.flagDetails')}
                 </Typography>
@@ -2319,7 +2326,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                           tags: flag.tags || [],
                         });
                         const matchingTags = (flag.tags || [])
-                          .map((tagName) => allTags.find((t) => t.name === tagName))
+                          .map((tagName) =>
+                            allTags.find((t) => t.name === tagName)
+                          )
                           .filter((t): t is Tag => !!t);
                         setEditTagSelection(matchingTags);
                         setEditFlagDialogOpen(true);
@@ -2577,7 +2586,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                         variant="contained"
                         onClick={handleArchiveClick}
                         size="small"
-                        sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
+                        sx={{
+                          flex: 1,
+                          whiteSpace: 'nowrap',
+                          minWidth: 0,
+                          px: 1,
+                        }}
                       >
                         {flag.isArchived
                           ? t('featureFlags.revive')
@@ -2587,7 +2601,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                         variant="contained"
                         onClick={handleStaleClick}
                         size="small"
-                        sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
+                        sx={{
+                          flex: 1,
+                          whiteSpace: 'nowrap',
+                          minWidth: 0,
+                          px: 1,
+                        }}
                       >
                         {flag.stale
                           ? t('featureFlags.unmarkStale')
@@ -2600,7 +2619,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                           color="error"
                           onClick={() => setDeleteDialogOpen(true)}
                           size="small"
-                          sx={{ flex: 1, whiteSpace: 'nowrap', minWidth: 0, px: 1 }}
+                          sx={{
+                            flex: 1,
+                            whiteSpace: 'nowrap',
+                            minWidth: 0,
+                            px: 1,
+                          }}
                         >
                           {t('common.delete')}
                         </Button>
@@ -3984,7 +4008,10 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Typography>{t('featureFlags.deleteStrategyDescription')}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={handleCloseDeleteStrategyConfirm}>
+          <Button
+            variant="contained"
+            onClick={handleCloseDeleteStrategyConfirm}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -4159,7 +4186,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                 justifyContent: 'flex-end',
               }}
             >
-              <Button onClick={() => setEditFlagDialogOpen(false)} variant="contained">
+              <Button
+                onClick={() => setEditFlagDialogOpen(false)}
+                variant="contained"
+              >
                 {t('common.cancel')}
               </Button>
               <Button
@@ -4298,7 +4328,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={() => setVariantDialogOpen(false)} variant="contained">
+          <Button
+            onClick={() => setVariantDialogOpen(false)}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button variant="text" onClick={handleSaveVariants}>
@@ -4381,7 +4414,10 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setArchiveConfirmOpen(false)} variant="contained">
+          <Button
+            onClick={() => setArchiveConfirmOpen(false)}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -4420,7 +4456,10 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setStaleConfirmOpen(false)} variant="contained">
+          <Button
+            onClick={() => setStaleConfirmOpen(false)}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button

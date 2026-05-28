@@ -297,9 +297,7 @@ export class QueueService {
               `Re-registered repeatable job: connected-users:poll (every ${CONNECTED_USERS_POLL_INTERVAL}ms)`
             );
           } else {
-            logger.info(
-              'Repeatable job already exists: connected-users:poll'
-            );
+            logger.info('Repeatable job already exists: connected-users:poll');
           }
         } else {
           await this.addJob(

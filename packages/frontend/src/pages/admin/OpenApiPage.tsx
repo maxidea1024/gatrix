@@ -39,7 +39,19 @@ export const OpenApiPage: React.FC = () => {
     { key: 'client', label: 'Client SDK API' },
   ];
 
-  const tabConfig: Record<TabKey, { chips: { label: string; color: 'error' | 'primary' | 'success' | 'warning' }[]; description: string; borderColor: string; bgColor: string; spec: any }> = {
+  const tabConfig: Record<
+    TabKey,
+    {
+      chips: {
+        label: string;
+        color: 'error' | 'primary' | 'success' | 'warning';
+      }[];
+      description: string;
+      borderColor: string;
+      bgColor: string;
+      spec: any;
+    }
+  > = {
     admin: {
       chips: [
         { label: t('openApi.adminOnly'), color: 'error' },

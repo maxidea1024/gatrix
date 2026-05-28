@@ -90,7 +90,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   const [searchText, setSearchText] = useState<string>('');
   const justAddedFilterRef = React.useRef<string | null>(null);
   const textInputRef = React.useRef<HTMLInputElement>(null);
-  const [overflowAnchorEl, setOverflowAnchorEl] = useState<null | HTMLElement>(null);
+  const [overflowAnchorEl, setOverflowAnchorEl] = useState<null | HTMLElement>(
+    null
+  );
 
   // Close overflow popover when a filter enters edit mode (promoted from overflow to inline)
   React.useEffect(() => {

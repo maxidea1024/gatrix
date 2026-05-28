@@ -8,7 +8,12 @@
  * - isRealtime property indicates the proxy's operational mode.
  * - Client is always present (never null).
  */
-import { type EvaluatedFlag, type Variant, type ValueType, type VariationResult } from './types';
+import {
+  type EvaluatedFlag,
+  type Variant,
+  type ValueType,
+  type VariationResult,
+} from './types';
 import { type VariationProvider } from './variation-provider';
 
 export class FlagProxy {
@@ -16,7 +21,11 @@ export class FlagProxy {
   private _forceRealtime: boolean;
   private client: VariationProvider;
 
-  constructor(client: VariationProvider, flagName: string, forceRealtime: boolean = true) {
+  constructor(
+    client: VariationProvider,
+    flagName: string,
+    forceRealtime: boolean = true
+  ) {
     this._flagName = flagName ?? '';
     this._forceRealtime = forceRealtime;
     this.client = client;
@@ -51,7 +60,10 @@ export class FlagProxy {
   }
 
   get valueType(): ValueType {
-    return this.client.getValueTypeInternal(this._flagName, this._forceRealtime);
+    return this.client.getValueTypeInternal(
+      this._flagName,
+      this._forceRealtime
+    );
   }
 
   get version(): number {
@@ -59,7 +71,10 @@ export class FlagProxy {
   }
 
   get impressionData(): boolean {
-    return this.client.getImpressionDataInternal(this._flagName, this._forceRealtime);
+    return this.client.getImpressionDataInternal(
+      this._flagName,
+      this._forceRealtime
+    );
   }
 
   get raw(): EvaluatedFlag | undefined {
@@ -75,23 +90,43 @@ export class FlagProxy {
   // FlagProxy is a convenience shell - no own logic.
 
   variation(fallbackValue: string): string {
-    return this.client.variationInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.variationInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   boolVariation(fallbackValue: boolean): boolean {
-    return this.client.boolVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.boolVariationInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   stringVariation(fallbackValue: string): string {
-    return this.client.stringVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.stringVariationInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   numberVariation(fallbackValue: number): number {
-    return this.client.numberVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.numberVariationInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   jsonVariation<T>(fallbackValue: T): T {
-    return this.client.jsonVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.jsonVariationInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   // ==================== Variation Details ====================
@@ -131,18 +166,30 @@ export class FlagProxy {
   // ==================== Strict Variation Methods (OrThrow) ====================
 
   boolVariationOrThrow(): boolean {
-    return this.client.boolVariationOrThrowInternal(this._flagName, this._forceRealtime);
+    return this.client.boolVariationOrThrowInternal(
+      this._flagName,
+      this._forceRealtime
+    );
   }
 
   stringVariationOrThrow(): string {
-    return this.client.stringVariationOrThrowInternal(this._flagName, this._forceRealtime);
+    return this.client.stringVariationOrThrowInternal(
+      this._flagName,
+      this._forceRealtime
+    );
   }
 
   numberVariationOrThrow(): number {
-    return this.client.numberVariationOrThrowInternal(this._flagName, this._forceRealtime);
+    return this.client.numberVariationOrThrowInternal(
+      this._flagName,
+      this._forceRealtime
+    );
   }
 
   jsonVariationOrThrow<T>(): T {
-    return this.client.jsonVariationOrThrowInternal<T>(this._flagName, this._forceRealtime);
+    return this.client.jsonVariationOrThrowInternal<T>(
+      this._flagName,
+      this._forceRealtime
+    );
   }
 }

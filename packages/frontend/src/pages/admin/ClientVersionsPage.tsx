@@ -1872,7 +1872,8 @@ const ClientVersionsPage: React.FC = () => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('users.columnSettings')}>
-              <IconButton size="small"
+              <IconButton
+                size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   bgcolor: 'background.paper',
@@ -2192,7 +2193,10 @@ const ClientVersionsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -2485,7 +2489,10 @@ const ClientVersionsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained" onClick={() => setBulkStatusDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setBulkStatusDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -2604,7 +2611,10 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setBulkDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           {requiresApproval && hasPermission([P.CHANGE_REQUESTS_SKIP]) && (

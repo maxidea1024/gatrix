@@ -1,4 +1,8 @@
-import { truncateToMinute, buildContextQueryParams, SYSTEM_CONTEXT_FIELDS } from '../src/context-utils';
+import {
+  truncateToMinute,
+  buildContextQueryParams,
+  SYSTEM_CONTEXT_FIELDS,
+} from '../src/context-utils';
 import { UrlBuilder } from '../src/url-builder';
 import { GatrixContext } from '../src/types';
 

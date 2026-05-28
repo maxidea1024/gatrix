@@ -797,7 +797,11 @@ const RolesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDialogOpen(false)} disabled={saving} variant="contained">
+          <Button
+            onClick={() => setDialogOpen(false)}
+            disabled={saving}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -840,7 +844,11 @@ const RolesPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} disabled={saving} variant="contained">
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            disabled={saving}
+            variant="contained"
+          >
             {t('common.cancel')}
           </Button>
           <Button

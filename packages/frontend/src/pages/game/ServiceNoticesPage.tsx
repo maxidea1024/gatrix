@@ -792,7 +792,8 @@ const ServiceNoticesPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('users.columnSettings')}>
-                  <IconButton size="small"
+                  <IconButton
+                    size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       bgcolor: 'background.paper',
@@ -1037,7 +1038,10 @@ const ServiceNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'category') {
                             return (
-                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
+                              <TableCell
+                                key={column.id}
+                                sx={{ whiteSpace: 'nowrap' }}
+                              >
                                 <Chip
                                   label={t(
                                     `serviceNotices.categories.${notice.category}`
@@ -1050,8 +1054,14 @@ const ServiceNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'tabTitle') {
                             return (
-                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
-                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                              <TableCell
+                                key={column.id}
+                                sx={{ whiteSpace: 'nowrap' }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 500 }}
+                                >
                                   {notice.tabTitle || '-'}
                                 </Typography>
                               </TableCell>
@@ -1059,7 +1069,10 @@ const ServiceNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'title') {
                             return (
-                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
+                              <TableCell
+                                key={column.id}
+                                sx={{ whiteSpace: 'nowrap' }}
+                              >
                                 <Typography
                                   variant="body2"
                                   sx={{
@@ -1156,12 +1169,23 @@ const ServiceNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'period') {
                             return (
-                              <TableCell key={column.id} sx={{ whiteSpace: 'nowrap' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <TableCell
+                                key={column.id}
+                                sx={{ whiteSpace: 'nowrap' }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                  }}
+                                >
                                   <Tooltip
                                     title={
                                       notice.startDate
-                                        ? formatDateTimeDetailed(notice.startDate)
+                                        ? formatDateTimeDetailed(
+                                            notice.startDate
+                                          )
                                         : t('serviceNotices.startImmediately')
                                     }
                                   >
@@ -1175,7 +1199,10 @@ const ServiceNoticesPage: React.FC = () => {
                                         : t('serviceNotices.startImmediately')}
                                     </Typography>
                                   </Tooltip>
-                                  <Typography variant="caption" color="text.secondary">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     ~
                                   </Typography>
                                   <Tooltip
@@ -1341,7 +1368,10 @@ const ServiceNoticesPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
@@ -1367,7 +1397,10 @@ const ServiceNoticesPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setBulkDeleteDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons

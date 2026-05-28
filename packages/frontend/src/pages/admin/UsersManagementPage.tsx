@@ -1859,7 +1859,8 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Column Settings Button */}
             <Tooltip title={t('users.columnSettings')}>
-              <IconButton size="small"
+              <IconButton
+                size="small"
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
                   bgcolor: 'background.paper',
@@ -3278,7 +3279,8 @@ const UsersManagementPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={() => setEditUserDialog({ open: false, user: null })}
           >
             {t('common.cancel')}

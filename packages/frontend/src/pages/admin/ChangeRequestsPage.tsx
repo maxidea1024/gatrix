@@ -488,7 +488,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setSubmitDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setSubmitDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -525,7 +528,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setRejectDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setRejectDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button onClick={handleReject} color="error" disabled={actionLoading}>
@@ -564,7 +570,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setReopenDialogOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => setReopenDialogOpen(false)}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -650,17 +659,26 @@ const ChangeRequestsPage: React.FC = () => {
 
   // Tab state controlled by URL param
   const [searchParams, setSearchParams] = useSearchParams();
-  const STATUS_KEYS = ['all', 'draft', 'open', 'approved', 'applied', 'rejected', 'conflict'] as const;
+  const STATUS_KEYS = [
+    'all',
+    'draft',
+    'open',
+    'approved',
+    'applied',
+    'rejected',
+    'conflict',
+  ] as const;
   type StatusKey = (typeof STATUS_KEYS)[number];
-  const statusKeyToFilter: Record<StatusKey, ChangeRequestStatus | undefined> = {
-    all: undefined,
-    draft: 'draft',
-    open: 'open',
-    approved: 'approved',
-    applied: 'applied',
-    rejected: 'rejected',
-    conflict: 'conflict',
-  };
+  const statusKeyToFilter: Record<StatusKey, ChangeRequestStatus | undefined> =
+    {
+      all: undefined,
+      draft: 'draft',
+      open: 'open',
+      approved: 'approved',
+      applied: 'applied',
+      rejected: 'rejected',
+      conflict: 'conflict',
+    };
 
   // Initialize/Get tab value from URL
   const activeStatusKey: StatusKey = useMemo(() => {
@@ -759,7 +777,11 @@ const ChangeRequestsPage: React.FC = () => {
           <SegmentedTabs
             items={STATUS_KEYS.map((key) => ({
               key,
-              label: t(`changeRequest.tabs.${key}`) + (stats?.[key as keyof typeof stats] ? ` (${stats[key as keyof typeof stats]})` : ''),
+              label:
+                t(`changeRequest.tabs.${key}`) +
+                (stats?.[key as keyof typeof stats]
+                  ? ` (${stats[key as keyof typeof stats]})`
+                  : ''),
             }))}
             value={activeStatusKey}
             onChange={handleSegmentChange}

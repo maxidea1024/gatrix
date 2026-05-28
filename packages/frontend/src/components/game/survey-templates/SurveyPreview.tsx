@@ -448,9 +448,7 @@ const SurveyPreview: React.FC<Props> = ({
           <LinearProgress
             variant="determinate"
             value={
-              totalSlides > 1
-                ? ((currentSlide + 1) / totalSlides) * 100
-                : 0
+              totalSlides > 1 ? ((currentSlide + 1) / totalSlides) * 100 : 0
             }
             sx={{ height: 3 }}
           />

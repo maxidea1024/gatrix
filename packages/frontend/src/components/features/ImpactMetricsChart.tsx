@@ -919,9 +919,7 @@ const ChartPreviewPanel: React.FC<{
         data,
         borderColor: color.border,
         backgroundColor:
-          chartType === 'line'
-            ? color.bg.replace('0.45', '0.08')
-            : color.bg,
+          chartType === 'line' ? color.bg.replace('0.45', '0.08') : color.bg,
         borderWidth: chartType === 'bar' ? 0 : 2,
         tension: 0.4,
         pointRadius: 0,
@@ -1401,7 +1399,9 @@ const ChartConfigDialog: React.FC<{
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="contained">{t('common.cancel')}</Button>
+        <Button onClick={onClose} variant="contained">
+          {t('common.cancel')}
+        </Button>
         <Button variant="contained" onClick={handleSave} disabled={!metricName}>
           {initialValues ? t('common.update') : t('common.add')}
         </Button>
@@ -1882,7 +1882,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           />
 
           {/* Divider */}
-          <Box sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }} />
+          <Box
+            sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }}
+          />
           {/* Time Range Picker */}
           <ToggleButtonGroup
             size="small"
@@ -1913,7 +1915,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           </ToggleButtonGroup>
 
           {/* Divider */}
-          <Box sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }} />
+          <Box
+            sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }}
+          />
 
           {/* Auto-Refresh Selector */}
           <FormControl size="small" sx={{ minWidth: 80 }}>
@@ -1972,7 +1976,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           </Tooltip>
 
           {/* Divider */}
-          <Box sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }} />
+          <Box
+            sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }}
+          />
 
           {/* Auto-arrange */}
           {canManage && (

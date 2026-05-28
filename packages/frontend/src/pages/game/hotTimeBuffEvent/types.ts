@@ -27,15 +27,50 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
   { id: 'cmsId', label: 'ID', visible: true, width: 70 },
   { id: 'world', label: 'hotTimeBuffEvent.colWorld', visible: true, width: 90 },
   { id: 'name', label: 'hotTimeBuffEvent.colName', visible: true, width: 240 },
-  { id: 'enabled', label: 'hotTimeBuffEvent.colEnabled', visible: true, width: 70 },
-  { id: 'liveStatus', label: 'hotTimeBuffEvent.colLiveStatus', visible: true, width: 80 },
-  { id: 'startDate', label: 'hotTimeBuffEvent.colStartDate', visible: true, width: 120 },
-  { id: 'endDate', label: 'hotTimeBuffEvent.colEndDate', visible: true, width: 120 },
+  {
+    id: 'enabled',
+    label: 'hotTimeBuffEvent.colEnabled',
+    visible: true,
+    width: 70,
+  },
+  {
+    id: 'liveStatus',
+    label: 'hotTimeBuffEvent.colLiveStatus',
+    visible: true,
+    width: 80,
+  },
+  {
+    id: 'startDate',
+    label: 'hotTimeBuffEvent.colStartDate',
+    visible: true,
+    width: 120,
+  },
+  {
+    id: 'endDate',
+    label: 'hotTimeBuffEvent.colEndDate',
+    visible: true,
+    width: 120,
+  },
   { id: 'hours', label: 'hotTimeBuffEvent.colHours', visible: true, width: 80 },
   { id: 'level', label: 'hotTimeBuffEvent.colLevel', visible: true, width: 70 },
-  { id: 'dayOfWeek', label: 'hotTimeBuffEvent.colDayOfWeek', visible: true, width: 100 },
-  { id: 'worldBuffs', label: 'hotTimeBuffEvent.colWorldBuffs', visible: true, width: 120 },
-  { id: 'status', label: 'hotTimeBuffEvent.colStatus', visible: true, width: 90 },
+  {
+    id: 'dayOfWeek',
+    label: 'hotTimeBuffEvent.colDayOfWeek',
+    visible: true,
+    width: 100,
+  },
+  {
+    id: 'worldBuffs',
+    label: 'hotTimeBuffEvent.colWorldBuffs',
+    visible: true,
+    width: 120,
+  },
+  {
+    id: 'status',
+    label: 'hotTimeBuffEvent.colStatus',
+    visible: true,
+    width: 90,
+  },
 ];
 
 export const DAY_BITS = [
