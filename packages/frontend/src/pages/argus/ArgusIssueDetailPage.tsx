@@ -9,8 +9,8 @@ import {
   IconButton,
   useTheme,
   alpha,
-  Collapse,
   Tooltip,
+  Collapse,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -29,6 +29,7 @@ import {
   Language as LanguageIcon,
   Person as PersonIcon,
   Sell as TagIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import argusService, { ArgusIssueDetail } from '@/services/argusService';
@@ -169,10 +170,52 @@ const ArgusIssueDetailPage: React.FC = () => {
             )}
             {issue.is_regression && (
               <Chip label="Regression" size="small" sx={{
-                ml: 'auto', fontWeight: 700, fontSize: '0.68rem',
+                fontWeight: 700, fontSize: '0.68rem',
                 backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',
               }} />
             )}
+            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              {issue.fingerprint && (
+                <Tooltip title="핑거프린트 복사">
+                  <Chip
+                    icon={<CopyIcon sx={{ fontSize: '12px !important' }} />}
+                    label={`FP: ${issue.fingerprint.slice(0, 8)}`}
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(issue.fingerprint);
+                    }}
+                    sx={{
+                      cursor: 'pointer', height: 22, fontSize: '0.68rem',
+                      fontFamily: 'monospace',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                      '& .MuiChip-icon': { color: isDark ? '#555' : '#bbb' },
+                      border: 'none',
+                    }}
+                  />
+                </Tooltip>
+              )}
+              {latestEvent?.event_id && (
+                <Tooltip title="이벤트 ID 복사">
+                  <Chip
+                    icon={<CopyIcon sx={{ fontSize: '12px !important' }} />}
+                    label={`ID: ${latestEvent.event_id.slice(0, 8)}`}
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(latestEvent.event_id);
+                    }}
+                    sx={{
+                      cursor: 'pointer', height: 22, fontSize: '0.68rem',
+                      fontFamily: 'monospace',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                      '& .MuiChip-icon': { color: isDark ? '#555' : '#bbb' },
+                      border: 'none',
+                    }}
+                  />
+                </Tooltip>
+              )}
+            </Box>
           </Paper>
 
           {/* Summary Stats */}

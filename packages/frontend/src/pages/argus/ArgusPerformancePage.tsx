@@ -418,7 +418,10 @@ const ArgusPerformancePage: React.FC = () => {
             ) : (
               transactions.map((txn, idx) => {
                 const p95Val = Number(txn.p95);
+                const p50Val = Number(txn.p50);
                 const errRate = Number(txn.error_rate);
+                const maxP95 = Math.max(...transactions.map(t => Number(t.p95)), 1);
+                const { method, path: txnPath } = parseTransaction(txn.name);
                 return (
                   <Box
                     key={txn.name}
@@ -431,16 +434,40 @@ const ArgusPerformancePage: React.FC = () => {
                       '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
                     }}
                   >
-                    <Typography variant="body2" fontWeight={500} noWrap>{txn.name}</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden' }}>
+                      {method && (
+                        <Chip label={method} size="small" sx={{
+                          height: 20, fontSize: '0.65rem', fontWeight: 700, borderRadius: 0.8, minWidth: 40,
+                          backgroundColor: alpha(getMethodColor(method), 0.12),
+                          color: getMethodColor(method), border: 'none',
+                        }} />
+                      )}
+                      <Typography variant="body2" fontWeight={500} noWrap>{txnPath}</Typography>
+                    </Box>
                     <Typography variant="body2" sx={{ textAlign: 'right' }}>{Number(txn.count).toLocaleString()}</Typography>
                     <Typography variant="body2" sx={{ textAlign: 'right' }}>{Number(txn.avg_duration).toFixed(0)}ms</Typography>
-                    <Typography variant="body2" sx={{ textAlign: 'right' }}>{Number(txn.p50).toFixed(0)}ms</Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{
-                      textAlign: 'right',
-                      color: p95Val > 3000 ? '#f44336' : p95Val > 1000 ? '#ff9800' : 'inherit',
-                    }}>
-                      {p95Val.toFixed(0)}ms
-                    </Typography>
+                    {/* P50 with mini bar */}
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>{p50Val.toFixed(0)}ms</Typography>
+                      <Box sx={{ height: 3, borderRadius: 2, mt: 0.3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+                        <Box sx={{ height: '100%', borderRadius: 2, width: `${(p50Val / maxP95) * 100}%`, backgroundColor: '#4caf50', transition: 'width 0.3s' }} />
+                      </Box>
+                    </Box>
+                    {/* P95 with mini bar */}
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="body2" fontWeight={600} sx={{
+                        fontSize: '0.82rem',
+                        color: p95Val > 3000 ? '#f44336' : p95Val > 1000 ? '#ff9800' : 'inherit',
+                      }}>
+                        {p95Val.toFixed(0)}ms
+                      </Typography>
+                      <Box sx={{ height: 3, borderRadius: 2, mt: 0.3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+                        <Box sx={{ height: '100%', borderRadius: 2, width: `${(p95Val / maxP95) * 100}%`,
+                          backgroundColor: p95Val > 3000 ? '#f44336' : p95Val > 1000 ? '#ff9800' : '#7c4dff',
+                          transition: 'width 0.3s',
+                        }} />
+                      </Box>
+                    </Box>
                     <Box sx={{ textAlign: 'right' }}>
                       <Chip
                         label={`${errRate.toFixed(1)}%`}
@@ -557,20 +584,40 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
           />
         )}
 
-        {/* Span bars */}
-        {spans.map((span, idx) => (
-          <WaterfallRow
-            key={span.span_id || idx}
-            label={span.description || span.op}
-            sublabel={span.op}
-            op={span.op}
-            duration={Number(span.duration)}
-            barPos={getBarPosition(span.start_timestamp, Number(span.duration))}
-            status={span.status}
-            isDark={isDark}
-            data={typeof span.data === 'object' ? span.data : undefined}
-          />
-        ))}
+        {/* Span bars — with depth calculation */}
+        {(() => {
+          // Build depth map: root span_id has depth 0, children get parent's depth + 1
+          const rootSpanId = root?.span_id;
+          const depthMap = new Map<string, number>();
+          // First pass: index by span_id
+          if (rootSpanId) depthMap.set(rootSpanId, 0);
+          // Multiple passes to resolve depths (handles unordered spans)
+          for (let pass = 0; pass < 5; pass++) {
+            for (const span of spans) {
+              if (depthMap.has(span.span_id)) continue;
+              if (span.parent_span_id && depthMap.has(span.parent_span_id)) {
+                depthMap.set(span.span_id, (depthMap.get(span.parent_span_id) || 0) + 1);
+              }
+            }
+          }
+          return spans.map((span, idx) => {
+            const depth = depthMap.get(span.span_id) ?? 1;
+            return (
+              <WaterfallRow
+                key={span.span_id || idx}
+                label={span.description || span.op}
+                sublabel={span.op}
+                op={span.op}
+                duration={Number(span.duration)}
+                barPos={getBarPosition(span.start_timestamp, Number(span.duration))}
+                status={span.status}
+                isDark={isDark}
+                depth={depth}
+                data={typeof span.data === 'object' ? span.data : undefined}
+              />
+            );
+          });
+        })()}
 
         {spans.length === 0 && (
           <Box sx={{ py: 4, textAlign: 'center' }}>
@@ -592,8 +639,9 @@ const WaterfallRow: React.FC<{
   status: string;
   isRoot?: boolean;
   isDark: boolean;
+  depth?: number;
   data?: Record<string, string>;
-}> = ({ label, sublabel, op, duration, barPos, status, isRoot, isDark, data }) => {
+}> = ({ label, sublabel, op, duration, barPos, status, isRoot, isDark, depth = 0, data }) => {
   const opColor = getOpColor(op);
   const isErr = status !== 'ok' && status !== '';
 
@@ -619,9 +667,17 @@ const WaterfallRow: React.FC<{
         transition: 'background 0.1s',
       }}>
         {/* Label */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, px: 1.5, py: 0.6, overflow: 'hidden' }}>
-          {!isRoot && <Box sx={{ width: 12, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, flexShrink: 0 }} />}
-          <Box sx={{ color: opColor, display: 'flex', flexShrink: 0 }}>{getOpIcon(op)}</Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1.5, py: 0.6, overflow: 'hidden', pl: isRoot ? 1.5 : `${12 + depth * 16}px` }}>
+          {!isRoot && (
+            <Box sx={{ display: 'flex', alignItems: 'center', mr: 0.3, flexShrink: 0 }}>
+              <Box sx={{ width: 8, height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' }} />
+            </Box>
+          )}
+          <Chip label={op.split('.')[0]} size="small" sx={{
+            height: 18, fontSize: '0.6rem', fontWeight: 600,
+            backgroundColor: alpha(opColor, isDark ? 0.15 : 0.08), color: opColor,
+            border: 'none', flexShrink: 0, borderRadius: 0.8,
+          }} />
           <Typography variant="caption" noWrap sx={{
             fontFamily: 'monospace', fontSize: '0.73rem',
             fontWeight: isRoot ? 700 : 400,
@@ -678,6 +734,19 @@ const WaterfallRow: React.FC<{
 // totalDuration helper for bar — parse width percentage back
 function totalDuration(barPos: { width: string }): number {
   return parseFloat(barPos.width) || 100;
+}
+
+const METHOD_COLORS: Record<string, string> = {
+  GET: '#4caf50', POST: '#2196f3', PUT: '#ff9800', PATCH: '#7c4dff',
+  DELETE: '#f44336', HEAD: '#9e9e9e', OPTIONS: '#607d8b',
+};
+function getMethodColor(method: string): string {
+  return METHOD_COLORS[method.toUpperCase()] || '#9e9e9e';
+}
+function parseTransaction(name: string): { method: string; path: string } {
+  const match = name.match(/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(.+)$/i);
+  if (match) return { method: match[1].toUpperCase(), path: match[2] };
+  return { method: '', path: name };
 }
 
 function formatHour(hourStr: string): string {

@@ -21,7 +21,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               count() AS total_sessions,
               countIf(status = 'crashed') AS crashed,
               countIf(status = 'errored') AS errored,
-              countIf(status = 'healthy') AS healthy,
+              countIf(status IN ('ok', 'exited')) AS healthy,
               countIf(status = 'abnormal') AS abnormal,
               if(total_sessions > 0, (1 - crashed / total_sessions) * 100, 100) AS crash_free_rate,
               uniq(distinct_id) AS unique_users,
@@ -41,7 +41,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               toStartOfHour(started) AS hour,
               count() AS total,
               countIf(status = 'crashed') AS crashed,
-              countIf(status = 'healthy') AS healthy,
+              countIf(status IN ('ok', 'exited')) AS healthy,
               if(total > 0, (1 - crashed / total) * 100, 100) AS crash_free_rate
             FROM argus.sessions
             WHERE project_id = {projectId:String}
