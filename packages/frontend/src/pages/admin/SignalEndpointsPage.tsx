@@ -52,6 +52,7 @@ import signalEndpointService, {
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -618,14 +619,17 @@ const SignalEndpointsPage: React.FC = () => {
         title={t('signalEndpoints.title')}
         subtitle={t('signalEndpoints.subtitle')}
         actions={
-          endpoints.length > 0 && canManage ? (
-            <Button
-              variant="contained"
-              onClick={() => setEditDialog({ open: true, endpoint: null })}
-            >
-              {t('signalEndpoints.createEndpoint')}
-            </Button>
-          ) : undefined
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {endpoints.length > 0 && canManage && (
+              <Button
+                variant="contained"
+                onClick={() => setEditDialog({ open: true, endpoint: null })}
+              >
+                {t('signalEndpoints.createEndpoint')}
+              </Button>
+            )}
+            <PageHeaderContextMenu onRefresh={fetchEndpoints} refreshDisabled={loading} />
+          </Box>
         }
       />
 

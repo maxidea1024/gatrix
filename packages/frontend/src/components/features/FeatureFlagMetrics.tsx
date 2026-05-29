@@ -9,6 +9,7 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import {
   Box,
   Paper,
+  Card,
   Typography,
   ToggleButton,
   ToggleButtonGroup,
@@ -64,6 +65,8 @@ ChartJS.register(
   Legend,
   Filler
 );
+
+import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 
 interface FeatureFlagMetricsProps {
   flagName: string;
@@ -407,28 +410,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEnvs, period, chartGroupBy, variantGroupBy, envNamesKey]);
 
-  // Toggle environment selection (multi-select)
-  const handleEnvToggle = (env: string) => {
-    setSelectedEnvs((prev) => {
-      if (prev.includes(env)) {
-        // Don't allow deselecting all environments
-        if (prev.length === 1) return prev;
-        return prev.filter((e) => e !== env);
-      }
-      return [...prev, env];
-    });
+  // Multi-select change handlers (prevent deselecting all)
+  const handleEnvChange = (newSelected: string[]) => {
+    if (newSelected.length === 0) return;
+    setSelectedEnvs(newSelected);
   };
 
-  // Toggle app selection (multi-select)
-  const handleAppToggle = (app: string) => {
-    setSelectedApps((prev) => {
-      if (prev.includes(app)) {
-        // Don't allow deselecting all apps
-        if (prev.length === 1) return prev;
-        return prev.filter((a) => a !== app);
-      }
-      return [...prev, app];
-    });
+  const handleAppChange = (newSelected: string[]) => {
+    if (newSelected.length === 0) return;
+    setSelectedApps(newSelected);
   };
 
   const handlePeriodChange = (event: SelectChangeEvent<PeriodOption>) => {
@@ -968,27 +958,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         }}
       >
         {/* Environment Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
-            {t('featureFlags.metrics.environments')}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-            {environments.map((env) => {
-              const isSelected = selectedEnvs.includes(env.environmentId);
-              return (
-                <Chip
-                  key={env.environmentId}
-                  label={getEnvDisplayName(env.environmentId)}
-                  onClick={() => handleEnvToggle(env.environmentId)}
-                  color={isSelected ? 'primary' : 'default'}
-                  variant={isSelected ? 'filled' : 'outlined'}
-                  size="small"
-                  sx={{ borderRadius: '16px' }}
-                />
-              );
-            })}
-          </Box>
-        </Box>
+        <MultiSelectFilterChip
+          label={t('featureFlags.metrics.environments')}
+          options={environments.map((env) => ({
+            value: env.environmentId,
+            label: getEnvDisplayName(env.environmentId),
+          }))}
+          selected={selectedEnvs}
+          onChange={handleEnvChange}
+        />
 
         {/* Divider */}
         {availableApps.length > 0 && (
@@ -997,32 +975,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
         {/* Application Filter - only show if apps are available */}
         {availableApps.length > 0 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ mr: 0.5 }}
-            >
-              {t('featureFlags.metrics.applications')}
-              {loadingApps && <CircularProgress size={12} sx={{ ml: 1 }} />}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              {availableApps.map((app) => {
-                const isSelected = selectedApps.includes(app);
-                return (
-                  <Chip
-                    key={app}
-                    label={app}
-                    onClick={() => handleAppToggle(app)}
-                    color={isSelected ? 'primary' : 'default'}
-                    variant={isSelected ? 'filled' : 'outlined'}
-                    size="small"
-                    sx={{ borderRadius: '16px' }}
-                  />
-                );
-              })}
-            </Box>
-          </Box>
+          <MultiSelectFilterChip
+            label={t('featureFlags.metrics.applications')}
+            options={availableApps.map((app) => ({
+              value: app,
+              label: app,
+            }))}
+            selected={selectedApps}
+            onChange={handleAppChange}
+          />
         )}
 
         {/* Divider */}
@@ -1205,10 +1166,11 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 </Typography>
               </Box>
               <Collapse in={showTable}>
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
+                <Card variant="outlined" sx={{ mt: 2, position: 'relative' }}>
+                  <TableContainer>
+                    <Table size="small" sx={{ tableLayout: 'auto' }}>
+                      <TableHead>
+                        <TableRow>
                         <TableCell>{t('featureFlags.metrics.time')}</TableCell>
                         {availableApps.length > 0 && (
                           <TableCell>
@@ -1236,7 +1198,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                             ? ((row.exposed / row.total) * 100).toFixed(1)
                             : '0.0';
                         return (
-                          <TableRow key={`${row.time}-${row.appName || index}`}>
+                          <TableRow key={`${row.time}-${row.appName || index}`} hover>
                             <TableCell>{row.displayTime}</TableCell>
                             {availableApps.length > 0 && (
                               <TableCell>
@@ -1270,6 +1232,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                     </TableBody>
                   </Table>
                 </TableContainer>
+                </Card>
               </Collapse>
             </Box>
           </Paper>

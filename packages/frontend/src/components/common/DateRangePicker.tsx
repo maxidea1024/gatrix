@@ -445,6 +445,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             <Button
               key={presetValue}
               variant={currentPreset === presetValue ? 'contained' : 'outlined'}
+              disableElevation
               onClick={() => handlePresetClick(presetValue)}
             >
               {getPresetLabel(presetValue)}
@@ -455,6 +456,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         {availablePresets.includes('custom') && (
           <Button
             variant={currentPreset === 'custom' ? 'contained' : 'outlined'}
+            disableElevation
             onClick={(e) => {
               // Reset temp values when opening popover
               setTempFrom(dateFrom);

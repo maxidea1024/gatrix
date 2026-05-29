@@ -60,8 +60,10 @@ import { useDebounce } from '../../hooks/useDebounce';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import SearchTextField from '@/components/common/SearchTextField';
 import SimplePagination from '../../components/common/SimplePagination';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -79,7 +81,7 @@ const UnknownFlagsPage: React.FC = () => {
 
   // Pagination state
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // Menu state
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -559,6 +561,9 @@ const UnknownFlagsPage: React.FC = () => {
         icon={<UnknownIcon />}
         title={`${t('featureFlags.unknownFlags')} (${filteredFlags.length})`}
         subtitle={t('featureFlags.unknownFlagsDescription')}
+        actions={
+          <PageHeaderContextMenu onRefresh={loadFlags} refreshDisabled={loading} />
+        }
       />
 
       {/* Search and Filters */}

@@ -63,6 +63,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 
 // Register Chart.js components
@@ -979,22 +980,7 @@ const FeatureNetworkPage: React.FC = () => {
         title={t('network.title')}
         subtitle={t('network.subtitle')}
         actions={
-          <Tooltip title={t('common.refresh')}>
-            <span>
-              <IconButton
-                onClick={fetchData}
-                disabled={loading || isRefreshing}
-              >
-                <RefreshIcon
-                  sx={{
-                    animation: isRefreshing
-                      ? `${spin} 1s linear infinite`
-                      : 'none',
-                  }}
-                />
-              </IconButton>
-            </span>
-          </Tooltip>
+          <PageHeaderContextMenu onRefresh={fetchData} refreshDisabled={loading || isRefreshing} />
         }
       />
 

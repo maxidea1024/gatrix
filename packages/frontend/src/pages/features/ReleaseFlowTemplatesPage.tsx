@@ -84,6 +84,7 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import TagSelector from '../../components/common/TagSelector';
 import TagChips from '../../components/common/TagChips';
 import { Tag } from '../../services/tagService';
@@ -1708,15 +1709,18 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         title={t('releaseFlow.templatesTitle')}
         subtitle={t('releaseFlow.templatesSubtitle')}
         actions={
-          canManage ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              {t('releaseFlow.addTemplate')}
-            </Button>
-          ) : undefined
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('releaseFlow.addTemplate')}
+              </Button>
+            )}
+            <PageHeaderContextMenu onRefresh={loadTemplates} refreshDisabled={loading} />
+          </Box>
         }
       />
 
@@ -1757,8 +1761,6 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleDynamicFilterChange}
               onOperatorChange={handleOperatorChange}
-              onRefresh={loadTemplates}
-              refreshDisabled={loading}
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>

@@ -54,6 +54,7 @@ import actionSetService, {
 } from '@/services/actionSetService';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import featureFlagService from '@/services/featureFlagService';
@@ -724,15 +725,18 @@ const ActionSetsPage: React.FC = () => {
         title={t('actionSets.title')}
         subtitle={t('actionSets.subtitle')}
         actions={
-          actionSets.length > 0 ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setEditDialog({ open: true, actionSet: null })}
-            >
-              {t('actionSets.createActionSet')}
-            </Button>
-          ) : undefined
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {actionSets.length > 0 && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setEditDialog({ open: true, actionSet: null })}
+              >
+                {t('actionSets.createActionSet')}
+              </Button>
+            )}
+            <PageHeaderContextMenu onRefresh={fetchActionSets} refreshDisabled={loading} />
+          </Box>
         }
       />
 

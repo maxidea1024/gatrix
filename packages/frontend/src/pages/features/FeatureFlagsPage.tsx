@@ -82,7 +82,7 @@ import {
   SportsEsports as JoystickIcon,
   SwapVert as ImportExportIcon,
   Tune as RemoteConfigIcon,
-  ViewList as ViewListIcon,
+  GridView as GridViewIcon,
   GitHub as GitHubIcon,
   Schedule as ScheduleIcon,
 } from '@mui/icons-material';
@@ -99,6 +99,7 @@ import featureFlagService, {
 import PageContentLoader from '../../components/common/PageContentLoader';
 import SegmentedTabs from '../../components/common/SegmentedTabs';
 import OverflowTooltip from '../../components/common/OverflowTooltip';
+import SafeTooltip from '../../components/common/SafeTooltip';
 
 import changeRequestService from '../../services/changeRequestService';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -197,17 +198,19 @@ const FeatureFlagsPage: React.FC = () => {
   const { currentProjectId, currentProject } = useOrgProject();
   const [searchParams] = useSearchParams();
 
-  // Compact view state - query param overrides localStorage
-  const [compactView, setCompactView] = useState<boolean>(() => {
-    const queryVal = searchParams.get('compact');
-    if (queryVal !== null) return queryVal === 'true' || queryVal === '1';
-    return localStorage.getItem('featureFlagsCompactView') === 'true';
+  // Card view state - query param overrides localStorage
+  const [cardView, setCardView] = useState<boolean>(() => {
+    const queryVal = searchParams.get('card');
+    if (queryVal !== null) {
+      return queryVal === 'true';
+    }
+    return localStorage.getItem('featureFlagsCardView') === 'true';
   });
 
-  const handleCompactViewToggle = () => {
-    const newVal = !compactView;
-    setCompactView(newVal);
-    localStorage.setItem('featureFlagsCompactView', String(newVal));
+  const handleCardViewToggle = () => {
+    const newVal = !cardView;
+    setCardView(newVal);
+    localStorage.setItem('featureFlagsCardView', String(newVal));
   };
 
   // State
@@ -1967,7 +1970,7 @@ const FeatureFlagsPage: React.FC = () => {
               noWrap={true}
               afterFilterAddActions={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  {!compactView && (
+                  {!cardView && (
                     <Tooltip
                       title={t('common.columnSettings')}
                       disableFocusListener
@@ -1994,29 +1997,25 @@ const FeatureFlagsPage: React.FC = () => {
                     sx={{ mx: 0.5, my: 0.5 }}
                   />
                   <Tooltip
-                    title={t('featureFlags.compactView')}
+                    title={t('featureFlags.cardView')}
                     disableFocusListener
                   >
                     <IconButton
                       size="small"
-                      onClick={handleCompactViewToggle}
+                      onClick={handleCardViewToggle}
                       sx={{
-                        bgcolor: compactView
-                          ? 'primary.main'
-                          : 'background.paper',
-                        color: compactView
+                        bgcolor: cardView ? 'primary.main' : 'background.paper',
+                        color: cardView
                           ? 'primary.contrastText'
                           : 'text.primary',
                         border: 1,
-                        borderColor: compactView ? 'primary.main' : 'divider',
+                        borderColor: cardView ? 'primary.main' : 'divider',
                         '&:hover': {
-                          bgcolor: compactView
-                            ? 'primary.dark'
-                            : 'action.hover',
+                          bgcolor: cardView ? 'primary.dark' : 'action.hover',
                         },
                       }}
                     >
-                      <ViewListIcon fontSize="small" />
+                      <GridViewIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -2026,7 +2025,7 @@ const FeatureFlagsPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Table / Compact View */}
+      {/* Table / Card View */}
       <PageContentLoader loading={loading && isInitialLoad}>
         {flags.length === 0 ? (
           <EmptyPagePlaceholder
@@ -2040,10 +2039,10 @@ const FeatureFlagsPage: React.FC = () => {
           />
         ) : (
           <Card
-            variant={compactView ? 'elevation' : 'outlined'}
+            variant={cardView ? 'elevation' : 'outlined'}
             elevation={0}
             sx={
-              compactView
+              cardView
                 ? {
                     border: 'none !important',
                     boxShadow: 'none !important',
@@ -2053,11 +2052,10 @@ const FeatureFlagsPage: React.FC = () => {
             }
           >
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-              {compactView ? (
+              {cardView ? (
                 <>
                   <Box
                     sx={{
-                      p: 2,
                       display: 'grid',
                       gridTemplateColumns: {
                         xs: '1fr',
@@ -2065,11 +2063,8 @@ const FeatureFlagsPage: React.FC = () => {
                         xl: '1fr 1fr 1fr',
                       },
                       gap: 2,
-                      bgcolor: (theme: any) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(0,0,0,0.2)'
-                          : 'rgba(0,0,0,0.02)',
-                      borderRadius: 2,
+                      pt: 1,
+                      pb: 1,
                     }}
                   >
                     {flags.map((flag, index) => {
@@ -2189,15 +2184,37 @@ const FeatureFlagsPage: React.FC = () => {
                                     {flag.flagName}
                                   </Typography>
                                 </OverflowTooltip>
-                                {flag.isFavorite && (
-                                  <StarIcon
+                                <SafeTooltip
+                                  title={
+                                    flag.isFavorite
+                                      ? t('featureFlags.removeFromFavorites')
+                                      : t('featureFlags.addToFavorites')
+                                  }
+                                >
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleFavoriteToggle(flag);
+                                    }}
                                     sx={{
-                                      fontSize: 16,
-                                      color: 'warning.main',
+                                      p: '2px',
+                                      color: flag.isFavorite
+                                        ? 'warning.main'
+                                        : 'action.disabled',
+                                      opacity: flag.isFavorite ? 1 : 0.5,
+                                      '&:hover': { opacity: 1 },
                                       flexShrink: 0,
                                     }}
-                                  />
-                                )}
+                                  >
+                                    {flag.isFavorite ? (
+                                      <StarIcon sx={{ fontSize: 18 }} />
+                                    ) : (
+                                      <StarBorderIcon sx={{ fontSize: 18 }} />
+                                    )}
+                                  </IconButton>
+                                </SafeTooltip>
                               </Box>
 
                               <Box
@@ -2781,30 +2798,44 @@ const FeatureFlagsPage: React.FC = () => {
                                               <CopyIcon sx={{ fontSize: 13 }} />
                                             </IconButton>
                                           </Tooltip>
-                                          <IconButton
-                                            size="small"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleFavoriteToggle(flag);
-                                            }}
-                                            sx={{
-                                              color: flag.isFavorite
-                                                ? 'warning.main'
-                                                : 'action.disabled',
-                                              opacity: flag.isFavorite
-                                                ? 1
-                                                : 0.5,
-                                              '&:hover': { opacity: 1 },
-                                            }}
+                                          <SafeTooltip
+                                            title={
+                                              flag.isFavorite
+                                                ? t(
+                                                    'featureFlags.removeFromFavorites'
+                                                  )
+                                                : t(
+                                                    'featureFlags.addToFavorites'
+                                                  )
+                                            }
                                           >
-                                            {flag.isFavorite ? (
-                                              <StarIcon sx={{ fontSize: 16 }} />
-                                            ) : (
-                                              <StarBorderIcon
-                                                sx={{ fontSize: 16 }}
-                                              />
-                                            )}
-                                          </IconButton>
+                                            <IconButton
+                                              size="small"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleFavoriteToggle(flag);
+                                              }}
+                                              sx={{
+                                                color: flag.isFavorite
+                                                  ? 'warning.main'
+                                                  : 'action.disabled',
+                                                opacity: flag.isFavorite
+                                                  ? 1
+                                                  : 0.5,
+                                                '&:hover': { opacity: 1 },
+                                              }}
+                                            >
+                                              {flag.isFavorite ? (
+                                                <StarIcon
+                                                  sx={{ fontSize: 16 }}
+                                                />
+                                              ) : (
+                                                <StarBorderIcon
+                                                  sx={{ fontSize: 16 }}
+                                                />
+                                              )}
+                                            </IconButton>
+                                          </SafeTooltip>
                                         </Box>
                                         {flag.displayName &&
                                           flag.displayName !==

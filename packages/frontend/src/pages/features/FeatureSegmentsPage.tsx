@@ -99,6 +99,7 @@ interface FeatureSegment {
 
 import { toTitleCase } from '../../utils/stringUtils';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 
 const FeatureSegmentsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -587,7 +588,7 @@ const FeatureSegmentsPage: React.FC = () => {
         title={t('featureFlags.segments')}
         subtitle={t('featureFlags.segmentsDescription')}
         actions={
-          <>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {canManage && (
               <Button
                 variant="contained"
@@ -597,7 +598,8 @@ const FeatureSegmentsPage: React.FC = () => {
                 {t('featureFlags.addSegment')}
               </Button>
             )}
-          </>
+            <PageHeaderContextMenu onRefresh={loadSegments} refreshDisabled={loading} />
+          </Box>
         }
       />
 
@@ -638,8 +640,6 @@ const FeatureSegmentsPage: React.FC = () => {
               onFilterAdd={handleFilterAdd}
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleFilterChange}
-              onRefresh={loadSegments}
-              refreshDisabled={loading}
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>

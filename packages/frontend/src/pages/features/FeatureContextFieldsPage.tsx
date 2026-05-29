@@ -78,6 +78,7 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import SvgIcon from '@mui/material/SvgIcon';
 import PageHeader from '@/components/common/PageHeader';
+import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import DiscoveredContextFieldsTab from '../../components/features/DiscoveredContextFieldsTab';
 
@@ -810,7 +811,7 @@ const FeatureContextFieldsPage: React.FC = () => {
           />
         }
         actions={
-          <>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {canManage && activeTab === 0 && (
               <Button
                 variant="contained"
@@ -820,9 +821,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                 {t('featureFlags.addContextField')}
               </Button>
             )}
-          </>
+            <PageHeaderContextMenu onRefresh={loadFields} />
+          </Box>
         }
-        onRefresh={loadFields}
       />
 
       {/* Discovered Tab */}
@@ -885,8 +886,6 @@ const FeatureContextFieldsPage: React.FC = () => {
                 onFilterAdd={handleFilterAdd}
                 onFilterRemove={handleFilterRemove}
                 onFilterChange={handleFilterChange}
-                onRefresh={loadFields}
-                refreshDisabled={loading}
                 noWrap={true}
                 afterFilterAddActions={
                   <Tooltip title={t('common.columnSettings')}>
