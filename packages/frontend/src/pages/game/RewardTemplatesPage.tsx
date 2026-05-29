@@ -23,6 +23,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  LinearProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -661,7 +662,20 @@ const RewardTemplatesPage: React.FC = () => {
                   setImportDialogOpen(true);
                 }}
               />
-            </Menu>
+            
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    setPageMenuAnchor(null);
+                    loadTemplates();
+                  }}
+                >
+                  <ListItemIcon>
+                    <RefreshIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t('common.refresh')}</ListItemText>
+                </MenuItem>
+              </Menu>
           </>
         }
       />
@@ -726,19 +740,7 @@ const RewardTemplatesPage: React.FC = () => {
           </Box>
 
           {/* Right side: Refresh Button */}
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Tooltip title={t('common.refresh')}>
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={loadTemplates}
-                  disabled={loading}
-                >
-                  <RefreshIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </Box>
+          
         </Box>
       </Box>
 
@@ -770,7 +772,26 @@ const RewardTemplatesPage: React.FC = () => {
             subtitle={canManage ? t('common.addFirstItem') : undefined}
           />
         ) : (
-          <Card variant="outlined">
+          <Card
+              variant="outlined"
+              sx={{
+                position: 'relative',
+                overflow: 'hidden',
+                opacity: !isInitialLoad && loading ? 0.5 : 1,
+                pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+                transition: 'opacity 0.2s ease',
+              }}
+            >
+              {!isInitialLoad && loading && (
+                <LinearProgress 
+                  sx={{ 
+                    position: 'absolute', 
+                    top: 0, left: 0, right: 0, 
+                    zIndex: 1,
+                    height: 3
+                  }} 
+                />
+              )}
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table size="small">

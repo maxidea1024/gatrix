@@ -50,6 +50,7 @@ import {
   ListItemIcon,
   ClickAwayListener,
   Menu as MuiMenu,
+  Divider,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -1049,7 +1050,20 @@ const MessageTemplatesPage: React.FC = () => {
                   setImportDialogOpen(true);
                 }}
               />
-            </MuiMenu>
+            
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    setPageMenuAnchor(null);
+                    load();
+                  }}
+                >
+                  <ListItemIcon>
+                    <RefreshIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t('common.refresh')}</ListItemText>
+                </MenuItem>
+              </MuiMenu>
           </>
         }
       />

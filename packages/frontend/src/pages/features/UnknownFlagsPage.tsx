@@ -559,7 +559,6 @@ const UnknownFlagsPage: React.FC = () => {
         icon={<UnknownIcon />}
         title={`${t('featureFlags.unknownFlags')} (${filteredFlags.length})`}
         subtitle={t('featureFlags.unknownFlagsDescription')}
-        onRefresh={loadFlags}
       />
 
       {/* Search and Filters */}
@@ -594,8 +593,6 @@ const UnknownFlagsPage: React.FC = () => {
               onFilterAdd={handleFilterAdd}
               onFilterRemove={handleRemoveFilter}
               onFilterChange={handleFilterChange}
-              onRefresh={loadFlags}
-              refreshDisabled={loading}
               noWrap={true}
               afterFilterAddActions={
                 <Tooltip title={t('common.columnSettings')}>
