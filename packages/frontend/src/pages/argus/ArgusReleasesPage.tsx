@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -9,21 +9,25 @@ import {
   ToggleButtonGroup,
   useTheme,
   alpha,
-  Divider,
+  Skeleton,
+  LinearProgress,
+  Tooltip,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
-  NewReleases as ReleasesIcon,
-  BugReport as BugIcon,
+  NewReleases as ReleaseIcon,
+  BugReport as BugReportIcon,
   People as PeopleIcon,
-  Schedule as ScheduleIcon,
-  Warning as WarnIcon,
-  AccessTime as AccessTimeIcon,
+  Speed as SpeedIcon,
+  Devices as DevicesIcon,
+  Warning as WarningIcon,
   CheckCircle as CheckIcon,
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusRelease } from '@/services/argusService';
+import ArgusSparkline from '@/components/argus/ArgusSparkline';
 
 const TIME_RANGES = [
   { value: '7d', label: '7D' },
@@ -39,13 +43,13 @@ const ArgusReleasesPage: React.FC = () => {
 
   const [releases, setReleases] = useState<ArgusRelease[]>([]);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('30d');
+  const [period, setPeriod] = useState(() => localStorage.getItem('argus-releases-period') || '30d');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const data = await argusService.getReleases(projectId, period);
-      setReleases(data);
+      setReleases(data || []);
     } catch (error) {
       console.error('Failed to fetch releases:', error);
     } finally {
@@ -58,16 +62,32 @@ const ArgusReleasesPage: React.FC = () => {
   const handlePeriodChange = (_: React.MouseEvent<HTMLElement>, v: string | null) => {
     if (!v) return;
     setPeriod(v);
+    localStorage.setItem('argus-releases-period', v);
   };
+
+  // Summary stats across all releases
+  const totalErrors = releases.reduce((s, r) => s + Number(r.error_count), 0);
+  const totalUsers = releases.reduce((s, r) => s + Number(r.affected_users), 0);
+  const avgCrashFree = releases.length > 0
+    ? releases.reduce((s, r) => s + Number(r.crash_free_rate), 0) / releases.length
+    : 100;
 
   return (
     <Box>
       {/* Header */}
       <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h5" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ReleasesIcon sx={{ color: '#7c4dff' }} />
-          {t('argus.releases.title')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <ReleaseIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
+          <Typography variant="h5" fontWeight={700}>
+            {t('argus.releases.title')}
+          </Typography>
+          {!loading && (
+            <Chip label={`${releases.length} releases`} size="small" sx={{
+              fontWeight: 700, fontSize: '0.75rem', height: 22,
+              backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
+            }} />
+          )}
+        </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ToggleButtonGroup value={period} exclusive onChange={handlePeriodChange} size="small">
             {TIME_RANGES.map((r) => (
@@ -81,6 +101,44 @@ const ArgusReleasesPage: React.FC = () => {
         </Box>
       </Box>
 
+      {/* Summary Stats */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2, mb: 3 }}>
+        {[
+          { icon: <ReleaseIcon />, color: '#7c4dff', label: 'Releases', value: releases.length },
+          { icon: <BugReportIcon />, color: '#f44336', label: 'Total Errors', value: totalErrors },
+          { icon: <PeopleIcon />, color: '#ff9800', label: 'Affected Users', value: totalUsers },
+          { icon: <CheckIcon />, color: avgCrashFree >= 99 ? '#4caf50' : avgCrashFree >= 95 ? '#ff9800' : '#f44336', label: 'Avg. Crash Free', value: `${avgCrashFree.toFixed(1)}%` },
+        ].map((card, idx) => (
+          <Paper key={idx} elevation={0} sx={{
+            p: 2,
+            background: isDark
+              ? `linear-gradient(135deg, ${alpha(card.color, 0.12)}, ${alpha(card.color, 0.03)})`
+              : `linear-gradient(135deg, ${alpha(card.color, 0.06)}, ${alpha(card.color, 0.01)})`,
+            border: `1px solid ${alpha(card.color, 0.2)}`,
+            borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1.5,
+            transition: 'all 0.2s', '&:hover': { transform: 'translateY(-1px)' },
+          }}>
+            <Box sx={{
+              width: 36, height: 36, borderRadius: 2,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1), color: card.color,
+            }}>
+              {React.cloneElement(card.icon, { sx: { fontSize: 18 } })}
+            </Box>
+            <Box>
+              {loading ? <Skeleton width={50} height={24} /> : (
+                <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, fontSize: '1.1rem' }}>
+                  {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
+                </Typography>
+              )}
+              <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, fontSize: '0.65rem' }}>
+                {card.label}
+              </Typography>
+            </Box>
+          </Paper>
+        ))}
+      </Box>
+
       <PageContentLoader loading={loading}>
         {releases.length === 0 ? (
           <Paper elevation={0} sx={{
@@ -88,89 +146,86 @@ const ArgusReleasesPage: React.FC = () => {
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             borderRadius: 2,
           }}>
-            <ReleasesIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+            <ReleaseIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
             <Typography color="text.secondary">{t('argus.releases.noReleases')}</Typography>
           </Paper>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {releases.map((r, idx) => {
-              const rate = Number(r.crash_free_rate);
-              const rateColor = rate >= 99 ? '#4caf50' : rate >= 95 ? '#ff9800' : '#f44336';
-              const isBeta = r.release.includes('beta') || r.release.includes('alpha') || r.release.includes('rc');
+              const crashFree = Number(r.crash_free_rate);
               const isHotfix = r.release.includes('hotfix');
+              const statusColor = crashFree >= 99 ? '#4caf50' : crashFree >= 95 ? '#ff9800' : '#f44336';
+              const errorCount = Number(r.error_count);
+              const fatalCount = Number(r.fatal_count || 0);
+              const unhandledCount = Number(r.unhandled_count || 0);
+              const txnCount = Number(r.transaction_count || 0);
+              const avgDur = Number(r.avg_duration || 0);
+              const p95 = Number(r.p95 || 0);
+              const txnErrorRate = Number(r.txn_error_rate || 0);
+
               return (
                 <Paper
                   key={`${r.release}-${idx}`}
                   elevation={0}
                   sx={{
                     border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                    borderRadius: 2,
-                    overflow: 'hidden',
+                    borderRadius: 2, overflow: 'hidden',
+                    borderLeft: `3px solid ${statusColor}`,
                     transition: 'all 0.15s',
-                    '&:hover': { borderColor: alpha('#7c4dff', 0.3) },
+                    '&:hover': { borderColor: alpha(statusColor, 0.5), boxShadow: `0 2px 12px ${alpha(statusColor, 0.08)}` },
                   }}
                 >
-                  {/* Release Header */}
+                  {/* Header row */}
                   <Box sx={{
-                    display: 'flex', alignItems: 'center', gap: 1.5,
-                    px: 2.5, py: 1.5,
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                    display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.5,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                   }}>
-                    <Chip
-                      label={r.release}
-                      size="small"
-                      sx={{
-                        fontWeight: 700, fontSize: '0.82rem',
-                        backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
-                      }}
-                    />
-                    {isBeta && <Chip label="Beta" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none' }} />}
-                    {isHotfix && <Chip label="Hotfix" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha('#f44336', 0.12), color: '#f44336', border: 'none' }} />}
-                    <Box sx={{ flex: 1 }} />
-                    {/* Crash-free badge */}
-                    <Box sx={{
-                      display: 'flex', alignItems: 'center', gap: 0.5,
-                      px: 1.2, py: 0.3, borderRadius: 1,
-                      backgroundColor: alpha(rateColor, 0.1),
-                    }}>
-                      {rate >= 99 ? <CheckIcon sx={{ fontSize: 14, color: rateColor }} /> : <WarnIcon sx={{ fontSize: 14, color: rateColor }} />}
-                      <Typography variant="caption" fontWeight={700} sx={{ color: rateColor }}>
-                        {rate.toFixed(1)}% crash free
+                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="subtitle2" fontWeight={700} sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                        {r.release}
+                      </Typography>
+                      {isHotfix && (
+                        <Chip label="hotfix" size="small" sx={{ height: 18, fontSize: '0.6rem', backgroundColor: alpha('#ff9800', 0.1), color: '#ff9800', border: 'none' }} />
+                      )}
+                    </Box>
+                    {/* Crash-free rate badge */}
+                    <Tooltip title="Crash Free Rate">
+                      <Chip
+                        icon={<CheckIcon sx={{ fontSize: '14px !important' }} />}
+                        label={`${crashFree.toFixed(1)}%`}
+                        size="small"
+                        sx={{
+                          height: 24, fontWeight: 700, fontSize: '0.72rem',
+                          backgroundColor: alpha(statusColor, isDark ? 0.15 : 0.08),
+                          color: statusColor, border: `1px solid ${alpha(statusColor, 0.3)}`,
+                          '& .MuiChip-icon': { color: statusColor },
+                        }}
+                      />
+                    </Tooltip>
+                    {/* Sparkline */}
+                    {r.error_trend && r.error_trend.length > 1 && (
+                      <ArgusSparkline data={r.error_trend} width={60} height={20} color="#f44336" />
+                    )}
+                    {/* Time */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+                      <ScheduleIcon sx={{ fontSize: 13, color: isDark ? '#555' : '#bbb' }} />
+                      <Typography variant="caption" sx={{ fontSize: '0.65rem', color: isDark ? '#666' : '#999' }}>
+                        {formatDate(r.first_seen)} → {formatDate(r.last_seen)}
                       </Typography>
                     </Box>
                   </Box>
 
-                  {/* Stats Row */}
-                  <Box sx={{ display: 'flex', px: 2.5, py: 2, gap: 3, flexWrap: 'wrap' }}>
-                    <StatItem icon={<BugIcon sx={{ fontSize: 15 }} />} color="#f44336" label={t('argus.releases.errors')} value={Number(r.error_count).toLocaleString()} />
-                    <Divider orientation="vertical" flexItem />
-                    <StatItem icon={<BugIcon sx={{ fontSize: 15 }} />} color="#ff9800" label={t('argus.releases.issues')} value={Number(r.issue_count).toLocaleString()} />
-                    <Divider orientation="vertical" flexItem />
-                    <StatItem icon={<PeopleIcon sx={{ fontSize: 15 }} />} color="#2196f3" label={t('argus.releases.users')} value={Number(r.affected_users).toLocaleString()} />
-                    <Divider orientation="vertical" flexItem />
-                    <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <AccessTimeIcon sx={{ fontSize: 14, color: isDark ? '#666' : '#999' }} />
-                        <Typography variant="caption" sx={{ color: isDark ? '#888' : '#666' }}>
-                          {t('argus.releases.firstSeen')}: {formatRelative(r.first_seen, t)}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.68rem', display: 'block' }}>
-                        {t('argus.releases.lastSeen')}: {formatRelative(r.last_seen, t)}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Health bar */}
-                  <Box sx={{ px: 2.5, pb: 2 }}>
-                    <Box sx={{ height: 6, borderRadius: 3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
-                      <Box sx={{
-                        height: '100%', borderRadius: 3, width: `${Math.min(rate, 100)}%`,
-                        background: `linear-gradient(90deg, ${rateColor}, ${alpha(rateColor, 0.5)})`,
-                        transition: 'width 0.5s',
-                      }} />
-                    </Box>
+                  {/* Metrics grid */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 0, px: 0 }}>
+                    <MetricCell label="Errors" value={errorCount.toLocaleString()} color="#f44336" isDark={isDark} icon={<BugReportIcon />} />
+                    <MetricCell label="Fatal" value={fatalCount.toLocaleString()} color={fatalCount > 0 ? '#d50000' : '#4caf50'} isDark={isDark} icon={<WarningIcon />} />
+                    <MetricCell label="Unhandled" value={unhandledCount.toLocaleString()} color={unhandledCount > 0 ? '#ff5722' : '#4caf50'} isDark={isDark} icon={<WarningIcon />} />
+                    <MetricCell label="Affected Users" value={Number(r.affected_users).toLocaleString()} color="#ff9800" isDark={isDark} icon={<PeopleIcon />} />
+                    <MetricCell label="Issues" value={Number(r.issue_count).toLocaleString()} color="#2196f3" isDark={isDark} icon={<BugReportIcon />} />
+                    <MetricCell label="Sessions" value={Number(r.total_sessions).toLocaleString()} color="#7c4dff" isDark={isDark} icon={<DevicesIcon />} />
+                    <MetricCell label="Transactions" value={txnCount.toLocaleString()} color="#00bcd4" isDark={isDark} icon={<SpeedIcon />} />
+                    <MetricCell label="P95 Latency" value={p95 > 0 ? `${Math.round(p95)}ms` : '-'} color={p95 > 3000 ? '#f44336' : p95 > 1000 ? '#ff9800' : '#4caf50'} isDark={isDark} icon={<SpeedIcon />} />
                   </Box>
                 </Paper>
               );
@@ -182,31 +237,34 @@ const ArgusReleasesPage: React.FC = () => {
   );
 };
 
-const StatItem: React.FC<{ icon: React.ReactElement; color: string; label: string; value: string }> = ({ icon, color, label, value }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-    <Box sx={{ color, display: 'flex' }}>{icon}</Box>
+// --- Sub-components ---
+
+const MetricCell: React.FC<{ label: string; value: string; color: string; isDark: boolean; icon: React.ReactElement }> = ({ label, value, color, isDark, icon }) => (
+  <Box sx={{
+    py: 1.5, px: 2,
+    borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+    display: 'flex', alignItems: 'center', gap: 1,
+  }}>
+    <Box sx={{ color: alpha(color, 0.5), display: 'flex' }}>
+      {React.cloneElement(icon, { sx: { fontSize: 15 } })}
+    </Box>
     <Box>
-      <Typography variant="body2" fontWeight={700}>{value}</Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>{label}</Typography>
+      <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.82rem', color, lineHeight: 1.2 }}>
+        {value}
+      </Typography>
+      <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#666' : '#aaa' }}>
+        {label}
+      </Typography>
     </Box>
   </Box>
 );
 
-function formatRelative(dateStr: string, t: any): string {
+function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const hrs = Math.floor(diff / 3600000);
-    const days = Math.floor(hrs / 24);
-
-    if (hrs < 1) return t('common.time.justNow');
-    if (hrs < 24) return t('common.time.hoursAgo', { count: hrs });
-    if (days < 30) return t('common.time.daysAgo', { count: days });
-    return d.toLocaleDateString();
-  } catch {
-    return dateStr;
-  }
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  } catch { return dateStr; }
 }
 
 export default ArgusReleasesPage;

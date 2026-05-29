@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -12,19 +12,40 @@ import {
   useTheme,
   alpha,
   Avatar,
+  TextField,
+  InputAdornment,
+  Skeleton,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
   Feedback as FeedbackIcon,
-  Person as PersonIcon,
-  Email as EmailIcon,
   Schedule as ScheduleIcon,
   Link as LinkIcon,
   FormatQuote as QuoteIcon,
+  Search as SearchIcon,
+  People as PeopleIcon,
+  ContactMail as ContactIcon,
+  TextFields as TextIcon,
+  TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import argusService, { ArgusFeedbackItem } from '@/services/argusService';
+import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse } from '@/services/argusService';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
 const PAGE_SIZE = 20;
 const TIME_RANGES = [
@@ -33,7 +54,6 @@ const TIME_RANGES = [
   { value: '30d', label: '30D' },
 ];
 
-// Generate avatar color from name
 function stringToColor(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
@@ -51,24 +71,30 @@ const ArgusFeedbackPage: React.FC = () => {
   const isDark = theme.palette.mode === 'dark';
   const projectId = '1';
 
-  const [items, setItems] = useState<ArgusFeedbackItem[]>([]);
-  const [total, setTotal] = useState(0);
+  const [data, setData] = useState<ArgusFeedbackResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [period, setPeriod] = useState('7d');
+  const [search, setSearch] = useState('');
+  const [searchDebounce, setSearchDebounce] = useState('');
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchDebounce(search), 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await argusService.getFeedback(projectId, { period, page, limit: PAGE_SIZE });
-      setItems(data.items || []);
-      setTotal(data.total || 0);
+      const result = await argusService.getFeedback(projectId, { period, page, limit: PAGE_SIZE, search: searchDebounce || undefined });
+      setData(result);
     } catch (error) {
       console.error('Failed to fetch feedback:', error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, period, page]);
+  }, [projectId, period, page, searchDebounce]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -78,7 +104,46 @@ const ArgusFeedbackPage: React.FC = () => {
     setPage(1);
   };
 
+  const items = data?.items || [];
+  const total = data?.total || 0;
+  const summary = data?.summary;
   const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  // Trend chart
+  const trendChartData = useMemo(() => {
+    if (!data?.trend) return { labels: [], datasets: [] };
+    return {
+      labels: data.trend.map(d => {
+        try { const dt = new Date(d.day); return `${dt.getMonth() + 1}/${dt.getDate()}`; } catch { return d.day; }
+      }),
+      datasets: [{
+        label: 'Feedback',
+        data: data.trend.map(d => Number(d.count)),
+        backgroundColor: alpha('#7c4dff', 0.6),
+        borderColor: '#7c4dff',
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false,
+      }],
+    };
+  }, [data]);
+
+  const chartOpts = useMemo(() => ({
+    responsive: true, maintainAspectRatio: false,
+    animation: { duration: 300 },
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } },
+      y: { beginAtZero: true, border: { display: false }, grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 } } },
+    },
+  }), [isDark]);
+
+  const statCards = [
+    { icon: <FeedbackIcon />, color: '#7c4dff', label: 'Total Feedback', value: summary?.total_feedback },
+    { icon: <PeopleIcon />, color: '#2196f3', label: 'Unique Users', value: summary?.unique_users },
+    { icon: <ContactIcon />, color: '#4caf50', label: 'With Contact Email', value: summary?.with_contact },
+    { icon: <TextIcon />, color: '#ff9800', label: 'Avg. Message Length', value: summary ? `${Math.round(Number(summary.avg_message_length))} chars` : undefined },
+  ];
 
   return (
     <Box>
@@ -109,6 +174,76 @@ const ArgusFeedbackPage: React.FC = () => {
         </Box>
       </Box>
 
+      {/* Stats + Trend Row */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
+        {/* Stats Grid */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
+          {statCards.map((card, idx) => (
+            <Paper key={idx} elevation={0} sx={{
+              p: 2,
+              background: isDark
+                ? `linear-gradient(135deg, ${alpha(card.color, 0.12)}, ${alpha(card.color, 0.03)})`
+                : `linear-gradient(135deg, ${alpha(card.color, 0.06)}, ${alpha(card.color, 0.01)})`,
+              border: `1px solid ${alpha(card.color, 0.2)}`,
+              borderRadius: 2,
+              display: 'flex', alignItems: 'center', gap: 1.5,
+              transition: 'all 0.2s',
+              '&:hover': { transform: 'translateY(-1px)' },
+            }}>
+              <Box sx={{
+                width: 36, height: 36, borderRadius: 2,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1), color: card.color,
+              }}>
+                {React.cloneElement(card.icon, { sx: { fontSize: 18 } })}
+              </Box>
+              <Box>
+                {loading ? <Skeleton width={50} height={24} /> : (
+                  <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, fontSize: '1.1rem' }}>
+                    {typeof card.value === 'number' ? card.value.toLocaleString() : card.value ?? '-'}
+                  </Typography>
+                )}
+                <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, fontSize: '0.65rem' }}>
+                  {card.label}
+                </Typography>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+
+        {/* Trend Chart */}
+        <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <TrendingUpIcon fontSize="small" sx={{ color: '#7c4dff' }} />
+            Feedback Trend
+          </Typography>
+          <Box sx={{ height: 140 }}>
+            {loading ? <Skeleton variant="rounded" height={140} /> : <Bar data={trendChartData} options={chartOpts} />}
+          </Box>
+        </Paper>
+      </Box>
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          size="small"
+          placeholder={t('argus.feedback.searchPlaceholder', 'Search by name, email, or message...')}
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          InputProps={{
+            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: isDark ? '#555' : '#bbb' }} /></InputAdornment>,
+          }}
+          sx={{
+            width: { xs: '100%', md: 360 },
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+              fontSize: '0.85rem',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+            },
+          }}
+        />
+      </Box>
+
       <PageContentLoader loading={loading}>
         {items.length === 0 ? (
           <Paper elevation={0} sx={{
@@ -121,12 +256,12 @@ const ArgusFeedbackPage: React.FC = () => {
           </Paper>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {items.map((item) => {
+            {items.map((item, idx) => {
               const displayName = item.name || item.email?.split('@')[0] || 'Anonymous';
               const avatarColor = stringToColor(displayName);
               return (
                 <Paper
-                  key={item.event_id}
+                  key={`${item.event_id}-${idx}`}
                   elevation={0}
                   sx={{
                     p: 0, overflow: 'hidden',
@@ -157,16 +292,20 @@ const ArgusFeedbackPage: React.FC = () => {
                       )}
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      {item.contact_email && (
+                        <Chip
+                          icon={<ContactIcon sx={{ fontSize: '14px !important' }} />}
+                          label="Contact"
+                          size="small"
+                          sx={{ height: 20, fontSize: '0.6rem', backgroundColor: alpha('#4caf50', 0.08), color: '#4caf50', border: 'none', '& .MuiChip-icon': { color: '#4caf50' } }}
+                        />
+                      )}
                       {item.url && (
                         <Chip
                           icon={<LinkIcon sx={{ fontSize: '14px !important' }} />}
-                          label={item.url}
+                          label={item.url.replace(/^https?:\/\//, '').substring(0, 30)}
                           size="small"
-                          sx={{
-                            height: 20, fontSize: '0.65rem',
-                            backgroundColor: alpha('#2196f3', 0.08), color: '#2196f3', border: 'none',
-                            '& .MuiChip-icon': { color: '#2196f3' },
-                          }}
+                          sx={{ height: 20, fontSize: '0.65rem', backgroundColor: alpha('#2196f3', 0.08), color: '#2196f3', border: 'none', '& .MuiChip-icon': { color: '#2196f3' } }}
                         />
                       )}
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>

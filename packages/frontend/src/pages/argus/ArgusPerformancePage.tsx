@@ -378,6 +378,56 @@ const ArgusPerformancePage: React.FC = () => {
       {/* === TRANSACTION LIST === */}
       {viewMode === 'list' && (
         <PageContentLoader loading={loading}>
+          {/* Performance Summary Stats */}
+          {transactions.length > 0 && (
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2, mb: 3 }}>
+              {(() => {
+                const totalCount = transactions.reduce((s, t) => s + Number(t.count), 0);
+                const avgP95 = transactions.reduce((s, t) => s + Number(t.p95), 0) / transactions.length;
+                const avgDur = transactions.reduce((s, t) => s + Number(t.avg_duration), 0) / transactions.length;
+                const avgErr = transactions.reduce((s, t) => s + Number(t.error_rate), 0) / transactions.length;
+                const slowest = transactions.reduce((max, t) => Number(t.p95) > Number(max.p95) ? t : max, transactions[0]);
+                return [
+                  { label: t('argus.performance.totalTransactions', 'Total Transactions'), value: totalCount.toLocaleString(), color: '#7c4dff', icon: <SpeedIcon /> },
+                  { label: t('argus.performance.avgP95', 'Avg. P95'), value: `${avgP95.toFixed(0)}ms`, color: avgP95 > 3000 ? '#f44336' : avgP95 > 1000 ? '#ff9800' : '#4caf50', icon: <TimelineIcon /> },
+                  { label: t('argus.performance.avgDuration', 'Avg. Duration'), value: `${avgDur.toFixed(0)}ms`, color: '#2196f3', icon: <ScheduleIcon /> },
+                  { label: t('argus.performance.avgErrorRate', 'Avg. Error Rate'), value: `${avgErr.toFixed(2)}%`, color: avgErr > 5 ? '#f44336' : avgErr > 1 ? '#ff9800' : '#4caf50', icon: <SpeedIcon /> },
+                  { label: t('argus.performance.slowestEndpoint', 'Slowest Endpoint'), value: `${parseTransaction(slowest.name).path.slice(0, 20)}`, color: '#f44336', icon: <SpeedIcon />, subtitle: `P95: ${Number(slowest.p95).toFixed(0)}ms` },
+                ].map((card, idx) => (
+                  <Paper key={idx} elevation={0} sx={{
+                    p: 2,
+                    background: isDark
+                      ? `linear-gradient(135deg, ${alpha(card.color, 0.12)}, ${alpha(card.color, 0.03)})`
+                      : `linear-gradient(135deg, ${alpha(card.color, 0.06)}, ${alpha(card.color, 0.01)})`,
+                    border: `1px solid ${alpha(card.color, 0.2)}`,
+                    borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1.5,
+                    transition: 'all 0.2s', '&:hover': { transform: 'translateY(-1px)' },
+                  }}>
+                    <Box sx={{
+                      width: 36, height: 36, borderRadius: 2,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1), color: card.color,
+                    }}>
+                      {React.cloneElement(card.icon, { sx: { fontSize: 18 } })}
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, fontSize: '1rem', color: card.color }}>
+                        {card.value}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, fontSize: '0.6rem' }}>
+                        {card.label}
+                      </Typography>
+                      {(card as any).subtitle && (
+                        <Typography variant="caption" sx={{ display: 'block', color: isDark ? '#555' : '#bbb', fontSize: '0.58rem' }}>
+                          {(card as any).subtitle}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Paper>
+                ));
+              })()}
+            </Box>
+          )}
           <Paper elevation={0} sx={{ border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, overflow: 'hidden' }}>
             {/* Table Header */}
             <Box sx={{

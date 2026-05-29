@@ -448,12 +448,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.CRASH_EVENTS_READ,
       },
       {
-        text: 'sidebar.argusSettings',
-        icon: 'Settings',
-        path: '/argus/settings',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
-      {
         text: 'sidebar.argusSessions',
         icon: 'Devices',
         path: '/argus/sessions',
@@ -470,6 +464,13 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'NewReleases',
         path: '/argus/releases',
         requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusSettings',
+        icon: 'Settings',
+        path: '/argus/settings',
+        requiredPermission: P.CRASH_EVENTS_READ,
+        divider: true,
       },
     ],
   },

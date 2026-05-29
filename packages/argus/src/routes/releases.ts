@@ -5,64 +5,112 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('releases-api');
 
 export default async function releasesRoutes(app: FastifyInstance) {
-  // List releases with stats
+  // List releases with enriched stats
   app.get(
     '/releases/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const { period = '30d' } = request.query as { period?: string };
       const interval = periodToInterval(period);
+      const qp = { projectId: String(projectId) };
 
       try {
-        const result = await clickhouse.query({
-          query: `
-            SELECT
+        const [errorResult, sessionResult, txnResult, trendResult] = await Promise.all([
+          // Error stats per release
+          clickhouse.query({
+            query: `SELECT
               release,
               min(timestamp) AS first_seen,
               max(timestamp) AS last_seen,
               count() AS error_count,
               uniq(user_id) AS affected_users,
-              uniqExact(fingerprint) AS issue_count
+              uniqExact(fingerprint) AS issue_count,
+              countIf(level = 'fatal') AS fatal_count,
+              countIf(is_handled = 0) AS unhandled_count
             FROM argus.errors
-            WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL ${interval}
-              AND release != ''
-            GROUP BY release
-            ORDER BY last_seen DESC
-          `,
-          query_params: { projectId: String(projectId) },
-        });
-        const data = await result.json();
+            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND release != ''
+            GROUP BY release ORDER BY last_seen DESC`,
+            query_params: qp,
+          }),
 
-        // Session crash-free per release
-        const sessionResult = await clickhouse.query({
-          query: `
-            SELECT
+          // Session crash-free per release
+          clickhouse.query({
+            query: `SELECT
               release,
               count() AS total_sessions,
               countIf(status = 'crashed') AS crashed,
-              if(total_sessions > 0, (1 - crashed / total_sessions) * 100, 100) AS crash_free_rate
+              if(total_sessions > 0, (1 - crashed / total_sessions) * 100, 100) AS crash_free_rate,
+              uniq(distinct_id) AS session_users
             FROM argus.sessions
-            WHERE project_id = {projectId:String}
-              AND started >= now() - INTERVAL ${interval}
-              AND release != ''
-            GROUP BY release
-          `,
-          query_params: { projectId: String(projectId) },
-        });
-        const sessionData = await sessionResult.json();
+            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval} AND release != ''
+            GROUP BY release`,
+            query_params: qp,
+          }),
+
+          // Transaction performance per release
+          clickhouse.query({
+            query: `SELECT
+              release,
+              count() AS transaction_count,
+              avg(duration) AS avg_duration,
+              quantile(0.95)(duration) AS p95,
+              countIf(transaction_status != 'ok') / count() * 100 AS error_rate
+            FROM argus.transactions
+            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND release != ''
+            GROUP BY release`,
+            query_params: qp,
+          }),
+
+          // NEW: Error trend per release (daily, for sparklines)
+          clickhouse.query({
+            query: `SELECT
+              release,
+              toStartOfDay(timestamp) AS day,
+              count() AS count
+            FROM argus.errors
+            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND release != ''
+            GROUP BY release, day ORDER BY release, day`,
+            query_params: qp,
+          }),
+        ]);
+
+        const [errorData, sessionData, txnData, trendData] = await Promise.all([
+          errorResult.json(),
+          sessionResult.json(),
+          txnResult.json(),
+          trendResult.json(),
+        ]);
 
         const sessionMap = new Map<string, any>();
         for (const s of (sessionData.data || []) as any[]) {
           sessionMap.set(s.release, s);
         }
 
-        const releases = ((data.data || []) as any[]).map((r: any) => {
+        const txnMap = new Map<string, any>();
+        for (const t of (txnData.data || []) as any[]) {
+          txnMap.set(t.release, t);
+        }
+
+        // Build trend sparklines per release
+        const trendMap = new Map<string, number[]>();
+        for (const t of (trendData.data || []) as any[]) {
+          if (!trendMap.has(t.release)) trendMap.set(t.release, []);
+          trendMap.get(t.release)!.push(Number(t.count));
+        }
+
+        const releases = ((errorData.data || []) as any[]).map((r: any) => {
           const sess = sessionMap.get(r.release);
+          const txn = txnMap.get(r.release);
           return {
             ...r,
-            total_sessions: sess?.total_sessions || 0,
-            crash_free_rate: sess?.crash_free_rate || 100,
+            total_sessions: Number(sess?.total_sessions || 0),
+            crash_free_rate: Number(sess?.crash_free_rate || 100),
+            session_users: Number(sess?.session_users || 0),
+            transaction_count: Number(txn?.transaction_count || 0),
+            avg_duration: Number(txn?.avg_duration || 0),
+            p95: Number(txn?.p95 || 0),
+            txn_error_rate: Number(txn?.error_rate || 0),
+            error_trend: trendMap.get(r.release) || [],
           };
         });
 

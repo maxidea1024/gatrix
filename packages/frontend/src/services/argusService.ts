@@ -97,6 +97,7 @@ export interface ArgusErrorEvent {
   device: string;
   tags: Record<string, string>;
   breadcrumbs: string;
+  contexts: string | Record<string, any>;
 }
 
 export interface ArgusIssueListParams {
@@ -224,6 +225,11 @@ export interface ArgusSessionHealth {
   };
   trend: { hour: string; total: number; crashed: number; healthy: number; crash_free_rate: number }[];
   by_release: { release: string; total: number; crashed: number; crash_free_rate: number; users: number }[];
+  duration_distribution: { bucket: string; count: number }[];
+  status_timeline: { hour: string; healthy: number; errored: number; crashed: number; abnormal: number }[];
+  crash_by_browser: { browser: string; total: number; crashed: number; crash_rate: number }[];
+  crash_by_os: { os: string; total: number; crashed: number; crash_rate: number }[];
+  previous_period: { total_sessions: number; crashed: number; crash_free_rate: number; unique_users: number };
 }
 
 export interface ArgusFeedbackItem {
@@ -236,6 +242,20 @@ export interface ArgusFeedbackItem {
   url: string;
 }
 
+export interface ArgusFeedbackSummary {
+  total_feedback: number;
+  unique_users: number;
+  with_contact: number;
+  avg_message_length: number;
+}
+
+export interface ArgusFeedbackResponse {
+  items: ArgusFeedbackItem[];
+  total: number;
+  trend: { day: string; count: number }[];
+  summary: ArgusFeedbackSummary;
+}
+
 export interface ArgusRelease {
   release: string;
   first_seen: string;
@@ -243,8 +263,16 @@ export interface ArgusRelease {
   error_count: number;
   affected_users: number;
   issue_count: number;
+  fatal_count: number;
+  unhandled_count: number;
   total_sessions: number;
   crash_free_rate: number;
+  session_users: number;
+  transaction_count: number;
+  avg_duration: number;
+  p95: number;
+  txn_error_rate: number;
+  error_trend: number[];
 }
 
 // ==================== Prefix for all Argus API calls ====================
@@ -315,8 +343,8 @@ class ArgusService {
 
   async getFeedback(
     projectId: number | string,
-    params?: { period?: string; page?: number; limit?: number }
-  ): Promise<{ items: ArgusFeedbackItem[]; total: number }> {
+    params?: { period?: string; page?: number; limit?: number; search?: string }
+  ): Promise<ArgusFeedbackResponse> {
     const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
     return response.data?.data || response.data;
   }
