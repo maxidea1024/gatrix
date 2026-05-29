@@ -10,6 +10,7 @@ import {
   useTheme,
   alpha,
   Skeleton,
+  Tooltip,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -20,6 +21,11 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
   ArrowForward as ArrowForwardIcon,
+  ReportProblem as UnhandledIcon,
+  GridView as HeatmapIcon,
+  DevicesOther as DevicesIcon,
+  Cloud as EnvIcon,
+  NewReleases as ReleaseIcon,
 } from '@mui/icons-material';
 import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useNavigate } from 'react-router-dom';
@@ -53,6 +59,8 @@ const TIME_RANGES = [
   { value: '30d', label: '30D' },
 ];
 
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 const ArgusOverviewPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -82,6 +90,12 @@ const ArgusOverviewPage: React.FC = () => {
     if (!value) return;
     setPeriod(value);
     localStorage.setItem('argus-overview-period', value);
+  };
+
+  // --- Helpers ---
+  const calcChange = (current: number | undefined, previous: number | undefined): number | null => {
+    if (current == null || previous == null || previous === 0) return null;
+    return ((current - previous) / previous) * 100;
   };
 
   // --- Chart Data ---
@@ -177,6 +191,11 @@ const ArgusOverviewPage: React.FC = () => {
   const es = data?.error_summary;
   const ts = data?.transaction_summary;
   const ss = data?.session_summary;
+  const pp = data?.previous_period;
+
+  const errorChange = calcChange(es?.total_errors, pp?.total_errors);
+  const userChange = calcChange(es?.affected_users, pp?.affected_users);
+  const txnChange = calcChange(ts?.total_transactions, pp?.total_transactions);
 
   // --- Stat Card Configs ---
   const statCards = [
@@ -189,7 +208,9 @@ const ArgusOverviewPage: React.FC = () => {
       color: '#f44336',
       label: t('argus.overview.totalErrors'),
       value: es?.total_errors,
+      change: errorChange,
       sparkData: errorTrendData,
+      invertChange: true,
     },
     {
       icon: <PeopleIcon />,
@@ -200,7 +221,9 @@ const ArgusOverviewPage: React.FC = () => {
       color: '#ff9800',
       label: t('argus.overview.affectedUsers'),
       value: es?.affected_users,
+      change: userChange,
       sparkData: errorTrendData,
+      invertChange: true,
     },
     {
       icon: <SpeedIcon />,
@@ -211,7 +234,9 @@ const ArgusOverviewPage: React.FC = () => {
       color: '#7c4dff',
       label: t('argus.overview.transactions'),
       value: ts?.total_transactions,
+      change: txnChange,
       sparkData: txnTrendData,
+      invertChange: false,
     },
     {
       icon: <CheckCircleIcon />,
@@ -222,9 +247,27 @@ const ArgusOverviewPage: React.FC = () => {
       color: '#4caf50',
       label: t('argus.overview.crashFreeRate'),
       value: ss ? `${Number(ss.crash_free_rate).toFixed(1)}%` : undefined,
+      change: null,
       sparkData: [],
+      invertChange: false,
+    },
+    {
+      icon: <UnhandledIcon />,
+      gradient: isDark
+        ? `linear-gradient(135deg, ${alpha('#ef5350', 0.15)}, ${alpha('#e53935', 0.05)})`
+        : `linear-gradient(135deg, ${alpha('#ef5350', 0.08)}, ${alpha('#e53935', 0.02)})`,
+      borderColor: alpha('#ef5350', 0.3),
+      color: '#ef5350',
+      label: t('argus.overview.unhandledRate', 'Unhandled Rate'),
+      value: data ? `${Number(data.unhandled_rate || 0).toFixed(1)}%` : undefined,
+      change: null,
+      sparkData: [],
+      invertChange: true,
     },
   ];
+
+  // --- Heatmap data ---
+  const heatmapMax = Math.max(1, ...(data?.error_heatmap?.map(h => Number(h.count)) || [1]));
 
   return (
     <Box>
@@ -259,14 +302,14 @@ const ArgusOverviewPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Stat Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 2, mb: 3 }}>
+      {/* Stat Cards — with change indicators */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2, mb: 3 }}>
         {statCards.map((card, idx) => (
           <Paper
             key={idx}
             elevation={0}
             sx={{
-              p: 2.5,
+              p: 2,
               background: card.gradient,
               border: `1px solid ${card.borderColor}`,
               borderRadius: 2,
@@ -280,29 +323,34 @@ const ArgusOverviewPage: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Box
                 sx={{
-                  width: 42, height: 42, borderRadius: 2,
+                  width: 40, height: 40, borderRadius: 2,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1),
                   color: card.color,
                 }}
               >
-                {React.cloneElement(card.icon, { sx: { fontSize: 22 } })}
+                {React.cloneElement(card.icon, { sx: { fontSize: 20 } })}
               </Box>
               <Box>
                 {loading ? (
-                  <Skeleton width={60} height={32} />
+                  <Skeleton width={60} height={28} />
                 ) : (
-                  <Typography variant="h5" fontWeight={800} sx={{ lineHeight: 1.2, color: isDark ? '#fff' : '#1a1a2e' }}>
-                    {typeof card.value === 'number' ? card.value.toLocaleString() : card.value ?? '-'}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.8 }}>
+                    <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, color: isDark ? '#fff' : '#1a1a2e' }}>
+                      {typeof card.value === 'number' ? card.value.toLocaleString() : card.value ?? '-'}
+                    </Typography>
+                    {card.change != null && (
+                      <ChangeIndicator value={card.change} invert={card.invertChange} />
+                    )}
+                  </Box>
                 )}
-                <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, letterSpacing: 0.3 }}>
+                <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, letterSpacing: 0.3, fontSize: '0.68rem' }}>
                   {card.label}
                 </Typography>
               </Box>
             </Box>
             {card.sparkData.length > 2 && (
-              <ArgusSparkline data={card.sparkData} width={70} height={28} color={card.color} />
+              <ArgusSparkline data={card.sparkData} width={60} height={24} color={card.color} />
             )}
           </Paper>
         ))}
@@ -331,8 +379,97 @@ const ArgusOverviewPage: React.FC = () => {
         </Paper>
       </Box>
 
-      {/* Bottom Row: Performance Summary + Top Issues */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: 2 }}>
+      {/* NEW: Error Heatmap */}
+      <Paper elevation={0} sx={{ p: 2.5, mb: 3, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <HeatmapIcon fontSize="small" sx={{ color: theme.palette.error.main }} />
+          {t('argus.overview.errorHeatmap', 'Error Heatmap')}
+          <Typography variant="caption" sx={{ ml: 1, color: isDark ? '#666' : '#aaa' }}>
+            {t('argus.overview.last7Days', 'Last 7 days')}
+          </Typography>
+        </Typography>
+        {loading ? (
+          <Skeleton variant="rounded" height={180} />
+        ) : (
+          <Box sx={{ overflowX: 'auto' }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '48px repeat(24, 1fr)', gap: '2px', minWidth: 600 }}>
+              {/* Hour labels header */}
+              <Box />
+              {Array.from({ length: 24 }, (_, h) => (
+                <Typography key={`h-${h}`} variant="caption" sx={{ textAlign: 'center', fontSize: '0.6rem', color: isDark ? '#555' : '#bbb' }}>
+                  {h.toString().padStart(2, '0')}
+                </Typography>
+              ))}
+              {/* Rows: each day */}
+              {DAY_LABELS.map((dayLabel, dayIdx) => (
+                <React.Fragment key={dayLabel}>
+                  <Typography variant="caption" sx={{ fontSize: '0.68rem', color: isDark ? '#777' : '#999', display: 'flex', alignItems: 'center', pr: 0.5 }}>
+                    {dayLabel}
+                  </Typography>
+                  {Array.from({ length: 24 }, (_, h) => {
+                    const cell = data?.error_heatmap?.find(c => Number(c.day) === dayIdx + 1 && Number(c.hour) === h);
+                    const count = Number(cell?.count || 0);
+                    const intensity = heatmapMax > 0 ? count / heatmapMax : 0;
+                    return (
+                      <Tooltip key={`${dayIdx}-${h}`} title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count} errors`} arrow>
+                        <Box sx={{
+                          height: 20,
+                          borderRadius: 0.5,
+                          backgroundColor: count === 0
+                            ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)')
+                            : alpha('#f44336', Math.max(0.1, Math.min(intensity, 1))),
+                          transition: 'all 0.15s',
+                          cursor: 'default',
+                          '&:hover': { transform: 'scale(1.2)', zIndex: 1 },
+                        }} />
+                      </Tooltip>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </Box>
+            {/* Legend */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1, justifyContent: 'flex-end' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#555' : '#bbb', mr: 0.5 }}>Less</Typography>
+              {[0.05, 0.2, 0.4, 0.6, 0.8, 1].map((v) => (
+                <Box key={v} sx={{ width: 12, height: 12, borderRadius: 0.3, backgroundColor: alpha('#f44336', v) }} />
+              ))}
+              <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#555' : '#bbb', ml: 0.5 }}>More</Typography>
+            </Box>
+          </Box>
+        )}
+      </Paper>
+
+      {/* NEW: Distribution Row — Environment / Browser / OS */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+        <DistributionCard
+          title={t('argus.overview.errorByEnv', 'By Environment')}
+          icon={<EnvIcon fontSize="small" sx={{ color: '#7c4dff' }} />}
+          data={data?.error_by_environment?.map(d => ({ label: d.environment, value: Number(d.count) })) || []}
+          loading={loading}
+          isDark={isDark}
+          color="#7c4dff"
+        />
+        <DistributionCard
+          title={t('argus.overview.errorByBrowser', 'By Browser')}
+          icon={<DevicesIcon fontSize="small" sx={{ color: '#2196f3' }} />}
+          data={data?.error_by_browser?.map(d => ({ label: d.browser, value: Number(d.count) })) || []}
+          loading={loading}
+          isDark={isDark}
+          color="#2196f3"
+        />
+        <DistributionCard
+          title={t('argus.overview.errorByOS', 'By OS')}
+          icon={<DevicesIcon fontSize="small" sx={{ color: '#ff9800' }} />}
+          data={data?.error_by_os?.map(d => ({ label: d.os, value: Number(d.count) })) || []}
+          loading={loading}
+          isDark={isDark}
+          color="#ff9800"
+        />
+      </Box>
+
+      {/* Bottom Row: Performance Summary + Release Health + Top Issues */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 2fr' }, gap: 2 }}>
         {/* Performance Metrics */}
         <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
           <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -348,6 +485,52 @@ const ArgusOverviewPage: React.FC = () => {
               <MetricRow label={t('argus.overview.errorRate')} value={`${Number(ts?.error_rate || 0).toFixed(2)}%`} highlight={Number(ts?.error_rate || 0) > 5} />
             </Box>
           </Box>
+        </Paper>
+
+        {/* NEW: Release Error Comparison */}
+        <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <ReleaseIcon fontSize="small" sx={{ color: '#7c4dff' }} />
+            {t('argus.overview.errorByRelease', 'Errors by Release')}
+          </Typography>
+          {loading ? (
+            <Skeleton variant="rounded" height={160} />
+          ) : !data?.error_by_release?.length ? (
+            <Box sx={{ py: 4, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">{t('argus.overview.noData', 'No data')}</Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {data.error_by_release.map((r, idx) => {
+                const maxCount = Math.max(...data.error_by_release.map(d => Number(d.count)));
+                const pct = maxCount > 0 ? (Number(r.count) / maxCount) * 100 : 0;
+                return (
+                  <Box key={`${r.release}-${idx}`}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
+                      <Typography variant="caption" noWrap sx={{ fontFamily: 'monospace', fontSize: '0.72rem', maxWidth: '60%' }}>
+                        {r.release}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Typography variant="caption" fontWeight={700} sx={{ color: '#f44336' }}>
+                          {Number(r.count).toLocaleString()}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: isDark ? '#555' : '#bbb' }}>
+                          {Number(r.users).toLocaleString()} users
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ height: 5, borderRadius: 3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+                      <Box sx={{
+                        height: '100%', borderRadius: 3, width: `${pct}%`,
+                        background: `linear-gradient(90deg, #7c4dff, ${alpha('#7c4dff', 0.5)})`,
+                        transition: 'width 0.5s ease',
+                      }} />
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
         </Paper>
 
         {/* Top Issues */}
@@ -388,13 +571,10 @@ const ArgusOverviewPage: React.FC = () => {
                       '&:hover': { backgroundColor: alpha(levelColor, 0.06) },
                     }}
                   >
-                    {/* Level color bar */}
                     <Box sx={{ width: 3, height: 32, borderRadius: 1, backgroundColor: levelColor, flexShrink: 0 }} />
-                    {/* Rank */}
                     <Typography variant="caption" sx={{ color: isDark ? '#555' : '#bbb', fontWeight: 700, fontSize: '0.7rem', width: 14, textAlign: 'center' }}>
                       {idx + 1}
                     </Typography>
-                    {/* Info */}
                     <Box sx={{ flex: 1, overflow: 'hidden', minWidth: 0 }}>
                       <Typography variant="body2" fontWeight={600} noWrap sx={{ lineHeight: 1.3 }}>
                         {issue.title || issue.fingerprint?.slice(0, 16)}
@@ -403,7 +583,6 @@ const ArgusOverviewPage: React.FC = () => {
                         {issue.subtitle}
                       </Typography>
                     </Box>
-                    {/* Event count badge */}
                     <Box sx={{
                       px: 1.2, py: 0.3, borderRadius: 1,
                       backgroundColor: alpha(levelColor, isDark ? 0.15 : 0.08),
@@ -425,6 +604,77 @@ const ArgusOverviewPage: React.FC = () => {
 };
 
 // --- Sub-components ---
+
+const ChangeIndicator: React.FC<{ value: number; invert?: boolean }> = ({ value, invert }) => {
+  const isUp = value > 0;
+  // For errors: up is bad (red), down is good (green). For transactions: up is good.
+  const isGood = invert ? !isUp : isUp;
+  const color = isGood ? '#4caf50' : '#f44336';
+  return (
+    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.2 }}>
+      {isUp ? (
+        <TrendingUpIcon sx={{ fontSize: 14, color }} />
+      ) : (
+        <TrendingDownIcon sx={{ fontSize: 14, color }} />
+      )}
+      <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color }}>
+        {Math.abs(value).toFixed(0)}%
+      </Typography>
+    </Box>
+  );
+};
+
+const DistributionCard: React.FC<{
+  title: string;
+  icon: React.ReactNode;
+  data: { label: string; value: number }[];
+  loading: boolean;
+  isDark: boolean;
+  color: string;
+}> = ({ title, icon, data, loading, isDark, color }) => {
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+  return (
+    <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {icon}
+        {title}
+      </Typography>
+      {loading ? (
+        <Skeleton variant="rounded" height={120} />
+      ) : data.length === 0 ? (
+        <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>No data</Typography>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+          {data.slice(0, 5).map((item, idx) => {
+            const pct = total > 0 ? (item.value / total) * 100 : 0;
+            return (
+              <Box key={`${item.label}-${idx}`}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 500 }}>{item.label}</Typography>
+                  <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                    <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.7rem' }}>
+                      {item.value.toLocaleString()}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontSize: '0.62rem', color: isDark ? '#555' : '#bbb' }}>
+                      {pct.toFixed(1)}%
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ height: 4, borderRadius: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+                  <Box sx={{
+                    height: '100%', borderRadius: 2, width: `${pct}%`,
+                    backgroundColor: alpha(color, 0.6 + idx * 0.05),
+                    transition: 'width 0.4s ease',
+                  }} />
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
+      )}
+    </Paper>
+  );
+};
 
 const MetricBar: React.FC<{ label: string; value: number; max: number; color: string }> = ({ label, value, max, color }) => {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;

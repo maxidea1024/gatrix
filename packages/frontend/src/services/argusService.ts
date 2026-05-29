@@ -136,10 +136,24 @@ export interface ArgusOverviewData {
     fingerprint: string;
     title: string;
     subtitle: string;
+    level?: string;
     event_count: number;
     user_count: number;
     last_seen: string;
   }[];
+  // NEW — Insight data
+  error_heatmap: { day: number; hour: number; count: number }[];
+  error_by_environment: { environment: string; count: number }[];
+  error_by_browser: { browser: string; count: number }[];
+  error_by_os: { os: string; count: number }[];
+  error_by_release: { release: string; count: number; users: number }[];
+  unhandled_rate: number;
+  previous_period: {
+    total_errors: number;
+    affected_users: number;
+    total_transactions: number;
+    crash_free_rate: number;
+  };
 }
 
 export interface ArgusTransaction {
