@@ -158,6 +158,43 @@ export interface ArgusTransactionDetail {
   trend: { hour: string; count: number; avg_duration: number; p95: number; error_rate: number }[];
   histogram: { bucket: string; count: number }[];
   spans: { description: string; op: string; count: number; avg_duration: number; p95: number }[];
+  recent_traces: ArgusRecentTrace[];
+}
+
+export interface ArgusRecentTrace {
+  event_id: string;
+  trace_id: string;
+  timestamp: string;
+  duration: number;
+  transaction_status: string;
+  http_status_code: number;
+  span_count: number;
+  user_id: string;
+}
+
+export interface ArgusTraceDetail {
+  trace_id: string;
+  root: any;
+  transactions: any[];
+  spans: ArgusTraceSpan[];
+  total_spans: number;
+}
+
+export interface ArgusTraceSpan {
+  span_id: string;
+  trace_id: string;
+  parent_span_id: string;
+  transaction_id: string;
+  op: string;
+  description: string;
+  status: string;
+  action: string;
+  domain: string;
+  timestamp: string;
+  start_timestamp: string;
+  duration: number;
+  data: Record<string, string>;
+  tags: Record<string, string>;
 }
 
 export interface ArgusSessionHealth {
@@ -234,6 +271,16 @@ class ArgusService {
     const response = await argusApi.get(
       `${ARGUS_BASE}/performance/${projectId}/transactions/${encodeURIComponent(txnName)}`,
       { params: { period } }
+    );
+    return response.data?.data || response.data;
+  }
+
+  async getTraceDetail(
+    projectId: number | string,
+    traceId: string
+  ): Promise<ArgusTraceDetail> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/performance/${projectId}/traces/${traceId}`
     );
     return response.data?.data || response.data;
   }

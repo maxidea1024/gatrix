@@ -134,11 +134,35 @@ export default async function performanceRoutes(app: FastifyInstance) {
         });
         const spans = await spansResult.json();
 
+        // Recent trace samples for this transaction
+        const recentTracesResult = await clickhouse.query({
+          query: `
+            SELECT
+              event_id,
+              trace_id,
+              timestamp,
+              duration,
+              transaction_status,
+              http_status_code,
+              span_count,
+              user_id
+            FROM argus.transactions
+            WHERE project_id = {projectId:String}
+              AND transaction = {txnName:String}
+              AND timestamp >= now() - INTERVAL ${interval}
+            ORDER BY timestamp DESC
+            LIMIT 20
+          `,
+          query_params: { projectId: String(projectId), txnName },
+        });
+        const recentTraces = await recentTracesResult.json();
+
         return reply.send({
           data: {
             trend: trend.data || [],
             histogram: histogram.data || [],
             spans: spans.data || [],
+            recent_traces: recentTraces.data || [],
           },
         });
       } catch (error) {
@@ -148,6 +172,96 @@ export default async function performanceRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get transaction detail' });
+      }
+    }
+  );
+
+  // Trace waterfall — get all spans for a specific trace
+  app.get(
+    '/performance/:projectId/traces/:traceId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, traceId } = request.params as { projectId: string; traceId: string };
+
+      try {
+        // Get the root transaction
+        const txnResult = await clickhouse.query({
+          query: `
+            SELECT
+              event_id,
+              trace_id,
+              span_id,
+              parent_span_id,
+              transaction,
+              transaction_op,
+              transaction_status,
+              http_method,
+              http_status_code,
+              timestamp,
+              start_timestamp,
+              duration,
+              platform,
+              environment,
+              release,
+              user_id
+            FROM argus.transactions
+            WHERE project_id = {projectId:String}
+              AND trace_id = {traceId:String}
+            ORDER BY timestamp
+            LIMIT 10
+          `,
+          query_params: { projectId: String(projectId), traceId },
+        });
+        const txnData = await txnResult.json();
+
+        // Get all spans for this trace
+        const spansResult = await clickhouse.query({
+          query: `
+            SELECT
+              span_id,
+              trace_id,
+              parent_span_id,
+              transaction_id,
+              op,
+              description,
+              status,
+              action,
+              domain,
+              timestamp,
+              start_timestamp,
+              duration,
+              data,
+              tags
+            FROM argus.spans
+            WHERE project_id = {projectId:String}
+              AND trace_id = {traceId:String}
+            ORDER BY start_timestamp
+          `,
+          query_params: { projectId: String(projectId), traceId },
+        });
+        const spansData = await spansResult.json();
+
+        const transactions = txnData.data || [];
+        const spans = spansData.data || [];
+
+        // Build the root info from the first transaction
+        const root = transactions[0] || null;
+
+        return reply.send({
+          data: {
+            trace_id: traceId,
+            root,
+            transactions,
+            spans,
+            total_spans: spans.length,
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to get trace detail', {
+          projectId,
+          traceId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get trace detail' });
       }
     }
   );
