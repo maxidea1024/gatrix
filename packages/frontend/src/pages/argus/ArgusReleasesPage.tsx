@@ -100,7 +100,7 @@ const ArgusReleasesPage: React.FC = () => {
               const isHotfix = r.release.includes('hotfix');
               return (
                 <Paper
-                  key={r.release}
+                  key={`${r.release}-${idx}`}
                   elevation={0}
                   sx={{
                     border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,

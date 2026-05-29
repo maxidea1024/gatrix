@@ -271,7 +271,7 @@ const ArgusSessionHealthPage: React.FC = () => {
               const rate = Number(r.crash_free_rate);
               const barColor = rate >= 99 ? '#4caf50' : rate >= 95 ? '#ff9800' : '#f44336';
               return (
-                <Box key={r.release} sx={{
+                <Box key={`${r.release}-${idx}`} sx={{
                   display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.2,
                   borderBottom: idx < data.by_release.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
                 }}>

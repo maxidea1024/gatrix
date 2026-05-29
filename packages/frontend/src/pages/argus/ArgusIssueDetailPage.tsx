@@ -651,8 +651,8 @@ const StatMini: React.FC<{ label: string; value: string; color: string }> = ({ l
 
 const ContextGrid: React.FC<{ items: { label: string; value: string }[]; isDark: boolean }> = ({ items, isDark }) => (
   <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px' }}>
-    {items.map((item) => (
-      <React.Fragment key={item.label}>
+    {items.map((item, idx) => (
+      <React.Fragment key={`${item.label}-${idx}`}>
         <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontWeight: 500 }}>{item.label}</Typography>
         <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 500, fontSize: '0.78rem' }}>{item.value}</Typography>
       </React.Fragment>
