@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS argus.error_frequency_hourly (
   project_id String,
   issue_id UInt64,
   environment LowCardinality(String),
-  release LowCardinality(String),
+  `release` LowCardinality(String),
   hour DateTime,
   event_count AggregateFunction(count),
   affected_users AggregateFunction(uniq, String)
@@ -13,12 +13,12 @@ ORDER BY (project_id, issue_id, hour);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS argus.error_frequency_hourly_mv
 TO argus.error_frequency_hourly AS SELECT
-  project_id, issue_id, environment, release,
+  project_id, issue_id, environment, `release`,
   toStartOfHour(timestamp) AS hour,
   countState() AS event_count,
   uniqState(user_id) AS affected_users
 FROM argus.errors
-GROUP BY project_id, issue_id, environment, release, hour;
+GROUP BY project_id, issue_id, environment, `release`, hour;
 
 -- Transaction performance hourly aggregation
 CREATE TABLE IF NOT EXISTS argus.transaction_metrics_hourly (
@@ -46,7 +46,7 @@ GROUP BY project_id, transaction, environment, hour;
 -- Session health daily aggregation
 CREATE TABLE IF NOT EXISTS argus.session_health_daily (
   project_id String,
-  release LowCardinality(String),
+  `release` LowCardinality(String),
   environment LowCardinality(String),
   day Date,
   total_sessions AggregateFunction(count),
@@ -55,15 +55,15 @@ CREATE TABLE IF NOT EXISTS argus.session_health_daily (
   crashed_users AggregateFunction(uniqIf, String, UInt8)
 ) ENGINE = AggregatingMergeTree()
 PARTITION BY toYYYYMM(day)
-ORDER BY (project_id, release, day);
+ORDER BY (project_id, `release`, day);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS argus.session_health_daily_mv
 TO argus.session_health_daily AS SELECT
-  project_id, release, environment,
+  project_id, `release`, environment,
   toDate(timestamp) AS day,
   countState() AS total_sessions,
   countIfState(status = 'crashed') AS crashed_sessions,
   uniqState(distinct_id) AS total_users,
   uniqIfState(distinct_id, status = 'crashed') AS crashed_users
 FROM argus.sessions
-GROUP BY project_id, release, environment, day;
+GROUP BY project_id, `release`, environment, day;

@@ -95,7 +95,75 @@ export default async function issuesRoutes(app: FastifyInstance) {
           return reply.code(404).send({ error: 'Issue not found' });
         }
 
-        return reply.send({ data: results[0] });
+        const issue = results[0];
+
+        // Fetch latest event from ClickHouse for stacktrace / breadcrumbs
+        try {
+          const latestEventResult = await clickhouse.query({
+            query: `
+              SELECT
+                event_id, timestamp, platform, level, type, value, mechanism,
+                exception, stacktrace_frames, breadcrumbs,
+                user_id, user_email, user_ip, user_name,
+                environment, release, transaction,
+                os_name, os_version, browser_name, browser_version,
+                device_name, device_family, runtime_name, runtime_version,
+                sdk_name, sdk_version, tags, extra, contexts,
+                http_method, http_url
+              FROM argus.errors
+              WHERE project_id = {projectId:String}
+                AND issue_id = {issueId:UInt64}
+              ORDER BY timestamp DESC
+              LIMIT 1
+            `,
+            query_params: {
+              projectId: String(projectId),
+              issueId: parseInt(issueId, 10),
+            },
+          });
+          const eventData = await latestEventResult.json();
+          const latestEvent = (eventData.data as any[])?.[0];
+
+          if (latestEvent) {
+            // Parse JSON strings back to objects for the frontend
+            issue.latest_event = {
+              ...latestEvent,
+              exception_type: latestEvent.type,
+              exception_value: latestEvent.value,
+              stacktrace_raw: latestEvent.stacktrace_frames,
+              os: latestEvent.os_name,
+              browser: latestEvent.browser_name,
+            };
+          }
+
+          // Fetch event count and user count
+          const countResult = await clickhouse.query({
+            query: `
+              SELECT count() as event_count, uniq(user_id) as user_count
+              FROM argus.errors
+              WHERE project_id = {projectId:String}
+                AND issue_id = {issueId:UInt64}
+            `,
+            query_params: {
+              projectId: String(projectId),
+              issueId: parseInt(issueId, 10),
+            },
+          });
+          const countData = await countResult.json();
+          const counts = (countData.data as any[])?.[0];
+          if (counts) {
+            issue.event_count = parseInt(counts.event_count, 10);
+            issue.user_count = parseInt(counts.user_count, 10);
+          }
+        } catch (chError) {
+          logger.warn('Failed to fetch latest event from ClickHouse', {
+            issueId,
+            error: chError instanceof Error ? chError.message : String(chError),
+          });
+          // Continue without latest_event — MySQL data is still returned
+        }
+
+        return reply.send({ data: issue });
       } catch (error) {
         logger.error('Failed to get issue', {
           projectId,

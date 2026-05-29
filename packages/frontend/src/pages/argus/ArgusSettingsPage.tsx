@@ -55,12 +55,30 @@ const ArgusSettingsPage: React.FC = () => {
       setTxnSampleRate(data.transaction_sample_rate);
       setSessionSampleRate(data.session_sample_rate);
       setRetentionDays(data.retention_days);
-    } catch (error) {
-      console.error('Failed to fetch project:', error);
+    } catch (error: any) {
+      // If project doesn't exist yet, auto-create it
+      if (error?.response?.status === 404 || error?.status === 404) {
+        try {
+          const created = await argusService.createProject({
+            gatrix_project_id: projectId,
+            name: 'Default Project',
+            slug: 'default',
+            platform: 'javascript',
+          });
+          setProject(created);
+          setName(created.name);
+          setPlatform(created.platform);
+          enqueueSnackbar(t('argus.settings.projectCreated', 'Argus project auto-created'), { variant: 'success' });
+        } catch (createError) {
+          console.error('Failed to auto-create project:', createError);
+        }
+      } else {
+        console.error('Failed to fetch project:', error);
+      }
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, enqueueSnackbar, t]);
 
   useEffect(() => {
     fetchProject();
