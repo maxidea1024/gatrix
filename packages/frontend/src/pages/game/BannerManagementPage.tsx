@@ -510,20 +510,20 @@ const BannerManagementPage: React.FC = () => {
                 }}
                 jsonOnly={true}
               />
-            
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setPageMenuAnchor(null);
-                    loadBanners();
-                  }}
-                >
-                  <ListItemIcon>
-                    <RefreshIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>{t('common.refresh')}</ListItemText>
-                </MenuItem>
-              </Menu>
+
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  loadBanners();
+                }}
+              >
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('common.refresh')}</ListItemText>
+              </MenuItem>
+            </Menu>
           </>
         }
       />
@@ -571,7 +571,6 @@ const BannerManagementPage: React.FC = () => {
               </IconButton>
             </Tooltip>
           </Box>
-          
         </Box>
       </Box>
 
@@ -604,25 +603,27 @@ const BannerManagementPage: React.FC = () => {
           />
         ) : (
           <Card
-              variant="outlined"
-              sx={{
-                position: 'relative',
-                overflow: 'hidden',
-                opacity: !isInitialLoad && loading ? 0.5 : 1,
-                pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
-                transition: 'opacity 0.2s ease',
-              }}
-            >
-              {!isInitialLoad && loading && (
-                <LinearProgress 
-                  sx={{ 
-                    position: 'absolute', 
-                    top: 0, left: 0, right: 0, 
-                    zIndex: 1,
-                    height: 3
-                  }} 
-                />
-              )}
+            variant="outlined"
+            sx={{
+              position: 'relative',
+              overflow: 'hidden',
+              opacity: !isInitialLoad && loading ? 0.5 : 1,
+              pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            {!isInitialLoad && loading && (
+              <LinearProgress
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 1,
+                  height: 3,
+                }}
+              />
+            )}
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table size="small">

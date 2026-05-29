@@ -1050,20 +1050,20 @@ const MessageTemplatesPage: React.FC = () => {
                   setImportDialogOpen(true);
                 }}
               />
-            
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setPageMenuAnchor(null);
-                    load();
-                  }}
-                >
-                  <ListItemIcon>
-                    <RefreshIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>{t('common.refresh')}</ListItemText>
-                </MenuItem>
-              </MuiMenu>
+
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  load();
+                }}
+              >
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('common.refresh')}</ListItemText>
+              </MenuItem>
+            </MuiMenu>
           </>
         }
       />
