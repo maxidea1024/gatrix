@@ -3,12 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
   IconButton,
   TextField,
@@ -20,6 +14,7 @@ import {
   Stack,
   Pagination,
   useTheme,
+  alpha,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -29,6 +24,8 @@ import {
   Warning as WarningIcon,
   Info as InfoIcon,
   BugReport as BugReportIcon,
+  Schedule as ScheduleIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -39,25 +36,18 @@ import argusService, {
 
 const PAGE_SIZE = 25;
 
-const LEVEL_COLORS: Record<string, 'error' | 'warning' | 'info' | 'default'> = {
-  fatal: 'error',
-  error: 'error',
-  warning: 'warning',
-  info: 'info',
-  debug: 'default',
+const LEVEL_CONFIG: Record<string, { color: string; icon: React.ReactElement; bg: string }> = {
+  fatal: { color: '#f44336', icon: <ErrorIcon sx={{ fontSize: 16 }} />, bg: 'rgba(244,67,54,0.08)' },
+  error: { color: '#ff5722', icon: <ErrorIcon sx={{ fontSize: 16 }} />, bg: 'rgba(255,87,34,0.08)' },
+  warning: { color: '#ff9800', icon: <WarningIcon sx={{ fontSize: 16 }} />, bg: 'rgba(255,152,0,0.08)' },
+  info: { color: '#2196f3', icon: <InfoIcon sx={{ fontSize: 16 }} />, bg: 'rgba(33,150,243,0.08)' },
+  debug: { color: '#9e9e9e', icon: <InfoIcon sx={{ fontSize: 16 }} />, bg: 'rgba(158,158,158,0.08)' },
 };
 
-const LEVEL_ICONS: Record<string, React.ReactElement> = {
-  fatal: <ErrorIcon fontSize="small" />,
-  error: <ErrorIcon fontSize="small" />,
-  warning: <WarningIcon fontSize="small" />,
-  info: <InfoIcon fontSize="small" />,
-};
-
-const STATUS_COLORS: Record<string, 'error' | 'warning' | 'success' | 'default'> = {
-  unresolved: 'error',
-  resolved: 'success',
-  ignored: 'default',
+const STATUS_CONFIG: Record<string, { color: string; label: string }> = {
+  unresolved: { color: '#f44336', label: 'Unresolved' },
+  resolved: { color: '#4caf50', label: 'Resolved' },
+  ignored: { color: '#9e9e9e', label: 'Ignored' },
 };
 
 interface ArgusIssuesPageProps {
@@ -69,8 +59,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isDark = theme.palette.mode === 'dark';
 
-  // Use projectId from props or URL param
   const projectId = propProjectId || searchParams.get('projectId') || '1';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
@@ -105,9 +95,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     }
   }, [projectId, status, level, sort, currentPage, search]);
 
-  useEffect(() => {
-    fetchIssues();
-  }, [fetchIssues]);
+  useEffect(() => { fetchIssues(); }, [fetchIssues]);
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     const params = new URLSearchParams(searchParams);
@@ -124,7 +112,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <BugReportIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
           <Typography variant="h5" fontWeight={700}>
@@ -132,27 +120,30 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           </Typography>
           {!loading && (
             <Chip
-              label={`${total} ${t('argus.issues.issueCount')}`}
+              label={total.toLocaleString()}
               size="small"
-              color="default"
-              variant="outlined"
+              sx={{
+                fontWeight: 700, fontSize: '0.75rem', height: 22,
+                backgroundColor: alpha(theme.palette.error.main, 0.1),
+                color: theme.palette.error.main,
+                border: 'none',
+              }}
             />
           )}
         </Box>
-        <IconButton onClick={fetchIssues} disabled={loading}>
+        <IconButton onClick={fetchIssues} disabled={loading} size="small">
           <RefreshIcon />
         </IconButton>
       </Box>
 
-      {/* Filters */}
+      {/* Filter Bar */}
       <Paper
+        elevation={0}
         sx={{
-          p: 2,
-          mb: 2,
-          display: 'flex',
-          gap: 2,
-          flexWrap: 'wrap',
-          alignItems: 'center',
+          p: 1.5, mb: 2,
+          display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          borderRadius: 2,
         }}
       >
         <TextField
@@ -169,19 +160,22 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             }
           }}
           InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
+            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment>,
           }}
-          sx={{ minWidth: 260 }}
+          sx={{
+            minWidth: 260,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 1.5, fontSize: '0.85rem',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+            },
+          }}
         />
-        <FormControl size="small" sx={{ minWidth: 130 }}>
-          <InputLabel>{t('argus.issues.status')}</InputLabel>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel sx={{ fontSize: '0.85rem' }}>{t('argus.issues.status')}</InputLabel>
           <Select
             value={status}
             label={t('argus.issues.status')}
+            sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}
             onChange={(e) => {
               setStatus(e.target.value);
               const params = new URLSearchParams(searchParams);
@@ -196,11 +190,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             <MenuItem value="ignored">{t('argus.issues.ignored')}</MenuItem>
           </Select>
         </FormControl>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>{t('argus.issues.level')}</InputLabel>
+        <FormControl size="small" sx={{ minWidth: 110 }}>
+          <InputLabel sx={{ fontSize: '0.85rem' }}>{t('argus.issues.level')}</InputLabel>
           <Select
             value={level}
             label={t('argus.issues.level')}
+            sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}
             onChange={(e) => {
               setLevel(e.target.value);
               const params = new URLSearchParams(searchParams);
@@ -216,11 +211,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             <MenuItem value="info">Info</MenuItem>
           </Select>
         </FormControl>
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>{t('argus.issues.sort')}</InputLabel>
+        <FormControl size="small" sx={{ minWidth: 130 }}>
+          <InputLabel sx={{ fontSize: '0.85rem' }}>{t('argus.issues.sort')}</InputLabel>
           <Select
             value={sort}
             label={t('argus.issues.sort')}
+            sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}
             onChange={(e) => {
               setSort(e.target.value);
               const params = new URLSearchParams(searchParams);
@@ -237,121 +233,142 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       </Paper>
 
       <PageContentLoader loading={loading}>
-        {/* Issues Table */}
-        <TableContainer component={Paper} sx={{ mb: 2 }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 600, width: '45%' }}>{t('argus.issues.issue')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{t('argus.issues.level')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{t('argus.issues.status')}</TableCell>
-                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>{t('argus.issues.events')}</TableCell>
-                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>{t('argus.issues.users')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{t('argus.issues.lastSeen')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {issues.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} sx={{ py: 6, textAlign: 'center' }}>
-                    <Typography color="text.secondary">
-                      {t('argus.issues.noIssues')}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-              issues.map((issue) => (
-                <TableRow
+        {/* Issue Cards */}
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 2,
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            borderRadius: 2,
+            overflow: 'hidden',
+          }}
+        >
+          {issues.length === 0 ? (
+            <Box sx={{ py: 8, textAlign: 'center' }}>
+              <BugReportIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+              <Typography color="text.secondary">{t('argus.issues.noIssues')}</Typography>
+            </Box>
+          ) : (
+            issues.map((issue, idx) => {
+              const lc = LEVEL_CONFIG[issue.level] || LEVEL_CONFIG.info;
+              const sc = STATUS_CONFIG[issue.status] || STATUS_CONFIG.unresolved;
+              return (
+                <Box
                   key={issue.id}
-                  hover
                   onClick={() => handleIssueClick(issue)}
                   sx={{
+                    display: 'flex',
+                    alignItems: 'stretch',
                     cursor: 'pointer',
+                    transition: 'background 0.15s',
+                    borderBottom: idx < issues.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` : 'none',
                     '&:hover': {
-                      backgroundColor: theme.palette.action.hover,
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
                     },
                   }}
                 >
-                  <TableCell>
-                    <Box>
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        sx={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          maxWidth: 500,
-                        }}
-                      >
-                        {issue.title}
-                        {issue.is_regression ? (
+                  {/* Level Color Bar */}
+                  <Box sx={{
+                    width: 4, flexShrink: 0,
+                    backgroundColor: lc.color,
+                    borderRadius: idx === 0 ? '8px 0 0 0' : idx === issues.length - 1 ? '0 0 0 8px' : 0,
+                  }} />
+
+                  {/* Content */}
+                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', px: 2, py: 1.5, gap: 2, minWidth: 0 }}>
+                    {/* Level Icon */}
+                    <Box sx={{
+                      width: 30, height: 30, borderRadius: 1.5, flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      backgroundColor: lc.bg, color: lc.color,
+                    }}>
+                      {lc.icon}
+                    </Box>
+
+                    {/* Issue Info */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.2 }}>
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          noWrap
+                          sx={{ color: isDark ? '#e0e0e0' : '#1a1a2e', lineHeight: 1.3 }}
+                        >
+                          {issue.title}
+                        </Typography>
+                        {issue.is_regression && (
                           <Chip
                             label="Regression"
                             size="small"
-                            color="warning"
-                            variant="outlined"
-                            sx={{ ml: 1, height: 18, fontSize: '0.65rem' }}
+                            sx={{
+                              height: 18, fontSize: '0.6rem', fontWeight: 700,
+                              backgroundColor: alpha('#ff9800', 0.15),
+                              color: '#ff9800', border: 'none',
+                            }}
                           />
-                        ) : null}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {issue.culprit || issue.fingerprint?.slice(0, 12)}
+                        )}
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        noWrap
+                        sx={{ color: isDark ? '#666' : '#999', fontSize: '0.75rem', display: 'block' }}
+                      >
+                        {issue.culprit || issue.fingerprint?.slice(0, 16)}
                       </Typography>
                     </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      icon={LEVEL_ICONS[issue.level]}
-                      label={issue.level}
-                      size="small"
-                      color={LEVEL_COLORS[issue.level] || 'default'}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={issue.status}
-                      size="small"
-                      color={STATUS_COLORS[issue.status] || 'default'}
-                      variant="filled"
-                      sx={{ textTransform: 'capitalize' }}
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography variant="body2" fontWeight={500}>
-                      {issue.event_count?.toLocaleString() || 0}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography variant="body2">
-                      {issue.user_count?.toLocaleString() || 0}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption" color="text.secondary">
-                      {issue.last_seen ? formatTimeAgo(issue.last_seen) : '-'}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <Stack alignItems="center">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            color="primary"
-            shape="rounded"
-          />
-        </Stack>
-      )}
+                    {/* Stats */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                      {/* Event count */}
+                      <Box sx={{ textAlign: 'center', minWidth: 50 }}>
+                        <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+                          {issue.event_count?.toLocaleString() || 0}
+                        </Typography>
+                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: isDark ? '#555' : '#aaa' }}>
+                          {t('argus.issues.events')}
+                        </Typography>
+                      </Box>
+
+                      {/* User count */}
+                      <Box sx={{ textAlign: 'center', minWidth: 40 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, justifyContent: 'center' }}>
+                          <PersonIcon sx={{ fontSize: 13, color: isDark ? '#555' : '#aaa' }} />
+                          <Typography variant="body2" fontWeight={600}>
+                            {issue.user_count?.toLocaleString() || 0}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Time */}
+                      <Box sx={{ minWidth: 70, textAlign: 'right' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, justifyContent: 'flex-end' }}>
+                          <ScheduleIcon sx={{ fontSize: 12, color: isDark ? '#555' : '#aaa' }} />
+                          <Typography variant="caption" sx={{ fontSize: '0.72rem', color: isDark ? '#777' : '#888' }}>
+                            {issue.last_seen ? formatTimeAgo(issue.last_seen) : '-'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              );
+            })
+          )}
+        </Paper>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Stack alignItems="center" sx={{ mt: 2 }}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              shape="rounded"
+              size="small"
+            />
+          </Stack>
+        )}
       </PageContentLoader>
     </Box>
   );
@@ -367,10 +384,10 @@ function formatTimeAgo(dateStr: string): string {
     const diffHour = Math.floor(diffMin / 60);
     const diffDay = Math.floor(diffHour / 24);
 
-    if (diffSec < 60) return `${diffSec}s ago`;
-    if (diffMin < 60) return `${diffMin}m ago`;
-    if (diffHour < 24) return `${diffHour}h ago`;
-    if (diffDay < 30) return `${diffDay}d ago`;
+    if (diffSec < 60) return `${diffSec}초 전`;
+    if (diffMin < 60) return `${diffMin}분 전`;
+    if (diffHour < 24) return `${diffHour}시간 전`;
+    if (diffDay < 30) return `${diffDay}일 전`;
     return date.toLocaleDateString();
   } catch {
     return dateStr;
