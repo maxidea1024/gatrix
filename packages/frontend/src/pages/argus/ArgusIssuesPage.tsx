@@ -33,6 +33,7 @@ import argusService, {
   ArgusIssue,
   ArgusIssueListParams,
 } from '@/services/argusService';
+import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 
 const PAGE_SIZE = 25;
 
@@ -72,6 +73,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [level, setLevel] = useState(searchParams.get('level') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
 
+  // Contextual filters (from Overview page clicks)
+  const [environment, setEnvironment] = useState(searchParams.get('environment') || '');
+  const [browser, setBrowser] = useState(searchParams.get('browser') || '');
+  const [os, setOs] = useState(searchParams.get('os') || '');
+
   const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
@@ -82,6 +88,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         limit: PAGE_SIZE,
         offset: (currentPage - 1) * PAGE_SIZE,
         search: search || undefined,
+        environment: environment || undefined,
+        browser: browser || undefined,
+        os: os || undefined,
       };
       const result = await argusService.listIssues(projectId, params);
       setIssues(result.data);
@@ -93,9 +102,22 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     } finally {
       setLoading(false);
     }
-  }, [projectId, status, level, sort, currentPage, search]);
+  }, [projectId, status, level, sort, currentPage, search, environment, browser, os]);
 
   useEffect(() => { fetchIssues(); }, [fetchIssues]);
+
+  // Helper to update URL and state for contextual filters
+  const setFilterAndUrl = (key: string, value: string, setter: (v: string) => void) => {
+    setter(value);
+    const params = new URLSearchParams(searchParams);
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    params.set('page', '1');
+    setSearchParams(params);
+  };
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     const params = new URLSearchParams(searchParams);
@@ -230,6 +252,32 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             <MenuItem value="user_count">{t('argus.issues.users')}</MenuItem>
           </Select>
         </FormControl>
+
+        {/* Contextual Filters (from Overview page) */}
+        {environment && (
+          <Chip
+            label={`${t('argus.issues.environment', 'Environment')}: ${environment}`}
+            size="small"
+            onDelete={() => setFilterAndUrl('environment', '', setEnvironment)}
+            sx={{ fontWeight: 600, fontSize: '0.75rem', height: 28 }}
+          />
+        )}
+        {browser && (
+          <Chip
+            label={`${t('argus.issues.browser', 'Browser')}: ${browser}`}
+            size="small"
+            onDelete={() => setFilterAndUrl('browser', '', setBrowser)}
+            sx={{ fontWeight: 600, fontSize: '0.75rem', height: 28 }}
+          />
+        )}
+        {os && (
+          <Chip
+            label={`${t('argus.issues.os', 'OS')}: ${os}`}
+            size="small"
+            onDelete={() => setFilterAndUrl('os', '', setOs)}
+            sx={{ fontWeight: 600, fontSize: '0.75rem', height: 28 }}
+          />
+        )}
       </Paper>
 
       <PageContentLoader loading={loading}>

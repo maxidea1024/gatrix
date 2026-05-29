@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
   Paper,
   Chip,
   IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
   useTheme,
   alpha,
   Skeleton,
@@ -41,16 +39,12 @@ import {
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusSessionHealth } from '@/services/argusService';
+import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
-const TIME_RANGES = [
-  { value: '1h', label: '1H' },
-  { value: '6h', label: '6H' },
-  { value: '24h', label: '24H' },
-  { value: '7d', label: '7D' },
-  { value: '30d', label: '30D' },
-];
+
+
 
 const ArgusSessionHealthPage: React.FC = () => {
   const theme = useTheme();
@@ -60,26 +54,31 @@ const ArgusSessionHealthPage: React.FC = () => {
 
   const [data, setData] = useState<ArgusSessionHealth | null>(null);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState(() => localStorage.getItem('argus-session-period') || '24h');
+  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+    const saved = localStorage.getItem('argus-session-period');
+    return { type: 'preset', preset: saved || '24h' };
+  });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await argusService.getSessionHealth(projectId, period);
+      const ap = argusDateRangeToApiParams(dateRange);
+      const result = await argusService.getSessionHealth(projectId, ap.period, ap.start, ap.end);
       setData(result);
     } catch (error) {
       console.error('Failed to fetch session health:', error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, period]);
+  }, [projectId, dateRange]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handlePeriodChange = (_: React.MouseEvent<HTMLElement>, value: string | null) => {
-    if (!value) return;
-    setPeriod(value);
-    localStorage.setItem('argus-session-period', value);
+  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
+    setDateRange(value);
+    if (value.type === 'preset' && value.preset) {
+      localStorage.setItem('argus-session-period', value.preset);
+    }
   };
 
   const s = data?.summary;
@@ -186,14 +185,7 @@ const ArgusSessionHealthPage: React.FC = () => {
           {t('argus.sessions.title')}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ToggleButtonGroup value={period} exclusive onChange={handlePeriodChange} size="small">
-            {TIME_RANGES.map((r) => (
-              <ToggleButton key={r.value} value={r.value} sx={{
-                px: 1.2, py: 0.3, textTransform: 'none', fontSize: '0.75rem', minWidth: 36,
-                '&.Mui-selected': { backgroundColor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.main, fontWeight: 600 },
-              }}>{r.label}</ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
           <IconButton onClick={fetchData} size="small"><RefreshIcon /></IconButton>
         </Box>
       </Box>

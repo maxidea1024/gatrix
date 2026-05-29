@@ -5,8 +5,6 @@ import {
   Paper,
   Chip,
   IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
   useTheme,
   alpha,
   Skeleton,
@@ -45,19 +43,14 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import argusService, { ArgusOverviewData } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
+import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
   Title, ChartTooltip, Legend, Filler
 );
 
-const TIME_RANGES = [
-  { value: '1h', label: '1H' },
-  { value: '6h', label: '6H' },
-  { value: '24h', label: '24H' },
-  { value: '7d', label: '7D' },
-  { value: '30d', label: '30D' },
-];
+
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -69,27 +62,32 @@ const ArgusOverviewPage: React.FC = () => {
 
   const [data, setData] = useState<ArgusOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState(() => localStorage.getItem('argus-overview-period') || '24h');
+  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+    const saved = localStorage.getItem('argus-overview-period');
+    return { type: 'preset', preset: saved || '24h' };
+  });
   const projectId = '1';
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await argusService.getOverview(projectId, period);
+      const apiParams = argusDateRangeToApiParams(dateRange);
+      const result = await argusService.getOverview(projectId, apiParams.period, apiParams.start, apiParams.end);
       setData(result);
     } catch (error) {
       console.error('Failed to fetch overview:', error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, period]);
+  }, [projectId, dateRange]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handlePeriodChange = (_: React.MouseEvent<HTMLElement>, value: string | null) => {
-    if (!value) return;
-    setPeriod(value);
-    localStorage.setItem('argus-overview-period', value);
+  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
+    setDateRange(value);
+    if (value.type === 'preset' && value.preset) {
+      localStorage.setItem('argus-overview-period', value.preset);
+    }
   };
 
   // --- Helpers ---
@@ -278,24 +276,7 @@ const ArgusOverviewPage: React.FC = () => {
           {t('argus.overview.title')}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ToggleButtonGroup value={period} exclusive onChange={handlePeriodChange} size="small">
-            {TIME_RANGES.map((r) => (
-              <ToggleButton
-                key={r.value}
-                value={r.value}
-                sx={{
-                  px: 1.5, py: 0.3, textTransform: 'none', fontSize: '0.75rem', minWidth: 36,
-                  '&.Mui-selected': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                    color: theme.palette.primary.main,
-                    fontWeight: 600,
-                  },
-                }}
-              >
-                {r.label}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
           <IconButton onClick={fetchData} disabled={loading} size="small">
             <RefreshIcon sx={{ transition: 'transform 0.3s', ...(loading && { animation: 'spin 1s linear infinite', '@keyframes spin': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } } }) }} />
           </IconButton>
@@ -419,9 +400,11 @@ const ArgusOverviewPage: React.FC = () => {
                             ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)')
                             : alpha('#f44336', Math.max(0.1, Math.min(intensity, 1))),
                           transition: 'all 0.15s',
-                          cursor: 'default',
-                          '&:hover': { transform: 'scale(1.2)', zIndex: 1 },
-                        }} />
+                          cursor: 'pointer',
+                          '&:hover': { transform: 'scale(1.2)', zIndex: 1, outline: '1px solid rgba(244,67,54,0.5)' },
+                        }}
+                        onClick={() => navigate(`/argus/issues?dayOfWeek=${dayIdx + 1}&hour=${h}`)}
+                      />
                       </Tooltip>
                     );
                   })}
@@ -449,6 +432,7 @@ const ArgusOverviewPage: React.FC = () => {
           loading={loading}
           isDark={isDark}
           color="#7c4dff"
+          onItemClick={(label) => navigate(`/argus/issues?environment=${encodeURIComponent(label)}`)}
         />
         <DistributionCard
           title={t('argus.overview.errorByBrowser', 'By Browser')}
@@ -457,6 +441,7 @@ const ArgusOverviewPage: React.FC = () => {
           loading={loading}
           isDark={isDark}
           color="#2196f3"
+          onItemClick={(label) => navigate(`/argus/issues?browser=${encodeURIComponent(label)}`)}
         />
         <DistributionCard
           title={t('argus.overview.errorByOS', 'By OS')}
@@ -465,6 +450,7 @@ const ArgusOverviewPage: React.FC = () => {
           loading={loading}
           isDark={isDark}
           color="#ff9800"
+          onItemClick={(label) => navigate(`/argus/issues?os=${encodeURIComponent(label)}`)}
         />
       </Box>
 
@@ -631,7 +617,8 @@ const DistributionCard: React.FC<{
   loading: boolean;
   isDark: boolean;
   color: string;
-}> = ({ title, icon, data, loading, isDark, color }) => {
+  onItemClick?: (label: string) => void;
+}> = ({ title, icon, data, loading, isDark, color, onItemClick }) => {
   const total = data.reduce((sum, d) => sum + d.value, 0);
   return (
     <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
@@ -648,7 +635,18 @@ const DistributionCard: React.FC<{
           {data.slice(0, 5).map((item, idx) => {
             const pct = total > 0 ? (item.value / total) * 100 : 0;
             return (
-              <Box key={`${item.label}-${idx}`}>
+              <Box
+                key={`${item.label}-${idx}`}
+                onClick={() => onItemClick?.(item.label)}
+                sx={{
+                  cursor: onItemClick ? 'pointer' : 'default',
+                  borderRadius: 1,
+                  px: 0.5,
+                  py: 0.3,
+                  transition: 'background 0.15s',
+                  '&:hover': onItemClick ? { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' } : {},
+                }}
+              >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}>
                   <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 500 }}>{item.label}</Typography>
                   <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>

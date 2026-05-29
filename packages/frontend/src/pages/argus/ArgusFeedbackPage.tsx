@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
   Paper,
   Chip,
   IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
   Stack,
   Pagination,
   useTheme,
@@ -44,15 +42,11 @@ import {
 import { Bar } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse } from '@/services/argusService';
+import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
 const PAGE_SIZE = 20;
-const TIME_RANGES = [
-  { value: '24h', label: '24H' },
-  { value: '7d', label: '7D' },
-  { value: '30d', label: '30D' },
-];
 
 function stringToColor(str: string): string {
   let hash = 0;
@@ -74,7 +68,7 @@ const ArgusFeedbackPage: React.FC = () => {
   const [data, setData] = useState<ArgusFeedbackResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [period, setPeriod] = useState('7d');
+  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>({ type: 'preset', preset: '7d' });
   const [search, setSearch] = useState('');
   const [searchDebounce, setSearchDebounce] = useState('');
 
@@ -87,20 +81,20 @@ const ArgusFeedbackPage: React.FC = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await argusService.getFeedback(projectId, { period, page, limit: PAGE_SIZE, search: searchDebounce || undefined });
+      const ap = argusDateRangeToApiParams(dateRange);
+      const result = await argusService.getFeedback(projectId, { ...ap, page, limit: PAGE_SIZE, search: searchDebounce || undefined });
       setData(result);
     } catch (error) {
       console.error('Failed to fetch feedback:', error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, period, page, searchDebounce]);
+  }, [projectId, dateRange, page, searchDebounce]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handlePeriodChange = (_: React.MouseEvent<HTMLElement>, v: string | null) => {
-    if (!v) return;
-    setPeriod(v);
+  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
+    setDateRange(value);
     setPage(1);
   };
 
@@ -162,14 +156,7 @@ const ArgusFeedbackPage: React.FC = () => {
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ToggleButtonGroup value={period} exclusive onChange={handlePeriodChange} size="small">
-            {TIME_RANGES.map((r) => (
-              <ToggleButton key={r.value} value={r.value} sx={{
-                px: 1.2, py: 0.3, textTransform: 'none', fontSize: '0.75rem', minWidth: 36,
-                '&.Mui-selected': { backgroundColor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.main, fontWeight: 600 },
-              }}>{r.label}</ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
           <IconButton onClick={fetchData} size="small"><RefreshIcon /></IconButton>
         </Box>
       </Box>

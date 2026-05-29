@@ -107,6 +107,9 @@ export interface ArgusIssueListParams {
   limit?: number;
   offset?: number;
   search?: string;
+  environment?: string;
+  browser?: string;
+  os?: string;
 }
 
 export interface ArgusProjectStats {
@@ -285,10 +288,12 @@ class ArgusService {
 
   async getOverview(
     projectId: number | string,
-    period?: string
+    period?: string,
+    start?: string,
+    end?: string
   ): Promise<ArgusOverviewData> {
     const response = await argusApi.get(`${ARGUS_BASE}/overview/${projectId}`, {
-      params: { period },
+      params: { period, start, end },
     });
     return response.data?.data || response.data;
   }
@@ -297,7 +302,7 @@ class ArgusService {
 
   async getTransactions(
     projectId: number | string,
-    params?: { period?: string; sort?: string; limit?: number }
+    params?: { period?: string; sort?: string; limit?: number; start?: string; end?: string }
   ): Promise<ArgusTransaction[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/performance/${projectId}/transactions`, {
       params,
@@ -308,11 +313,13 @@ class ArgusService {
   async getTransactionDetail(
     projectId: number | string,
     txnName: string,
-    period?: string
+    period?: string,
+    start?: string,
+    end?: string
   ): Promise<ArgusTransactionDetail> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/performance/${projectId}/transactions/${encodeURIComponent(txnName)}`,
-      { params: { period } }
+      { params: { period, start, end } }
     );
     return response.data?.data || response.data;
   }
@@ -331,10 +338,12 @@ class ArgusService {
 
   async getSessionHealth(
     projectId: number | string,
-    period?: string
+    period?: string,
+    start?: string,
+    end?: string
   ): Promise<ArgusSessionHealth> {
     const response = await argusApi.get(`${ARGUS_BASE}/sessions/${projectId}`, {
-      params: { period },
+      params: { period, start, end },
     });
     return response.data?.data || response.data;
   }
@@ -343,7 +352,7 @@ class ArgusService {
 
   async getFeedback(
     projectId: number | string,
-    params?: { period?: string; page?: number; limit?: number; search?: string }
+    params?: { period?: string; page?: number; limit?: number; search?: string; start?: string; end?: string }
   ): Promise<ArgusFeedbackResponse> {
     const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
     return response.data?.data || response.data;
@@ -353,10 +362,12 @@ class ArgusService {
 
   async getReleases(
     projectId: number | string,
-    period?: string
+    period?: string,
+    start?: string,
+    end?: string
   ): Promise<ArgusRelease[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/releases/${projectId}`, {
-      params: { period },
+      params: { period, start, end },
     });
     return response.data?.data || response.data || [];
   }

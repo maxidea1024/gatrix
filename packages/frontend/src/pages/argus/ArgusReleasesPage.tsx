@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
   Paper,
   Chip,
   IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
   useTheme,
   alpha,
   Skeleton,
@@ -28,12 +26,8 @@ import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusRelease } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
+import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
-const TIME_RANGES = [
-  { value: '7d', label: '7D' },
-  { value: '30d', label: '30D' },
-  { value: '90d', label: '90D' },
-];
 
 const ArgusReleasesPage: React.FC = () => {
   const theme = useTheme();
@@ -43,26 +37,31 @@ const ArgusReleasesPage: React.FC = () => {
 
   const [releases, setReleases] = useState<ArgusRelease[]>([]);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState(() => localStorage.getItem('argus-releases-period') || '30d');
+  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+    const saved = localStorage.getItem('argus-releases-period');
+    return { type: 'preset', preset: saved || '30d' };
+  });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await argusService.getReleases(projectId, period);
+      const ap = argusDateRangeToApiParams(dateRange);
+      const data = await argusService.getReleases(projectId, ap.period, ap.start, ap.end);
       setReleases(data || []);
     } catch (error) {
       console.error('Failed to fetch releases:', error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, period]);
+  }, [projectId, dateRange]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handlePeriodChange = (_: React.MouseEvent<HTMLElement>, v: string | null) => {
-    if (!v) return;
-    setPeriod(v);
-    localStorage.setItem('argus-releases-period', v);
+  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
+    setDateRange(value);
+    if (value.type === 'preset' && value.preset) {
+      localStorage.setItem('argus-releases-period', value.preset);
+    }
   };
 
   // Summary stats across all releases
@@ -89,14 +88,7 @@ const ArgusReleasesPage: React.FC = () => {
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ToggleButtonGroup value={period} exclusive onChange={handlePeriodChange} size="small">
-            {TIME_RANGES.map((r) => (
-              <ToggleButton key={r.value} value={r.value} sx={{
-                px: 1.2, py: 0.3, textTransform: 'none', fontSize: '0.75rem', minWidth: 36,
-                '&.Mui-selected': { backgroundColor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.main, fontWeight: 600 },
-              }}>{r.label}</ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
           <IconButton onClick={fetchData} size="small"><RefreshIcon /></IconButton>
         </Box>
       </Box>

@@ -17,9 +17,44 @@ export default async function issuesRoutes(app: FastifyInstance) {
         limit = '25',
         offset = '0',
         query,
+        environment,
+        browser,
+        os,
       } = request.query as Record<string, string>;
 
       try {
+        // If contextual filters are set, resolve matching issue_ids from ClickHouse first
+        let issueIdFilter: number[] | null = null;
+        if (environment || browser || os) {
+          const conditions: string[] = [`project_id = {projectId:String}`];
+          const qp: Record<string, string> = { projectId: String(projectId) };
+
+          if (environment) {
+            conditions.push(`environment = {env:String}`);
+            qp.env = environment;
+          }
+          if (browser) {
+            conditions.push(`browser_name = {browser:String}`);
+            qp.browser = browser;
+          }
+          if (os) {
+            conditions.push(`os_name = {os:String}`);
+            qp.os = os;
+          }
+
+          const chResult = await clickhouse.query({
+            query: `SELECT DISTINCT issue_id FROM argus.errors WHERE ${conditions.join(' AND ')} LIMIT 10000`,
+            query_params: qp,
+          });
+          const chRows = await chResult.json<{ data: { issue_id: string }[] }>();
+          issueIdFilter = (chRows.data || []).map((r: any) => Number(r.issue_id));
+
+          // If no matching issues found, return empty
+          if (issueIdFilter.length === 0) {
+            return reply.send({ data: [], total: 0, limit: parseInt(limit, 10), offset: parseInt(offset, 10) });
+          }
+        }
+
         let sql = `
           SELECT * FROM g_argus_issues
           WHERE project_id = ?
@@ -34,6 +69,12 @@ export default async function issuesRoutes(app: FastifyInstance) {
         if (query) {
           sql += ' AND (title LIKE ? OR culprit LIKE ?)';
           params.push(`%${query}%`, `%${query}%`);
+        }
+
+        // Apply ClickHouse-resolved issue_id filter
+        if (issueIdFilter && issueIdFilter.length > 0) {
+          sql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
+          params.push(...issueIdFilter);
         }
 
         // Sort
@@ -55,6 +96,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
         if (status && status !== 'all') {
           countSql += ' AND status = ?';
           countParams.push(status);
+        }
+        if (issueIdFilter && issueIdFilter.length > 0) {
+          countSql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
+          countParams.push(...issueIdFilter);
         }
         const [countRows] = await mysqlPool.query(countSql, countParams);
         const total = (countRows as any[])[0]?.total || 0;
