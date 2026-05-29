@@ -31,6 +31,7 @@ import {
   BugReport as BugReportIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import argusService, {
   ArgusIssue,
   ArgusIssueListParams,
@@ -65,6 +66,7 @@ interface ArgusIssuesPageProps {
 
 const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjectId }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -126,11 +128,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <BugReportIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
           <Typography variant="h5" fontWeight={700}>
-            Argus Issues
+            {t('argus.issues.title')}
           </Typography>
           {!loading && (
             <Chip
-              label={`${total} issues`}
+              label={`${total} ${t('argus.issues.issueCount')}`}
               size="small"
               color="default"
               variant="outlined"
@@ -155,7 +157,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       >
         <TextField
           size="small"
-          placeholder="Search issues..."
+          placeholder={t('argus.issues.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => {
@@ -176,10 +178,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           sx={{ minWidth: 260 }}
         />
         <FormControl size="small" sx={{ minWidth: 130 }}>
-          <InputLabel>Status</InputLabel>
+          <InputLabel>{t('argus.issues.status')}</InputLabel>
           <Select
             value={status}
-            label="Status"
+            label={t('argus.issues.status')}
             onChange={(e) => {
               setStatus(e.target.value);
               const params = new URLSearchParams(searchParams);
@@ -188,17 +190,17 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               setSearchParams(params);
             }}
           >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="unresolved">Unresolved</MenuItem>
-            <MenuItem value="resolved">Resolved</MenuItem>
-            <MenuItem value="ignored">Ignored</MenuItem>
+            <MenuItem value="">{t('common.all')}</MenuItem>
+            <MenuItem value="unresolved">{t('argus.issues.unresolved')}</MenuItem>
+            <MenuItem value="resolved">{t('argus.issues.resolved')}</MenuItem>
+            <MenuItem value="ignored">{t('argus.issues.ignored')}</MenuItem>
           </Select>
         </FormControl>
         <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Level</InputLabel>
+          <InputLabel>{t('argus.issues.level')}</InputLabel>
           <Select
             value={level}
-            label="Level"
+            label={t('argus.issues.level')}
             onChange={(e) => {
               setLevel(e.target.value);
               const params = new URLSearchParams(searchParams);
@@ -207,7 +209,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               setSearchParams(params);
             }}
           >
-            <MenuItem value="">All</MenuItem>
+            <MenuItem value="">{t('common.all')}</MenuItem>
             <MenuItem value="fatal">Fatal</MenuItem>
             <MenuItem value="error">Error</MenuItem>
             <MenuItem value="warning">Warning</MenuItem>
@@ -215,10 +217,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           </Select>
         </FormControl>
         <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>Sort</InputLabel>
+          <InputLabel>{t('argus.issues.sort')}</InputLabel>
           <Select
             value={sort}
-            label="Sort"
+            label={t('argus.issues.sort')}
             onChange={(e) => {
               setSort(e.target.value);
               const params = new URLSearchParams(searchParams);
@@ -226,10 +228,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               setSearchParams(params);
             }}
           >
-            <MenuItem value="last_seen">Last Seen</MenuItem>
-            <MenuItem value="first_seen">First Seen</MenuItem>
-            <MenuItem value="event_count">Events</MenuItem>
-            <MenuItem value="user_count">Users</MenuItem>
+            <MenuItem value="last_seen">{t('argus.issues.lastSeen')}</MenuItem>
+            <MenuItem value="first_seen">{t('argus.issues.firstSeen')}</MenuItem>
+            <MenuItem value="event_count">{t('argus.issues.events')}</MenuItem>
+            <MenuItem value="user_count">{t('argus.issues.users')}</MenuItem>
           </Select>
         </FormControl>
       </Paper>
@@ -240,12 +242,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, width: '45%' }}>Issue</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Level</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Events</TableCell>
-                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Users</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Last Seen</TableCell>
+                <TableCell sx={{ fontWeight: 600, width: '45%' }}>{t('argus.issues.issue')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('argus.issues.level')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('argus.issues.status')}</TableCell>
+                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>{t('argus.issues.events')}</TableCell>
+                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>{t('argus.issues.users')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('argus.issues.lastSeen')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -253,7 +255,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                 <TableRow>
                   <TableCell colSpan={6} sx={{ py: 6, textAlign: 'center' }}>
                     <Typography color="text.secondary">
-                      No issues found
+                      {t('argus.issues.noIssues')}
                     </Typography>
                   </TableCell>
                 </TableRow>
