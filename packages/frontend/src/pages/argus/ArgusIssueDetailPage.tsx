@@ -41,7 +41,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueDetail, ArgusTraceDetail } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
-import { formatRelative } from '@/utils/dateFormatter';
+
 
 const LEVEL_COLORS: Record<string, string> = {
   fatal: '#f44336',
