@@ -980,7 +980,10 @@ const FeatureNetworkPage: React.FC = () => {
         title={t('network.title')}
         subtitle={t('network.subtitle')}
         actions={
-          <PageHeaderContextMenu onRefresh={fetchData} refreshDisabled={loading || isRefreshing} />
+          <PageHeaderContextMenu
+            onRefresh={fetchData}
+            refreshDisabled={loading || isRefreshing}
+          />
         }
       />
 

@@ -1719,7 +1719,10 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                 {t('releaseFlow.addTemplate')}
               </Button>
             )}
-            <PageHeaderContextMenu onRefresh={loadTemplates} refreshDisabled={loading} />
+            <PageHeaderContextMenu
+              onRefresh={loadTemplates}
+              refreshDisabled={loading}
+            />
           </Box>
         }
       />

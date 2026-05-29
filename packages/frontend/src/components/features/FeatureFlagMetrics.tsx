@@ -1171,67 +1171,72 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                     <Table size="small" sx={{ tableLayout: 'auto' }}>
                       <TableHead>
                         <TableRow>
-                        <TableCell>{t('featureFlags.metrics.time')}</TableCell>
-                        {availableApps.length > 0 && (
                           <TableCell>
-                            {t('featureFlags.metrics.applications')}
+                            {t('featureFlags.metrics.time')}
                           </TableCell>
-                        )}
-                        <TableCell align="right">
-                          {t('featureFlags.metrics.exposed')}
-                        </TableCell>
-                        <TableCell align="right">
-                          {t('featureFlags.metrics.notExposed')}
-                        </TableCell>
-                        <TableCell align="right">
-                          {t('featureFlags.metrics.total')}
-                        </TableCell>
-                        <TableCell align="right">
-                          {t('featureFlags.metrics.exposureRate')}
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {tableData.map((row, index) => {
-                        const rate =
-                          row.total > 0
-                            ? ((row.exposed / row.total) * 100).toFixed(1)
-                            : '0.0';
-                        return (
-                          <TableRow key={`${row.time}-${row.appName || index}`} hover>
-                            <TableCell>{row.displayTime}</TableCell>
-                            {availableApps.length > 0 && (
-                              <TableCell>
-                                <Chip
-                                  label={row.appName || '-'}
-                                  size="small"
-                                  color="info"
-                                  sx={{ borderRadius: '16px' }}
-                                />
+                          {availableApps.length > 0 && (
+                            <TableCell>
+                              {t('featureFlags.metrics.applications')}
+                            </TableCell>
+                          )}
+                          <TableCell align="right">
+                            {t('featureFlags.metrics.exposed')}
+                          </TableCell>
+                          <TableCell align="right">
+                            {t('featureFlags.metrics.notExposed')}
+                          </TableCell>
+                          <TableCell align="right">
+                            {t('featureFlags.metrics.total')}
+                          </TableCell>
+                          <TableCell align="right">
+                            {t('featureFlags.metrics.exposureRate')}
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {tableData.map((row, index) => {
+                          const rate =
+                            row.total > 0
+                              ? ((row.exposed / row.total) * 100).toFixed(1)
+                              : '0.0';
+                          return (
+                            <TableRow
+                              key={`${row.time}-${row.appName || index}`}
+                              hover
+                            >
+                              <TableCell>{row.displayTime}</TableCell>
+                              {availableApps.length > 0 && (
+                                <TableCell>
+                                  <Chip
+                                    label={row.appName || '-'}
+                                    size="small"
+                                    color="info"
+                                    sx={{ borderRadius: '16px' }}
+                                  />
+                                </TableCell>
+                              )}
+                              <TableCell
+                                align="right"
+                                sx={{ color: 'success.main' }}
+                              >
+                                {row.exposed.toLocaleString()}
                               </TableCell>
-                            )}
-                            <TableCell
-                              align="right"
-                              sx={{ color: 'success.main' }}
-                            >
-                              {row.exposed.toLocaleString()}
-                            </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{ color: 'error.main' }}
-                            >
-                              {row.notExposed.toLocaleString()}
-                            </TableCell>
-                            <TableCell align="right">
-                              {row.total.toLocaleString()}
-                            </TableCell>
-                            <TableCell align="right">{rate}%</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                              <TableCell
+                                align="right"
+                                sx={{ color: 'error.main' }}
+                              >
+                                {row.notExposed.toLocaleString()}
+                              </TableCell>
+                              <TableCell align="right">
+                                {row.total.toLocaleString()}
+                              </TableCell>
+                              <TableCell align="right">{rate}%</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Card>
               </Collapse>
             </Box>

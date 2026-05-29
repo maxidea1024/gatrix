@@ -735,7 +735,10 @@ const ActionSetsPage: React.FC = () => {
                 {t('actionSets.createActionSet')}
               </Button>
             )}
-            <PageHeaderContextMenu onRefresh={fetchActionSets} refreshDisabled={loading} />
+            <PageHeaderContextMenu
+              onRefresh={fetchActionSets}
+              refreshDisabled={loading}
+            />
           </Box>
         }
       />

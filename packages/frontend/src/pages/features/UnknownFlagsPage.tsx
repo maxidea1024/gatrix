@@ -562,7 +562,10 @@ const UnknownFlagsPage: React.FC = () => {
         title={`${t('featureFlags.unknownFlags')} (${filteredFlags.length})`}
         subtitle={t('featureFlags.unknownFlagsDescription')}
         actions={
-          <PageHeaderContextMenu onRefresh={loadFlags} refreshDisabled={loading} />
+          <PageHeaderContextMenu
+            onRefresh={loadFlags}
+            refreshDisabled={loading}
+          />
         }
       />
 

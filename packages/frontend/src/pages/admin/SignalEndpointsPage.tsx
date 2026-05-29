@@ -628,7 +628,10 @@ const SignalEndpointsPage: React.FC = () => {
                 {t('signalEndpoints.createEndpoint')}
               </Button>
             )}
-            <PageHeaderContextMenu onRefresh={fetchEndpoints} refreshDisabled={loading} />
+            <PageHeaderContextMenu
+              onRefresh={fetchEndpoints}
+              refreshDisabled={loading}
+            />
           </Box>
         }
       />

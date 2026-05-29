@@ -598,7 +598,10 @@ const FeatureSegmentsPage: React.FC = () => {
                 {t('featureFlags.addSegment')}
               </Button>
             )}
-            <PageHeaderContextMenu onRefresh={loadSegments} refreshDisabled={loading} />
+            <PageHeaderContextMenu
+              onRefresh={loadSegments}
+              refreshDisabled={loading}
+            />
           </Box>
         }
       />

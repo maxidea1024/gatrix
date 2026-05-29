@@ -37,10 +37,7 @@ const PageHeaderContextMenu: React.FC<PageHeaderContextMenuProps> = ({
 
   return (
     <>
-      <IconButton
-        onClick={handleOpen}
-        disabled={refreshDisabled}
-      >
+      <IconButton onClick={handleOpen} disabled={refreshDisabled}>
         <MoreVertIcon />
       </IconButton>
       <Menu
