@@ -646,46 +646,47 @@ const WaterfallRow: React.FC<{
   const isErr = status !== 'ok' && status !== '';
 
   return (
-    <Tooltip
-      title={
-        <Box sx={{ fontSize: '0.75rem' }}>
-          <Box><strong>{op}</strong>: {label}</Box>
-          <Box>Duration: {duration}ms</Box>
-          <Box>Status: {status}</Box>
-          {data && Object.entries(data).slice(0, 3).map(([k, v]) => (
-            <Box key={k}>{k}: {v}</Box>
-          ))}
-        </Box>
-      }
-      placement="top"
-      arrow
-    >
       <Box sx={{
         display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0,
         borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'}`,
         '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
         transition: 'background 0.1s',
       }}>
-        {/* Label */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1.5, py: 0.6, overflow: 'hidden', pl: isRoot ? 1.5 : `${12 + depth * 16}px` }}>
-          {!isRoot && (
-            <Box sx={{ display: 'flex', alignItems: 'center', mr: 0.3, flexShrink: 0 }}>
-              <Box sx={{ width: 8, height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' }} />
+        {/* Label with tooltip */}
+        <Tooltip
+          title={
+            <Box sx={{ fontSize: '0.75rem' }}>
+              <Box><strong>{op}</strong>: {label}</Box>
+              <Box>Duration: {duration}ms</Box>
+              <Box>Status: {status}</Box>
+              {data && Object.entries(data).slice(0, 3).map(([k, v]) => (
+                <Box key={k}>{k}: {v}</Box>
+              ))}
             </Box>
-          )}
-          <Chip label={op.split('.')[0]} size="small" sx={{
-            height: 18, fontSize: '0.6rem', fontWeight: 600,
-            backgroundColor: alpha(opColor, isDark ? 0.15 : 0.08), color: opColor,
-            border: 'none', flexShrink: 0, borderRadius: 0.8,
-          }} />
-          <Typography variant="caption" noWrap sx={{
-            fontFamily: 'monospace', fontSize: '0.73rem',
-            fontWeight: isRoot ? 700 : 400,
-            color: isErr ? '#f44336' : (isDark ? '#ccc' : '#333'),
-          }}>
-            {label}
-          </Typography>
-        </Box>
+          }
+          placement="right"
+          arrow
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1.5, py: 0.6, overflow: 'hidden', pl: isRoot ? 1.5 : `${12 + depth * 16}px`, cursor: 'default' }}>
+            {!isRoot && (
+              <Box sx={{ display: 'flex', alignItems: 'center', mr: 0.3, flexShrink: 0 }}>
+                <Box sx={{ width: 8, height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' }} />
+              </Box>
+            )}
+            <Chip label={op.split('.')[0]} size="small" sx={{
+              height: 18, fontSize: '0.6rem', fontWeight: 600,
+              backgroundColor: alpha(opColor, isDark ? 0.15 : 0.08), color: opColor,
+              border: 'none', flexShrink: 0, borderRadius: 0.8,
+            }} />
+            <Typography variant="caption" noWrap sx={{
+              fontFamily: 'monospace', fontSize: '0.73rem',
+              fontWeight: isRoot ? 700 : 400,
+              color: isErr ? '#f44336' : (isDark ? '#ccc' : '#333'),
+            }}>
+              {label}
+            </Typography>
+          </Box>
+        </Tooltip>
 
         {/* Bar */}
         <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', px: 1 }}>
@@ -727,7 +728,6 @@ const WaterfallRow: React.FC<{
           )}
         </Box>
       </Box>
-    </Tooltip>
   );
 };
 

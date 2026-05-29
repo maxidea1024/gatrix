@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
+import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+SyntaxHighlighter.registerLanguage('javascript', javascript);
+SyntaxHighlighter.registerLanguage('bash', bash);
 import {
   Box,
   Typography,
@@ -520,21 +527,22 @@ const CodeBlock: React.FC<{ title: string; language: string; code: string; isDar
         </IconButton>
       </Tooltip>
     </Box>
-    <Box sx={{
-      p: 2,
-      backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.02)',
-      overflow: 'auto',
-    }}>
-      <Typography component="pre" sx={{
-        fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+    {/* @ts-expect-error react-syntax-highlighter type incompatibility with React 18 */}
+    <SyntaxHighlighter
+      language={language}
+      style={isDark ? vscDarkPlus : oneLight}
+      customStyle={{
+        margin: 0,
+        padding: '16px',
         fontSize: '0.78rem',
         lineHeight: 1.6,
-        m: 0, whiteSpace: 'pre-wrap',
-        color: isDark ? '#ddd' : '#333',
-      }}>
-        {code}
-      </Typography>
-    </Box>
+        borderRadius: 0,
+        background: isDark ? '#1e1e2e' : '#fafafa',
+      }}
+      showLineNumbers={false}
+    >
+      {code}
+    </SyntaxHighlighter>
   </Paper>
 );
 
