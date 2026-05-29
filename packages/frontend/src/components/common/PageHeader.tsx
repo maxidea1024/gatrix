@@ -56,11 +56,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        mb: 1,
-        pb: 1,
-        minHeight: 40,
-        borderBottom: 1,
-        borderColor: 'divider',
+        mb: 2,
+        px: 1.5,
+        py: 0,
+        height: 48,
+        borderRadius: '6px',
+        bgcolor: (theme: any) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.03)'
+            : 'rgba(0, 0, 0, 0.02)',
       }}
     >
       {/* Left: icon + title + subtitle */}
@@ -79,9 +83,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             sx={{
               display: 'flex',
               alignItems: 'center',
-              color: 'text.primary',
+              justifyContent: 'center',
               flexShrink: 0,
-              '& .MuiSvgIcon-root': { color: 'inherit', fontSize: '1.25rem' },
+              width: 26,
+              height: 26,
+              borderRadius: '6px',
+              background: (theme) =>
+                `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+              color: '#fff',
+              '& .MuiSvgIcon-root': { fontSize: '0.95rem' },
             }}
           >
             {icon}

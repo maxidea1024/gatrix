@@ -190,7 +190,8 @@ const IngamePopupNoticesPage: React.FC = () => {
       labelKey: 'ingamePopupNotices.targetingInfo',
       visible: true,
     },
-    { id: 'period', labelKey: 'ingamePopupNotices.period', visible: true },
+    { id: 'startDate', labelKey: 'ingamePopupNotices.startDate', visible: true },
+    { id: 'endDate', labelKey: 'ingamePopupNotices.endDate', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
     { id: 'tags', labelKey: 'common.tags', visible: true },
   ];
@@ -689,7 +690,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             )}
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       {canManage && (
@@ -880,7 +881,7 @@ const IngamePopupNoticesPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === 'period') {
+                          if (column.id === 'startDate') {
                             return (
                               <TableCell key={column.id}>
                                 <Tooltip
@@ -890,7 +891,7 @@ const IngamePopupNoticesPage: React.FC = () => {
                                       : t('ingamePopupNotices.startImmediately')
                                   }
                                 >
-                                  <Typography variant="caption" display="block">
+                                  <Typography variant="caption">
                                     {notice.startDate
                                       ? formatRelativeTime(
                                           notice.startDate,
@@ -902,6 +903,12 @@ const IngamePopupNoticesPage: React.FC = () => {
                                         )}
                                   </Typography>
                                 </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'endDate') {
+                            return (
+                              <TableCell key={column.id}>
                                 <Tooltip
                                   title={
                                     notice.endDate
@@ -909,12 +916,7 @@ const IngamePopupNoticesPage: React.FC = () => {
                                       : t('ingamePopupNotices.endDateNotSet')
                                   }
                                 >
-                                  <Typography
-                                    variant="caption"
-                                    display="block"
-                                    color="text.secondary"
-                                  >
-                                    ~{' '}
+                                  <Typography variant="caption">
                                     {notice.endDate
                                       ? formatRelativeTime(
                                           notice.endDate,
