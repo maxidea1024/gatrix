@@ -7,7 +7,7 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 export const config = {
   // Server
   port: parseInt(
-    process.env.ARGUS_API_PORT || process.env.PORT || '45300',
+    process.env.ARGUS_API_PORT || '45300',
     10
   ),
   nodeEnv: process.env.NODE_ENV || 'development',
