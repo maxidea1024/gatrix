@@ -107,20 +107,26 @@ export default async function performanceRoutes(app: FastifyInstance) {
         });
         const histogram = await histResult.json();
 
-        // Top spans
+        // Top spans — join spans with transactions via transaction_id
         const spansResult = await clickhouse.query({
           query: `
             SELECT
-              description,
-              op,
+              s.description,
+              s.op,
               count() AS count,
-              avg(duration) AS avg_duration,
-              quantile(0.95)(duration) AS p95
-            FROM argus.spans
-            WHERE project_id = {projectId:String}
-              AND transaction = {txnName:String}
-              AND timestamp >= now() - INTERVAL ${interval}
-            GROUP BY description, op
+              avg(s.duration) AS avg_duration,
+              quantile(0.95)(s.duration) AS p95
+            FROM argus.spans s
+            INNER JOIN (
+              SELECT event_id
+              FROM argus.transactions
+              WHERE project_id = {projectId:String}
+                AND transaction = {txnName:String}
+                AND timestamp >= now() - INTERVAL ${interval}
+            ) t ON s.transaction_id = t.event_id
+            WHERE s.project_id = {projectId:String}
+              AND s.timestamp >= now() - INTERVAL ${interval}
+            GROUP BY s.description, s.op
             ORDER BY avg_duration DESC
             LIMIT 20
           `,
