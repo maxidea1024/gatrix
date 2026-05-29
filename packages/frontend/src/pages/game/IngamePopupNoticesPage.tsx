@@ -190,7 +190,11 @@ const IngamePopupNoticesPage: React.FC = () => {
       labelKey: 'ingamePopupNotices.targetingInfo',
       visible: true,
     },
-    { id: 'startDate', labelKey: 'ingamePopupNotices.startDate', visible: true },
+    {
+      id: 'startDate',
+      labelKey: 'ingamePopupNotices.startDate',
+      visible: true,
+    },
     { id: 'endDate', labelKey: 'ingamePopupNotices.endDate', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
     { id: 'tags', labelKey: 'common.tags', visible: true },
