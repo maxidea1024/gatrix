@@ -4,28 +4,24 @@ import {
   Typography,
   Paper,
   Chip,
-  IconButton,
   TextField,
   InputAdornment,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Stack,
   Pagination,
+  Stack,
   useTheme,
   alpha,
+  Popover,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   Search as SearchIcon,
-  Refresh as RefreshIcon,
   ErrorOutline as ErrorIcon,
   Warning as WarningIcon,
   Info as InfoIcon,
   BugReport as BugReportIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +29,7 @@ import argusService, {
   ArgusIssue,
   ArgusIssueListParams,
 } from '@/services/argusService';
-import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
+import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 
 const PAGE_SIZE = 25;
 
@@ -73,10 +69,22 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [level, setLevel] = useState(searchParams.get('level') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
 
-  // Contextual filters (from Overview page clicks)
-  const [environment, setEnvironment] = useState(searchParams.get('environment') || '');
-  const [browser, setBrowser] = useState(searchParams.get('browser') || '');
-  const [os, setOs] = useState(searchParams.get('os') || '');
+  // ArgusFilterBar state (includes environment/browser/os from URL)
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
+    const state = defaultArgusFilterState('24h');
+    const env = searchParams.get('environment');
+    const br = searchParams.get('browser');
+    const osParam = searchParams.get('os');
+    if (env) state.environments = [env];
+    if (br) state.browsers = [br];
+    if (osParam) state.os = [osParam];
+    return state;
+  });
+
+  // Dropdown anchor state for compact filter chips
+  const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
+  const [levelAnchor, setLevelAnchor] = useState<HTMLElement | null>(null);
+  const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
 
   const fetchIssues = useCallback(async () => {
     setLoading(true);
@@ -88,9 +96,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         limit: PAGE_SIZE,
         offset: (currentPage - 1) * PAGE_SIZE,
         search: search || undefined,
-        environment: environment || undefined,
-        browser: browser || undefined,
-        os: os || undefined,
+        environment: filters.environments.length === 1 ? filters.environments[0] : undefined,
+        browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
+        os: filters.os.length === 1 ? filters.os[0] : undefined,
       };
       const result = await argusService.listIssues(projectId, params);
       setIssues(result.data);
@@ -102,21 +110,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     } finally {
       setLoading(false);
     }
-  }, [projectId, status, level, sort, currentPage, search, environment, browser, os]);
+  }, [projectId, status, level, sort, currentPage, search, filters]);
 
   useEffect(() => { fetchIssues(); }, [fetchIssues]);
 
-  // Helper to update URL and state for contextual filters
-  const setFilterAndUrl = (key: string, value: string, setter: (v: string) => void) => {
-    setter(value);
-    const params = new URLSearchParams(searchParams);
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    params.set('page', '1');
-    setSearchParams(params);
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
   };
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
@@ -131,43 +130,126 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  // Filter chip option helpers
+  const statusOptions = [
+    { value: '', label: t('common.all', 'All') },
+    { value: 'unresolved', label: t('argus.issues.unresolved', 'Unresolved'), color: '#f44336' },
+    { value: 'resolved', label: t('argus.issues.resolved', 'Resolved'), color: '#4caf50' },
+    { value: 'ignored', label: t('argus.issues.ignored', 'Ignored'), color: '#9e9e9e' },
+  ];
+  const levelOptions = [
+    { value: '', label: t('common.all', 'All') },
+    { value: 'fatal', label: 'Fatal', color: '#f44336' },
+    { value: 'error', label: 'Error', color: '#ff5722' },
+    { value: 'warning', label: 'Warning', color: '#ff9800' },
+    { value: 'info', label: 'Info', color: '#2196f3' },
+  ];
+  const sortOptions = [
+    { value: 'last_seen', label: t('argus.issues.lastSeen', 'Last Seen') },
+    { value: 'first_seen', label: t('argus.issues.firstSeen', 'First Seen') },
+    { value: 'event_count', label: t('argus.issues.events', 'Events') },
+    { value: 'user_count', label: t('argus.issues.users', 'Users') },
+  ];
+
+  const FilterChipSelect: React.FC<{
+    label: string;
+    value: string;
+    options: { value: string; label: string; color?: string }[];
+    anchorEl: HTMLElement | null;
+    onOpen: (e: React.MouseEvent<HTMLElement>) => void;
+    onClose: () => void;
+    onSelect: (value: string) => void;
+  }> = ({ label, value, options, anchorEl, onOpen, onClose, onSelect }) => {
+    const currentOption = options.find(o => o.value === value);
+    const displayLabel = currentOption?.label || options[0]?.label;
+    const dotColor = currentOption?.color;
+    return (
+      <>
+        <Box
+          onClick={onOpen}
+          sx={{
+            display: 'inline-flex', alignItems: 'center', gap: 0.5,
+            height: 28, px: 1.2, borderRadius: '6px',
+            border: '1px solid', borderColor: anchorEl ? 'primary.main' : 'divider',
+            bgcolor: anchorEl ? alpha(theme.palette.primary.main, 0.04) : 'transparent',
+            cursor: 'pointer', transition: 'all 0.15s', userSelect: 'none',
+            '&:hover': { borderColor: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.04) },
+          }}
+        >
+          {dotColor && <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: dotColor }} />}
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>{label}:</Typography>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'text.primary' }}>{displayLabel}</Typography>
+          <ExpandMoreIcon sx={{ fontSize: 13, color: 'text.disabled', transform: anchorEl ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+        </Box>
+        <Popover
+          open={Boolean(anchorEl)}
+          anchorEl={anchorEl}
+          onClose={onClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          slotProps={{ paper: { sx: { mt: 0.5, borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', minWidth: 140, py: 0.5 } } }}
+        >
+          {options.map(opt => (
+            <Box
+              key={opt.value}
+              onClick={() => { onSelect(opt.value); onClose(); }}
+              sx={{
+                px: 1.5, py: 0.6, cursor: 'pointer', fontSize: '0.78rem',
+                fontWeight: opt.value === value ? 700 : 400,
+                color: opt.value === value ? 'primary.main' : 'text.primary',
+                backgroundColor: opt.value === value ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
+                display: 'flex', alignItems: 'center', gap: 0.8,
+                transition: 'background 0.1s',
+                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.04) },
+              }}
+            >
+              {opt.color && <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: opt.color }} />}
+              {opt.label}
+            </Box>
+          ))}
+        </Popover>
+      </>
+    );
+  };
+
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <BugReportIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
-          <Typography variant="h5" fontWeight={700}>
-            {t('argus.issues.title')}
-          </Typography>
-          {!loading && (
-            <Chip
-              label={total.toLocaleString()}
-              size="small"
-              sx={{
-                fontWeight: 700, fontSize: '0.75rem', height: 22,
-                backgroundColor: alpha(theme.palette.error.main, 0.1),
-                color: theme.palette.error.main,
-                border: 'none',
-              }}
-            />
-          )}
-        </Box>
-        <IconButton onClick={fetchIssues} disabled={loading} size="small">
-          <RefreshIcon />
-        </IconButton>
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <BugReportIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
+        <Typography variant="h5" fontWeight={700}>
+          {t('argus.issues.title')}
+        </Typography>
+        {!loading && (
+          <Chip
+            label={total.toLocaleString()}
+            size="small"
+            sx={{
+              fontWeight: 700, fontSize: '0.75rem', height: 22,
+              backgroundColor: alpha(theme.palette.error.main, 0.1),
+              color: theme.palette.error.main,
+              border: 'none',
+            }}
+          />
+        )}
       </Box>
 
-      {/* Filter Bar */}
-      <Paper
-        elevation={0}
+      {/* Global Filter Bar (environment / browser / OS / date range) */}
+      <ArgusFilterBar
+        projectId={String(projectId)}
+        value={filters}
+        onChange={handleFilterChange}
+        onRefresh={fetchIssues}
+        loading={loading}
+      />
+
+      {/* Issue-specific Filter Bar */}
+      <Box
         sx={{
-          p: 1.5, mb: 2,
-          display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: 2,
+          display: 'flex', gap: 0.75, mb: 2, flexWrap: 'wrap', alignItems: 'center',
         }}
       >
+        {/* Search */}
         <TextField
           size="small"
           placeholder={t('argus.issues.searchPlaceholder')}
@@ -182,103 +264,66 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             }
           }}
           InputProps={{
-            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment>,
+            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 16, color: 'text.disabled' }} /></InputAdornment>,
           }}
           sx={{
-            minWidth: 260,
+            minWidth: 220,
             '& .MuiOutlinedInput-root': {
-              borderRadius: 1.5, fontSize: '0.85rem',
+              borderRadius: '6px', fontSize: '0.78rem', height: 28,
               backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
             },
+            '& .MuiOutlinedInput-input': { py: 0.4 },
           }}
         />
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel sx={{ fontSize: '0.85rem' }}>{t('argus.issues.status')}</InputLabel>
-          <Select
-            value={status}
-            label={t('argus.issues.status')}
-            sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              const params = new URLSearchParams(searchParams);
-              params.set('status', e.target.value);
-              params.set('page', '1');
-              setSearchParams(params);
-            }}
-          >
-            <MenuItem value="">{t('common.all')}</MenuItem>
-            <MenuItem value="unresolved">{t('argus.issues.unresolved')}</MenuItem>
-            <MenuItem value="resolved">{t('argus.issues.resolved')}</MenuItem>
-            <MenuItem value="ignored">{t('argus.issues.ignored')}</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 110 }}>
-          <InputLabel sx={{ fontSize: '0.85rem' }}>{t('argus.issues.level')}</InputLabel>
-          <Select
-            value={level}
-            label={t('argus.issues.level')}
-            sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}
-            onChange={(e) => {
-              setLevel(e.target.value);
-              const params = new URLSearchParams(searchParams);
-              params.set('level', e.target.value);
-              params.set('page', '1');
-              setSearchParams(params);
-            }}
-          >
-            <MenuItem value="">{t('common.all')}</MenuItem>
-            <MenuItem value="fatal">Fatal</MenuItem>
-            <MenuItem value="error">Error</MenuItem>
-            <MenuItem value="warning">Warning</MenuItem>
-            <MenuItem value="info">Info</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 130 }}>
-          <InputLabel sx={{ fontSize: '0.85rem' }}>{t('argus.issues.sort')}</InputLabel>
-          <Select
-            value={sort}
-            label={t('argus.issues.sort')}
-            sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}
-            onChange={(e) => {
-              setSort(e.target.value);
-              const params = new URLSearchParams(searchParams);
-              params.set('sort', e.target.value);
-              setSearchParams(params);
-            }}
-          >
-            <MenuItem value="last_seen">{t('argus.issues.lastSeen')}</MenuItem>
-            <MenuItem value="first_seen">{t('argus.issues.firstSeen')}</MenuItem>
-            <MenuItem value="event_count">{t('argus.issues.events')}</MenuItem>
-            <MenuItem value="user_count">{t('argus.issues.users')}</MenuItem>
-          </Select>
-        </FormControl>
 
-        {/* Contextual Filters (from Overview page) */}
-        {environment && (
-          <Chip
-            label={`${t('argus.issues.environment', 'Environment')}: ${environment}`}
-            size="small"
-            onDelete={() => setFilterAndUrl('environment', '', setEnvironment)}
-            sx={{ fontWeight: 600, fontSize: '0.75rem', height: 28 }}
-          />
-        )}
-        {browser && (
-          <Chip
-            label={`${t('argus.issues.browser', 'Browser')}: ${browser}`}
-            size="small"
-            onDelete={() => setFilterAndUrl('browser', '', setBrowser)}
-            sx={{ fontWeight: 600, fontSize: '0.75rem', height: 28 }}
-          />
-        )}
-        {os && (
-          <Chip
-            label={`${t('argus.issues.os', 'OS')}: ${os}`}
-            size="small"
-            onDelete={() => setFilterAndUrl('os', '', setOs)}
-            sx={{ fontWeight: 600, fontSize: '0.75rem', height: 28 }}
-          />
-        )}
-      </Paper>
+        {/* Status */}
+        <FilterChipSelect
+          label={t('argus.issues.status', 'Status')}
+          value={status}
+          options={statusOptions}
+          anchorEl={statusAnchor}
+          onOpen={(e) => setStatusAnchor(e.currentTarget)}
+          onClose={() => setStatusAnchor(null)}
+          onSelect={(v) => {
+            setStatus(v);
+            const params = new URLSearchParams(searchParams);
+            params.set('status', v); params.set('page', '1');
+            setSearchParams(params);
+          }}
+        />
+
+        {/* Level */}
+        <FilterChipSelect
+          label={t('argus.issues.level', 'Level')}
+          value={level}
+          options={levelOptions}
+          anchorEl={levelAnchor}
+          onOpen={(e) => setLevelAnchor(e.currentTarget)}
+          onClose={() => setLevelAnchor(null)}
+          onSelect={(v) => {
+            setLevel(v);
+            const params = new URLSearchParams(searchParams);
+            params.set('level', v); params.set('page', '1');
+            setSearchParams(params);
+          }}
+        />
+
+        {/* Sort */}
+        <FilterChipSelect
+          label={t('argus.issues.sort', 'Sort')}
+          value={sort}
+          options={sortOptions}
+          anchorEl={sortAnchor}
+          onOpen={(e) => setSortAnchor(e.currentTarget)}
+          onClose={() => setSortAnchor(null)}
+          onSelect={(v) => {
+            setSort(v);
+            const params = new URLSearchParams(searchParams);
+            params.set('sort', v);
+            setSearchParams(params);
+          }}
+        />
+      </Box>
 
       <PageContentLoader loading={loading}>
         {/* Issue Cards */}

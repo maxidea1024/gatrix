@@ -223,4 +223,56 @@ export default async function overviewRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  // --- Filter Options ---
+  app.get(
+    '/filters/:projectId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { period = '30d' } = request.query as { period?: string };
+
+      const periodMap: Record<string, string> = {
+        '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
+        '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
+      };
+      const interval = periodMap[period] || '30 DAY';
+
+      try {
+        const qp = { projectId: String(projectId) };
+
+        const [envResult, browserResult, osResult] = await Promise.all([
+          clickhouse.query({
+            query: `SELECT DISTINCT environment FROM argus.errors WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} ORDER BY environment`,
+            query_params: qp,
+          }),
+          clickhouse.query({
+            query: `SELECT DISTINCT browser_name FROM argus.errors WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND browser_name != '' ORDER BY browser_name`,
+            query_params: qp,
+          }),
+          clickhouse.query({
+            query: `SELECT DISTINCT os_name FROM argus.errors WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND os_name != '' ORDER BY os_name`,
+            query_params: qp,
+          }),
+        ]);
+
+        const envRows = await envResult.json<{ data: { environment: string }[] }>();
+        const browserRows = await browserResult.json<{ data: { browser_name: string }[] }>();
+        const osRows = await osResult.json<{ data: { os_name: string }[] }>();
+
+        return reply.send({
+          data: {
+            environments: (envRows.data || []).map(r => r.environment).filter(Boolean),
+            browsers: (browserRows.data || []).map(r => r.browser_name).filter(Boolean),
+            os: (osRows.data || []).map(r => r.os_name).filter(Boolean),
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to get filter options', {
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get filter options' });
+      }
+    }
+  );
 }

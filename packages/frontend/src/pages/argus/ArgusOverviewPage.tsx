@@ -43,7 +43,8 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import argusService, { ArgusOverviewData } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
-import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
+import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -62,16 +63,16 @@ const ArgusOverviewPage: React.FC = () => {
 
   const [data, setData] = useState<ArgusOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
     const saved = localStorage.getItem('argus-overview-period');
-    return { type: 'preset', preset: saved || '24h' };
+    return defaultArgusFilterState(saved || '24h');
   });
   const projectId = '1';
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const apiParams = argusDateRangeToApiParams(dateRange);
+      const apiParams = argusDateRangeToApiParams(filters.dateRange);
       const result = await argusService.getOverview(projectId, apiParams.period, apiParams.start, apiParams.end);
       setData(result);
     } catch (error) {
@@ -79,14 +80,14 @@ const ArgusOverviewPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, dateRange]);
+  }, [projectId, filters]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
-    setDateRange(value);
-    if (value.type === 'preset' && value.preset) {
-      localStorage.setItem('argus-overview-period', value.preset);
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
+    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      localStorage.setItem('argus-overview-period', newFilters.dateRange.preset);
     }
   };
 
@@ -270,18 +271,21 @@ const ArgusOverviewPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h5" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <BugReportIcon sx={{ color: theme.palette.error.main }} />
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <BugReportIcon sx={{ color: theme.palette.error.main }} />
+        <Typography variant="h5" fontWeight={700}>
           {t('argus.overview.title')}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-          <IconButton onClick={fetchData} disabled={loading} size="small">
-            <RefreshIcon sx={{ transition: 'transform 0.3s', ...(loading && { animation: 'spin 1s linear infinite', '@keyframes spin': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } } }) }} />
-          </IconButton>
-        </Box>
       </Box>
+
+      {/* Filter Bar */}
+      <ArgusFilterBar
+        projectId={projectId}
+        value={filters}
+        onChange={handleFilterChange}
+        onRefresh={fetchData}
+        loading={loading}
+      />
 
       {/* Stat Cards — with change indicators */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2, mb: 3 }}>

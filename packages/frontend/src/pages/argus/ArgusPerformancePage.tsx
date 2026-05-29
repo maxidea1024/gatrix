@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -50,7 +50,8 @@ import argusService, {
   ArgusTraceSpan,
 } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
-import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -79,9 +80,9 @@ const ArgusPerformancePage: React.FC = () => {
 
   const [transactions, setTransactions] = useState<ArgusTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
     const saved = localStorage.getItem('argus-perf-period');
-    return { type: 'preset', preset: saved || '24h' };
+    return defaultArgusFilterState(saved || '24h');
   });
   const [sort, setSort] = useState<string>('count');
 
@@ -97,7 +98,7 @@ const ArgusPerformancePage: React.FC = () => {
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
     try {
-      const ap = argusDateRangeToApiParams(dateRange);
+      const ap = argusDateRangeToApiParams(filters.dateRange);
       const data = await argusService.getTransactions(projectId, { ...ap, sort, limit: 30 });
       setTransactions(data);
     } catch (error) {
@@ -105,14 +106,14 @@ const ArgusPerformancePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, dateRange, sort]);
+  }, [projectId, filters, sort]);
 
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
   const fetchDetail = useCallback(async (txnName: string) => {
     setDetailLoading(true);
     try {
-      const ap = argusDateRangeToApiParams(dateRange);
+      const ap = argusDateRangeToApiParams(filters.dateRange);
       const data = await argusService.getTransactionDetail(projectId, txnName, ap.period, ap.start, ap.end);
       setDetail(data);
     } catch (error) {
@@ -120,7 +121,7 @@ const ArgusPerformancePage: React.FC = () => {
     } finally {
       setDetailLoading(false);
     }
-  }, [projectId, dateRange]);
+  }, [projectId, filters]);
 
   const fetchTrace = useCallback(async (traceId: string) => {
     setTraceLoading(true);
@@ -152,10 +153,10 @@ const ArgusPerformancePage: React.FC = () => {
     }
   };
 
-  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
-    setDateRange(value);
-    if (value.type === 'preset' && value.preset) {
-      localStorage.setItem('argus-perf-period', value.preset);
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
+    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      localStorage.setItem('argus-perf-period', newFilters.dateRange.preset);
     }
     if (selectedTxn && viewMode === 'detail') fetchDetail(selectedTxn);
   };
@@ -228,23 +229,24 @@ const ArgusPerformancePage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {viewMode !== 'list' && (
-            <IconButton onClick={handleBack} size="small"><ArrowBackIcon /></IconButton>
-          )}
-          <SpeedIcon sx={{ fontSize: 26, color: theme.palette.primary.main }} />
-          <Typography variant="h5" fontWeight={700} noWrap sx={{ maxWidth: 500 }}>
-            {headerTitle}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-          <IconButton onClick={viewMode === 'list' ? fetchTransactions : () => selectedTxn && fetchDetail(selectedTxn)} size="small">
-            <RefreshIcon />
-          </IconButton>
-        </Box>
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        {viewMode !== 'list' && (
+          <IconButton onClick={handleBack} size="small"><ArrowBackIcon /></IconButton>
+        )}
+        <SpeedIcon sx={{ fontSize: 26, color: theme.palette.primary.main }} />
+        <Typography variant="h5" fontWeight={700} noWrap sx={{ maxWidth: 500 }}>
+          {headerTitle}
+        </Typography>
       </Box>
+
+      {/* Filter Bar */}
+      <ArgusFilterBar
+        projectId={projectId}
+        value={filters}
+        onChange={handleFilterChange}
+        onRefresh={viewMode === 'list' ? fetchTransactions : () => selectedTxn && fetchDetail(selectedTxn)}
+        loading={loading}
+      />
 
       {/* === TRACE WATERFALL VIEW === */}
       {viewMode === 'trace' && (

@@ -298,6 +298,18 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  // --- Filter Options ---
+
+  async getFilterOptions(
+    projectId: number | string,
+    period?: string
+  ): Promise<{ environments: string[]; browsers: string[]; os: string[] }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/filters/${projectId}`, {
+      params: { period },
+    });
+    return response.data?.data || response.data || { environments: [], browsers: [], os: [] };
+  }
+
   // --- Performance ---
 
   async getTransactions(

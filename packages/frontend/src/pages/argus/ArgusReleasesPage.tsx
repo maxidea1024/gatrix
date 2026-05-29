@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -26,7 +26,8 @@ import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusRelease } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
-import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 
 const ArgusReleasesPage: React.FC = () => {
@@ -37,15 +38,15 @@ const ArgusReleasesPage: React.FC = () => {
 
   const [releases, setReleases] = useState<ArgusRelease[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
     const saved = localStorage.getItem('argus-releases-period');
-    return { type: 'preset', preset: saved || '30d' };
+    return defaultArgusFilterState(saved || '30d');
   });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const ap = argusDateRangeToApiParams(dateRange);
+      const ap = argusDateRangeToApiParams(filters.dateRange);
       const data = await argusService.getReleases(projectId, ap.period, ap.start, ap.end);
       setReleases(data || []);
     } catch (error) {
@@ -53,14 +54,14 @@ const ArgusReleasesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, dateRange]);
+  }, [projectId, filters]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
-    setDateRange(value);
-    if (value.type === 'preset' && value.preset) {
-      localStorage.setItem('argus-releases-period', value.preset);
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
+    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      localStorage.setItem('argus-releases-period', newFilters.dateRange.preset);
     }
   };
 
@@ -74,24 +75,27 @@ const ArgusReleasesPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <ReleaseIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
-          <Typography variant="h5" fontWeight={700}>
-            {t('argus.releases.title')}
-          </Typography>
-          {!loading && (
-            <Chip label={`${releases.length} releases`} size="small" sx={{
-              fontWeight: 700, fontSize: '0.75rem', height: 22,
-              backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
-            }} />
-          )}
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-          <IconButton onClick={fetchData} size="small"><RefreshIcon /></IconButton>
-        </Box>
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <ReleaseIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
+        <Typography variant="h5" fontWeight={700}>
+          {t('argus.releases.title')}
+        </Typography>
+        {!loading && (
+          <Chip label={`${releases.length} releases`} size="small" sx={{
+            fontWeight: 700, fontSize: '0.75rem', height: 22,
+            backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
+          }} />
+        )}
       </Box>
+
+      {/* Filter Bar */}
+      <ArgusFilterBar
+        projectId={projectId}
+        value={filters}
+        onChange={handleFilterChange}
+        onRefresh={fetchData}
+        loading={loading}
+      />
 
       {/* Summary Stats */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2, mb: 3 }}>

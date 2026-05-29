@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -42,7 +42,8 @@ import {
 import { Bar } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse } from '@/services/argusService';
-import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
@@ -68,7 +69,7 @@ const ArgusFeedbackPage: React.FC = () => {
   const [data, setData] = useState<ArgusFeedbackResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>({ type: 'preset', preset: '7d' });
+  const [filters, setFilters] = useState<ArgusFilterState>(defaultArgusFilterState('7d'));
   const [search, setSearch] = useState('');
   const [searchDebounce, setSearchDebounce] = useState('');
 
@@ -81,7 +82,7 @@ const ArgusFeedbackPage: React.FC = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const ap = argusDateRangeToApiParams(dateRange);
+      const ap = argusDateRangeToApiParams(filters.dateRange);
       const result = await argusService.getFeedback(projectId, { ...ap, page, limit: PAGE_SIZE, search: searchDebounce || undefined });
       setData(result);
     } catch (error) {
@@ -89,12 +90,12 @@ const ArgusFeedbackPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, dateRange, page, searchDebounce]);
+  }, [projectId, filters, page, searchDebounce]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
-    setDateRange(value);
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     setPage(1);
   };
 
@@ -142,24 +143,27 @@ const ArgusFeedbackPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <FeedbackIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
-          <Typography variant="h5" fontWeight={700}>
-            {t('argus.feedback.title')}
-          </Typography>
-          {!loading && (
-            <Chip label={total.toLocaleString()} size="small" sx={{
-              fontWeight: 700, fontSize: '0.75rem', height: 22,
-              backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
-            }} />
-          )}
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-          <IconButton onClick={fetchData} size="small"><RefreshIcon /></IconButton>
-        </Box>
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <FeedbackIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
+        <Typography variant="h5" fontWeight={700}>
+          {t('argus.feedback.title')}
+        </Typography>
+        {!loading && (
+          <Chip label={total.toLocaleString()} size="small" sx={{
+            fontWeight: 700, fontSize: '0.75rem', height: 22,
+            backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
+          }} />
+        )}
       </Box>
+
+      {/* Filter Bar */}
+      <ArgusFilterBar
+        projectId={projectId}
+        value={filters}
+        onChange={handleFilterChange}
+        onRefresh={fetchData}
+        loading={loading}
+      />
 
       {/* Stats + Trend Row */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>

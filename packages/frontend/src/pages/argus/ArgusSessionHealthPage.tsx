@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -39,7 +39,8 @@ import {
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusSessionHealth } from '@/services/argusService';
-import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
@@ -54,15 +55,15 @@ const ArgusSessionHealthPage: React.FC = () => {
 
   const [data, setData] = useState<ArgusSessionHealth | null>(null);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<ArgusDateRangeValue>(() => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
     const saved = localStorage.getItem('argus-session-period');
-    return { type: 'preset', preset: saved || '24h' };
+    return defaultArgusFilterState(saved || '24h');
   });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const ap = argusDateRangeToApiParams(dateRange);
+      const ap = argusDateRangeToApiParams(filters.dateRange);
       const result = await argusService.getSessionHealth(projectId, ap.period, ap.start, ap.end);
       setData(result);
     } catch (error) {
@@ -70,14 +71,14 @@ const ArgusSessionHealthPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, dateRange]);
+  }, [projectId, filters]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleDateRangeChange = (value: ArgusDateRangeValue) => {
-    setDateRange(value);
-    if (value.type === 'preset' && value.preset) {
-      localStorage.setItem('argus-session-period', value.preset);
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
+    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      localStorage.setItem('argus-session-period', newFilters.dateRange.preset);
     }
   };
 
@@ -179,16 +180,21 @@ const ArgusSessionHealthPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h5" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <DevicesIcon sx={{ color: theme.palette.info.main }} />
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DevicesIcon sx={{ color: theme.palette.info.main }} />
+        <Typography variant="h5" fontWeight={700}>
           {t('argus.sessions.title')}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ArgusDateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-          <IconButton onClick={fetchData} size="small"><RefreshIcon /></IconButton>
-        </Box>
       </Box>
+
+      {/* Filter Bar */}
+      <ArgusFilterBar
+        projectId={projectId}
+        value={filters}
+        onChange={handleFilterChange}
+        onRefresh={fetchData}
+        loading={loading}
+      />
 
       <PageContentLoader loading={loading}>
         {/* Top Row: Donut + Stats */}
