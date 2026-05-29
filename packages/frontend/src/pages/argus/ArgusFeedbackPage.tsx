@@ -112,9 +112,9 @@ const ArgusFeedbackPage: React.FC = () => {
                   <TableRow key={item.event_id}>
                     <TableCell>
                       <Typography variant="body2" fontWeight={500}>
-                        {item.user_name || item.user_email || '-'}
+                        {item.name || item.email || '-'}
                       </Typography>
-                      {item.contact_email && (
+                      {item.contact_email && item.contact_email !== item.email && (
                         <Typography variant="caption" color="text.secondary">
                           {item.contact_email}
                         </Typography>
@@ -122,7 +122,7 @@ const ArgusFeedbackPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                        {item.comments}
+                        {item.message}
                       </Typography>
                     </TableCell>
                     <TableCell>

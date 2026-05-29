@@ -177,9 +177,9 @@ export interface ArgusSessionHealth {
 
 export interface ArgusFeedbackItem {
   event_id: string;
-  user_email: string;
-  user_name: string;
-  comments: string;
+  email: string;
+  name: string;
+  message: string;
   contact_email: string;
   submitted_at: string;
   url: string;
