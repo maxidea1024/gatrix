@@ -447,6 +447,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         path: '/argus/performance',
         requiredPermission: P.CRASH_EVENTS_READ,
       },
+      {
+        text: 'sidebar.argusSettings',
+        icon: 'Settings',
+        path: '/argus/settings',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
     ],
   },
 
