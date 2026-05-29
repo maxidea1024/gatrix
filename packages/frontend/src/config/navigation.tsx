@@ -423,6 +423,21 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
+  // Argus (Error Tracking)
+  {
+    id: 'argus',
+    text: 'sidebar.argus',
+    icon: 'BugReport',
+    children: [
+      {
+        text: 'sidebar.argusIssues',
+        icon: 'BugReport',
+        path: '/argus/issues',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+    ],
+  },
+
   // Admin Panel
   {
     id: 'admin-panel',

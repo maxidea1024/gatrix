@@ -302,6 +302,14 @@ const SharedSpreadsheetPage = React.lazy(
   () => import('./pages/shared/SharedSpreadsheetPage')
 );
 
+// Pages - Argus
+const ArgusIssuesPage = React.lazy(
+  () => import('./pages/argus/ArgusIssuesPage')
+);
+const ArgusIssueDetailPage = React.lazy(
+  () => import('./pages/argus/ArgusIssueDetailPage')
+);
+
 // LottieLoader is now imported from @/components/common/LottieLoader
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
@@ -1125,6 +1133,27 @@ const AppContent: React.FC = () => {
                                         />
                                       </Routes>
                                     </EnvironmentAwareLayout>
+                                  </ProtectedRoute>
+                                }
+                              />
+
+                              {/* Argus Routes */}
+                              <Route
+                                path="/argus/*"
+                                element={
+                                  <ProtectedRoute requiredRoles={['admin']}>
+                                    <MainLayout>
+                                      <Routes>
+                                        <Route
+                                          path="issues"
+                                          element={<ArgusIssuesPage />}
+                                        />
+                                        <Route
+                                          path="issues/:projectId/:issueId"
+                                          element={<ArgusIssueDetailPage />}
+                                        />
+                                      </Routes>
+                                    </MainLayout>
                                   </ProtectedRoute>
                                 }
                               />
