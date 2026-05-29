@@ -27,9 +27,7 @@ export const usePageState = ({
       // Restore limit from URL, then localStorage, then default
       const savedLimit = localStorage.getItem(`${storageKey}_limit`);
       const limit = parseInt(
-        searchParams.get('limit') ||
-          savedLimit ||
-          String(defaultState.limit)
+        searchParams.get('limit') || savedLimit || String(defaultState.limit)
       );
       const sortBy = searchParams.get('sortBy') || defaultState.sortBy;
       const sortOrder =
