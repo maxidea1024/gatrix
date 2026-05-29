@@ -1389,13 +1389,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1413,7 +1413,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         {t('playerConnections.ccu.total')}
                       </Typography>
                       <Typography
-                        variant="h4"
+                        variant="h5"
                         fontWeight={700}
                         color="primary.main"
                       >
@@ -1482,8 +1482,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.primary.main, 0.15),
                         color: 'primary.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <CcuIcon />
@@ -1505,13 +1505,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1529,7 +1529,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         {t('playerConnections.ccu.worldCount')}
                       </Typography>
                       <Typography
-                        variant="h4"
+                        variant="h5"
                         fontWeight={700}
                         color="primary.main"
                       >
@@ -1540,8 +1540,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.primary.main, 0.15),
                         color: 'primary.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <WorldIcon />
@@ -1563,13 +1563,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1611,8 +1611,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.primary.main, 0.15),
                         color: 'primary.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <TrendingUpIcon />
@@ -1644,13 +1644,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.error.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1680,8 +1680,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.error.main, 0.15),
                         color: 'error.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <KickIcon />
@@ -1707,13 +1707,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.info.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1731,7 +1731,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         {t('playerConnections.overview.totalPlayers')}
                       </Typography>
                       <Typography
-                        variant="h4"
+                        variant="h5"
                         fontWeight={700}
                         color="info.main"
                       >
@@ -1742,8 +1742,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.info.main, 0.15),
                         color: 'info.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <PeopleIcon />
@@ -1765,13 +1765,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.success.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1789,7 +1789,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         {t('playerConnections.overview.todayNewPlayers')}
                       </Typography>
                       <Typography
-                        variant="h4"
+                        variant="h5"
                         fontWeight={700}
                         color="success.main"
                       >
@@ -1802,8 +1802,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.success.main, 0.15),
                         color: 'success.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <TrendingUpIcon />
@@ -1825,13 +1825,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.secondary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1849,7 +1849,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         {t('playerConnections.overview.totalCharacters')}
                       </Typography>
                       <Typography
-                        variant="h4"
+                        variant="h5"
                         fontWeight={700}
                         color="secondary.main"
                       >
@@ -1861,8 +1861,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.secondary.main, 0.15),
                         color: 'secondary.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <WorldIcon />
@@ -1884,13 +1884,13 @@ const PlayerConnectionsPage: React.FC = () => {
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 100,
-                    height: 100,
+                    width: 80,
+                    height: 80,
                     borderRadius: '50%',
                     bgcolor: alpha(theme.palette.success.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -1908,7 +1908,7 @@ const PlayerConnectionsPage: React.FC = () => {
                         {t('playerConnections.overview.todayNewCharacters')}
                       </Typography>
                       <Typography
-                        variant="h4"
+                        variant="h5"
                         fontWeight={700}
                         color="success.main"
                       >
@@ -1921,8 +1921,8 @@ const PlayerConnectionsPage: React.FC = () => {
                       sx={(theme) => ({
                         bgcolor: alpha(theme.palette.success.main, 0.15),
                         color: 'success.main',
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                       })}
                     >
                       <TrendingUpIcon />
@@ -1949,13 +1949,13 @@ const PlayerConnectionsPage: React.FC = () => {
                       position: 'absolute',
                       top: -20,
                       right: -20,
-                      width: 100,
-                      height: 100,
+                      width: 80,
+                      height: 80,
                       borderRadius: '50%',
                       bgcolor: alpha(theme.palette.warning.main, 0.1),
                     })}
                   />
-                  <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+                  <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                     <Box
                       sx={{
                         display: 'flex',
@@ -1973,7 +1973,7 @@ const PlayerConnectionsPage: React.FC = () => {
                           {t('playerConnections.queue.total')}
                         </Typography>
                         <Typography
-                          variant="h4"
+                          variant="h5"
                           fontWeight={700}
                           color="warning.main"
                         >
@@ -1984,8 +1984,8 @@ const PlayerConnectionsPage: React.FC = () => {
                         sx={(theme) => ({
                           bgcolor: alpha(theme.palette.warning.main, 0.15),
                           color: 'warning.main',
-                          width: 48,
-                          height: 48,
+                          width: 36,
+                          height: 36,
                         })}
                       >
                         <QueueIcon />
@@ -2072,8 +2072,8 @@ const PlayerConnectionsPage: React.FC = () => {
                         sx={(theme) => ({
                           bgcolor: alpha(theme.palette.warning.main, 0.15),
                           color: 'warning.main',
-                          width: 48,
-                          height: 48,
+                          width: 36,
+                          height: 36,
                         })}
                       >
                         <TrendingUpIcon />

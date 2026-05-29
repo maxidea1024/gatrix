@@ -19,6 +19,7 @@ interface SimplePaginationProps {
   onRowsPerPageChange: (event: SelectChangeEvent<number> | any) => void;
   rowsPerPageOptions?: number[];
   showRowsPerPage?: boolean;
+  size?: 'small' | 'medium' | 'large';
 }
 
 const SimplePagination: React.FC<SimplePaginationProps> = ({
@@ -29,6 +30,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   onRowsPerPageChange,
   rowsPerPageOptions = [5, 10, 15, 20, 25, 50, 100],
   showRowsPerPage = true,
+  size = 'medium',
 }) => {
   const { t } = useTranslation();
 
@@ -65,7 +67,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 2,
-        py: 2,
+        py: 1,
         flexWrap: 'wrap',
       }}
     >
@@ -80,6 +82,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
         boundaryCount={1}
         showFirstButton
         showLastButton
+        size={size}
       />
 
       {/* Right side - Divider and Rows per page selector */}

@@ -168,6 +168,7 @@ import featureFlagService, {
 } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import PageContentLoader from '../../components/common/PageContentLoader';
+import SegmentedTabs from '../../components/common/SegmentedTabs';
 
 import changeRequestService from '../../services/changeRequestService';
 
@@ -1975,11 +1976,6 @@ const FeatureFlagDetailPage: React.FC = () => {
             }
           }}
           valueType={type}
-          label={
-            field === 'enabledValue'
-              ? t('featureFlags.enabledValue')
-              : t('featureFlags.disabledValue')
-          }
           disabled={!canManage}
           legalValues={legalValues}
         />
@@ -2067,11 +2063,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           }
         }}
         valueType={type}
-        label={
-          field === 'enabledValue'
-            ? t('featureFlags.enabledValue')
-            : t('featureFlags.disabledValue')
-        }
         onValidationError={
           type === 'json' ? (err) => setJsonError(field, err) : undefined
         }
@@ -2204,14 +2195,26 @@ const FeatureFlagDetailPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <IconButton onClick={() => navigate('/feature-flags')}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Box sx={{ flex: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      {/* Title Bar */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        flexWrap: 'wrap', 
+        gap: 2,
+        px: 3, 
+        py: 2,
+        bgcolor: 'background.paper',
+        borderBottom: 1,
+        borderColor: 'divider',
+        mb: 3
+      }}>
+        <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton onClick={() => navigate('/feature-flags')} sx={{ ml: -1 }}>
+              <ArrowBackIcon />
+            </IconButton>
             <Typography variant="h5" fontWeight={600}>
               {flag.flagName}
             </Typography>
@@ -2244,45 +2247,67 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Tooltip>
           </Box>
           {flag.description && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, ml: 5 }}>
               {flag.description}
             </Typography>
           )}
         </Box>
+
+          {/* Tabs */}
+          <Box sx={{ flexShrink: 0 }}>
+        <SegmentedTabs
+          value={String(tabValue)}
+          onChange={(key) => setTabValue(Number(key))}
+          items={[
+            {
+              key: '0',
+              label: t('featureFlags.overview'),
+            },
+            {
+              key: '1',
+              label: t('featureFlags.flagValues'),
+              disabled: isCreating,
+            },
+            {
+              key: '2',
+              label: t('featureFlags.metrics'),
+              disabled: isCreating,
+            },
+            {
+              key: '3',
+              label: (
+                <>
+                  {t('featureFlags.tabs.codeReferences')}
+                  {codeReferenceCount !== null && codeReferenceCount > 0 && (
+                    <Chip
+                      label={codeReferenceCount}
+                      size="small"
+                      variant="filled"
+                      sx={{
+                        height: 20,
+                        minWidth: 20,
+                        fontSize: '0.7rem',
+                        bgcolor: 'action.selected',
+                      }}
+                    />
+                  )}
+                </>
+              ),
+              disabled: isCreating,
+            },
+            {
+              key: '4',
+              label: t('featureFlags.tabs.history'),
+              disabled: isCreating,
+            },
+          ]}
+        />
+        </Box>
       </Box>
 
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
-          <Tab label={t('featureFlags.overview')} />
-          <Tab label={t('featureFlags.flagValues')} disabled={isCreating} />
-          <Tab label={t('featureFlags.metrics')} disabled={isCreating} />
-          <Tab
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                {t('featureFlags.tabs.codeReferences')}
-                {codeReferenceCount !== null && codeReferenceCount > 0 && (
-                  <Chip
-                    label={codeReferenceCount}
-                    size="small"
-                    variant="filled"
-                    sx={{
-                      height: 20,
-                      minWidth: 20,
-                      fontSize: '0.7rem',
-                      bgcolor: 'action.selected',
-                    }}
-                  />
-                )}
-              </Box>
-            }
-            disabled={isCreating}
-          />
-          <Tab label={t('featureFlags.tabs.history')} disabled={isCreating} />
-        </Tabs>
-      </Box>
-
-      {/* Overview Tab */}
+      {/* Main Content */}
+      <Box sx={{ px: 3, pb: 3, flex: 1 }}>
+        {/* Overview Tab */}
       <TabPanel value={tabValue} index={0}>
         <Box
           sx={{
@@ -3704,11 +3729,11 @@ const FeatureFlagDetailPage: React.FC = () => {
       {/* Flag Values Tab */}
       <TabPanel value={tabValue} index={1}>
         <PageContentLoader loading={false}>
-          <Box>
+          <Box sx={{ maxWidth: 800, py: 2 }}>
             <Paper
               variant="outlined"
               sx={{
-                p: 3,
+                p: { xs: 3, md: 4 },
                 borderRadius: 2,
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
@@ -4517,6 +4542,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         initialFlags={flag?.flagName ? [flag.flagName] : []}
         initialEnvironments={playgroundInitialEnvironments}
       />
+        </Box>
     </Box>
   );
 };

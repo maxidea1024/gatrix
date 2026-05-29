@@ -11,8 +11,9 @@ import { Box, ButtonBase, Typography } from '@mui/material';
 
 export interface SegmentedTabItem {
   key: string;
-  label: string;
+  label: React.ReactNode;
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 interface SegmentedTabsProps {
@@ -39,10 +40,12 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
     >
       {items.map((item, index) => {
         const isActive = item.key === value;
+        const isDisabled = item.disabled;
         return (
           <ButtonBase
             key={item.key}
-            onClick={() => onChange(item.key)}
+            onClick={() => !isDisabled && onChange(item.key)}
+            disabled={isDisabled}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -57,11 +60,13 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
                       ? 'primary.dark'
                       : 'primary.main'
                 : 'transparent',
+              opacity: isDisabled ? 0.5 : 1,
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
               // Divider between inactive items
               borderRight: index < items.length - 1 ? 1 : 0,
               borderColor: 'divider',
               '&:hover': {
-                bgcolor: isActive
+                bgcolor: isActive || isDisabled
                   ? undefined
                   : (theme) =>
                       theme.palette.mode === 'dark'
@@ -78,13 +83,17 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
             {item.icon}
             <Typography
               variant="body2"
+              component="div"
               sx={{
                 fontSize: '0.8rem',
-                fontWeight: isActive ? 600 : 500,
+                fontWeight: 600,
                 color: isActive ? '#fff' : 'text.secondary',
                 whiteSpace: 'nowrap',
                 lineHeight: 1.4,
                 transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
               }}
             >
               {item.label}

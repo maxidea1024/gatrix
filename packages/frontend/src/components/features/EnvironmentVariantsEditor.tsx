@@ -938,11 +938,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         }}
         valueType={valueType}
         disabled={!isActuallyEditable}
-        label={
-          field === 'enabledValue'
-            ? t('featureFlags.enabledValue')
-            : t('featureFlags.disabledValue')
-        }
         onValidationError={(err) =>
           setValueJsonErrors((prev) => ({ ...prev, [field]: err }))
         }

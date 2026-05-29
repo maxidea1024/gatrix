@@ -159,16 +159,16 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
 
   return (
     <Box>
-      <Box
-        sx={{
-          mb: 2,
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          gap: 2,
-        }}
-      >
-        {scanInfo && (
+      {scanInfo && (
+        <Box
+          sx={{
+            mb: 2,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -252,32 +252,8 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
               </Box>
             )}
           </Box>
-        )}
-        <Tooltip title={t('common.refresh')}>
-          <span>
-            <IconButton
-              size="small"
-              onClick={() => setRefreshKey((prev) => prev + 1)}
-              disabled={isRefetching}
-            >
-              <RefreshIcon
-                fontSize="small"
-                sx={{
-                  animation: isRefetching ? 'spin 1s linear infinite' : 'none',
-                  '@keyframes spin': {
-                    '0%': {
-                      transform: 'rotate(0deg)',
-                    },
-                    '100%': {
-                      transform: 'rotate(360deg)',
-                    },
-                  },
-                }}
-              />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
+        </Box>
+      )}
 
       {references.length === 0 ? (
         <EmptyPlaceholder

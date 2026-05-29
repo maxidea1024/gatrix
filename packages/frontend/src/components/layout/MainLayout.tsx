@@ -1201,10 +1201,36 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (aliases?.some((p) => location.pathname.startsWith(p))) {
       return true;
     }
-    // /settings, /feature-flags use exact match only (no prefix matching)
-    if (path.startsWith('/settings') || path.startsWith('/feature-flags')) {
+    
+    // Special handling for /feature-flags to prevent it from being highlighted
+    // when we are inside a distinct sub-menu (like /feature-flags/segments).
+    // However, it SHOULD be highlighted if we are in a feature flag detail page.
+    if (path === '/feature-flags') {
+      const subMenus = [
+        '/feature-flags/segments',
+        '/feature-flags/context-fields',
+        '/feature-flags/types',
+        '/feature-flags/templates',
+        '/feature-flags/actions',
+        '/feature-flags/network',
+        '/feature-flags/impact-metrics',
+        '/feature-flags/unknown',
+        '/feature-flags/bulk-operations'
+      ];
+      if (subMenus.some((sub) => location.pathname.startsWith(sub))) {
+        return false;
+      }
+      if (location.pathname.startsWith('/feature-flags/')) {
+        return true;
+      }
       return false;
     }
+
+    // /settings uses exact match only to prevent /settings matching /settings/members
+    if (path === '/settings') {
+      return false;
+    }
+
     // Sub-path match (only when separated by '/')
     if (path !== '/' && location.pathname.startsWith(path + '/')) {
       return true;

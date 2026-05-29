@@ -45,6 +45,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  ButtonGroup,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -95,6 +96,10 @@ import featureFlagService, {
   FeatureFlag,
   FlagType,
 } from '../../services/featureFlagService';
+import PageContentLoader from '../../components/common/PageContentLoader';
+import SegmentedTabs from '../../components/common/SegmentedTabs';
+import OverflowTooltip from '../../components/common/OverflowTooltip';
+
 import changeRequestService from '../../services/changeRequestService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
@@ -127,7 +132,7 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import FlagStatusIcon from '../../components/common/FlagStatusIcon';
-import PageContentLoader from '@/components/common/PageContentLoader';
+
 import {
   getPlan,
   startPlan,
@@ -1801,9 +1806,27 @@ const FeatureFlagsPage: React.FC = () => {
               <>
                 <Button
                   variant="contained"
+                  size="small"
                   startIcon={<AddIcon />}
-                  onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
-                  endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
+                  onClick={() => handleOpenCreateDialog('featureFlag')}
+                  endIcon={
+                    <Box
+                      component="span"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        setCreateMenuAnchor(e.currentTarget as HTMLElement);
+                      }}
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        ml: 0.5,
+                        pl: 0.75,
+                        borderLeft: '1px solid rgba(255,255,255,0.3)',
+                      }}
+                    >
+                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                    </Box>
+                  }
                 >
                   {t('featureFlags.createFlagOrRemoteConfig')}
                 </Button>
@@ -1941,8 +1964,6 @@ const FeatureFlagsPage: React.FC = () => {
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleFilterChange}
               onOperatorChange={handleOperatorChange}
-              onRefresh={loadFlags}
-              refreshDisabled={loading}
               noWrap={true}
               afterFilterAddActions={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -1967,11 +1988,13 @@ const FeatureFlagsPage: React.FC = () => {
                       </IconButton>
                     </Tooltip>
                   )}
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 0.5 }} />
                   <Tooltip
                     title={t('featureFlags.compactView')}
                     disableFocusListener
                   >
                     <IconButton
+                      size="small"
                       onClick={handleCompactViewToggle}
                       sx={{
                         bgcolor: compactView
@@ -1989,7 +2012,7 @@ const FeatureFlagsPage: React.FC = () => {
                         },
                       }}
                     >
-                      <ViewListIcon />
+                      <ViewListIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -2012,11 +2035,19 @@ const FeatureFlagsPage: React.FC = () => {
             addButtonLabel={t('featureFlags.createFlag')}
           />
         ) : (
-          <Card variant="outlined">
+          <Card 
+            variant={compactView ? "elevation" : "outlined"} 
+            elevation={0}
+            sx={compactView ? { 
+              border: 'none !important', 
+              boxShadow: 'none !important', 
+              bgcolor: 'transparent' 
+            } : undefined}
+          >
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               {compactView ? (
                 <>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Box sx={{ p: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', xl: '1fr 1fr 1fr' }, gap: 2, bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
                     {flags.map((flag, index) => {
                       // Value preview helper
                       const formatValuePreview = (val: any): string => {
@@ -2025,10 +2056,11 @@ const FeatureFlagsPage: React.FC = () => {
                           return val ? 'true' : 'false';
                         if (typeof val === 'object') {
                           const str = JSON.stringify(val);
-                          return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                          return str.length > 20 ? str.slice(0, 20) + '…' : str;
                         }
                         const str = String(val);
-                        return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                        if (str === '') return "''";
+                        return str.length > 20 ? str.slice(0, 20) + '…' : str;
                       };
                       // Get the most recent lastSeenAt across all environments
                       const lastSeen =
@@ -2041,289 +2073,106 @@ const FeatureFlagsPage: React.FC = () => {
                         }, flag.lastSeenAt || '') || flag.lastSeenAt;
 
                       return (
-                        <Box
+                        <Card
                           key={flag.id}
+                          elevation={0}
                           sx={{
-                            px: 2.5,
-                            py: 1.5,
-                            borderBottom: '1px solid',
-                            borderColor: 'divider',
+                            display: 'flex',
+                            flexDirection: 'column',
                             cursor: 'pointer',
-                            transition: 'background-color 0.15s',
-                            bgcolor:
-                              index % 2 === 1 ? 'action.hover' : 'transparent',
-                            '&:hover': { bgcolor: 'action.selected' },
+                            transition: 'all 0.2s ease',
+                            border: 'none !important',
+                            boxShadow: 'none !important',
+                            borderRadius: 3,
+                            bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)',
+                            height: '100%',
+                            '&:hover': {
+                              bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)',
+                              transform: 'translateY(-2px)'
+                            },
                             ...(flag.isArchived ? { opacity: 0.6 } : {}),
                           }}
                           onClick={() =>
                             navigate(`/feature-flags/${flag.flagName}`)
                           }
                         >
-                          {/* Row 1: Flag name + status + action */}
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                            }}
-                          >
-                            <Tooltip
-                              title={t(`featureFlags.types.${flag.flagType}`)}
-                            >
-                              {getTypeIcon(flag.flagType)}
-                            </Tooltip>
-                            {isStale(flag) && (
-                              <Tooltip title={t('featureFlags.staleWarning')}>
-                                <WarningIcon
-                                  sx={{ fontSize: 16, color: 'warning.main' }}
-                                />
-                              </Tooltip>
-                            )}
-                            <Typography
-                              fontWeight={600}
-                              variant="body1"
-                              noWrap
-                              sx={{ flex: 1, minWidth: 0 }}
-                            >
-                              {flag.flagName}
-                            </Typography>
-                            {flag.codeReferenceCount !== undefined &&
-                              flag.codeReferenceCount > 0 && (
-                                <Chip
-                                  icon={<GitHubIcon sx={{ fontSize: 14 }} />}
-                                  label={flag.codeReferenceCount}
-                                  size="small"
-                                  variant="outlined"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(
-                                      `/feature-flags/${flag.flagName}?tab=code-references`
-                                    );
-                                  }}
-                                  sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    cursor: 'pointer',
-                                    mr: 0.5,
-                                    pl: 0.5,
-                                    borderRadius: 1,
-                                    '& .MuiChip-icon': { ml: 0 },
-                                  }}
-                                />
-                              )}
-                            {flag.isFavorite && (
-                              <StarIcon
-                                sx={{ fontSize: 16, color: 'warning.main' }}
-                              />
-                            )}
-                            {(() => {
-                              const { status: flagStatus, color } =
-                                getFlagStatus(flag);
-                              return (
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 0.5,
-                                    flexShrink: 0,
-                                  }}
-                                >
-                                  <FlagStatusIcon
-                                    status={flagStatus}
-                                    size={16}
-                                  />
-                                  <Chip
-                                    label={t(
-                                      `featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`
-                                    )}
-                                    size="small"
-                                    color={color}
-                                    variant={
-                                      flagStatus === 'active'
-                                        ? 'outlined'
-                                        : 'filled'
-                                    }
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                </Box>
-                              );
-                            })()}
-                            {canManage && (
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleActionMenuOpen(e, flag);
-                                }}
-                              >
-                                <MoreVertIcon fontSize="small" />
-                              </IconButton>
-                            )}
-                          </Box>
-
-                          {/* Row 2: Display name + description (when available) */}
-                          {((flag.displayName &&
-                            flag.displayName !== flag.flagName) ||
-                            flag.description) && (
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                mt: 0.25,
-                                pl: 3.5,
-                              }}
-                            >
-                              {flag.displayName &&
-                                flag.displayName !== flag.flagName && (
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    noWrap
-                                  >
-                                    {flag.displayName}
-                                  </Typography>
+                          <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', gap: 1.5, '&:last-child': { pb: 2 } }}>
+                            {/* Header: Name, Type, Status, Actions */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flex: 1 }}>
+                                <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
+                                  <Box sx={{ display: 'flex', flexShrink: 0 }}>{getTypeIcon(flag.flagType)}</Box>
+                                </Tooltip>
+                                {isStale(flag) && (
+                                  <Tooltip title={t('featureFlags.staleWarning')}>
+                                    <WarningIcon sx={{ fontSize: 16, color: 'warning.main', flexShrink: 0 }} />
+                                  </Tooltip>
                                 )}
-                              {flag.description && (
-                                <Typography
-                                  variant="body2"
-                                  color="text.disabled"
-                                  noWrap
-                                  sx={{ flex: 1, minWidth: 0 }}
-                                >
-                                  — {flag.description}
-                                </Typography>
-                              )}
-                            </Box>
-                          )}
-
-                          {/* Row 3: Env switches + value info + tags + times */}
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1.5,
-                              mt: 0.75,
-                              pl: 3.5,
-                            }}
-                          >
-                            {/* Environment switches */}
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.25,
-                                flexShrink: 0,
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {environments.map((env) => {
-                                const isEnabled = getEnvEnabled(
-                                  flag,
-                                  env.environmentId
-                                );
-                                return (
-                                  <FeatureSwitch
-                                    key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
+                                <OverflowTooltip title={flag.flagName} disableInteractive>
+                                  <Typography fontWeight={600} variant="body1" noWrap sx={{ lineHeight: 1.2 }}>
+                                    {flag.flagName}
+                                  </Typography>
+                                </OverflowTooltip>
+                                {flag.isFavorite && (
+                                  <StarIcon sx={{ fontSize: 16, color: 'warning.main', flexShrink: 0 }} />
+                                )}
+                              </Box>
+                              
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                                {(() => {
+                                  const { status: flagStatus, color } = getFlagStatus(flag);
+                                  return (
+                                    <Chip
+                                      label={t(`featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`)}
+                                      size="small"
+                                      color={color}
+                                      variant={flagStatus === 'active' ? 'outlined' : 'filled'}
+                                      sx={{ height: 20, fontSize: '0.7rem' }}
+                                    />
+                                  );
+                                })()}
+                                {canManage && (
+                                  <IconButton
                                     size="small"
-                                    checked={isEnabled}
-                                    onChange={() =>
-                                      handleToggle(
-                                        flag,
-                                        env.environmentId,
-                                        isEnabled
-                                      )
-                                    }
-                                    disabled={flag.isArchived || !canManage}
-                                    onClick={(e) => e.stopPropagation()}
-                                    color={env.color}
-                                    label={env.displayName}
-                                  />
-                                );
-                              })}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleActionMenuOpen(e, flag);
+                                    }}
+                                  >
+                                    <MoreVertIcon fontSize="small" />
+                                  </IconButton>
+                                )}
+                              </Box>
                             </Box>
 
-                            {/* Divider */}
-                            <Divider
-                              orientation="vertical"
-                              flexItem
-                              sx={{ mx: 0.5 }}
-                            />
-
-                            {/* Value type + value previews */}
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                flexShrink: 0,
-                              }}
-                            >
-                              <FieldTypeIcon
-                                type={flag.valueType || 'string'}
-                                size={14}
-                              />
-                              <Tooltip
-                                title={`${t('featureFlags.enabledValue')}: ${formatValuePreview(flag.enabledValue)}`}
-                                disableFocusListener
-                              >
-                                <Chip
-                                  label={formatValuePreview(flag.enabledValue)}
-                                  size="small"
-                                  sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    maxWidth: 120,
-                                    bgcolor: 'success.main',
-                                    color: 'success.contrastText',
-                                    opacity: 0.85,
-                                  }}
-                                />
-                              </Tooltip>
-                              <Typography
-                                variant="caption"
-                                color="text.disabled"
-                              >
-                                /
-                              </Typography>
-                              <Tooltip
-                                title={`${t('featureFlags.disabledValue')}: ${formatValuePreview(flag.disabledValue)}`}
-                                disableFocusListener
-                              >
-                                <Chip
-                                  label={formatValuePreview(flag.disabledValue)}
-                                  size="small"
-                                  sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    maxWidth: 120,
-                                    bgcolor: 'action.disabledBackground',
-                                    color: 'text.secondary',
-                                  }}
-                                />
-                              </Tooltip>
-                            </Box>
-
-                            {/* Tags */}
-                            {flag.tags && flag.tags.length > 0 && (
-                              <>
-                                <Divider
-                                  orientation="vertical"
-                                  flexItem
-                                  sx={{ mx: 0.5 }}
-                                />
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    flexShrink: 0,
-                                    flexWrap: 'wrap',
-                                  }}
-                                >
+                            {/* Body: Description & Tags */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              {((flag.displayName && flag.displayName !== flag.flagName) || flag.description) && (
+                                <Box>
+                                  {flag.displayName && flag.displayName !== flag.flagName && (
+                                    <Typography variant="body2" color="text.secondary" noWrap>
+                                      {flag.displayName}
+                                    </Typography>
+                                  )}
+                                  {flag.description && (
+                                    <OverflowTooltip title={flag.description} disableInteractive placement="bottom-start">
+                                      <Typography
+                                        variant="body2"
+                                        color="text.disabled"
+                                        noWrap
+                                        sx={{ mt: 0.5 }}
+                                      >
+                                        {flag.description}
+                                      </Typography>
+                                    </OverflowTooltip>
+                                  )}
+                                </Box>
+                              )}
+                              
+                              {flag.tags && flag.tags.length > 0 && (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                   {flag.tags.slice(0, 5).map((tagName) => {
-                                    const tagObj = allTags.find(
-                                      (tItem) => tItem.name === tagName
-                                    );
+                                    const tagObj = allTags.find((tItem) => tItem.name === tagName);
                                     const color = tagObj?.color || '#888';
                                     return (
                                       <Chip
@@ -2347,79 +2196,106 @@ const FeatureFlagsPage: React.FC = () => {
                                     />
                                   )}
                                 </Box>
-                              </>
-                            )}
+                              )}
+                            </Box>
 
-                            {/* Impression data indicator */}
-                            {flag.impressionDataEnabled && (
-                              <Tooltip
-                                title={t('featureFlags.impressionDataOn')}
-                                disableFocusListener
-                              >
-                                <Chip
-                                  label="📊"
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    borderColor: 'info.main',
-                                  }}
-                                />
-                              </Tooltip>
-                            )}
+                            <Box sx={{ flexGrow: 1 }} />
 
-                            {/* Spacer */}
-                            <Box sx={{ flex: 1 }} />
+                            <Divider sx={{ borderStyle: 'dashed', my: 0.5 }} />
 
-                            {/* Last seen */}
-                            {lastSeen && (
-                              <Tooltip
-                                title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`}
-                                disableFocusListener
-                              >
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  noWrap
-                                  sx={{ fontSize: '0.7rem' }}
-                                >
-                                  ⚡ {formatRelativeTime(lastSeen)}
-                                </Typography>
-                              </Tooltip>
-                            )}
-
-                            {/* Created time */}
-                            <Tooltip
-                              title={formatDateTimeDetailed(flag.createdAt)}
-                              disableFocusListener
+                            {/* Environments */}
+                            <Box
+                              sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                noWrap
-                              >
-                                {formatRelativeTime(flag.createdAt)}
-                              </Typography>
-                            </Tooltip>
-                          </Box>
-                        </Box>
+                              {environments.map((env) => {
+                                const isEnabled = getEnvEnabled(flag, env.environmentId);
+                                return (
+                                  <FeatureSwitch
+                                    key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
+                                    size="small"
+                                    checked={isEnabled}
+                                    onChange={() => handleToggle(flag, env.environmentId, isEnabled)}
+                                    disabled={flag.isArchived || !canManage}
+                                    color={env.color}
+                                    label={env.displayName}
+                                  />
+                                );
+                              })}
+                            </Box>
+
+                            {/* Footer: Values and Meta */}
+                            <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', mt: 0.5 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
+                                <FieldTypeIcon type={flag.valueType || 'string'} size={14} />
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                  <Tooltip title={`${t('featureFlags.enabledValue')}: ${flag.enabledValue}`} disableFocusListener>
+                                    <Box sx={{ 
+                                      fontFamily: 'monospace', fontSize: '0.75rem', color: 'success.main', fontWeight: 600,
+                                      bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(76, 175, 80, 0.08)',
+                                      px: 0.75, py: 0.25, borderRadius: 1
+                                    }}>
+                                      {formatValuePreview(flag.enabledValue)}
+                                    </Box>
+                                  </Tooltip>
+                                  
+                                  <Tooltip title={`${t('featureFlags.disabledValue')}: ${flag.disabledValue}`} disableFocusListener>
+                                    <Box sx={{ 
+                                      fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary',
+                                      bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                                      px: 0.75, py: 0.25, borderRadius: 1
+                                    }}>
+                                      {formatValuePreview(flag.disabledValue)}
+                                    </Box>
+                                  </Tooltip>
+                                </Box>
+                              </Box>
+                              
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {lastSeen ? (
+                                  <Tooltip title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`} disableFocusListener>
+                                    <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.7rem' }}>
+                                      ⚡ {formatRelativeTime(lastSeen)}
+                                    </Typography>
+                                  </Tooltip>
+                                ) : (
+                                  <Tooltip title={formatDateTimeDetailed(flag.createdAt)} disableFocusListener>
+                                    <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.7rem' }}>
+                                      {formatRelativeTime(flag.createdAt)}
+                                    </Typography>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </Box>
+                          </CardContent>
+                        </Card>
                       );
                     })}
                   </Box>
                   <Box
-                    sx={{ display: 'flex', justifyContent: 'flex-end', pr: 1 }}
+                    sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 1 }}
                   >
-                    <SimplePagination
-                      page={page}
-                      rowsPerPage={rowsPerPage}
-                      count={total}
-                      onPageChange={(event, newPage) => setPage(newPage)}
-                      onRowsPerPageChange={(event) => {
-                        setRowsPerPage(Number(event.target.value));
-                        setPage(0);
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                        borderRadius: 8,
+                        px: 2,
+                        py: 0.5,
                       }}
-                    />
+                    >
+                      <SimplePagination
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        count={total}
+                        size="small"
+                        onPageChange={(event, newPage) => setPage(newPage)}
+                        onRowsPerPageChange={(event) => {
+                          setRowsPerPage(Number(event.target.value));
+                          setPage(0);
+                        }}
+                      />
+                    </Box>
                   </Box>
                 </>
               ) : (
@@ -4111,6 +3987,18 @@ const FeatureFlagsPage: React.FC = () => {
             <ImportIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('featureFlags.import')}</ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            setImportExportMenuAnchor(null);
+            loadFlags();
+          }}
+        >
+          <ListItemIcon>
+            <RefreshIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.refresh')}</ListItemText>
         </MenuItem>
       </Menu>
 
