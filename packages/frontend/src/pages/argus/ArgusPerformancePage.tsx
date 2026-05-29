@@ -336,11 +336,11 @@ const ArgusPerformancePage: React.FC = () => {
                 </Typography>
               ) : (
                 <Box sx={{ maxHeight: 280, overflow: 'auto' }}>
-                  {detail.recent_traces.map((tr) => {
+                  {detail.recent_traces.map((tr, idx) => {
                     const isErr = tr.transaction_status !== 'ok';
                     return (
                       <Box
-                        key={tr.event_id}
+                        key={`${tr.event_id || tr.trace_id}-${idx}`}
                         onClick={() => fetchTrace(tr.trace_id)}
                         sx={{
                           display: 'flex', alignItems: 'center', gap: 1.5, p: 1, borderRadius: 1.5,
@@ -414,7 +414,7 @@ const ArgusPerformancePage: React.FC = () => {
                 const { method, path: txnPath } = parseTransaction(txn.name);
                 return (
                   <Box
-                    key={txn.name}
+                    key={`${txn.name}-${idx}`}
                     onClick={() => handleTxnClick(txn.name)}
                     sx={{
                       display: 'grid', gridTemplateColumns: '2fr repeat(5, 1fr)', gap: 1,

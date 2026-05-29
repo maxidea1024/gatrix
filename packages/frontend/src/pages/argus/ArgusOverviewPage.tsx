@@ -379,7 +379,7 @@ const ArgusOverviewPage: React.FC = () => {
                   : issue.level === 'warning' ? '#ff9800' : '#2196f3';
                 return (
                   <Box
-                    key={issue.fingerprint || idx}
+                    key={`${issue.fingerprint || 'issue'}-${idx}`}
                     onClick={() => navigate('/argus/issues')}
                     sx={{
                       display: 'flex', alignItems: 'center', gap: 1.5,
