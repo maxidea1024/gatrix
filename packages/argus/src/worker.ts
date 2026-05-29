@@ -1,4 +1,6 @@
 import { ErrorWorker } from './workers/error-worker';
+import { TransactionWorker } from './workers/transaction-worker';
+import { SessionWorker } from './workers/session-worker';
 import { testClickHouseConnection } from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import { createLogger } from './utils/logger';
@@ -22,18 +24,29 @@ async function start() {
       throw new Error('MySQL connection failed');
     }
 
-    // Start workers
+    // Start all workers
     const errorWorker = new ErrorWorker();
-    await errorWorker.start();
+    const transactionWorker = new TransactionWorker();
+    const sessionWorker = new SessionWorker();
 
-    logger.info('All workers started successfully');
+    await errorWorker.start();
+    await transactionWorker.start();
+    await sessionWorker.start();
+
+    logger.info('All workers started successfully', {
+      workers: ['error', 'transaction', 'session'],
+    });
 
     // Graceful shutdown
     const shutdown = async (signal: string) => {
       logger.info(`${signal} received, shutting down workers...`);
 
       try {
-        await errorWorker.close();
+        await Promise.all([
+          errorWorker.close(),
+          transactionWorker.close(),
+          sessionWorker.close(),
+        ]);
 
         logger.info('All workers closed');
         process.exit(0);
