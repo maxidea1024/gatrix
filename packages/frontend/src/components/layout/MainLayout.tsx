@@ -1201,7 +1201,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (aliases?.some((p) => location.pathname.startsWith(p))) {
       return true;
     }
-    
+
     // Special handling for /feature-flags to prevent it from being highlighted
     // when we are inside a distinct sub-menu (like /feature-flags/segments).
     // However, it SHOULD be highlighted if we are in a feature flag detail page.
@@ -1215,7 +1215,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         '/feature-flags/network',
         '/feature-flags/impact-metrics',
         '/feature-flags/unknown',
-        '/feature-flags/bulk-operations'
+        '/feature-flags/bulk-operations',
       ];
       if (subMenus.some((sub) => location.pathname.startsWith(sub))) {
         return false;

@@ -6,7 +6,7 @@ interface OverflowTooltipProps extends Omit<TooltipProps, 'children'> {
 }
 
 /**
- * A wrapper around MUI Tooltip that only displays the tooltip if the 
+ * A wrapper around MUI Tooltip that only displays the tooltip if the
  * child element's content is actually overflowing (e.g. truncated with text-overflow: ellipsis).
  */
 const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
@@ -22,8 +22,8 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
       const element = textElementRef.current;
       if (element) {
         setIsOverflowed(
-          element.scrollWidth > element.clientWidth || 
-          element.scrollHeight > element.clientHeight
+          element.scrollWidth > element.clientWidth ||
+            element.scrollHeight > element.clientHeight
         );
       }
     };

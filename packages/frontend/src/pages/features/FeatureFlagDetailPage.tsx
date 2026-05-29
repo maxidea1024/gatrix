@@ -2197,22 +2197,27 @@ const FeatureFlagDetailPage: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       {/* Title Bar */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        flexWrap: 'wrap', 
-        gap: 2,
-        px: 3, 
-        py: 2,
-        bgcolor: 'background.paper',
-        borderBottom: 1,
-        borderColor: 'divider',
-        mb: 3
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: 2,
+          px: 3,
+          py: 2,
+          bgcolor: 'background.paper',
+          borderBottom: 1,
+          borderColor: 'divider',
+          mb: 3,
+        }}
+      >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton onClick={() => navigate('/feature-flags')} sx={{ ml: -1 }}>
+            <IconButton
+              onClick={() => navigate('/feature-flags')}
+              sx={{ ml: -1 }}
+            >
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h5" fontWeight={600}>
@@ -2247,402 +2252,399 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Tooltip>
           </Box>
           {flag.description && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, ml: 5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 0.5, ml: 5 }}
+            >
               {flag.description}
             </Typography>
           )}
         </Box>
 
-          {/* Tabs */}
-          <Box sx={{ flexShrink: 0 }}>
-        <SegmentedTabs
-          value={String(tabValue)}
-          onChange={(key) => setTabValue(Number(key))}
-          items={[
-            {
-              key: '0',
-              label: t('featureFlags.overview'),
-            },
-            {
-              key: '1',
-              label: t('featureFlags.flagValues'),
-              disabled: isCreating,
-            },
-            {
-              key: '2',
-              label: t('featureFlags.metrics'),
-              disabled: isCreating,
-            },
-            {
-              key: '3',
-              label: (
-                <>
-                  {t('featureFlags.tabs.codeReferences')}
-                  {codeReferenceCount !== null && codeReferenceCount > 0 && (
-                    <Chip
-                      label={codeReferenceCount}
-                      size="small"
-                      variant="filled"
-                      sx={{
-                        height: 20,
-                        minWidth: 20,
-                        fontSize: '0.7rem',
-                        bgcolor: 'action.selected',
-                      }}
-                    />
-                  )}
-                </>
-              ),
-              disabled: isCreating,
-            },
-            {
-              key: '4',
-              label: t('featureFlags.tabs.history'),
-              disabled: isCreating,
-            },
-          ]}
-        />
+        {/* Tabs */}
+        <Box sx={{ flexShrink: 0 }}>
+          <SegmentedTabs
+            value={String(tabValue)}
+            onChange={(key) => setTabValue(Number(key))}
+            items={[
+              {
+                key: '0',
+                label: t('featureFlags.overview'),
+              },
+              {
+                key: '1',
+                label: t('featureFlags.flagValues'),
+                disabled: isCreating,
+              },
+              {
+                key: '2',
+                label: t('featureFlags.metrics'),
+                disabled: isCreating,
+              },
+              {
+                key: '3',
+                label: (
+                  <>
+                    {t('featureFlags.tabs.codeReferences')}
+                    {codeReferenceCount !== null && codeReferenceCount > 0 && (
+                      <Chip
+                        label={codeReferenceCount}
+                        size="small"
+                        variant="filled"
+                        sx={{
+                          height: 20,
+                          minWidth: 20,
+                          fontSize: '0.7rem',
+                          bgcolor: 'action.selected',
+                        }}
+                      />
+                    )}
+                  </>
+                ),
+                disabled: isCreating,
+              },
+              {
+                key: '4',
+                label: t('featureFlags.tabs.history'),
+                disabled: isCreating,
+              },
+            ]}
+          />
         </Box>
       </Box>
 
       {/* Main Content */}
       <Box sx={{ px: 3, pb: 3, flex: 1 }}>
         {/* Overview Tab */}
-      <TabPanel value={tabValue} index={0}>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 3,
-            flexDirection: { xs: 'column', md: 'row' },
-          }}
-        >
-          {/* Left Sidebar - Flag Details */}
-          <Box sx={{ width: { xs: '100%', md: 320 }, flexShrink: 0 }}>
-            {/* Flag Details Card */}
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2,
-                mb: 2,
-                borderRadius: 1,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-            >
-              <Box
+        <TabPanel value={tabValue} index={0}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 3,
+              flexDirection: { xs: 'column', md: 'row' },
+            }}
+          >
+            {/* Left Sidebar - Flag Details */}
+            <Box sx={{ width: { xs: '100%', md: 320 }, flexShrink: 0 }}>
+              {/* Flag Details Card */}
+              <Paper
+                variant="outlined"
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 0.5,
+                  p: 2,
+                  mb: 2,
+                  borderRadius: 1,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                 }}
               >
-                <Typography variant="subtitle2" fontWeight={600}>
-                  {t('featureFlags.flagDetails')}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 0.5,
+                  }}
+                >
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    {t('featureFlags.flagDetails')}
+                  </Typography>
+                  {canManage && !isCreating && (
+                    <Tooltip title={t('common.edit')}>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setEditingFlagData({
+                            displayName: flag.displayName || '',
+                            description: flag.description || '',
+                            impressionDataEnabled: flag.impressionDataEnabled,
+                            tags: flag.tags || [],
+                          });
+                          const matchingTags = (flag.tags || [])
+                            .map((tagName) =>
+                              allTags.find((t) => t.name === tagName)
+                            )
+                            .filter((t): t is Tag => !!t);
+                          setEditTagSelection(matchingTags);
+                          setEditFlagDialogOpen(true);
+                        }}
+                      >
+                        <EditIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
+                  {flag.flagName}
                 </Typography>
-                {canManage && !isCreating && (
-                  <Tooltip title={t('common.edit')}>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        setEditingFlagData({
-                          displayName: flag.displayName || '',
-                          description: flag.description || '',
-                          impressionDataEnabled: flag.impressionDataEnabled,
-                          tags: flag.tags || [],
-                        });
-                        const matchingTags = (flag.tags || [])
-                          .map((tagName) =>
-                            allTags.find((t) => t.name === tagName)
-                          )
-                          .filter((t): t is Tag => !!t);
-                        setEditTagSelection(matchingTags);
-                        setEditFlagDialogOpen(true);
-                      }}
-                    >
-                      <EditIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {flag.flagName}
-              </Typography>
 
-              <Stack spacing={1.5}>
-                {/* Flag Type */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('featureFlags.flagType')}
-                  </Typography>
-                  {isCreating ? (
-                    <FormControl size="small" sx={{ minWidth: 200 }}>
-                      <Select
-                        value={flag.flagType}
-                        onChange={(e) =>
-                          setFlag({ ...flag, flagType: e.target.value as any })
-                        }
-                      >
-                        {FLAG_TYPES.map((type) => (
-                          <MenuItem key={type.value} value={type.value}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                gap: 1,
-                              }}
-                            >
-                              <Box sx={{ mt: 0.3 }}>
-                                {getTypeIcon(type.value)}
-                              </Box>
-                              <Box>
-                                <Typography variant="body2" fontWeight={500}>
-                                  {t(type.labelKey)}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ display: 'block' }}
-                                >
-                                  {t(type.descKey)}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  ) : (
-                    <Box
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                    >
-                      {getTypeIcon(flag.flagType)}
-                      <Typography variant="body2">
-                        {t(`featureFlags.types.${flag.flagType}`)}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-
-                {/* Value Type */}
-                {!isCreating && (
+                <Stack spacing={1.5}>
+                  {/* Flag Type */}
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      {t('featureFlags.valueType')}
+                      {t('featureFlags.flagType')}
                     </Typography>
-                    <Box
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                    >
-                      <FieldTypeIcon
-                        type={flag.valueType || 'boolean'}
-                        size={16}
-                      />
-                      <Typography variant="body2">
-                        {t(
-                          `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
-                        )}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
-
-                {/* Created By */}
-                {flag.createdByName && (
-                  <Box
-                    sx={{ display: 'flex', justifyContent: 'space-between' }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      {t('featureFlags.createdBy')}
-                    </Typography>
-                    <Typography variant="body2">
-                      {flag.createdByName}
-                    </Typography>
-                  </Box>
-                )}
-
-                {/* Created At */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('featureFlags.createdAt')}
-                  </Typography>
-                  <Tooltip title={formatDateTimeDetailed(flag.createdAt)} arrow>
-                    <Typography variant="body2">
-                      {formatRelativeTime(flag.createdAt)}
-                    </Typography>
-                  </Tooltip>
-                </Box>
-
-                {/* Updated At */}
-                {flag.updatedAt && (
-                  <Box
-                    sx={{ display: 'flex', justifyContent: 'space-between' }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      {t('featureFlags.updatedAt')}
-                    </Typography>
-                    <Tooltip
-                      title={formatDateTimeDetailed(flag.updatedAt)}
-                      arrow
-                    >
-                      <Typography variant="body2">
-                        {formatRelativeTime(flag.updatedAt)}
-                      </Typography>
-                    </Tooltip>
-                  </Box>
-                )}
-
-                {/* Last Seen At */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('featureFlags.lastSeenAt')}
-                  </Typography>
-                  {flag.lastSeenAt ? (
-                    <Tooltip
-                      title={formatDateTimeDetailed(flag.lastSeenAt)}
-                      arrow
-                    >
-                      <Typography variant="body2">
-                        {formatRelativeTime(flag.lastSeenAt)}
-                      </Typography>
-                    </Tooltip>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      -
-                    </Typography>
-                  )}
-                </Box>
-
-                <Divider />
-
-                {/* Tags */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {t('featureFlags.tags')}
-                  </Typography>
-                  <TagChips
-                    tags={(flag.tags || [])
-                      .map((tagName) => allTags.find((t) => t.name === tagName))
-                      .filter((t): t is Tag => !!t)}
-                    emptyText={t('featureFlags.noTags')}
-                  />
-                </Box>
-
-                {/* Settings Info - only in view mode */}
-                {!isCreating && (
-                  <>
-                    <Divider />
-                    <Box>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        gutterBottom
-                      >
-                        {t('common.settings')}
-                      </Typography>
-                      <Stack spacing={1}>
-                        {/* Display Name */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
+                    {isCreating ? (
+                      <FormControl size="small" sx={{ minWidth: 200 }}>
+                        <Select
+                          value={flag.flagType}
+                          onChange={(e) =>
+                            setFlag({
+                              ...flag,
+                              flagType: e.target.value as any,
+                            })
+                          }
                         >
-                          <Typography variant="caption" color="text.secondary">
-                            {t('featureFlags.displayName')}
-                          </Typography>
-                          <Typography variant="body2">
-                            {flag.displayName || '-'}
-                          </Typography>
-                        </Box>
-                        {/* Description */}
-                        {flag.description && (
-                          <Box>
+                          {FLAG_TYPES.map((type) => (
+                            <MenuItem key={type.value} value={type.value}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'flex-start',
+                                  gap: 1,
+                                }}
+                              >
+                                <Box sx={{ mt: 0.3 }}>
+                                  {getTypeIcon(type.value)}
+                                </Box>
+                                <Box>
+                                  <Typography variant="body2" fontWeight={500}>
+                                    {t(type.labelKey)}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ display: 'block' }}
+                                  >
+                                    {t(type.descKey)}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    ) : (
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        {getTypeIcon(flag.flagType)}
+                        <Typography variant="body2">
+                          {t(`featureFlags.types.${flag.flagType}`)}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+
+                  {/* Value Type */}
+                  {!isCreating && (
+                    <Box
+                      sx={{ display: 'flex', justifyContent: 'space-between' }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        {t('featureFlags.valueType')}
+                      </Typography>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        <FieldTypeIcon
+                          type={flag.valueType || 'boolean'}
+                          size={16}
+                        />
+                        <Typography variant="body2">
+                          {t(
+                            `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
+                          )}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Created By */}
+                  {flag.createdByName && (
+                    <Box
+                      sx={{ display: 'flex', justifyContent: 'space-between' }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        {t('featureFlags.createdBy')}
+                      </Typography>
+                      <Typography variant="body2">
+                        {flag.createdByName}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Created At */}
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {t('featureFlags.createdAt')}
+                    </Typography>
+                    <Tooltip
+                      title={formatDateTimeDetailed(flag.createdAt)}
+                      arrow
+                    >
+                      <Typography variant="body2">
+                        {formatRelativeTime(flag.createdAt)}
+                      </Typography>
+                    </Tooltip>
+                  </Box>
+
+                  {/* Updated At */}
+                  {flag.updatedAt && (
+                    <Box
+                      sx={{ display: 'flex', justifyContent: 'space-between' }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        {t('featureFlags.updatedAt')}
+                      </Typography>
+                      <Tooltip
+                        title={formatDateTimeDetailed(flag.updatedAt)}
+                        arrow
+                      >
+                        <Typography variant="body2">
+                          {formatRelativeTime(flag.updatedAt)}
+                        </Typography>
+                      </Tooltip>
+                    </Box>
+                  )}
+
+                  {/* Last Seen At */}
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {t('featureFlags.lastSeenAt')}
+                    </Typography>
+                    {flag.lastSeenAt ? (
+                      <Tooltip
+                        title={formatDateTimeDetailed(flag.lastSeenAt)}
+                        arrow
+                      >
+                        <Typography variant="body2">
+                          {formatRelativeTime(flag.lastSeenAt)}
+                        </Typography>
+                      </Tooltip>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        -
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Divider />
+
+                  {/* Tags */}
+                  <Box>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      gutterBottom
+                    >
+                      {t('featureFlags.tags')}
+                    </Typography>
+                    <TagChips
+                      tags={(flag.tags || [])
+                        .map((tagName) =>
+                          allTags.find((t) => t.name === tagName)
+                        )
+                        .filter((t): t is Tag => !!t)}
+                      emptyText={t('featureFlags.noTags')}
+                    />
+                  </Box>
+
+                  {/* Settings Info - only in view mode */}
+                  {!isCreating && (
+                    <>
+                      <Divider />
+                      <Box>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          gutterBottom
+                        >
+                          {t('common.settings')}
+                        </Typography>
+                        <Stack spacing={1}>
+                          {/* Display Name */}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
                             <Typography
                               variant="caption"
                               color="text.secondary"
                             >
-                              {t('featureFlags.description')}
+                              {t('featureFlags.displayName')}
                             </Typography>
-                            <Typography variant="body2" sx={{ mt: 0.5 }}>
-                              {flag.description}
+                            <Typography variant="body2">
+                              {flag.displayName || '-'}
                             </Typography>
                           </Box>
-                        )}
-                        {/* Impression Data */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            {t('featureFlags.impressionData')}
-                          </Typography>
-                          <Chip
-                            label={
-                              flag.impressionDataEnabled
-                                ? t('common.enabled')
-                                : t('common.disabled')
-                            }
-                            size="small"
-                            color={
-                              flag.impressionDataEnabled ? 'success' : 'default'
-                            }
-                            variant="outlined"
-                          />
-                        </Box>
-                      </Stack>
-                    </Box>
-                  </>
-                )}
+                          {/* Description */}
+                          {flag.description && (
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {t('featureFlags.description')}
+                              </Typography>
+                              <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                {flag.description}
+                              </Typography>
+                            </Box>
+                          )}
+                          {/* Impression Data */}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {t('featureFlags.impressionData')}
+                            </Typography>
+                            <Chip
+                              label={
+                                flag.impressionDataEnabled
+                                  ? t('common.enabled')
+                                  : t('common.disabled')
+                              }
+                              size="small"
+                              color={
+                                flag.impressionDataEnabled
+                                  ? 'success'
+                                  : 'default'
+                              }
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Stack>
+                      </Box>
+                    </>
+                  )}
 
-                {/* Actions */}
-                {canManage && !isCreating && (
-                  <>
-                    <Divider />
-                    <Box sx={{ display: 'flex', gap: 0.75 }}>
-                      <Button
-                        variant="contained"
-                        onClick={handleArchiveClick}
-                        size="small"
-                        sx={{
-                          flex: 1,
-                          whiteSpace: 'nowrap',
-                          minWidth: 0,
-                          px: 1,
-                        }}
-                      >
-                        {flag.isArchived
-                          ? t('featureFlags.revive')
-                          : t('featureFlags.archive')}
-                      </Button>
-                      <Button
-                        variant="contained"
-                        onClick={handleStaleClick}
-                        size="small"
-                        sx={{
-                          flex: 1,
-                          whiteSpace: 'nowrap',
-                          minWidth: 0,
-                          px: 1,
-                        }}
-                      >
-                        {flag.stale
-                          ? t('featureFlags.unmarkStale')
-                          : t('featureFlags.markStale')}
-                      </Button>
-
-                      {flag.isArchived && (
+                  {/* Actions */}
+                  {canManage && !isCreating && (
+                    <>
+                      <Divider />
+                      <Box sx={{ display: 'flex', gap: 0.75 }}>
                         <Button
                           variant="contained"
-                          color="error"
-                          onClick={() => setDeleteDialogOpen(true)}
+                          onClick={handleArchiveClick}
                           size="small"
                           sx={{
                             flex: 1,
@@ -2651,398 +2653,502 @@ const FeatureFlagDetailPage: React.FC = () => {
                             px: 1,
                           }}
                         >
-                          {t('common.delete')}
+                          {flag.isArchived
+                            ? t('featureFlags.revive')
+                            : t('featureFlags.archive')}
                         </Button>
-                      )}
-                    </Box>
-                  </>
-                )}
-              </Stack>
-            </Paper>
+                        <Button
+                          variant="contained"
+                          onClick={handleStaleClick}
+                          size="small"
+                          sx={{
+                            flex: 1,
+                            whiteSpace: 'nowrap',
+                            minWidth: 0,
+                            px: 1,
+                          }}
+                        >
+                          {flag.stale
+                            ? t('featureFlags.unmarkStale')
+                            : t('featureFlags.markStale')}
+                        </Button>
 
-            {/* Basic Info - only in create mode */}
-            {isCreating && (
-              <Paper variant="outlined" sx={{ p: 2 }}>
-                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                  {t('featureFlags.basicInfo')}
-                </Typography>
-                <Stack spacing={2}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    required
-                    label={t('featureFlags.flagName')}
-                    value={flag.flagName || ''}
-                    onChange={(e) =>
-                      setFlag({
-                        ...flag,
-                        flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
-                      })
-                    }
-                    helperText={t('featureFlags.flagNameHelp')}
-                  />
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label={t('featureFlags.displayName')}
-                    value={flag.displayName || ''}
-                    onChange={(e) =>
-                      setFlag({ ...flag, displayName: e.target.value })
-                    }
-                  />
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    rows={2}
-                    label={t('featureFlags.description')}
-                    value={flag.description || ''}
-                    onChange={(e) =>
-                      setFlag({ ...flag, description: e.target.value })
-                    }
-                  />
+                        {flag.isArchived && (
+                          <Button
+                            variant="contained"
+                            color="error"
+                            onClick={() => setDeleteDialogOpen(true)}
+                            size="small"
+                            sx={{
+                              flex: 1,
+                              whiteSpace: 'nowrap',
+                              minWidth: 0,
+                              px: 1,
+                            }}
+                          >
+                            {t('common.delete')}
+                          </Button>
+                        )}
+                      </Box>
+                    </>
+                  )}
                 </Stack>
               </Paper>
-            )}
 
-            {/* Links Section */}
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2,
-                borderRadius: 1,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-            >
-              <Typography
-                variant="subtitle2"
-                color="text.secondary"
-                gutterBottom
-              >
-                {t('featureFlags.links.title')}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: 'block', mb: 2 }}
-              >
-                {t('featureFlags.links.helpText')}
-              </Typography>
+              {/* Basic Info - only in create mode */}
+              {isCreating && (
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                    {t('featureFlags.basicInfo')}
+                  </Typography>
+                  <Stack spacing={2}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      required
+                      label={t('featureFlags.flagName')}
+                      value={flag.flagName || ''}
+                      onChange={(e) =>
+                        setFlag({
+                          ...flag,
+                          flagName: e.target.value.replace(
+                            /[^a-zA-Z0-9_-]/g,
+                            ''
+                          ),
+                        })
+                      }
+                      helperText={t('featureFlags.flagNameHelp')}
+                    />
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label={t('featureFlags.displayName')}
+                      value={flag.displayName || ''}
+                      onChange={(e) =>
+                        setFlag({ ...flag, displayName: e.target.value })
+                      }
+                    />
+                    <TextField
+                      fullWidth
+                      size="small"
+                      multiline
+                      rows={2}
+                      label={t('featureFlags.description')}
+                      value={flag.description || ''}
+                      onChange={(e) =>
+                        setFlag({ ...flag, description: e.target.value })
+                      }
+                    />
+                  </Stack>
+                </Paper>
+              )}
 
-              {(flag.links?.length || 0) > 0 ? (
-                <Stack spacing={1}>
-                  {flag.links?.map((link, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        py: 0.5,
-                        '&:hover .link-actions': { opacity: 1 },
-                      }}
-                    >
+              {/* Links Section */}
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  borderRadius: 1,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  {t('featureFlags.links.title')}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mb: 2 }}
+                >
+                  {t('featureFlags.links.helpText')}
+                </Typography>
+
+                {(flag.links?.length || 0) > 0 ? (
+                  <Stack spacing={1}>
+                    {flag.links?.map((link, index) => (
                       <Box
-                        component="a"
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        key={index}
                         sx={{
-                          flex: 1,
                           display: 'flex',
                           alignItems: 'center',
                           gap: 1,
-                          textDecoration: 'none',
-                          color: 'primary.main',
-                          '&:hover': { textDecoration: 'underline' },
-                          overflow: 'hidden',
+                          py: 0.5,
+                          '&:hover .link-actions': { opacity: 1 },
                         }}
                       >
-                        <LinkIcon
-                          fontSize="small"
-                          sx={{ color: 'text.secondary', mr: 0.5 }}
-                        />
-                        <Typography
-                          variant="body2"
-                          noWrap
-                          title={link.title || link.url}
-                        >
-                          {link.title || link.url}
-                        </Typography>
-                      </Box>
-                      {canManage && (
                         <Box
-                          className="link-actions"
+                          component="a"
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           sx={{
-                            opacity: 0,
-                            transition: 'opacity 0.2s',
+                            flex: 1,
                             display: 'flex',
-                            gap: 0,
+                            alignItems: 'center',
+                            gap: 1,
+                            textDecoration: 'none',
+                            color: 'primary.main',
+                            '&:hover': { textDecoration: 'underline' },
+                            overflow: 'hidden',
                           }}
                         >
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleOpenEditLink(link, index)}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDeleteLink(index)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          <LinkIcon
+                            fontSize="small"
+                            sx={{ color: 'text.secondary', mr: 0.5 }}
+                          />
+                          <Typography
+                            variant="body2"
+                            noWrap
+                            title={link.title || link.url}
+                          >
+                            {link.title || link.url}
+                          </Typography>
                         </Box>
-                      )}
-                    </Box>
-                  ))}
-                </Stack>
-              ) : null}
-
-              {canManage && (
-                <Box
-                  sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}
-                >
-                  <Button
-                    size="small"
-                    startIcon={<AddIcon />}
-                    onClick={handleOpenAddLink}
-                  >
-                    {t('featureFlags.links.addLink')}
-                  </Button>
-                </Box>
-              )}
-            </Paper>
-          </Box>
-
-          {/* Right Main Area - Environment Cards */}
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <PageContentLoader loading={envLoading}>
-              <Stack spacing={2} sx={{ minWidth: 0 }}>
-                {environments.map((env, envIndex) => {
-                  // Get environment-specific isEnabled from flag.environments
-                  const envSettings = flag.environments?.find(
-                    (e) => e.environmentId === env.environmentId
-                  );
-                  const isEnabled = envSettings?.isEnabled ?? false;
-                  // Use environment-specific strategies
-                  const strategies = envStrategies[env.environmentId] || [];
-                  const strategiesCount = strategies.length;
-                  const isExpanded = expandedEnvs.has(env.environmentId);
-
-                  return (
-                    <React.Fragment key={env.environmentId}>
-                      {envIndex > 0 && (
-                        <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
-                      )}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          border: 1,
-                          borderColor: 'divider',
-                          overflow: 'hidden',
-                          borderRadius: 1,
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                        }}
-                      >
-                        {/* Content */}
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Accordion
-                            expanded={isExpanded}
-                            onChange={(_, expanded) => {
-                              setExpandedEnvs((prev) => {
-                                const next = new Set(prev);
-                                if (expanded) {
-                                  next.add(env.environmentId);
-                                } else {
-                                  next.delete(env.environmentId);
-                                }
-                                return next;
-                              });
-                            }}
-                            disableGutters
+                        {canManage && (
+                          <Box
+                            className="link-actions"
                             sx={{
-                              '&:before': { display: 'none' },
-                              bgcolor: 'background.paper',
+                              opacity: 0,
+                              transition: 'opacity 0.2s',
+                              display: 'flex',
+                              gap: 0,
                             }}
                           >
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
+                            <Tooltip title={t('common.edit')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleOpenEditLink(link, index)}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('common.delete')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteLink(index)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                ) : null}
+
+                {canManage && (
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}
+                  >
+                    <Button
+                      size="small"
+                      startIcon={<AddIcon />}
+                      onClick={handleOpenAddLink}
+                    >
+                      {t('featureFlags.links.addLink')}
+                    </Button>
+                  </Box>
+                )}
+              </Paper>
+            </Box>
+
+            {/* Right Main Area - Environment Cards */}
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <PageContentLoader loading={envLoading}>
+                <Stack spacing={2} sx={{ minWidth: 0 }}>
+                  {environments.map((env, envIndex) => {
+                    // Get environment-specific isEnabled from flag.environments
+                    const envSettings = flag.environments?.find(
+                      (e) => e.environmentId === env.environmentId
+                    );
+                    const isEnabled = envSettings?.isEnabled ?? false;
+                    // Use environment-specific strategies
+                    const strategies = envStrategies[env.environmentId] || [];
+                    const strategiesCount = strategies.length;
+                    const isExpanded = expandedEnvs.has(env.environmentId);
+
+                    return (
+                      <React.Fragment key={env.environmentId}>
+                        {envIndex > 0 && (
+                          <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
+                        )}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            border: 1,
+                            borderColor: 'divider',
+                            overflow: 'hidden',
+                            borderRadius: 1,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                          }}
+                        >
+                          {/* Content */}
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Accordion
+                              expanded={isExpanded}
+                              onChange={(_, expanded) => {
+                                setExpandedEnvs((prev) => {
+                                  const next = new Set(prev);
+                                  if (expanded) {
+                                    next.add(env.environmentId);
+                                  } else {
+                                    next.delete(env.environmentId);
+                                  }
+                                  return next;
+                                });
+                              }}
+                              disableGutters
                               sx={{
-                                px: 2,
-                                '& .MuiAccordionSummary-content': {
-                                  alignItems: 'center',
-                                  gap: 2,
-                                },
+                                '&:before': { display: 'none' },
+                                bgcolor: 'background.paper',
                               }}
                             >
-                              {/* Toggle switch */}
-                              <Tooltip
-                                title={
-                                  isEnabled
-                                    ? t('common.disable')
-                                    : t('common.enable')
-                                }
-                                disableFocusListener
-                                enterDelay={500}
-                                leaveDelay={0}
-                              >
-                                <Box onClick={(e) => e.stopPropagation()}>
-                                  <FeatureSwitch
-                                    size="small"
-                                    checked={isEnabled}
-                                    onChange={() => {
-                                      handleEnvToggle(
-                                        env.environmentId,
-                                        isEnabled
-                                      );
-                                    }}
-                                    disabled={!canManage || flag.isArchived}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      (e.currentTarget as any).blur();
-                                    }}
-                                    color={env.color}
-                                  />
-                                </Box>
-                              </Tooltip>
-
-                              {/* Environment info */}
-                              <Box sx={{ flex: 1 }}>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t('common.environment')}
-                                </Typography>
-                                <Box
-                                  sx={{
-                                    display: 'flex',
+                              <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                sx={{
+                                  px: 2,
+                                  '& .MuiAccordionSummary-content': {
                                     alignItems: 'center',
-                                    gap: 1,
-                                  }}
+                                    gap: 2,
+                                  },
+                                }}
+                              >
+                                {/* Toggle switch */}
+                                <Tooltip
+                                  title={
+                                    isEnabled
+                                      ? t('common.disable')
+                                      : t('common.enable')
+                                  }
+                                  disableFocusListener
+                                  enterDelay={500}
+                                  leaveDelay={0}
                                 >
-                                  <Typography
-                                    variant="subtitle1"
-                                    fontWeight={600}
-                                  >
-                                    {env.displayName}
-                                  </Typography>
-                                  {flagDraftStatus.draftEnvIds?.has(
-                                    env.environmentId
-                                  ) && (
-                                    <Tooltip
-                                      title={t('changeRequest.pendingChanges')}
-                                      arrow
-                                    >
-                                      <ScheduleIcon
-                                        sx={{
-                                          fontSize: 14,
-                                          color: 'warning.main',
-                                          animation: 'pulse 2s infinite',
-                                          '@keyframes pulse': {
-                                            '0%, 100%': { opacity: 1 },
-                                            '50%': { opacity: 0.4 },
-                                          },
-                                        }}
-                                      />
-                                    </Tooltip>
-                                  )}
-                                  {releaseFlowEnvs.has(env.environmentId) ? (
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.5,
-                                        px: 1,
-                                        py: 0.25,
-                                        bgcolor: 'action.hover',
-                                        borderRadius: '4px',
-                                        color: 'text.secondary',
-                                        mt: 0.5,
-                                        width: 'fit-content',
-                                        fontSize: '0.75rem',
+                                  <Box onClick={(e) => e.stopPropagation()}>
+                                    <FeatureSwitch
+                                      size="small"
+                                      checked={isEnabled}
+                                      onChange={() => {
+                                        handleEnvToggle(
+                                          env.environmentId,
+                                          isEnabled
+                                        );
                                       }}
+                                      disabled={!canManage || flag.isArchived}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        (e.currentTarget as any).blur();
+                                      }}
+                                      color={env.color}
+                                    />
+                                  </Box>
+                                </Tooltip>
+
+                                {/* Environment info */}
+                                <Box sx={{ flex: 1 }}>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {t('common.environment')}
+                                  </Typography>
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="subtitle1"
+                                      fontWeight={600}
                                     >
-                                      <ReleaseFlowActiveIcon
-                                        sx={{ fontSize: 13 }}
-                                      />
-                                      {activeMilestoneByEnv[env.environmentId]
-                                        ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environmentId]}`
-                                        : t('releaseFlow.tabTitle')}
+                                      {env.displayName}
                                     </Typography>
-                                  ) : (
-                                    strategiesCount > 0 && (
+                                    {flagDraftStatus.draftEnvIds?.has(
+                                      env.environmentId
+                                    ) && (
+                                      <Tooltip
+                                        title={t(
+                                          'changeRequest.pendingChanges'
+                                        )}
+                                        arrow
+                                      >
+                                        <ScheduleIcon
+                                          sx={{
+                                            fontSize: 14,
+                                            color: 'warning.main',
+                                            animation: 'pulse 2s infinite',
+                                            '@keyframes pulse': {
+                                              '0%, 100%': { opacity: 1 },
+                                              '50%': { opacity: 0.4 },
+                                            },
+                                          }}
+                                        />
+                                      </Tooltip>
+                                    )}
+                                    {releaseFlowEnvs.has(env.environmentId) ? (
                                       <Typography
                                         variant="caption"
                                         sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 0.5,
                                           px: 1,
                                           py: 0.25,
                                           bgcolor: 'action.hover',
                                           borderRadius: '4px',
                                           color: 'text.secondary',
+                                          mt: 0.5,
+                                          width: 'fit-content',
+                                          fontSize: '0.75rem',
                                         }}
                                       >
-                                        {t('featureFlags.strategiesCount', {
-                                          count: strategiesCount,
-                                        })}
+                                        <ReleaseFlowActiveIcon
+                                          sx={{ fontSize: 13 }}
+                                        />
+                                        {activeMilestoneByEnv[env.environmentId]
+                                          ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environmentId]}`
+                                          : t('releaseFlow.tabTitle')}
                                       </Typography>
-                                    )
-                                  )}
+                                    ) : (
+                                      strategiesCount > 0 && (
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            px: 1,
+                                            py: 0.25,
+                                            bgcolor: 'action.hover',
+                                            borderRadius: '4px',
+                                            color: 'text.secondary',
+                                          }}
+                                        >
+                                          {t('featureFlags.strategiesCount', {
+                                            count: strategiesCount,
+                                          })}
+                                        </Typography>
+                                      )
+                                    )}
+                                  </Box>
                                 </Box>
-                              </Box>
 
-                              {/* Metrics mini pie chart */}
-                              {(() => {
-                                const metrics = envMetrics[env.environmentId];
-                                // Only show chart if we have actual metrics data
-                                if (metrics && metrics.total > 0) {
-                                  const yesPercent = Math.round(
-                                    (metrics.totalYes / metrics.total) * 100
-                                  );
-                                  const noPercent = 100 - yesPercent;
+                                {/* Metrics mini pie chart */}
+                                {(() => {
+                                  const metrics = envMetrics[env.environmentId];
+                                  // Only show chart if we have actual metrics data
+                                  if (metrics && metrics.total > 0) {
+                                    const yesPercent = Math.round(
+                                      (metrics.totalYes / metrics.total) * 100
+                                    );
+                                    const noPercent = 100 - yesPercent;
 
-                                  // SVG-based mini pie chart - filled style
-                                  const radius = 24;
-                                  const cx = 26;
-                                  const cy = 26;
+                                    // SVG-based mini pie chart - filled style
+                                    const radius = 24;
+                                    const cx = 26;
+                                    const cy = 26;
 
-                                  // Calculate arc path for pie chart
-                                  const getArcPath = (
-                                    startAngle: number,
-                                    endAngle: number,
-                                    r: number
-                                  ) => {
-                                    const startRad =
-                                      ((startAngle - 90) * Math.PI) / 180;
-                                    const endRad =
-                                      ((endAngle - 90) * Math.PI) / 180;
-                                    const x1 = cx + r * Math.cos(startRad);
-                                    const y1 = cy + r * Math.sin(startRad);
-                                    const x2 = cx + r * Math.cos(endRad);
-                                    const y2 = cy + r * Math.sin(endRad);
-                                    const largeArc =
-                                      endAngle - startAngle > 180 ? 1 : 0;
-                                    return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                                  };
+                                    // Calculate arc path for pie chart
+                                    const getArcPath = (
+                                      startAngle: number,
+                                      endAngle: number,
+                                      r: number
+                                    ) => {
+                                      const startRad =
+                                        ((startAngle - 90) * Math.PI) / 180;
+                                      const endRad =
+                                        ((endAngle - 90) * Math.PI) / 180;
+                                      const x1 = cx + r * Math.cos(startRad);
+                                      const y1 = cy + r * Math.sin(startRad);
+                                      const x2 = cx + r * Math.cos(endRad);
+                                      const y2 = cy + r * Math.sin(endRad);
+                                      const largeArc =
+                                        endAngle - startAngle > 180 ? 1 : 0;
+                                      return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                                    };
 
-                                  const yesAngle = (yesPercent / 100) * 360;
+                                    const yesAngle = (yesPercent / 100) * 360;
 
+                                    return (
+                                      <Tooltip
+                                        title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
+                                        arrow
+                                      >
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            mr: 1,
+                                          }}
+                                        >
+                                          <svg
+                                            width="52"
+                                            height="52"
+                                            viewBox="0 0 52 52"
+                                          >
+                                            {/* No (red) - full circle background */}
+                                            <circle
+                                              cx={cx}
+                                              cy={cy}
+                                              r={radius}
+                                              fill="#ef5350"
+                                            />
+                                            {/* Yes (green) - pie slice */}
+                                            {yesPercent > 0 &&
+                                              yesPercent < 100 && (
+                                                <path
+                                                  d={getArcPath(
+                                                    0,
+                                                    yesAngle,
+                                                    radius
+                                                  )}
+                                                  fill="#4caf50"
+                                                />
+                                              )}
+                                            {yesPercent >= 100 && (
+                                              <circle
+                                                cx={cx}
+                                                cy={cy}
+                                                r={radius}
+                                                fill="#4caf50"
+                                              />
+                                            )}
+                                            {/* Center text */}
+                                            <text
+                                              x={cx}
+                                              y={cy}
+                                              textAnchor="middle"
+                                              dominantBaseline="central"
+                                              fontSize="14"
+                                              fontWeight="bold"
+                                              fontFamily="system-ui, -apple-system, sans-serif"
+                                              fill="white"
+                                              style={{
+                                                textShadow:
+                                                  '0 1px 2px rgba(0,0,0,0.8)',
+                                              }}
+                                            >
+                                              {yesPercent}%
+                                            </text>
+                                          </svg>
+                                        </Box>
+                                      </Tooltip>
+                                    );
+                                  }
                                   return (
                                     <Tooltip
-                                      title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
+                                      title={t('featureFlags.noMetricsYetHint')}
                                       arrow
                                     >
                                       <Box
                                         sx={{
                                           display: 'flex',
                                           alignItems: 'center',
-                                          gap: 1,
                                           mr: 1,
                                         }}
                                       >
@@ -3051,250 +3157,29 @@ const FeatureFlagDetailPage: React.FC = () => {
                                           height="52"
                                           viewBox="0 0 52 52"
                                         >
-                                          {/* No (red) - full circle background */}
+                                          {/* Donut ring for no metrics */}
                                           <circle
-                                            cx={cx}
-                                            cy={cy}
-                                            r={radius}
-                                            fill="#ef5350"
+                                            cx={26}
+                                            cy={26}
+                                            r={20}
+                                            fill="none"
+                                            stroke={
+                                              theme.palette.mode === 'dark'
+                                                ? 'rgba(255,255,255,0.08)'
+                                                : 'rgba(0,0,0,0.06)'
+                                            }
+                                            strokeWidth={6}
                                           />
-                                          {/* Yes (green) - pie slice */}
-                                          {yesPercent > 0 &&
-                                            yesPercent < 100 && (
-                                              <path
-                                                d={getArcPath(
-                                                  0,
-                                                  yesAngle,
-                                                  radius
-                                                )}
-                                                fill="#4caf50"
-                                              />
-                                            )}
-                                          {yesPercent >= 100 && (
-                                            <circle
-                                              cx={cx}
-                                              cy={cy}
-                                              r={radius}
-                                              fill="#4caf50"
-                                            />
-                                          )}
-                                          {/* Center text */}
-                                          <text
-                                            x={cx}
-                                            y={cy}
-                                            textAnchor="middle"
-                                            dominantBaseline="central"
-                                            fontSize="14"
-                                            fontWeight="bold"
-                                            fontFamily="system-ui, -apple-system, sans-serif"
-                                            fill="white"
-                                            style={{
-                                              textShadow:
-                                                '0 1px 2px rgba(0,0,0,0.8)',
-                                            }}
-                                          >
-                                            {yesPercent}%
-                                          </text>
                                         </svg>
                                       </Box>
                                     </Tooltip>
                                   );
-                                }
-                                return (
-                                  <Tooltip
-                                    title={t('featureFlags.noMetricsYetHint')}
-                                    arrow
-                                  >
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        mr: 1,
-                                      }}
-                                    >
-                                      <svg
-                                        width="52"
-                                        height="52"
-                                        viewBox="0 0 52 52"
-                                      >
-                                        {/* Donut ring for no metrics */}
-                                        <circle
-                                          cx={26}
-                                          cy={26}
-                                          r={20}
-                                          fill="none"
-                                          stroke={
-                                            theme.palette.mode === 'dark'
-                                              ? 'rgba(255,255,255,0.08)'
-                                              : 'rgba(0,0,0,0.06)'
-                                          }
-                                          strokeWidth={6}
-                                        />
-                                      </svg>
-                                    </Box>
-                                  </Tooltip>
-                                );
-                              })()}
-                            </AccordionSummary>
+                                })()}
+                              </AccordionSummary>
 
-                            <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
-                              {releaseFlowEnvs.has(env.environmentId) ? (
-                                <>
-                                  <ReleaseFlowTab
-                                    flagId={flag.id}
-                                    flagName={flag.flagName}
-                                    environments={[
-                                      {
-                                        environmentId: env.environmentId,
-                                        displayName: env.displayName,
-                                      },
-                                    ]}
-                                    canManage={canManage}
-                                    envEnabled={isEnabled}
-                                    allSegments={segments}
-                                    contextFields={contextFields}
-                                    onPlanChange={() => {
-                                      mutateReleaseFlowPlans();
-                                      // Refresh strategies (release flow changes them)
-                                      loadFlag();
-                                      setRefreshCounter((c) => c + 1);
-                                    }}
-                                    onPlanDeleted={() => {
-                                      mutateReleaseFlowPlans();
-                                      const nextManual = new Set(
-                                        envManualReleaseFlow
-                                      );
-                                      nextManual.delete(env.environmentId);
-                                      setEnvManualReleaseFlow(nextManual);
-                                    }}
-                                  />
-
-                                  <Divider sx={{ my: 2 }} />
-
-                                  <EnvironmentVariantsEditor
-                                    environmentId={env.environmentId}
-                                    variants={
-                                      (envVariants[env.environmentId] ||
-                                        []) as EditorVariant[]
-                                    }
-                                    valueType={flag.valueType || 'boolean'}
-                                    flagType={flag.flagType || 'release'}
-                                    enabledValue={flag.enabledValue}
-                                    disabledValue={flag.disabledValue}
-                                    envEnabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.enabledValue
-                                    }
-                                    envDisabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.disabledValue
-                                    }
-                                    overrideEnabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.overrideEnabledValue ?? false
-                                    }
-                                    overrideDisabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.overrideDisabledValue ?? false
-                                    }
-                                    canManage={canManage}
-                                    isArchived={flag.isArchived}
-                                    useFixedWeightVariants={
-                                      flag.useFixedWeightVariants
-                                    }
-                                    onUseFixedWeightVariantsChange={
-                                      handleUseFixedWeightVariantsChange
-                                    }
-                                    onSave={(variants) =>
-                                      handleSaveEnvVariants(
-                                        env.environmentId,
-                                        variants
-                                      )
-                                    }
-                                    onSaveValues={(
-                                      enabledValue,
-                                      disabledValue,
-                                      overrideEnabled,
-                                      overrideDisabled
-                                    ) =>
-                                      handleSaveEnvFallbackValue(
-                                        env.environmentId,
-                                        enabledValue,
-                                        disabledValue,
-                                        overrideEnabled,
-                                        overrideDisabled
-                                      )
-                                    }
-                                    onChangeDetected={() =>
-                                      setFlagDraftStatus({ hasDraft: true })
-                                    }
-                                    onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={true}
-                                    validationRules={flag.validationRules}
-                                  />
-                                </>
-                              ) : strategies.length === 0 ? (
-                                <>
-                                  <EmptyPlaceholder
-                                    message={t(
-                                      'featureFlags.noStrategiesTitle'
-                                    )}
-                                    description={t(
-                                      'featureFlags.noStrategiesDescription'
-                                    )}
-                                  >
-                                    {canManage && (
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          justifyContent: 'center',
-                                          gap: 2,
-                                          mt: 1.5,
-                                        }}
-                                      >
-                                        <Button
-                                          variant="contained"
-                                          size="small"
-                                          startIcon={<AddIcon />}
-                                          onClick={() =>
-                                            handleAddStrategy(env.environmentId)
-                                          }
-                                        >
-                                          {t('featureFlags.addFirstStrategy')}
-                                        </Button>
-                                        <Button
-                                          variant="contained"
-                                          size="small"
-                                          startIcon={
-                                            <ReleaseFlowActiveIcon
-                                              sx={{ fontSize: 18 }}
-                                            />
-                                          }
-                                          onClick={() => {
-                                            setEnvManualReleaseFlow((prev) =>
-                                              new Set(prev).add(
-                                                env.environmentId
-                                              )
-                                            );
-                                          }}
-                                        >
-                                          {t('releaseFlow.tabTitle')}
-                                        </Button>
-                                      </Box>
-                                    )}
-                                  </EmptyPlaceholder>
-
-                                  {envManualReleaseFlow.has(
-                                    env.environmentId
-                                  ) && (
+                              <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
+                                {releaseFlowEnvs.has(env.environmentId) ? (
+                                  <>
                                     <ReleaseFlowTab
                                       flagId={flag.id}
                                       flagName={flag.flagName}
@@ -3305,7 +3190,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         },
                                       ]}
                                       canManage={canManage}
-                                      initialShowTemplates={true}
                                       envEnabled={isEnabled}
                                       allSegments={segments}
                                       contextFields={contextFields}
@@ -3316,6 +3200,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         setRefreshCounter((c) => c + 1);
                                       }}
                                       onPlanDeleted={() => {
+                                        mutateReleaseFlowPlans();
                                         const nextManual = new Set(
                                           envManualReleaseFlow
                                         );
@@ -3323,1226 +3208,1431 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         setEnvManualReleaseFlow(nextManual);
                                       }}
                                     />
-                                  )}
 
-                                  <Divider sx={{ my: 2 }} />
+                                    <Divider sx={{ my: 2 }} />
 
-                                  <EnvironmentVariantsEditor
-                                    environmentId={env.environmentId}
-                                    variants={
-                                      (envVariants[env.environmentId] ||
-                                        []) as EditorVariant[]
-                                    }
-                                    valueType={flag.valueType || 'boolean'}
-                                    flagType={flag.flagType || 'release'}
-                                    enabledValue={flag.enabledValue}
-                                    disabledValue={flag.disabledValue}
-                                    envEnabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.enabledValue
-                                    }
-                                    envDisabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.disabledValue
-                                    }
-                                    overrideEnabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.overrideEnabledValue ?? false
-                                    }
-                                    overrideDisabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.overrideDisabledValue ?? false
-                                    }
-                                    canManage={canManage}
-                                    isArchived={flag.isArchived}
-                                    useFixedWeightVariants={
-                                      flag.useFixedWeightVariants
-                                    }
-                                    onUseFixedWeightVariantsChange={
-                                      handleUseFixedWeightVariantsChange
-                                    }
-                                    onSave={(variants) =>
-                                      handleSaveEnvVariants(
-                                        env.environmentId,
-                                        variants
-                                      )
-                                    }
-                                    onSaveValues={(
-                                      enabledValue,
-                                      disabledValue,
-                                      overrideEnabled,
-                                      overrideDisabled
-                                    ) =>
-                                      handleSaveEnvFallbackValue(
-                                        env.environmentId,
+                                    <EnvironmentVariantsEditor
+                                      environmentId={env.environmentId}
+                                      variants={
+                                        (envVariants[env.environmentId] ||
+                                          []) as EditorVariant[]
+                                      }
+                                      valueType={flag.valueType || 'boolean'}
+                                      flagType={flag.flagType || 'release'}
+                                      enabledValue={flag.enabledValue}
+                                      disabledValue={flag.disabledValue}
+                                      envEnabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.enabledValue
+                                      }
+                                      envDisabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.disabledValue
+                                      }
+                                      overrideEnabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.overrideEnabledValue ?? false
+                                      }
+                                      overrideDisabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.overrideDisabledValue ?? false
+                                      }
+                                      canManage={canManage}
+                                      isArchived={flag.isArchived}
+                                      useFixedWeightVariants={
+                                        flag.useFixedWeightVariants
+                                      }
+                                      onUseFixedWeightVariantsChange={
+                                        handleUseFixedWeightVariantsChange
+                                      }
+                                      onSave={(variants) =>
+                                        handleSaveEnvVariants(
+                                          env.environmentId,
+                                          variants
+                                        )
+                                      }
+                                      onSaveValues={(
                                         enabledValue,
                                         disabledValue,
                                         overrideEnabled,
                                         overrideDisabled
-                                      )
-                                    }
-                                    onChangeDetected={() =>
-                                      setFlagDraftStatus({ hasDraft: true })
-                                    }
-                                    onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={true}
-                                    validationRules={flag.validationRules}
-                                  />
-                                </>
-                              ) : (
-                                <>
-                                  <DndContext
-                                    sensors={sensors}
-                                    collisionDetection={closestCenter}
-                                    onDragEnd={(event: DragEndEvent) => {
-                                      const { active, over } = event;
-                                      if (over && active.id !== over.id) {
-                                        const oldIndex = strategies.findIndex(
-                                          (s) => s.id === active.id
-                                        );
-                                        const newIndex = strategies.findIndex(
-                                          (s) => s.id === over.id
-                                        );
-                                        handleReorderStrategies(
+                                      ) =>
+                                        handleSaveEnvFallbackValue(
                                           env.environmentId,
-                                          oldIndex,
-                                          newIndex
-                                        );
+                                          enabledValue,
+                                          disabledValue,
+                                          overrideEnabled,
+                                          overrideDisabled
+                                        )
                                       }
-                                    }}
-                                  >
-                                    <SortableContext
-                                      items={strategies.map((s) => s.id)}
-                                      strategy={verticalListSortingStrategy}
+                                      onChangeDetected={() =>
+                                        setFlagDraftStatus({ hasDraft: true })
+                                      }
+                                      onGoToPayloadTab={() => setTabValue(1)}
+                                      defaultExpanded={true}
+                                      validationRules={flag.validationRules}
+                                    />
+                                  </>
+                                ) : strategies.length === 0 ? (
+                                  <>
+                                    <EmptyPlaceholder
+                                      message={t(
+                                        'featureFlags.noStrategiesTitle'
+                                      )}
+                                      description={t(
+                                        'featureFlags.noStrategiesDescription'
+                                      )}
                                     >
-                                      <Stack spacing={2}>
-                                        {strategies.map((strategy, index) => (
-                                          <React.Fragment
-                                            key={strategy.id || index}
+                                      {canManage && (
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            gap: 2,
+                                            mt: 1.5,
+                                          }}
+                                        >
+                                          <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={<AddIcon />}
+                                            onClick={() =>
+                                              handleAddStrategy(
+                                                env.environmentId
+                                              )
+                                            }
                                           >
-                                            {/* OR divider */}
-                                            {index > 0 && (
-                                              <Box
-                                                sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  gap: 1,
-                                                }}
-                                              >
-                                                <Divider sx={{ flexGrow: 1 }} />
-                                                <Chip
-                                                  label="OR"
-                                                  size="small"
-                                                  variant="outlined"
-                                                  color="secondary"
-                                                  sx={{
-                                                    fontWeight: 600,
-                                                    fontSize: '0.7rem',
-                                                  }}
-                                                />
-                                                <Divider sx={{ flexGrow: 1 }} />
-                                              </Box>
-                                            )}
+                                            {t('featureFlags.addFirstStrategy')}
+                                          </Button>
+                                          <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={
+                                              <ReleaseFlowActiveIcon
+                                                sx={{ fontSize: 18 }}
+                                              />
+                                            }
+                                            onClick={() => {
+                                              setEnvManualReleaseFlow((prev) =>
+                                                new Set(prev).add(
+                                                  env.environmentId
+                                                )
+                                              );
+                                            }}
+                                          >
+                                            {t('releaseFlow.tabTitle')}
+                                          </Button>
+                                        </Box>
+                                      )}
+                                    </EmptyPlaceholder>
 
-                                            {/* Strategy card wrapped with sortable */}
-                                            <SortableStrategyItem
-                                              id={strategy.id}
-                                              isDraggable={
-                                                strategies.length > 1
-                                              }
-                                            >
-                                              {({ dragHandleProps }) => (
-                                                <StrategyCardReadonly
-                                                  strategy={{
-                                                    strategyName: strategy.name,
-                                                    title: strategy.title,
-                                                    parameters:
-                                                      strategy.parameters,
-                                                    constraints:
-                                                      strategy.constraints,
-                                                    segments: strategy.segments,
-                                                    disabled: strategy.disabled,
-                                                  }}
-                                                  allSegments={segments}
-                                                  contextFields={contextFields}
-                                                  headerPrefix={
-                                                    dragHandleProps ? (
-                                                      <Box
-                                                        {...dragHandleProps}
-                                                        sx={{
-                                                          color:
-                                                            'text.disabled',
-                                                          cursor: 'grab',
-                                                          display: 'flex',
-                                                          alignItems: 'center',
-                                                          '&:active': {
-                                                            cursor: 'grabbing',
-                                                          },
-                                                        }}
-                                                      >
-                                                        <DragIcon fontSize="small" />
-                                                      </Box>
-                                                    ) : undefined
-                                                  }
-                                                  headerActions={
-                                                    canManage ? (
-                                                      <StrategyContextMenu
-                                                        onEdit={() =>
-                                                          handleEditStrategy(
-                                                            strategy,
-                                                            env.environmentId
-                                                          )
-                                                        }
-                                                        onDelete={() =>
-                                                          handleOpenDeleteStrategyConfirm(
-                                                            strategy.id,
-                                                            index,
-                                                            env.environmentId
-                                                          )
-                                                        }
-                                                      />
-                                                    ) : undefined
-                                                  }
-                                                  collapsible
-                                                />
-                                              )}
-                                            </SortableStrategyItem>
-                                          </React.Fragment>
-                                        ))}
-                                      </Stack>
-                                    </SortableContext>
-                                  </DndContext>
+                                    {envManualReleaseFlow.has(
+                                      env.environmentId
+                                    ) && (
+                                      <ReleaseFlowTab
+                                        flagId={flag.id}
+                                        flagName={flag.flagName}
+                                        environments={[
+                                          {
+                                            environmentId: env.environmentId,
+                                            displayName: env.displayName,
+                                          },
+                                        ]}
+                                        canManage={canManage}
+                                        initialShowTemplates={true}
+                                        envEnabled={isEnabled}
+                                        allSegments={segments}
+                                        contextFields={contextFields}
+                                        onPlanChange={() => {
+                                          mutateReleaseFlowPlans();
+                                          // Refresh strategies (release flow changes them)
+                                          loadFlag();
+                                          setRefreshCounter((c) => c + 1);
+                                        }}
+                                        onPlanDeleted={() => {
+                                          const nextManual = new Set(
+                                            envManualReleaseFlow
+                                          );
+                                          nextManual.delete(env.environmentId);
+                                          setEnvManualReleaseFlow(nextManual);
+                                        }}
+                                      />
+                                    )}
 
-                                  {/* Add strategy button */}
-                                  {canManage && (
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        justifyContent: 'flex-end',
-                                        gap: 1,
-                                        mt: 2,
+                                    <Divider sx={{ my: 2 }} />
+
+                                    <EnvironmentVariantsEditor
+                                      environmentId={env.environmentId}
+                                      variants={
+                                        (envVariants[env.environmentId] ||
+                                          []) as EditorVariant[]
+                                      }
+                                      valueType={flag.valueType || 'boolean'}
+                                      flagType={flag.flagType || 'release'}
+                                      enabledValue={flag.enabledValue}
+                                      disabledValue={flag.disabledValue}
+                                      envEnabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.enabledValue
+                                      }
+                                      envDisabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.disabledValue
+                                      }
+                                      overrideEnabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.overrideEnabledValue ?? false
+                                      }
+                                      overrideDisabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.overrideDisabledValue ?? false
+                                      }
+                                      canManage={canManage}
+                                      isArchived={flag.isArchived}
+                                      useFixedWeightVariants={
+                                        flag.useFixedWeightVariants
+                                      }
+                                      onUseFixedWeightVariantsChange={
+                                        handleUseFixedWeightVariantsChange
+                                      }
+                                      onSave={(variants) =>
+                                        handleSaveEnvVariants(
+                                          env.environmentId,
+                                          variants
+                                        )
+                                      }
+                                      onSaveValues={(
+                                        enabledValue,
+                                        disabledValue,
+                                        overrideEnabled,
+                                        overrideDisabled
+                                      ) =>
+                                        handleSaveEnvFallbackValue(
+                                          env.environmentId,
+                                          enabledValue,
+                                          disabledValue,
+                                          overrideEnabled,
+                                          overrideDisabled
+                                        )
+                                      }
+                                      onChangeDetected={() =>
+                                        setFlagDraftStatus({ hasDraft: true })
+                                      }
+                                      onGoToPayloadTab={() => setTabValue(1)}
+                                      defaultExpanded={true}
+                                      validationRules={flag.validationRules}
+                                    />
+                                  </>
+                                ) : (
+                                  <>
+                                    <DndContext
+                                      sensors={sensors}
+                                      collisionDetection={closestCenter}
+                                      onDragEnd={(event: DragEndEvent) => {
+                                        const { active, over } = event;
+                                        if (over && active.id !== over.id) {
+                                          const oldIndex = strategies.findIndex(
+                                            (s) => s.id === active.id
+                                          );
+                                          const newIndex = strategies.findIndex(
+                                            (s) => s.id === over.id
+                                          );
+                                          handleReorderStrategies(
+                                            env.environmentId,
+                                            oldIndex,
+                                            newIndex
+                                          );
+                                        }
                                       }}
                                     >
-                                      <Button
-                                        variant="contained"
-                                        startIcon={<AddIcon />}
-                                        onClick={() =>
-                                          handleAddStrategy(env.environmentId)
-                                        }
-                                        size="small"
+                                      <SortableContext
+                                        items={strategies.map((s) => s.id)}
+                                        strategy={verticalListSortingStrategy}
                                       >
-                                        {t('featureFlags.addStrategy')}
-                                      </Button>
-                                    </Box>
-                                  )}
+                                        <Stack spacing={2}>
+                                          {strategies.map((strategy, index) => (
+                                            <React.Fragment
+                                              key={strategy.id || index}
+                                            >
+                                              {/* OR divider */}
+                                              {index > 0 && (
+                                                <Box
+                                                  sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                  }}
+                                                >
+                                                  <Divider
+                                                    sx={{ flexGrow: 1 }}
+                                                  />
+                                                  <Chip
+                                                    label="OR"
+                                                    size="small"
+                                                    variant="outlined"
+                                                    color="secondary"
+                                                    sx={{
+                                                      fontWeight: 600,
+                                                      fontSize: '0.7rem',
+                                                    }}
+                                                  />
+                                                  <Divider
+                                                    sx={{ flexGrow: 1 }}
+                                                  />
+                                                </Box>
+                                              )}
 
-                                  {/* Divider between strategies and variants */}
-                                  <Divider sx={{ my: 2 }} />
+                                              {/* Strategy card wrapped with sortable */}
+                                              <SortableStrategyItem
+                                                id={strategy.id}
+                                                isDraggable={
+                                                  strategies.length > 1
+                                                }
+                                              >
+                                                {({ dragHandleProps }) => (
+                                                  <StrategyCardReadonly
+                                                    strategy={{
+                                                      strategyName:
+                                                        strategy.name,
+                                                      title: strategy.title,
+                                                      parameters:
+                                                        strategy.parameters,
+                                                      constraints:
+                                                        strategy.constraints,
+                                                      segments:
+                                                        strategy.segments,
+                                                      disabled:
+                                                        strategy.disabled,
+                                                    }}
+                                                    allSegments={segments}
+                                                    contextFields={
+                                                      contextFields
+                                                    }
+                                                    headerPrefix={
+                                                      dragHandleProps ? (
+                                                        <Box
+                                                          {...dragHandleProps}
+                                                          sx={{
+                                                            color:
+                                                              'text.disabled',
+                                                            cursor: 'grab',
+                                                            display: 'flex',
+                                                            alignItems:
+                                                              'center',
+                                                            '&:active': {
+                                                              cursor:
+                                                                'grabbing',
+                                                            },
+                                                          }}
+                                                        >
+                                                          <DragIcon fontSize="small" />
+                                                        </Box>
+                                                      ) : undefined
+                                                    }
+                                                    headerActions={
+                                                      canManage ? (
+                                                        <StrategyContextMenu
+                                                          onEdit={() =>
+                                                            handleEditStrategy(
+                                                              strategy,
+                                                              env.environmentId
+                                                            )
+                                                          }
+                                                          onDelete={() =>
+                                                            handleOpenDeleteStrategyConfirm(
+                                                              strategy.id,
+                                                              index,
+                                                              env.environmentId
+                                                            )
+                                                          }
+                                                        />
+                                                      ) : undefined
+                                                    }
+                                                    collapsible
+                                                  />
+                                                )}
+                                              </SortableStrategyItem>
+                                            </React.Fragment>
+                                          ))}
+                                        </Stack>
+                                      </SortableContext>
+                                    </DndContext>
 
-                                  {/* Environment-specific Variants Editor */}
-                                  <EnvironmentVariantsEditor
-                                    environmentId={env.environmentId}
-                                    variants={
-                                      (envVariants[env.environmentId] ||
-                                        []) as EditorVariant[]
-                                    }
-                                    valueType={flag.valueType || 'boolean'}
-                                    flagType={flag.flagType || 'release'}
-                                    enabledValue={flag.enabledValue}
-                                    disabledValue={flag.disabledValue}
-                                    envEnabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.enabledValue
-                                    }
-                                    envDisabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.disabledValue
-                                    }
-                                    overrideEnabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.overrideEnabledValue ?? false
-                                    }
-                                    overrideDisabledValue={
-                                      flag.environments?.find(
-                                        (e) =>
-                                          e.environmentId === env.environmentId
-                                      )?.overrideDisabledValue ?? false
-                                    }
-                                    canManage={canManage}
-                                    isArchived={flag.isArchived}
-                                    useFixedWeightVariants={
-                                      flag.useFixedWeightVariants
-                                    }
-                                    onUseFixedWeightVariantsChange={
-                                      handleUseFixedWeightVariantsChange
-                                    }
-                                    onSave={(variants) =>
-                                      handleSaveEnvVariants(
-                                        env.environmentId,
-                                        variants
-                                      )
-                                    }
-                                    onSaveValues={(
-                                      enabledValue,
-                                      disabledValue,
-                                      overrideEnabled,
-                                      overrideDisabled
-                                    ) =>
-                                      handleSaveEnvFallbackValue(
-                                        env.environmentId,
+                                    {/* Add strategy button */}
+                                    {canManage && (
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          justifyContent: 'flex-end',
+                                          gap: 1,
+                                          mt: 2,
+                                        }}
+                                      >
+                                        <Button
+                                          variant="contained"
+                                          startIcon={<AddIcon />}
+                                          onClick={() =>
+                                            handleAddStrategy(env.environmentId)
+                                          }
+                                          size="small"
+                                        >
+                                          {t('featureFlags.addStrategy')}
+                                        </Button>
+                                      </Box>
+                                    )}
+
+                                    {/* Divider between strategies and variants */}
+                                    <Divider sx={{ my: 2 }} />
+
+                                    {/* Environment-specific Variants Editor */}
+                                    <EnvironmentVariantsEditor
+                                      environmentId={env.environmentId}
+                                      variants={
+                                        (envVariants[env.environmentId] ||
+                                          []) as EditorVariant[]
+                                      }
+                                      valueType={flag.valueType || 'boolean'}
+                                      flagType={flag.flagType || 'release'}
+                                      enabledValue={flag.enabledValue}
+                                      disabledValue={flag.disabledValue}
+                                      envEnabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.enabledValue
+                                      }
+                                      envDisabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.disabledValue
+                                      }
+                                      overrideEnabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.overrideEnabledValue ?? false
+                                      }
+                                      overrideDisabledValue={
+                                        flag.environments?.find(
+                                          (e) =>
+                                            e.environmentId ===
+                                            env.environmentId
+                                        )?.overrideDisabledValue ?? false
+                                      }
+                                      canManage={canManage}
+                                      isArchived={flag.isArchived}
+                                      useFixedWeightVariants={
+                                        flag.useFixedWeightVariants
+                                      }
+                                      onUseFixedWeightVariantsChange={
+                                        handleUseFixedWeightVariantsChange
+                                      }
+                                      onSave={(variants) =>
+                                        handleSaveEnvVariants(
+                                          env.environmentId,
+                                          variants
+                                        )
+                                      }
+                                      onSaveValues={(
                                         enabledValue,
                                         disabledValue,
                                         overrideEnabled,
                                         overrideDisabled
-                                      )
-                                    }
-                                    onChangeDetected={() => {
-                                      if (env.requiresApproval) {
-                                        setFlagDraftStatus((prev) => ({
-                                          hasDraft: true,
-                                          draftEnvIds: new Set([
-                                            ...(prev.draftEnvIds || []),
-                                            env.environmentId,
-                                          ]),
-                                        }));
+                                      ) =>
+                                        handleSaveEnvFallbackValue(
+                                          env.environmentId,
+                                          enabledValue,
+                                          disabledValue,
+                                          overrideEnabled,
+                                          overrideDisabled
+                                        )
                                       }
-                                    }}
-                                    onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={true}
-                                    validationRules={flag.validationRules}
-                                  />
-                                </>
-                              )}
-                            </AccordionDetails>
-                          </Accordion>
+                                      onChangeDetected={() => {
+                                        if (env.requiresApproval) {
+                                          setFlagDraftStatus((prev) => ({
+                                            hasDraft: true,
+                                            draftEnvIds: new Set([
+                                              ...(prev.draftEnvIds || []),
+                                              env.environmentId,
+                                            ]),
+                                          }));
+                                        }
+                                      }}
+                                      onGoToPayloadTab={() => setTabValue(1)}
+                                      defaultExpanded={true}
+                                      validationRules={flag.validationRules}
+                                    />
+                                  </>
+                                )}
+                              </AccordionDetails>
+                            </Accordion>
+                          </Box>
                         </Box>
-                      </Box>
-                    </React.Fragment>
-                  );
-                })}
-              </Stack>
-            </PageContentLoader>
-          </Box>
+                      </React.Fragment>
+                    );
+                  })}
+                </Stack>
+              </PageContentLoader>
+            </Box>
 
-          {/* Right Playground Panel - inline embedded playground */}
-          {!isCreating && embeddedPlaygroundVisible && (
-            <Box
-              ref={playgroundPanelRef}
-              sx={{
-                width: playgroundPanelWidth,
-                flexShrink: 0,
-                position: 'relative',
-                ml: 1,
-              }}
-            >
-              {/* Resize Handle */}
+            {/* Right Playground Panel - inline embedded playground */}
+            {!isCreating && embeddedPlaygroundVisible && (
               <Box
-                ref={resizeHandleRef}
-                onMouseDown={handlePlaygroundResizeStart}
+                ref={playgroundPanelRef}
                 sx={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: 6,
-                  cursor: 'col-resize',
-                  bgcolor: 'transparent',
-                  transition: 'background-color 0.2s',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                  zIndex: 10,
-                }}
-              />
-              <Box
-                sx={{
-                  borderLeft: 1,
-                  borderColor: 'divider',
-                  pl: 1.5,
-                  height: '100%',
+                  width: playgroundPanelWidth,
+                  flexShrink: 0,
+                  position: 'relative',
+                  ml: 1,
                 }}
               >
+                {/* Resize Handle */}
+                <Box
+                  ref={resizeHandleRef}
+                  onMouseDown={handlePlaygroundResizeStart}
+                  sx={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 6,
+                    cursor: 'col-resize',
+                    bgcolor: 'transparent',
+                    transition: 'background-color 0.2s',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                    zIndex: 10,
+                  }}
+                />
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
+                    borderLeft: 1,
+                    borderColor: 'divider',
+                    pl: 1.5,
+                    height: '100%',
                   }}
                 >
                   <Box
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 1,
+                      flexDirection: 'column',
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <JoystickIcon color="primary" fontSize="small" />
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {t('playground.title')}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 1,
+                      }}
+                    >
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <JoystickIcon color="primary" fontSize="small" />
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {t('playground.title')}
+                        </Typography>
+                      </Box>
+                      <IconButton
+                        size="small"
+                        onClick={() => setEmbeddedPlaygroundVisible(false)}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', mb: 2 }}
+                    >
+                      {t('playground.subtitle')}
+                    </Typography>
+                    <Box sx={{ flex: 1, overflow: 'auto' }}>
+                      <PlaygroundDialog
+                        open={true}
+                        onClose={() => setEmbeddedPlaygroundVisible(false)}
+                        initialFlags={[flag.flagName]}
+                        embedded={true}
+                        initialFlagDetails={flag}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </TabPanel>
+
+        {/* Flag Values Tab */}
+        <TabPanel value={tabValue} index={1}>
+          <PageContentLoader loading={false}>
+            <Box sx={{ maxWidth: 800, py: 2 }}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: { xs: 3, md: 4 },
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  {t('featureFlags.valueSettings')}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 3 }}
+                >
+                  {t('featureFlags.valueSettingsDescription')}
+                </Typography>
+
+                <Stack spacing={3}>
+                  {/* Value Type Display (read-only) */}
+                  <Box>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        mb: 1,
+                      }}
+                    >
+                      {t('featureFlags.valueType')}
+                      <Tooltip title={t('featureFlags.valueTypeHelp')}>
+                        <HelpOutlineIcon fontSize="small" color="action" />
+                      </Tooltip>
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        p: 1.5,
+                        border: 1,
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        bgcolor: 'action.hover',
+                      }}
+                    >
+                      <FieldTypeIcon
+                        type={flag.valueType || 'boolean'}
+                        size={18}
+                      />
+                      <Typography variant="body2" fontWeight={500}>
+                        {t(
+                          `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
+                        )}
                       </Typography>
                     </Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => setEmbeddedPlaygroundVisible(false)}
-                    >
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: 'block', mb: 2 }}
-                  >
-                    {t('playground.subtitle')}
-                  </Typography>
-                  <Box sx={{ flex: 1, overflow: 'auto' }}>
-                    <PlaygroundDialog
-                      open={true}
-                      onClose={() => setEmbeddedPlaygroundVisible(false)}
-                      initialFlags={[flag.flagName]}
-                      embedded={true}
-                      initialFlagDetails={flag}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </TabPanel>
-
-      {/* Flag Values Tab */}
-      <TabPanel value={tabValue} index={1}>
-        <PageContentLoader loading={false}>
-          <Box sx={{ maxWidth: 800, py: 2 }}>
-            <Paper
-              variant="outlined"
-              sx={{
-                p: { xs: 3, md: 4 },
-                borderRadius: 2,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                {t('featureFlags.valueSettings')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {t('featureFlags.valueSettingsDescription')}
-              </Typography>
-
-              <Stack spacing={3}>
-                {/* Value Type Display (read-only) */}
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      mb: 1,
-                    }}
-                  >
-                    {t('featureFlags.valueType')}
-                    <Tooltip title={t('featureFlags.valueTypeHelp')}>
-                      <HelpOutlineIcon fontSize="small" color="action" />
-                    </Tooltip>
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      p: 1.5,
-                      border: 1,
-                      borderColor: 'divider',
-                      borderRadius: 1,
-                      bgcolor: 'action.hover',
-                    }}
-                  >
-                    <FieldTypeIcon
-                      type={flag.valueType || 'boolean'}
-                      size={18}
-                    />
-                    <Typography variant="body2" fontWeight={500}>
-                      {t(
-                        `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
-                      )}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Validation Rules - component has internal toggle, returns null for boolean */}
-                <ValidationRulesEditor
-                  valueType={flag.valueType || 'boolean'}
-                  rules={flag.validationRules}
-                  onChange={(rules) =>
-                    setFlag((prev) =>
-                      prev ? { ...prev, validationRules: rules } : prev
-                    )
-                  }
-                  disabled={saving || !canManage}
-                />
-
-                {/* Flag Values */}
-                <Stack spacing={2}>
-                  <Box
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: 600,
-                        flexShrink: 0,
-                        whiteSpace: 'nowrap',
-                        minWidth: 120,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                      }}
-                    >
-                      {t('featureFlags.enabledValue')}
-                      <Tooltip title={t('featureFlags.enabledValueHelp')}>
-                        <HelpOutlineIcon fontSize="small" color="action" />
-                      </Tooltip>
-                    </Typography>
-                    <Box sx={{ flex: 1 }}>
-                      {renderValueInput('enabledValue')}
-                    </Box>
                   </Box>
 
-                  <Box
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: 600,
-                        flexShrink: 0,
-                        whiteSpace: 'nowrap',
-                        minWidth: 120,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                      }}
-                    >
-                      {t('featureFlags.disabledValue')}
-                      <Tooltip title={t('featureFlags.disabledValueHelp')}>
-                        <HelpOutlineIcon fontSize="small" color="action" />
-                      </Tooltip>
-                    </Typography>
-                    <Box sx={{ flex: 1 }}>
-                      {renderValueInput('disabledValue')}
-                    </Box>
-                  </Box>
-                </Stack>
-
-                {/* Action Buttons - only show for users with edit permission */}
-                {canManage && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      gap: 1,
-                      pt: 2,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      onClick={() => {
-                        if (originalFlag) {
-                          setFlag((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  enabledValue: originalFlag.enabledValue,
-                                  disabledValue: originalFlag.disabledValue,
-                                  validationRules: originalFlag.validationRules,
-                                }
-                              : prev
-                          );
-                        }
-                      }}
-                      disabled={
-                        saving ||
-                        (JSON.stringify(flag.enabledValue) ===
-                          JSON.stringify(originalFlag?.enabledValue) &&
-                          JSON.stringify(flag.disabledValue) ===
-                            JSON.stringify(originalFlag?.disabledValue) &&
-                          JSON.stringify(flag.validationRules) ===
-                            JSON.stringify(originalFlag?.validationRules))
-                      }
-                    >
-                      {t('common.cancel')}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={async () => {
-                        if (!flag) return;
-                        try {
-                          setSaving(true);
-                          // Only include changed values in draft
-                          const updates: Record<string, any> = {};
-                          if (
-                            JSON.stringify(flag.enabledValue) !==
-                            JSON.stringify(originalFlag?.enabledValue)
-                          ) {
-                            updates.enabledValue = flag.enabledValue;
-                          }
-                          if (
-                            JSON.stringify(flag.disabledValue) !==
-                            JSON.stringify(originalFlag?.disabledValue)
-                          ) {
-                            updates.disabledValue = flag.disabledValue;
-                          }
-                          if (
-                            JSON.stringify(flag.validationRules) !==
-                            JSON.stringify(originalFlag?.validationRules)
-                          ) {
-                            updates.validationRules =
-                              flag.validationRules ?? null;
-                          }
-                          await saveGlobalChangesToDraft(updates);
-                          // Sync originalFlag so the update button becomes disabled
-                          setOriginalFlag((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  enabledValue: flag.enabledValue,
-                                  disabledValue: flag.disabledValue,
-                                  validationRules: flag.validationRules,
-                                }
-                              : prev
-                          );
-                        } catch (error: any) {
-                          enqueueSnackbar(
-                            parseApiErrorMessage(error, 'common.saveFailed'),
-                            {
-                              variant: 'error',
-                            }
-                          );
-                        } finally {
-                          setSaving(false);
-                        }
-                      }}
-                      disabled={
-                        saving ||
-                        !!valueJsonErrors.enabledValue ||
-                        !!valueJsonErrors.disabledValue ||
-                        // Disable if nothing changed
-                        (JSON.stringify(flag.enabledValue) ===
-                          JSON.stringify(originalFlag?.enabledValue) &&
-                          JSON.stringify(flag.disabledValue) ===
-                            JSON.stringify(originalFlag?.disabledValue) &&
-                          JSON.stringify(flag.validationRules) ===
-                            JSON.stringify(originalFlag?.validationRules))
-                      }
-                    >
-                      {saving ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        t('common.update')
-                      )}
-                    </Button>
-                  </Box>
-                )}
-              </Stack>
-            </Paper>
-          </Box>
-        </PageContentLoader>
-      </TabPanel>
-
-      {/* Metrics Tab */}
-      <TabPanel value={tabValue} index={2}>
-        <PageContentLoader loading={false}>
-          <FeatureFlagMetrics
-            flagName={flag.flagName}
-            environments={(flag.environments || []).map((e) => ({
-              environmentId: e.environmentId,
-              isEnabled: e.isEnabled,
-            }))}
-            currentEnvironment={
-              flag.environments?.[0]?.environmentId || 'production'
-            }
-          />
-        </PageContentLoader>
-      </TabPanel>
-      <TabPanel value={tabValue} index={3}>
-        <PageContentLoader loading={false}>
-          <FeatureFlagCodeReferences
-            flagName={flag.flagName}
-            onLoad={(count) => setCodeReferenceCount(count)}
-          />
-        </PageContentLoader>
-      </TabPanel>
-      <TabPanel value={tabValue} index={4}>
-        <PageContentLoader loading={false}>
-          <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
-        </PageContentLoader>
-      </TabPanel>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDeleteDialog
-        open={deleteDialogOpen}
-        title={t('featureFlags.deleteConfirmTitle')}
-        message={t('featureFlags.deleteConfirmMessage', {
-          name: flag.flagName,
-        })}
-        onConfirm={handleDelete}
-        onClose={() => setDeleteDialogOpen(false)}
-        confirmButtonText={t('common.delete')}
-      />
-
-      {/* Strategy Delete Confirmation Dialog */}
-      <Dialog
-        open={strategyDeleteConfirm.open}
-        onClose={handleCloseDeleteStrategyConfirm}
-      >
-        <DialogTitle>{t('featureFlags.deleteStrategyTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography>{t('featureFlags.deleteStrategyDescription')}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            onClick={handleCloseDeleteStrategyConfirm}
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            onClick={handleConfirmDeleteStrategy}
-            color="error"
-            variant="contained"
-            disabled={saving}
-          >
-            {t('common.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Edit Flag Settings Drawer */}
-      <ResizableDrawer
-        open={editFlagDialogOpen}
-        onClose={() => setEditFlagDialogOpen(false)}
-        title={t('featureFlags.editFlagSettings')}
-        subtitle={t('featureFlags.editFlagSettingsSubtitle')}
-        storageKey="featureFlagEditDrawerWidth"
-        defaultWidth={500}
-      >
-        {editingFlagData && (
-          <>
-            <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
-              <Stack spacing={2.5}>
-                {/* Flag Name + Display Name on same row */}
-                <Box
-                  sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}
-                >
-                  <TextField
-                    sx={{ flex: 1 }}
-                    label={t('featureFlags.flagName')}
-                    value={flag?.flagName || ''}
-                    InputProps={{ readOnly: true }}
-                    helperText={t('featureFlags.flagNameHelp')}
-                    slotProps={{
-                      input: {
-                        sx: {
-                          color: 'text.secondary',
-                          cursor: 'default',
-                        },
-                      },
-                    }}
-                  />
-                  <TextField
-                    sx={{ flex: 1 }}
-                    label={t('featureFlags.displayName')}
-                    value={editingFlagData.displayName}
-                    onChange={(e) =>
-                      setEditingFlagData({
-                        ...editingFlagData,
-                        displayName: e.target.value,
-                      })
+                  {/* Validation Rules - component has internal toggle, returns null for boolean */}
+                  <ValidationRulesEditor
+                    valueType={flag.valueType || 'boolean'}
+                    rules={flag.validationRules}
+                    onChange={(rules) =>
+                      setFlag((prev) =>
+                        prev ? { ...prev, validationRules: rules } : prev
+                      )
                     }
-                    helperText={t('featureFlags.displayNameHelp')}
+                    disabled={saving || !canManage}
                   />
-                </Box>
 
-                {/* Expandable Description + Tags buttons */}
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {!editingFlagData.description && (
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={() =>
+                  {/* Flag Values */}
+                  <Stack spacing={2}>
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 600,
+                          flexShrink: 0,
+                          whiteSpace: 'nowrap',
+                          minWidth: 120,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                        }}
+                      >
+                        {t('featureFlags.enabledValue')}
+                        <Tooltip title={t('featureFlags.enabledValueHelp')}>
+                          <HelpOutlineIcon fontSize="small" color="action" />
+                        </Tooltip>
+                      </Typography>
+                      <Box sx={{ flex: 1 }}>
+                        {renderValueInput('enabledValue')}
+                      </Box>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 600,
+                          flexShrink: 0,
+                          whiteSpace: 'nowrap',
+                          minWidth: 120,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                        }}
+                      >
+                        {t('featureFlags.disabledValue')}
+                        <Tooltip title={t('featureFlags.disabledValueHelp')}>
+                          <HelpOutlineIcon fontSize="small" color="action" />
+                        </Tooltip>
+                      </Typography>
+                      <Box sx={{ flex: 1 }}>
+                        {renderValueInput('disabledValue')}
+                      </Box>
+                    </Box>
+                  </Stack>
+
+                  {/* Action Buttons - only show for users with edit permission */}
+                  {canManage && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: 1,
+                        pt: 2,
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          if (originalFlag) {
+                            setFlag((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    enabledValue: originalFlag.enabledValue,
+                                    disabledValue: originalFlag.disabledValue,
+                                    validationRules:
+                                      originalFlag.validationRules,
+                                  }
+                                : prev
+                            );
+                          }
+                        }}
+                        disabled={
+                          saving ||
+                          (JSON.stringify(flag.enabledValue) ===
+                            JSON.stringify(originalFlag?.enabledValue) &&
+                            JSON.stringify(flag.disabledValue) ===
+                              JSON.stringify(originalFlag?.disabledValue) &&
+                            JSON.stringify(flag.validationRules) ===
+                              JSON.stringify(originalFlag?.validationRules))
+                        }
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={async () => {
+                          if (!flag) return;
+                          try {
+                            setSaving(true);
+                            // Only include changed values in draft
+                            const updates: Record<string, any> = {};
+                            if (
+                              JSON.stringify(flag.enabledValue) !==
+                              JSON.stringify(originalFlag?.enabledValue)
+                            ) {
+                              updates.enabledValue = flag.enabledValue;
+                            }
+                            if (
+                              JSON.stringify(flag.disabledValue) !==
+                              JSON.stringify(originalFlag?.disabledValue)
+                            ) {
+                              updates.disabledValue = flag.disabledValue;
+                            }
+                            if (
+                              JSON.stringify(flag.validationRules) !==
+                              JSON.stringify(originalFlag?.validationRules)
+                            ) {
+                              updates.validationRules =
+                                flag.validationRules ?? null;
+                            }
+                            await saveGlobalChangesToDraft(updates);
+                            // Sync originalFlag so the update button becomes disabled
+                            setOriginalFlag((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    enabledValue: flag.enabledValue,
+                                    disabledValue: flag.disabledValue,
+                                    validationRules: flag.validationRules,
+                                  }
+                                : prev
+                            );
+                          } catch (error: any) {
+                            enqueueSnackbar(
+                              parseApiErrorMessage(error, 'common.saveFailed'),
+                              {
+                                variant: 'error',
+                              }
+                            );
+                          } finally {
+                            setSaving(false);
+                          }
+                        }}
+                        disabled={
+                          saving ||
+                          !!valueJsonErrors.enabledValue ||
+                          !!valueJsonErrors.disabledValue ||
+                          // Disable if nothing changed
+                          (JSON.stringify(flag.enabledValue) ===
+                            JSON.stringify(originalFlag?.enabledValue) &&
+                            JSON.stringify(flag.disabledValue) ===
+                              JSON.stringify(originalFlag?.disabledValue) &&
+                            JSON.stringify(flag.validationRules) ===
+                              JSON.stringify(originalFlag?.validationRules))
+                        }
+                      >
+                        {saving ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          t('common.update')
+                        )}
+                      </Button>
+                    </Box>
+                  )}
+                </Stack>
+              </Paper>
+            </Box>
+          </PageContentLoader>
+        </TabPanel>
+
+        {/* Metrics Tab */}
+        <TabPanel value={tabValue} index={2}>
+          <PageContentLoader loading={false}>
+            <FeatureFlagMetrics
+              flagName={flag.flagName}
+              environments={(flag.environments || []).map((e) => ({
+                environmentId: e.environmentId,
+                isEnabled: e.isEnabled,
+              }))}
+              currentEnvironment={
+                flag.environments?.[0]?.environmentId || 'production'
+              }
+            />
+          </PageContentLoader>
+        </TabPanel>
+        <TabPanel value={tabValue} index={3}>
+          <PageContentLoader loading={false}>
+            <FeatureFlagCodeReferences
+              flagName={flag.flagName}
+              onLoad={(count) => setCodeReferenceCount(count)}
+            />
+          </PageContentLoader>
+        </TabPanel>
+        <TabPanel value={tabValue} index={4}>
+          <PageContentLoader loading={false}>
+            <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
+          </PageContentLoader>
+        </TabPanel>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDeleteDialog
+          open={deleteDialogOpen}
+          title={t('featureFlags.deleteConfirmTitle')}
+          message={t('featureFlags.deleteConfirmMessage', {
+            name: flag.flagName,
+          })}
+          onConfirm={handleDelete}
+          onClose={() => setDeleteDialogOpen(false)}
+          confirmButtonText={t('common.delete')}
+        />
+
+        {/* Strategy Delete Confirmation Dialog */}
+        <Dialog
+          open={strategyDeleteConfirm.open}
+          onClose={handleCloseDeleteStrategyConfirm}
+        >
+          <DialogTitle>{t('featureFlags.deleteStrategyTitle')}</DialogTitle>
+          <DialogContent>
+            <Typography>
+              {t('featureFlags.deleteStrategyDescription')}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              onClick={handleCloseDeleteStrategyConfirm}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleConfirmDeleteStrategy}
+              color="error"
+              variant="contained"
+              disabled={saving}
+            >
+              {t('common.delete')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Edit Flag Settings Drawer */}
+        <ResizableDrawer
+          open={editFlagDialogOpen}
+          onClose={() => setEditFlagDialogOpen(false)}
+          title={t('featureFlags.editFlagSettings')}
+          subtitle={t('featureFlags.editFlagSettingsSubtitle')}
+          storageKey="featureFlagEditDrawerWidth"
+          defaultWidth={500}
+        >
+          {editingFlagData && (
+            <>
+              <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
+                <Stack spacing={2.5}>
+                  {/* Flag Name + Display Name on same row */}
+                  <Box
+                    sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}
+                  >
+                    <TextField
+                      sx={{ flex: 1 }}
+                      label={t('featureFlags.flagName')}
+                      value={flag?.flagName || ''}
+                      InputProps={{ readOnly: true }}
+                      helperText={t('featureFlags.flagNameHelp')}
+                      slotProps={{
+                        input: {
+                          sx: {
+                            color: 'text.secondary',
+                            cursor: 'default',
+                          },
+                        },
+                      }}
+                    />
+                    <TextField
+                      sx={{ flex: 1 }}
+                      label={t('featureFlags.displayName')}
+                      value={editingFlagData.displayName}
+                      onChange={(e) =>
                         setEditingFlagData({
                           ...editingFlagData,
-                          description: ' ',
+                          displayName: e.target.value,
                         })
                       }
-                      sx={{
-                        textTransform: 'none',
-                        color: 'text.secondary',
-                        fontSize: '0.8rem',
-                      }}
-                    >
-                      {t('common.addDescription')}
-                    </Button>
-                  )}
-                  {!editingFlagData.tags?.length && (
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={() =>
-                        setEditingFlagData({
-                          ...editingFlagData,
-                          tags: [],
-                          _showTags: true,
-                        } as any)
-                      }
-                      sx={{
-                        textTransform: 'none',
-                        color: 'text.secondary',
-                        fontSize: '0.8rem',
-                      }}
-                    >
-                      + {t('common.addTag')}
-                    </Button>
-                  )}
-                </Box>
+                      helperText={t('featureFlags.displayNameHelp')}
+                    />
+                  </Box>
 
-                {/* Collapsible Description */}
-                {!!editingFlagData.description && (
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={3}
-                    label={t('featureFlags.description')}
-                    value={
-                      editingFlagData.description.trim() === ''
-                        ? ''
-                        : editingFlagData.description
-                    }
-                    onChange={(e) =>
-                      setEditingFlagData({
-                        ...editingFlagData,
-                        description: e.target.value || ' ',
-                      })
-                    }
-                    helperText={t('featureFlags.descriptionHelp')}
-                  />
-                )}
-
-                {/* Collapsible Tags */}
-                {(!!editingFlagData.tags?.length ||
-                  (editingFlagData as any)._showTags) && (
-                  <TagSelector
-                    value={editTagSelection}
-                    onChange={(tags) => {
-                      setEditTagSelection(tags);
-                      setEditingFlagData({
-                        ...editingFlagData,
-                        tags: tags.map((t) => t.name),
-                      });
-                    }}
-                  />
-                )}
-
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={editingFlagData.impressionDataEnabled}
-                        onChange={(e) =>
+                  {/* Expandable Description + Tags buttons */}
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {!editingFlagData.description && (
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={() =>
                           setEditingFlagData({
                             ...editingFlagData,
-                            impressionDataEnabled: e.target.checked,
+                            description: ' ',
                           })
                         }
-                      />
-                    }
-                    label={t('featureFlags.impressionData')}
-                  />
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: 'block', ml: 6 }}
-                  >
-                    {t('featureFlags.impressionDataHelp')}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Box>
-            <Box
-              sx={{
-                p: 2,
-                borderTop: 1,
-                borderColor: 'divider',
-                display: 'flex',
-                gap: 1,
-                justifyContent: 'flex-end',
-              }}
-            >
-              <Button
-                onClick={() => setEditFlagDialogOpen(false)}
-                variant="contained"
+                        sx={{
+                          textTransform: 'none',
+                          color: 'text.secondary',
+                          fontSize: '0.8rem',
+                        }}
+                      >
+                        {t('common.addDescription')}
+                      </Button>
+                    )}
+                    {!editingFlagData.tags?.length && (
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={() =>
+                          setEditingFlagData({
+                            ...editingFlagData,
+                            tags: [],
+                            _showTags: true,
+                          } as any)
+                        }
+                        sx={{
+                          textTransform: 'none',
+                          color: 'text.secondary',
+                          fontSize: '0.8rem',
+                        }}
+                      >
+                        + {t('common.addTag')}
+                      </Button>
+                    )}
+                  </Box>
+
+                  {/* Collapsible Description */}
+                  {!!editingFlagData.description && (
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={3}
+                      label={t('featureFlags.description')}
+                      value={
+                        editingFlagData.description.trim() === ''
+                          ? ''
+                          : editingFlagData.description
+                      }
+                      onChange={(e) =>
+                        setEditingFlagData({
+                          ...editingFlagData,
+                          description: e.target.value || ' ',
+                        })
+                      }
+                      helperText={t('featureFlags.descriptionHelp')}
+                    />
+                  )}
+
+                  {/* Collapsible Tags */}
+                  {(!!editingFlagData.tags?.length ||
+                    (editingFlagData as any)._showTags) && (
+                    <TagSelector
+                      value={editTagSelection}
+                      onChange={(tags) => {
+                        setEditTagSelection(tags);
+                        setEditingFlagData({
+                          ...editingFlagData,
+                          tags: tags.map((t) => t.name),
+                        });
+                      }}
+                    />
+                  )}
+
+                  <Box>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={editingFlagData.impressionDataEnabled}
+                          onChange={(e) =>
+                            setEditingFlagData({
+                              ...editingFlagData,
+                              impressionDataEnabled: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label={t('featureFlags.impressionData')}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', ml: 6 }}
+                    >
+                      {t('featureFlags.impressionDataHelp')}
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Box>
+              <Box
+                sx={{
+                  p: 2,
+                  borderTop: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
+                  gap: 1,
+                  justifyContent: 'flex-end',
+                }}
               >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                variant="text"
-                onClick={async () => {
-                  if (!flag || !editingFlagData) return;
-                  try {
-                    setSaving(true);
-                    // Save metadata (displayName, description, tags) directly
-                    await api.put(
-                      `${projectApiPath}/features/${flag.flagName}`,
-                      {
+                <Button
+                  onClick={() => setEditFlagDialogOpen(false)}
+                  variant="contained"
+                >
+                  {t('common.cancel')}
+                </Button>
+                <Button
+                  variant="text"
+                  onClick={async () => {
+                    if (!flag || !editingFlagData) return;
+                    try {
+                      setSaving(true);
+                      // Save metadata (displayName, description, tags) directly
+                      await api.put(
+                        `${projectApiPath}/features/${flag.flagName}`,
+                        {
+                          displayName: editingFlagData.displayName,
+                          description: editingFlagData.description,
+                          tags: editingFlagData.tags,
+                        }
+                      );
+                      // impressionDataEnabled affects SDK → save to draft
+                      if (
+                        editingFlagData.impressionDataEnabled !==
+                        flag.impressionDataEnabled
+                      ) {
+                        await saveGlobalChangesToDraft({
+                          impressionDataEnabled:
+                            editingFlagData.impressionDataEnabled,
+                        });
+                      }
+                      setFlag({
+                        ...flag,
                         displayName: editingFlagData.displayName,
                         description: editingFlagData.description,
-                        tags: editingFlagData.tags,
-                      }
-                    );
-                    // impressionDataEnabled affects SDK → save to draft
-                    if (
-                      editingFlagData.impressionDataEnabled !==
-                      flag.impressionDataEnabled
-                    ) {
-                      await saveGlobalChangesToDraft({
                         impressionDataEnabled:
                           editingFlagData.impressionDataEnabled,
+                        tags: editingFlagData.tags,
                       });
+                      setEditFlagDialogOpen(false);
+                      enqueueSnackbar(t('common.saveSuccess'), {
+                        variant: 'success',
+                      });
+                    } catch (error: any) {
+                      enqueueSnackbar(error.message || t('common.saveFailed'), {
+                        variant: 'error',
+                      });
+                    } finally {
+                      setSaving(false);
                     }
-                    setFlag({
-                      ...flag,
-                      displayName: editingFlagData.displayName,
-                      description: editingFlagData.description,
-                      impressionDataEnabled:
-                        editingFlagData.impressionDataEnabled,
-                      tags: editingFlagData.tags,
-                    });
-                    setEditFlagDialogOpen(false);
-                    enqueueSnackbar(t('common.saveSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (error: any) {
-                    enqueueSnackbar(error.message || t('common.saveFailed'), {
-                      variant: 'error',
-                    });
-                  } finally {
-                    setSaving(false);
+                  }}
+                  disabled={
+                    saving ||
+                    (editingFlagData?.displayName ===
+                      (flag?.displayName || '') &&
+                      editingFlagData?.description ===
+                        (flag?.description || '') &&
+                      editingFlagData?.impressionDataEnabled ===
+                        flag?.impressionDataEnabled &&
+                      JSON.stringify(editingFlagData?.tags || []) ===
+                        JSON.stringify(flag?.tags || []))
                   }
-                }}
-                disabled={
-                  saving ||
-                  (editingFlagData?.displayName === (flag?.displayName || '') &&
-                    editingFlagData?.description ===
-                      (flag?.description || '') &&
-                    editingFlagData?.impressionDataEnabled ===
-                      flag?.impressionDataEnabled &&
-                    JSON.stringify(editingFlagData?.tags || []) ===
-                      JSON.stringify(flag?.tags || []))
-                }
-              >
-                {saving ? <CircularProgress size={20} /> : t('common.update')}
-              </Button>
-            </Box>
-          </>
-        )}
-      </ResizableDrawer>
-
-      {/* Strategy Edit Drawer */}
-      <StrategyEditDrawer
-        open={strategyDialogOpen}
-        onClose={() => {
-          setStrategyDialogOpen(false);
-          setExpandedSegmentsDialog(new Set());
-        }}
-        strategy={editingStrategy}
-        originalStrategy={originalEditingStrategy}
-        onStrategyChange={setEditingStrategy}
-        onSave={handleSaveStrategy}
-        isAdding={isAddingStrategy}
-        saving={saving}
-        flagName={flag?.flagName}
-        contextFields={contextFields}
-        segments={segments}
-        strategyJsonErrors={strategyJsonErrors}
-      />
-      {/* Variant Edit Drawer */}
-      <ResizableDrawer
-        open={variantDialogOpen}
-        onClose={() => setVariantDialogOpen(false)}
-        title={t('featureFlags.editVariant')}
-        storageKey="featureFlagVariantDrawerWidth"
-        defaultWidth={500}
-      >
-        <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
-          {editingVariant && (
-            <Stack spacing={3}>
-              <TextField
-                fullWidth
-                required
-                label={t('featureFlags.variantName')}
-                value={editingVariant.name}
-                onChange={(e) =>
-                  setEditingVariant({ ...editingVariant, name: e.target.value })
-                }
-              />
-              <Box>
-                <Typography gutterBottom>{t('featureFlags.weight')}</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Slider
-                    value={editingVariant.weight}
-                    onChange={(_, value) =>
-                      setEditingVariant({
-                        ...editingVariant,
-                        weight: value as number,
-                      })
-                    }
-                    valueLabelDisplay="auto"
-                    min={0}
-                    max={100}
-                    sx={{ flex: 1 }}
-                  />
-                  <Typography sx={{ width: 50 }}>
-                    {editingVariant.weight}%
-                  </Typography>
-                </Box>
+                >
+                  {saving ? <CircularProgress size={20} /> : t('common.update')}
+                </Button>
               </Box>
-            </Stack>
+            </>
           )}
-        </Box>
-        <Box
-          sx={{
-            p: 2,
-            borderTop: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            gap: 1,
-            justifyContent: 'flex-end',
-            bgcolor: 'background.paper',
+        </ResizableDrawer>
+
+        {/* Strategy Edit Drawer */}
+        <StrategyEditDrawer
+          open={strategyDialogOpen}
+          onClose={() => {
+            setStrategyDialogOpen(false);
+            setExpandedSegmentsDialog(new Set());
           }}
+          strategy={editingStrategy}
+          originalStrategy={originalEditingStrategy}
+          onStrategyChange={setEditingStrategy}
+          onSave={handleSaveStrategy}
+          isAdding={isAddingStrategy}
+          saving={saving}
+          flagName={flag?.flagName}
+          contextFields={contextFields}
+          segments={segments}
+          strategyJsonErrors={strategyJsonErrors}
+        />
+        {/* Variant Edit Drawer */}
+        <ResizableDrawer
+          open={variantDialogOpen}
+          onClose={() => setVariantDialogOpen(false)}
+          title={t('featureFlags.editVariant')}
+          storageKey="featureFlagVariantDrawerWidth"
+          defaultWidth={500}
         >
-          <Button
-            onClick={() => setVariantDialogOpen(false)}
-            variant="contained"
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button variant="text" onClick={handleSaveVariants}>
-            {t('common.update')}
-          </Button>
-        </Box>
-      </ResizableDrawer>
-
-      {/* Link Add/Edit Dialog */}
-      <Dialog
-        open={linkDialogOpen}
-        onClose={() => setLinkDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {editingLinkIndex !== null
-            ? t('featureFlags.links.editLink')
-            : t('featureFlags.links.addLink')}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              fullWidth
-              size="small"
-              autoFocus
-              label={t('featureFlags.links.url')}
-              placeholder="https://example.com"
-              value={editingLink.url}
-              onChange={(e) =>
-                setEditingLink({ ...editingLink, url: e.target.value })
-              }
-              required
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label={t('featureFlags.links.titleLabel')}
-              placeholder={t('featureFlags.links.titlePlaceholder')}
-              value={editingLink.title || ''}
-              onChange={(e) =>
-                setEditingLink({ ...editingLink, title: e.target.value })
-              }
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setLinkDialogOpen(false)} variant="contained">
-            {t('common.cancel')}
-          </Button>
-          <Button
-            variant="text"
-            onClick={handleSaveLink}
-            disabled={!editingLink.url}
-          >
-            {editingLinkIndex !== null ? t('common.update') : t('common.save')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Archive/Revive Confirmation Dialog */}
-      <Dialog
-        open={archiveConfirmOpen}
-        onClose={() => setArchiveConfirmOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>
-          {flag?.isArchived
-            ? t('featureFlags.reviveConfirmTitle')
-            : t('featureFlags.archiveConfirmTitle')}
-        </DialogTitle>
-        <DialogContent>
-          <Typography>
-            {flag?.isArchived
-              ? t('featureFlags.reviveConfirmMessage', { name: flag?.flagName })
-              : t('featureFlags.archiveConfirmMessage', {
-                  name: flag?.flagName,
-                })}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setArchiveConfirmOpen(false)}
-            variant="contained"
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            variant="text"
-            color={flag?.isArchived ? 'success' : 'warning'}
-            onClick={handleArchiveConfirm}
-          >
-            {flag?.isArchived
-              ? t('featureFlags.revive')
-              : t('featureFlags.archive')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Stale Confirmation Dialog */}
-      <Dialog
-        open={staleConfirmOpen}
-        onClose={() => setStaleConfirmOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>
-          {flag?.stale
-            ? t('featureFlags.unmarkStaleConfirmTitle')
-            : t('featureFlags.markStaleConfirmTitle')}
-        </DialogTitle>
-        <DialogContent>
-          <Typography>
-            {flag?.stale
-              ? t('featureFlags.unmarkStaleConfirmMessage', {
-                  name: flag?.flagName,
-                })
-              : t('featureFlags.markStaleConfirmMessage', {
-                  name: flag?.flagName,
-                })}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setStaleConfirmOpen(false)}
-            variant="contained"
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            variant="text"
-            color={flag?.stale ? 'info' : 'secondary'}
-            onClick={handleStaleConfirm}
-          >
-            {flag?.stale
-              ? t('featureFlags.unmarkStale')
-              : t('featureFlags.markStale')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Floating Playground Toggle Button - positioned on right edge, only when panel is hidden */}
-      {!isCreating && flag && !embeddedPlaygroundVisible && tabValue === 0 && (
-        <Tooltip title={t('playground.title')} placement="left">
-          <IconButton
-            onClick={() => setEmbeddedPlaygroundVisible(true)}
+          <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
+            {editingVariant && (
+              <Stack spacing={3}>
+                <TextField
+                  fullWidth
+                  required
+                  label={t('featureFlags.variantName')}
+                  value={editingVariant.name}
+                  onChange={(e) =>
+                    setEditingVariant({
+                      ...editingVariant,
+                      name: e.target.value,
+                    })
+                  }
+                />
+                <Box>
+                  <Typography gutterBottom>
+                    {t('featureFlags.weight')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Slider
+                      value={editingVariant.weight}
+                      onChange={(_, value) =>
+                        setEditingVariant({
+                          ...editingVariant,
+                          weight: value as number,
+                        })
+                      }
+                      valueLabelDisplay="auto"
+                      min={0}
+                      max={100}
+                      sx={{ flex: 1 }}
+                    />
+                    <Typography sx={{ width: 50 }}>
+                      {editingVariant.weight}%
+                    </Typography>
+                  </Box>
+                </Box>
+              </Stack>
+            )}
+          </Box>
+          <Box
             sx={{
-              position: 'fixed',
-              right: 0,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 1000,
-              width: 40,
-              height: 40,
+              p: 2,
+              borderTop: 1,
+              borderColor: 'divider',
+              display: 'flex',
+              gap: 1,
+              justifyContent: 'flex-end',
               bgcolor: 'background.paper',
-              color: 'primary.main',
-              opacity: 0.7,
-              boxShadow: 3,
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              borderTopLeftRadius: 20,
-              borderBottomLeftRadius: 20,
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                opacity: 1,
-                bgcolor: 'background.paper',
-              },
             }}
           >
-            <JoystickIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+            <Button
+              onClick={() => setVariantDialogOpen(false)}
+              variant="contained"
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button variant="text" onClick={handleSaveVariants}>
+              {t('common.update')}
+            </Button>
+          </Box>
+        </ResizableDrawer>
 
-      {/* Playground Dialog */}
-      <PlaygroundDialog
-        open={playgroundOpen}
-        onClose={() => {
-          setPlaygroundOpen(false);
-          setPlaygroundInitialEnvironments([]);
-        }}
-        initialFlags={flag?.flagName ? [flag.flagName] : []}
-        initialEnvironments={playgroundInitialEnvironments}
-      />
-        </Box>
+        {/* Link Add/Edit Dialog */}
+        <Dialog
+          open={linkDialogOpen}
+          onClose={() => setLinkDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            {editingLinkIndex !== null
+              ? t('featureFlags.links.editLink')
+              : t('featureFlags.links.addLink')}
+          </DialogTitle>
+          <DialogContent>
+            <Stack spacing={2} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                autoFocus
+                label={t('featureFlags.links.url')}
+                placeholder="https://example.com"
+                value={editingLink.url}
+                onChange={(e) =>
+                  setEditingLink({ ...editingLink, url: e.target.value })
+                }
+                required
+              />
+              <TextField
+                fullWidth
+                size="small"
+                label={t('featureFlags.links.titleLabel')}
+                placeholder={t('featureFlags.links.titlePlaceholder')}
+                value={editingLink.title || ''}
+                onChange={(e) =>
+                  setEditingLink({ ...editingLink, title: e.target.value })
+                }
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setLinkDialogOpen(false)}
+              variant="contained"
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="text"
+              onClick={handleSaveLink}
+              disabled={!editingLink.url}
+            >
+              {editingLinkIndex !== null
+                ? t('common.update')
+                : t('common.save')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Archive/Revive Confirmation Dialog */}
+        <Dialog
+          open={archiveConfirmOpen}
+          onClose={() => setArchiveConfirmOpen(false)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>
+            {flag?.isArchived
+              ? t('featureFlags.reviveConfirmTitle')
+              : t('featureFlags.archiveConfirmTitle')}
+          </DialogTitle>
+          <DialogContent>
+            <Typography>
+              {flag?.isArchived
+                ? t('featureFlags.reviveConfirmMessage', {
+                    name: flag?.flagName,
+                  })
+                : t('featureFlags.archiveConfirmMessage', {
+                    name: flag?.flagName,
+                  })}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setArchiveConfirmOpen(false)}
+              variant="contained"
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="text"
+              color={flag?.isArchived ? 'success' : 'warning'}
+              onClick={handleArchiveConfirm}
+            >
+              {flag?.isArchived
+                ? t('featureFlags.revive')
+                : t('featureFlags.archive')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Stale Confirmation Dialog */}
+        <Dialog
+          open={staleConfirmOpen}
+          onClose={() => setStaleConfirmOpen(false)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>
+            {flag?.stale
+              ? t('featureFlags.unmarkStaleConfirmTitle')
+              : t('featureFlags.markStaleConfirmTitle')}
+          </DialogTitle>
+          <DialogContent>
+            <Typography>
+              {flag?.stale
+                ? t('featureFlags.unmarkStaleConfirmMessage', {
+                    name: flag?.flagName,
+                  })
+                : t('featureFlags.markStaleConfirmMessage', {
+                    name: flag?.flagName,
+                  })}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setStaleConfirmOpen(false)}
+              variant="contained"
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="text"
+              color={flag?.stale ? 'info' : 'secondary'}
+              onClick={handleStaleConfirm}
+            >
+              {flag?.stale
+                ? t('featureFlags.unmarkStale')
+                : t('featureFlags.markStale')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Floating Playground Toggle Button - positioned on right edge, only when panel is hidden */}
+        {!isCreating &&
+          flag &&
+          !embeddedPlaygroundVisible &&
+          tabValue === 0 && (
+            <Tooltip title={t('playground.title')} placement="left">
+              <IconButton
+                onClick={() => setEmbeddedPlaygroundVisible(true)}
+                sx={{
+                  position: 'fixed',
+                  right: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 1000,
+                  width: 40,
+                  height: 40,
+                  bgcolor: 'background.paper',
+                  color: 'primary.main',
+                  opacity: 0.7,
+                  boxShadow: 3,
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                  borderTopLeftRadius: 20,
+                  borderBottomLeftRadius: 20,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    opacity: 1,
+                    bgcolor: 'background.paper',
+                  },
+                }}
+              >
+                <JoystickIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+
+        {/* Playground Dialog */}
+        <PlaygroundDialog
+          open={playgroundOpen}
+          onClose={() => {
+            setPlaygroundOpen(false);
+            setPlaygroundInitialEnvironments([]);
+          }}
+          initialFlags={flag?.flagName ? [flag.flagName] : []}
+          initialEnvironments={playgroundInitialEnvironments}
+        />
+      </Box>
     </Box>
   );
 };

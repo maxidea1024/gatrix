@@ -1395,7 +1395,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1511,7 +1519,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1569,7 +1585,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1650,7 +1674,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.error.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1713,7 +1745,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.info.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1771,7 +1811,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.success.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1831,7 +1879,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.secondary.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1890,7 +1946,15 @@ const PlayerConnectionsPage: React.FC = () => {
                     bgcolor: alpha(theme.palette.success.main, 0.1),
                   })}
                 />
-                <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    py: 1.5,
+                    px: 2,
+                    '&:last-child': { pb: 1.5 },
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -1955,7 +2019,15 @@ const PlayerConnectionsPage: React.FC = () => {
                       bgcolor: alpha(theme.palette.warning.main, 0.1),
                     })}
                   />
-                  <CardContent sx={{ position: 'relative', zIndex: 1, py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                  <CardContent
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      py: 1.5,
+                      px: 2,
+                      '&:last-child': { pb: 1.5 },
+                    }}
+                  >
                     <Box
                       sx={{
                         display: 'flex',

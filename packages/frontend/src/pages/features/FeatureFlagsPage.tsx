@@ -1988,7 +1988,11 @@ const FeatureFlagsPage: React.FC = () => {
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 0.5 }} />
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{ mx: 0.5, my: 0.5 }}
+                  />
                   <Tooltip
                     title={t('featureFlags.compactView')}
                     disableFocusListener
@@ -2035,19 +2039,39 @@ const FeatureFlagsPage: React.FC = () => {
             addButtonLabel={t('featureFlags.createFlag')}
           />
         ) : (
-          <Card 
-            variant={compactView ? "elevation" : "outlined"} 
+          <Card
+            variant={compactView ? 'elevation' : 'outlined'}
             elevation={0}
-            sx={compactView ? { 
-              border: 'none !important', 
-              boxShadow: 'none !important', 
-              bgcolor: 'transparent' 
-            } : undefined}
+            sx={
+              compactView
+                ? {
+                    border: 'none !important',
+                    boxShadow: 'none !important',
+                    bgcolor: 'transparent',
+                  }
+                : undefined
+            }
           >
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               {compactView ? (
                 <>
-                  <Box sx={{ p: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', xl: '1fr 1fr 1fr' }, gap: 2, bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      display: 'grid',
+                      gridTemplateColumns: {
+                        xs: '1fr',
+                        md: '1fr 1fr',
+                        xl: '1fr 1fr 1fr',
+                      },
+                      gap: 2,
+                      bgcolor: (theme: any) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(0,0,0,0.2)'
+                          : 'rgba(0,0,0,0.02)',
+                      borderRadius: 2,
+                    }}
+                  >
                     {flags.map((flag, index) => {
                       // Value preview helper
                       const formatValuePreview = (val: any): string => {
@@ -2084,11 +2108,17 @@ const FeatureFlagsPage: React.FC = () => {
                             border: 'none !important',
                             boxShadow: 'none !important',
                             borderRadius: 3,
-                            bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)',
+                            bgcolor: (theme: any) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255,255,255,0.06)'
+                                : 'rgba(0,0,0,0.03)',
                             height: '100%',
                             '&:hover': {
-                              bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)',
-                              transform: 'translateY(-2px)'
+                              bgcolor: (theme: any) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255,255,255,0.09)'
+                                  : 'rgba(0,0,0,0.06)',
+                              transform: 'translateY(-2px)',
                             },
                             ...(flag.isArchived ? { opacity: 0.6 } : {}),
                           }}
@@ -2096,37 +2126,103 @@ const FeatureFlagsPage: React.FC = () => {
                             navigate(`/feature-flags/${flag.flagName}`)
                           }
                         >
-                          <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', gap: 1.5, '&:last-child': { pb: 2 } }}>
+                          <CardContent
+                            sx={{
+                              p: 2,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              height: '100%',
+                              gap: 1.5,
+                              '&:last-child': { pb: 2 },
+                            }}
+                          >
                             {/* Header: Name, Type, Status, Actions */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flex: 1 }}>
-                                <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
-                                  <Box sx={{ display: 'flex', flexShrink: 0 }}>{getTypeIcon(flag.flagType)}</Box>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: 1,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                  minWidth: 0,
+                                  flex: 1,
+                                }}
+                              >
+                                <Tooltip
+                                  title={t(
+                                    `featureFlags.types.${flag.flagType}`
+                                  )}
+                                >
+                                  <Box sx={{ display: 'flex', flexShrink: 0 }}>
+                                    {getTypeIcon(flag.flagType)}
+                                  </Box>
                                 </Tooltip>
                                 {isStale(flag) && (
-                                  <Tooltip title={t('featureFlags.staleWarning')}>
-                                    <WarningIcon sx={{ fontSize: 16, color: 'warning.main', flexShrink: 0 }} />
+                                  <Tooltip
+                                    title={t('featureFlags.staleWarning')}
+                                  >
+                                    <WarningIcon
+                                      sx={{
+                                        fontSize: 16,
+                                        color: 'warning.main',
+                                        flexShrink: 0,
+                                      }}
+                                    />
                                   </Tooltip>
                                 )}
-                                <OverflowTooltip title={flag.flagName} disableInteractive>
-                                  <Typography fontWeight={600} variant="body1" noWrap sx={{ lineHeight: 1.2 }}>
+                                <OverflowTooltip
+                                  title={flag.flagName}
+                                  disableInteractive
+                                >
+                                  <Typography
+                                    fontWeight={600}
+                                    variant="body1"
+                                    noWrap
+                                    sx={{ lineHeight: 1.2 }}
+                                  >
                                     {flag.flagName}
                                   </Typography>
                                 </OverflowTooltip>
                                 {flag.isFavorite && (
-                                  <StarIcon sx={{ fontSize: 16, color: 'warning.main', flexShrink: 0 }} />
+                                  <StarIcon
+                                    sx={{
+                                      fontSize: 16,
+                                      color: 'warning.main',
+                                      flexShrink: 0,
+                                    }}
+                                  />
                                 )}
                               </Box>
-                              
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  flexShrink: 0,
+                                }}
+                              >
                                 {(() => {
-                                  const { status: flagStatus, color } = getFlagStatus(flag);
+                                  const { status: flagStatus, color } =
+                                    getFlagStatus(flag);
                                   return (
                                     <Chip
-                                      label={t(`featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`)}
+                                      label={t(
+                                        `featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`
+                                      )}
                                       size="small"
                                       color={color}
-                                      variant={flagStatus === 'active' ? 'outlined' : 'filled'}
+                                      variant={
+                                        flagStatus === 'active'
+                                          ? 'outlined'
+                                          : 'filled'
+                                      }
                                       sx={{ height: 20, fontSize: '0.7rem' }}
                                     />
                                   );
@@ -2146,16 +2242,33 @@ const FeatureFlagsPage: React.FC = () => {
                             </Box>
 
                             {/* Body: Description & Tags */}
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              {((flag.displayName && flag.displayName !== flag.flagName) || flag.description) && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1,
+                              }}
+                            >
+                              {((flag.displayName &&
+                                flag.displayName !== flag.flagName) ||
+                                flag.description) && (
                                 <Box>
-                                  {flag.displayName && flag.displayName !== flag.flagName && (
-                                    <Typography variant="body2" color="text.secondary" noWrap>
-                                      {flag.displayName}
-                                    </Typography>
-                                  )}
+                                  {flag.displayName &&
+                                    flag.displayName !== flag.flagName && (
+                                      <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        noWrap
+                                      >
+                                        {flag.displayName}
+                                      </Typography>
+                                    )}
                                   {flag.description && (
-                                    <OverflowTooltip title={flag.description} disableInteractive placement="bottom-start">
+                                    <OverflowTooltip
+                                      title={flag.description}
+                                      disableInteractive
+                                      placement="bottom-start"
+                                    >
                                       <Typography
                                         variant="body2"
                                         color="text.disabled"
@@ -2168,11 +2281,19 @@ const FeatureFlagsPage: React.FC = () => {
                                   )}
                                 </Box>
                               )}
-                              
+
                               {flag.tags && flag.tags.length > 0 && (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: 0.5,
+                                  }}
+                                >
                                   {flag.tags.slice(0, 5).map((tagName) => {
-                                    const tagObj = allTags.find((tItem) => tItem.name === tagName);
+                                    const tagObj = allTags.find(
+                                      (tItem) => tItem.name === tagName
+                                    );
                                     const color = tagObj?.color || '#888';
                                     return (
                                       <Chip
@@ -2205,17 +2326,31 @@ const FeatureFlagsPage: React.FC = () => {
 
                             {/* Environments */}
                             <Box
-                              sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 1.5,
+                                alignItems: 'center',
+                              }}
                               onClick={(e) => e.stopPropagation()}
                             >
                               {environments.map((env) => {
-                                const isEnabled = getEnvEnabled(flag, env.environmentId);
+                                const isEnabled = getEnvEnabled(
+                                  flag,
+                                  env.environmentId
+                                );
                                 return (
                                   <FeatureSwitch
                                     key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
                                     size="small"
                                     checked={isEnabled}
-                                    onChange={() => handleToggle(flag, env.environmentId, isEnabled)}
+                                    onChange={() =>
+                                      handleToggle(
+                                        flag,
+                                        env.environmentId,
+                                        isEnabled
+                                      )
+                                    }
                                     disabled={flag.isArchived || !canManage}
                                     color={env.color}
                                     label={env.displayName}
@@ -2225,42 +2360,114 @@ const FeatureFlagsPage: React.FC = () => {
                             </Box>
 
                             {/* Footer: Values and Meta */}
-                            <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', mt: 0.5 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
-                                <FieldTypeIcon type={flag.valueType || 'string'} size={14} />
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                                  <Tooltip title={`${t('featureFlags.enabledValue')}: ${flag.enabledValue}`} disableFocusListener>
-                                    <Box sx={{ 
-                                      fontFamily: 'monospace', fontSize: '0.75rem', color: 'success.main', fontWeight: 600,
-                                      bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(76, 175, 80, 0.08)',
-                                      px: 0.75, py: 0.25, borderRadius: 1
-                                    }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'flex-end',
+                                justifyContent: 'space-between',
+                                mt: 0.5,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.75,
+                                  flexWrap: 'wrap',
+                                }}
+                              >
+                                <FieldTypeIcon
+                                  type={flag.valueType || 'string'}
+                                  size={14}
+                                />
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.75,
+                                  }}
+                                >
+                                  <Tooltip
+                                    title={`${t('featureFlags.enabledValue')}: ${flag.enabledValue}`}
+                                    disableFocusListener
+                                  >
+                                    <Box
+                                      sx={{
+                                        fontFamily: 'monospace',
+                                        fontSize: '0.75rem',
+                                        color: 'success.main',
+                                        fontWeight: 600,
+                                        bgcolor: (theme: any) =>
+                                          theme.palette.mode === 'dark'
+                                            ? 'rgba(76, 175, 80, 0.1)'
+                                            : 'rgba(76, 175, 80, 0.08)',
+                                        px: 0.75,
+                                        py: 0.25,
+                                        borderRadius: 1,
+                                      }}
+                                    >
                                       {formatValuePreview(flag.enabledValue)}
                                     </Box>
                                   </Tooltip>
-                                  
-                                  <Tooltip title={`${t('featureFlags.disabledValue')}: ${flag.disabledValue}`} disableFocusListener>
-                                    <Box sx={{ 
-                                      fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary',
-                                      bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                                      px: 0.75, py: 0.25, borderRadius: 1
-                                    }}>
+
+                                  <Tooltip
+                                    title={`${t('featureFlags.disabledValue')}: ${flag.disabledValue}`}
+                                    disableFocusListener
+                                  >
+                                    <Box
+                                      sx={{
+                                        fontFamily: 'monospace',
+                                        fontSize: '0.75rem',
+                                        color: 'text.secondary',
+                                        bgcolor: (theme: any) =>
+                                          theme.palette.mode === 'dark'
+                                            ? 'rgba(255,255,255,0.08)'
+                                            : 'rgba(0,0,0,0.04)',
+                                        px: 0.75,
+                                        py: 0.25,
+                                        borderRadius: 1,
+                                      }}
+                                    >
                                       {formatValuePreview(flag.disabledValue)}
                                     </Box>
                                   </Tooltip>
                                 </Box>
                               </Box>
-                              
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                }}
+                              >
                                 {lastSeen ? (
-                                  <Tooltip title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`} disableFocusListener>
-                                    <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.7rem' }}>
+                                  <Tooltip
+                                    title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`}
+                                    disableFocusListener
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      noWrap
+                                      sx={{ fontSize: '0.7rem' }}
+                                    >
                                       ⚡ {formatRelativeTime(lastSeen)}
                                     </Typography>
                                   </Tooltip>
                                 ) : (
-                                  <Tooltip title={formatDateTimeDetailed(flag.createdAt)} disableFocusListener>
-                                    <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.7rem' }}>
+                                  <Tooltip
+                                    title={formatDateTimeDetailed(
+                                      flag.createdAt
+                                    )}
+                                    disableFocusListener
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      noWrap
+                                      sx={{ fontSize: '0.7rem' }}
+                                    >
                                       {formatRelativeTime(flag.createdAt)}
                                     </Typography>
                                   </Tooltip>
@@ -2273,12 +2480,20 @@ const FeatureFlagsPage: React.FC = () => {
                     })}
                   </Box>
                   <Box
-                    sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 1 }}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      mt: 3,
+                      mb: 1,
+                    }}
                   >
                     <Box
                       sx={{
                         display: 'inline-flex',
-                        bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                        bgcolor: (theme: any) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.03)'
+                            : 'rgba(0,0,0,0.02)',
                         borderRadius: 8,
                         px: 2,
                         py: 0.5,
