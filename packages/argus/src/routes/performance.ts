@@ -23,19 +23,19 @@ export default async function performanceRoutes(app: FastifyInstance) {
         const result = await clickhouse.query({
           query: `
             SELECT
-              transaction_name AS name,
+              transaction AS name,
               count() AS count,
               avg(duration) AS avg_duration,
               quantile(0.5)(duration) AS p50,
               quantile(0.75)(duration) AS p75,
               quantile(0.95)(duration) AS p95,
               quantile(0.99)(duration) AS p99,
-              countIf(status != 'ok') / count() * 100 AS error_rate,
+              countIf(transaction_status != 'ok') / count() * 100 AS error_rate,
               max(timestamp) AS last_seen
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND timestamp >= now() - INTERVAL ${interval}
-            GROUP BY transaction_name
+            GROUP BY transaction
             ORDER BY ${orderBy}
             LIMIT {limit:UInt32}
           `,
@@ -70,10 +70,10 @@ export default async function performanceRoutes(app: FastifyInstance) {
               count() AS count,
               avg(duration) AS avg_duration,
               quantile(0.95)(duration) AS p95,
-              countIf(status != 'ok') / count() * 100 AS error_rate
+              countIf(transaction_status != 'ok') / count() * 100 AS error_rate
             FROM argus.transactions
             WHERE project_id = {projectId:String}
-              AND transaction_name = {txnName:String}
+              AND transaction = {txnName:String}
               AND timestamp >= now() - INTERVAL ${interval}
             GROUP BY hour
             ORDER BY hour
@@ -98,7 +98,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
               count() AS count
             FROM argus.transactions
             WHERE project_id = {projectId:String}
-              AND transaction_name = {txnName:String}
+              AND transaction = {txnName:String}
               AND timestamp >= now() - INTERVAL ${interval}
             GROUP BY bucket
             ORDER BY min(duration)
@@ -118,7 +118,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
               quantile(0.95)(duration) AS p95
             FROM argus.spans
             WHERE project_id = {projectId:String}
-              AND transaction_name = {txnName:String}
+              AND transaction = {txnName:String}
               AND timestamp >= now() - INTERVAL ${interval}
             GROUP BY description, op
             ORDER BY avg_duration DESC

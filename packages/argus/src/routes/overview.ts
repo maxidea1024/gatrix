@@ -45,7 +45,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
             SELECT
               count() AS total_errors,
               uniq(user_id) AS affected_users,
-              uniq(fingerprint) AS unique_issues
+              uniq(primary_hash) AS unique_issues
             FROM argus.errors
             WHERE project_id = {projectId:String}
               AND timestamp >= now() - INTERVAL ${interval}
@@ -63,7 +63,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
               quantile(0.5)(duration) AS p50,
               quantile(0.95)(duration) AS p95,
               quantile(0.99)(duration) AS p99,
-              countIf(status != 'ok') / count() * 100 AS error_rate
+              countIf(transaction_status != 'ok') / count() * 100 AS error_rate
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND timestamp >= now() - INTERVAL ${interval}
@@ -109,16 +109,16 @@ export default async function overviewRoutes(app: FastifyInstance) {
         const topIssuesResult = await clickhouse.query({
           query: `
             SELECT
-              fingerprint,
-              any(exception_type) AS title,
-              any(exception_value) AS subtitle,
+              primary_hash,
+              any(type) AS title,
+              any(value) AS subtitle,
               count() AS event_count,
               uniq(user_id) AS user_count,
               max(timestamp) AS last_seen
             FROM argus.errors
             WHERE project_id = {projectId:String}
               AND timestamp >= now() - INTERVAL ${interval}
-            GROUP BY fingerprint
+            GROUP BY primary_hash
             ORDER BY event_count DESC
             LIMIT 5
           `,

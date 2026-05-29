@@ -25,7 +25,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             SELECT count() AS total
             FROM argus.user_feedback
             WHERE project_id = {projectId:String}
-              AND submitted_at >= now() - INTERVAL ${interval}
+              AND timestamp >= now() - INTERVAL ${interval}
           `,
           query_params: { projectId: String(projectId) },
         });
@@ -36,16 +36,16 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           query: `
             SELECT
               event_id,
-              user_email,
-              user_name,
-              comments,
+              email,
+              name,
+              message,
               contact_email,
-              submitted_at,
+              timestamp AS submitted_at,
               url
             FROM argus.user_feedback
             WHERE project_id = {projectId:String}
-              AND submitted_at >= now() - INTERVAL ${interval}
-            ORDER BY submitted_at DESC
+              AND timestamp >= now() - INTERVAL ${interval}
+            ORDER BY timestamp DESC
             LIMIT {limit:UInt32} OFFSET {offset:UInt32}
           `,
           query_params: {

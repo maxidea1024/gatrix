@@ -333,7 +333,7 @@ class ArgusService {
     projectId: number | string,
     params?: ArgusIssueListParams
   ): Promise<{ data: ArgusIssue[]; total: number }> {
-    const response = await argusApi.get(`${ARGUS_BASE}/issues/${projectId}`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues`, {
       params,
     });
     const result = response.data;
@@ -347,7 +347,7 @@ class ArgusService {
     projectId: number | string,
     issueId: number | string
   ): Promise<ArgusIssueDetail> {
-    const response = await argusApi.get(`${ARGUS_BASE}/issues/${projectId}/${issueId}`);
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}`);
     return response.data?.data || response.data;
   }
 
@@ -356,7 +356,7 @@ class ArgusService {
     issueId: number | string,
     status: string
   ): Promise<void> {
-    await argusApi.patch(`${ARGUS_BASE}/issues/${projectId}/${issueId}/status`, {
+    await argusApi.patch(`${ARGUS_BASE}/${projectId}/issues/${issueId}`, {
       status,
     });
   }
@@ -366,7 +366,7 @@ class ArgusService {
     issueId: number | string,
     assignee: string | null
   ): Promise<void> {
-    await argusApi.patch(`${ARGUS_BASE}/issues/${projectId}/${issueId}/assign`, {
+    await argusApi.patch(`${ARGUS_BASE}/${projectId}/issues/${issueId}`, {
       assigned_to: assignee,
     });
   }
