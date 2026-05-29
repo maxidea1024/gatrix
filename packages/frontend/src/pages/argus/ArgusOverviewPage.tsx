@@ -4,13 +4,13 @@ import {
   Typography,
   Paper,
   Chip,
-  Skeleton,
   IconButton,
   ToggleButton,
   ToggleButtonGroup,
   useTheme,
   Divider,
 } from '@mui/material';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   Refresh as RefreshIcon,
   BugReport as BugReportIcon,
@@ -188,86 +188,68 @@ const ArgusOverviewPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Summary Cards */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-        <StatCard
-          loading={loading}
-          icon={<BugReportIcon />}
-          color={theme.palette.error.main}
-          label={t('argus.overview.totalErrors')}
-          value={es?.total_errors}
-        />
-        <StatCard
-          loading={loading}
-          icon={<PeopleIcon />}
-          color={theme.palette.warning.main}
-          label={t('argus.overview.affectedUsers')}
-          value={es?.affected_users}
-        />
-        <StatCard
-          loading={loading}
-          icon={<SpeedIcon />}
-          color={theme.palette.primary.main}
-          label={t('argus.overview.transactions')}
-          value={ts?.total_transactions}
-        />
-        <StatCard
-          loading={loading}
-          icon={<CheckCircleIcon />}
-          color={theme.palette.success.main}
-          label={t('argus.overview.crashFreeRate')}
-          value={ss ? `${Number(ss.crash_free_rate).toFixed(1)}%` : undefined}
-        />
-      </Box>
+      <PageContentLoader loading={loading}>
+        {/* Summary Cards */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+          <StatCard
+            icon={<BugReportIcon />}
+            color={theme.palette.error.main}
+            label={t('argus.overview.totalErrors')}
+            value={es?.total_errors}
+          />
+          <StatCard
+            icon={<PeopleIcon />}
+            color={theme.palette.warning.main}
+            label={t('argus.overview.affectedUsers')}
+            value={es?.affected_users}
+          />
+          <StatCard
+            icon={<SpeedIcon />}
+            color={theme.palette.primary.main}
+            label={t('argus.overview.transactions')}
+            value={ts?.total_transactions}
+          />
+          <StatCard
+            icon={<CheckCircleIcon />}
+            color={theme.palette.success.main}
+            label={t('argus.overview.crashFreeRate')}
+            value={ss ? `${Number(ss.crash_free_rate).toFixed(1)}%` : undefined}
+          />
+        </Box>
 
-      {/* Charts Row */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-        {/* Error Trend */}
-        <Paper sx={{ p: 2, flex: '1 1 400px', minWidth: 300 }}>
-          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
-            {t('argus.overview.errorTrend')}
-          </Typography>
-          {loading ? (
-            <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 1 }} />
-          ) : (
+        {/* Charts Row */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+          {/* Error Trend */}
+          <Paper sx={{ p: 2, flex: '1 1 400px', minWidth: 300 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
+              {t('argus.overview.errorTrend')}
+            </Typography>
             <Box sx={{ height: 220 }}>
               <Line data={errorChartData} options={chartOptions} />
             </Box>
-          )}
-        </Paper>
+          </Paper>
 
-        {/* Transaction Throughput */}
-        <Paper sx={{ p: 2, flex: '1 1 400px', minWidth: 300 }}>
-          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
-            {t('argus.overview.transactionThroughput')}
-          </Typography>
-          {loading ? (
-            <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 1 }} />
-          ) : (
+          {/* Transaction Throughput */}
+          <Paper sx={{ p: 2, flex: '1 1 400px', minWidth: 300 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
+              {t('argus.overview.transactionThroughput')}
+            </Typography>
             <Box sx={{ height: 220 }}>
               <Bar data={txnChartData} options={chartOptions} />
             </Box>
-          )}
-        </Paper>
-      </Box>
+          </Paper>
+        </Box>
 
-      {/* Performance Summary + Top Issues */}
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        {/* Performance Metrics */}
-        <Paper sx={{ p: 2, flex: '1 1 300px', minWidth: 260 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <TrendingUpIcon fontSize="small" color="primary" />
-            <Typography variant="subtitle2" fontWeight={600}>
-              {t('argus.overview.performanceSummary')}
-            </Typography>
-          </Box>
-          {loading ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} width="70%" height={24} />
-              ))}
+        {/* Performance Summary + Top Issues */}
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          {/* Performance Metrics */}
+          <Paper sx={{ p: 2, flex: '1 1 300px', minWidth: 260 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <TrendingUpIcon fontSize="small" color="primary" />
+              <Typography variant="subtitle2" fontWeight={600}>
+                {t('argus.overview.performanceSummary')}
+              </Typography>
             </Box>
-          ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <MetricRow label="P50" value={`${Number(ts?.p50 || 0).toFixed(0)}ms`} />
               <MetricRow label="P95" value={`${Number(ts?.p95 || 0).toFixed(0)}ms`} />
@@ -276,74 +258,68 @@ const ArgusOverviewPage: React.FC = () => {
               <MetricRow label={t('argus.overview.avgDuration')} value={`${Number(ts?.avg_duration || 0).toFixed(0)}ms`} />
               <MetricRow label={t('argus.overview.errorRate')} value={`${Number(ts?.error_rate || 0).toFixed(2)}%`} />
             </Box>
-          )}
-        </Paper>
+          </Paper>
 
-        {/* Top Issues */}
-        <Paper sx={{ p: 2, flex: '2 1 400px', minWidth: 300 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <BugReportIcon fontSize="small" color="error" />
-              <Typography variant="subtitle2" fontWeight={600}>
-                {t('argus.overview.topIssues')}
+          {/* Top Issues */}
+          <Paper sx={{ p: 2, flex: '2 1 400px', minWidth: 300 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <BugReportIcon fontSize="small" color="error" />
+                <Typography variant="subtitle2" fontWeight={600}>
+                  {t('argus.overview.topIssues')}
+                </Typography>
+              </Box>
+              <Chip
+                label={t('argus.overview.viewAll')}
+                size="small"
+                variant="outlined"
+                onClick={() => navigate('/argus/issues')}
+                sx={{ cursor: 'pointer' }}
+              />
+            </Box>
+            {data?.top_issues?.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+                {t('argus.overview.noIssues')}
               </Typography>
-            </Box>
-            <Chip
-              label={t('argus.overview.viewAll')}
-              size="small"
-              variant="outlined"
-              onClick={() => navigate('/argus/issues')}
-              sx={{ cursor: 'pointer' }}
-            />
-          </Box>
-          {loading ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} width="100%" height={32} />
-              ))}
-            </Box>
-          ) : data?.top_issues?.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
-              {t('argus.overview.noIssues')}
-            </Typography>
-          ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-              {data?.top_issues?.map((issue, idx) => (
-                <Box
-                  key={issue.fingerprint}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.5,
-                    p: 1,
-                    borderRadius: 1,
-                    cursor: 'pointer',
-                    '&:hover': { backgroundColor: theme.palette.action.hover },
-                  }}
-                  onClick={() => navigate('/argus/issues')}
-                >
-                  <Typography variant="caption" color="text.secondary" sx={{ minWidth: 16 }}>
-                    {idx + 1}
-                  </Typography>
-                  <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                    >
-                      {issue.title || issue.fingerprint.slice(0, 16)}
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                {data?.top_issues?.map((issue, idx) => (
+                  <Box
+                    key={issue.fingerprint}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      p: 1,
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: theme.palette.action.hover },
+                    }}
+                    onClick={() => navigate('/argus/issues')}
+                  >
+                    <Typography variant="caption" color="text.secondary" sx={{ minWidth: 16 }}>
+                      {idx + 1}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {issue.subtitle}
-                    </Typography>
+                    <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                      <Typography
+                        variant="body2"
+                        fontWeight={500}
+                        sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                      >
+                        {issue.title || issue.fingerprint.slice(0, 16)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {issue.subtitle}
+                      </Typography>
+                    </Box>
+                    <Chip label={issue.event_count.toLocaleString()} size="small" variant="outlined" />
                   </Box>
-                  <Chip label={issue.event_count.toLocaleString()} size="small" variant="outlined" />
-                </Box>
-              ))}
-            </Box>
-          )}
-        </Paper>
-      </Box>
+                ))}
+              </Box>
+            )}
+          </Paper>
+        </Box>
+      </PageContentLoader>
     </Box>
   );
 };
@@ -351,14 +327,13 @@ const ArgusOverviewPage: React.FC = () => {
 // --- Sub-components ---
 
 interface StatCardProps {
-  loading: boolean;
   icon: React.ReactElement;
   color: string;
   label: string;
   value?: number | string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ loading, icon, color, label, value }) => (
+const StatCard: React.FC<StatCardProps> = ({ icon, color, label, value }) => (
   <Paper
     sx={{
       p: 2,
@@ -384,13 +359,9 @@ const StatCard: React.FC<StatCardProps> = ({ loading, icon, color, label, value 
       {React.cloneElement(icon, { fontSize: 'small' })}
     </Box>
     <Box>
-      {loading ? (
-        <Skeleton width={60} height={28} />
-      ) : (
-        <Typography variant="h6" fontWeight={700}>
-          {typeof value === 'number' ? value.toLocaleString() : value ?? '-'}
-        </Typography>
-      )}
+      <Typography variant="h6" fontWeight={700}>
+        {typeof value === 'number' ? value.toLocaleString() : value ?? '-'}
+      </Typography>
       <Typography variant="caption" color="text.secondary">
         {label}
       </Typography>

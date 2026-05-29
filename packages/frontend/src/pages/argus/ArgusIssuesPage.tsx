@@ -17,11 +17,11 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Skeleton,
   Stack,
   Pagination,
   useTheme,
 } from '@mui/material';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
@@ -234,40 +234,30 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         </FormControl>
       </Paper>
 
-      {/* Issues Table */}
-      <TableContainer component={Paper} sx={{ mb: 2 }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 600, width: '45%' }}>Issue</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Level</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Events</TableCell>
-              <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Users</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Last Seen</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: 8 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton width="80%" /></TableCell>
-                  <TableCell><Skeleton width={60} /></TableCell>
-                  <TableCell><Skeleton width={80} /></TableCell>
-                  <TableCell><Skeleton width={40} /></TableCell>
-                  <TableCell><Skeleton width={40} /></TableCell>
-                  <TableCell><Skeleton width={100} /></TableCell>
-                </TableRow>
-              ))
-            ) : issues.length === 0 ? (
+      <PageContentLoader loading={loading}>
+        {/* Issues Table */}
+        <TableContainer component={Paper} sx={{ mb: 2 }}>
+          <Table size="small">
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={6} sx={{ py: 6, textAlign: 'center' }}>
-                  <Typography color="text.secondary">
-                    No issues found
-                  </Typography>
-                </TableCell>
+                <TableCell sx={{ fontWeight: 600, width: '45%' }}>Issue</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Level</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Events</TableCell>
+                <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Users</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Last Seen</TableCell>
               </TableRow>
-            ) : (
+            </TableHead>
+            <TableBody>
+              {issues.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} sx={{ py: 6, textAlign: 'center' }}>
+                    <Typography color="text.secondary">
+                      No issues found
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
               issues.map((issue) => (
                 <TableRow
                   key={issue.id}
@@ -360,6 +350,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           />
         </Stack>
       )}
+      </PageContentLoader>
     </Box>
   );
 };

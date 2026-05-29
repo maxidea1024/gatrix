@@ -6,10 +6,10 @@ import {
   Chip,
   Divider,
   Button,
-  Skeleton,
   IconButton,
   useTheme,
 } from '@mui/material';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   ArrowBack as ArrowBackIcon,
   ErrorOutline as ErrorIcon,
@@ -65,18 +65,11 @@ const ArgusIssueDetailPage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <Box>
-        <Skeleton width={300} height={40} />
-        <Skeleton width="100%" height={200} sx={{ mt: 2 }} />
-        <Skeleton width="100%" height={400} sx={{ mt: 2 }} />
-      </Box>
-    );
-  }
+  const latestEvent = issue?.latest_event;
 
-  if (!issue) {
-    return (
+  return (
+    <PageContentLoader loading={loading}>
+    {!issue ? (
       <Box sx={{ textAlign: 'center', py: 8 }}>
         <Typography color="text.secondary">Issue not found</Typography>
         <Button
@@ -88,12 +81,7 @@ const ArgusIssueDetailPage: React.FC = () => {
           Go Back
         </Button>
       </Box>
-    );
-  }
-
-  const latestEvent = issue.latest_event;
-
-  return (
+    ) : (
     <Box>
       {/* Back button + Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -323,6 +311,8 @@ const ArgusIssueDetailPage: React.FC = () => {
         </Paper>
       )}
     </Box>
+    )}
+    </PageContentLoader>
   );
 };
 
