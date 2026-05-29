@@ -128,6 +128,8 @@ packages/*/src/**/*.js
 packages/*/src/**/*.d.ts
 packages/*/src/**/*.js.map
 packages/*/src/**/*.d.ts.map
+# But keep migration files (plain JS, not compiled)
+!packages/*/src/database/migrations/*.js
 
 # Runtime generated planning data (dynamically generated at runtime)
 /packages/backend/data/planning/

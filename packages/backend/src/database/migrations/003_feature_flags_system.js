@@ -9,7 +9,7 @@ exports.up = async function (connection) {
 
   // Feature flags
   await connection.execute(`
-    CREATE TABLE g_feature_flags (
+    CREATE TABLE IF NOT EXISTS g_feature_flags (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       projectId CHAR(26) NOT NULL,
       flagName VARCHAR(255) NOT NULL,
@@ -41,7 +41,7 @@ exports.up = async function (connection) {
 
   // Feature flag environments
   await connection.execute(`
-    CREATE TABLE g_feature_flag_environments (
+    CREATE TABLE IF NOT EXISTS g_feature_flag_environments (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       flagId CHAR(26) NOT NULL,
       environmentId CHAR(26) NOT NULL,
@@ -61,7 +61,7 @@ exports.up = async function (connection) {
 
   // Feature strategies
   await connection.execute(`
-    CREATE TABLE g_feature_strategies (
+    CREATE TABLE IF NOT EXISTS g_feature_strategies (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       flagId CHAR(26) NOT NULL,
       environmentId CHAR(26) NOT NULL,
@@ -82,7 +82,7 @@ exports.up = async function (connection) {
 
   // Feature variants
   await connection.execute(`
-    CREATE TABLE g_feature_variants (
+    CREATE TABLE IF NOT EXISTS g_feature_variants (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       flagId CHAR(26) NOT NULL,
       environmentId CHAR(26) NOT NULL,
@@ -105,7 +105,7 @@ exports.up = async function (connection) {
 
   // Feature segments
   await connection.execute(`
-    CREATE TABLE g_feature_segments (
+    CREATE TABLE IF NOT EXISTS g_feature_segments (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       projectId CHAR(26) NOT NULL,
       segmentName VARCHAR(255) NOT NULL,
@@ -126,7 +126,7 @@ exports.up = async function (connection) {
 
   // Feature flag-segment junction
   await connection.execute(`
-    CREATE TABLE g_feature_flag_segments (
+    CREATE TABLE IF NOT EXISTS g_feature_flag_segments (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       strategyId CHAR(26) NOT NULL,
       segmentId CHAR(26) NOT NULL,
@@ -139,7 +139,7 @@ exports.up = async function (connection) {
 
   // Feature context fields
   await connection.execute(`
-    CREATE TABLE g_feature_context_fields (
+    CREATE TABLE IF NOT EXISTS g_feature_context_fields (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       projectId CHAR(26) NOT NULL,
       fieldName VARCHAR(255) NOT NULL,
@@ -166,7 +166,7 @@ exports.up = async function (connection) {
 
   // Feature metrics
   await connection.execute(`
-    CREATE TABLE g_feature_metrics (
+    CREATE TABLE IF NOT EXISTS g_feature_metrics (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       environmentId CHAR(26) NOT NULL,
       flagName VARCHAR(255) NOT NULL,
@@ -184,7 +184,7 @@ exports.up = async function (connection) {
 
   // Feature variant metrics
   await connection.execute(`
-    CREATE TABLE g_feature_variant_metrics (
+    CREATE TABLE IF NOT EXISTS g_feature_variant_metrics (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       environmentId CHAR(26) NOT NULL,
       flagName VARCHAR(255) NOT NULL,
@@ -198,7 +198,7 @@ exports.up = async function (connection) {
 
   // Feature flag types (matches main branch: 026)
   await connection.execute(`
-    CREATE TABLE g_feature_flag_types (
+    CREATE TABLE IF NOT EXISTS g_feature_flag_types (
       flagType VARCHAR(50) PRIMARY KEY COMMENT 'Type identifier',
       displayName VARCHAR(255) NOT NULL,
       description TEXT NULL,
@@ -225,7 +225,7 @@ exports.up = async function (connection) {
 
   // Feature code references
   await connection.execute(`
-    CREATE TABLE g_feature_code_references (
+    CREATE TABLE IF NOT EXISTS g_feature_code_references (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       flagId CHAR(26) NOT NULL,
       filePath VARCHAR(500) NOT NULL,
@@ -244,7 +244,7 @@ exports.up = async function (connection) {
 
   // Unknown flags (matches main branch: 037+038+044)
   await connection.execute(`
-    CREATE TABLE g_unknown_flags (
+    CREATE TABLE IF NOT EXISTS g_unknown_flags (
       id INT AUTO_INCREMENT PRIMARY KEY,
       flagName VARCHAR(255) NOT NULL,
       environmentId VARCHAR(100) NOT NULL,
@@ -262,7 +262,7 @@ exports.up = async function (connection) {
 
   // Impact metric configs (matches main branch: 062+063+064+065)
   await connection.execute(`
-    CREATE TABLE g_impact_metric_configs (
+    CREATE TABLE IF NOT EXISTS g_impact_metric_configs (
       id VARCHAR(26) NOT NULL PRIMARY KEY,
       flagId VARCHAR(255) DEFAULT NULL,
       title VARCHAR(255) NOT NULL,
