@@ -157,6 +157,27 @@ export interface ArgusSessionHealth {
   by_release: { release: string; total: number; crashed: number; crash_free_rate: number; users: number }[];
 }
 
+export interface ArgusFeedbackItem {
+  event_id: string;
+  user_email: string;
+  user_name: string;
+  comments: string;
+  contact_email: string;
+  submitted_at: string;
+  url: string;
+}
+
+export interface ArgusRelease {
+  release: string;
+  first_seen: string;
+  last_seen: string;
+  error_count: number;
+  affected_users: number;
+  issue_count: number;
+  total_sessions: number;
+  crash_free_rate: number;
+}
+
 // ==================== Prefix for all Argus API calls ====================
 const ARGUS_BASE = '/argus/api';
 
@@ -209,6 +230,28 @@ class ArgusService {
       params: { period },
     });
     return response.data?.data || response.data;
+  }
+
+  // --- Feedback ---
+
+  async getFeedback(
+    projectId: number | string,
+    params?: { period?: string; page?: number; limit?: number }
+  ): Promise<{ items: ArgusFeedbackItem[]; total: number }> {
+    const response = await api.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
+    return response.data?.data || response.data;
+  }
+
+  // --- Releases ---
+
+  async getReleases(
+    projectId: number | string,
+    period?: string
+  ): Promise<ArgusRelease[]> {
+    const response = await api.get(`${ARGUS_BASE}/releases/${projectId}`, {
+      params: { period },
+    });
+    return response.data?.data || response.data || [];
   }
 
   // --- Projects ---

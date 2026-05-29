@@ -459,6 +459,18 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         path: '/argus/sessions',
         requiredPermission: P.CRASH_EVENTS_READ,
       },
+      {
+        text: 'sidebar.argusFeedback',
+        icon: 'Feedback',
+        path: '/argus/feedback',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusReleases',
+        icon: 'NewReleases',
+        path: '/argus/releases',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
     ],
   },
 
