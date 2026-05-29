@@ -142,6 +142,21 @@ export interface ArgusTransactionDetail {
   spans: { description: string; op: string; count: number; avg_duration: number; p95: number }[];
 }
 
+export interface ArgusSessionHealth {
+  summary: {
+    total_sessions: number;
+    crashed: number;
+    errored: number;
+    healthy: number;
+    abnormal: number;
+    crash_free_rate: number;
+    unique_users: number;
+    avg_duration: number;
+  };
+  trend: { hour: string; total: number; crashed: number; healthy: number; crash_free_rate: number }[];
+  by_release: { release: string; total: number; crashed: number; crash_free_rate: number; users: number }[];
+}
+
 // ==================== Prefix for all Argus API calls ====================
 const ARGUS_BASE = '/argus/api';
 
@@ -181,6 +196,18 @@ class ArgusService {
       `${ARGUS_BASE}/performance/${projectId}/transactions/${encodeURIComponent(txnName)}`,
       { params: { period } }
     );
+    return response.data?.data || response.data;
+  }
+
+  // --- Sessions ---
+
+  async getSessionHealth(
+    projectId: number | string,
+    period?: string
+  ): Promise<ArgusSessionHealth> {
+    const response = await api.get(`${ARGUS_BASE}/sessions/${projectId}`, {
+      params: { period },
+    });
     return response.data?.data || response.data;
   }
 
