@@ -430,6 +430,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     icon: 'BugReport',
     children: [
       {
+        text: 'sidebar.argusOverview',
+        icon: 'Dashboard',
+        path: '/argus/overview',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
         text: 'sidebar.argusIssues',
         icon: 'BugReport',
         path: '/argus/issues',

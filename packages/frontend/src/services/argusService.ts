@@ -96,12 +96,52 @@ export interface ArgusProjectStats {
   affected_users: number;
 }
 
+export interface ArgusOverviewData {
+  error_trend: { hour: string; count: number; users: number }[];
+  error_summary: { total_errors: number; affected_users: number; unique_issues: number };
+  transaction_summary: {
+    total_transactions: number;
+    avg_duration: number;
+    p50: number;
+    p95: number;
+    p99: number;
+    error_rate: number;
+  };
+  transaction_trend: { hour: string; count: number; avg_duration: number }[];
+  session_summary: {
+    total_sessions: number;
+    crashed_sessions: number;
+    errored_sessions: number;
+    crash_free_rate: number;
+  };
+  top_issues: {
+    fingerprint: string;
+    title: string;
+    subtitle: string;
+    event_count: number;
+    user_count: number;
+    last_seen: string;
+  }[];
+}
+
 // ==================== Prefix for all Argus API calls ====================
 const ARGUS_BASE = '/argus/api';
 
 // ==================== Service ====================
 
 class ArgusService {
+  // --- Overview ---
+
+  async getOverview(
+    projectId: number | string,
+    period?: string
+  ): Promise<ArgusOverviewData> {
+    const response = await api.get(`${ARGUS_BASE}/overview/${projectId}`, {
+      params: { period },
+    });
+    return response.data?.data || response.data;
+  }
+
   // --- Projects ---
 
   async listProjects(): Promise<ArgusProject[]> {
