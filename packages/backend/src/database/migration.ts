@@ -188,7 +188,8 @@ export class Migration {
 
         // Detect pre-existing DB: if ALL migrations are pending but core tables exist,
         // this means migrations were applied before tracking was set up.
-        // Seed migration records without re-running them.
+        // Run each migration normally — they should be idempotent (IF NOT EXISTS).
+        // For any that fail because tables already exist, just seed the record.
         if (
           executedMigrations.length === 0 &&
           pendingMigrations.length === migrationFiles.length
@@ -196,11 +197,45 @@ export class Migration {
           const coreTablesExist = await this.checkCoreTablesExist();
           if (coreTablesExist) {
             logger.info(
-              'Detected pre-existing database with no migration records. Seeding migration history...'
+              'Detected pre-existing database with no migration records. Running migrations with idempotent safety...'
             );
-            await this.seedMigrationRecords(migrationFiles);
+            await this.createMigrationsTable();
+
+            for (const migration of pendingMigrations) {
+              try {
+                await this.runMigration(migration);
+                logger.info(
+                  `  [APPLIED] ${migration.id} — executed successfully`
+                );
+              } catch (error: any) {
+                // Table/column already exists — safe to seed as completed
+                if (
+                  error.errno === 1050 || // ER_TABLE_EXISTS
+                  error.errno === 1060 || // ER_DUP_FIELDNAME
+                  error.errno === 1061 || // ER_DUP_KEYNAME
+                  error.code === 'ER_TABLE_EXISTS' ||
+                  error.code === 'ER_DUP_FIELDNAME' ||
+                  error.code === 'ER_DUP_KEYNAME'
+                ) {
+                  await database.query(
+                    'INSERT IGNORE INTO g_migrations (id, name) VALUES (?, ?)',
+                    [migration.id, migration.name]
+                  );
+                  logger.info(
+                    `  [SEEDED] ${migration.id} — table/column already exists, marked as completed`
+                  );
+                } else {
+                  logger.error(
+                    `  [FAILED] ${migration.id} — unexpected error`,
+                    error
+                  );
+                  throw error;
+                }
+              }
+            }
+
             logger.info(
-              'Migration history seeded successfully. All migrations marked as completed.'
+              'Pre-existing database migration reconciliation complete.'
             );
             return;
           }

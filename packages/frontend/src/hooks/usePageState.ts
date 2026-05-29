@@ -24,8 +24,12 @@ export const usePageState = ({
   const [pageState, setPageState] = useState<PageState>(() => {
     try {
       const page = parseInt(searchParams.get('page') || '1');
+      // Restore limit from URL, then localStorage, then default
+      const savedLimit = localStorage.getItem(`${storageKey}_limit`);
       const limit = parseInt(
-        searchParams.get('limit') || String(defaultState.limit)
+        searchParams.get('limit') ||
+          savedLimit ||
+          String(defaultState.limit)
       );
       const sortBy = searchParams.get('sortBy') || defaultState.sortBy;
       const sortOrder =
@@ -120,9 +124,10 @@ export const usePageState = ({
 
   const updateLimit = useCallback(
     (limit: number) => {
+      localStorage.setItem(`${storageKey}_limit`, String(limit));
       savePageState({ limit, page: 1 }); // 페이지 크기 변경 시 첫 페이지로
     },
-    [savePageState]
+    [savePageState, storageKey]
   );
 
   const updateSort = useCallback(
