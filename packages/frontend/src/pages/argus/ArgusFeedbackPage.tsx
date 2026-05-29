@@ -172,7 +172,7 @@ const ArgusFeedbackPage: React.FC = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
                         <ScheduleIcon sx={{ fontSize: 13, color: isDark ? '#555' : '#bbb' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.68rem', color: isDark ? '#666' : '#999' }}>
-                          {formatRelative(item.submitted_at)}
+                          {formatRelative(item.submitted_at, t)}
                         </Typography>
                       </Box>
                     </Box>
@@ -212,23 +212,20 @@ const ArgusFeedbackPage: React.FC = () => {
   );
 };
 
-function formatRelative(dateStr: string): string {
+function formatRelative(ts: string, t: any): string {
+  if (!ts) return '';
   try {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const mins = Math.floor(diff / 60000);
+    const diffSec = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+    if (diffSec < 0) return t('common.time.justNow');
+    const mins = Math.floor(diffSec / 60);
     const hrs = Math.floor(mins / 60);
     const days = Math.floor(hrs / 24);
-
-    if (mins < 1) return '방금';
-    if (mins < 60) return `${mins}분 전`;
-    if (hrs < 24) return `${hrs}시간 전`;
-    if (days < 30) return `${days}일 전`;
-    return d.toLocaleDateString('ko-KR');
-  } catch {
-    return dateStr;
-  }
+    if (mins < 1) return t('common.time.justNow');
+    if (mins < 60) return t('common.time.minutesAgo', { count: mins });
+    if (hrs < 24) return t('common.time.hoursAgo', { count: hrs });
+    if (days < 30) return t('common.time.daysAgo', { count: days });
+    return new Date(ts).toLocaleDateString();
+  } catch { return ts; }
 }
 
 export default ArgusFeedbackPage;

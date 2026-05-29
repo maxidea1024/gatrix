@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -24,7 +24,12 @@ import {
   Cached as CacheIcon,
   Send as SendIcon,
   Lock as LockIcon,
+  Timeline as TimelineIcon,
+  ZoomIn as ZoomInIcon,
+  ZoomOut as ZoomOutIcon,
+  FitScreen as FitScreenIcon,
 } from '@mui/icons-material';
+import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useTranslation } from 'react-i18next';
 import {
   Chart as ChartJS,
@@ -46,6 +51,7 @@ import argusService, {
   ArgusTraceDetail,
   ArgusTraceSpan,
 } from '@/services/argusService';
+import TraceWaterfall from '@/components/argus/TraceWaterfall';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -59,22 +65,6 @@ const TIME_RANGES = [
   { value: '7d', label: '7D' },
   { value: '30d', label: '30D' },
 ];
-
-// Span operation colors
-const OP_COLORS: Record<string, string> = {
-  'db.query': '#26a69a',
-  'db': '#26a69a',
-  'http.client': '#7c4dff',
-  'http': '#7c4dff',
-  'cache.get': '#42a5f5',
-  'cache.set': '#42a5f5',
-  'cache': '#42a5f5',
-  'function': '#ffa726',
-  'crypto': '#ef5350',
-  'message.publish': '#66bb6a',
-  'message': '#66bb6a',
-};
-const getOpColor = (op: string) => OP_COLORS[op] || OP_COLORS[op.split('.')[0]] || '#9e9e9e';
 
 const OP_ICONS: Record<string, React.ReactElement> = {
   db: <StorageIcon sx={{ fontSize: 13 }} />,
@@ -281,8 +271,8 @@ const ArgusPerformancePage: React.FC = () => {
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
                 {t('argus.performance.latencyTrend')}
               </Typography>
-              <Box sx={{ height: 220 }}>
-                <Line data={trendChartData} options={chartOpts} />
+              <Box sx={{ height: 260 }}>
+                <Line data={trendChartData} options={chartOpts} plugins={[getCrosshairPlugin(isDark)]} />
               </Box>
             </Paper>
             <Paper elevation={0} sx={{ p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
@@ -338,11 +328,11 @@ const ArgusPerformancePage: React.FC = () => {
             {/* Recent Traces */}
             <Paper elevation={0} sx={{ p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
-                최근 트레이스
+                {t('argus.performance.recentTraces')}
               </Typography>
               {!detail?.recent_traces?.length ? (
                 <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-                  트레이스 없음
+                  {t('argus.performance.noTraces')}
                 </Typography>
               ) : (
                 <Box sx={{ maxHeight: 280, overflow: 'auto' }}>
@@ -491,251 +481,6 @@ const ArgusPerformancePage: React.FC = () => {
   );
 };
 
-// ==================== TRACE WATERFALL COMPONENT ====================
-
-const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = ({ trace, isDark }) => {
-  const theme = useTheme();
-  const root = trace.root;
-  const spans = trace.spans || [];
-
-  // Calculate timeline boundaries
-  const allTimestamps = [
-    root?.start_timestamp,
-    root?.timestamp,
-    ...spans.map((s) => s.start_timestamp),
-    ...spans.map((s) => s.timestamp),
-  ].filter(Boolean).map((t) => new Date(t).getTime());
-
-  const timelineStart = Math.min(...allTimestamps);
-  const timelineEnd = Math.max(...allTimestamps);
-  const totalDuration = timelineEnd - timelineStart || 1;
-
-  const getBarPosition = (startTs: string, dur: number) => {
-    const start = new Date(startTs).getTime();
-    const left = ((start - timelineStart) / totalDuration) * 100;
-    const width = Math.max((dur / totalDuration) * 100, 0.5);
-    return { left: `${left}%`, width: `${Math.min(width, 100 - left)}%` };
-  };
-
-  return (
-    <Box>
-      {/* Root transaction header */}
-      {root && (
-        <Paper elevation={0} sx={{
-          p: 2, mb: 2,
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: 2,
-          display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap',
-        }}>
-          <Box>
-            <Typography variant="body1" fontWeight={700}>{root.transaction}</Typography>
-            <Typography variant="caption" color="text.secondary">{root.transaction_op}</Typography>
-          </Box>
-          <Chip label={`${Number(root.duration).toLocaleString()}ms`} size="small" sx={{ fontWeight: 700 }} />
-          <Chip
-            label={root.transaction_status}
-            size="small"
-            sx={{
-              fontWeight: 600,
-              backgroundColor: alpha(root.transaction_status === 'ok' ? '#4caf50' : '#f44336', 0.12),
-              color: root.transaction_status === 'ok' ? '#4caf50' : '#f44336',
-              border: 'none',
-            }}
-          />
-          {root.http_status_code > 0 && (
-            <Chip label={`HTTP ${root.http_status_code}`} size="small" variant="outlined" sx={{ fontSize: '0.72rem' }} />
-          )}
-          <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
-            {spans.length} spans · {root.environment} · {root.release}
-          </Typography>
-        </Paper>
-      )}
-
-      {/* Timeline header */}
-      <Paper elevation={0} sx={{
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2, overflow: 'hidden',
-      }}>
-        <Box sx={{
-          display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0,
-          backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          px: 1.5, py: 0.8,
-        }}>
-          <Typography variant="caption" fontWeight={600}>Operation</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="caption" color="text.secondary">0ms</Typography>
-            <Typography variant="caption" color="text.secondary">{(totalDuration / 2).toFixed(0)}ms</Typography>
-            <Typography variant="caption" color="text.secondary">{totalDuration.toFixed(0)}ms</Typography>
-          </Box>
-        </Box>
-
-        {/* Root transaction bar */}
-        {root && (
-          <WaterfallRow
-            label={root.transaction}
-            sublabel={root.transaction_op}
-            op="http.server"
-            duration={Number(root.duration)}
-            barPos={getBarPosition(root.start_timestamp, Number(root.duration))}
-            status={root.transaction_status}
-            isRoot
-            isDark={isDark}
-          />
-        )}
-
-        {/* Span bars — with depth calculation */}
-        {(() => {
-          // Build depth map: root span_id has depth 0, children get parent's depth + 1
-          const rootSpanId = root?.span_id;
-          const depthMap = new Map<string, number>();
-          // First pass: index by span_id
-          if (rootSpanId) depthMap.set(rootSpanId, 0);
-          // Multiple passes to resolve depths (handles unordered spans)
-          for (let pass = 0; pass < 5; pass++) {
-            for (const span of spans) {
-              if (depthMap.has(span.span_id)) continue;
-              if (span.parent_span_id && depthMap.has(span.parent_span_id)) {
-                depthMap.set(span.span_id, (depthMap.get(span.parent_span_id) || 0) + 1);
-              }
-            }
-          }
-          return spans.map((span, idx) => {
-            const depth = depthMap.get(span.span_id) ?? 1;
-            return (
-              <WaterfallRow
-                key={span.span_id || idx}
-                label={span.description || span.op}
-                sublabel={span.op}
-                op={span.op}
-                duration={Number(span.duration)}
-                barPos={getBarPosition(span.start_timestamp, Number(span.duration))}
-                status={span.status}
-                isDark={isDark}
-                depth={depth}
-                data={typeof span.data === 'object' ? span.data : undefined}
-              />
-            );
-          });
-        })()}
-
-        {spans.length === 0 && (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">이 트레이스에 span 데이터가 없습니다</Typography>
-          </Box>
-        )}
-      </Paper>
-    </Box>
-  );
-};
-
-// --- Waterfall Row ---
-const WaterfallRow: React.FC<{
-  label: string;
-  sublabel: string;
-  op: string;
-  duration: number;
-  barPos: { left: string; width: string };
-  status: string;
-  isRoot?: boolean;
-  isDark: boolean;
-  depth?: number;
-  data?: Record<string, string>;
-}> = ({ label, sublabel, op, duration, barPos, status, isRoot, isDark, depth = 0, data }) => {
-  const opColor = getOpColor(op);
-  const isErr = status !== 'ok' && status !== '';
-
-  return (
-      <Box sx={{
-        display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0,
-        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'}`,
-        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
-        transition: 'background 0.1s',
-      }}>
-        {/* Label with tooltip */}
-        <Tooltip
-          title={
-            <Box sx={{ fontSize: '0.75rem' }}>
-              <Box><strong>{op}</strong>: {label}</Box>
-              <Box>Duration: {duration}ms</Box>
-              <Box>Status: {status}</Box>
-              {data && Object.entries(data).slice(0, 3).map(([k, v]) => (
-                <Box key={k}>{k}: {v}</Box>
-              ))}
-            </Box>
-          }
-          placement="right"
-          arrow
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1.5, py: 0.6, overflow: 'hidden', pl: isRoot ? 1.5 : `${12 + depth * 16}px`, cursor: 'default' }}>
-            {!isRoot && (
-              <Box sx={{ display: 'flex', alignItems: 'center', mr: 0.3, flexShrink: 0 }}>
-                <Box sx={{ width: 8, height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' }} />
-              </Box>
-            )}
-            <Chip label={op.split('.')[0]} size="small" sx={{
-              height: 18, fontSize: '0.6rem', fontWeight: 600,
-              backgroundColor: alpha(opColor, isDark ? 0.15 : 0.08), color: opColor,
-              border: 'none', flexShrink: 0, borderRadius: 0.8,
-            }} />
-            <Typography variant="caption" noWrap sx={{
-              fontFamily: 'monospace', fontSize: '0.73rem',
-              fontWeight: isRoot ? 700 : 400,
-              color: isErr ? '#f44336' : (isDark ? '#ccc' : '#333'),
-            }}>
-              {label}
-            </Typography>
-          </Box>
-        </Tooltip>
-
-        {/* Bar */}
-        <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', px: 1 }}>
-          {/* Grid lines */}
-          {[25, 50, 75].map(pct => (
-            <Box key={pct} sx={{
-              position: 'absolute', left: `${pct}%`, top: 0, bottom: 0, width: 1,
-              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-            }} />
-          ))}
-          {/* Duration bar */}
-          <Box sx={{
-            position: 'absolute',
-            left: barPos.left,
-            width: barPos.width,
-            height: isRoot ? 20 : 16,
-            borderRadius: 1,
-            backgroundColor: isErr ? alpha('#f44336', 0.7) : alpha(opColor, 0.7),
-            border: `1px solid ${isErr ? '#f44336' : opColor}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            minWidth: 2,
-            transition: 'all 0.2s',
-          }}>
-            {duration > totalDuration(barPos) * 0.15 && (
-              <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 600, color: '#fff', textShadow: '0 0 2px rgba(0,0,0,0.3)' }}>
-                {duration}ms
-              </Typography>
-            )}
-          </Box>
-          {/* Duration label outside if bar is small */}
-          {duration <= totalDuration(barPos) * 0.15 && (
-            <Typography variant="caption" sx={{
-              position: 'absolute',
-              left: `calc(${barPos.left} + ${barPos.width} + 4px)`,
-              fontSize: '0.62rem', fontWeight: 600, color: isDark ? '#777' : '#999',
-            }}>
-              {duration}ms
-            </Typography>
-          )}
-        </Box>
-      </Box>
-  );
-};
-
-// totalDuration helper for bar — parse width percentage back
-function totalDuration(barPos: { width: string }): number {
-  return parseFloat(barPos.width) || 100;
-}
-
 const METHOD_COLORS: Record<string, string> = {
   GET: '#4caf50', POST: '#2196f3', PUT: '#ff9800', PATCH: '#7c4dff',
   DELETE: '#f44336', HEAD: '#9e9e9e', OPTIONS: '#607d8b',
@@ -761,6 +506,15 @@ function formatTime(ts: string): string {
     const d = new Date(ts);
     return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
   } catch { return ts; }
+}
+
+function getOpColor(op: string): string {
+  if (!op) return '#9e9e9e';
+  if (op.startsWith('db')) return '#ff9800';
+  if (op.startsWith('http')) return '#2196f3';
+  if (op.startsWith('queue')) return '#9c27b0';
+  if (op.startsWith('cache')) return '#00bcd4';
+  return '#9e9e9e';
 }
 
 export default ArgusPerformancePage;

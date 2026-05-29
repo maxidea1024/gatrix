@@ -138,6 +138,32 @@ function generateTransactionEvent() {
   const now = new Date(Date.now() - Math.random() * 24 * 3600000);
   const start = new Date(now.getTime() - duration);
 
+  const trace_id = uuid().replace(/-/g, '');
+  const span_id = uuid().replace(/-/g, '').slice(0, 16);
+  
+  const numSpans = randomInt(2, 8);
+  const spans = [];
+  let currentStart = start.getTime();
+  let parentSpanId = span_id;
+  for (let i = 0; i < numSpans; i++) {
+    const spanDur = randomInt(10, Math.max(10, Math.floor(duration / numSpans)));
+    spans.push({
+      span_id: uuid().replace(/-/g, '').slice(0, 16),
+      parent_span_id: parentSpanId,
+      trace_id,
+      op: randomItem(['db.query', 'http.client', 'cache.get', 'function']),
+      description: `Dummy operation ${i}`,
+      start_timestamp: new Date(currentStart).toISOString(),
+      timestamp: new Date(currentStart + spanDur).toISOString(),
+      duration: spanDur,
+      status: 'ok',
+      data: { 'db.system': 'mysql' }
+    });
+    // Create some hierarchy
+    if (Math.random() > 0.5) parentSpanId = spans[spans.length - 1].span_id;
+    currentStart += spanDur;
+  }
+
   return {
     type: 'transaction',
     event_id: uuid().replace(/-/g, ''),
@@ -147,10 +173,11 @@ function generateTransactionEvent() {
     release: randomItem(RELEASES),
     transaction: randomItem(TRANSACTION_NAMES),
     transaction_op: randomItem(TXN_OPS),
-    trace_id: uuid().replace(/-/g, ''),
-    span_id: uuid().replace(/-/g, '').slice(0, 16),
+    trace_id,
+    span_id,
     start_timestamp: start.toISOString(),
     duration,
+    spans,
     transaction_status: randomItem(['ok', 'ok', 'ok', 'ok', 'internal_error', 'deadline_exceeded']),
     http_method: randomItem(['GET', 'POST', 'PUT', 'DELETE']),
     http_status_code: randomItem([200, 200, 200, 201, 400, 404, 500]),

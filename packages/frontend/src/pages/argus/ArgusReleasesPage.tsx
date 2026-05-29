@@ -17,8 +17,9 @@ import {
   BugReport as BugIcon,
   People as PeopleIcon,
   Schedule as ScheduleIcon,
-  CheckCircle as CheckIcon,
   Warning as WarnIcon,
+  AccessTime as AccessTimeIcon,
+  CheckCircle as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -148,16 +149,16 @@ const ArgusReleasesPage: React.FC = () => {
                     <Divider orientation="vertical" flexItem />
                     <StatItem icon={<PeopleIcon sx={{ fontSize: 15 }} />} color="#2196f3" label={t('argus.releases.users')} value={Number(r.affected_users).toLocaleString()} />
                     <Divider orientation="vertical" flexItem />
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ScheduleIcon sx={{ fontSize: 14, color: isDark ? '#555' : '#bbb' }} />
-                      <Box>
-                        <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.68rem', display: 'block' }}>
-                          {t('argus.releases.firstSeen')}: {formatRelative(r.first_seen)}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.68rem', display: 'block' }}>
-                          {t('argus.releases.lastSeen')}: {formatRelative(r.last_seen)}
+                    <Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <AccessTimeIcon sx={{ fontSize: 14, color: isDark ? '#666' : '#999' }} />
+                        <Typography variant="caption" sx={{ color: isDark ? '#888' : '#666' }}>
+                          {t('argus.releases.firstSeen')}: {formatRelative(r.first_seen, t)}
                         </Typography>
                       </Box>
+                      <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.68rem', display: 'block' }}>
+                        {t('argus.releases.lastSeen')}: {formatRelative(r.last_seen, t)}
+                      </Typography>
                     </Box>
                   </Box>
 
@@ -191,7 +192,7 @@ const StatItem: React.FC<{ icon: React.ReactElement; color: string; label: strin
   </Box>
 );
 
-function formatRelative(dateStr: string): string {
+function formatRelative(dateStr: string, t: any): string {
   try {
     const d = new Date(dateStr);
     const now = new Date();
@@ -199,10 +200,10 @@ function formatRelative(dateStr: string): string {
     const hrs = Math.floor(diff / 3600000);
     const days = Math.floor(hrs / 24);
 
-    if (hrs < 1) return '방금';
-    if (hrs < 24) return `${hrs}시간 전`;
-    if (days < 30) return `${days}일 전`;
-    return d.toLocaleDateString('ko-KR');
+    if (hrs < 1) return t('common.time.justNow');
+    if (hrs < 24) return t('common.time.hoursAgo', { count: hrs });
+    if (days < 30) return t('common.time.daysAgo', { count: days });
+    return d.toLocaleDateString();
   } catch {
     return dateStr;
   }

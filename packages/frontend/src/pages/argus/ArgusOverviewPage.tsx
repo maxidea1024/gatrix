@@ -21,6 +21,7 @@ import {
   TrendingDown as TrendingDownIcon,
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
+import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -315,7 +316,7 @@ const ArgusOverviewPage: React.FC = () => {
             {t('argus.overview.errorTrend')}
           </Typography>
           <Box sx={{ height: 220 }}>
-            {loading ? <Skeleton variant="rounded" height={220} /> : <Line data={errorChartData} options={chartOptions} />}
+            {loading ? <Skeleton variant="rounded" height={220} /> : <Line data={errorChartData} options={chartOptions} plugins={[getCrosshairPlugin(isDark)]} />}
           </Box>
         </Paper>
 

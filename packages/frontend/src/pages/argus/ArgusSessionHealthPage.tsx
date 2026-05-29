@@ -18,6 +18,7 @@ import {
   People as PeopleIcon,
   Timer as TimerIcon,
 } from '@mui/icons-material';
+import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useTranslation } from 'react-i18next';
 import {
   Chart as ChartJS,
@@ -145,7 +146,7 @@ const ArgusSessionHealthPage: React.FC = () => {
     { icon: <DevicesIcon />, color: '#7c4dff', label: t('argus.sessions.totalSessions'), value: s?.total_sessions },
     { icon: <PeopleIcon />, color: '#2196f3', label: t('argus.sessions.uniqueUsers'), value: s?.unique_users },
     { icon: <CrashIcon />, color: '#f44336', label: t('argus.sessions.crashed'), value: s?.crashed },
-    { icon: <TimerIcon />, color: '#ff9800', label: '평균 지속', value: s ? `${Math.round(Number(s.avg_duration) / 1000)}s` : undefined },
+    { icon: <TimerIcon />, color: '#ff9800', label: t('argus.sessions.avgDuration'), value: s ? `${Math.round(Number(s.avg_duration) / 1000)}s` : undefined },
   ];
 
   return (
@@ -188,16 +189,16 @@ const ArgusSessionHealthPage: React.FC = () => {
                   {crashFreeRate.toFixed(1)}%
                 </Typography>
                 <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', fontSize: '0.68rem' }}>
-                  Crash Free
+                  {t('argus.sessions.crashFree')}
                 </Typography>
               </Box>
             </Box>
             {/* Legend */}
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
               {[
-                { label: 'Healthy', value: s?.healthy, color: '#4caf50' },
-                { label: 'Crashed', value: s?.crashed, color: '#f44336' },
-                { label: 'Abnormal', value: s?.abnormal, color: '#ff9800' },
+                { label: t('argus.sessions.healthy'), value: s?.healthy, color: '#4caf50' },
+                { label: t('argus.sessions.crashed'), value: s?.crashed, color: '#f44336' },
+                { label: t('argus.sessions.abnormal'), value: s?.abnormal, color: '#ff9800' },
               ].map(item => (
                 <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: item.color }} />
@@ -250,7 +251,7 @@ const ArgusSessionHealthPage: React.FC = () => {
             {t('argus.sessions.crashFreeTrend')}
           </Typography>
           <Box sx={{ height: 240 }}>
-            <Line data={trendChartData} options={chartOpts} />
+            <Line data={trendChartData} options={chartOpts} plugins={[getCrosshairPlugin(isDark)]} />
           </Box>
         </Paper>
 
@@ -281,7 +282,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                   <Box sx={{ flex: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
                       <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999' }}>
-                        {Number(r.total).toLocaleString()} sessions · {Number(r.users).toLocaleString()} users
+                        {t('argus.sessions.sessionsCount', { count: Number(r.total) as any }).replace(r.total.toString(), Number(r.total).toLocaleString())} · {t('argus.sessions.usersCount', { count: Number(r.users) as any }).replace(r.users.toString(), Number(r.users).toLocaleString())}
                       </Typography>
                       <Typography variant="caption" fontWeight={700} sx={{ color: barColor }}>
                         {rate.toFixed(1)}%
@@ -295,7 +296,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                       }} />
                     </Box>
                   </Box>
-                  <Chip label={`${Number(r.crashed)} crashes`} size="small" sx={{
+                  <Chip label={t('argus.sessions.crashesCount', { count: Number(r.crashed) })} size="small" sx={{
                     height: 20, fontSize: '0.65rem',
                     backgroundColor: Number(r.crashed) > 0 ? alpha('#f44336', 0.1) : alpha('#4caf50', 0.1),
                     color: Number(r.crashed) > 0 ? '#f44336' : '#4caf50',

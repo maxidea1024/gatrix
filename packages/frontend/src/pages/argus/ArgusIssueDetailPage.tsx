@@ -11,6 +11,12 @@ import {
   alpha,
   Tooltip,
   Collapse,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -32,7 +38,10 @@ import {
   ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import argusService, { ArgusIssueDetail } from '@/services/argusService';
+import { useTranslation } from 'react-i18next';
+import argusService, { ArgusIssueDetail, ArgusTraceDetail } from '@/services/argusService';
+import TraceWaterfall from '@/components/argus/TraceWaterfall';
+import { formatRelative } from '@/utils/dateFormatter';
 
 const LEVEL_COLORS: Record<string, string> = {
   fatal: '#f44336',
@@ -45,11 +54,17 @@ const LEVEL_COLORS: Record<string, string> = {
 const ArgusIssueDetailPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const { projectId, issueId } = useParams<{ projectId: string; issueId: string }>();
 
   const [issue, setIssue] = useState<ArgusIssueDetail | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Trace states
+  const [traceDetail, setTraceDetail] = useState<ArgusTraceDetail | null>(null);
+  const [loadingTrace, setLoadingTrace] = useState(false);
+  const [showTrace, setShowTrace] = useState(false);
 
   useEffect(() => {
     if (!projectId || !issueId) return;
@@ -67,27 +82,65 @@ const ArgusIssueDetailPage: React.FC = () => {
     fetchIssue();
   }, [projectId, issueId]);
 
-  const handleStatusChange = async (newStatus: string) => {
-    if (!projectId || !issueId || !issue) return;
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status: string }>({ open: false, status: '' });
+
+  const executeStatusChange = async () => {
+    if (!projectId || !issueId || !issue || !confirmDialog.status) return;
     try {
-      await argusService.updateIssueStatus(projectId, issueId, newStatus);
-      setIssue({ ...issue, status: newStatus });
+      await argusService.updateIssueStatus(projectId, issueId, confirmDialog.status);
+      setIssue({ ...issue, status: confirmDialog.status });
+      setConfirmDialog({ open: false, status: '' });
     } catch (error) {
       console.error('Failed to update status:', error);
+    }
+  };
+
+  const requestStatusChange = (status: string) => {
+    setConfirmDialog({ open: true, status });
+  };
+
+  const loadTrace = async (tid: string) => {
+    if (!projectId) return;
+    setLoadingTrace(true);
+    setShowTrace(true);
+    try {
+      const data = await argusService.getTraceDetail(projectId, tid);
+      setTraceDetail(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingTrace(false);
     }
   };
 
   const latestEvent = issue?.latest_event;
   const levelColor = LEVEL_COLORS[issue?.level || 'error'] || LEVEL_COLORS.error;
 
+  // Extract trace_id
+  let traceId = null;
+  if (latestEvent) {
+    if (latestEvent.contexts) {
+      try {
+        const ctx = typeof latestEvent.contexts === 'string' ? JSON.parse(latestEvent.contexts) : latestEvent.contexts;
+        traceId = ctx?.trace?.trace_id;
+      } catch (e) {}
+    }
+    if (!traceId && latestEvent.tags) {
+      try {
+        const tags = typeof latestEvent.tags === 'string' ? JSON.parse(latestEvent.tags) : latestEvent.tags;
+        traceId = tags?.trace_id || tags?.['sentry:trace'];
+      } catch (e) {}
+    }
+  }
+
   return (
     <PageContentLoader loading={loading}>
       {!issue ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <BugReportIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-          <Typography color="text.secondary">Issue not found</Typography>
+          <Typography color="text.secondary">{t('argus.issues.issueNotFound')}</Typography>
           <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-            Go Back
+            {t('argus.issues.goBack')}
           </Button>
         </Box>
       ) : (
@@ -146,37 +199,37 @@ const ArgusIssueDetailPage: React.FC = () => {
 
             {issue.status !== 'resolved' && (
               <Button variant="outlined" size="small" color="success" startIcon={<CheckCircleIcon />}
-                onClick={() => handleStatusChange('resolved')}
+                onClick={() => requestStatusChange('resolved')}
                 sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
               >
-                Resolve
+                {t('argus.issues.resolve')}
               </Button>
             )}
             {issue.status !== 'ignored' && (
               <Button variant="outlined" size="small" color="inherit" startIcon={<IgnoreIcon />}
-                onClick={() => handleStatusChange('ignored')}
+                onClick={() => requestStatusChange('ignored')}
                 sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
               >
-                Ignore
+                {t('argus.issues.ignore')}
               </Button>
             )}
             {issue.status !== 'unresolved' && (
               <Button variant="outlined" size="small" color="error" startIcon={<ErrorIcon />}
-                onClick={() => handleStatusChange('unresolved')}
+                onClick={() => requestStatusChange('unresolved')}
                 sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
               >
-                Reopen
+                {t('argus.issues.reopen')}
               </Button>
             )}
             {issue.is_regression && (
-              <Chip label="Regression" size="small" sx={{
+              <Chip label={t('argus.issues.regression')} size="small" sx={{
                 fontWeight: 700, fontSize: '0.68rem',
                 backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',
               }} />
             )}
             <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
               {issue.fingerprint && (
-                <Tooltip title="핑거프린트 복사">
+                <Tooltip title={t('argus.issues.copyFingerprint')}>
                   <Chip
                     icon={<CopyIcon sx={{ fontSize: '12px !important' }} />}
                     label={`FP: ${issue.fingerprint.slice(0, 8)}`}
@@ -196,7 +249,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </Tooltip>
               )}
               {latestEvent?.event_id && (
-                <Tooltip title="이벤트 ID 복사">
+                <Tooltip title={t('argus.issues.copyEventId')}>
                   <Chip
                     icon={<CopyIcon sx={{ fontSize: '12px !important' }} />}
                     label={`ID: ${latestEvent.event_id.slice(0, 8)}`}
@@ -220,10 +273,10 @@ const ArgusIssueDetailPage: React.FC = () => {
 
           {/* Summary Stats */}
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 2, mb: 3 }}>
-            <StatMini label="Events" value={issue.event_count?.toLocaleString() || '0'} color={levelColor} />
-            <StatMini label="Users Affected" value={issue.user_count?.toLocaleString() || '0'} color="#ff9800" />
-            <StatMini label="First Seen" value={issue.first_seen ? formatRelative(issue.first_seen) : '-'} color="#7c4dff" />
-            <StatMini label="Last Seen" value={issue.last_seen ? formatRelative(issue.last_seen) : '-'} color="#2196f3" />
+            <StatMini label={t('argus.issues.events')} value={issue.event_count?.toLocaleString() || '0'} color={levelColor} />
+            <StatMini label={t('argus.issues.users')} value={issue.user_count?.toLocaleString() || '0'} color="#ff9800" />
+            <StatMini label={t('argus.issues.firstSeen')} value={issue.first_seen ? formatRelative(issue.first_seen, t) : '-'} color="#7c4dff" />
+            <StatMini label={t('argus.issues.lastSeen')} value={issue.last_seen ? formatRelative(issue.last_seen, t) : '-'} color="#2196f3" />
           </Box>
 
           {/* Latest Event */}
@@ -260,14 +313,14 @@ const ArgusIssueDetailPage: React.FC = () => {
                 }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <DeviceIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
-                    Context
+                    {t('argus.issues.context')}
                   </Typography>
                   <ContextGrid items={[
-                    latestEvent.environment && { label: 'Environment', value: latestEvent.environment },
-                    latestEvent.release && { label: 'Release', value: latestEvent.release },
-                    latestEvent.browser && { label: 'Browser', value: `${latestEvent.browser} ${latestEvent.browser_version || ''}` },
-                    latestEvent.os && { label: 'OS', value: `${latestEvent.os} ${latestEvent.os_version || ''}` },
-                    latestEvent.transaction && { label: 'Transaction', value: latestEvent.transaction },
+                    latestEvent.environment && { label: t('argus.issues.environment'), value: latestEvent.environment },
+                    latestEvent.release && { label: t('argus.issues.release'), value: latestEvent.release },
+                    latestEvent.browser && { label: t('argus.issues.browser'), value: `${latestEvent.browser} ${latestEvent.browser_version || ''}` },
+                    latestEvent.os && { label: t('argus.issues.os'), value: `${latestEvent.os} ${latestEvent.os_version || ''}` },
+                    latestEvent.transaction && { label: t('argus.issues.transaction'), value: latestEvent.transaction },
                   ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
                 </Paper>
 
@@ -280,11 +333,11 @@ const ArgusIssueDetailPage: React.FC = () => {
                     <>
                       <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <PersonIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
-                        User
+                        {t('argus.issues.user')}
                       </Typography>
                       <ContextGrid items={[
-                        latestEvent.user_email && { label: 'Email', value: latestEvent.user_email },
-                        latestEvent.user_ip && { label: 'IP', value: latestEvent.user_ip },
+                        latestEvent.user_email && { label: t('argus.issues.email'), value: latestEvent.user_email },
+                        latestEvent.user_ip && { label: t('argus.issues.ip'), value: latestEvent.user_ip },
                       ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
                       <Divider sx={{ my: 1.5 }} />
                     </>
@@ -300,7 +353,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                           .map(([key, val]) => (
                             <Chip
                               key={key}
-                              label={`${key}: ${val}`}
+                              label={`${key}: ${String(val)}`}
                               size="small"
                               variant="outlined"
                               sx={{
@@ -315,6 +368,41 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </Paper>
               </Box>
 
+              {/* Trace Waterfall */}
+              {traceId && (
+                <Paper elevation={0} sx={{
+                  p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                  borderRadius: 2,
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTrace ? 2 : 0 }}>
+                    <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <ScheduleIcon fontSize="small" sx={{ color: theme.palette.success.main }} />
+                      {t('argus.issues.transactionTrace', 'Transaction Trace')}
+                    </Typography>
+                    {!showTrace && (
+                      <Button variant="outlined" size="small" onClick={() => loadTrace(traceId)} disabled={loadingTrace}>
+                        {t('argus.issues.viewTrace', 'Trace 보기')}
+                      </Button>
+                    )}
+                  </Box>
+                  {showTrace && (
+                    <Box>
+                      {loadingTrace ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                          <CircularProgress size={24} />
+                        </Box>
+                      ) : traceDetail ? (
+                        <TraceWaterfall trace={traceDetail} isDark={isDark} />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary" textAlign="center" py={4}>
+                          Trace 정보를 불러오지 못했습니다.
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                </Paper>
+              )}
+
               {/* Breadcrumbs */}
               {latestEvent.breadcrumbs && (
                 <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} isDark={isDark} />
@@ -323,13 +411,75 @@ const ArgusIssueDetailPage: React.FC = () => {
           )}
         </Box>
       )}
+
+      <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, status: '' })} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {confirmDialog.status === 'resolved' && t('argus.issues.confirmResolveTitle', '이슈 해결 확인')}
+          {confirmDialog.status === 'ignored' && t('argus.issues.confirmIgnoreTitle', '이슈 무시 확인')}
+          {confirmDialog.status === 'unresolved' && t('argus.issues.confirmReopenTitle', '이슈 재오픈 확인')}
+        </DialogTitle>
+        <DialogContent>
+          {issue && (
+            <Box sx={{ 
+              mb: 3, p: 2, mt: 1,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', 
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+              borderRadius: 2 
+            }}>
+              <Typography variant="caption" sx={{ color: isDark ? '#888' : '#666', mb: 1, display: 'block', fontWeight: 600 }}>
+                {t('argus.issues.targetIssue', '대상 이슈')}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <Box sx={{ width: 4, height: 18, borderRadius: 1, backgroundColor: levelColor, flexShrink: 0 }} />
+                <Typography variant="body1" fontWeight={700} sx={{ wordBreak: 'break-all', lineHeight: 1.3 }}>
+                  {issue.title}
+                </Typography>
+              </Box>
+              {issue.culprit && (
+                <Typography variant="body2" sx={{ color: isDark ? '#aaa' : '#666', ml: 1.5, mb: 1.5, fontSize: '0.8rem' }}>
+                  {issue.culprit}
+                </Typography>
+              )}
+              <Box sx={{ display: 'flex', gap: 3, ml: 1.5, flexWrap: 'wrap' }}>
+                <Typography variant="caption" sx={{ color: isDark ? '#ddd' : '#333' }}>
+                  <strong style={{ color: isDark ? '#888' : '#666' }}>{t('argus.issues.events', '발생 횟수')}:</strong> {issue.event_count?.toLocaleString() || 0}
+                </Typography>
+                <Typography variant="caption" sx={{ color: isDark ? '#ddd' : '#333' }}>
+                  <strong style={{ color: isDark ? '#888' : '#666' }}>{t('argus.issues.users', '사용자 수')}:</strong> {issue.user_count?.toLocaleString() || 0}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          <DialogContentText sx={{ color: 'text.primary', fontWeight: 500 }}>
+            {confirmDialog.status === 'resolved' && t('argus.issues.confirmResolveText', '위 이슈를 해결 처리하시겠습니까?')}
+            {confirmDialog.status === 'ignored' && t('argus.issues.confirmIgnoreText', '위 이슈를 앞으로 무시 처리하시겠습니까?')}
+            {confirmDialog.status === 'unresolved' && t('argus.issues.confirmReopenText', '위 이슈를 다시 미해결 상태로 변경하시겠습니까?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button onClick={() => setConfirmDialog({ open: false, status: '' })} color="inherit" sx={{ textTransform: 'none' }}>
+            {t('common.cancel', '취소')}
+          </Button>
+          <Button 
+            onClick={executeStatusChange} 
+            color={confirmDialog.status === 'resolved' ? 'success' : confirmDialog.status === 'ignored' ? 'inherit' : 'primary'} 
+            variant="contained"
+            disableElevation
+            sx={{ textTransform: 'none', fontWeight: 600, minWidth: 80 }}
+          >
+            {confirmDialog.status === 'resolved' && t('argus.issues.resolve', '해결')}
+            {confirmDialog.status === 'ignored' && t('argus.issues.ignore', '무시')}
+            {confirmDialog.status === 'unresolved' && t('argus.issues.reopen', '재오픈')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PageContentLoader>
   );
 };
 
 // --- Stacktrace Viewer ---
 const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stacktrace, isDark }) => {
-  const [expandedFrames, setExpandedFrames] = useState<Set<number>>(new Set());
+  const [toggledFrames, setToggledFrames] = useState<Set<number>>(new Set());
 
   let frames: any[] = [];
   try {
@@ -338,11 +488,8 @@ const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stackt
 
   if (frames.length === 0) return null;
 
-  // Show in-app frames expanded by default
-  const inAppIndices = new Set(frames.map((f: any, i: number) => f.in_app ? i : -1).filter((i: number) => i >= 0));
-
   const toggleFrame = (idx: number) => {
-    setExpandedFrames(prev => {
+    setToggledFrames(prev => {
       const next = new Set(prev);
       next.has(idx) ? next.delete(idx) : next.add(idx);
       return next;
@@ -352,23 +499,28 @@ const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stackt
   return (
     <Box>
       {frames.map((frame: any, idx: number) => {
-        const isInApp = frame.in_app;
-        const isExpanded = expandedFrames.has(idx) || inAppIndices.has(idx);
+        const isInApp = !!frame.in_app;
+        const hasContext = !!frame.context_line;
+        const isExpanded = hasContext && (toggledFrames.has(idx) ? !isInApp : isInApp);
         return (
           <Box key={idx}>
             <Box
-              onClick={() => toggleFrame(idx)}
+              onClick={hasContext ? () => toggleFrame(idx) : undefined}
               sx={{
                 display: 'flex', alignItems: 'center', gap: 1,
                 px: 2, py: 0.8,
-                cursor: 'pointer',
+                cursor: hasContext ? 'pointer' : 'default',
                 backgroundColor: isInApp ? alpha('#7c4dff', isDark ? 0.08 : 0.04) : 'transparent',
                 borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' },
+                '&:hover': { backgroundColor: hasContext ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)') : undefined },
                 transition: 'background 0.15s',
               }}
             >
-              {isExpanded ? <ExpandLessIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+              {hasContext ? (
+                isExpanded ? <ExpandLessIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              ) : (
+                <Box sx={{ width: 16 }} />
+              )}
               {isInApp && <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#7c4dff', flexShrink: 0 }} />}
               <Typography variant="body2" sx={{
                 fontFamily: 'monospace', fontSize: '0.78rem',
@@ -439,7 +591,7 @@ const BreadcrumbsTimeline: React.FC<{ breadcrumbs: any; isDark: boolean }> = ({ 
           const color = categoryColors[bc.category] || categoryColors.default;
           const icon = categoryIcons[bc.category] || <InfoIcon sx={{ fontSize: 14 }} />;
           return (
-            <Box key={idx} sx={{ display: 'flex', gap: 1.5, position: 'relative' }}>
+            <Box key={idx} sx={{ display: 'flex', gap: 1.5, position: 'relative', pb: 2 }}>
               {/* Timeline line */}
               <Box sx={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', width: 20, flexShrink: 0,
@@ -447,16 +599,16 @@ const BreadcrumbsTimeline: React.FC<{ breadcrumbs: any; isDark: boolean }> = ({ 
                 <Box sx={{
                   width: 20, height: 20, borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  backgroundColor: alpha(color, isDark ? 0.2 : 0.1), color,
+                  backgroundColor: alpha(color, isDark ? 0.2 : 0.1), color, zIndex: 1,
                 }}>
                   {icon}
                 </Box>
                 {idx < items.length - 1 && (
-                  <Box sx={{ width: 1, flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }} />
+                  <Box sx={{ width: 1.5, flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', mt: 0.5 }} />
                 )}
               </Box>
               {/* Content */}
-              <Box sx={{ pb: 1.5, flex: 1, minWidth: 0 }}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Chip label={bc.category} size="small" sx={{
                     height: 18, fontSize: '0.62rem', fontWeight: 600,
@@ -508,7 +660,7 @@ const ContextGrid: React.FC<{ items: { label: string; value: string }[]; isDark:
   </Box>
 );
 
-function formatRelative(dateStr: string): string {
+function formatRelative(dateStr: string, t: any): string {
   try {
     const d = new Date(dateStr);
     const now = new Date();
@@ -517,11 +669,11 @@ function formatRelative(dateStr: string): string {
     const hrs = Math.floor(mins / 60);
     const days = Math.floor(hrs / 24);
 
-    if (mins < 1) return '방금';
-    if (mins < 60) return `${mins}분 전`;
-    if (hrs < 24) return `${hrs}시간 전`;
-    if (days < 30) return `${days}일 전`;
-    return d.toLocaleDateString('ko-KR');
+    if (mins < 1) return t('common.time.justNow');
+    if (mins < 60) return t('common.time.minutesAgo', { count: mins });
+    if (hrs < 24) return t('common.time.hoursAgo', { count: hrs });
+    if (days < 30) return t('common.time.daysAgo', { count: days });
+    return d.toLocaleDateString();
   } catch {
     return dateStr;
   }

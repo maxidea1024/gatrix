@@ -82,10 +82,10 @@ const ArgusSettingsPage: React.FC = () => {
       setProject(data);
       setName(data.name);
       setPlatform(data.platform);
-      setErrorQuota(data.error_quota_daily);
-      setTxnSampleRate(data.transaction_sample_rate);
-      setSessionSampleRate(data.session_sample_rate);
-      setRetentionDays(data.retention_days);
+      setErrorQuota(Number(data.error_quota_daily));
+      setTxnSampleRate(Number(data.transaction_sample_rate));
+      setSessionSampleRate(Number(data.session_sample_rate));
+      setRetentionDays(Number(data.retention_days));
     } catch (error: any) {
       if (error?.response?.status === 404 || error?.status === 404) {
         try {
