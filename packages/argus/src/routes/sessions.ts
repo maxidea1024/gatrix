@@ -102,10 +102,18 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             query_params: qp,
           }),
 
-          // NEW: Crashes by browser
+          // NEW: Crashes by browser (extract from user_agent)
           clickhouse.query({
             query: `SELECT
-              if(browser = '', 'Unknown', browser) AS browser,
+              multiIf(
+                user_agent ILIKE '%Chrome%' AND user_agent NOT ILIKE '%Edg%', 'Chrome',
+                user_agent ILIKE '%Firefox%', 'Firefox',
+                user_agent ILIKE '%Safari%' AND user_agent NOT ILIKE '%Chrome%', 'Safari',
+                user_agent ILIKE '%Edg%', 'Edge',
+                user_agent ILIKE '%Opera%' OR user_agent ILIKE '%OPR%', 'Opera',
+                user_agent = '', 'Unknown',
+                'Other'
+              ) AS browser,
               count() AS total,
               countIf(status = 'crashed') AS crashed,
               if(total > 0, crashed / total * 100, 0) AS crash_rate
@@ -115,10 +123,18 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             query_params: qp,
           }),
 
-          // NEW: Crashes by OS
+          // NEW: Crashes by OS (extract from user_agent)
           clickhouse.query({
             query: `SELECT
-              if(os = '', 'Unknown', os) AS os,
+              multiIf(
+                user_agent ILIKE '%Windows%', 'Windows',
+                user_agent ILIKE '%Mac OS%' OR user_agent ILIKE '%Macintosh%', 'macOS',
+                user_agent ILIKE '%Linux%' AND user_agent NOT ILIKE '%Android%', 'Linux',
+                user_agent ILIKE '%Android%', 'Android',
+                user_agent ILIKE '%iPhone%' OR user_agent ILIKE '%iPad%', 'iOS',
+                user_agent = '', 'Unknown',
+                'Other'
+              ) AS os,
               count() AS total,
               countIf(status = 'crashed') AS crashed,
               if(total > 0, crashed / total * 100, 0) AS crash_rate
