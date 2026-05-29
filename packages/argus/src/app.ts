@@ -8,6 +8,7 @@ import ingestRoutes from './routes/ingest';
 import issuesRoutes from './routes/issues';
 import projectsRoutes from './routes/projects';
 import overviewRoutes from './routes/overview';
+import performanceRoutes from './routes/performance';
 
 const logger = createLogger('app');
 
@@ -65,6 +66,7 @@ export async function createApp(): Promise<FastifyInstance> {
   await app.register(issuesRoutes, { prefix: '/argus/api' });
   await app.register(projectsRoutes, { prefix: '/argus/api' });
   await app.register(overviewRoutes, { prefix: '/argus/api' });
+  await app.register(performanceRoutes, { prefix: '/argus/api' });
 
   // 404 handler
   app.setNotFoundHandler((request, reply) => {

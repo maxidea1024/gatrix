@@ -312,6 +312,9 @@ const ArgusIssueDetailPage = React.lazy(
 const ArgusOverviewPage = React.lazy(
   () => import('./pages/argus/ArgusOverviewPage')
 );
+const ArgusPerformancePage = React.lazy(
+  () => import('./pages/argus/ArgusPerformancePage')
+);
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 
@@ -1158,6 +1161,10 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="issues/:projectId/:issueId"
                                           element={<ArgusIssueDetailPage />}
+                                        />
+                                        <Route
+                                          path="performance"
+                                          element={<ArgusPerformancePage />}
                                         />
                                       </Routes>
                                     </MainLayout>

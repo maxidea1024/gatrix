@@ -124,6 +124,24 @@ export interface ArgusOverviewData {
   }[];
 }
 
+export interface ArgusTransaction {
+  name: string;
+  count: number;
+  avg_duration: number;
+  p50: number;
+  p75: number;
+  p95: number;
+  p99: number;
+  error_rate: number;
+  last_seen: string;
+}
+
+export interface ArgusTransactionDetail {
+  trend: { hour: string; count: number; avg_duration: number; p95: number; error_rate: number }[];
+  histogram: { bucket: string; count: number }[];
+  spans: { description: string; op: string; count: number; avg_duration: number; p95: number }[];
+}
+
 // ==================== Prefix for all Argus API calls ====================
 const ARGUS_BASE = '/argus/api';
 
@@ -139,6 +157,30 @@ class ArgusService {
     const response = await api.get(`${ARGUS_BASE}/overview/${projectId}`, {
       params: { period },
     });
+    return response.data?.data || response.data;
+  }
+
+  // --- Performance ---
+
+  async getTransactions(
+    projectId: number | string,
+    params?: { period?: string; sort?: string; limit?: number }
+  ): Promise<ArgusTransaction[]> {
+    const response = await api.get(`${ARGUS_BASE}/performance/${projectId}/transactions`, {
+      params,
+    });
+    return response.data?.data || response.data || [];
+  }
+
+  async getTransactionDetail(
+    projectId: number | string,
+    txnName: string,
+    period?: string
+  ): Promise<ArgusTransactionDetail> {
+    const response = await api.get(
+      `${ARGUS_BASE}/performance/${projectId}/transactions/${encodeURIComponent(txnName)}`,
+      { params: { period } }
+    );
     return response.data?.data || response.data;
   }
 
