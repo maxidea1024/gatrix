@@ -1,8 +1,26 @@
 /**
  * Argus Service — Frontend API client for the Argus error tracking backend.
- * Calls go through the Vite proxy: /argus/api/* -> localhost:45300
+ * Uses a dedicated axios instance (no /api/v1 prefix) so requests hit the
+ * Vite proxy: /argus/api/* -> localhost:45300
  */
-import api from './api';
+import axios, { AxiosInstance } from 'axios';
+import { apiService } from './api';
+
+// Dedicated axios instance for Argus — no baseURL prefix
+const argusApi: AxiosInstance = axios.create({
+  timeout: 60000,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// Share the auth token from the main ApiService
+argusApi.interceptors.request.use((config) => {
+  const token = apiService.getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // ==================== Types ====================
 
@@ -190,7 +208,7 @@ class ArgusService {
     projectId: number | string,
     period?: string
   ): Promise<ArgusOverviewData> {
-    const response = await api.get(`${ARGUS_BASE}/overview/${projectId}`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/overview/${projectId}`, {
       params: { period },
     });
     return response.data?.data || response.data;
@@ -202,7 +220,7 @@ class ArgusService {
     projectId: number | string,
     params?: { period?: string; sort?: string; limit?: number }
   ): Promise<ArgusTransaction[]> {
-    const response = await api.get(`${ARGUS_BASE}/performance/${projectId}/transactions`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/performance/${projectId}/transactions`, {
       params,
     });
     return response.data?.data || response.data || [];
@@ -213,7 +231,7 @@ class ArgusService {
     txnName: string,
     period?: string
   ): Promise<ArgusTransactionDetail> {
-    const response = await api.get(
+    const response = await argusApi.get(
       `${ARGUS_BASE}/performance/${projectId}/transactions/${encodeURIComponent(txnName)}`,
       { params: { period } }
     );
@@ -226,7 +244,7 @@ class ArgusService {
     projectId: number | string,
     period?: string
   ): Promise<ArgusSessionHealth> {
-    const response = await api.get(`${ARGUS_BASE}/sessions/${projectId}`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/sessions/${projectId}`, {
       params: { period },
     });
     return response.data?.data || response.data;
@@ -238,7 +256,7 @@ class ArgusService {
     projectId: number | string,
     params?: { period?: string; page?: number; limit?: number }
   ): Promise<{ items: ArgusFeedbackItem[]; total: number }> {
-    const response = await api.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
+    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
     return response.data?.data || response.data;
   }
 
@@ -248,7 +266,7 @@ class ArgusService {
     projectId: number | string,
     period?: string
   ): Promise<ArgusRelease[]> {
-    const response = await api.get(`${ARGUS_BASE}/releases/${projectId}`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/releases/${projectId}`, {
       params: { period },
     });
     return response.data?.data || response.data || [];
@@ -257,12 +275,12 @@ class ArgusService {
   // --- Projects ---
 
   async listProjects(): Promise<ArgusProject[]> {
-    const response = await api.get(`${ARGUS_BASE}/projects`);
+    const response = await argusApi.get(`${ARGUS_BASE}/projects`);
     return response.data?.data || response.data || [];
   }
 
   async getProject(projectId: number | string): Promise<ArgusProject> {
-    const response = await api.get(`${ARGUS_BASE}/projects/${projectId}`);
+    const response = await argusApi.get(`${ARGUS_BASE}/projects/${projectId}`);
     return response.data?.data || response.data;
   }
 
@@ -272,7 +290,7 @@ class ArgusService {
     slug: string;
     platform?: string;
   }): Promise<ArgusProject & { dsn: string }> {
-    const response = await api.post(`${ARGUS_BASE}/projects`, data);
+    const response = await argusApi.post(`${ARGUS_BASE}/projects`, data);
     return response.data?.data || response.data;
   }
 
@@ -280,14 +298,14 @@ class ArgusService {
     projectId: number | string,
     data: Partial<Pick<ArgusProject, 'name' | 'platform' | 'error_quota_daily' | 'transaction_sample_rate' | 'session_sample_rate' | 'retention_days'>>
   ): Promise<void> {
-    await api.patch(`${ARGUS_BASE}/projects/${projectId}`, data);
+    await argusApi.patch(`${ARGUS_BASE}/projects/${projectId}`, data);
   }
 
   async getProjectStats(
     projectId: number | string,
     period?: string
   ): Promise<ArgusProjectStats[]> {
-    const response = await api.get(`${ARGUS_BASE}/projects/${projectId}/stats`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/projects/${projectId}/stats`, {
       params: { period },
     });
     return response.data?.data || response.data || [];
@@ -299,14 +317,14 @@ class ArgusService {
     projectId: number | string,
     label?: string
   ): Promise<ArgusDsnKey> {
-    const response = await api.post(`${ARGUS_BASE}/projects/${projectId}/dsn-keys`, {
+    const response = await argusApi.post(`${ARGUS_BASE}/projects/${projectId}/dsn-keys`, {
       label,
     });
     return response.data?.data || response.data;
   }
 
   async revokeDsnKey(projectId: number | string, keyId: number | string): Promise<void> {
-    await api.delete(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}`);
+    await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}`);
   }
 
   // --- Issues ---
@@ -315,7 +333,7 @@ class ArgusService {
     projectId: number | string,
     params?: ArgusIssueListParams
   ): Promise<{ data: ArgusIssue[]; total: number }> {
-    const response = await api.get(`${ARGUS_BASE}/issues/${projectId}`, {
+    const response = await argusApi.get(`${ARGUS_BASE}/issues/${projectId}`, {
       params,
     });
     const result = response.data;
@@ -329,7 +347,7 @@ class ArgusService {
     projectId: number | string,
     issueId: number | string
   ): Promise<ArgusIssueDetail> {
-    const response = await api.get(`${ARGUS_BASE}/issues/${projectId}/${issueId}`);
+    const response = await argusApi.get(`${ARGUS_BASE}/issues/${projectId}/${issueId}`);
     return response.data?.data || response.data;
   }
 
@@ -338,7 +356,7 @@ class ArgusService {
     issueId: number | string,
     status: string
   ): Promise<void> {
-    await api.patch(`${ARGUS_BASE}/issues/${projectId}/${issueId}/status`, {
+    await argusApi.patch(`${ARGUS_BASE}/issues/${projectId}/${issueId}/status`, {
       status,
     });
   }
@@ -348,7 +366,7 @@ class ArgusService {
     issueId: number | string,
     assignee: string | null
   ): Promise<void> {
-    await api.patch(`${ARGUS_BASE}/issues/${projectId}/${issueId}/assign`, {
+    await argusApi.patch(`${ARGUS_BASE}/issues/${projectId}/${issueId}/assign`, {
       assigned_to: assignee,
     });
   }
