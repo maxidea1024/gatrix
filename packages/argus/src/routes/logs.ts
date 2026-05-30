@@ -55,6 +55,8 @@ export default async function logsRoutes(app: FastifyInstance) {
             message,
             body,
             service,
+            environment,
+            release,
             attributes
           FROM argus.logs
           WHERE ${conditions.join(' AND ')}

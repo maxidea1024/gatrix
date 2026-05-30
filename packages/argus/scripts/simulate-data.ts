@@ -451,7 +451,60 @@ function generateLogsForEvent(issueId: number, timestamp: Date, scenario: ErrorS
     );
   }
 
+  const user = randomPick(USERS);
+  const server = randomPick(SERVERS);
+  const characterId = String(randomInt(100000, 999999));
+
+  // Per-scenario attributes templates
+  const attrTemplates: Record<string, string>[][] = [];
+
+  if (scenario.type === 'ConnectionError') {
+    attrTemplates.push(
+      { 'ws.endpoint': 'wss://game-ws.unchartedwaters.com/play', 'ws.protocol': 'v2', 'heartbeat.interval_ms': '5000', 'server.shard': `shard-${randomInt(1, 20)}`, 'character.id': characterId, 'session.id': uuid().substring(0, 16) } as any,
+      { 'ws.latency_ms': String(randomInt(80, 200)), 'ws.rtt_ms': String(randomInt(100, 300)), 'server.shard': `shard-${randomInt(1, 20)}` } as any,
+      { 'ws.last_pong_ms': String(randomInt(5000, 30000)), 'ws.missed_pings': String(randomInt(2, 5)), 'network.type': randomPick(['wifi', '4g', 'ethernet']) } as any,
+      { 'connection.quality': 'POOR', 'packet.loss_rate': String((Math.random() * 0.5).toFixed(3)), 'jitter_ms': String(randomInt(50, 500)) } as any,
+      { 'ws.close_code': '1006', 'ws.close_reason': 'abnormal closure', 'ws.duration_s': String(randomInt(60, 3600)), 'bytes.sent': String(randomInt(10000, 500000)), 'bytes.received': String(randomInt(50000, 2000000)) } as any,
+      { 'reconnect.attempt': '1', 'reconnect.max': '3', 'reconnect.delay_ms': '2000' } as any,
+      { 'reconnect.attempt': '3', 'reconnect.result': 'FAILED', 'error.code': 'ECONNREFUSED', 'server.host': `game-ws-${randomInt(1, 5)}.unchartedwaters.com` } as any,
+    );
+  } else if (scenario.type === 'InventorySyncError') {
+    attrTemplates.push(
+      { 'sync.type': 'full', 'character.id': characterId, 'inventory.version': String(randomInt(100, 999)) } as any,
+      { 'http.method': 'GET', 'http.url': '/api/inventory/snapshot', 'http.status': '200', 'http.duration_ms': String(randomInt(50, 300)) } as any,
+      { 'inventory.server_count': '47', 'inventory.categories': '12', 'inventory.total_weight': String(randomInt(1000, 9999)) } as any,
+      { 'inventory.client_count': '49', 'inventory.diff': '+2', 'validation.status': 'MISMATCH' } as any,
+      { 'item.id': '30291', 'item.name': 'Refined Gold Bar', 'item.quantity': '2', 'item.duplicate': 'true', 'item.slot': String(randomInt(1, 50)) } as any,
+      { 'sync.result': 'ABORTED', 'sync.rollback': 'true', 'character.id': characterId, 'ticket.auto_created': 'true' } as any,
+    );
+  } else if (scenario.type === 'MatchmakingTimeout') {
+    attrTemplates.push(
+      { 'player.mmr': '1847', 'queue.mode': 'pvp_fleet_battle', 'character.id': characterId, 'character.level': String(randomInt(30, 80)), 'fleet.size': String(randomInt(3, 8)) } as any,
+      { 'queue.position': '342', 'queue.total': '2847', 'queue.region': 'ap-northeast-1', 'queue.estimated_wait_s': '45' } as any,
+      { 'search.mmr_min': '1647', 'search.mmr_max': '2047', 'search.candidates': '0' } as any,
+      { 'search.mmr_min': '1347', 'search.mmr_max': '2347', 'search.expansion': '2', 'search.candidates': '0' } as any,
+      { 'queue.elapsed_s': '90', 'search.attempts': '18', 'server.load': String((Math.random() * 0.9 + 0.1).toFixed(2)) } as any,
+      { 'queue.result': 'TIMEOUT', 'queue.elapsed_s': '120', 'queue.max_wait_s': '120', 'player.refund': 'true' } as any,
+    );
+  } else if (scenario.type === 'SlowQueryWarning') {
+    attrTemplates.push(
+      { 'db.system': 'mysql', 'db.name': 'game_ranking', 'db.statement': 'SELECT * FROM guild_rankings WHERE season=12 ORDER BY score DESC', 'db.operation': 'SELECT' } as any,
+      { 'db.plan': 'full_table_scan', 'db.index_used': 'none', 'db.table': 'guild_rankings', 'db.estimated_rows': '1500000' } as any,
+      { 'db.duration_ms': '5000', 'db.threshold_ms': '2000', 'db.connection_id': String(randomInt(100, 999)), 'db.pool_active': '8', 'db.pool_max': '10' } as any,
+      { 'db.pool_active': '8', 'db.pool_max': '10', 'db.pool_idle': '2', 'db.pool_wait_queue': String(randomInt(0, 5)) } as any,
+      { 'db.duration_ms': '8412', 'db.rows_scanned': '1284729', 'db.rows_returned': '100', 'db.bytes_read': String(randomInt(10000000, 50000000)) } as any,
+    );
+  } else {
+    const baseAttrs = { 'http.method': 'POST', 'http.url': scenario.transaction, 'server.name': server, 'character.id': characterId, 'environment': randomPick(scenario.environments) };
+    attrTemplates.push(
+      { ...baseAttrs, 'http.request_id': uuid().substring(0, 16) } as any,
+      { ...baseAttrs, 'handler.name': scenario.culprit } as any,
+      { ...baseAttrs, 'error.type': scenario.type, 'error.handled': 'false', 'stack.depth': String(scenario.frames.length) } as any,
+    );
+  }
+
   logTemplates.forEach((tmpl, i) => {
+    const attrs = attrTemplates[i] || attrTemplates[attrTemplates.length - 1] || {};
     logs.push({
       log_id: uuid(),
       project_id: PROJECT_ID,
@@ -466,7 +519,7 @@ function generateLogsForEvent(issueId: number, timestamp: Date, scenario: ErrorS
       environment: randomPick(scenario.environments),
       release: randomPick(scenario.releases),
       service: scenario.platform === 'node' ? 'game-server' : 'game-client',
-      attributes: {},
+      attributes: attrs,
     });
   });
 

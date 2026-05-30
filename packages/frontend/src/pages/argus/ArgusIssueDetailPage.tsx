@@ -72,6 +72,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [logs, setLogs] = useState<ArgusLogEntry[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
+  const [expandedLogIds, setExpandedLogIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!projectId || !issueId) return;
@@ -552,13 +553,14 @@ const ArgusIssueDetailPage: React.FC = () => {
                   {/* Header */}
                   <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: '76px 52px 150px 1fr',
+                    gridTemplateColumns: '16px 76px 52px 150px 1fr',
                     gap: '0 8px',
                     px: 1.5, py: 0.6,
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                    backgroundColor: isDark ? '#161b22' : '#f0f1f3',
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                    position: 'sticky', top: 0, zIndex: 1,
+                    position: 'sticky', top: 0, zIndex: 2,
                   }}>
+                    <Box /> {/* spacer for expand arrow */}
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Time</Typography>
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Level</Typography>
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Logger</Typography>
@@ -576,64 +578,142 @@ const ArgusIssueDetailPage: React.FC = () => {
                     const lc = levelColors[log.level] || levelColors.debug;
                     const ts = new Date(log.timestamp);
                     const timeStr = `${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}:${ts.getSeconds().toString().padStart(2, '0')}`;
+                    const logKey = log.log_id || String(i);
+                    const isExpanded = expandedLogIds.has(logKey);
+                    const toggleExpand = () => {
+                      setExpandedLogIds(prev => {
+                        const next = new Set(prev);
+                        if (next.has(logKey)) next.delete(logKey);
+                        else next.add(logKey);
+                        return next;
+                      });
+                    };
+
+                    // Build all fields for expanded view
+                    const allFields: { key: string; value: string }[] = [
+                      { key: 'timestamp', value: new Date(log.timestamp).toISOString() },
+                      { key: 'level', value: log.level },
+                      { key: 'logger', value: log.logger_name || '' },
+                      { key: 'service', value: log.service || '' },
+                      { key: 'environment', value: log.environment || '' },
+                      { key: 'release', value: log.release || '' },
+                      { key: 'trace_id', value: log.trace_id || '' },
+                      { key: 'span_id', value: log.span_id || '' },
+                      { key: 'message', value: log.message },
+                    ];
+                    // Add attributes
+                    if (log.attributes && typeof log.attributes === 'object') {
+                      Object.entries(log.attributes).forEach(([k, v]) => {
+                        allFields.push({ key: k, value: String(v) });
+                      });
+                    }
+
                     return (
-                      <Box key={log.log_id || i} sx={{
-                        display: 'grid',
-                        gridTemplateColumns: '76px 52px 150px 1fr',
-                        gap: '0 8px',
-                        px: 1.5, py: 0.4,
-                        alignItems: 'center',
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                        backgroundColor: i % 2 === 0
-                          ? 'transparent'
-                          : isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.015)',
-                        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
-                        transition: 'background-color 0.1s',
-                      }}>
-                        {/* Timestamp */}
-                        <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums' }}>
-                          {timeStr}
-                        </Typography>
-                        {/* Level */}
-                        <Box sx={{
-                          px: 0.6, py: 0.15,
-                          borderRadius: '3px',
-                          backgroundColor: lc.bg,
-                          color: lc.fg,
-                          fontSize: '0.62rem',
-                          fontWeight: 700,
-                          textAlign: 'center',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.03em',
-                          lineHeight: 1.4,
-                        }}>
-                          {log.level === 'warning' ? 'warn' : log.level}
+                      <React.Fragment key={logKey}>
+                        <Box
+                          onClick={toggleExpand}
+                          sx={{
+                            display: 'grid',
+                            gridTemplateColumns: '16px 76px 52px 150px 1fr',
+                            gap: '0 8px',
+                            px: 1.5, py: 0.4,
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            borderBottom: isExpanded ? 'none' : `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                            backgroundColor: isExpanded
+                              ? isDark ? 'rgba(33,150,243,0.06)' : 'rgba(33,150,243,0.04)'
+                              : i % 2 === 0 ? 'transparent' : isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.015)',
+                            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+                            transition: 'background-color 0.1s',
+                          }}
+                        >
+                          {/* Expand arrow */}
+                          <Box sx={{ fontSize: '0.7rem', color: 'text.disabled', display: 'flex', alignItems: 'center' }}>
+                            {isExpanded ? <ExpandLessIcon sx={{ fontSize: 14 }} /> : <ExpandMoreIcon sx={{ fontSize: 14 }} />}
+                          </Box>
+                          {/* Timestamp */}
+                          <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums' }}>
+                            {timeStr}
+                          </Typography>
+                          {/* Level */}
+                          <Box sx={{
+                            px: 0.6, py: 0.15,
+                            borderRadius: '3px',
+                            backgroundColor: lc.bg,
+                            color: lc.fg,
+                            fontSize: '0.62rem',
+                            fontWeight: 700,
+                            textAlign: 'center',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.03em',
+                            lineHeight: 1.4,
+                          }}>
+                            {log.level === 'warning' ? 'warn' : log.level}
+                          </Box>
+                          {/* Logger */}
+                          <Typography sx={{
+                            fontSize: '0.7rem',
+                            color: isDark ? '#8b949e' : '#656d76',
+                            fontFamily: 'inherit',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {log.logger_name || '—'}
+                          </Typography>
+                          {/* Message */}
+                          <Typography sx={{
+                            fontSize: '0.72rem',
+                            color: log.level === 'error' ? (isDark ? '#ffa4a2' : '#d32f2f')
+                              : log.level === 'warn' || log.level === 'warning' ? (isDark ? '#ffd699' : '#e65100')
+                              : isDark ? '#c9d1d9' : '#24292f',
+                            fontFamily: 'inherit',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {log.message}
+                          </Typography>
                         </Box>
-                        {/* Logger */}
-                        <Typography sx={{
-                          fontSize: '0.7rem',
-                          color: isDark ? '#8b949e' : '#656d76',
-                          fontFamily: 'inherit',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}>
-                          {log.logger_name || '—'}
-                        </Typography>
-                        {/* Message */}
-                        <Typography sx={{
-                          fontSize: '0.72rem',
-                          color: log.level === 'error' ? (isDark ? '#ffa4a2' : '#d32f2f')
-                            : log.level === 'warn' || log.level === 'warning' ? (isDark ? '#ffd699' : '#e65100')
-                            : isDark ? '#c9d1d9' : '#24292f',
-                          fontFamily: 'inherit',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}>
-                          {log.message}
-                        </Typography>
-                      </Box>
+                        {/* Expanded Fields Panel */}
+                        {isExpanded && (
+                          <Box sx={{
+                            px: 2, py: 1.2, ml: '16px',
+                            backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.02)',
+                            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                            borderLeft: `3px solid ${lc.fg}`,
+                          }}>
+                            <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '2px 12px' }}>
+                              {allFields.filter(f => f.value).map((field) => (
+                                <React.Fragment key={field.key}>
+                                  <Typography sx={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: 600,
+                                    color: isDark ? '#58a6ff' : '#0969da',
+                                    fontFamily: 'inherit',
+                                    py: 0.2,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                  }}>
+                                    {field.key}
+                                  </Typography>
+                                  <Typography sx={{
+                                    fontSize: '0.68rem',
+                                    color: isDark ? '#c9d1d9' : '#24292f',
+                                    fontFamily: 'inherit',
+                                    py: 0.2,
+                                    wordBreak: 'break-all',
+                                  }}>
+                                    {field.value}
+                                  </Typography>
+                                </React.Fragment>
+                              ))}
+                            </Box>
+                          </Box>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </Box>

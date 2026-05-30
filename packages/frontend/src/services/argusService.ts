@@ -629,6 +629,8 @@ export interface ArgusLogEntry {
   message: string;
   body: string;
   service: string;
+  environment: string;
+  release: string;
   attributes: Record<string, string>;
 }
 
