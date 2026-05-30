@@ -546,6 +546,38 @@ class ArgusService {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs`, { params });
     return response.data?.data || response.data || [];
   }
+
+  // --- Source Maps ---
+
+  async listSourcemapReleases(projectId: number | string): Promise<ArgusSourcemapRelease[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/sourcemaps`);
+    return response.data?.data || response.data || [];
+  }
+
+  async uploadSourcemaps(
+    projectId: number | string,
+    release: string,
+    files: File[],
+    dist?: string
+  ): Promise<{ release_id: number; file_count: number }> {
+    const formData = new FormData();
+    formData.append('release', release);
+    if (dist) formData.append('dist', dist);
+    files.forEach(f => formData.append('files', f));
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/sourcemaps`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data?.data || response.data;
+  }
+
+  async deleteSourcemapRelease(projectId: number | string, releaseId: number): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/sourcemaps/${releaseId}`);
+  }
+
+  async listSourcemapFiles(projectId: number | string, releaseId: number): Promise<ArgusSourcemapFile[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/sourcemaps/${releaseId}/files`);
+    return response.data?.data || response.data || [];
+  }
 }
 
 // --- Alert Rule Types ---
@@ -598,6 +630,23 @@ export interface ArgusLogEntry {
   body: string;
   service: string;
   attributes: Record<string, string>;
+}
+
+export interface ArgusSourcemapRelease {
+  id: number;
+  project_id: number;
+  release: string;
+  dist: string;
+  file_count: number;
+  created_at: string;
+}
+
+export interface ArgusSourcemapFile {
+  id: number;
+  file_path: string;
+  file_name: string;
+  file_size: number;
+  created_at: string;
 }
 
 export const argusService = new ArgusService();

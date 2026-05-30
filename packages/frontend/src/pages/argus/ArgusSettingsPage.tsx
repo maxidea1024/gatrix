@@ -36,11 +36,12 @@ import {
   Code as CodeIcon,
   CheckCircle as CheckIcon,
   Cancel as CancelIcon,
+  UploadFile as UploadIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import argusService, { ArgusProject, ArgusDsnKey } from '@/services/argusService';
+import argusService, { ArgusProject, ArgusDsnKey, ArgusSourcemapRelease } from '@/services/argusService';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -74,6 +75,10 @@ const ArgusSettingsPage: React.FC = () => {
   const [txnSampleRate, setTxnSampleRate] = useState(1.0);
   const [sessionSampleRate, setSessionSampleRate] = useState(1.0);
   const [retentionDays, setRetentionDays] = useState(90);
+
+  // Source map state
+  const [sourcemapReleases, setSourcemapReleases] = useState<ArgusSourcemapRelease[]>([]);
+  const [smLoading, setSmLoading] = useState(false);
 
   const fetchProject = useCallback(async () => {
     setLoading(true);
@@ -203,6 +208,7 @@ const ArgusSettingsPage: React.FC = () => {
             <Tab icon={<TuneIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.samplingQuotas')} />
             <Tab icon={<KeyIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.dsnKeys')} />
             <Tab icon={<CodeIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="SDK 설정" />
+            <Tab icon={<UploadIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Source Maps" />
           </Tabs>
 
           {/* === Tab 0: General === */}
@@ -482,6 +488,123 @@ Argus.init({
                   onCopy={handleCopyDsn}
                 />
               </Box>
+            </Box>
+          </TabPanel>
+
+          {/* === Tab 4: Source Maps === */}
+          <TabPanel value={tab} index={4}>
+            <Box sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+                <SectionTitle title="Source Maps" subtitle="난독화된 스택트레이스를 원본 코드로 변환하기 위한 소스맵 파일을 관리합니다." />
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<RefreshIcon />}
+                    onClick={async () => {
+                      setSmLoading(true);
+                      try {
+                        const data = await argusService.listSourcemapReleases(projectId);
+                        setSourcemapReleases(data);
+                      } catch (e) { console.error(e); }
+                      finally { setSmLoading(false); }
+                    }}
+                    sx={{ borderRadius: 1.5, textTransform: 'none' }}
+                  >
+                    새로고침
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    startIcon={<UploadIcon />}
+                    component="label"
+                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 600 }}
+                  >
+                    업로드
+                    <input
+                      type="file"
+                      multiple
+                      hidden
+                      accept=".map,.js.map"
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length === 0) return;
+                        const release = prompt('릴리즈 버전을 입력하세요 (예: 1.0.0)');
+                        if (!release) return;
+                        try {
+                          await argusService.uploadSourcemaps(projectId, release, files);
+                          enqueueSnackbar(`${files.length}개 소스맵 업로드 완료`, { variant: 'success' });
+                          const data = await argusService.listSourcemapReleases(projectId);
+                          setSourcemapReleases(data);
+                        } catch (err) {
+                          enqueueSnackbar('소스맵 업로드 실패', { variant: 'error' });
+                        }
+                      }}
+                    />
+                  </Button>
+                </Box>
+              </Box>
+
+              {/* CLI Guide */}
+              <Paper elevation={0} sx={{
+                p: 2, mb: 2.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                borderRadius: 1.5,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+              }}>
+                <Typography variant="caption" fontWeight={600} sx={{ mb: 1, display: 'block' }}>CLI 업로드 예시</Typography>
+                <Box sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: isDark ? '#aaa' : '#555', whiteSpace: 'pre' }}>
+                  {`curl -X POST '${window.location.origin}/argus/api/${projectId}/sourcemaps' \\\n  -F 'release=1.0.0' \\\n  -F 'files=@dist/main.js.map' \\\n  -F 'files=@dist/vendor.js.map'`}
+                </Box>
+              </Paper>
+
+              {/* Release List */}
+              {sourcemapReleases.length === 0 ? (
+                <Box sx={{ py: 6, textAlign: 'center' }}>
+                  <UploadIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                  <Typography color="text.secondary">업로드된 소스맵이 없습니다</Typography>
+                  <Typography variant="caption" color="text.disabled">빌드 시 소스맵을 업로드하면 스택트레이스가 원본 코드로 표시됩니다</Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {sourcemapReleases.map((rel) => (
+                    <Paper
+                      key={rel.id}
+                      elevation={0}
+                      sx={{
+                        p: 2, display: 'flex', alignItems: 'center', gap: 2,
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                        borderRadius: 1.5,
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" fontWeight={600}>{rel.release}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {rel.file_count} files · {new Date(rel.created_at).toLocaleString()}
+                          {rel.dist && ` · dist: ${rel.dist}`}
+                        </Typography>
+                      </Box>
+                      <Tooltip title="삭제">
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={async () => {
+                            try {
+                              await argusService.deleteSourcemapRelease(projectId, rel.id);
+                              setSourcemapReleases(prev => prev.filter(r => r.id !== rel.id));
+                              enqueueSnackbar('소스맵 삭제 완료', { variant: 'success' });
+                            } catch {
+                              enqueueSnackbar('삭제 실패', { variant: 'error' });
+                            }
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Paper>
+                  ))}
+                </Box>
+              )}
             </Box>
           </TabPanel>
         </Paper>
