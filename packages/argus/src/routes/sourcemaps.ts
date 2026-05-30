@@ -11,13 +11,20 @@ const logger = createLogger('sourcemaps-api');
 const SOURCEMAP_DIR = process.env.ARGUS_SOURCEMAP_DIR || path.join(process.cwd(), 'data', 'sourcemaps');
 
 export default async function sourcemapsRoutes(app: FastifyInstance) {
-  // Register multipart for file uploads
-  await app.register(multipart, {
-    limits: {
-      fileSize: 50 * 1024 * 1024, // 50MB max per file
-      files: 100,
-    },
-  });
+  // Register multipart for file uploads (skip if already registered)
+  try {
+    await app.register(multipart, {
+      limits: {
+        fileSize: 50 * 1024 * 1024, // 50MB max per file
+        files: 100,
+      },
+    });
+  } catch (e: any) {
+    // Already registered — ignore
+    if (!e.message?.includes('already registered')) {
+      logger.warn('Multipart registration warning', { error: e.message });
+    }
+  }
 
   // List source map releases for a project
   app.get(
@@ -34,7 +41,11 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           [projectId]
         );
         return reply.send({ data: rows });
-      } catch (error) {
+      } catch (error: any) {
+        // If table doesn't exist yet, return empty
+        if (error?.code === 'ER_NO_SUCH_TABLE') {
+          return reply.send({ data: [] });
+        }
         logger.error('Failed to list sourcemap releases', {
           projectId,
           error: error instanceof Error ? error.message : String(error),

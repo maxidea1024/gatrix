@@ -17,7 +17,10 @@ export default async function alertsRoutes(app: FastifyInstance) {
           [projectId]
         );
         return reply.send({ data: rows });
-      } catch (error) {
+      } catch (error: any) {
+        if (error?.code === 'ER_NO_SUCH_TABLE') {
+          return reply.send({ data: [] });
+        }
         logger.error('Failed to list alert rules', {
           projectId,
           error: error instanceof Error ? error.message : String(error),
