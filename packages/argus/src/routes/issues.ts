@@ -360,4 +360,87 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  // Merge multiple issues into one
+  app.post(
+    '/:projectId/issues/merge',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { issue_ids } = request.body as { issue_ids: number[] };
+
+      if (!issue_ids || issue_ids.length < 2) {
+        return reply.code(400).send({ error: 'At least 2 issue IDs are required to merge' });
+      }
+
+      const connection = await mysqlPool.getConnection();
+      try {
+        await connection.beginTransaction();
+
+        // Get all issues sorted by times_seen DESC — the most seen one becomes primary
+        const [rows] = await connection.query(
+          `SELECT id, times_seen, first_seen, last_seen, primary_hash
+           FROM g_argus_issues
+           WHERE project_id = ? AND id IN (${issue_ids.map(() => '?').join(',')})
+           ORDER BY times_seen DESC`,
+          [projectId, ...issue_ids]
+        );
+        const issues = rows as any[];
+
+        if (issues.length < 2) {
+          await connection.rollback();
+          return reply.code(404).send({ error: 'Not enough matching issues found' });
+        }
+
+        const primary = issues[0];
+        const mergedIds = issues.slice(1).map((i: any) => i.id);
+
+        // Aggregate stats into primary
+        const totalTimesSeen = issues.reduce((sum: number, i: any) => sum + i.times_seen, 0);
+        const earliestFirstSeen = issues.reduce((earliest: string, i: any) => i.first_seen < earliest ? i.first_seen : earliest, issues[0].first_seen);
+        const latestLastSeen = issues.reduce((latest: string, i: any) => i.last_seen > latest ? i.last_seen : latest, issues[0].last_seen);
+
+        // Update primary issue
+        await connection.query(
+          `UPDATE g_argus_issues SET times_seen = ?, first_seen = ?, last_seen = ? WHERE id = ?`,
+          [totalTimesSeen, earliestFirstSeen, latestLastSeen, primary.id]
+        );
+
+        // Update ClickHouse events to point to primary issue
+        // Note: ClickHouse does not support UPDATE, so we store merge mapping in MySQL
+        // Mark merged issues as "merged" status with a reference to primary
+        await connection.query(
+          `UPDATE g_argus_issues
+           SET status = 'merged', substatus = ?, times_seen = 0
+           WHERE id IN (${mergedIds.map(() => '?').join(',')}) AND project_id = ?`,
+          [String(primary.id), ...mergedIds, projectId]
+        );
+
+        await connection.commit();
+
+        logger.info('Issues merged', {
+          projectId,
+          primaryId: primary.id,
+          mergedIds,
+          totalTimesSeen,
+        });
+
+        return reply.send({
+          success: true,
+          data: {
+            primary_id: primary.id,
+            merged_count: mergedIds.length,
+          },
+        });
+      } catch (error) {
+        await connection.rollback();
+        logger.error('Failed to merge issues', {
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to merge issues' });
+      } finally {
+        connection.release();
+      }
+    }
+  );
 }

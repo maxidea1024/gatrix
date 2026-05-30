@@ -11,6 +11,9 @@ import {
   useTheme,
   alpha,
   Popover,
+  Checkbox,
+  Button,
+  Tooltip,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -22,6 +25,7 @@ import {
   Schedule as ScheduleIcon,
   Person as PersonIcon,
   ExpandMore as ExpandMoreIcon,
+  MergeType as MergeIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -133,6 +137,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [status, setStatus] = useState(searchParams.get('status') || 'unresolved');
   const [level, setLevel] = useState(searchParams.get('level') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [merging, setMerging] = useState(false);
 
   // ArgusFilterBar state (includes environment/browser/os from URL + heatmap time)
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
@@ -217,6 +223,29 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     navigate(`/argus/issues/${projectId}/${issue.id}`);
   };
 
+  const toggleSelect = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const handleMerge = async () => {
+    if (selectedIds.size < 2) return;
+    setMerging(true);
+    try {
+      await argusService.mergeIssues(projectId, Array.from(selectedIds));
+      setSelectedIds(new Set());
+      fetchIssues();
+    } catch (e) {
+      console.error('Failed to merge issues:', e);
+    } finally {
+      setMerging(false);
+    }
+  };
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   // Filter chip option helpers
@@ -270,6 +299,41 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         onRefresh={fetchIssues}
         loading={loading}
       />
+
+      {/* Merge Toolbar */}
+      {selectedIds.size > 0 && (
+        <Paper elevation={0} sx={{
+          mb: 1.5, p: 1, display: 'flex', alignItems: 'center', gap: 1.5,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+          borderRadius: 2,
+          backgroundColor: alpha(theme.palette.primary.main, 0.04),
+        }}>
+          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.8rem' }}>
+            {selectedIds.size} {t('argus.issues.selected', 'selected')}
+          </Typography>
+          <Tooltip title={selectedIds.size < 2 ? t('argus.issues.mergeMinTwo', 'Select at least 2 issues') : ''}>
+            <span>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<MergeIcon />}
+                disabled={selectedIds.size < 2 || merging}
+                onClick={handleMerge}
+                sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem' }}
+              >
+                {t('argus.issues.merge', 'Merge Issues')}
+              </Button>
+            </span>
+          </Tooltip>
+          <Button
+            size="small"
+            onClick={() => setSelectedIds(new Set())}
+            sx={{ textTransform: 'none', fontSize: '0.76rem', ml: 'auto' }}
+          >
+            {t('common.cancel', 'Cancel')}
+          </Button>
+        </Paper>
+      )}
 
       {/* Issue-specific Filter Bar */}
       <Box
@@ -395,8 +459,18 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                     borderRadius: idx === 0 ? '8px 0 0 0' : idx === issues.length - 1 ? '0 0 0 8px' : 0,
                   }} />
 
+                  {/* Checkbox */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', pl: 0.5 }}>
+                    <Checkbox
+                      size="small"
+                      checked={selectedIds.has(issue.id)}
+                      onClick={(e) => toggleSelect(issue.id, e)}
+                      sx={{ p: 0.3, '& .MuiSvgIcon-root': { fontSize: 16 } }}
+                    />
+                  </Box>
+
                   {/* Content */}
-                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', px: 2, py: 1.5, gap: 2, minWidth: 0 }}>
+                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', px: 1.5, py: 1.5, gap: 2, minWidth: 0 }}>
                     {/* Level Icon */}
                     <Box sx={{
                       width: 30, height: 30, borderRadius: 1.5, flexShrink: 0,

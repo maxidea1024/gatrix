@@ -36,10 +36,11 @@ import {
   Person as PersonIcon,
   Sell as TagIcon,
   ContentCopy as CopyIcon,
+  Article as LogIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import argusService, { ArgusIssueDetail, ArgusTraceDetail } from '@/services/argusService';
+import argusService, { ArgusIssueDetail, ArgusTraceDetail, ArgusLogEntry } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import BreadcrumbsTimeline from '@/components/argus/BreadcrumbsTimeline';
 
@@ -66,6 +67,11 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [traceDetail, setTraceDetail] = useState<ArgusTraceDetail | null>(null);
   const [loadingTrace, setLoadingTrace] = useState(false);
   const [showTrace, setShowTrace] = useState(false);
+
+  // Logs state
+  const [logs, setLogs] = useState<ArgusLogEntry[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
 
   useEffect(() => {
     if (!projectId || !issueId) return;
@@ -488,6 +494,99 @@ const ArgusIssueDetailPage: React.FC = () => {
             </Box>
           )}
         </Box>
+      )}
+
+      {/* Structured Logs Section */}
+      {issue && (
+        <Paper elevation={0} sx={{
+          p: 2, mb: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          borderRadius: 2,
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <LogIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
+              {t('argus.issues.logs', 'Logs')}
+              {logs.length > 0 && <Chip label={logs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />}
+            </Typography>
+            {!showLogs && (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={async () => {
+                  setShowLogs(true);
+                  setLogsLoading(true);
+                  try {
+                    const data = await argusService.getLogs(projectId!, { issue_id: issueId, limit: 100 });
+                    setLogs(data);
+                  } catch (e) {
+                    console.error('Failed to load logs:', e);
+                  } finally {
+                    setLogsLoading(false);
+                  }
+                }}
+                sx={{ textTransform: 'none', fontSize: '0.76rem', borderRadius: '6px' }}
+              >
+                {t('argus.issues.loadLogs', 'Load Logs')}
+              </Button>
+            )}
+          </Box>
+          {showLogs && (
+            <Box sx={{ mt: 1.5 }}>
+              {logsLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                  <CircularProgress size={20} />
+                </Box>
+              ) : logs.length === 0 ? (
+                <Typography variant="body2" color="text.secondary" textAlign="center" py={3}>
+                  {t('argus.issues.noLogs', 'No logs found for this issue')}
+                </Typography>
+              ) : (
+                <Box sx={{
+                  maxHeight: 400, overflowY: 'auto',
+                  fontFamily: 'monospace', fontSize: '0.75rem',
+                  backgroundColor: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.02)',
+                  borderRadius: 1, p: 1,
+                }}>
+                  {logs.map((log, i) => {
+                    const logLevelColor: Record<string, string> = {
+                      error: '#f44336', warn: '#ff9800', warning: '#ff9800',
+                      info: '#2196f3', debug: '#9e9e9e',
+                    };
+                    return (
+                      <Box key={log.log_id || i} sx={{
+                        display: 'flex', gap: 1, py: 0.3, px: 0.5,
+                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+                        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                      }}>
+                        <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                          {new Date(log.timestamp).toLocaleTimeString()}
+                        </Typography>
+                        <Chip
+                          label={log.level}
+                          size="small"
+                          sx={{
+                            height: 16, fontSize: '0.6rem', fontWeight: 700,
+                            backgroundColor: alpha(logLevelColor[log.level] || '#9e9e9e', 0.12),
+                            color: logLevelColor[log.level] || '#9e9e9e',
+                            border: 'none', flexShrink: 0,
+                          }}
+                        />
+                        {log.logger_name && (
+                          <Typography sx={{ fontSize: '0.7rem', color: theme.palette.primary.main, flexShrink: 0 }}>
+                            [{log.logger_name}]
+                          </Typography>
+                        )}
+                        <Typography sx={{ fontSize: '0.73rem', color: isDark ? '#ddd' : '#333', wordBreak: 'break-all' }}>
+                          {log.message}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
+            </Box>
+          )}
+        </Paper>
       )}
 
       <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, status: '' })} maxWidth="sm" fullWidth>

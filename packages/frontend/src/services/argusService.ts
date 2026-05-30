@@ -488,6 +488,16 @@ class ArgusService {
     });
   }
 
+  async mergeIssues(
+    projectId: number | string,
+    issueIds: number[]
+  ): Promise<{ primary_id: number; merged_count: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issues/merge`, {
+      issue_ids: issueIds,
+    });
+    return response.data?.data || response.data;
+  }
+
   // --- Alert Rules ---
 
   async listAlertRules(projectId: number | string): Promise<ArgusAlertRule[]> {
@@ -524,6 +534,16 @@ class ArgusService {
     params?: { limit?: number; ruleId?: number }
   ): Promise<ArgusAlertHistory[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/alerts/history`, { params });
+    return response.data?.data || response.data || [];
+  }
+
+  // --- Structured Logs ---
+
+  async getLogs(
+    projectId: number | string,
+    params: { trace_id?: string; issue_id?: string | number; level?: string; search?: string; limit?: number }
+  ): Promise<ArgusLogEntry[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs`, { params });
     return response.data?.data || response.data || [];
   }
 }
@@ -565,6 +585,19 @@ export interface ArgusAlertHistory {
   issue_id?: number;
   message: string;
   triggered_at: string;
+}
+
+export interface ArgusLogEntry {
+  log_id: string;
+  trace_id: string;
+  span_id: string;
+  timestamp: string;
+  level: string;
+  logger_name: string;
+  message: string;
+  body: string;
+  service: string;
+  attributes: Record<string, string>;
 }
 
 export const argusService = new ArgusService();
