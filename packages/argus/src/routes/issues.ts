@@ -26,9 +26,12 @@ export default async function issuesRoutes(app: FastifyInstance) {
       } = request.query as Record<string, string>;
 
       try {
-        // If contextual filters are set, resolve matching issue_ids from ClickHouse first
+        // Resolve issue_ids from ClickHouse when contextual or time filters are set
         let issueIdFilter: number[] | null = null;
-        if (environment || browser || os) {
+        const hasContextFilter = !!(environment || browser || os);
+        const hasTimeFilter = !!((start && end) || period);
+
+        if (hasContextFilter || hasTimeFilter) {
           const conditions: string[] = [`project_id = {projectId:String}`];
           const qp: Record<string, string> = { projectId: String(projectId) };
 
@@ -43,6 +46,23 @@ export default async function issuesRoutes(app: FastifyInstance) {
           if (os) {
             conditions.push(`os_name = {os:String}`);
             qp.os = os;
+          }
+
+          // Time range filter on ClickHouse events
+          if (start && end) {
+            conditions.push(`timestamp >= {start:String}`);
+            conditions.push(`timestamp <= {end:String}`);
+            qp.start = start;
+            qp.end = end;
+          } else if (period) {
+            const periodMap: Record<string, string> = {
+              '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
+              '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
+            };
+            const interval = periodMap[period];
+            if (interval) {
+              conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+            }
           }
 
           const chResult = await clickhouse.query({
@@ -74,25 +94,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
           params.push(`%${query}%`, `%${query}%`);
         }
 
-        // Apply ClickHouse-resolved issue_id filter
+        // Apply ClickHouse-resolved issue_id filter (covers context + time filters)
         if (issueIdFilter && issueIdFilter.length > 0) {
           sql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
           params.push(...issueIdFilter);
-        }
-
-        // Time range filter
-        if (start && end) {
-          sql += ' AND last_seen >= ? AND last_seen <= ?';
-          params.push(start, end);
-        } else if (period) {
-          const periodMap: Record<string, string> = {
-            '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
-            '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
-          };
-          const interval = periodMap[period];
-          if (interval) {
-            sql += ` AND last_seen >= DATE_SUB(NOW(), INTERVAL ${interval})`;
-          }
         }
 
         // Sort
@@ -118,20 +123,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
         if (issueIdFilter && issueIdFilter.length > 0) {
           countSql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
           countParams.push(...issueIdFilter);
-        }
-        // Time range filter (same as main query)
-        if (start && end) {
-          countSql += ' AND last_seen >= ? AND last_seen <= ?';
-          countParams.push(start, end);
-        } else if (period) {
-          const periodMap2: Record<string, string> = {
-            '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
-            '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
-          };
-          const interval2 = periodMap2[period];
-          if (interval2) {
-            countSql += ` AND last_seen >= DATE_SUB(NOW(), INTERVAL ${interval2})`;
-          }
         }
         const [countRows] = await mysqlPool.query(countSql, countParams);
         const total = (countRows as any[])[0]?.total || 0;
