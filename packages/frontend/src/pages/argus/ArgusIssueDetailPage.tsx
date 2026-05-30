@@ -41,6 +41,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueDetail, ArgusTraceDetail } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
+import BreadcrumbsTimeline from '@/components/argus/BreadcrumbsTimeline';
 
 
 const LEVEL_COLORS: Record<string, string> = {
@@ -404,8 +405,18 @@ const ArgusIssueDetailPage: React.FC = () => {
               )}
 
               {/* Breadcrumbs */}
-              {latestEvent.breadcrumbs && (
-                <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} isDark={isDark} />
+              {latestEvent.breadcrumbs && Array.isArray(latestEvent.breadcrumbs) && latestEvent.breadcrumbs.length > 0 && (
+                <Paper elevation={0} sx={{
+                  p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                  borderRadius: 2,
+                }}>
+                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <FolderIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
+                    {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
+                    <Chip label={latestEvent.breadcrumbs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
+                  </Typography>
+                  <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} />
+                </Paper>
               )}
             </Box>
           )}
@@ -554,84 +565,8 @@ const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stackt
   );
 };
 
-// --- Breadcrumbs Timeline ---
-const BreadcrumbsTimeline: React.FC<{ breadcrumbs: any; isDark: boolean }> = ({ breadcrumbs, isDark }) => {
-  let items: any[] = [];
-  try {
-    items = typeof breadcrumbs === 'string' ? JSON.parse(breadcrumbs) : (Array.isArray(breadcrumbs) ? breadcrumbs : []);
-  } catch { items = []; }
 
-  if (items.length === 0) return null;
 
-  const categoryIcons: Record<string, React.ReactElement> = {
-    navigation: <LanguageIcon sx={{ fontSize: 14 }} />,
-    http: <DeviceIcon sx={{ fontSize: 14 }} />,
-    'ui.click': <InfoIcon sx={{ fontSize: 14 }} />,
-    console: <WarningIcon sx={{ fontSize: 14 }} />,
-  };
-  const categoryColors: Record<string, string> = {
-    navigation: '#2196f3',
-    http: '#7c4dff',
-    'ui.click': '#4caf50',
-    console: '#ff9800',
-    default: '#9e9e9e',
-  };
-
-  return (
-    <Paper elevation={0} sx={{
-      p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      borderRadius: 2,
-    }}>
-      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <ScheduleIcon fontSize="small" sx={{ color: '#7c4dff' }} />
-        Breadcrumbs
-      </Typography>
-      <Box>
-        {items.map((bc: any, idx: number) => {
-          const color = categoryColors[bc.category] || categoryColors.default;
-          const icon = categoryIcons[bc.category] || <InfoIcon sx={{ fontSize: 14 }} />;
-          return (
-            <Box key={idx} sx={{ display: 'flex', gap: 1.5, position: 'relative', pb: 2 }}>
-              {/* Timeline line */}
-              <Box sx={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', width: 20, flexShrink: 0,
-              }}>
-                <Box sx={{
-                  width: 20, height: 20, borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  backgroundColor: alpha(color, isDark ? 0.2 : 0.1), color, zIndex: 1,
-                }}>
-                  {icon}
-                </Box>
-                {idx < items.length - 1 && (
-                  <Box sx={{ width: 1.5, flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', mt: 0.5 }} />
-                )}
-              </Box>
-              {/* Content */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip label={bc.category} size="small" sx={{
-                    height: 18, fontSize: '0.62rem', fontWeight: 600,
-                    backgroundColor: alpha(color, isDark ? 0.15 : 0.08), color,
-                    border: 'none',
-                  }} />
-                  {bc.timestamp && (
-                    <Typography variant="caption" sx={{ color: isDark ? '#555' : '#bbb', fontSize: '0.65rem' }}>
-                      {new Date(bc.timestamp).toLocaleTimeString()}
-                    </Typography>
-                  )}
-                </Box>
-                <Typography variant="body2" sx={{ mt: 0.3, fontSize: '0.8rem', color: isDark ? '#aaa' : '#555' }}>
-                  {bc.message}
-                </Typography>
-              </Box>
-            </Box>
-          );
-        })}
-      </Box>
-    </Paper>
-  );
-};
 
 // --- Helpers ---
 const StatMini: React.FC<{ label: string; value: string; color: string }> = ({ label, value, color }) => {

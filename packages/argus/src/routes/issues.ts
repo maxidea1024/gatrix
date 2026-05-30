@@ -194,6 +194,20 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
           if (latestEvent) {
             // Parse JSON strings back to objects for the frontend
+            let breadcrumbs: any[] = [];
+            try {
+              breadcrumbs = typeof latestEvent.breadcrumbs === 'string'
+                ? JSON.parse(latestEvent.breadcrumbs || '[]')
+                : (latestEvent.breadcrumbs || []);
+            } catch { breadcrumbs = []; }
+
+            let contexts: any = {};
+            try {
+              contexts = typeof latestEvent.contexts === 'string'
+                ? JSON.parse(latestEvent.contexts || '{}')
+                : (latestEvent.contexts || {});
+            } catch { contexts = {}; }
+
             issue.latest_event = {
               ...latestEvent,
               exception_type: latestEvent.type,
@@ -201,6 +215,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
               stacktrace_raw: latestEvent.stacktrace_frames,
               os: latestEvent.os_name,
               browser: latestEvent.browser_name,
+              breadcrumbs,
+              contexts,
+              tags: latestEvent.tags || {},
+              extra: latestEvent.extra || {},
             };
           }
 
