@@ -17,6 +17,10 @@ import {
   DialogContentText,
   DialogActions,
   CircularProgress,
+  TextField,
+  InputAdornment,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -37,6 +41,12 @@ import {
   Sell as TagIcon,
   ContentCopy as CopyIcon,
   Article as LogIcon,
+  Search as SearchIcon,
+  Fullscreen as FullscreenIcon,
+  FullscreenExit as FullscreenExitIcon,
+  FileDownload as ExportIcon,
+  AccessTime as GotoTimeIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -73,6 +83,12 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [logsLoading, setLogsLoading] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [expandedLogIds, setExpandedLogIds] = useState<Set<string>>(new Set());
+  const [logsFullscreen, setLogsFullscreen] = useState(false);
+  const [logSearch, setLogSearch] = useState('');
+  const [logGotoTime, setLogGotoTime] = useState('');
+  const [showLogGoto, setShowLogGoto] = useState(false);
+  const [copySnackbar, setCopySnackbar] = useState(false);
+  const logContainerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!projectId || !issueId) return;
@@ -502,37 +518,145 @@ const ArgusIssueDetailPage: React.FC = () => {
         <Paper elevation={0} sx={{
           p: 2, mt: 2, mb: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           borderRadius: 2,
+          ...(logsFullscreen ? {
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 1300, m: 0, borderRadius: 0, overflow: 'hidden',
+            display: 'flex', flexDirection: 'column',
+          } : {}),
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Toolbar */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <LogIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
               {t('argus.issues.logs', 'Logs')}
-              {logs.length > 0 && <Chip label={logs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />}
+              {logs.length > 0 && <Chip label={(() => { const filtered = logSearch ? logs.filter(l => l.message.toLowerCase().includes(logSearch.toLowerCase()) || l.logger_name?.toLowerCase().includes(logSearch.toLowerCase()) || (l.attributes && JSON.stringify(l.attributes).toLowerCase().includes(logSearch.toLowerCase()))) : logs; return `${filtered.length}${logSearch ? '/' + logs.length : ''}`; })()} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />}
             </Typography>
-            {!showLogs && (
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={async () => {
-                  setShowLogs(true);
-                  setLogsLoading(true);
-                  try {
-                    const data = await argusService.getLogs(projectId!, { issue_id: issueId, limit: 100 });
-                    setLogs(data);
-                  } catch (e) {
-                    console.error('Failed to load logs:', e);
-                  } finally {
-                    setLogsLoading(false);
-                  }
-                }}
-                sx={{ textTransform: 'none', fontSize: '0.76rem', borderRadius: '6px' }}
-              >
-                {t('argus.issues.loadLogs', 'Load Logs')}
-              </Button>
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              {showLogs && logs.length > 0 && (
+                <>
+                  {/* Search */}
+                  <TextField
+                    size="small"
+                    placeholder="Search logs..."
+                    value={logSearch}
+                    onChange={(e) => setLogSearch(e.target.value)}
+                    sx={{
+                      width: logsFullscreen ? 280 : 180,
+                      '& .MuiOutlinedInput-root': {
+                        height: 28, fontSize: '0.72rem', borderRadius: '6px',
+                        fontFamily: 'inherit',
+                      },
+                    }}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
+                      endAdornment: logSearch ? (
+                        <InputAdornment position="end">
+                          <IconButton size="small" onClick={() => setLogSearch('')} sx={{ p: 0.2 }}>
+                            <CloseIcon sx={{ fontSize: 12 }} />
+                          </IconButton>
+                        </InputAdornment>
+                      ) : null,
+                    }}
+                  />
+                  {/* Go-to time */}
+                  {showLogGoto ? (
+                    <TextField
+                      size="small"
+                      placeholder="HH:MM:SS"
+                      value={logGotoTime}
+                      onChange={(e) => setLogGotoTime(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && logGotoTime) {
+                          const parts = logGotoTime.split(':').map(Number);
+                          if (parts.length >= 2) {
+                            const targetH = parts[0] || 0;
+                            const targetM = parts[1] || 0;
+                            const targetS = parts[2] || 0;
+                            const targetMin = targetH * 3600 + targetM * 60 + targetS;
+                            // Find closest log
+                            let closestIdx = 0;
+                            let closestDiff = Infinity;
+                            logs.forEach((log, idx) => {
+                              const d = new Date(log.timestamp);
+                              const logMin = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+                              const diff = Math.abs(logMin - targetMin);
+                              if (diff < closestDiff) { closestDiff = diff; closestIdx = idx; }
+                            });
+                            // Scroll to that row
+                            const container = logContainerRef.current;
+                            if (container) {
+                              const rows = container.querySelectorAll('[data-log-row]');
+                              if (rows[closestIdx]) {
+                                rows[closestIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                // Flash highlight
+                                (rows[closestIdx] as HTMLElement).style.backgroundColor = isDark ? 'rgba(33,150,243,0.15)' : 'rgba(33,150,243,0.12)';
+                                setTimeout(() => { (rows[closestIdx] as HTMLElement).style.backgroundColor = ''; }, 1500);
+                              }
+                            }
+                          }
+                          setShowLogGoto(false);
+                          setLogGotoTime('');
+                        } else if (e.key === 'Escape') {
+                          setShowLogGoto(false);
+                          setLogGotoTime('');
+                        }
+                      }}
+                      autoFocus
+                      sx={{ width: 100, '& .MuiOutlinedInput-root': { height: 28, fontSize: '0.72rem', borderRadius: '6px' } }}
+                    />
+                  ) : (
+                    <Tooltip title="Jump to time (HH:MM:SS)">
+                      <IconButton size="small" onClick={() => setShowLogGoto(true)} sx={{ p: 0.4 }}>
+                        <GotoTimeIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {/* Export */}
+                  <Tooltip title="Export logs as JSON">
+                    <IconButton size="small" onClick={() => {
+                      const dataStr = JSON.stringify(logs, null, 2);
+                      const blob = new Blob([dataStr], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url; a.download = `logs-issue-${issueId}.json`;
+                      a.click(); URL.revokeObjectURL(url);
+                    }} sx={{ p: 0.4 }}>
+                      <ExportIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Tooltip>
+                  {/* Fullscreen */}
+                  <Tooltip title={logsFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
+                    <IconButton size="small" onClick={() => setLogsFullscreen(f => !f)} sx={{ p: 0.4 }}>
+                      {logsFullscreen ? <FullscreenExitIcon sx={{ fontSize: 16 }} /> : <FullscreenIcon sx={{ fontSize: 16 }} />}
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+              {!showLogs && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={async () => {
+                    setShowLogs(true);
+                    setLogsLoading(true);
+                    try {
+                      const data = await argusService.getLogs(projectId!, { issue_id: issueId, limit: 500 });
+                      setLogs(data);
+                    } catch (e) {
+                      console.error('Failed to load logs:', e);
+                    } finally {
+                      setLogsLoading(false);
+                    }
+                  }}
+                  sx={{ textTransform: 'none', fontSize: '0.76rem', borderRadius: '6px' }}
+                >
+                  {t('argus.issues.loadLogs', 'Load Logs')}
+                </Button>
+              )}
+            </Box>
           </Box>
           {showLogs && (
-            <Box sx={{ mt: 1.5 }}>
+            <Box sx={{ mt: 1.5, flex: logsFullscreen ? 1 : 'none', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
               {logsLoading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
                   <CircularProgress size={20} />
@@ -541,9 +665,21 @@ const ArgusIssueDetailPage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" textAlign="center" py={3}>
                   {t('argus.issues.noLogs', 'No logs found for this issue')}
                 </Typography>
-              ) : (
-                <Box sx={{
-                  maxHeight: 400, overflowY: 'auto',
+              ) : (() => {
+                const searchLower = logSearch.toLowerCase();
+                const filteredLogs = logSearch
+                  ? logs.filter(l =>
+                      l.message.toLowerCase().includes(searchLower) ||
+                      l.logger_name?.toLowerCase().includes(searchLower) ||
+                      l.level.toLowerCase().includes(searchLower) ||
+                      (l.attributes && JSON.stringify(l.attributes).toLowerCase().includes(searchLower))
+                    )
+                  : logs;
+                return (
+                <Box ref={logContainerRef} sx={{
+                  maxHeight: logsFullscreen ? 'none' : 400,
+                  flex: logsFullscreen ? 1 : 'none',
+                  overflowY: 'auto',
                   fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
                   fontSize: '0.73rem',
                   backgroundColor: isDark ? '#0d1117' : '#fafbfc',
@@ -560,14 +696,14 @@ const ArgusIssueDetailPage: React.FC = () => {
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
                     position: 'sticky', top: 0, zIndex: 2,
                   }}>
-                    <Box /> {/* spacer for expand arrow */}
+                    <Box />
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Time</Typography>
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Level</Typography>
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Logger</Typography>
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Message</Typography>
                   </Box>
                   {/* Rows */}
-                  {logs.map((log, i) => {
+                  {filteredLogs.map((log, i) => {
                     const levelColors: Record<string, { bg: string; fg: string }> = {
                       error: { bg: 'rgba(244,67,54,0.12)', fg: '#f44336' },
                       warn:  { bg: 'rgba(255,152,0,0.12)', fg: '#ff9800' },
@@ -589,7 +725,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                       });
                     };
 
-                    // Build all fields for expanded view
                     const allFields: { key: string; value: string }[] = [
                       { key: 'timestamp', value: new Date(log.timestamp).toISOString() },
                       { key: 'level', value: log.level },
@@ -601,16 +736,32 @@ const ArgusIssueDetailPage: React.FC = () => {
                       { key: 'span_id', value: log.span_id || '' },
                       { key: 'message', value: log.message },
                     ];
-                    // Add attributes
                     if (log.attributes && typeof log.attributes === 'object') {
                       Object.entries(log.attributes).forEach(([k, v]) => {
                         allFields.push({ key: k, value: String(v) });
                       });
                     }
 
+                    // Highlight search matches
+                    const highlightText = (text: string) => {
+                      if (!logSearch) return text;
+                      const idx = text.toLowerCase().indexOf(searchLower);
+                      if (idx === -1) return text;
+                      return (
+                        <>
+                          {text.substring(0, idx)}
+                          <Box component="span" sx={{ backgroundColor: isDark ? 'rgba(255,200,0,0.3)' : 'rgba(255,200,0,0.5)', borderRadius: '2px', px: '1px' }}>
+                            {text.substring(idx, idx + logSearch.length)}
+                          </Box>
+                          {text.substring(idx + logSearch.length)}
+                        </>
+                      );
+                    };
+
                     return (
                       <React.Fragment key={logKey}>
                         <Box
+                          data-log-row
                           onClick={toggleExpand}
                           sx={{
                             display: 'grid',
@@ -625,58 +776,37 @@ const ArgusIssueDetailPage: React.FC = () => {
                               ? isDark ? 'rgba(33,150,243,0.06)' : 'rgba(33,150,243,0.04)'
                               : i % 2 === 0 ? 'transparent' : isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.015)',
                             '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
-                            transition: 'background-color 0.1s',
+                            transition: 'background-color 0.15s',
                           }}
                         >
-                          {/* Expand arrow */}
-                          <Box sx={{ fontSize: '0.7rem', color: 'text.disabled', display: 'flex', alignItems: 'center' }}>
+                          <Box sx={{ color: 'text.disabled', display: 'flex', alignItems: 'center' }}>
                             {isExpanded ? <ExpandLessIcon sx={{ fontSize: 14 }} /> : <ExpandMoreIcon sx={{ fontSize: 14 }} />}
                           </Box>
-                          {/* Timestamp */}
                           <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums' }}>
                             {timeStr}
                           </Typography>
-                          {/* Level */}
                           <Box sx={{
-                            px: 0.6, py: 0.15,
-                            borderRadius: '3px',
-                            backgroundColor: lc.bg,
-                            color: lc.fg,
-                            fontSize: '0.62rem',
-                            fontWeight: 700,
-                            textAlign: 'center',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.03em',
-                            lineHeight: 1.4,
+                            px: 0.6, py: 0.15, borderRadius: '3px',
+                            backgroundColor: lc.bg, color: lc.fg,
+                            fontSize: '0.62rem', fontWeight: 700,
+                            textAlign: 'center', textTransform: 'uppercase',
+                            letterSpacing: '0.03em', lineHeight: 1.4,
                           }}>
                             {log.level === 'warning' ? 'warn' : log.level}
                           </Box>
-                          {/* Logger */}
-                          <Typography sx={{
-                            fontSize: '0.7rem',
-                            color: isDark ? '#8b949e' : '#656d76',
-                            fontFamily: 'inherit',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}>
-                            {log.logger_name || '—'}
+                          <Typography sx={{ fontSize: '0.7rem', color: isDark ? '#8b949e' : '#656d76', fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {highlightText(log.logger_name || '\u2014')}
                           </Typography>
-                          {/* Message */}
                           <Typography sx={{
                             fontSize: '0.72rem',
                             color: log.level === 'error' ? (isDark ? '#ffa4a2' : '#d32f2f')
                               : log.level === 'warn' || log.level === 'warning' ? (isDark ? '#ffd699' : '#e65100')
                               : isDark ? '#c9d1d9' : '#24292f',
-                            fontFamily: 'inherit',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
+                            fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>
-                            {log.message}
+                            {highlightText(log.message)}
                           </Typography>
                         </Box>
-                        {/* Expanded Fields Panel */}
                         {isExpanded && (
                           <Box sx={{
                             px: 2, py: 1.2, ml: '16px',
@@ -684,30 +814,28 @@ const ArgusIssueDetailPage: React.FC = () => {
                             borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                             borderLeft: `3px solid ${lc.fg}`,
                           }}>
-                            <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '2px 12px' }}>
+                            <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: '2px 12px', alignItems: 'center' }}>
                               {allFields.filter(f => f.value).map((field) => (
                                 <React.Fragment key={field.key}>
-                                  <Typography sx={{
-                                    fontSize: '0.68rem',
-                                    fontWeight: 600,
-                                    color: isDark ? '#58a6ff' : '#0969da',
-                                    fontFamily: 'inherit',
-                                    py: 0.2,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                  }}>
+                                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: isDark ? '#58a6ff' : '#0969da', fontFamily: 'inherit', py: 0.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {field.key}
                                   </Typography>
-                                  <Typography sx={{
-                                    fontSize: '0.68rem',
-                                    color: isDark ? '#c9d1d9' : '#24292f',
-                                    fontFamily: 'inherit',
-                                    py: 0.2,
-                                    wordBreak: 'break-all',
-                                  }}>
-                                    {field.value}
+                                  <Typography sx={{ fontSize: '0.68rem', color: isDark ? '#c9d1d9' : '#24292f', fontFamily: 'inherit', py: 0.2, wordBreak: 'break-all' }}>
+                                    {highlightText(field.value)}
                                   </Typography>
+                                  <Tooltip title="Copy value">
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(field.value);
+                                        setCopySnackbar(true);
+                                      }}
+                                      sx={{ p: 0.2, opacity: 0.4, '&:hover': { opacity: 1 } }}
+                                    >
+                                      <CopyIcon sx={{ fontSize: 12 }} />
+                                    </IconButton>
+                                  </Tooltip>
                                 </React.Fragment>
                               ))}
                             </Box>
@@ -716,12 +844,22 @@ const ArgusIssueDetailPage: React.FC = () => {
                       </React.Fragment>
                     );
                   })}
+                  {filteredLogs.length === 0 && logSearch && (
+                    <Box sx={{ p: 3, textAlign: 'center' }}>
+                      <Typography variant="body2" color="text.disabled">No logs matching &quot;{logSearch}&quot;</Typography>
+                    </Box>
+                  )}
                 </Box>
-              )}
+                );
+              })()}
             </Box>
           )}
         </Paper>
       )}
+      {/* Copy snackbar */}
+      <Snackbar open={copySnackbar} autoHideDuration={1500} onClose={() => setCopySnackbar(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert severity="success" sx={{ py: 0, fontSize: '0.75rem' }} onClose={() => setCopySnackbar(false)}>Copied to clipboard</Alert>
+      </Snackbar>
 
       <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, status: '' })} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 700 }}>
