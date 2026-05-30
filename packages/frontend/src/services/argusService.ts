@@ -485,6 +485,84 @@ class ArgusService {
       assigned_to: assignee,
     });
   }
+
+  // --- Alert Rules ---
+
+  async listAlertRules(projectId: number | string): Promise<ArgusAlertRule[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/alerts`);
+    return response.data?.data || response.data || [];
+  }
+
+  async createAlertRule(
+    projectId: number | string,
+    rule: Omit<ArgusAlertRule, 'id' | 'created_at' | 'updated_at' | 'last_triggered_at'>
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/alerts`, rule);
+    return response.data?.data || response.data;
+  }
+
+  async updateAlertRule(
+    projectId: number | string,
+    ruleId: number | string,
+    updates: Partial<ArgusAlertRule>
+  ): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/${projectId}/alerts/${ruleId}`, updates);
+  }
+
+  async deleteAlertRule(projectId: number | string, ruleId: number | string): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/alerts/${ruleId}`);
+  }
+
+  async testAlertRule(projectId: number | string, ruleId: number | string): Promise<void> {
+    await argusApi.post(`${ARGUS_BASE}/${projectId}/alerts/${ruleId}/test`);
+  }
+
+  async getAlertHistory(
+    projectId: number | string,
+    params?: { limit?: number; ruleId?: number }
+  ): Promise<ArgusAlertHistory[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/alerts/history`, { params });
+    return response.data?.data || response.data || [];
+  }
+}
+
+// --- Alert Rule Types ---
+
+export interface ArgusAlertCondition {
+  type: 'new_issue' | 'event_frequency' | 'user_count' | 'regression';
+  value?: number;
+  interval?: number; // seconds
+}
+
+export interface ArgusAlertAction {
+  type: 'webhook' | 'email';
+  target_url?: string;
+  channel?: string;
+}
+
+export interface ArgusAlertRule {
+  id: number;
+  project_id: number;
+  name: string;
+  conditions: ArgusAlertCondition[];
+  actions: ArgusAlertAction[];
+  frequency: number;
+  environment?: string;
+  level?: string;
+  enabled: boolean;
+  last_triggered_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArgusAlertHistory {
+  id: number;
+  rule_id: number;
+  rule_name?: string;
+  project_id: number;
+  issue_id?: number;
+  message: string;
+  triggered_at: string;
 }
 
 export const argusService = new ArgusService();
