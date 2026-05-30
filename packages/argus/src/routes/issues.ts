@@ -20,6 +20,9 @@ export default async function issuesRoutes(app: FastifyInstance) {
         environment,
         browser,
         os,
+        period,
+        start,
+        end,
       } = request.query as Record<string, string>;
 
       try {
@@ -77,6 +80,21 @@ export default async function issuesRoutes(app: FastifyInstance) {
           params.push(...issueIdFilter);
         }
 
+        // Time range filter
+        if (start && end) {
+          sql += ' AND last_seen >= ? AND last_seen <= ?';
+          params.push(start, end);
+        } else if (period) {
+          const periodMap: Record<string, string> = {
+            '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
+            '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
+          };
+          const interval = periodMap[period];
+          if (interval) {
+            sql += ` AND last_seen >= DATE_SUB(NOW(), INTERVAL ${interval})`;
+          }
+        }
+
         // Sort
         const sortMap: Record<string, string> = {
           last_seen: 'last_seen DESC',
@@ -100,6 +118,20 @@ export default async function issuesRoutes(app: FastifyInstance) {
         if (issueIdFilter && issueIdFilter.length > 0) {
           countSql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
           countParams.push(...issueIdFilter);
+        }
+        // Time range filter (same as main query)
+        if (start && end) {
+          countSql += ' AND last_seen >= ? AND last_seen <= ?';
+          countParams.push(start, end);
+        } else if (period) {
+          const periodMap2: Record<string, string> = {
+            '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
+            '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
+          };
+          const interval2 = periodMap2[period];
+          if (interval2) {
+            countSql += ` AND last_seen >= DATE_SUB(NOW(), INTERVAL ${interval2})`;
+          }
         }
         const [countRows] = await mysqlPool.query(countSql, countParams);
         const total = (countRows as any[])[0]?.total || 0;

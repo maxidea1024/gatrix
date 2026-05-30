@@ -110,6 +110,9 @@ export interface ArgusIssueListParams {
   environment?: string;
   browser?: string;
   os?: string;
+  period?: string;
+  start?: string;
+  end?: string;
 }
 
 export interface ArgusProjectStats {

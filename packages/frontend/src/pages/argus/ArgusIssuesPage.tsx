@@ -30,6 +30,7 @@ import argusService, {
   ArgusIssueListParams,
 } from '@/services/argusService';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 
 const PAGE_SIZE = 25;
 
@@ -69,7 +70,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [level, setLevel] = useState(searchParams.get('level') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
 
-  // ArgusFilterBar state (includes environment/browser/os from URL)
+  // ArgusFilterBar state (includes environment/browser/os from URL + heatmap time)
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
     const state = defaultArgusFilterState('24h');
     const env = searchParams.get('environment');
@@ -78,6 +79,28 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     if (env) state.environments = [env];
     if (br) state.browsers = [br];
     if (osParam) state.os = [osParam];
+
+    // Heatmap click: dayOfWeek (1=Mon..7=Sun) + hour (0..23)
+    const dayOfWeek = searchParams.get('dayOfWeek');
+    const hour = searchParams.get('hour');
+    if (dayOfWeek && hour) {
+      const dow = parseInt(dayOfWeek, 10); // 1=Mon..7=Sun
+      const h = parseInt(hour, 10);
+      // Find the most recent date matching this day-of-week
+      const now = new Date();
+      const jsDay = dow === 7 ? 0 : dow; // JS: 0=Sun,1=Mon..6=Sat
+      let diff = now.getDay() - jsDay;
+      if (diff < 0) diff += 7;
+      if (diff === 0 && now.getHours() < h) diff = 7; // hasn't happened today yet
+      const targetDate = new Date(now);
+      targetDate.setDate(targetDate.getDate() - diff);
+      const start = new Date(targetDate);
+      start.setHours(h, 0, 0, 0);
+      const end = new Date(start);
+      end.setHours(h + 1, 0, 0, 0);
+      state.dateRange = { type: 'custom', start, end };
+    }
+
     return state;
   });
 
@@ -89,6 +112,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
+      const dateParams = argusDateRangeToApiParams(filters.dateRange);
       const params: ArgusIssueListParams = {
         status: status || undefined,
         level: level || undefined,
@@ -99,6 +123,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         environment: filters.environments.length === 1 ? filters.environments[0] : undefined,
         browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
         os: filters.os.length === 1 ? filters.os[0] : undefined,
+        ...dateParams,
       };
       const result = await argusService.listIssues(projectId, params);
       setIssues(result.data);
