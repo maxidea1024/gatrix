@@ -417,7 +417,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                         >
                           {issue.title}
                         </Typography>
-                        {issue.is_regression && (
+                        {issue.substatus === 'regressed' && (
                           <Chip
                             label="Regression"
                             size="small"

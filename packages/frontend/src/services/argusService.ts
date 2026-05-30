@@ -61,6 +61,7 @@ export interface ArgusIssue {
   culprit: string;
   level: string;
   status: string;
+  substatus?: string;
   platform: string;
   first_seen: string;
   last_seen: string;
@@ -98,6 +99,7 @@ export interface ArgusErrorEvent {
   tags: Record<string, string>;
   breadcrumbs: string;
   contexts: string | Record<string, any>;
+  extra?: string | Record<string, any>;
 }
 
 export interface ArgusIssueListParams {

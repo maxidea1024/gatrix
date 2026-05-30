@@ -196,6 +196,17 @@ const ArgusIssueDetailPage: React.FC = () => {
                 border: 'none',
               }}
             />
+            {issue.substatus === 'regressed' && (
+              <Chip
+                label="Regressed"
+                size="small"
+                sx={{
+                  fontWeight: 700, fontSize: '0.68rem',
+                  backgroundColor: alpha('#ff9800', 0.15),
+                  color: '#ff9800', border: 'none',
+                }}
+              />
+            )}
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
             {issue.status !== 'resolved' && (
@@ -418,6 +429,62 @@ const ArgusIssueDetailPage: React.FC = () => {
                   <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} />
                 </Paper>
               )}
+
+              {/* Extra Data */}
+              {latestEvent.extra && (() => {
+                const extraData = typeof latestEvent.extra === 'string' ? (() => { try { return JSON.parse(latestEvent.extra); } catch { return null; } })() : latestEvent.extra;
+                return extraData && Object.keys(extraData).length > 0 ? (
+                  <Paper elevation={0} sx={{
+                    p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                    borderRadius: 2,
+                  }}>
+                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <InfoIcon fontSize="small" sx={{ color: theme.palette.secondary.main }} />
+                      {t('argus.issues.extraData', 'Additional Data')}
+                    </Typography>
+                    <Box sx={{
+                      fontFamily: 'monospace', fontSize: '0.78rem',
+                      backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
+                      borderRadius: 1, p: 1.5, maxHeight: 300, overflowY: 'auto',
+                      whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                      color: isDark ? '#ccc' : '#333',
+                    }}>
+                      {JSON.stringify(extraData, null, 2)}
+                    </Box>
+                  </Paper>
+                ) : null;
+              })()}
+
+              {/* Contexts */}
+              {latestEvent.contexts && (() => {
+                const ctxData = typeof latestEvent.contexts === 'string' ? (() => { try { return JSON.parse(latestEvent.contexts); } catch { return null; } })() : latestEvent.contexts;
+                return ctxData && Object.keys(ctxData).length > 0 ? (
+                  <Paper elevation={0} sx={{
+                    p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                    borderRadius: 2,
+                  }}>
+                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <DeviceIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
+                      {t('argus.issues.contexts', 'Contexts')}
+                    </Typography>
+                    {Object.entries(ctxData).map(([ctxKey, ctxVal]: [string, any]) => (
+                      <Box key={ctxKey} sx={{ mb: 1.5 }}>
+                        <Typography variant="caption" fontWeight={700} sx={{ color: theme.palette.primary.main, textTransform: 'capitalize', mb: 0.5, display: 'block' }}>
+                          {ctxKey}
+                        </Typography>
+                        {typeof ctxVal === 'object' && ctxVal !== null ? (
+                          <ContextGrid items={Object.entries(ctxVal).map(([k, v]) => ({
+                            label: k,
+                            value: String(v),
+                          }))} isDark={isDark} />
+                        ) : (
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{String(ctxVal)}</Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Paper>
+                ) : null;
+              })()}
             </Box>
           )}
         </Box>
