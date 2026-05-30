@@ -102,14 +102,15 @@ const ArgusSessionHealthPage: React.FC = () => {
         Number(s?.errored || 0),
         Number(s?.abnormal || 0),
       ],
-      backgroundColor: [alpha('#4caf50', 0.8), alpha('#f44336', 0.8), alpha('#ff9800', 0.8), alpha('#9e9e9e', 0.6)],
-      borderColor: [alpha('#4caf50', 1), alpha('#f44336', 1), alpha('#ff9800', 1), alpha('#9e9e9e', 1)],
-      borderWidth: 2,
+      backgroundColor: ['#4caf50', '#f44336', '#ff9800', '#9e9e9e'],
+      borderColor: isDark ? '#1a1a2e' : '#ffffff',
+      borderWidth: 3,
       cutout: '72%',
-      spacing: 2,
-      borderRadius: 4,
+      spacing: 0,
+      borderRadius: 0,
+      hoverOffset: 6,
     }],
-  }), [s]);
+  }), [s, isDark]);
 
   const donutOpts = useMemo(() => ({
     responsive: true, maintainAspectRatio: false,
