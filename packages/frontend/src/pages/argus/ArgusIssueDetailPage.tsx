@@ -543,40 +543,94 @@ const ArgusIssueDetailPage: React.FC = () => {
               ) : (
                 <Box sx={{
                   maxHeight: 400, overflowY: 'auto',
-                  fontFamily: 'monospace', fontSize: '0.75rem',
-                  backgroundColor: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.02)',
-                  borderRadius: 1, p: 1,
+                  fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
+                  fontSize: '0.73rem',
+                  backgroundColor: isDark ? '#0d1117' : '#fafbfc',
+                  borderRadius: 1,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 }}>
+                  {/* Header */}
+                  <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: '76px 52px 150px 1fr',
+                    gap: '0 8px',
+                    px: 1.5, py: 0.6,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                    position: 'sticky', top: 0, zIndex: 1,
+                  }}>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Time</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Level</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Logger</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Message</Typography>
+                  </Box>
+                  {/* Rows */}
                   {logs.map((log, i) => {
-                    const logLevelColor: Record<string, string> = {
-                      error: '#f44336', warn: '#ff9800', warning: '#ff9800',
-                      info: '#2196f3', debug: '#9e9e9e',
+                    const levelColors: Record<string, { bg: string; fg: string }> = {
+                      error: { bg: 'rgba(244,67,54,0.12)', fg: '#f44336' },
+                      warn:  { bg: 'rgba(255,152,0,0.12)', fg: '#ff9800' },
+                      warning: { bg: 'rgba(255,152,0,0.12)', fg: '#ff9800' },
+                      info:  { bg: 'rgba(33,150,243,0.10)', fg: '#64b5f6' },
+                      debug: { bg: 'rgba(158,158,158,0.10)', fg: '#9e9e9e' },
                     };
+                    const lc = levelColors[log.level] || levelColors.debug;
+                    const ts = new Date(log.timestamp);
+                    const timeStr = `${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}:${ts.getSeconds().toString().padStart(2, '0')}`;
                     return (
                       <Box key={log.log_id || i} sx={{
-                        display: 'flex', gap: 1, py: 0.3, px: 0.5,
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                        display: 'grid',
+                        gridTemplateColumns: '76px 52px 150px 1fr',
+                        gap: '0 8px',
+                        px: 1.5, py: 0.4,
+                        alignItems: 'center',
+                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                        backgroundColor: i % 2 === 0
+                          ? 'transparent'
+                          : isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.015)',
+                        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+                        transition: 'background-color 0.1s',
                       }}>
-                        <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          {new Date(log.timestamp).toLocaleTimeString()}
+                        {/* Timestamp */}
+                        <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums' }}>
+                          {timeStr}
                         </Typography>
-                        <Chip
-                          label={log.level}
-                          size="small"
-                          sx={{
-                            height: 16, fontSize: '0.6rem', fontWeight: 700,
-                            backgroundColor: alpha(logLevelColor[log.level] || '#9e9e9e', 0.12),
-                            color: logLevelColor[log.level] || '#9e9e9e',
-                            border: 'none', flexShrink: 0,
-                          }}
-                        />
-                        {log.logger_name && (
-                          <Typography sx={{ fontSize: '0.7rem', color: theme.palette.primary.main, flexShrink: 0 }}>
-                            [{log.logger_name}]
-                          </Typography>
-                        )}
-                        <Typography sx={{ fontSize: '0.73rem', color: isDark ? '#ddd' : '#333', wordBreak: 'break-all' }}>
+                        {/* Level */}
+                        <Box sx={{
+                          px: 0.6, py: 0.15,
+                          borderRadius: '3px',
+                          backgroundColor: lc.bg,
+                          color: lc.fg,
+                          fontSize: '0.62rem',
+                          fontWeight: 700,
+                          textAlign: 'center',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.03em',
+                          lineHeight: 1.4,
+                        }}>
+                          {log.level === 'warning' ? 'warn' : log.level}
+                        </Box>
+                        {/* Logger */}
+                        <Typography sx={{
+                          fontSize: '0.7rem',
+                          color: isDark ? '#8b949e' : '#656d76',
+                          fontFamily: 'inherit',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {log.logger_name || '—'}
+                        </Typography>
+                        {/* Message */}
+                        <Typography sx={{
+                          fontSize: '0.72rem',
+                          color: log.level === 'error' ? (isDark ? '#ffa4a2' : '#d32f2f')
+                            : log.level === 'warn' || log.level === 'warning' ? (isDark ? '#ffd699' : '#e65100')
+                            : isDark ? '#c9d1d9' : '#24292f',
+                          fontFamily: 'inherit',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}>
                           {log.message}
                         </Typography>
                       </Box>
