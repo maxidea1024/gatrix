@@ -45,7 +45,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         main: '#818cf8',
         light: '#a5b4fc',
         dark: '#6366f1',
-        contrastText: '#121212',
+        contrastText: '#ffffff',
       },
     },
     secondary: {
@@ -230,7 +230,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       },
       MuiButton: {
         defaultProps: {
-          variant: 'contained',
           disableElevation: false,
         },
         styleOverrides: {

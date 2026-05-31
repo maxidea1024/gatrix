@@ -22,6 +22,10 @@ import {
   Tabs,
   Tab,
   Tooltip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -37,11 +41,18 @@ import {
   CheckCircle as CheckIcon,
   Cancel as CancelIcon,
   UploadFile as UploadIcon,
+  GitHub as GitHubIcon,
+  Security as SecurityIcon,
+  Link as LinkIcon,
+  Edit as EditIcon,
+  BugReport as BugIcon,
+  PlayArrow as TestConnectionIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import argusService, { ArgusProject, ArgusDsnKey, ArgusSourcemapRelease } from '@/services/argusService';
+import argusService, { ArgusProject, ArgusDsnKey, ArgusSourcemapRelease, ArgusIntegration, ArgusOwnershipRule, ArgusIssueTracker } from '@/services/argusService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -61,7 +72,8 @@ const ArgusSettingsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const isDark = theme.palette.mode === 'dark';
 
-  const projectId = '1';
+  const { currentProject } = useOrgProject();
+  const projectId = currentProject?.id || '1';
   const [tab, setTab] = useState(0);
 
   const [project, setProject] = useState<ArgusProject | null>(null);
@@ -79,6 +91,31 @@ const ArgusSettingsPage: React.FC = () => {
   // Source map state
   const [sourcemapReleases, setSourcemapReleases] = useState<ArgusSourcemapRelease[]>([]);
   const [smLoading, setSmLoading] = useState(false);
+
+  // Integration state
+  const [integrations, setIntegrations] = useState<ArgusIntegration[]>([]);
+  const [intLoading, setIntLoading] = useState(false);
+  const [newIntProvider, setNewIntProvider] = useState('github');
+  const [newIntRepoUrl, setNewIntRepoUrl] = useState('');
+  const [newIntBranch, setNewIntBranch] = useState('main');
+
+  // Issue Tracker state
+  const [issueTrackers, setIssueTrackers] = useState<ArgusIssueTracker[]>([]);
+  const [itLoading, setItLoading] = useState(false);
+  const [newItProvider, setNewItProvider] = useState<'jira' | 'github' | 'linear'>('jira');
+  const [newItName, setNewItName] = useState('');
+  const [newItUrl, setNewItUrl] = useState('');
+  const [newItToken, setNewItToken] = useState('');
+  const [newItConfig, setNewItConfig] = useState<Record<string, string>>({});
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  // Ownership state
+  const [ownershipRules, setOwnershipRules] = useState<ArgusOwnershipRule[]>([]);
+  const [ownLoading, setOwnLoading] = useState(false);
+  const [newRuleName, setNewRuleName] = useState('');
+  const [newRuleType, setNewRuleType] = useState('path');
+  const [newRulePattern, setNewRulePattern] = useState('');
+  const [newRuleOwners, setNewRuleOwners] = useState('');
 
   const fetchProject = useCallback(async () => {
     setLoading(true);
@@ -167,10 +204,15 @@ const ArgusSettingsPage: React.FC = () => {
     <Box>
       {/* Header */}
       <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h5" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <SettingsIcon sx={{ color: theme.palette.primary.main }} />
-          {t('argus.settings.title')}
-        </Typography>
+          <Typography variant="h5" fontWeight={700}>
+            {t('argus.settings.title')}
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
+            — {t('argus.settings.subtitle')}
+          </Typography>
+        </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <IconButton onClick={fetchProject} size="small"><RefreshIcon /></IconButton>
           <Button
@@ -185,7 +227,7 @@ const ArgusSettingsPage: React.FC = () => {
               '&:hover': { boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}` },
             }}
           >
-            {saving ? '저장 중...' : t('common.save')}
+            {saving ? t('common.saving', 'Saving...') : t('common.save')}
           </Button>
         </Box>
       </Box>
@@ -207,16 +249,18 @@ const ArgusSettingsPage: React.FC = () => {
             <Tab icon={<SettingsIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.general')} />
             <Tab icon={<TuneIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.samplingQuotas')} />
             <Tab icon={<KeyIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.dsnKeys')} />
-            <Tab icon={<CodeIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="SDK 설정" />
-            <Tab icon={<UploadIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Source Maps" />
+            <Tab icon={<CodeIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.sdkSetup', 'SDK Setup')} />
+            <Tab icon={<UploadIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.sourceMaps', 'Source Maps')} />
+            <Tab icon={<GitHubIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.integrations', 'Integrations')} />
+            <Tab icon={<SecurityIcon sx={{ fontSize: 18 }} />} iconPosition="start" label={t('argus.settings.ownership', 'Ownership')} />
           </Tabs>
 
           {/* === Tab 0: General === */}
           <TabPanel value={tab} index={0}>
             <Box sx={{ p: 3 }}>
-              <SectionTitle title={t('argus.settings.general')} subtitle="프로젝트 이름, 플랫폼 등 기본 정보를 설정합니다." />
+              <SectionTitle title={t('argus.settings.general')} subtitle={t('argus.settings.generalDesc', 'Configure basic project information such as name and platform.')} />
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2.5, mt: 2.5 }}>
-                <SettingField label={t('argus.settings.projectName')} description="Argus 대시보드에 표시될 프로젝트 이름">
+                <SettingField label={t('argus.settings.projectName')} description={t('argus.settings.projectNameDesc', 'Project name displayed in Argus dashboard')}>
                   <TextField
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -225,7 +269,7 @@ const ArgusSettingsPage: React.FC = () => {
                     sx={inputSx(isDark)}
                   />
                 </SettingField>
-                <SettingField label={t('argus.settings.platform')} description="데이터 수집 SDK 플랫폼 (javascript, node, python 등)">
+                <SettingField label={t('argus.settings.platform')} description={t('argus.settings.platformDesc', 'SDK platform for data collection (javascript, node, python, etc.)')}>
                   <TextField
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value)}
@@ -234,7 +278,7 @@ const ArgusSettingsPage: React.FC = () => {
                     sx={inputSx(isDark)}
                   />
                 </SettingField>
-                <SettingField label="프로젝트 ID" description="변경 불가능한 내부 식별자">
+                <SettingField label={t('argus.settings.projectId', 'Project ID')} description={t('argus.settings.projectIdDesc', 'Immutable internal identifier')}>
                   <TextField
                     value={projectId}
                     size="small"
@@ -243,7 +287,7 @@ const ArgusSettingsPage: React.FC = () => {
                     sx={inputSx(isDark)}
                   />
                 </SettingField>
-                <SettingField label="프로젝트 Slug" description="URL에 사용되는 식별자">
+                <SettingField label={t('argus.settings.projectSlug', 'Project Slug')} description={t('argus.settings.projectSlugDesc', 'Identifier used in URLs')}>
                   <TextField
                     value={project?.slug || ''}
                     size="small"
@@ -259,11 +303,11 @@ const ArgusSettingsPage: React.FC = () => {
           {/* === Tab 1: Sampling & Quotas === */}
           <TabPanel value={tab} index={1}>
             <Box sx={{ p: 3 }}>
-              <SectionTitle title={t('argus.settings.samplingQuotas')} subtitle="데이터 수집 비율과 일일 한도를 설정합니다." />
+              <SectionTitle title={t('argus.settings.samplingQuotas')} subtitle={t('argus.settings.samplingDesc', 'Configure data collection rates and daily limits.')} />
 
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mt: 2.5 }}>
                 {/* Error Quota */}
-                <SettingField label={t('argus.settings.errorQuota')} description="일일 최대 에러 수집 건수. 초과 시 드랍됩니다.">
+                <SettingField label={t('argus.settings.errorQuota')} description={t('argus.settings.errorQuotaDesc', 'Maximum daily error collection count. Exceeding events are dropped.')}>
                   <TextField
                     type="number"
                     value={errorQuota}
@@ -277,7 +321,7 @@ const ArgusSettingsPage: React.FC = () => {
                 </SettingField>
 
                 {/* Retention */}
-                <SettingField label={t('argus.settings.retentionDays')} description="이벤트 데이터 보존 기간. 초과 데이터는 자동 삭제됩니다.">
+                <SettingField label={t('argus.settings.retentionDays')} description={t('argus.settings.retentionDesc', 'Event data retention period. Expired data is automatically deleted.')}>
                   <TextField
                     type="number"
                     value={retentionDays}
@@ -295,7 +339,7 @@ const ArgusSettingsPage: React.FC = () => {
 
               {/* Sample Rates */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-                <SettingField label={t('argus.settings.txnSampleRate')} description="성능 트랜잭션 샘플링 비율. 1.0 = 100%">
+                <SettingField label={t('argus.settings.txnSampleRate')} description={t('argus.settings.txnSampleDesc', 'Performance transaction sampling rate. 1.0 = 100%')}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Slider
                       value={txnSampleRate}
@@ -316,7 +360,7 @@ const ArgusSettingsPage: React.FC = () => {
                   </Box>
                 </SettingField>
 
-                <SettingField label={t('argus.settings.sessionSampleRate')} description="세션 데이터 샘플링 비율. 1.0 = 100%">
+                <SettingField label={t('argus.settings.sessionSampleRate')} description={t('argus.settings.sessionSampleDesc', 'Session data sampling rate. 1.0 = 100%')}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Slider
                       value={sessionSampleRate}
@@ -344,7 +388,7 @@ const ArgusSettingsPage: React.FC = () => {
           <TabPanel value={tab} index={2}>
             <Box sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
-                <SectionTitle title={t('argus.settings.dsnKeys')} subtitle="클라이언트 SDK에서 이벤트를 전송할 때 사용하는 인증 키입니다." />
+                <SectionTitle title={t('argus.settings.dsnKeys')} subtitle={t('argus.settings.dsnKeysDesc', 'Authentication keys used by client SDKs to send events.')} />
                 <Button
                   size="small"
                   startIcon={<AddIcon />}
@@ -361,7 +405,7 @@ const ArgusSettingsPage: React.FC = () => {
                   <KeyIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
                   <Typography color="text.secondary">{t('argus.settings.noKeys')}</Typography>
                   <Button size="small" startIcon={<AddIcon />} onClick={handleCreateKey} sx={{ mt: 1, textTransform: 'none' }}>
-                    키 생성하기
+                    {t('argus.settings.createKey')}
                   </Button>
                 </Box>
               ) : (
@@ -415,7 +459,7 @@ const ArgusSettingsPage: React.FC = () => {
                         </Box>
                       </Box>
                       <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}>
-                        <Tooltip title="DSN 복사" placement="top">
+                        <Tooltip title={t('argus.settings.copyDsn', 'Copy DSN')} placement="top">
                           <IconButton size="small" onClick={() => handleCopyDsn(key.dsn)}
                             sx={{ '&:hover': { color: theme.palette.primary.main } }}
                           >
@@ -423,7 +467,7 @@ const ArgusSettingsPage: React.FC = () => {
                           </IconButton>
                         </Tooltip>
                         {key.is_active && (
-                          <Tooltip title="키 비활성화" placement="top">
+                          <Tooltip title={t('argus.settings.deactivateKey', 'Deactivate key')} placement="top">
                             <IconButton size="small" color="error" onClick={() => handleRevokeKey(key.id)}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
@@ -440,7 +484,7 @@ const ArgusSettingsPage: React.FC = () => {
           {/* === Tab 3: SDK Setup === */}
           <TabPanel value={tab} index={3}>
             <Box sx={{ p: 3 }}>
-              <SectionTitle title="SDK 설정 가이드" subtitle="클라이언트에서 Argus SDK를 초기화하는 방법입니다." />
+              <SectionTitle title={t('argus.settings.sdkGuide', 'SDK Setup Guide')} subtitle={t('argus.settings.sdkGuideDesc', 'How to initialize the Argus SDK in your client.')} />
 
               <Box sx={{ mt: 2.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {/* JavaScript */}
@@ -478,7 +522,7 @@ Argus.init({
 
                 {/* cURL */}
                 <CodeBlock
-                  title="cURL (테스트용)"
+                  title={`cURL (${t('argus.settings.testUse', 'Test')})`}
                   language="bash"
                   code={`curl -X POST '${window.location.origin}/argus/api/${projectId}/ingest/batch' \\
   -H 'Authorization: Bearer ${project?.dsn_keys?.find(k => k.is_active)?.public_key || '<your-key>'}' \\
@@ -495,7 +539,7 @@ Argus.init({
           <TabPanel value={tab} index={4}>
             <Box sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
-                <SectionTitle title="Source Maps" subtitle="난독화된 스택트레이스를 원본 코드로 변환하기 위한 소스맵 파일을 관리합니다." />
+                <SectionTitle title={t('argus.settings.sourceMaps', 'Source Maps')} subtitle={t('argus.settings.sourceMapsDesc', 'Manage source map files to deobfuscate stack traces.')} />
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button
                     size="small"
@@ -511,7 +555,7 @@ Argus.init({
                     }}
                     sx={{ borderRadius: 1.5, textTransform: 'none' }}
                   >
-                    새로고침
+                    {t('common.refresh', 'Refresh')}
                   </Button>
                   <Button
                     size="small"
@@ -520,7 +564,7 @@ Argus.init({
                     component="label"
                     sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 600 }}
                   >
-                    업로드
+                    {t('common.upload', 'Upload')}
                     <input
                       type="file"
                       multiple
@@ -603,6 +647,480 @@ Argus.init({
                       </Tooltip>
                     </Paper>
                   ))}
+                </Box>
+              )}
+            </Box>
+          </TabPanel>
+
+          {/* === Tab 5: Integrations === */}
+          <TabPanel value={tab} index={5}>
+            <Box sx={{ p: 3 }}>
+              <SectionTitle
+                title={t('argus.settings.integrations', 'Integrations')}
+                subtitle={t('argus.settings.integrationsDesc', 'Connect your repository to link commits with issues and releases.')}
+              />
+
+              {/* Add Integration Form */}
+              <Paper elevation={0} sx={{
+                p: 2, mt: 2, mb: 2.5, borderRadius: 1.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+              }}>
+                <Typography variant="caption" fontWeight={600} sx={{ mb: 1.5, display: 'block', textTransform: 'uppercase', color: 'text.secondary', fontSize: '0.7rem' }}>
+                  {t('argus.settings.addIntegration', 'Add Integration')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                  <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <InputLabel>Provider</InputLabel>
+                    <Select value={newIntProvider} onChange={(e) => setNewIntProvider(e.target.value)} label="Provider">
+                      <MenuItem value="github">GitHub</MenuItem>
+                      <MenuItem value="gitlab">GitLab</MenuItem>
+                      <MenuItem value="bitbucket">Bitbucket</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    size="small"
+                    label={t('argus.settings.repoUrl', 'Repository URL')}
+                    placeholder="https://github.com/org/repo"
+                    value={newIntRepoUrl}
+                    onChange={(e) => setNewIntRepoUrl(e.target.value)}
+                    sx={{ flex: 1, minWidth: 250, ...inputSx(isDark) }}
+                  />
+                  <TextField
+                    size="small"
+                    label={t('argus.settings.defaultBranch', 'Branch')}
+                    value={newIntBranch}
+                    onChange={(e) => setNewIntBranch(e.target.value)}
+                    sx={{ width: 100, ...inputSx(isDark) }}
+                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    disabled={!newIntRepoUrl.trim()}
+                    onClick={async () => {
+                      try {
+                        await argusService.createIntegration(projectId, {
+                          provider: newIntProvider,
+                          repo_url: newIntRepoUrl.trim(),
+                          default_branch: newIntBranch,
+                        });
+                        const updated = await argusService.listIntegrations(projectId);
+                        setIntegrations(updated);
+                        setNewIntRepoUrl('');
+                        enqueueSnackbar(t('argus.settings.integrationAdded', 'Integration added'), { variant: 'success' });
+                      } catch {
+                        enqueueSnackbar(t('argus.settings.integrationFailed', 'Failed to add integration'), { variant: 'error' });
+                      }
+                    }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
+                  >
+                    {t('common.add', 'Add')}
+                  </Button>
+                </Box>
+              </Paper>
+
+              {/* Integration List */}
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<RefreshIcon />}
+                onClick={async () => {
+                  setIntLoading(true);
+                  try {
+                    const data = await argusService.listIntegrations(projectId);
+                    setIntegrations(data);
+                  } catch (e) { console.error(e); }
+                  finally { setIntLoading(false); }
+                }}
+                sx={{ mb: 2, borderRadius: 1.5, textTransform: 'none' }}
+              >
+                {t('common.refresh', 'Refresh')}
+              </Button>
+
+              {integrations.length === 0 ? (
+                <Box sx={{ py: 6, textAlign: 'center' }}>
+                  <GitHubIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                  <Typography color="text.secondary">
+                    {t('argus.settings.noIntegrations', 'No integrations configured')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {integrations.map((intg) => (
+                    <Paper
+                      key={intg.id}
+                      elevation={0}
+                      sx={{
+                        p: 2, display: 'flex', alignItems: 'center', gap: 2,
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                        borderRadius: 1.5,
+                        borderLeft: `4px solid ${intg.enabled ? '#4caf50' : '#9e9e9e'}`,
+                      }}
+                    >
+                      <GitHubIcon sx={{ color: intg.provider === 'github' ? '#fff' : '#fc6d26', fontSize: 24 }} />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" fontWeight={600} noWrap>{intg.repo_url}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {intg.provider} · {intg.default_branch} · {new Date(intg.created_at).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={intg.enabled ? t('common.active') : t('common.inactive')}
+                        size="small"
+                        sx={{
+                          height: 22, fontWeight: 600, fontSize: '0.7rem',
+                          backgroundColor: alpha(intg.enabled ? '#4caf50' : '#9e9e9e', 0.12),
+                          color: intg.enabled ? '#4caf50' : '#9e9e9e',
+                          border: 'none',
+                        }}
+                      />
+                      <IconButton size="small" color="error" onClick={async () => {
+                        await argusService.deleteIntegration(projectId, intg.id);
+                        setIntegrations(prev => prev.filter(i => i.id !== intg.id));
+                        enqueueSnackbar('Deleted', { variant: 'success' });
+                      }}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Paper>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          </TabPanel>
+
+          {/* === Tab 5b: Issue Trackers (within Integrations) === */}
+          {tab === 5 && (
+            <Box sx={{ px: 3, pb: 3 }}>
+              <Divider sx={{ mb: 3 }} />
+              <SectionTitle
+                title={t('argus.settings.issueTrackers', 'Issue Trackers')}
+                subtitle={t('argus.settings.issueTrackersDesc', 'Connect external issue trackers like Jira, GitHub Issues, or Linear to create and link issues.')}
+              />
+
+              {/* Add Issue Tracker Form */}
+              <Paper elevation={0} sx={{
+                p: 2, mt: 2, mb: 2.5, borderRadius: 1.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+              }}>
+                <Typography variant="caption" fontWeight={600} sx={{ mb: 1.5, display: 'block', textTransform: 'uppercase', color: 'text.secondary', fontSize: '0.7rem' }}>
+                  {t('argus.settings.addIssueTracker', 'Add Issue Tracker')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                  <FormControl size="small" sx={{ minWidth: 110 }}>
+                    <InputLabel>Provider</InputLabel>
+                    <Select value={newItProvider} onChange={(e) => { setNewItProvider(e.target.value as any); setNewItConfig({}); }} label="Provider">
+                      <MenuItem value="jira">Jira</MenuItem>
+                      <MenuItem value="github">GitHub</MenuItem>
+                      <MenuItem value="linear">Linear</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField size="small" label={t('argus.settings.trackerName', 'Name')} placeholder="My Jira"
+                    value={newItName} onChange={(e) => setNewItName(e.target.value)}
+                    sx={{ width: 140, ...inputSx(isDark) }}
+                  />
+                  <TextField size="small" label="API URL"
+                    placeholder={newItProvider === 'jira' ? 'https://myorg.atlassian.net' : newItProvider === 'github' ? 'https://api.github.com' : 'https://api.linear.app'}
+                    value={newItUrl} onChange={(e) => setNewItUrl(e.target.value)}
+                    sx={{ flex: 1, minWidth: 200, ...inputSx(isDark) }}
+                  />
+                  <TextField size="small" label="API Token" type="password"
+                    value={newItToken} onChange={(e) => setNewItToken(e.target.value)}
+                    sx={{ width: 180, ...inputSx(isDark) }}
+                  />
+                </Box>
+
+                {/* Provider-specific config */}
+                <Box sx={{ display: 'flex', gap: 1.5, mt: 1.5, flexWrap: 'wrap' }}>
+                  {newItProvider === 'jira' && (
+                    <>
+                      <TextField size="small" label="Project Key" placeholder="PROJ"
+                        value={newItConfig.project_key || ''} onChange={(e) => setNewItConfig({ ...newItConfig, project_key: e.target.value })}
+                        sx={{ width: 120, ...inputSx(isDark) }}
+                      />
+                      <TextField size="small" label="Email" placeholder="user@company.com"
+                        value={newItConfig.email || ''} onChange={(e) => setNewItConfig({ ...newItConfig, email: e.target.value })}
+                        sx={{ width: 200, ...inputSx(isDark) }}
+                      />
+                      <TextField size="small" label="Issue Type" placeholder="Bug"
+                        value={newItConfig.issue_type || ''} onChange={(e) => setNewItConfig({ ...newItConfig, issue_type: e.target.value })}
+                        sx={{ width: 120, ...inputSx(isDark) }}
+                      />
+                    </>
+                  )}
+                  {newItProvider === 'github' && (
+                    <TextField size="small" label="Repository" placeholder="owner/repo"
+                      value={newItConfig.repo || ''} onChange={(e) => setNewItConfig({ ...newItConfig, repo: e.target.value })}
+                      sx={{ width: 250, ...inputSx(isDark) }}
+                    />
+                  )}
+                  {newItProvider === 'linear' && (
+                    <TextField size="small" label="Team ID" placeholder="team-uuid"
+                      value={newItConfig.team_id || ''} onChange={(e) => setNewItConfig({ ...newItConfig, team_id: e.target.value })}
+                      sx={{ width: 250, ...inputSx(isDark) }}
+                    />
+                  )}
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                  <Button variant="contained" size="small" startIcon={<AddIcon />}
+                    disabled={!newItName.trim() || !newItUrl.trim() || !newItToken.trim()}
+                    onClick={async () => {
+                      try {
+                        await argusService.createIssueTracker(projectId, {
+                          provider: newItProvider, name: newItName.trim(),
+                          api_url: newItUrl.trim(), api_token: newItToken.trim(),
+                          config: Object.keys(newItConfig).length > 0 ? newItConfig : undefined,
+                        });
+                        setIssueTrackers(await argusService.listIssueTrackers(projectId));
+                        setNewItName(''); setNewItUrl(''); setNewItToken(''); setNewItConfig({});
+                        enqueueSnackbar(t('argus.settings.trackerAdded', 'Issue tracker added'), { variant: 'success' });
+                      } catch {
+                        enqueueSnackbar(t('argus.settings.trackerAddFailed', 'Failed to add tracker'), { variant: 'error' });
+                      }
+                    }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
+                  >
+                    {t('common.add', 'Add')}
+                  </Button>
+                </Box>
+              </Paper>
+
+              {/* Issue Tracker List */}
+              <Button size="small" variant="outlined" startIcon={<RefreshIcon />}
+                onClick={async () => {
+                  setItLoading(true);
+                  try { setIssueTrackers(await argusService.listIssueTrackers(projectId)); }
+                  catch (e) { console.error(e); }
+                  finally { setItLoading(false); }
+                }}
+                sx={{ mb: 2, borderRadius: 1.5, textTransform: 'none' }}
+              >
+                {t('common.refresh', 'Refresh')}
+              </Button>
+
+              {issueTrackers.length === 0 ? (
+                <Box sx={{ py: 4, textAlign: 'center' }}>
+                  <BugIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
+                  <Typography color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                    {t('argus.settings.noIssueTrackers', 'No issue trackers configured')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {issueTrackers.map((tracker) => {
+                    const pColor: Record<string, string> = { jira: '#0052CC', github: '#333', linear: '#5E6AD2' };
+                    const pLabel: Record<string, string> = { jira: 'Jira', github: 'GitHub Issues', linear: 'Linear' };
+                    return (
+                      <Paper key={tracker.id} elevation={0} sx={{
+                        p: 2, display: 'flex', alignItems: 'center', gap: 2,
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                        borderRadius: 1.5,
+                        borderLeft: `4px solid ${tracker.enabled ? pColor[tracker.provider] || '#9e9e9e' : '#9e9e9e'}`,
+                      }}>
+                        <BugIcon sx={{ color: pColor[tracker.provider] || '#9e9e9e', fontSize: 24 }} />
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" fontWeight={600}>{tracker.name}</Typography>
+                            <Chip label={pLabel[tracker.provider] || tracker.provider} size="small"
+                              sx={{ height: 20, fontSize: '0.62rem', fontWeight: 700,
+                                backgroundColor: alpha(pColor[tracker.provider] || '#9e9e9e', 0.1),
+                                color: pColor[tracker.provider] || '#9e9e9e', border: 'none',
+                              }}
+                            />
+                          </Box>
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            {tracker.api_url}
+                            {tracker.config?.project_key && ` · ${tracker.config.project_key}`}
+                            {tracker.config?.repo && ` · ${tracker.config.repo}`}
+                          </Typography>
+                        </Box>
+                        <Tooltip title={t('argus.settings.testConnection', 'Test Connection')}>
+                          <IconButton size="small" onClick={async () => {
+                            try {
+                              const result = await argusService.testIssueTracker(projectId, tracker.id);
+                              enqueueSnackbar(result.ok ? result.message : `Failed: ${result.message}`,
+                                { variant: result.ok ? 'success' : 'error' });
+                            } catch { enqueueSnackbar('Test failed', { variant: 'error' }); }
+                          }} sx={{ '&:hover': { color: '#4caf50' } }}>
+                            <TestConnectionIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Chip label={tracker.enabled ? t('common.active') : t('common.inactive')} size="small"
+                          onClick={async () => {
+                            await argusService.updateIssueTracker(projectId, tracker.id, { enabled: !tracker.enabled });
+                            setIssueTrackers(await argusService.listIssueTrackers(projectId));
+                          }}
+                          sx={{ height: 22, fontWeight: 600, fontSize: '0.7rem', cursor: 'pointer',
+                            backgroundColor: alpha(tracker.enabled ? '#4caf50' : '#9e9e9e', 0.12),
+                            color: tracker.enabled ? '#4caf50' : '#9e9e9e', border: 'none',
+                          }}
+                        />
+                        <IconButton size="small" color="error" onClick={async () => {
+                          await argusService.deleteIssueTracker(projectId, tracker.id);
+                          setIssueTrackers(prev => prev.filter(i => i.id !== tracker.id));
+                          enqueueSnackbar('Deleted', { variant: 'success' });
+                        }}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Paper>
+                    );
+                  })}
+                </Box>
+              )}
+            </Box>
+          )}
+
+          {/* === Tab 6: Ownership Rules === */}
+          <TabPanel value={tab} index={6}>
+            <Box sx={{ p: 3 }}>
+              <SectionTitle
+                title={t('argus.settings.ownership', 'Ownership Rules')}
+                subtitle={t('argus.settings.ownershipDesc', 'Define rules to auto-assign issues based on file paths, modules, or tags — like CODEOWNERS.')}
+              />
+
+              {/* Add Rule Form */}
+              <Paper elevation={0} sx={{
+                p: 2, mt: 2, mb: 2.5, borderRadius: 1.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+              }}>
+                <Typography variant="caption" fontWeight={600} sx={{ mb: 1.5, display: 'block', textTransform: 'uppercase', color: 'text.secondary', fontSize: '0.7rem' }}>
+                  {t('argus.settings.addRule', 'Add Rule')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                  <TextField
+                    size="small"
+                    label={t('argus.settings.ruleName', 'Rule Name')}
+                    placeholder="Frontend Team"
+                    value={newRuleName}
+                    onChange={(e) => setNewRuleName(e.target.value)}
+                    sx={{ width: 160, ...inputSx(isDark) }}
+                  />
+                  <FormControl size="small" sx={{ minWidth: 100 }}>
+                    <InputLabel>{t('argus.settings.matchType', 'Type')}</InputLabel>
+                    <Select value={newRuleType} onChange={(e) => setNewRuleType(e.target.value)} label="Type">
+                      <MenuItem value="path">Path</MenuItem>
+                      <MenuItem value="module">Module</MenuItem>
+                      <MenuItem value="tag">Tag</MenuItem>
+                      <MenuItem value="url">URL</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    size="small"
+                    label={t('argus.settings.pattern', 'Pattern')}
+                    placeholder="src/components/**"
+                    value={newRulePattern}
+                    onChange={(e) => setNewRulePattern(e.target.value)}
+                    sx={{ flex: 1, minWidth: 180, ...inputSx(isDark), '& .MuiOutlinedInput-root': { ...inputSx(isDark)['& .MuiOutlinedInput-root'], fontFamily: 'monospace' } }}
+                  />
+                  <TextField
+                    size="small"
+                    label={t('argus.settings.owners', 'Owners')}
+                    placeholder="alice, bob"
+                    value={newRuleOwners}
+                    onChange={(e) => setNewRuleOwners(e.target.value)}
+                    sx={{ width: 180, ...inputSx(isDark) }}
+                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    disabled={!newRuleName.trim() || !newRulePattern.trim() || !newRuleOwners.trim()}
+                    onClick={async () => {
+                      try {
+                        await argusService.createOwnershipRule(projectId, {
+                          name: newRuleName.trim(),
+                          match_type: newRuleType,
+                          match_pattern: newRulePattern.trim(),
+                          owners: newRuleOwners.split(',').map(o => o.trim()).filter(Boolean),
+                        });
+                        const updated = await argusService.listOwnershipRules(projectId);
+                        setOwnershipRules(updated);
+                        setNewRuleName(''); setNewRulePattern(''); setNewRuleOwners('');
+                        enqueueSnackbar(t('argus.settings.ruleAdded', 'Rule added'), { variant: 'success' });
+                      } catch {
+                        enqueueSnackbar(t('argus.settings.ruleFailed', 'Failed to add rule'), { variant: 'error' });
+                      }
+                    }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
+                  >
+                    {t('common.add', 'Add')}
+                  </Button>
+                </Box>
+              </Paper>
+
+              {/* Rules List */}
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<RefreshIcon />}
+                onClick={async () => {
+                  setOwnLoading(true);
+                  try {
+                    const data = await argusService.listOwnershipRules(projectId);
+                    setOwnershipRules(data);
+                  } catch (e) { console.error(e); }
+                  finally { setOwnLoading(false); }
+                }}
+                sx={{ mb: 2, borderRadius: 1.5, textTransform: 'none' }}
+              >
+                {t('common.refresh', 'Refresh')}
+              </Button>
+
+              {ownershipRules.length === 0 ? (
+                <Box sx={{ py: 6, textAlign: 'center' }}>
+                  <SecurityIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                  <Typography color="text.secondary">
+                    {t('argus.settings.noRules', 'No ownership rules defined')}
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    {t('argus.settings.noRulesHint', 'Rules auto-assign issues to team members based on matching patterns.')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {ownershipRules.map((rule) => {
+                    const owners = typeof rule.owners === 'string' ? JSON.parse(rule.owners) : rule.owners;
+                    return (
+                      <Paper
+                        key={rule.id}
+                        elevation={0}
+                        sx={{
+                          p: 2, display: 'flex', alignItems: 'center', gap: 2,
+                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                          borderRadius: 1.5,
+                          borderLeft: `4px solid ${rule.enabled ? '#7c4dff' : '#9e9e9e'}`,
+                        }}
+                      >
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <Typography variant="body2" fontWeight={600}>{rule.name}</Typography>
+                            <Chip label={rule.match_type} size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 700 }} />
+                            {rule.auto_assign && (
+                              <Chip label="auto-assign" size="small" sx={{ height: 18, fontSize: '0.62rem', backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none' }} />
+                            )}
+                          </Box>
+                          <Typography variant="caption" sx={{ fontFamily: 'monospace', color: isDark ? '#aaa' : '#666', fontSize: '0.72rem' }}>
+                            {rule.match_pattern}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                            {(owners as string[]).map((o: string, idx: number) => (
+                              <Chip key={idx} label={o} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600 }} />
+                            ))}
+                          </Box>
+                        </Box>
+                        <IconButton size="small" color="error" onClick={async () => {
+                          await argusService.deleteOwnershipRule(projectId, rule.id);
+                          setOwnershipRules(prev => prev.filter(r => r.id !== rule.id));
+                          enqueueSnackbar('Deleted', { variant: 'success' });
+                        }}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Paper>
+                    );
+                  })}
                 </Box>
               )}
             </Box>

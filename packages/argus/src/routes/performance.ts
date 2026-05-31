@@ -10,14 +10,18 @@ export default async function performanceRoutes(app: FastifyInstance) {
     '/performance/:projectId/transactions',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', sort = 'count', limit = '20' } = request.query as {
+      const { period = '24h', sort = 'count', limit = '20', start, end } = request.query as {
         period?: string;
         sort?: string;
         limit?: string;
+        start?: string;
+        end?: string;
       };
 
-      const interval = periodToInterval(period);
-      const orderBy = sort === 'p95' ? 'p95 DESC' : sort === 'avg' ? 'avg_duration DESC' : 'count DESC';
+      const orderBy = sort === 'p95' ? 'p95 DESC' : sort === 'avg' ? 'avg_duration DESC' : sort === 'error_rate' ? 'error_rate DESC' : 'count DESC';
+      const timeFilter = start && end
+        ? `timestamp >= {start:String} AND timestamp <= {end:String}`
+        : `timestamp >= now() - INTERVAL ${periodToInterval(period)}`;
 
       try {
         const result = await clickhouse.query({
@@ -34,12 +38,12 @@ export default async function performanceRoutes(app: FastifyInstance) {
               max(timestamp) AS last_seen
             FROM argus.transactions
             WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND ${timeFilter}
             GROUP BY transaction
             ORDER BY ${orderBy}
             LIMIT {limit:UInt32}
           `,
-          query_params: { projectId: String(projectId), limit: parseInt(limit, 10) },
+          query_params: { projectId: String(projectId), limit: parseInt(limit, 10), ...(start && end ? { start, end } : {}) },
         });
         const data = await result.json();
         return reply.send({ data: data.data || [] });

@@ -29,7 +29,7 @@ export interface ArgusIssue {
   substatus?: string;
   resolved_at?: Date;
   resolved_by?: number;
-  assigned_to?: number;
+  assigned_to?: string;
   first_release?: string;
   last_release?: string;
   priority: IssuePriority;

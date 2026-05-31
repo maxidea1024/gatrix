@@ -230,11 +230,24 @@ const FEEDBACK_MESSAGES = [
   "Export to CSV is not working for large datasets.",
 ];
 
-function generateFeedbackEvent() {
+function generateFeedbackEvent(linkedEventId?: string) {
   const userId = randomItem(USER_IDS);
+
+  // ~40% of feedbacks include screenshot attachments
+  const attachments: string[] = [];
+  if (Math.random() < 0.4) {
+    const numScreenshots = Math.random() < 0.6 ? 1 : Math.random() < 0.8 ? 2 : 3;
+    for (let i = 0; i < numScreenshots; i++) {
+      const w = randomItem([800, 1024, 1280, 1920]);
+      const h = randomItem([600, 768, 720, 1080]);
+      attachments.push(`https://picsum.photos/${w}/${h}?random=${Date.now()}_${i}`);
+    }
+  }
+
   return {
     type: 'feedback',
     event_id: uuid().replace(/-/g, ''),
+    linked_event_id: linkedEventId || undefined,
     timestamp: pastTimestamp(48),
     platform: randomItem(PLATFORMS),
     environment: randomItem(ENVIRONMENTS),
@@ -245,6 +258,7 @@ function generateFeedbackEvent() {
     contact_email: `${userId}@example.com`,
     url: randomItem(['/dashboard', '/game/lobby', '/settings', '/inventory', '/leaderboard']),
     source: randomItem(['widget', 'api', 'dialog']),
+    attachments,
   };
 }
 
@@ -297,9 +311,14 @@ async function main() {
   const errors = Array.from({ length: ERROR_COUNT }, generateErrorEvent);
   const transactions = Array.from({ length: TRANSACTION_COUNT }, generateTransactionEvent);
   const sessions = Array.from({ length: SESSION_COUNT }, generateSessionEvent);
-  const feedbacks = Array.from({ length: FEEDBACK_COUNT }, generateFeedbackEvent);
+  // Link ~70% of feedbacks to actual error events so issue linking works
+  const feedbacks = Array.from({ length: FEEDBACK_COUNT }, (_, i) => {
+    const linkedError = i < Math.floor(FEEDBACK_COUNT * 0.7) ? errors[i % errors.length] : null;
+    return generateFeedbackEvent(linkedError?.event_id);
+  });
 
   console.log(`   ${errors.length} errors, ${transactions.length} transactions, ${sessions.length} sessions, ${feedbacks.length} feedbacks`);
+  console.log(`   (${feedbacks.filter(f => f.linked_event_id).length} feedbacks linked to error events)`);
   console.log('');
 
   // Send in batches

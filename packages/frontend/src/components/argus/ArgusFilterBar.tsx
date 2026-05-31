@@ -37,6 +37,8 @@ interface ArgusFilterBarProps {
   loading?: boolean;
   /** Hide specific filters */
   hideFilters?: ('environment' | 'browser' | 'os')[];
+  /** Extra controls to render before the spacer (e.g., sort chip) */
+  extraControls?: React.ReactNode;
 }
 
 // ==================== Default State ====================
@@ -57,6 +59,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
   onRefresh,
   loading = false,
   hideFilters = [],
+  extraControls,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -166,6 +169,9 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         />
       )}
 
+      {/* Extra controls (e.g., sort chip) */}
+      {extraControls}
+
       {/* Spacer */}
       <Box sx={{ flex: 1 }} />
 
@@ -180,19 +186,21 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         <>
           <Divider orientation="vertical" flexItem sx={{ mx: 0.3, borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)' }} />
           <Tooltip title={t('common.refresh', { defaultValue: 'Refresh' })}>
-            <IconButton onClick={onRefresh} disabled={loading} size="small" sx={{ p: 0.5 }}>
-              <RefreshIcon sx={{
-                fontSize: 18,
-                transition: 'transform 0.3s',
-                ...(loading && {
-                  animation: 'argus-spin 1s linear infinite',
-                  '@keyframes argus-spin': {
-                    from: { transform: 'rotate(0deg)' },
-                    to: { transform: 'rotate(360deg)' },
-                  },
-                }),
-              }} />
-            </IconButton>
+            <span>
+              <IconButton onClick={onRefresh} disabled={loading} size="small" sx={{ p: 0.5 }}>
+                <RefreshIcon sx={{
+                  fontSize: 18,
+                  transition: 'transform 0.3s',
+                  ...(loading && {
+                    animation: 'argus-spin 1s linear infinite',
+                    '@keyframes argus-spin': {
+                      from: { transform: 'rotate(0deg)' },
+                      to: { transform: 'rotate(360deg)' },
+                    },
+                  }),
+                }} />
+              </IconButton>
+            </span>
           </Tooltip>
         </>
       )}

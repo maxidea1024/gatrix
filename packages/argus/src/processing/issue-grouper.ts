@@ -15,7 +15,8 @@ export interface IssueGroupResult {
  * Uses primary_hash for grouping lookup.
  */
 export async function groupIntoIssue(
-  projectId: number,
+  internalProjectId: number,
+  projectId: string,
   event: ArgusErrorEvent,
   primaryHash: string,
   fingerprint: string[]
@@ -28,7 +29,7 @@ export async function groupIntoIssue(
       `SELECT id, status, times_seen FROM g_argus_issues
        WHERE project_id = ? AND primary_hash = ?
        FOR UPDATE`,
-      [projectId, primaryHash]
+      [internalProjectId, primaryHash]
     );
 
     const rows = existing as any[];
@@ -36,6 +37,23 @@ export async function groupIntoIssue(
     if (rows.length > 0) {
       const issue = rows[0];
       const isRegression = issue.status === 'resolved';
+      const newTimesSeen = Number(issue.times_seen) + 1;
+
+      // Determine substatus:
+      // 1. Regression: previously resolved issue gets a new event
+      // 2. Escalating: event count exceeds threshold (100+ events and growing fast)
+      let substatusClause = 'substatus';
+      if (isRegression) {
+        substatusClause = `'regressed'`;
+      } else if (
+        !isRegression &&
+        issue.status === 'unresolved' &&
+        (!issue.substatus || issue.substatus === 'ongoing') &&
+        newTimesSeen > 100 &&
+        newTimesSeen % 50 === 0 // Re-evaluate every 50 events
+      ) {
+        substatusClause = `'escalating'`;
+      }
 
       // Update existing issue
       await connection.query(
@@ -44,7 +62,7 @@ export async function groupIntoIssue(
              last_seen = NOW(),
              last_release = ?,
              status = IF(status = 'resolved', 'unresolved', status),
-             substatus = IF(status = 'resolved', 'regressed', substatus)
+             substatus = ${substatusClause}
          WHERE id = ?`,
         [event.release || null, issue.id]
       );
@@ -66,8 +84,8 @@ export async function groupIntoIssue(
     // Create new issue — get next short_id
     const [maxRows] = await connection.query(
       `SELECT COALESCE(MAX(short_id), 0) + 1 as next_id
-       FROM g_argus_issues WHERE project_id = ?`,
-      [projectId]
+        FROM g_argus_issues WHERE project_id = ?`,
+      [internalProjectId]
     );
     const nextShortId = (maxRows as any[])[0]?.next_id || 1;
 
@@ -82,7 +100,7 @@ export async function groupIntoIssue(
         first_release, last_release, status, priority)
        VALUES (?, ?, ?, ?, 'error', ?, ?, ?, ?, NOW(), NOW(), 1, ?, ?, 'unresolved', 'medium')`,
       [
-        projectId,
+        internalProjectId,
         nextShortId,
         title,
         culprit,

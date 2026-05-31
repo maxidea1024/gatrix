@@ -21,6 +21,11 @@ import {
   InputAdornment,
   Snackbar,
   Alert,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Avatar,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -47,13 +52,32 @@ import {
   FileDownload as ExportIcon,
   AccessTime as GotoTimeIcon,
   Close as CloseIcon,
+  WrapText as WrapTextIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import argusService, { ArgusIssueDetail, ArgusTraceDetail, ArgusLogEntry } from '@/services/argusService';
+import argusService, { ArgusIssueDetail, ArgusTraceDetail, ArgusLogEntry, ArgusErrorEvent } from '@/services/argusService';
+import { rbacService } from '@/services/rbacService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import BreadcrumbsTimeline from '@/components/argus/BreadcrumbsTimeline';
+import EventNavigator from '@/components/argus/EventNavigator';
+import ActivityTimeline from '@/components/argus/ActivityTimeline';
+import TagDistribution from '@/components/argus/TagDistribution';
+import AiRootCausePanel from '@/components/argus/AiRootCausePanel';
+import PresenceIndicator from '@/components/argus/PresenceIndicator';
+import BusinessImpactWidget from '@/components/argus/BusinessImpactWidget';
 
+
+function stringToColor(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ff9800'];
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function getInitials(name: string): string {
+  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
 
 const LEVEL_COLORS: Record<string, string> = {
   fatal: '#f44336',
@@ -72,6 +96,22 @@ const ArgusIssueDetailPage: React.FC = () => {
 
   const [issue, setIssue] = useState<ArgusIssueDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState<any[]>([]);
+  const [assigneeAnchor, setAssigneeAnchor] = useState<HTMLElement | null>(null);
+  const [currentEvent, setCurrentEvent] = useState<ArgusErrorEvent | null>(null);
+
+  useEffect(() => {
+    if (!projectId) return;
+    const fetchMembers = async () => {
+      try {
+        const data = await rbacService.getProjectMembers(projectId);
+        setMembers(data);
+      } catch (error) {
+        console.error('Failed to fetch project members:', error);
+      }
+    };
+    fetchMembers();
+  }, [projectId]);
 
   // Trace states
   const [traceDetail, setTraceDetail] = useState<ArgusTraceDetail | null>(null);
@@ -82,10 +122,12 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [logs, setLogs] = useState<ArgusLogEntry[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
+  const [logsHasMore, setLogsHasMore] = useState(false);
   const [expandedLogIds, setExpandedLogIds] = useState<Set<string>>(new Set());
   const [logsFullscreen, setLogsFullscreen] = useState(false);
   const [logSearch, setLogSearch] = useState('');
   const [logGotoTime, setLogGotoTime] = useState('');
+  const [wrapLines, setWrapLines] = useState(false);
   const [showLogGoto, setShowLogGoto] = useState(false);
   const [copySnackbar, setCopySnackbar] = useState(false);
   const logContainerRef = React.useRef<HTMLDivElement>(null);
@@ -123,6 +165,16 @@ const ArgusIssueDetailPage: React.FC = () => {
     setConfirmDialog({ open: true, status });
   };
 
+  const handleAssign = async (assignee: string) => {
+    if (!projectId || !issueId || !issue) return;
+    try {
+      await argusService.assignIssue(projectId, issueId, assignee || null);
+      setIssue({ ...issue, assigned_to: assignee || null });
+    } catch (error) {
+      console.error('Failed to assign issue:', error);
+    }
+  };
+
   const loadTrace = async (tid: string) => {
     if (!projectId) return;
     setLoadingTrace(true);
@@ -137,7 +189,7 @@ const ArgusIssueDetailPage: React.FC = () => {
     }
   };
 
-  const latestEvent = issue?.latest_event;
+  const latestEvent = currentEvent || issue?.latest_event;
   const levelColor = LEVEL_COLORS[issue?.level || 'error'] || LEVEL_COLORS.error;
 
   // Extract trace_id
@@ -208,7 +260,7 @@ const ArgusIssueDetailPage: React.FC = () => {
             }}
           >
             <Chip
-              label={issue.status}
+              label={t(`argus.issues.${issue.status}`, issue.status)}
               size="small"
               sx={{
                 fontWeight: 700, fontSize: '0.72rem', textTransform: 'capitalize',
@@ -221,7 +273,7 @@ const ArgusIssueDetailPage: React.FC = () => {
             />
             {issue.substatus === 'regressed' && (
               <Chip
-                label="Regressed"
+                label={t('argus.issues.regressed', 'Regressed')}
                 size="small"
                 sx={{
                   fontWeight: 700, fontSize: '0.68rem',
@@ -262,7 +314,52 @@ const ArgusIssueDetailPage: React.FC = () => {
                 backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',
               }} />
             )}
-            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+            {/* Assignee */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <PersonIcon sx={{ fontSize: 16, color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />
+              {issue.assigned_to ? (
+                <Chip
+                  label={issue.assigned_to}
+                  size="small"
+                  onClick={(e) => setAssigneeAnchor(e.currentTarget)}
+                  onDelete={() => handleAssign('')}
+                  sx={{
+                    height: 22, fontSize: '0.72rem', fontWeight: 600,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    color: 'primary.main', border: 'none',
+                  }}
+                />
+              ) : (
+                <Tooltip title={t('argus.issues.assign', 'Assign')}>
+                  <Chip
+                    label={t('argus.issues.unassigned', 'Unassigned')}
+                    size="small"
+                    onClick={(e) => setAssigneeAnchor(e.currentTarget)}
+                    sx={{
+                      height: 22, fontSize: '0.72rem', cursor: 'pointer',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                      border: 'none',
+                    }}
+                  />
+                </Tooltip>
+              )}
+            </Box>
+
+            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+              {/* Multiplayer Presence */}
+              {projectId && issueId && (
+                <PresenceIndicator
+                  projectId={projectId}
+                  resourceId={issueId}
+                  resourceType="issue"
+                  currentUser={{ id: 'current-user', name: 'You' }}
+                  isDark={isDark}
+                />
+              )}
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.3 }} />
               {issue.fingerprint && (
                 <Tooltip title={t('argus.issues.copyFingerprint')}>
                   <Chip
@@ -313,6 +410,65 @@ const ArgusIssueDetailPage: React.FC = () => {
             <StatMini label={t('argus.issues.firstSeen')} value={issue.first_seen ? formatRelative(issue.first_seen, t) : '-'} color="#7c4dff" />
             <StatMini label={t('argus.issues.lastSeen')} value={issue.last_seen ? formatRelative(issue.last_seen, t) : '-'} color="#2196f3" />
           </Box>
+
+          {/* Business Impact + AI Root Cause */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
+            {projectId && issueId && (
+              <BusinessImpactWidget
+                projectId={projectId}
+                issueId={issueId}
+                eventCount={issue.event_count || 0}
+                userCount={issue.user_count || 0}
+                firstSeen={issue.first_seen}
+                lastSeen={issue.last_seen}
+                level={issue.level || 'error'}
+                isDark={isDark}
+              />
+            )}
+            {projectId && issueId && (
+              <AiRootCausePanel
+                projectId={projectId}
+                issueId={issueId}
+                issueTitle={issue.title}
+                exceptionType={latestEvent?.exception_type}
+                exceptionValue={latestEvent?.exception_value}
+                stacktrace={latestEvent?.stacktrace_raw}
+                tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
+                isDark={isDark}
+              />
+            )}
+          </Box>
+
+          {/* Activity Timeline */}
+          {projectId && issueId && (
+            <ActivityTimeline
+              projectId={projectId}
+              issueId={issueId}
+              isDark={isDark}
+            />
+          )}
+
+          {/* Tag Distribution */}
+          {projectId && issueId && (
+            <TagDistribution
+              projectId={projectId}
+              issueId={issueId}
+              isDark={isDark}
+            />
+          )}
+
+          {/* Event Navigator */}
+          {projectId && issueId && (
+            <Box sx={{ mb: 2 }}>
+              <EventNavigator
+                projectId={projectId}
+                issueId={issueId}
+                currentEvent={latestEvent as ArgusErrorEvent | null}
+                onEventChange={(evt) => setCurrentEvent(evt)}
+                isDark={isDark}
+              />
+            </Box>
+          )}
 
           {/* Latest Event */}
           {latestEvent && (
@@ -381,7 +537,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                     <>
                       <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <TagIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
-                        Tags
+                        {t('argus.issues.tags', 'Tags')}
                       </Typography>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {Object.entries(typeof latestEvent.tags === 'string' ? JSON.parse(latestEvent.tags) : latestEvent.tags)
@@ -430,7 +586,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                         <TraceWaterfall trace={traceDetail} isDark={isDark} />
                       ) : (
                         <Typography variant="body2" color="text.secondary" textAlign="center" py={4}>
-                          Trace 정보를 불러오지 못했습니다.
+                          {t('argus.issues.traceLoadFailed', 'Trace 정보를 불러오지 못했습니다.')}
                         </Typography>
                       )}
                     </Box>
@@ -524,8 +680,46 @@ const ArgusIssueDetailPage: React.FC = () => {
             display: 'flex', flexDirection: 'column',
           } : {}),
         }}>
-          {/* Toolbar */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          {!showLogs ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 5 }}>
+              <Button
+                variant="outlined"
+                startIcon={<LogIcon />}
+                onClick={async () => {
+                  setShowLogs(true);
+                  setLogsLoading(true);
+                  try {
+                    const result = await argusService.getLogs(projectId!, { issue_id: issueId, limit: 200, order: 'DESC' });
+                    setLogs(result.data);
+                    setLogsHasMore(result.meta.hasMore);
+                  } catch (e) {
+                    console.error('Failed to load logs:', e);
+                  } finally {
+                    setLogsLoading(false);
+                  }
+                }}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  borderRadius: '8px',
+                  px: 3.5,
+                  py: 1.2,
+                  borderColor: theme.palette.info.main,
+                  color: theme.palette.info.main,
+                  '&:hover': {
+                    borderColor: theme.palette.info.dark,
+                    backgroundColor: alpha(theme.palette.info.main, 0.04),
+                  }
+                }}
+              >
+                {t('argus.issues.loadLogs', 'Load Logs')}
+              </Button>
+            </Box>
+          ) : (
+            <>
+              {/* Toolbar */}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <LogIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
               {t('argus.issues.logs', 'Logs')}
@@ -537,7 +731,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   {/* Search */}
                   <TextField
                     size="small"
-                    placeholder="Search logs..."
+                    placeholder={t('argus.logs.searchPlaceholder')}
                     value={logSearch}
                     onChange={(e) => setLogSearch(e.target.value)}
                     sx={{
@@ -605,14 +799,14 @@ const ArgusIssueDetailPage: React.FC = () => {
                       sx={{ width: 100, '& .MuiOutlinedInput-root': { height: 28, fontSize: '0.72rem', borderRadius: '6px' } }}
                     />
                   ) : (
-                    <Tooltip title="Jump to time (HH:MM:SS)">
+                    <Tooltip title={t('argus.logs.jumpToTime')}>
                       <IconButton size="small" onClick={() => setShowLogGoto(true)} sx={{ p: 0.4 }}>
                         <GotoTimeIcon sx={{ fontSize: 16 }} />
                       </IconButton>
                     </Tooltip>
                   )}
                   {/* Export */}
-                  <Tooltip title="Export logs as JSON">
+                  <Tooltip title={t('argus.logs.exportJson')}>
                     <IconButton size="small" onClick={() => {
                       const dataStr = JSON.stringify(logs, null, 2);
                       const blob = new Blob([dataStr], { type: 'application/json' });
@@ -624,34 +818,19 @@ const ArgusIssueDetailPage: React.FC = () => {
                       <ExportIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Tooltip>
+                  {/* Wrap Lines */}
+                  <Tooltip title={wrapLines ? t('argus.logs.unwrapLines', '줄바꿈 취소') : t('argus.logs.wrapLines', '줄바꿈')}>
+                    <IconButton size="small" onClick={() => setWrapLines(w => !w)} color={wrapLines ? 'primary' : 'default'} sx={{ p: 0.4 }}>
+                      <WrapTextIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Tooltip>
                   {/* Fullscreen */}
-                  <Tooltip title={logsFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
+                  <Tooltip title={logsFullscreen ? t('argus.logs.exitFullscreen') : t('argus.logs.fullscreen')}>
                     <IconButton size="small" onClick={() => setLogsFullscreen(f => !f)} sx={{ p: 0.4 }}>
                       {logsFullscreen ? <FullscreenExitIcon sx={{ fontSize: 16 }} /> : <FullscreenIcon sx={{ fontSize: 16 }} />}
                     </IconButton>
                   </Tooltip>
                 </>
-              )}
-              {!showLogs && (
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={async () => {
-                    setShowLogs(true);
-                    setLogsLoading(true);
-                    try {
-                      const data = await argusService.getLogs(projectId!, { issue_id: issueId, limit: 500 });
-                      setLogs(data);
-                    } catch (e) {
-                      console.error('Failed to load logs:', e);
-                    } finally {
-                      setLogsLoading(false);
-                    }
-                  }}
-                  sx={{ textTransform: 'none', fontSize: '0.76rem', borderRadius: '6px' }}
-                >
-                  {t('argus.issues.loadLogs', 'Load Logs')}
-                </Button>
               )}
             </Box>
           </Box>
@@ -677,7 +856,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   : logs;
                 return (
                 <Box ref={logContainerRef} sx={{
-                  maxHeight: logsFullscreen ? 'none' : 400,
+                  maxHeight: logsFullscreen ? 'none' : 650,
                   flex: logsFullscreen ? 1 : 'none',
                   overflowY: 'auto',
                   fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
@@ -697,10 +876,10 @@ const ArgusIssueDetailPage: React.FC = () => {
                     position: 'sticky', top: 0, zIndex: 2,
                   }}>
                     <Box />
-                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Time</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Level</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Logger</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Message</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('argus.logs.time')}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('argus.logs.level')}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('argus.logs.logger')}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('argus.logs.message')}</Typography>
                   </Box>
                   {/* Rows */}
                   {filteredLogs.map((log, i) => {
@@ -802,7 +981,15 @@ const ArgusIssueDetailPage: React.FC = () => {
                             color: log.level === 'error' ? (isDark ? '#ffa4a2' : '#d32f2f')
                               : log.level === 'warn' || log.level === 'warning' ? (isDark ? '#ffd699' : '#e65100')
                               : isDark ? '#c9d1d9' : '#24292f',
-                            fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            fontFamily: 'inherit',
+                            ...(wrapLines ? {
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-all',
+                            } : {
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            })
                           }}>
                             {highlightText(log.message)}
                           </Typography>
@@ -814,16 +1001,69 @@ const ArgusIssueDetailPage: React.FC = () => {
                             borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                             borderLeft: `3px solid ${lc.fg}`,
                           }}>
+                            {/* Prominent Full Message Block */}
+                            <Box sx={{
+                              mb: 2,
+                              p: 1.5,
+                              borderRadius: '4px',
+                              backgroundColor: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.8)',
+                              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                              position: 'relative',
+                            }}>
+                              <Typography sx={{
+                                fontSize: '0.62rem',
+                                fontWeight: 700,
+                                color: 'text.disabled',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                mb: 0.8
+                              }}>
+                                {t('argus.logs.fullMessage', 'Full Message')}
+                              </Typography>
+                              <Typography sx={{
+                                fontSize: '0.75rem',
+                                color: log.level === 'error' ? (isDark ? '#ffa4a2' : '#d32f2f')
+                                  : log.level === 'warn' || log.level === 'warning' ? (isDark ? '#ffd699' : '#e65100')
+                                  : isDark ? '#e6edf3' : '#1f2328',
+                                fontFamily: 'monospace',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-all',
+                                pr: 4,
+                              }}>
+                                {highlightText(log.message)}
+                              </Typography>
+                              <Tooltip title={t('argus.logs.copyMessage', 'Copy Message')}>
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(log.message);
+                                    setCopySnackbar(true);
+                                  }}
+                                  sx={{
+                                    position: 'absolute',
+                                    right: 8,
+                                    top: 8,
+                                    opacity: 0.4,
+                                    '&:hover': { opacity: 1 }
+                                  }}
+                                >
+                                  <CopyIcon sx={{ fontSize: 14 }} />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+
+                            {/* Metadata Fields Grid */}
                             <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: '2px 12px', alignItems: 'center' }}>
-                              {allFields.filter(f => f.value).map((field) => (
+                              {allFields.filter(f => f.key !== 'message' && f.value).map((field) => (
                                 <React.Fragment key={field.key}>
                                   <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: isDark ? '#58a6ff' : '#0969da', fontFamily: 'inherit', py: 0.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {field.key}
                                   </Typography>
-                                  <Typography sx={{ fontSize: '0.68rem', color: isDark ? '#c9d1d9' : '#24292f', fontFamily: 'inherit', py: 0.2, wordBreak: 'break-all' }}>
+                                  <Typography sx={{ fontSize: '0.68rem', color: isDark ? '#c9d1d9' : '#24292f', fontFamily: 'inherit', py: 0.2, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                                     {highlightText(field.value)}
                                   </Typography>
-                                  <Tooltip title="Copy value">
+                                  <Tooltip title={t('argus.logs.copyValue')}>
                                     <IconButton
                                       size="small"
                                       onClick={(e) => {
@@ -846,7 +1086,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   })}
                   {filteredLogs.length === 0 && logSearch && (
                     <Box sx={{ p: 3, textAlign: 'center' }}>
-                      <Typography variant="body2" color="text.disabled">No logs matching &quot;{logSearch}&quot;</Typography>
+                      <Typography variant="body2" color="text.disabled">{t('argus.logs.noMatchingLogs', { query: logSearch })}</Typography>
                     </Box>
                   )}
                 </Box>
@@ -854,11 +1094,45 @@ const ArgusIssueDetailPage: React.FC = () => {
               })()}
             </Box>
           )}
+          {/* Load More */}
+          {logsHasMore && (
+            <Box sx={{ py: 2, textAlign: 'center', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
+              <Button
+                variant="outlined" size="small"
+                disabled={logsLoading}
+                startIcon={logsLoading ? <CircularProgress size={14} color="inherit" /> : undefined}
+                onClick={async () => {
+                  setLogsLoading(true);
+                  try {
+                    const lastLog = logs[logs.length - 1];
+                    const result = await argusService.getLogs(projectId!, {
+                      issue_id: issueId, limit: 200, order: 'DESC',
+                      cursor: lastLog?.timestamp,
+                    });
+                    setLogs(prev => [...prev, ...result.data]);
+                    setLogsHasMore(result.meta.hasMore);
+                  } catch (e) {
+                    console.error('Failed to load more logs:', e);
+                  } finally {
+                    setLogsLoading(false);
+                  }
+                }}
+                sx={{
+                  textTransform: 'none', fontSize: '0.78rem', fontWeight: 600, minWidth: 160,
+                  borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+                }}
+              >
+                {t('argus.logs.loadMore', 'Load More Logs')}
+              </Button>
+            </Box>
+          )}
+          </>
+        )}
         </Paper>
       )}
       {/* Copy snackbar */}
       <Snackbar open={copySnackbar} autoHideDuration={1500} onClose={() => setCopySnackbar(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="success" sx={{ py: 0, fontSize: '0.75rem' }} onClose={() => setCopySnackbar(false)}>Copied to clipboard</Alert>
+        <Alert severity="success" sx={{ py: 0, fontSize: '0.75rem' }} onClose={() => setCopySnackbar(false)}>{t('argus.common.copiedToClipboard')}</Alert>
       </Snackbar>
 
       <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, status: '' })} maxWidth="sm" fullWidth>
@@ -922,6 +1196,31 @@ const ArgusIssueDetailPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Assignee Menu */}
+      <Menu
+        anchorEl={assigneeAnchor}
+        open={Boolean(assigneeAnchor)}
+        onClose={() => setAssigneeAnchor(null)}
+        slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 160, maxHeight: 300, boxShadow: '0 4px 20px rgba(0,0,0,0.12)' } } }}
+      >
+        <MenuItem onClick={() => { handleAssign(''); setAssigneeAnchor(null); }}>
+          <ListItemIcon><PersonIcon sx={{ fontSize: 18 }} /></ListItemIcon>
+          <ListItemText primary={t('argus.issues.unassigned', 'Unassigned')} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+        </MenuItem>
+        <Divider />
+        {members.map(member => {
+          const displayName = member.name || member.email || member.userId;
+          return (
+            <MenuItem key={member.userId} onClick={() => { handleAssign(displayName); setAssigneeAnchor(null); }}>
+              <Avatar sx={{ width: 20, height: 20, mr: 1, fontSize: '0.55rem', fontWeight: 700, backgroundColor: stringToColor(displayName) }}>
+                {getInitials(displayName)}
+              </Avatar>
+              <ListItemText primary={displayName} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+            </MenuItem>
+          );
+        })}
+      </Menu>
     </PageContentLoader>
   );
 };

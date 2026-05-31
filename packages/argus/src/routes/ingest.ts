@@ -35,7 +35,7 @@ export default async function ingestRoutes(app: FastifyInstance) {
       const eventId = event.event_id || ulid();
 
       try {
-        await enqueueEvent(auth.projectId, { ...event, event_id: eventId });
+        await enqueueEvent(auth.projectId, { ...event, event_id: eventId, internal_project_id: auth.dsnKey.project_id } as any);
 
         return reply.code(202).send({ event_id: eventId });
       } catch (error) {
@@ -82,7 +82,7 @@ export default async function ingestRoutes(app: FastifyInstance) {
               streamKey,
               'MAXLEN', '~', '500000',
               '*',
-              'data', JSON.stringify({ ...event, event_id: eventId, project_id: String(auth.projectId) }),
+              'data', JSON.stringify({ ...event, event_id: eventId, project_id: String(auth.projectId), internal_project_id: auth.dsnKey.project_id }),
             );
           }
         }
@@ -110,7 +110,7 @@ export default async function ingestRoutes(app: FastifyInstance) {
   );
 }
 
-function getStreamKey(eventType: string, projectId: number): string | null {
+function getStreamKey(eventType: string, projectId: string): string | null {
   const base = STREAM_KEYS[eventType];
   if (!base) {
     logger.warn('Unknown event type', { eventType });
@@ -119,7 +119,7 @@ function getStreamKey(eventType: string, projectId: number): string | null {
   return `${base}:${projectId}`;
 }
 
-async function enqueueEvent(projectId: number, event: ArgusEvent): Promise<void> {
+async function enqueueEvent(projectId: string, event: ArgusEvent): Promise<void> {
   const streamKey = getStreamKey(event.type, projectId);
   if (!streamKey) {
     throw new Error(`Unsupported event type: ${event.type}`);
@@ -129,7 +129,7 @@ async function enqueueEvent(projectId: number, event: ArgusEvent): Promise<void>
     streamKey,
     'MAXLEN', '~', '500000',
     '*',
-    'data', JSON.stringify({ ...event, project_id: String(projectId) }),
+    'data', JSON.stringify({ ...event, project_id: String(projectId), internal_project_id: (event as any).internal_project_id }),
   );
 
   logger.debug('Event enqueued', {

@@ -472,6 +472,24 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.CRASH_EVENTS_READ,
       },
       {
+        text: 'sidebar.argusDiscover',
+        icon: 'Explore',
+        path: '/argus/discover',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusDashboards',
+        icon: 'Dashboard',
+        path: '/argus/dashboards',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusLogs',
+        icon: 'Terminal',
+        path: '/argus/logs',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
         text: 'sidebar.argusSettings',
         icon: 'Settings',
         path: '/argus/settings',

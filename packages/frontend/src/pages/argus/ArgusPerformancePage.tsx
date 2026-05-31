@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import useArgusUrlState from '@/hooks/useArgusUrlState';
 import {
   Box,
   Typography,
@@ -6,10 +7,10 @@ import {
   Chip,
   IconButton,
   useTheme,
-  TableSortLabel,
   alpha,
   Tooltip,
   Skeleton,
+  Popover,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -26,6 +27,7 @@ import {
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
   FitScreen as FitScreenIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +45,8 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { TableSkeleton, ChartSkeleton, StatsRowSkeleton } from '@/components/argus/ArgusSkeletons';
+import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import argusService, {
   ArgusTransaction,
   ArgusTransactionDetail,
@@ -52,6 +56,13 @@ import argusService, {
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { formatCompactNumber } from '@/utils/numberFormat';
+import SimplePagination from '@/components/common/SimplePagination';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+
+const PERF_PAGE_SIZE_KEY = 'argusPerf.pageSize';
+const PERF_DEFAULT_PAGE_SIZE = 15;
+const PERF_VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -75,19 +86,43 @@ type ViewMode = 'list' | 'detail' | 'trace';
 const ArgusPerformancePage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+
   const isDark = theme.palette.mode === 'dark';
-  const projectId = '1';
+  const { currentProject } = useOrgProject();
+  const projectId = currentProject?.id || '1';
+
+  // ─── URL-driven state ───
+  const URL_PARAMS = useMemo(() => ({
+    view:   { key: 'view',   default: 'list',  pushHistory: true },
+    txn:    { key: 'txn',    default: '',       pushHistory: true },
+    trace:  { key: 'trace',  default: '',       pushHistory: true },
+    period: { key: 'period', default: '24h',    storageKey: 'argus-perf-period' },
+    sort:   { key: 'sort',   default: 'count' },
+  }), []);
+  const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
+
+  const viewMode = urlState.view as ViewMode;
+  const selectedTxn = urlState.txn || null;
+  const sort = urlState.sort;
+
+  // Derive ArgusFilterState from URL period (for ArgusFilterBar compatibility)
+  const filters = useMemo<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period),
+    [urlState.period],
+  );
 
   const [transactions, setTransactions] = useState<ArgusTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<ArgusFilterState>(() => {
-    const saved = localStorage.getItem('argus-perf-period');
-    return defaultArgusFilterState(saved || '24h');
+  const [perfPage, setPerfPage] = useState(0);
+  const [perfRowsPerPage, setPerfRowsPerPage] = useState(() => {
+    const saved = parseInt(localStorage.getItem(PERF_PAGE_SIZE_KEY) || '', 10);
+    if (!isNaN(saved) && PERF_VALID_PAGE_SIZES.includes(saved)) return saved;
+    return PERF_DEFAULT_PAGE_SIZE;
   });
-  const [sort, setSort] = useState<string>('count');
 
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [selectedTxn, setSelectedTxn] = useState<string | null>(null);
+  useEffect(() => {
+    localStorage.setItem(PERF_PAGE_SIZE_KEY, String(perfRowsPerPage));
+  }, [perfRowsPerPage]);
   const [detail, setDetail] = useState<ArgusTransactionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -99,8 +134,9 @@ const ArgusPerformancePage: React.FC = () => {
     setLoading(true);
     try {
       const ap = argusDateRangeToApiParams(filters.dateRange);
-      const data = await argusService.getTransactions(projectId, { ...ap, sort, limit: 30 });
+      const data = await argusService.getTransactions(projectId, { ...ap, sort, limit: 500 });
       setTransactions(data);
+      setPerfPage(0);
     } catch (error) {
       console.error('Failed to fetch transactions:', error);
     } finally {
@@ -128,7 +164,6 @@ const ArgusPerformancePage: React.FC = () => {
     try {
       const data = await argusService.getTraceDetail(projectId, traceId);
       setTraceData(data);
-      setViewMode('trace');
     } catch (error) {
       console.error('Failed to fetch trace:', error);
     } finally {
@@ -136,29 +171,44 @@ const ArgusPerformancePage: React.FC = () => {
     }
   }, [projectId]);
 
+  // Restore view from URL on mount
+  useEffect(() => {
+    if (urlState.trace) {
+      // URL has trace ID — ensure we're in trace view and fetch data
+      if (viewMode !== 'trace') setUrlState({ view: 'trace' });
+      fetchTrace(urlState.trace);
+    } else if (urlState.txn) {
+      // URL has transaction name — ensure we're in detail view and fetch data
+      if (viewMode !== 'detail') setUrlState({ view: 'detail' });
+      fetchDetail(urlState.txn);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
+
   const handleTxnClick = (txnName: string) => {
-    setSelectedTxn(txnName);
-    setViewMode('detail');
+    setUrlState({ view: 'detail', txn: txnName, trace: '' });
     fetchDetail(txnName);
   };
 
   const handleBack = () => {
     if (viewMode === 'trace') {
-      setViewMode('detail');
+      setUrlState({ view: selectedTxn ? 'detail' : 'list', trace: '' });
       setTraceData(null);
     } else {
-      setViewMode('list');
-      setSelectedTxn(null);
+      setUrlState({ view: 'list', txn: '', trace: '' });
       setDetail(null);
     }
   };
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
-    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      localStorage.setItem('argus-perf-period', newFilters.dateRange.preset);
+      setUrlState({ period: newFilters.dateRange.preset });
     }
     if (selectedTxn && viewMode === 'detail') fetchDetail(selectedTxn);
+  };
+
+  const handleSortChange = (newSort: string) => {
+    setUrlState({ sort: newSort });
   };
 
   // --- Chart Data ---
@@ -222,8 +272,8 @@ const ArgusPerformancePage: React.FC = () => {
     },
   }), [isDark]);
 
-  const headerTitle = viewMode === 'trace' ? `Trace ${traceData?.trace_id?.slice(0, 8)}...`
-    : viewMode === 'detail' ? selectedTxn
+  const headerTitle = viewMode === 'trace' ? `Trace ${(traceData?.trace_id || urlState.trace || '')?.slice(0, 8)}...`
+    : viewMode === 'detail' ? (selectedTxn || urlState.txn)
     : t('argus.performance.title');
 
   return (
@@ -237,27 +287,33 @@ const ArgusPerformancePage: React.FC = () => {
         <Typography variant="h5" fontWeight={700} noWrap sx={{ maxWidth: 500 }}>
           {headerTitle}
         </Typography>
+        {viewMode === 'list' && (
+          <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
+            — {t('argus.performance.subtitle')}
+          </Typography>
+        )}
       </Box>
 
-      {/* Filter Bar */}
+      {/* Filter Bar + Sort */}
       <ArgusFilterBar
         projectId={projectId}
         value={filters}
         onChange={handleFilterChange}
         onRefresh={viewMode === 'list' ? fetchTransactions : () => selectedTxn && fetchDetail(selectedTxn)}
         loading={loading}
+        extraControls={viewMode === 'list' ? <PerfSortChip sort={sort} onSortChange={handleSortChange} isDark={isDark} /> : undefined}
       />
 
       {/* === TRACE WATERFALL VIEW === */}
       {viewMode === 'trace' && (
-        <PageContentLoader loading={traceLoading}>
+        <PageContentLoader loading={traceLoading} skeleton={<TableSkeleton rows={8} cols={6} />}>
           {traceData && <TraceWaterfall trace={traceData} isDark={isDark} />}
         </PageContentLoader>
       )}
 
       {/* === DETAIL VIEW === */}
       {viewMode === 'detail' && (
-        <PageContentLoader loading={detailLoading}>
+        <PageContentLoader loading={detailLoading} skeleton={<><Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 2 }}><Paper elevation={0} sx={{ p: 2, border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2 }}><ArgusChartSkeleton type="line" height={260} color="#ff9800" /></Paper><Paper elevation={0} sx={{ p: 2, border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2 }}><ArgusChartSkeleton type="bar" height={220} color={theme.palette.info.main} /></Paper></Box></>}>
           {/* Charts */}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 2 }}>
             <Paper elevation={0} sx={{ p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
@@ -265,7 +321,7 @@ const ArgusPerformancePage: React.FC = () => {
                 {t('argus.performance.latencyTrend')}
               </Typography>
               <Box sx={{ height: 260 }}>
-                <Line data={trendChartData} options={chartOpts} plugins={[getCrosshairPlugin(isDark)]} />
+                {detailLoading ? <ArgusChartSkeleton type="line" height={260} color="#ff9800" /> : <Line data={trendChartData} options={chartOpts} plugins={[getCrosshairPlugin(isDark)]} />}
               </Box>
             </Paper>
             <Paper elevation={0} sx={{ p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
@@ -273,7 +329,7 @@ const ArgusPerformancePage: React.FC = () => {
                 {t('argus.performance.durationDistribution')}
               </Typography>
               <Box sx={{ height: 220 }}>
-                <Bar data={histogramData} options={barOpts} />
+                {detailLoading ? <ArgusChartSkeleton type="bar" height={220} color={theme.palette.info.main} /> : <Bar data={histogramData} options={barOpts} />}
               </Box>
             </Paper>
           </Box>
@@ -334,7 +390,7 @@ const ArgusPerformancePage: React.FC = () => {
                     return (
                       <Box
                         key={`${tr.event_id || tr.trace_id}-${idx}`}
-                        onClick={() => fetchTrace(tr.trace_id)}
+                        onClick={() => { setUrlState({ view: 'trace', trace: tr.trace_id }); fetchTrace(tr.trace_id); }}
                         sx={{
                           display: 'flex', alignItems: 'center', gap: 1.5, p: 1, borderRadius: 1.5,
                           cursor: 'pointer', transition: 'background 0.15s',
@@ -370,7 +426,7 @@ const ArgusPerformancePage: React.FC = () => {
 
       {/* === TRANSACTION LIST === */}
       {viewMode === 'list' && (
-        <PageContentLoader loading={loading}>
+        <PageContentLoader loading={loading} skeleton={<><StatsRowSkeleton count={5} /><TableSkeleton rows={10} cols={6} /></>}>
           {/* Performance Summary Stats */}
           {transactions.length > 0 && (
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2, mb: 3 }}>
@@ -381,7 +437,7 @@ const ArgusPerformancePage: React.FC = () => {
                 const avgErr = transactions.reduce((s, t) => s + Number(t.error_rate), 0) / transactions.length;
                 const slowest = transactions.reduce((max, t) => Number(t.p95) > Number(max.p95) ? t : max, transactions[0]);
                 return [
-                  { label: t('argus.performance.totalTransactions', 'Total Transactions'), value: totalCount.toLocaleString(), color: '#7c4dff', icon: <SpeedIcon /> },
+                  { label: t('argus.performance.totalTransactions', 'Total Transactions'), value: formatCompactNumber(totalCount), color: '#7c4dff', icon: <SpeedIcon /> },
                   { label: t('argus.performance.avgP95', 'Avg. P95'), value: `${avgP95.toFixed(0)}ms`, color: avgP95 > 3000 ? '#f44336' : avgP95 > 1000 ? '#ff9800' : '#4caf50', icon: <TimelineIcon /> },
                   { label: t('argus.performance.avgDuration', 'Avg. Duration'), value: `${avgDur.toFixed(0)}ms`, color: '#2196f3', icon: <ScheduleIcon /> },
                   { label: t('argus.performance.avgErrorRate', 'Avg. Error Rate'), value: `${avgErr.toFixed(2)}%`, color: avgErr > 5 ? '#f44336' : avgErr > 1 ? '#ff9800' : '#4caf50', icon: <SpeedIcon /> },
@@ -424,23 +480,23 @@ const ArgusPerformancePage: React.FC = () => {
           <Paper elevation={0} sx={{ border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, overflow: 'hidden' }}>
             {/* Table Header */}
             <Box sx={{
-              display: 'grid', gridTemplateColumns: '2fr repeat(5, 1fr)', gap: 1,
-              px: 2, py: 1.2,
+              display: 'grid', gridTemplateColumns: '2fr repeat(5, 1fr)', gap: 0,
+              px: 0, py: 0,
               backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             }}>
-              <Typography variant="caption" fontWeight={600}>{t('argus.performance.transactionName')}</Typography>
-              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', cursor: 'pointer' }} onClick={() => setSort('count')}>
-                {t('argus.performance.count')} {sort === 'count' ? '↓' : ''}
+              <Typography variant="caption" fontWeight={600} sx={{ px: 2, py: 1.2 }}>{t('argus.performance.transactionName')}</Typography>
+              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                {t('argus.performance.count')}
               </Typography>
-              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', cursor: 'pointer' }} onClick={() => setSort('avg')}>
-                {t('argus.performance.avgDuration')} {sort === 'avg' ? '↓' : ''}
+              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                {t('argus.performance.avgDuration')}
               </Typography>
-              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right' }}>P50</Typography>
-              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', cursor: 'pointer' }} onClick={() => setSort('p95')}>
-                P95 {sort === 'p95' ? '↓' : ''}
+              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>P50</Typography>
+              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                P95
               </Typography>
-              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right' }}>{t('argus.performance.errorRate')}</Typography>
+              <Typography variant="caption" fontWeight={600} sx={{ textAlign: 'right', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>{t('argus.performance.errorRate')}</Typography>
             </Box>
 
             {transactions.length === 0 ? (
@@ -449,7 +505,7 @@ const ArgusPerformancePage: React.FC = () => {
                 <Typography color="text.secondary">{t('argus.performance.noTransactions')}</Typography>
               </Box>
             ) : (
-              transactions.map((txn, idx) => {
+              transactions.slice(perfPage * perfRowsPerPage, perfPage * perfRowsPerPage + perfRowsPerPage).map((txn, idx) => {
                 const p95Val = Number(txn.p95);
                 const p50Val = Number(txn.p50);
                 const errRate = Number(txn.error_rate);
@@ -460,34 +516,39 @@ const ArgusPerformancePage: React.FC = () => {
                     key={`${txn.name}-${idx}`}
                     onClick={() => handleTxnClick(txn.name)}
                     sx={{
-                      display: 'grid', gridTemplateColumns: '2fr repeat(5, 1fr)', gap: 1,
-                      px: 2, py: 1.2, alignItems: 'center', cursor: 'pointer',
-                      borderBottom: idx < transactions.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
+                      display: 'grid', gridTemplateColumns: '2fr repeat(5, 1fr)', gap: 0,
+                      px: 0, py: 0, alignItems: 'stretch', cursor: 'pointer',
+                      borderBottom: idx < perfRowsPerPage - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
                       transition: 'background 0.15s',
                       '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden' }}>
-                      {method && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden', px: 2, py: 1.2 }}>
+                      <Box sx={{ width: 55, flexShrink: 0 }}>
                         <Chip label={method} size="small" sx={{
-                          height: 20, fontSize: '0.65rem', fontWeight: 700, borderRadius: 0.8, minWidth: 40,
+                          height: 20, fontSize: '0.65rem', fontWeight: 700, borderRadius: 0.8,
+                          width: '100%',
                           backgroundColor: alpha(getMethodColor(method), 0.12),
                           color: getMethodColor(method), border: 'none',
                         }} />
-                      )}
-                      <Typography variant="body2" fontWeight={500} noWrap>{txnPath}</Typography>
+                      </Box>
+                      <Typography variant="body2" fontWeight={500} noWrap sx={{ flex: 1 }}>{txnPath}</Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ textAlign: 'right' }}>{Number(txn.count).toLocaleString()}</Typography>
-                    <Typography variant="body2" sx={{ textAlign: 'right' }}>{Number(txn.avg_duration).toFixed(0)}ms</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                      <Typography variant="body2">{formatCompactNumber(Number(txn.count))}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                      <Typography variant="body2">{Number(txn.avg_duration).toFixed(0)}ms</Typography>
+                    </Box>
                     {/* P50 with mini bar */}
-                    <Box sx={{ textAlign: 'right' }}>
+                    <Box sx={{ px: 2, py: 1.2, textAlign: 'right', borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                       <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>{p50Val.toFixed(0)}ms</Typography>
                       <Box sx={{ height: 3, borderRadius: 2, mt: 0.3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
                         <Box sx={{ height: '100%', borderRadius: 2, width: `${(p50Val / maxP95) * 100}%`, backgroundColor: '#4caf50', transition: 'width 0.3s' }} />
                       </Box>
                     </Box>
                     {/* P95 with mini bar */}
-                    <Box sx={{ textAlign: 'right' }}>
+                    <Box sx={{ px: 2, py: 1.2, textAlign: 'right', borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                       <Typography variant="body2" fontWeight={600} sx={{
                         fontSize: '0.82rem',
                         color: p95Val > 3000 ? '#f44336' : p95Val > 1000 ? '#ff9800' : 'inherit',
@@ -501,40 +562,130 @@ const ArgusPerformancePage: React.FC = () => {
                         }} />
                       </Box>
                     </Box>
-                    <Box sx={{ textAlign: 'right' }}>
-                      <Chip
-                        label={`${errRate.toFixed(1)}%`}
-                        size="small"
-                        sx={{
-                          height: 20, fontSize: '0.7rem', fontWeight: 600,
-                          backgroundColor: alpha(errRate > 5 ? '#f44336' : errRate > 1 ? '#ff9800' : '#4caf50', 0.12),
+                    {/* Error Rate with bar */}
+                    <Box sx={{ px: 2, py: 1.2, borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1, mb: 0.3 }}>
+                        <Box sx={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+                          <Box sx={{
+                            height: '100%', borderRadius: 3,
+                            width: `${Math.min(errRate, 100)}%`,
+                            backgroundColor: errRate > 5 ? '#f44336' : errRate > 1 ? '#ff9800' : '#4caf50',
+                            transition: 'width 0.3s',
+                          }} />
+                        </Box>
+                        <Typography variant="body2" fontWeight={600} sx={{
+                          fontSize: '0.78rem', flexShrink: 0, minWidth: 38, textAlign: 'right',
                           color: errRate > 5 ? '#f44336' : errRate > 1 ? '#ff9800' : '#4caf50',
-                          border: 'none',
-                        }}
-                      />
+                        }}>
+                          {errRate.toFixed(1)}%
+                        </Typography>
+                      </Box>
                     </Box>
                   </Box>
                 );
               })
             )}
           </Paper>
+          {transactions.length > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <SimplePagination
+                count={transactions.length}
+                page={perfPage}
+                rowsPerPage={perfRowsPerPage}
+                onPageChange={(_, newPage) => setPerfPage(newPage)}
+                onRowsPerPageChange={(e) => {
+                  setPerfRowsPerPage(Number(e.target.value));
+                  setPerfPage(0);
+                }}
+                rowsPerPageOptions={PERF_VALID_PAGE_SIZES}
+                size="small"
+              />
+            </Box>
+          )}
         </PageContentLoader>
       )}
     </Box>
   );
 };
 
+// --- Sort Chip Selector ---
+const SORT_OPTIONS = [
+  { value: 'count', labelKey: 'argus.performance.count' },
+  { value: 'avg', labelKey: 'argus.performance.avgDuration' },
+  { value: 'p95', labelKey: 'P95' },
+  { value: 'error_rate', labelKey: 'argus.performance.errorRate' },
+];
+
+const PerfSortChip: React.FC<{ sort: string; onSortChange: (v: string) => void; isDark: boolean }> = ({ sort, onSortChange, isDark }) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const currentOpt = SORT_OPTIONS.find(o => o.value === sort);
+  const displayLabel = currentOpt ? (currentOpt.labelKey.startsWith('argus.') ? t(currentOpt.labelKey) : currentOpt.labelKey) : sort;
+
+  return (
+    <>
+      <Box
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{
+          display: 'inline-flex', alignItems: 'center', gap: 0.5,
+          height: 32, px: 1.5, borderRadius: '6px',
+          border: '1px solid', borderColor: anchorEl ? 'primary.main' : 'divider',
+          bgcolor: anchorEl ? alpha(theme.palette.primary.main, 0.04) : 'transparent',
+          cursor: 'pointer', transition: 'all 0.15s', userSelect: 'none', whiteSpace: 'nowrap',
+          '&:hover': { borderColor: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.04) },
+        }}
+      >
+        <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.issues.sort', 'Sort')}:</Typography>
+        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'text.primary' }}>{displayLabel}</Typography>
+        <ExpandMoreIcon sx={{ fontSize: 13, color: 'text.disabled', transform: anchorEl ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+      </Box>
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        slotProps={{ paper: { sx: { mt: 0.5, borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', minWidth: 160, py: 0.5 } } }}
+      >
+        {SORT_OPTIONS.map(opt => {
+          const label = opt.labelKey.startsWith('argus.') ? t(opt.labelKey) : opt.labelKey;
+          return (
+            <Box
+              key={opt.value}
+              onClick={() => { onSortChange(opt.value); setAnchorEl(null); }}
+              sx={{
+                px: 1.5, py: 0.7, cursor: 'pointer', fontSize: '0.8rem',
+                fontWeight: opt.value === sort ? 700 : 400,
+                color: opt.value === sort ? 'primary.main' : 'text.primary',
+                backgroundColor: opt.value === sort ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
+                transition: 'background 0.1s',
+                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.04) },
+              }}
+            >
+              {label}
+            </Box>
+          );
+        })}
+      </Popover>
+    </>
+  );
+};
+
 const METHOD_COLORS: Record<string, string> = {
   GET: '#4caf50', POST: '#2196f3', PUT: '#ff9800', PATCH: '#7c4dff',
   DELETE: '#f44336', HEAD: '#9e9e9e', OPTIONS: '#607d8b',
+  WS: '#00bcd4', CRON: '#e91e63', JOB: '#e91e63', GRPC: '#ff5722',
+  TXN: '#8d6e63', FUNC: '#8d6e63'
 };
 function getMethodColor(method: string): string {
   return METHOD_COLORS[method.toUpperCase()] || '#9e9e9e';
 }
 function parseTransaction(name: string): { method: string; path: string } {
-  const match = name.match(/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(.+)$/i);
+  // Match any uppercase word at the start (e.g., GET, POST, WS, CRON)
+  const match = name.match(/^([A-Z]{2,10})\s+(.+)$/);
   if (match) return { method: match[1].toUpperCase(), path: match[2] };
-  return { method: '', path: name };
+  return { method: 'TXN', path: name };
 }
 
 function formatHour(hourStr: string): string {

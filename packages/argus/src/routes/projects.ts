@@ -117,8 +117,11 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
 
       try {
+        const isNumeric = /^\d+$/.test(projectId);
         const [rows] = await mysqlPool.query(
-          'SELECT * FROM g_argus_projects WHERE id = ?',
+          isNumeric
+            ? 'SELECT * FROM g_argus_projects WHERE id = ?'
+            : 'SELECT * FROM g_argus_projects WHERE gatrix_project_id = ?',
           [projectId]
         );
         const results = rows as any[];
@@ -178,10 +181,12 @@ export default async function projectsRoutes(app: FastifyInstance) {
       }
 
       params.push(projectId);
+      const isNumeric = /^\d+$/.test(projectId);
+      const whereCol = isNumeric ? 'id' : 'gatrix_project_id';
 
       try {
         await mysqlPool.query(
-          `UPDATE g_argus_projects SET ${updates.join(', ')} WHERE id = ?`,
+          `UPDATE g_argus_projects SET ${updates.join(', ')} WHERE ${whereCol} = ?`,
           params
         );
         return reply.send({ success: true });

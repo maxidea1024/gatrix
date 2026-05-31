@@ -146,6 +146,7 @@ export class ErrorWorker {
 
           const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusErrorEvent & {
             project_id: string;
+            internal_project_id: number;
           };
 
           // Process the event
@@ -178,7 +179,7 @@ export class ErrorWorker {
   }
 
   private async processEvent(
-    rawEvent: ArgusErrorEvent & { project_id: string }
+    rawEvent: ArgusErrorEvent & { project_id: string; internal_project_id: number }
   ): Promise<NormalizedError | null> {
     try {
       // 1. Normalize
@@ -189,7 +190,8 @@ export class ErrorWorker {
 
       // 3. Issue grouping
       const groupResult = await groupIntoIssue(
-        parseInt(rawEvent.project_id, 10),
+        rawEvent.internal_project_id,
+        rawEvent.project_id,
         rawEvent,
         primary_hash,
         fingerprint

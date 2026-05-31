@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -25,7 +25,8 @@ import {
   Cloud as EnvIcon,
   NewReleases as ReleaseIcon,
 } from '@mui/icons-material';
-import { getCrosshairPlugin } from '../../utils/chartPlugins';
+import { getCrosshairPlugin, getDragSelectPlugin } from '../../utils/chartPlugins';
+import { formatCompactNumber } from '../../utils/numberFormat';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -45,6 +46,9 @@ import argusService, { ArgusOverviewData } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+import useArgusUrlState from '@/hooks/useArgusUrlState';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -53,7 +57,7 @@ ChartJS.register(
 
 
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_KEYS = ['common.day.mon', 'common.day.tue', 'common.day.wed', 'common.day.thu', 'common.day.fri', 'common.day.sat', 'common.day.sun'];
 
 const ArgusOverviewPage: React.FC = () => {
   const theme = useTheme();
@@ -61,13 +65,19 @@ const ArgusOverviewPage: React.FC = () => {
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
+  const URL_PARAMS = useMemo(() => ({
+    period: { key: 'period', default: '24h', storageKey: 'argus-overview-period' },
+  }), []);
+  const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
+
   const [data, setData] = useState<ArgusOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<ArgusFilterState>(() => {
-    const saved = localStorage.getItem('argus-overview-period');
-    return defaultArgusFilterState(saved || '24h');
-  });
-  const projectId = '1';
+  const filters = useMemo<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period),
+    [urlState.period],
+  );
+  const { currentProject } = useOrgProject();
+  const projectId = currentProject?.id || '1';
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -85,9 +95,8 @@ const ArgusOverviewPage: React.FC = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
-    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      localStorage.setItem('argus-overview-period', newFilters.dateRange.preset);
+      setUrlState({ period: newFilters.dateRange.preset });
     }
   };
 
@@ -276,6 +285,9 @@ const ArgusOverviewPage: React.FC = () => {
         <Typography variant="h5" fontWeight={700}>
           {t('argus.overview.title')}
         </Typography>
+        <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
+          — {t('argus.overview.subtitle')}
+        </Typography>
       </Box>
 
       {/* Filter Bar */}
@@ -321,9 +333,11 @@ const ArgusOverviewPage: React.FC = () => {
                   <Skeleton width={60} height={28} />
                 ) : (
                   <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.8 }}>
-                    <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, color: isDark ? '#fff' : '#1a1a2e' }}>
-                      {typeof card.value === 'number' ? card.value.toLocaleString() : card.value ?? '-'}
-                    </Typography>
+                    <Tooltip title={typeof card.value === 'number' && card.value >= 1000 ? card.value.toLocaleString() : ''} arrow>
+                      <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, color: isDark ? '#fff' : '#1a1a2e' }}>
+                        {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value ?? '-'}
+                      </Typography>
+                    </Tooltip>
                     {card.change != null && (
                       <ChangeIndicator value={card.change} invert={card.invertChange} />
                     )}
@@ -349,7 +363,17 @@ const ArgusOverviewPage: React.FC = () => {
             {t('argus.overview.errorTrend')}
           </Typography>
           <Box sx={{ height: 220 }}>
-            {loading ? <Skeleton variant="rounded" height={220} /> : <Line data={errorChartData} options={chartOptions} plugins={[getCrosshairPlugin(isDark)]} />}
+            {loading ? <ArgusChartSkeleton type="line" height={220} color={theme.palette.error.main} /> : <Line data={errorChartData} options={chartOptions} plugins={[getCrosshairPlugin(isDark), getDragSelectPlugin(isDark, (si, ei) => {
+              const trend = data?.error_trend;
+              if (!trend) return;
+              const startHour = trend[si]?.hour;
+              const endHour = trend[ei]?.hour;
+              if (startHour && endHour) {
+                const start = new Date(startHour).toISOString();
+                const end = new Date(new Date(endHour).getTime() + 3600000).toISOString();
+                navigate(`/argus/issues?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
+              }
+            })]} />}
           </Box>
         </Paper>
 
@@ -359,7 +383,17 @@ const ArgusOverviewPage: React.FC = () => {
             {t('argus.overview.transactionThroughput')}
           </Typography>
           <Box sx={{ height: 220 }}>
-            {loading ? <Skeleton variant="rounded" height={220} /> : <Bar data={txnChartData} options={chartOptions} />}
+            {loading ? <ArgusChartSkeleton type="bar" height={220} color={theme.palette.primary.main} /> : <Bar data={txnChartData} options={chartOptions} plugins={[getDragSelectPlugin(isDark, (si, ei) => {
+              const trend = data?.transaction_trend;
+              if (!trend) return;
+              const startHour = trend[si]?.hour;
+              const endHour = trend[ei]?.hour;
+              if (startHour && endHour) {
+                const start = new Date(startHour).toISOString();
+                const end = new Date(new Date(endHour).getTime() + 3600000).toISOString();
+                navigate(`/argus/issues?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
+              }
+            })]} />}
           </Box>
         </Paper>
       </Box>
@@ -386,8 +420,10 @@ const ArgusOverviewPage: React.FC = () => {
                 </Typography>
               ))}
               {/* Rows: each day */}
-              {DAY_LABELS.map((dayLabel, dayIdx) => (
-                <React.Fragment key={dayLabel}>
+              {DAY_KEYS.map((dayKey, dayIdx) => {
+                const dayLabel = t(dayKey);
+                return (
+                <React.Fragment key={dayKey}>
                   <Typography variant="caption" sx={{ fontSize: '0.68rem', color: isDark ? '#777' : '#999', display: 'flex', alignItems: 'center', pr: 0.5 }}>
                     {dayLabel}
                   </Typography>
@@ -396,7 +432,7 @@ const ArgusOverviewPage: React.FC = () => {
                     const count = Number(cell?.count || 0);
                     const intensity = heatmapMax > 0 ? count / heatmapMax : 0;
                     return (
-                      <Tooltip key={`${dayIdx}-${h}`} title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count} errors`} arrow>
+                      <Tooltip key={`${dayIdx}-${h}`} title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count} ${t('argus.overview.errors')}`} arrow>
                         <Box sx={{
                           height: 20,
                           borderRadius: 0.5,
@@ -413,15 +449,16 @@ const ArgusOverviewPage: React.FC = () => {
                     );
                   })}
                 </React.Fragment>
-              ))}
+                );
+              })}
             </Box>
             {/* Legend */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1, justifyContent: 'flex-end' }}>
-              <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#555' : '#bbb', mr: 0.5 }}>Less</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#555' : '#bbb', mr: 0.5 }}>{t('argus.overview.less')}</Typography>
               {[0.05, 0.2, 0.4, 0.6, 0.8, 1].map((v) => (
                 <Box key={v} sx={{ width: 12, height: 12, borderRadius: 0.3, backgroundColor: alpha('#f44336', v) }} />
               ))}
-              <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#555' : '#bbb', ml: 0.5 }}>More</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.6rem', color: isDark ? '#555' : '#bbb', ml: 0.5 }}>{t('argus.overview.more')}</Typography>
             </Box>
           </Box>
         )}
@@ -505,7 +542,7 @@ const ArgusOverviewPage: React.FC = () => {
                           {Number(r.count).toLocaleString()}
                         </Typography>
                         <Typography variant="caption" sx={{ color: isDark ? '#555' : '#bbb' }}>
-                          {Number(r.users).toLocaleString()} users
+                          {Number(r.users).toLocaleString()} {t('argus.overview.users')}
                         </Typography>
                       </Box>
                     </Box>
@@ -623,6 +660,7 @@ const DistributionCard: React.FC<{
   color: string;
   onItemClick?: (label: string) => void;
 }> = ({ title, icon, data, loading, isDark, color, onItemClick }) => {
+  const { t } = useTranslation();
   const total = data.reduce((sum, d) => sum + d.value, 0);
   return (
     <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
@@ -633,7 +671,7 @@ const DistributionCard: React.FC<{
       {loading ? (
         <Skeleton variant="rounded" height={120} />
       ) : data.length === 0 ? (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>No data</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>{t('argus.overview.noData')}</Typography>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
           {data.slice(0, 5).map((item, idx) => {

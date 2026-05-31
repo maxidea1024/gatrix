@@ -70,6 +70,7 @@ import {
   Tune as TuneIcon,
   RocketLaunch as RocketLaunchIcon,
   Construction as ConstructionIcon,
+  Explore as ExploreIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 
@@ -140,6 +141,7 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Tune: <TuneIcon />,
   RocketLaunch: <RocketLaunchIcon />,
   Construction: <ConstructionIcon />,
+  Explore: <ExploreIcon />,
   Ripple: <RippleIcon />,
 };
 

@@ -26,6 +26,7 @@ interface NormalizedFeedback {
   release: string;
   source: string;
   tags: Record<string, string>;
+  attachments: string[];
 }
 
 export class FeedbackWorker {
@@ -188,6 +189,7 @@ export class FeedbackWorker {
       release: event.release || '',
       source: event.source || 'widget',
       tags: event.tags || {},
+      attachments: (event as any).attachments || [],
     };
   }
 

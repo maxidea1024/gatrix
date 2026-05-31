@@ -35,13 +35,14 @@ export default async function alertsRoutes(app: FastifyInstance) {
     '/:projectId/alerts',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { name, conditions, actions, frequency, environment, level } = request.body as {
+      const { name, conditions, actions, frequency, environment, level, tags } = request.body as {
         name: string;
         conditions: any[];
         actions: any[];
         frequency?: number;
         environment?: string;
         level?: string;
+        tags?: Record<string, string>;
       };
 
       if (!name || !conditions || !actions) {
@@ -50,8 +51,8 @@ export default async function alertsRoutes(app: FastifyInstance) {
 
       try {
         const [result] = await mysqlPool.query(
-          `INSERT INTO g_argus_alert_rules (project_id, name, conditions, actions, frequency, environment, level)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO g_argus_alert_rules (project_id, name, conditions, actions, frequency, environment, level, tags)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             projectId,
             name,
@@ -60,6 +61,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
             frequency || 60,
             environment || null,
             level || null,
+            tags ? JSON.stringify(tags) : null,
           ]
         );
         const insertId = (result as any).insertId;
@@ -79,7 +81,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
     '/:projectId/alerts/:ruleId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, ruleId } = request.params as { projectId: string; ruleId: string };
-      const { name, conditions, actions, frequency, environment, level, enabled } = request.body as {
+      const { name, conditions, actions, frequency, environment, level, enabled, tags } = request.body as {
         name?: string;
         conditions?: any[];
         actions?: any[];
@@ -87,6 +89,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         environment?: string;
         level?: string;
         enabled?: boolean;
+        tags?: Record<string, string>;
       };
 
       try {
@@ -100,6 +103,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         if (environment !== undefined) { updates.push('environment = ?'); params.push(environment || null); }
         if (level !== undefined) { updates.push('level = ?'); params.push(level || null); }
         if (enabled !== undefined) { updates.push('enabled = ?'); params.push(enabled ? 1 : 0); }
+        if (tags !== undefined) { updates.push('tags = ?'); params.push(tags ? JSON.stringify(tags) : null); }
 
         if (updates.length === 0) {
           return reply.code(400).send({ error: 'No fields to update' });

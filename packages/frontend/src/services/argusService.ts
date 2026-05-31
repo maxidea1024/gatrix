@@ -69,6 +69,10 @@ export interface ArgusIssue {
   user_count: number;
   assigned_to: string | null;
   is_regression: number;
+  priority?: 'critical' | 'high' | 'medium' | 'low';
+  stats_24h?: number[];
+  external_url?: string | null;
+  external_key?: string | null;
 }
 
 export interface ArgusIssueDetail extends ArgusIssue {
@@ -102,6 +106,93 @@ export interface ArgusErrorEvent {
   extra?: string | Record<string, any>;
 }
 
+export interface ArgusIssueActivity {
+  id: number;
+  project_id: number;
+  issue_id: number;
+  user_name: string | null;
+  action: 'status_change' | 'assign' | 'comment' | 'priority_change' | 'merge';
+  data: Record<string, any> | null;
+  created_at: string;
+}
+
+export interface ArgusIssueTagGroup {
+  key: string;
+  totalValues: number;
+  topValues: { value: string; count: number }[];
+}
+
+export interface ArgusSavedQuery {
+  id: number;
+  project_id: number;
+  name: string;
+  description: string | null;
+  query_config: {
+    fields: string[];
+    conditions?: string;
+    groupBy?: string[];
+    orderBy?: string;
+    period?: string;
+  };
+  display_type: 'table' | 'bar' | 'line' | 'number';
+  is_global: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArgusIntegration {
+  id: number;
+  project_id: number;
+  provider: 'github' | 'gitlab' | 'bitbucket';
+  repo_url: string;
+  default_branch: string;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArgusIssueTracker {
+  id: number;
+  project_id: number;
+  provider: 'jira' | 'github' | 'linear';
+  name: string;
+  api_url: string;
+  config: Record<string, any>;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArgusCommit {
+  id: number;
+  project_id: number;
+  commit_hash: string;
+  author_name: string | null;
+  author_email: string | null;
+  message: string | null;
+  timestamp: string | null;
+  release_version: string | null;
+  files_changed: string | null;
+  additions: number;
+  deletions: number;
+  created_at: string;
+}
+
+export interface ArgusOwnershipRule {
+  id: number;
+  project_id: number;
+  name: string;
+  match_type: 'path' | 'module' | 'tag' | 'url';
+  match_pattern: string;
+  owners: string[];
+  priority: number;
+  auto_assign: boolean;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ArgusIssueListParams {
   status?: string;
   level?: string;
@@ -115,6 +206,8 @@ export interface ArgusIssueListParams {
   period?: string;
   start?: string;
   end?: string;
+  substatus?: string;
+  assigned_to?: string;
 }
 
 export interface ArgusProjectStats {
@@ -241,6 +334,7 @@ export interface ArgusSessionHealth {
 }
 
 export interface ArgusFeedbackItem {
+  feedback_id: string;
   event_id: string;
   email: string;
   name: string;
@@ -248,6 +342,18 @@ export interface ArgusFeedbackItem {
   contact_email: string;
   submitted_at: string;
   url: string;
+  status: 'unresolved' | 'resolved' | 'spam';
+  assigned_to: string;
+  is_spam: number;
+  attachments: string[];
+  environment: string;
+  release: string;
+  source: string;
+  tags: Record<string, string>;
+  // Issue linking
+  issue_id: number | null;
+  issue_title: string | null;
+  issue_status: string | null;
 }
 
 export interface ArgusFeedbackSummary {
@@ -255,6 +361,9 @@ export interface ArgusFeedbackSummary {
   unique_users: number;
   with_contact: number;
   avg_message_length: number;
+  unresolved_count: number;
+  resolved_count: number;
+  spam_count: number;
 }
 
 export interface ArgusFeedbackResponse {
@@ -281,6 +390,8 @@ export interface ArgusRelease {
   p95: number;
   txn_error_rate: number;
   error_trend: number[];
+  crash_free_users?: number;
+  new_issues?: number;
 }
 
 // ==================== Prefix for all Argus API calls ====================
@@ -369,9 +480,134 @@ class ArgusService {
 
   async getFeedback(
     projectId: number | string,
-    params?: { period?: string; page?: number; limit?: number; search?: string; start?: string; end?: string }
+    params?: {
+      period?: string; page?: number; limit?: number; search?: string; status?: string;
+      start?: string; end?: string; sort?: string;
+      filterUrl?: string; filterAssigned?: string; filterEnvironment?: string;
+    }
   ): Promise<ArgusFeedbackResponse> {
     const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
+    return response.data?.data || response.data;
+  }
+
+  async updateFeedback(
+    projectId: number | string,
+    feedbackId: string,
+    data: { status?: string; assigned_to?: string; is_spam?: boolean }
+  ): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}`, data);
+  }
+
+  async bulkFeedbackAction(
+    projectId: number | string,
+    feedbackIds: string[],
+    action: 'resolve' | 'unresolve' | 'spam' | 'not_spam' | 'assign',
+    assignedTo?: string
+  ): Promise<void> {
+    await argusApi.post(`${ARGUS_BASE}/feedback/${projectId}/bulk`, {
+      feedback_ids: feedbackIds,
+      action,
+      assigned_to: assignedTo,
+    });
+  }
+
+  async uploadFeedbackAttachments(
+    projectId: number | string,
+    feedbackId: string,
+    files: File[]
+  ): Promise<{ urls: string[] }> {
+    const formData = new FormData();
+    files.forEach(f => formData.append('files', f));
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/attachments`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    return response.data?.data || response.data;
+  }
+
+  // --- Issue Creation (from feedback) ---
+
+  async createIssue(
+    projectId: number | string,
+    data: { title: string; level?: string; message?: string; culprit?: string; tracker_id?: number }
+  ): Promise<{ id: number; external_url?: string; external_key?: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issues`, data);
+    return response.data?.data || response.data;
+  }
+
+  // --- Issue Trackers ---
+
+  async listIssueTrackers(
+    projectId: number | string
+  ): Promise<ArgusIssueTracker[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issue-trackers`);
+    return response.data?.data || response.data || [];
+  }
+
+  async createIssueTracker(
+    projectId: number | string,
+    data: { provider: string; name: string; api_url: string; api_token: string; config?: Record<string, any> }
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issue-trackers`, data);
+    return response.data?.data || response.data;
+  }
+
+  async updateIssueTracker(
+    projectId: number | string,
+    trackerId: number,
+    data: Partial<{ name: string; api_url: string; api_token: string; config: Record<string, any>; enabled: boolean }>
+  ): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}`, data);
+  }
+
+  async deleteIssueTracker(
+    projectId: number | string,
+    trackerId: number
+  ): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}`);
+  }
+
+  async testIssueTracker(
+    projectId: number | string,
+    trackerId: number
+  ): Promise<{ ok: boolean; message: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}/test`);
+    return response.data?.data || response.data;
+  }
+
+  // --- Spam Filter Keywords ---
+
+  async getSpamKeywords(
+    projectId: number | string
+  ): Promise<{ id: number; keyword: string; is_regex: boolean; created_at: string }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}/spam-keywords`);
+    return response.data?.data || response.data || [];
+  }
+
+  async addSpamKeyword(
+    projectId: number | string,
+    keyword: string,
+    isRegex: boolean = false
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/feedback/${projectId}/spam-keywords`, {
+      keyword,
+      is_regex: isRegex,
+    });
+    return response.data?.data || response.data;
+  }
+
+  async deleteSpamKeyword(
+    projectId: number | string,
+    keywordId: number
+  ): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/feedback/${projectId}/spam-keywords/${keywordId}`);
+  }
+
+  async runAutoSpam(
+    projectId: number | string
+  ): Promise<{ matched: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/feedback/${projectId}/auto-spam`);
     return response.data?.data || response.data;
   }
 
@@ -488,6 +724,18 @@ class ArgusService {
     });
   }
 
+  async bulkUpdateIssues(
+    projectId: number | string,
+    issueIds: number[],
+    update: { status?: string; assigned_to?: string | null }
+  ): Promise<{ updated: number }> {
+    const response = await argusApi.put(`${ARGUS_BASE}/${projectId}/issues/bulk`, {
+      issue_ids: issueIds,
+      ...update,
+    });
+    return response.data?.data || response.data;
+  }
+
   async mergeIssues(
     projectId: number | string,
     issueIds: number[]
@@ -496,6 +744,42 @@ class ArgusService {
       issue_ids: issueIds,
     });
     return response.data?.data || response.data;
+  }
+
+  async getIssueActivity(
+    projectId: number | string,
+    issueId: number | string
+  ): Promise<ArgusIssueActivity[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}/activity`);
+    return response.data?.data || [];
+  }
+
+  async addIssueComment(
+    projectId: number | string,
+    issueId: number | string,
+    text: string
+  ): Promise<void> {
+    await argusApi.post(`${ARGUS_BASE}/${projectId}/issues/${issueId}/comments`, { text });
+  }
+
+  async getIssueTags(
+    projectId: number | string,
+    issueId: number | string
+  ): Promise<ArgusIssueTagGroup[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}/tags`);
+    return response.data?.data || [];
+  }
+
+  async listIssueEvents(
+    projectId: number | string,
+    issueId: number | string,
+    params?: { limit?: number; offset?: number }
+  ): Promise<{ data: ArgusErrorEvent[] }> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/${projectId}/issues/${issueId}/events`,
+      { params }
+    );
+    return { data: response.data?.data || response.data || [] };
   }
 
   // --- Alert Rules ---
@@ -541,10 +825,56 @@ class ArgusService {
 
   async getLogs(
     projectId: number | string,
-    params: { trace_id?: string; issue_id?: string | number; level?: string; search?: string; limit?: number }
-  ): Promise<ArgusLogEntry[]> {
+    params: { trace_id?: string; issue_id?: string | number; level?: string; search?: string; limit?: number; order?: string; cursor?: string }
+  ): Promise<{ data: ArgusLogEntry[]; meta: { count: number; hasMore: boolean } }> {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs`, { params });
-    return response.data?.data || response.data || [];
+    const result = response.data?.data ? response.data : { data: response.data || [], meta: { count: 0, hasMore: false } };
+    // Backward compat: if result.data is directly the array (old format)
+    if (Array.isArray(result)) {
+      return { data: result, meta: { count: result.length, hasMore: false } };
+    }
+    return { data: result.data || [], meta: result.meta || { count: 0, hasMore: false } };
+  }
+
+  async browseLogs(
+    projectId: number | string,
+    params: { period?: string; level?: string; search?: string; service?: string; environment?: string; limit?: number; order?: string; cursor?: string }
+  ): Promise<{ data: ArgusLogEntry[]; meta: { count: number; hasMore: boolean } }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/browse`, { params });
+    return response.data || { data: [], meta: { count: 0, hasMore: false } };
+  }
+
+  async getLogFacets(
+    projectId: number | string,
+    period?: string
+  ): Promise<{
+    levels: { level: string; count: number }[];
+    services: { service: string; count: number }[];
+    environments: { environment: string; count: number }[];
+    loggers: { logger_name: string; count: number }[];
+  }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/facets`, { params: { period } });
+    return response.data?.data || { levels: [], services: [], environments: [], loggers: [] };
+  }
+
+  async getLogVolume(
+    projectId: number | string,
+    params?: { period?: string; level?: string }
+  ): Promise<{ bucket: string; level: string; count: number }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/volume`, { params });
+    return response.data?.data || [];
+  }
+
+  async getLogAggregate(
+    projectId: number | string,
+    params: { period?: string; groupBy?: string; search?: string; service?: string; environment?: string }
+  ): Promise<{
+    groupBy: string;
+    topValues: { group_value: string; count: number }[];
+    timeSeries: { bucket: string; group_value: string; count: number }[];
+  }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/aggregate`, { params });
+    return response.data?.data || { groupBy: 'level', topValues: [], timeSeries: [] };
   }
 
   // --- Source Maps ---
@@ -578,12 +908,168 @@ class ArgusService {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/sourcemaps/${releaseId}/files`);
     return response.data?.data || response.data || [];
   }
+
+  async discoverQuery(
+    projectId: number | string,
+    query: {
+      fields: string[];
+      conditions?: string;
+      groupBy?: string[];
+      orderBy?: string;
+      limit?: number;
+      offset?: number;
+      period?: string;
+      start?: string;
+      end?: string;
+    }
+  ): Promise<{ data: Record<string, any>[]; meta: { fields: { name: string; type: string }[] } }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/discover`, query);
+    return response.data?.data ? response.data : { data: [], meta: { fields: [] } };
+  }
+
+  async discoverTags(
+    projectId: number | string
+  ): Promise<{
+    columns: string[];
+    aggregates: string[];
+    stats: Record<string, any>;
+    tags: Record<string, { value: string; count: number }[]>;
+  }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/discover/tags`);
+    return response.data?.data || { columns: [], aggregates: [], stats: {}, tags: {} };
+  }
+
+  async getDiscoverVolume(
+    projectId: number | string,
+    params: { period?: string; start?: string; end?: string; search?: string }
+  ): Promise<{ bucket: string; level: string; count: number }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/discover/volume`, { params });
+    return response.data?.data || [];
+  }
+
+  async listSavedQueries(projectId: number | string): Promise<ArgusSavedQuery[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/discover/saved`);
+    return response.data?.data || [];
+  }
+
+  async createSavedQuery(
+    projectId: number | string,
+    data: { name: string; description?: string; query_config: Record<string, any>; display_type?: string; is_global?: boolean }
+  ): Promise<{ id: number; name: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/discover/saved`, data);
+    return response.data?.data || response.data;
+  }
+
+  async deleteSavedQuery(projectId: number | string, queryId: number): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/discover/saved/${queryId}`);
+  }
+
+  // === Dashboards ===
+
+  async listDashboards(projectId: number | string): Promise<any[]> {
+    try {
+      const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/dashboards`);
+      return response.data?.data || [];
+    } catch { return []; }
+  }
+
+  async listDashboardPresets(projectId: number | string): Promise<any[]> {
+    try {
+      const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/dashboards/presets`);
+      return response.data?.data || [];
+    } catch { return []; }
+  }
+
+  async createDashboard(projectId: number | string, data: { title: string; description?: string; preset_id?: string }): Promise<any> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/dashboards`, data);
+    return response.data?.data || response.data;
+  }
+
+  async getDashboard(projectId: number | string, dashboardId: number): Promise<any> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}`);
+    return response.data?.data || response.data;
+  }
+
+  async updateDashboard(projectId: number | string, dashboardId: number, data: any): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}`, data);
+  }
+
+  async deleteDashboard(projectId: number | string, dashboardId: number): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}`);
+  }
+
+  async queryDashboardWidget(projectId: number | string, query: any): Promise<any[]> {
+    try {
+      const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/dashboards/widget-query`, { query });
+      return response.data?.data || [];
+    } catch { return []; }
+  }
+
+  // === Integrations ===
+
+  async listIntegrations(projectId: number | string): Promise<ArgusIntegration[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/integrations`);
+    return response.data?.data || [];
+  }
+
+  async createIntegration(
+    projectId: number | string,
+    data: { provider: string; repo_url: string; default_branch?: string; access_token?: string }
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/integrations`, data);
+    return response.data?.data || response.data;
+  }
+
+  async updateIntegration(projectId: number | string, integrationId: number, data: Partial<ArgusIntegration>): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/${projectId}/integrations/${integrationId}`, data);
+  }
+
+  async deleteIntegration(projectId: number | string, integrationId: number): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/integrations/${integrationId}`);
+  }
+
+  // === Commits ===
+
+  async listCommits(projectId: number | string, release?: string): Promise<ArgusCommit[]> {
+    const params: Record<string, string> = {};
+    if (release) params.release = release;
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/commits`, { params });
+    return response.data?.data || [];
+  }
+
+  async getSuspectCommits(projectId: number | string, issueId: number | string): Promise<ArgusCommit[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}/suspect-commits`);
+    return response.data?.data || [];
+  }
+
+  // === Ownership Rules ===
+
+  async listOwnershipRules(projectId: number | string): Promise<ArgusOwnershipRule[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/ownership`);
+    return response.data?.data || [];
+  }
+
+  async createOwnershipRule(
+    projectId: number | string,
+    data: { name: string; match_type: string; match_pattern: string; owners: string[]; priority?: number; auto_assign?: boolean }
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/ownership`, data);
+    return response.data?.data || response.data;
+  }
+
+  async updateOwnershipRule(projectId: number | string, ruleId: number, data: Partial<ArgusOwnershipRule>): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/${projectId}/ownership/${ruleId}`, data);
+  }
+
+  async deleteOwnershipRule(projectId: number | string, ruleId: number): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/ownership/${ruleId}`);
+  }
 }
 
 // --- Alert Rule Types ---
 
 export interface ArgusAlertCondition {
-  type: 'new_issue' | 'event_frequency' | 'user_count' | 'regression';
+  type: 'new_issue' | 'event_frequency' | 'user_count' | 'regression' | 'new_feedback';
   value?: number;
   interval?: number; // seconds
 }
@@ -603,6 +1089,7 @@ export interface ArgusAlertRule {
   frequency: number;
   environment?: string;
   level?: string;
+  tags?: Record<string, string>;
   enabled: boolean;
   last_triggered_at?: string;
   created_at: string;

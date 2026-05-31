@@ -10,7 +10,7 @@ const DSN_CACHE_PREFIX = 'argus:dsn:';
 const DSN_CACHE_TTL = 300; // 5 minutes
 
 export interface DsnAuthResult {
-  projectId: number;
+  projectId: string; // gatrix project ID (ULID)
   dsnKey: ArgusDsnKey;
 }
 
@@ -27,7 +27,7 @@ export async function resolveDsn(publicKey: string): Promise<DsnAuthResult | nul
 
   // Query MySQL
   const [rows] = await mysqlPool.query(
-    `SELECT d.*, p.id as argus_project_id
+    `SELECT d.*, p.gatrix_project_id
      FROM g_argus_dsnKeys d
      JOIN g_argus_projects p ON d.project_id = p.id
      WHERE d.public_key = ? AND d.is_active = 1`,
@@ -41,7 +41,7 @@ export async function resolveDsn(publicKey: string): Promise<DsnAuthResult | nul
 
   const row = results[0];
   const result: DsnAuthResult = {
-    projectId: row.project_id,
+    projectId: row.gatrix_project_id,
     dsnKey: {
       id: row.id,
       project_id: row.project_id,

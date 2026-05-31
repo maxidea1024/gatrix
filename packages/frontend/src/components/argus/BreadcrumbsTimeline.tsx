@@ -209,8 +209,8 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({ breadcrumbs }
             <Box
               key={idx}
               sx={{
-                display: 'flex', alignItems: 'flex-start', gap: 1,
-                px: 1.5, py: 0.7,
+                display: 'flex', alignItems: 'stretch', gap: 1,
+                px: 1.5,
                 borderBottom: idx < filtered.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` : 'none',
                 backgroundColor: isError ? alpha('#f44336', 0.03) : 'transparent',
                 transition: 'background 0.1s',
@@ -220,22 +220,28 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({ breadcrumbs }
               onClick={() => hasData && setExpandedIdx(isExpanded ? null : idx)}
             >
               {/* Timeline line */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 0.3, minWidth: 20 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 20, alignSelf: 'stretch' }}>
+                {idx > 0 ? (
+                  <Box sx={{ width: '2px', height: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', flexShrink: 0 }} />
+                ) : (
+                  <Box sx={{ height: '8px', flexShrink: 0 }} />
+                )}
                 <Box sx={{
                   width: 20, height: 20, borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   backgroundColor: alpha(levelColor || cfg.color, 0.12),
                   color: levelColor || cfg.color,
+                  flexShrink: 0,
                 }}>
                   {cfg.icon}
                 </Box>
                 {idx < filtered.length - 1 && (
-                  <Box sx={{ width: 1, flex: 1, minHeight: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }} />
+                  <Box sx={{ width: '2px', flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
                 )}
               </Box>
 
               {/* Content */}
-              <Box sx={{ flex: 1, minWidth: 0, py: 0.1 }}>
+              <Box sx={{ flex: 1, minWidth: 0, py: 0.7 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.2 }}>
                   <Chip
                     label={crumb.category || crumb.type || 'event'}
@@ -305,7 +311,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({ breadcrumbs }
               <Tooltip title={crumb.timestamp || ''}>
                 <Typography sx={{
                   fontSize: '0.65rem', color: 'text.disabled', fontFamily: 'monospace',
-                  whiteSpace: 'nowrap', pt: 0.3,
+                  whiteSpace: 'nowrap', py: 0.7,
                 }}>
                   {formatTime(crumb.timestamp)}
                 </Typography>

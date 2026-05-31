@@ -255,15 +255,15 @@ export default async function overviewRoutes(app: FastifyInstance) {
           }),
         ]);
 
-        const envRows = await envResult.json<{ data: { environment: string }[] }>();
-        const browserRows = await browserResult.json<{ data: { browser_name: string }[] }>();
-        const osRows = await osResult.json<{ data: { os_name: string }[] }>();
+        const envRows = (await envResult.json()) as any;
+        const browserRows = (await browserResult.json()) as any;
+        const osRows = (await osResult.json()) as any;
 
         return reply.send({
           data: {
-            environments: (envRows.data || []).map(r => r.environment).filter(Boolean),
-            browsers: (browserRows.data || []).map(r => r.browser_name).filter(Boolean),
-            os: (osRows.data || []).map(r => r.os_name).filter(Boolean),
+            environments: (envRows.data || []).map((r: any) => r.environment).filter(Boolean),
+            browsers: (browserRows.data || []).map((r: any) => r.browser_name).filter(Boolean),
+            os: (osRows.data || []).map((r: any) => r.os_name).filter(Boolean),
           },
         });
       } catch (error) {

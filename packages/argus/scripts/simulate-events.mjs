@@ -11,10 +11,10 @@ const ARGUS_URL = process.env.ARGUS_URL || 'http://localhost:45300';
 const PROJECT_ID = process.env.ARGUS_PROJECT_ID || '1';
 
 // ============ Quantities ============
-const ERROR_COUNT     = 80;
-const TXN_COUNT       = 200;
-const SESSION_COUNT   = 150;
-const FEEDBACK_COUNT  = 25;
+const ERROR_COUNT     = 4200;
+const TXN_COUNT       = 1500;
+const SESSION_COUNT   = 1000;
+const FEEDBACK_COUNT  = 50;
 
 // ============ Helpers ============
 function uuid() {
@@ -39,28 +39,12 @@ function isoAt(ms) { return new Date(ms).toISOString(); }
 
 // ============ Realistic Data Pools ============
 
-const USERS = [
-  { id: 'usr_a1f3e2', name: 'Kim Minjun', email: 'minjun.kim@naver.com' },
-  { id: 'usr_b2d4c1', name: 'Park Soyeon', email: 'soyeon.park@gmail.com' },
-  { id: 'usr_c3e5d8', name: 'Lee Jihoon', email: 'jihoon.lee@kakao.com' },
-  { id: 'usr_d4f6e9', name: 'Choi Yuna', email: 'yuna.choi@naver.com' },
-  { id: 'usr_e5a7f0', name: 'Jung Taehyung', email: 'taehyung.j@gmail.com' },
-  { id: 'usr_f6b8a1', name: 'Kang Seulgi', email: 'seulgi.kang@daum.net' },
-  { id: 'usr_a7c9b2', name: 'Han Woojin', email: 'woojin.han@naver.com' },
-  { id: 'usr_b8d0c3', name: 'Yoon Chaeyoung', email: 'chae.yoon@gmail.com' },
-  { id: 'usr_c9e1d4', name: 'Song Hyunwoo', email: 'hyunwoo.song@kakao.com' },
-  { id: 'usr_d0f2e5', name: 'Oh Jiwon', email: 'jiwon.oh@naver.com' },
-  { id: 'usr_e1a3f6', name: 'Shin Eunji', email: 'eunji.shin@gmail.com' },
-  { id: 'usr_f2b4a7', name: 'Jang Donghyuk', email: 'donghyuk.j@kakao.com' },
-  { id: 'usr_a3c5b8', name: 'Hwang Mirae', email: 'mirae.hwang@naver.com' },
-  { id: 'usr_b4d6c9', name: 'Bae Sungjin', email: 'sungjin.bae@gmail.com' },
-  { id: 'usr_c5e7d0', name: 'Lim Hayoung', email: 'hayoung.lim@daum.net' },
-  { id: 'usr_d6f8e1', name: 'Ko Jaehyun', email: 'jaehyun.ko@naver.com' },
-  { id: 'usr_e7a9f2', name: 'Kwon Nayeon', email: 'nayeon.kwon@gmail.com' },
-  { id: 'usr_f8b0a3', name: 'Ryu Changmin', email: 'changmin.ryu@kakao.com' },
-  { id: 'usr_a9c1b4', name: 'Moon Sooyoung', email: 'sooyoung.m@naver.com' },
-  { id: 'usr_b0d2c5', name: 'Ahn Doyoon', email: 'doyoon.ahn@gmail.com' },
-];
+const USERS = Array.from({ length: 850 }, (_, i) => {
+  const names = ['Kim', 'Park', 'Lee', 'Choi', 'Jung', 'Kang', 'Han', 'Yoon', 'Song', 'Oh', 'Shin', 'Jang', 'Hwang', 'Bae', 'Lim', 'Ko', 'Kwon', 'Ryu', 'Moon', 'Ahn'];
+  const firsts = ['Minjun', 'Soyeon', 'Jihoon', 'Yuna', 'Taehyung', 'Seulgi', 'Woojin', 'Chaeyoung', 'Hyunwoo', 'Jiwon', 'Eunji', 'Donghyuk', 'Mirae', 'Sungjin', 'Hayoung', 'Jaehyun', 'Nayeon', 'Changmin', 'Sooyoung', 'Doyoon'];
+  const n = `${pick(names)} ${pick(firsts)}`;
+  return { id: `usr_${hex(6)}`, name: n, email: `${n.replace(' ', '.').toLowerCase()}${i}@example.com` };
+});
 
 const ENVS = [
   { v: 'production', w: 70 },
@@ -85,19 +69,19 @@ const PLATFORMS = [
 // ============ Error Scenarios ============
 const ERROR_SCENARIOS = [
   // --- High frequency production errors ---
-  { type: 'TypeError', value: "Cannot read properties of undefined (reading 'inventory')", culprit: 'InventoryController.getItems', level: 'error', w: 15,
+  { type: 'TypeError', value: "Cannot read properties of undefined (reading 'inventory')", culprit: 'InventoryController.getItems', level: 'error', w: 850,
     frames: [
       { filename: 'src/controllers/InventoryController.ts', function: 'getItems', lineno: 47, colno: 23, in_app: true, context_line: "    const items = player.inventory.filter(i => i.equipped);" },
       { filename: 'src/routes/inventory.ts', function: 'handleGetInventory', lineno: 28, colno: 5, in_app: true },
       { filename: 'node_modules/fastify/lib/reply.js', function: 'Reply.send', lineno: 425, colno: 15, in_app: false },
     ]},
-  { type: 'DatabaseError', value: "ER_LOCK_DEADLOCK: Deadlock found when trying to get lock; try restarting transaction", culprit: 'MatchmakingService.assignMatch', level: 'error', w: 12,
+  { type: 'DatabaseError', value: "ER_LOCK_DEADLOCK: Deadlock found when trying to get lock; try restarting transaction", culprit: 'MatchmakingService.assignMatch', level: 'error', w: 420,
     frames: [
       { filename: 'src/services/MatchmakingService.ts', function: 'assignMatch', lineno: 189, colno: 11, in_app: true, context_line: "    await this.db.query('UPDATE match_queue SET status=? WHERE id=?', ['matched', queueId]);" },
       { filename: 'src/services/MatchmakingService.ts', function: 'processQueue', lineno: 142, colno: 7, in_app: true },
       { filename: 'node_modules/mysql2/promise.js', function: 'PromisePoolConnection.execute', lineno: 55, colno: 20, in_app: false },
     ]},
-  { type: 'WebSocketError', value: "Connection closed abnormally (code: 1006) during game session", culprit: 'GameSessionHandler.onClose', level: 'error', w: 10,
+  { type: 'WebSocketError', value: "Connection closed abnormally (code: 1006) during game session", culprit: 'GameSessionHandler.onClose', level: 'error', w: 230,
     frames: [
       { filename: 'src/realtime/GameSessionHandler.ts', function: 'onClose', lineno: 78, colno: 5, in_app: true, context_line: "    this.saveSessionState(session.id, 'abnormal_disconnect');" },
       { filename: 'src/realtime/WebSocketManager.ts', function: 'handleDisconnect', lineno: 203, colno: 9, in_app: true },
@@ -109,35 +93,35 @@ const ERROR_SCENARIOS = [
       { filename: 'src/middleware/profileLoader.ts', function: 'loadProfile', lineno: 31, colno: 5, in_app: true },
       { filename: 'node_modules/ioredis/built/Redis.js', function: 'Redis.sendCommand', lineno: 512, colno: 24, in_app: false },
     ]},
-  { type: 'ValidationError', value: "Invalid item_id: expected UUID format but received '0xDEAD'", culprit: 'TradeValidator.validateOffer', level: 'warning', w: 8,
+  { type: 'ValidationError', value: "Invalid item_id: expected UUID format but received '0xDEAD'", culprit: 'TradeValidator.validateOffer', level: 'warning', w: 60,
     frames: [
       { filename: 'src/validators/TradeValidator.ts', function: 'validateOffer', lineno: 95, colno: 7, in_app: true, context_line: "    if (!UUID_REGEX.test(offer.item_id)) throw new ValidationError(...);" },
       { filename: 'src/controllers/TradeController.ts', function: 'createOffer', lineno: 44, colno: 3, in_app: true },
     ]},
-  { type: 'RateLimitError', value: "Rate limit exceeded: 1000 requests/min from IP 203.0.113.42", culprit: 'RateLimiter.check', level: 'warning', w: 7,
+  { type: 'RateLimitError', value: "Rate limit exceeded: 1000 requests/min from IP 203.0.113.42", culprit: 'RateLimiter.check', level: 'warning', w: 120,
     frames: [
       { filename: 'src/middleware/RateLimiter.ts', function: 'check', lineno: 38, colno: 9, in_app: true },
       { filename: 'src/middleware/index.ts', function: 'applyMiddleware', lineno: 15, colno: 5, in_app: true },
     ]},
-  { type: 'PaymentError', value: "Payment gateway timeout: PG responded with 504 after 30s for order ORD-2026-48291", culprit: 'PaymentService.processPayment', level: 'error', w: 6,
+  { type: 'PaymentError', value: "Payment gateway timeout: PG responded with 504 after 30s for order ORD-2026-48291", culprit: 'PaymentService.processPayment', level: 'error', w: 15,
     frames: [
       { filename: 'src/services/PaymentService.ts', function: 'processPayment', lineno: 167, colno: 14, in_app: true, context_line: "    const pgResponse = await this.pgClient.charge(order.amount, order.pg_token);" },
       { filename: 'src/controllers/ShopController.ts', function: 'purchaseItem', lineno: 89, colno: 7, in_app: true },
       { filename: 'src/services/PaymentService.ts', function: 'callPG', lineno: 231, colno: 11, in_app: true },
       { filename: 'node_modules/axios/lib/core/dispatchRequest.js', function: 'dispatchRequest', lineno: 52, colno: 10, in_app: false },
     ]},
-  { type: 'AuthenticationError', value: "JWT signature verification failed: token issued by unknown key 'kid=old-key-2024'", culprit: 'AuthMiddleware.verifyToken', level: 'error', w: 8,
+  { type: 'AuthenticationError', value: "JWT signature verification failed: token issued by unknown key 'kid=old-key-2024'", culprit: 'AuthMiddleware.verifyToken', level: 'error', w: 2,
     frames: [
       { filename: 'src/middleware/AuthMiddleware.ts', function: 'verifyToken', lineno: 52, colno: 13, in_app: true, context_line: "    const decoded = jwt.verify(token, this.publicKey, { algorithms: ['RS256'] });" },
       { filename: 'src/middleware/AuthMiddleware.ts', function: 'authenticate', lineno: 28, colno: 5, in_app: true },
       { filename: 'node_modules/jsonwebtoken/verify.js', function: 'verify', lineno: 171, colno: 16, in_app: false },
     ]},
-  { type: 'OutOfMemoryError', value: "Worker heap limit reached: 1536MB used of 1536MB max during leaderboard aggregation", culprit: 'LeaderboardAggregator.computeRankings', level: 'fatal', w: 3,
+  { type: 'OutOfMemoryError', value: "Worker heap limit reached: 1536MB used of 1536MB max during leaderboard aggregation", culprit: 'LeaderboardAggregator.computeRankings', level: 'fatal', w: 1,
     frames: [
       { filename: 'src/workers/LeaderboardAggregator.ts', function: 'computeRankings', lineno: 134, colno: 5, in_app: true, context_line: "    const allScores = await this.db.query('SELECT * FROM player_scores WHERE season_id=?', [seasonId]);" },
       { filename: 'src/workers/LeaderboardAggregator.ts', function: 'run', lineno: 45, colno: 7, in_app: true },
     ]},
-  { type: 'ConcurrencyError', value: "Optimistic lock failed: match state was modified by another process (version mismatch: expected 3, got 5)", culprit: 'MatchStateManager.updateState', level: 'error', w: 6,
+  { type: 'ConcurrencyError', value: "Optimistic lock failed: match state was modified by another process (version mismatch: expected 3, got 5)", culprit: 'MatchStateManager.updateState', level: 'error', w: 35,
     frames: [
       { filename: 'src/game/MatchStateManager.ts', function: 'updateState', lineno: 88, colno: 9, in_app: true, context_line: "    if (current.version !== expected) throw new ConcurrencyError(...);" },
       { filename: 'src/game/MatchEngine.ts', function: 'processAction', lineno: 212, colno: 7, in_app: true },
@@ -277,7 +261,6 @@ function genError() {
     level: scenario.level,
     logger: pick(['game-server', 'api-gateway', 'matchmaker', 'payment-worker', 'ws-handler']),
     transaction: pick(TXN_SCENARIOS).transaction,
-    fingerprint: [hex(32)],
     exception: {
       type: scenario.type, value: scenario.value,
       mechanism: pick(['onerror', 'onunhandledrejection', 'instrument', 'generic']),
@@ -310,7 +293,7 @@ function genTransaction() {
   const rel = pickW(RELEASES);
   const isError = Math.random() < scenario.errorRate;
 
-  const totalDur = randInt(scenario.baseDuration[0], scenario.baseDuration[1]) * (isError ? randFloat(1.5, 4) : 1);
+  let totalDur = randInt(scenario.baseDuration[0], scenario.baseDuration[1]) * (isError ? randFloat(1.5, 4) : 1);
   const now = pastMs(24);
   const startMs = now - totalDur;
   const traceId = hex(32);
@@ -339,6 +322,10 @@ function genTransaction() {
       tags: { region: pick(REGIONS) },
     });
     elapsed += spanDur + randInt(0, 3); // gap between spans
+  }
+
+  if (elapsed > totalDur) {
+    totalDur = elapsed + randInt(2, 10);
   }
 
   const statusCode = isError ? pick([500, 502, 503, 504]) : pick([200, 200, 200, 201]);
@@ -401,6 +388,30 @@ function genFeedback() {
   };
 }
 
+function genLog() {
+  const env = pickW(ENVS);
+  const rel = pickW(RELEASES);
+  const level = pickW([{ v: 'info', w: 60 }, { v: 'warning', w: 30 }, { v: 'error', w: 10 }]);
+  const messages = {
+    info: ["User logged in successfully", "Match started", "Item purchased", "Session created"],
+    warning: ["Rate limit approaching", "High latency detected", "Retry connection"],
+    error: ["Database timeout", "Failed to process payment", "Crash in render loop"]
+  };
+  const t = pastMs(72);
+  return {
+    log_id: hex(32),
+    timestamp: isoAt(t),
+    level,
+    logger_name: pick(['game-client', 'api-server', 'matchmaker']),
+    message: pick(messages[level]),
+    body: JSON.stringify({ context: 'Extra log details', random_val: randInt(1, 100) }),
+    environment: env,
+    release: rel,
+    service: pick(['auth', 'game', 'shop']),
+    attributes: { region: pick(REGIONS) }
+  };
+}
+
 // ============ HTTP ============
 async function postJSON(url, body, headers = {}) {
   const resp = await fetch(url, {
@@ -445,12 +456,14 @@ async function main() {
   const txns = Array.from({ length: TXN_COUNT }, genTransaction);
   const sessions = Array.from({ length: SESSION_COUNT }, genSession);
   const feedbacks = Array.from({ length: FEEDBACK_COUNT }, genFeedback);
+  const logs = Array.from({ length: 300 }, genLog);
   
   const totalSpans = txns.reduce((s, t) => s + (t.spans?.length || 0), 0);
   console.log(`  🐛 ${errors.length} errors (${new Set(errors.map(e=>e.exception.type)).size} unique types)`);
   console.log(`  ⚡ ${txns.length} transactions + ${totalSpans} spans`);
   console.log(`  📊 ${sessions.length} sessions`);
   console.log(`  💬 ${feedbacks.length} feedback entries`);
+  console.log(`  📝 ${logs.length} logs`);
   console.log('');
 
   // Send
@@ -477,8 +490,22 @@ async function main() {
   }
   console.log(`  📊 Sessions:     ${ok} batches ok, ${fail} failed`);
 
-  const fr = await postJSON(batchUrl, { events: feedbacks }, auth);
-  console.log(`  💬 Feedback:     ${fr.status === 202 ? 'ok' : 'FAILED'}`);
+  const BATCH_SIZE = 20;
+  process.stdout.write(`  💬 Feedback:     `);
+  for (let i = 0; i < feedbacks.length; i += BATCH_SIZE) {
+    const fbResp = await postJSON(batchUrl, { events: feedbacks.slice(i, i + BATCH_SIZE) }, auth);
+    if (fbResp.status !== 202) console.error(`    ❌ Failed to send feedback batch: HTTP ${fbResp.status}`);
+  }
+  process.stdout.write(`    ok\n`);
+
+  process.stdout.write(`  📝 Logs:         `);
+  const logsUrl = `${ARGUS_URL}/argus/api/${PROJECT_ID}/logs`;
+  for (let i = 0; i < logs.length; i += BATCH_SIZE) {
+    const batch = logs.slice(i, i + BATCH_SIZE);
+    const resp = await postJSON(logsUrl, batch, auth);
+    if (resp.status !== 202) console.error(`    ❌ Failed to send logs batch: HTTP ${resp.status}`);
+  }
+  process.stdout.write(`    ok\n`);
 
   console.log('');
   console.log('⏳ Waiting 8s for worker processing...');

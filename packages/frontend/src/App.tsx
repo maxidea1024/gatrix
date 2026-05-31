@@ -330,6 +330,18 @@ const ArgusReleasesPage = React.lazy(
 const ArgusAlertRulesPage = React.lazy(
   () => import('./pages/argus/ArgusAlertRulesPage')
 );
+const ArgusReleaseDetailPage = React.lazy(
+  () => import('./pages/argus/ArgusReleaseDetailPage')
+);
+const ArgusDiscoverPage = React.lazy(
+  () => import('./pages/argus/ArgusDiscoverPage')
+);
+const ArgusDashboardsPage = React.lazy(
+  () => import('./pages/argus/ArgusDashboardsPage')
+);
+const ArgusLogsPage = React.lazy(
+  () => import('./pages/argus/ArgusLogsPage')
+);
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 
@@ -1198,8 +1210,24 @@ const AppContent: React.FC = () => {
                                           element={<ArgusReleasesPage />}
                                         />
                                         <Route
+                                          path="releases/:projectId/:release"
+                                          element={<ArgusReleaseDetailPage />}
+                                        />
+                                        <Route
                                           path="alerts"
                                           element={<ArgusAlertRulesPage />}
+                                        />
+                                        <Route
+                                          path="discover"
+                                          element={<ArgusDiscoverPage />}
+                                        />
+                                        <Route
+                                          path="dashboards"
+                                          element={<ArgusDashboardsPage />}
+                                        />
+                                        <Route
+                                          path="logs"
+                                          element={<ArgusLogsPage />}
                                         />
                                       </Routes>
                                     </MainLayout>

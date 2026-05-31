@@ -6,16 +6,22 @@ import {
   Chip,
   TextField,
   InputAdornment,
-  Pagination,
-  Stack,
   useTheme,
   alpha,
   Popover,
   Checkbox,
   Button,
   Tooltip,
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  IconButton,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import {
   Search as SearchIcon,
   ErrorOutline as ErrorIcon,
@@ -26,6 +32,14 @@ import {
   Person as PersonIcon,
   ExpandMore as ExpandMoreIcon,
   MergeType as MergeIcon,
+  PersonAdd as AssignIcon,
+  CheckCircle as ResolveIcon,
+  Block as IgnoreIcon,
+  KeyboardDoubleArrowUp as CriticalPriorityIcon,
+  KeyboardArrowUp as HighPriorityIcon,
+  Remove as MediumPriorityIcon,
+  KeyboardArrowDown as LowPriorityIcon,
+  OpenInNew as ExternalLinkIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -33,10 +47,18 @@ import argusService, {
   ArgusIssue,
   ArgusIssueListParams,
 } from '@/services/argusService';
+import { rbacService } from '@/services/rbacService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSnackbar } from 'notistack';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { formatCompactNumber } from '@/utils/numberFormat';
+import SimplePagination from '@/components/common/SimplePagination';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE_STORAGE_KEY = 'argusIssues.pageSize';
+const DEFAULT_PAGE_SIZE = 25;
+const VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 
 const LEVEL_CONFIG: Record<string, { color: string; icon: React.ReactElement; bg: string }> = {
   fatal: { color: '#f44336', icon: <ErrorIcon sx={{ fontSize: 16 }} />, bg: 'rgba(244,67,54,0.08)' },
@@ -46,11 +68,29 @@ const LEVEL_CONFIG: Record<string, { color: string; icon: React.ReactElement; bg
   debug: { color: '#9e9e9e', icon: <InfoIcon sx={{ fontSize: 16 }} />, bg: 'rgba(158,158,158,0.08)' },
 };
 
+const PRIORITY_CONFIG: Record<string, { color: string; label: string; icon: React.ReactElement }> = {
+  critical: { color: '#f44336', label: 'Critical', icon: <CriticalPriorityIcon sx={{ fontSize: 14 }} /> },
+  high: { color: '#ff5722', label: 'High', icon: <HighPriorityIcon sx={{ fontSize: 14 }} /> },
+  medium: { color: '#ff9800', label: 'Medium', icon: <MediumPriorityIcon sx={{ fontSize: 14 }} /> },
+  low: { color: '#2196f3', label: 'Low', icon: <LowPriorityIcon sx={{ fontSize: 14 }} /> },
+};
+
 const STATUS_CONFIG: Record<string, { color: string; label: string }> = {
   unresolved: { color: '#f44336', label: 'Unresolved' },
   resolved: { color: '#4caf50', label: 'Resolved' },
   ignored: { color: '#9e9e9e', label: 'Ignored' },
 };
+
+function stringToColor(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ff9800'];
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function getInitials(name: string): string {
+  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
 
 interface ArgusIssuesPageProps {
   projectId?: string | number;
@@ -125,22 +165,57 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
   const isDark = theme.palette.mode === 'dark';
 
-  const projectId = propProjectId || searchParams.get('projectId') || '1';
+  const { currentProject } = useOrgProject();
+  const projectId = propProjectId || searchParams.get('projectId') || currentProject?.id || '1';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const [rowsPerPage, setRowsPerPage] = useState(() => {
+    const saved = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '', 10);
+    if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
+    return DEFAULT_PAGE_SIZE;
+  });
 
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [searchDebounce, setSearchDebounce] = useState(search);
   const [status, setStatus] = useState(searchParams.get('status') || 'unresolved');
   const [level, setLevel] = useState(searchParams.get('level') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [merging, setMerging] = useState(false);
+  const [activeView, setActiveView] = useState<'all' | 'unresolved' | 'regressed' | 'escalating' | 'mine'>('unresolved');
+  const [members, setMembers] = useState<any[]>([]);
+  const [assigneeAnchor, setAssigneeAnchor] = useState<{ el: HTMLElement; issue: ArgusIssue } | null>(null);
 
-  // ArgusFilterBar state (includes environment/browser/os from URL + heatmap time)
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const data = await rbacService.getProjectMembers(String(projectId));
+        setMembers(data);
+      } catch (error) {
+        console.error('Failed to fetch project members:', error);
+      }
+    };
+    fetchMembers();
+  }, [projectId]);
+
+  const handleAssignIssue = async (issueId: number | undefined, assignee: string) => {
+    if (!issueId) return;
+    try {
+      await argusService.assignIssue(projectId, issueId, assignee || null);
+      setIssues(prev => prev.map(issue => issue.id === issueId ? { ...issue, assigned_to: assignee || null } : issue));
+      enqueueSnackbar(t('argus.issues.assigneeUpdated', 'Assignee updated'), { variant: 'success' });
+    } catch {
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+    setAssigneeAnchor(null);
+  };
+
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
     const state = defaultArgusFilterState('24h');
     const env = searchParams.get('environment');
@@ -150,18 +225,16 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     if (br) state.browsers = [br];
     if (osParam) state.os = [osParam];
 
-    // Heatmap click: dayOfWeek (1=Mon..7=Sun) + hour (0..23)
     const dayOfWeek = searchParams.get('dayOfWeek');
     const hour = searchParams.get('hour');
     if (dayOfWeek && hour) {
-      const dow = parseInt(dayOfWeek, 10); // 1=Mon..7=Sun
+      const dow = parseInt(dayOfWeek, 10);
       const h = parseInt(hour, 10);
-      // Find the most recent date matching this day-of-week
       const now = new Date();
-      const jsDay = dow === 7 ? 0 : dow; // JS: 0=Sun,1=Mon..6=Sat
+      const jsDay = dow === 7 ? 0 : dow;
       let diff = now.getDay() - jsDay;
       if (diff < 0) diff += 7;
-      if (diff === 0 && now.getHours() < h) diff = 7; // hasn't happened today yet
+      if (diff === 0 && now.getHours() < h) diff = 7;
       const targetDate = new Date(now);
       targetDate.setDate(targetDate.getDate() - diff);
       const start = new Date(targetDate);
@@ -171,29 +244,48 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       state.dateRange = { type: 'custom', start, end };
     }
 
+    const startParam = searchParams.get('start');
+    const endParam = searchParams.get('end');
+    if (startParam && endParam) {
+      const startDate = new Date(startParam);
+      const endDate = new Date(endParam);
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        state.dateRange = { type: 'custom', start: startDate, end: endDate };
+      }
+    }
+
     return state;
   });
 
-  // Dropdown anchor state for compact filter chips
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [levelAnchor, setLevelAnchor] = useState<HTMLElement | null>(null);
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchDebounce(search), 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
       const dateParams = argusDateRangeToApiParams(filters.dateRange);
+      const substatus = searchParams.get('substatus') || undefined;
+      const assignedTo = searchParams.get('assigned_to') || undefined;
       const params: ArgusIssueListParams = {
         status: status || undefined,
         level: level || undefined,
         sort,
-        limit: PAGE_SIZE,
-        offset: (currentPage - 1) * PAGE_SIZE,
-        search: search || undefined,
+        limit: rowsPerPage,
+        offset: (currentPage - 1) * rowsPerPage,
+        search: searchDebounce || undefined,
         environment: filters.environments.length === 1 ? filters.environments[0] : undefined,
         browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
         os: filters.os.length === 1 ? filters.os[0] : undefined,
         ...dateParams,
+        substatus,
+        assigned_to: assignedTo,
       };
       const result = await argusService.listIssues(projectId, params);
       setIssues(result.data);
@@ -205,7 +297,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     } finally {
       setLoading(false);
     }
-  }, [projectId, status, level, sort, currentPage, search, filters]);
+  }, [projectId, status, level, sort, currentPage, rowsPerPage, searchDebounce, filters]);
+
+  // Persist page size to localStorage
+  useEffect(() => {
+    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
+  }, [rowsPerPage]);
 
   useEffect(() => { fetchIssues(); }, [fetchIssues]);
 
@@ -213,7 +310,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     setFilters(newFilters);
   };
 
-  const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
+  const handlePageChange = (_: unknown, page: number) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', String(page));
     setSearchParams(params);
@@ -238,17 +335,32 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     try {
       await argusService.mergeIssues(projectId, Array.from(selectedIds));
       setSelectedIds(new Set());
+      enqueueSnackbar(t('argus.issues.mergeSuccess', 'Issues merged'), { variant: 'success' });
       fetchIssues();
     } catch (e) {
-      console.error('Failed to merge issues:', e);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     } finally {
       setMerging(false);
     }
   };
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const handleBulkAction = async (action: 'resolved' | 'ignored') => {
+    if (selectedIds.size === 0) return;
+    try {
+      await argusService.bulkUpdateIssues(projectId, Array.from(selectedIds), { status: action });
+      setSelectedIds(new Set());
+      enqueueSnackbar(
+        t('argus.issues.bulkSuccess', { count: selectedIds.size, action: t(`argus.issues.${action}`, action) }),
+        { variant: 'success' }
+      );
+      fetchIssues();
+    } catch {
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  };
 
-  // Filter chip option helpers
+  const totalPages = Math.ceil(total / rowsPerPage);
+
   const statusOptions = [
     { value: '', label: t('common.all', 'All') },
     { value: 'unresolved', label: t('argus.issues.unresolved', 'Unresolved'), color: '#f44336' },
@@ -257,10 +369,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   ];
   const levelOptions = [
     { value: '', label: t('common.all', 'All') },
-    { value: 'fatal', label: 'Fatal', color: '#f44336' },
-    { value: 'error', label: 'Error', color: '#ff5722' },
-    { value: 'warning', label: 'Warning', color: '#ff9800' },
-    { value: 'info', label: 'Info', color: '#2196f3' },
+    { value: 'fatal', label: t('argus.issues.fatal'), color: '#f44336' },
+    { value: 'error', label: t('argus.issues.error'), color: '#ff5722' },
+    { value: 'warning', label: t('argus.issues.warning'), color: '#ff9800' },
+    { value: 'info', label: t('argus.issues.info'), color: '#2196f3' },
   ];
   const sortOptions = [
     { value: 'last_seen', label: t('argus.issues.lastSeen', 'Last Seen') },
@@ -271,15 +383,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   return (
     <Box>
-      {/* Header */}
       <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <BugReportIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
         <Typography variant="h5" fontWeight={700}>
           {t('argus.issues.title')}
         </Typography>
-        {!loading && (
+        {!loading && total > 0 && (
           <Chip
-            label={total.toLocaleString()}
+            label={`${formatCompactNumber(total)} ${t('argus.issues.issuesLabel', 'issues')}`}
             size="small"
             sx={{
               fontWeight: 700, fontSize: '0.75rem', height: 22,
@@ -289,39 +400,189 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             }}
           />
         )}
+        <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
+          — {t('argus.issues.subtitle')}
+        </Typography>
       </Box>
 
-      {/* Global Filter Bar (environment / browser / OS / date range) */}
+      {/* Issue Views tabs */}
+      <Box sx={{ display: 'flex', gap: 0.5, mb: 1.5 }}>
+        {[
+          { key: 'all', label: t('argus.issues.viewAll', 'All') },
+          { key: 'unresolved', label: t('argus.issues.viewUnresolved', 'Unresolved') },
+          { key: 'regressed', label: t('argus.issues.viewRegressed', 'Regressed') },
+          { key: 'escalating', label: t('argus.issues.viewEscalating', 'Escalating') },
+          { key: 'mine', label: t('argus.issues.viewMine', 'Assigned to Me') },
+        ].map(({ key, label }) => (
+          <Chip
+            key={key}
+            label={label}
+            size="small"
+            onClick={() => {
+              setActiveView(key as any);
+              const params = new URLSearchParams(searchParams);
+              if (key === 'all') {
+                params.set('status', 'all');
+                params.delete('substatus');
+                params.delete('assigned_to');
+              } else if (key === 'unresolved') {
+                params.set('status', 'unresolved');
+                params.delete('substatus');
+                params.delete('assigned_to');
+              } else if (key === 'regressed') {
+                params.set('status', 'unresolved');
+                params.set('substatus', 'regressed');
+                params.delete('assigned_to');
+              } else if (key === 'escalating') {
+                params.set('status', 'unresolved');
+                params.set('substatus', 'escalating');
+                params.delete('assigned_to');
+              } else if (key === 'mine') {
+                params.set('status', 'all');
+                params.delete('substatus');
+                params.set('assigned_to', user?.name || '');
+              }
+              params.set('page', '1');
+              setSearchParams(params);
+            }}
+            variant={activeView === key ? 'filled' : 'outlined'}
+            sx={{
+              fontSize: '0.76rem',
+              fontWeight: activeView === key ? 700 : 500,
+              borderRadius: '16px',
+              ...(activeView === key ? {
+                backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                color: theme.palette.primary.main,
+                borderColor: 'transparent',
+              } : {
+                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                color: 'text.secondary',
+              }),
+            }}
+          />
+        ))}
+      </Box>
+
       <ArgusFilterBar
         projectId={String(projectId)}
         value={filters}
         onChange={handleFilterChange}
         onRefresh={fetchIssues}
         loading={loading}
+        extraControls={
+          <>
+            <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
+            <TextField
+              size="small"
+              placeholder={t('argus.issues.searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const params = new URLSearchParams(searchParams);
+                  params.set('search', search);
+                  params.set('page', '1');
+                  setSearchParams(params);
+                }
+              }}
+              InputProps={{
+                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
+              }}
+              sx={{
+                minWidth: 160,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '6px', fontSize: '0.75rem', height: 26,
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                },
+                '& .MuiOutlinedInput-input': { py: 0.3 },
+              }}
+            />
+            <FilterChipSelect
+              label={t('argus.issues.status', 'Status')}
+              value={status}
+              options={statusOptions}
+              anchorEl={statusAnchor}
+              onOpen={(e) => setStatusAnchor(e.currentTarget)}
+              onClose={() => setStatusAnchor(null)}
+              onSelect={(v) => {
+                setStatus(v);
+                const params = new URLSearchParams(searchParams);
+                params.set('status', v); params.set('page', '1');
+                setSearchParams(params);
+              }}
+            />
+            <FilterChipSelect
+              label={t('argus.issues.level', 'Level')}
+              value={level}
+              options={levelOptions}
+              anchorEl={levelAnchor}
+              onOpen={(e) => setLevelAnchor(e.currentTarget)}
+              onClose={() => setLevelAnchor(null)}
+              onSelect={(v) => {
+                setLevel(v);
+                const params = new URLSearchParams(searchParams);
+                params.set('level', v); params.set('page', '1');
+                setSearchParams(params);
+              }}
+            />
+            <FilterChipSelect
+              label={t('argus.issues.sort', 'Sort')}
+              value={sort}
+              options={sortOptions}
+              anchorEl={sortAnchor}
+              onOpen={(e) => setSortAnchor(e.currentTarget)}
+              onClose={() => setSortAnchor(null)}
+              onSelect={(v) => {
+                setSort(v);
+                const params = new URLSearchParams(searchParams);
+                params.set('sort', v);
+                setSearchParams(params);
+              }}
+            />
+          </>
+        }
       />
 
-      {/* Merge Toolbar */}
       {selectedIds.size > 0 && (
         <Paper elevation={0} sx={{
-          mb: 1.5, p: 1, display: 'flex', alignItems: 'center', gap: 1.5,
+          mb: 1.5, p: 1, display: 'flex', alignItems: 'center', gap: 1,
           border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
           borderRadius: 2,
           backgroundColor: alpha(theme.palette.primary.main, 0.04),
         }}>
-          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.8rem' }}>
+          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.8rem', mr: 0.5 }}>
             {selectedIds.size} {t('argus.issues.selected', 'selected')}
           </Typography>
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<ResolveIcon sx={{ fontSize: 14 }} />}
+            onClick={() => handleBulkAction('resolved')}
+            sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem', borderColor: alpha('#4caf50', 0.5), color: '#4caf50', '&:hover': { borderColor: '#4caf50', backgroundColor: alpha('#4caf50', 0.08) } }}
+          >
+            {t('argus.issues.resolve', 'Resolve')}
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<IgnoreIcon sx={{ fontSize: 14 }} />}
+            onClick={() => handleBulkAction('ignored')}
+            sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem', borderColor: alpha('#9e9e9e', 0.5), color: '#9e9e9e', '&:hover': { borderColor: '#9e9e9e', backgroundColor: alpha('#9e9e9e', 0.08) } }}
+          >
+            {t('argus.issues.ignore', 'Ignore')}
+          </Button>
           <Tooltip title={selectedIds.size < 2 ? t('argus.issues.mergeMinTwo', 'Select at least 2 issues') : ''}>
             <span>
               <Button
-                variant="contained"
+                variant="outlined"
                 size="small"
-                startIcon={<MergeIcon />}
+                startIcon={<MergeIcon sx={{ fontSize: 14 }} />}
                 disabled={selectedIds.size < 2 || merging}
                 onClick={handleMerge}
                 sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem' }}
               >
-                {t('argus.issues.merge', 'Merge Issues')}
+                {t('argus.issues.merge', 'Merge')}
               </Button>
             </span>
           </Tooltip>
@@ -335,90 +596,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         </Paper>
       )}
 
-      {/* Issue-specific Filter Bar */}
-      <Box
-        sx={{
-          display: 'flex', gap: 0.75, mb: 2, flexWrap: 'wrap', alignItems: 'center',
-        }}
-      >
-        {/* Search */}
-        <TextField
-          size="small"
-          placeholder={t('argus.issues.searchPlaceholder')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              const params = new URLSearchParams(searchParams);
-              params.set('search', search);
-              params.set('page', '1');
-              setSearchParams(params);
-            }
-          }}
-          InputProps={{
-            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 16, color: 'text.disabled' }} /></InputAdornment>,
-          }}
-          sx={{
-            minWidth: 220,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '6px', fontSize: '0.78rem', height: 28,
-              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-            },
-            '& .MuiOutlinedInput-input': { py: 0.4 },
-          }}
-        />
-
-        {/* Status */}
-        <FilterChipSelect
-          label={t('argus.issues.status', 'Status')}
-          value={status}
-          options={statusOptions}
-          anchorEl={statusAnchor}
-          onOpen={(e) => setStatusAnchor(e.currentTarget)}
-          onClose={() => setStatusAnchor(null)}
-          onSelect={(v) => {
-            setStatus(v);
-            const params = new URLSearchParams(searchParams);
-            params.set('status', v); params.set('page', '1');
-            setSearchParams(params);
-          }}
-        />
-
-        {/* Level */}
-        <FilterChipSelect
-          label={t('argus.issues.level', 'Level')}
-          value={level}
-          options={levelOptions}
-          anchorEl={levelAnchor}
-          onOpen={(e) => setLevelAnchor(e.currentTarget)}
-          onClose={() => setLevelAnchor(null)}
-          onSelect={(v) => {
-            setLevel(v);
-            const params = new URLSearchParams(searchParams);
-            params.set('level', v); params.set('page', '1');
-            setSearchParams(params);
-          }}
-        />
-
-        {/* Sort */}
-        <FilterChipSelect
-          label={t('argus.issues.sort', 'Sort')}
-          value={sort}
-          options={sortOptions}
-          anchorEl={sortAnchor}
-          onOpen={(e) => setSortAnchor(e.currentTarget)}
-          onClose={() => setSortAnchor(null)}
-          onSelect={(v) => {
-            setSort(v);
-            const params = new URLSearchParams(searchParams);
-            params.set('sort', v);
-            setSearchParams(params);
-          }}
-        />
-      </Box>
-
-      <PageContentLoader loading={loading}>
-        {/* Issue Cards */}
+      <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />}>
         <Paper
           elevation={0}
           sx={{
@@ -436,7 +614,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           ) : (
             issues.map((issue, idx) => {
               const lc = LEVEL_CONFIG[issue.level] || LEVEL_CONFIG.info;
-              const sc = STATUS_CONFIG[issue.status] || STATUS_CONFIG.unresolved;
               return (
                 <Box
                   key={issue.id}
@@ -452,14 +629,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                     },
                   }}
                 >
-                  {/* Level Color Bar */}
                   <Box sx={{
                     width: 4, flexShrink: 0,
                     backgroundColor: lc.color,
                     borderRadius: idx === 0 ? '8px 0 0 0' : idx === issues.length - 1 ? '0 0 0 8px' : 0,
                   }} />
 
-                  {/* Checkbox */}
                   <Box sx={{ display: 'flex', alignItems: 'center', pl: 0.5 }}>
                     <Checkbox
                       size="small"
@@ -469,9 +644,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                     />
                   </Box>
 
-                  {/* Content */}
                   <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', px: 1.5, py: 1.5, gap: 2, minWidth: 0 }}>
-                    {/* Level Icon */}
                     <Box sx={{
                       width: 30, height: 30, borderRadius: 1.5, flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -480,7 +653,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                       {lc.icon}
                     </Box>
 
-                    {/* Issue Info */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.2 }}>
                         <Typography
@@ -491,14 +663,49 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                         >
                           {issue.title}
                         </Typography>
+                        {issue.external_url && (
+                          <Tooltip title={`${issue.external_key || 'External'} — ${t('argus.issues.openExternal', 'Open in external tracker')}`}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => { e.stopPropagation(); window.open(issue.external_url!, '_blank'); }}
+                              sx={{ p: 0.2, '&:hover': { color: '#0052CC' } }}
+                            >
+                              <ExternalLinkIcon sx={{ fontSize: 13 }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                         {issue.substatus === 'regressed' && (
                           <Chip
-                            label="Regression"
+                            label={t('argus.issues.regression')}
                             size="small"
                             sx={{
                               height: 18, fontSize: '0.6rem', fontWeight: 700,
                               backgroundColor: alpha('#ff9800', 0.15),
                               color: '#ff9800', border: 'none',
+                            }}
+                          />
+                        )}
+                        {issue.substatus === 'escalating' && (
+                          <Chip
+                            label={t('argus.issues.escalating', 'Escalating')}
+                            size="small"
+                            sx={{
+                              height: 18, fontSize: '0.6rem', fontWeight: 700,
+                              backgroundColor: alpha('#f44336', 0.15),
+                              color: '#f44336', border: 'none',
+                            }}
+                          />
+                        )}
+                        {issue.priority && PRIORITY_CONFIG[issue.priority] && (
+                          <Chip
+                            icon={PRIORITY_CONFIG[issue.priority].icon}
+                            label={t(`argus.issues.priority.${issue.priority}`, PRIORITY_CONFIG[issue.priority].label)}
+                            size="small"
+                            sx={{
+                              height: 18, fontSize: '0.6rem', fontWeight: 600,
+                              backgroundColor: alpha(PRIORITY_CONFIG[issue.priority].color, 0.1),
+                              color: PRIORITY_CONFIG[issue.priority].color, border: 'none',
+                              '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
                             }}
                           />
                         )}
@@ -512,34 +719,79 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                       </Typography>
                     </Box>
 
-                    {/* Stats */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                      {/* Event count */}
+                      {/* 24h Sparkline */}
+                      {issue.stats_24h && issue.stats_24h.length > 0 && (() => {
+                        const data = issue.stats_24h!;
+                        const max = Math.max(...data, 1);
+                        const w = 48, h = 20;
+                        const points = data.map((v, i) =>
+                          `${(i / (data.length - 1)) * w},${h - (v / max) * h}`
+                        ).join(' ');
+                        return (
+                          <svg width={w} height={h} style={{ flexShrink: 0 }}>
+                            <polyline
+                              points={points}
+                              fill="none"
+                              stroke={lc.color}
+                              strokeWidth={1.5}
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                              opacity={0.7}
+                            />
+                          </svg>
+                        );
+                      })()}
                       <Box sx={{ textAlign: 'center', minWidth: 50 }}>
                         <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1.2 }}>
-                          {issue.event_count?.toLocaleString() || 0}
+                          {formatCompactNumber(issue.event_count || 0)}
                         </Typography>
                         <Typography variant="caption" sx={{ fontSize: '0.65rem', color: isDark ? '#555' : '#aaa' }}>
                           {t('argus.issues.events')}
                         </Typography>
                       </Box>
 
-                      {/* User count */}
                       <Box sx={{ textAlign: 'center', minWidth: 40 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, justifyContent: 'center' }}>
                           <PersonIcon sx={{ fontSize: 13, color: isDark ? '#555' : '#aaa' }} />
                           <Typography variant="body2" fontWeight={600}>
-                            {issue.user_count?.toLocaleString() || 0}
+                            {formatCompactNumber(issue.user_count || 0)}
                           </Typography>
                         </Box>
                       </Box>
 
-                      {/* Time */}
+                      <Box sx={{ minWidth: 28, display: 'flex', justifyContent: 'center' }}>
+                        {issue.assigned_to ? (
+                          <Tooltip title={`${t('argus.issues.assignedTo', 'Assigned to')}: ${issue.assigned_to}`}>
+                            <Avatar
+                              onClick={(e) => { e.stopPropagation(); setAssigneeAnchor({ el: e.currentTarget, issue }); }}
+                              sx={{
+                                width: 22, height: 22, fontSize: '0.55rem', fontWeight: 700,
+                                backgroundColor: stringToColor(issue.assigned_to),
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {getInitials(issue.assigned_to)}
+                            </Avatar>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title={t('argus.issues.unassigned', 'Unassigned')}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => { e.stopPropagation(); setAssigneeAnchor({ el: e.currentTarget, issue }); }}
+                              sx={{ p: 0.3 }}
+                            >
+                              <AssignIcon sx={{ fontSize: 16, color: isDark ? '#444' : '#ccc' }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+
                       <Box sx={{ minWidth: 70, textAlign: 'right' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, justifyContent: 'flex-end' }}>
                           <ScheduleIcon sx={{ fontSize: 12, color: isDark ? '#555' : '#aaa' }} />
                           <Typography variant="caption" sx={{ fontSize: '0.72rem', color: isDark ? '#777' : '#888' }}>
-                            {issue.last_seen ? formatTimeAgo(issue.last_seen) : '-'}
+                            {issue.last_seen ? formatTimeAgo(issue.last_seen, t) : '-'}
                           </Typography>
                         </Box>
                       </Box>
@@ -551,25 +803,54 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           )}
         </Paper>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Stack alignItems="center" sx={{ mt: 2 }}>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              shape="rounded"
+        {total > 0 && (
+          <Box sx={{ mt: 3 }}>
+            <SimplePagination
+              count={total}
+              page={currentPage - 1}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                const params = new URLSearchParams(searchParams);
+                params.set('page', '1');
+                setSearchParams(params);
+              }}
+              rowsPerPageOptions={VALID_PAGE_SIZES}
               size="small"
             />
-          </Stack>
+          </Box>
         )}
       </PageContentLoader>
+
+      <Menu
+        anchorEl={assigneeAnchor?.el}
+        open={Boolean(assigneeAnchor)}
+        onClose={() => setAssigneeAnchor(null)}
+        slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 160, maxHeight: 300, boxShadow: '0 4px 20px rgba(0,0,0,0.12)' } } }}
+      >
+        <MenuItem onClick={() => handleAssignIssue(assigneeAnchor?.issue.id, '')}>
+          <ListItemIcon><PersonIcon sx={{ fontSize: 18 }} /></ListItemIcon>
+          <ListItemText primary={t('argus.issues.unassigned', 'Unassigned')} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+        </MenuItem>
+        <Divider />
+        {members.map(member => {
+          const displayName = member.name || member.email || member.userId;
+          return (
+            <MenuItem key={member.userId} onClick={() => handleAssignIssue(assigneeAnchor?.issue?.id, displayName)}>
+              <Avatar sx={{ width: 20, height: 20, mr: 1, fontSize: '0.55rem', fontWeight: 700, backgroundColor: stringToColor(displayName) }}>
+                {getInitials(displayName)}
+              </Avatar>
+              <ListItemText primary={displayName} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+            </MenuItem>
+          );
+        })}
+      </Menu>
     </Box>
   );
 };
 
-function formatTimeAgo(dateStr: string): string {
+function formatTimeAgo(dateStr: string, t?: any): string {
   try {
     const date = new Date(dateStr);
     const now = new Date();
@@ -579,10 +860,17 @@ function formatTimeAgo(dateStr: string): string {
     const diffHour = Math.floor(diffMin / 60);
     const diffDay = Math.floor(diffHour / 24);
 
-    if (diffSec < 60) return `${diffSec}초 전`;
-    if (diffMin < 60) return `${diffMin}분 전`;
-    if (diffHour < 24) return `${diffHour}시간 전`;
-    if (diffDay < 30) return `${diffDay}일 전`;
+    if (t) {
+      if (diffSec < 60) return t('common.time.justNow');
+      if (diffMin < 60) return t('common.time.minutesAgo', { count: diffMin });
+      if (diffHour < 24) return t('common.time.hoursAgo', { count: diffHour });
+      if (diffDay < 30) return t('common.time.daysAgo', { count: diffDay });
+    } else {
+      if (diffSec < 60) return `${diffSec}s ago`;
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHour < 24) return `${diffHour}h ago`;
+      if (diffDay < 30) return `${diffDay}d ago`;
+    }
     return date.toLocaleDateString();
   } catch {
     return dateStr;
