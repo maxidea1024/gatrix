@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import {
   Box,
@@ -91,6 +92,7 @@ type ViewMode = 'list' | 'detail' | 'trace';
 const ArgusPerformancePage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
@@ -436,6 +438,7 @@ const ArgusPerformancePage: React.FC = () => {
                       return (
                         <Box
                           key={idx}
+                          onClick={() => navigate(`/argus/issues/${projectId}/${issue.issue_id}`)}
                           sx={{
                             display: 'flex', alignItems: 'center', gap: 1.5, p: 1, pl: 0, borderRadius: 1.5,
                             cursor: 'pointer', transition: 'background 0.15s',
