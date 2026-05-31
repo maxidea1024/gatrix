@@ -200,6 +200,7 @@ export interface ArgusIssueListParams {
   limit?: number;
   offset?: number;
   search?: string;
+  query?: string;
   environment?: string;
   browser?: string;
   os?: string;
@@ -271,10 +272,13 @@ export interface ArgusTransaction {
 }
 
 export interface ArgusTransactionDetail {
+  summary: { count: number; avg_duration: number; p50: number; p95: number; error_rate: number };
   trend: { hour: string; count: number; avg_duration: number; p95: number; error_rate: number }[];
   histogram: { bucket: string; count: number }[];
   spans: { description: string; op: string; count: number; avg_duration: number; p95: number }[];
   recent_traces: ArgusRecentTrace[];
+  suspect_tags: { tag_key: string; tag_value: string; count: number; avg_duration: number; p95: number }[];
+  related_issues: { issue_id: string; event_count: number; last_seen: string; title?: string; subtitle?: string; level?: string }[];
 }
 
 export interface ArgusRecentTrace {

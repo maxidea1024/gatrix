@@ -40,6 +40,7 @@ import {
   Remove as MediumPriorityIcon,
   KeyboardArrowDown as LowPriorityIcon,
   OpenInNew as ExternalLinkIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -90,6 +91,29 @@ function stringToColor(str: string): string {
 
 function getInitials(name: string): string {
   return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+function HighlightText({ text, highlight, isDark }: { text: string; highlight: string; isDark: boolean }) {
+  if (!highlight.trim()) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <span key={i} style={{ 
+            backgroundColor: isDark ? 'rgba(255, 235, 59, 0.2)' : 'rgba(255, 235, 59, 0.4)',
+            color: isDark ? '#ffd54f' : '#f57f17',
+            borderRadius: '2px',
+            padding: '0 2px'
+          }}>
+            {part}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
 }
 
 interface ArgusIssuesPageProps {
@@ -279,7 +303,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         sort,
         limit: rowsPerPage,
         offset: (currentPage - 1) * rowsPerPage,
-        search: searchDebounce || undefined,
+        query: searchDebounce || undefined,
         environment: filters.environments.length === 1 ? filters.environments[0] : undefined,
         browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
         os: filters.os.length === 1 ? filters.os[0] : undefined,
@@ -487,6 +511,19 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               }}
               InputProps={{
                 startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
+                endAdornment: search ? (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={() => {
+                      setSearch('');
+                      const params = new URLSearchParams(searchParams);
+                      params.delete('search');
+                      params.set('page', '1');
+                      setSearchParams(params);
+                    }} sx={{ p: 0.2 }}>
+                      <CloseIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
               }}
               sx={{
                 minWidth: 160,
@@ -661,7 +698,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                           noWrap
                           sx={{ color: isDark ? '#e0e0e0' : '#1a1a2e', lineHeight: 1.3 }}
                         >
-                          {issue.title}
+                          <HighlightText text={issue.title} highlight={searchDebounce} isDark={isDark} />
                         </Typography>
                         {issue.external_url && (
                           <Tooltip title={`${issue.external_key || 'External'} — ${t('argus.issues.openExternal', 'Open in external tracker')}`}>

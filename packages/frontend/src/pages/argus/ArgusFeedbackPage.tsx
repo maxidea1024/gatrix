@@ -110,6 +110,30 @@ function getInitials(name: string): string {
   return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
+function HighlightText({ text, highlight, isDark }: { text: string; highlight: string; isDark: boolean }) {
+  if (!text) return <>{text}</>;
+  if (!highlight.trim()) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <span key={i} style={{ 
+            backgroundColor: isDark ? 'rgba(255, 235, 59, 0.2)' : 'rgba(255, 235, 59, 0.4)',
+            color: isDark ? '#ffd54f' : '#f57f17',
+            borderRadius: '2px',
+            padding: '0 2px'
+          }}>
+            {part}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
 function formatRelative(ts: string, t: any): string {
   if (!ts) return '';
   try {
@@ -675,7 +699,7 @@ const ArgusFeedbackPage: React.FC = () => {
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.2 }}>
                           <Typography variant="body2" fontWeight={600} noWrap sx={{ fontSize: '0.8rem', flex: 1 }}>
-                            {displayName}
+                            <HighlightText text={displayName} highlight={searchDebounce} isDark={isDark} />
                           </Typography>
                           <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.62rem', flexShrink: 0 }}>
                             {formatRelative(item.submitted_at, t)}
@@ -685,7 +709,7 @@ const ArgusFeedbackPage: React.FC = () => {
                           color: isDark ? '#999' : '#666', fontSize: '0.72rem', display: 'block',
                           lineHeight: 1.4, maxHeight: '2.8em', overflow: 'hidden',
                         }}>
-                          {item.message}
+                          <HighlightText text={item.message} highlight={searchDebounce} isDark={isDark} />
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 0.5, mt: 0.4, flexWrap: 'wrap' }}>
                           {item.issue_id && (

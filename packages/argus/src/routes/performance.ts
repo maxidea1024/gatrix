@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
+import { mysqlPool } from '../config/mysql';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('performance-api');
@@ -161,12 +162,87 @@ export default async function performanceRoutes(app: FastifyInstance) {
         });
         const recentTraces = await recentTracesResult.json();
 
+        // Transaction Summary
+        const summaryResult = await clickhouse.query({
+          query: `
+            SELECT
+              count() AS count,
+              avg(duration) AS avg_duration,
+              quantile(0.5)(duration) AS p50,
+              quantile(0.95)(duration) AS p95,
+              countIf(transaction_status != 'ok') / count() * 100 AS error_rate
+            FROM argus.transactions
+            WHERE project_id = {projectId:String}
+              AND transaction = {txnName:String}
+              AND timestamp >= now() - INTERVAL ${interval}
+          `,
+          query_params: { projectId: String(projectId), txnName },
+        });
+        const summaryData = await summaryResult.json();
+
+        // Suspect Tags (Insights)
+        const suspectTagsResult = await clickhouse.query({
+          query: `
+            SELECT 'browser' AS tag_key, tags['browser'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
+            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= now() - INTERVAL ${interval} AND tags['browser'] != '' GROUP BY tags['browser'] HAVING count > 0
+            UNION ALL
+            SELECT 'os' AS tag_key, tags['os'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
+            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= now() - INTERVAL ${interval} AND tags['os'] != '' GROUP BY tags['os'] HAVING count > 0
+            UNION ALL
+            SELECT 'environment' AS tag_key, environment AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
+            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= now() - INTERVAL ${interval} AND environment != '' GROUP BY environment HAVING count > 0
+          `,
+          query_params: { projectId: String(projectId), txnName },
+        });
+        const suspectTagsData = await suspectTagsResult.json();
+
+        // Related Issues
+        const errorsResult = await clickhouse.query({
+          query: `
+            SELECT
+              issue_id,
+              count() AS event_count,
+              max(timestamp) AS last_seen
+            FROM argus.errors
+            WHERE project_id = {projectId:String}
+              AND transaction = {txnName:String}
+              AND timestamp >= now() - INTERVAL ${interval}
+              AND toString(issue_id) != ''
+            GROUP BY issue_id
+            ORDER BY event_count DESC
+            LIMIT 5
+          `,
+          query_params: { projectId: String(projectId), txnName },
+        });
+        const errorsData = await errorsResult.json();
+        let relatedIssues = (errorsData.data || []) as any[];
+
+        if (relatedIssues.length > 0) {
+          const issueIds = relatedIssues.map(i => i.issue_id);
+          const [issueRows] = await mysqlPool.query(
+            `SELECT id, title, level FROM g_argus_issues WHERE id IN (${issueIds.map(() => '?').join(',')})`,
+            issueIds
+          ) as any;
+          
+          relatedIssues = relatedIssues.map(r => {
+            const row = issueRows.find((i: any) => i.id === Number(r.issue_id));
+            return {
+              ...r,
+              title: row?.title || `Issue #${r.issue_id}`,
+              level: row?.level || 'error',
+            };
+          });
+        }
+
         return reply.send({
           data: {
+            summary: (summaryData.data as any[])?.[0] || {},
             trend: trend.data || [],
             histogram: histogram.data || [],
             spans: spans.data || [],
             recent_traces: recentTraces.data || [],
+            suspect_tags: suspectTagsData.data || [],
+            related_issues: relatedIssues,
           },
         });
       } catch (error) {

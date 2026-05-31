@@ -77,7 +77,8 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       const orderBy = sort === 'oldest' ? 'timestamp ASC' : 'timestamp DESC';
 
       try {
-        const whereBase = `project_id = {projectId:String} AND ${dateClause} ${searchClause} ${statusClause} ${structuredClause}`;
+        const baseConditionNoStatus = `project_id = {projectId:String} AND ${dateClause} ${searchClause} ${structuredClause}`;
+        const whereBase = `${baseConditionNoStatus} ${statusClause}`;
 
         const [countResult, itemsResult, trendResult, summaryResult] = await Promise.all([
           // Total count
@@ -122,7 +123,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               countIf(status = 'resolved') AS resolved_count,
               countIf(is_spam = 1) AS spam_count
             FROM argus.user_feedback
-            WHERE project_id = {projectId:String} AND ${dateClause}`,
+            WHERE ${baseConditionNoStatus}`,
             query_params: qp,
           }),
         ]);

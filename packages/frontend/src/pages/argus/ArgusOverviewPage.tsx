@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -313,43 +313,49 @@ const ArgusOverviewPage: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              overflow: 'hidden',
               transition: 'all 0.2s ease',
               '&:hover': { transform: 'translateY(-2px)', boxShadow: `0 4px 20px ${alpha(card.color, 0.15)}` },
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
               <Box
                 sx={{
                   width: 40, height: 40, borderRadius: 2,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1),
                   color: card.color,
+                  flexShrink: 0,
                 }}
               >
                 {React.cloneElement(card.icon, { sx: { fontSize: 20 } })}
               </Box>
-              <Box>
+              <Box sx={{ minWidth: 0 }}>
                 {loading ? (
                   <Skeleton width={60} height={28} />
                 ) : (
-                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.8 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.8, flexWrap: 'wrap' }}>
                     <Tooltip title={typeof card.value === 'number' && card.value >= 1000 ? card.value.toLocaleString() : ''} arrow>
-                      <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, color: isDark ? '#fff' : '#1a1a2e' }}>
+                      <Typography variant="h6" fontWeight={800} noWrap sx={{ lineHeight: 1.2, color: isDark ? '#fff' : '#1a1a2e', maxWidth: '100%' }}>
                         {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value ?? '-'}
                       </Typography>
                     </Tooltip>
                     {card.change != null && (
-                      <ChangeIndicator value={card.change} invert={card.invertChange} />
+                      <Box sx={{ flexShrink: 0 }}>
+                        <ChangeIndicator value={card.change} invert={card.invertChange} />
+                      </Box>
                     )}
                   </Box>
                 )}
-                <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, letterSpacing: 0.3, fontSize: '0.68rem' }}>
+                <Typography variant="caption" noWrap sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, letterSpacing: 0.3, fontSize: '0.68rem', display: 'block' }}>
                   {card.label}
                 </Typography>
               </Box>
             </Box>
             {card.sparkData.length > 2 && (
-              <ArgusSparkline data={card.sparkData} width={60} height={24} color={card.color} />
+              <Box sx={{ flexShrink: 0, ml: 1 }}>
+                <ArgusSparkline data={card.sparkData} width={60} height={24} color={card.color} />
+              </Box>
             )}
           </Paper>
         ))}
