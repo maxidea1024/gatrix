@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
+import { getDynamicBucketFn } from '../utils/timeBucket';
 
 const logger = createLogger('logs-api');
 
@@ -27,6 +28,8 @@ export default async function logsRoutes(app: FastifyInstance) {
         order = 'DESC',
         period = '24h',
         cursor,
+        start,
+        end,
       } = request.query as Record<string, string>;
 
       const periodMap: Record<string, string> = {
@@ -39,7 +42,13 @@ export default async function logsRoutes(app: FastifyInstance) {
         const conditions: string[] = ['project_id = {projectId:String}'];
         const params: Record<string, string> = { projectId: String(projectId) };
 
-        conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+        if (period === 'custom' && start && end) {
+          conditions.push(`timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`);
+          params.start = start.replace('T', ' ').replace('Z', '');
+          params.end = end.replace('T', ' ').replace('Z', '');
+        } else {
+          conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+        }
 
         if (cursor) {
           const op = order === 'DESC' ? '<' : '>';
@@ -92,24 +101,48 @@ export default async function logsRoutes(app: FastifyInstance) {
     '/:projectId/logs/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', level } = request.query as Record<string, string>;
+      const { period = '24h', level, start, end, search } = request.query as Record<string, string>;
 
       const periodMap: Record<string, string> = {
         '1h': '1 HOUR', '6h': '6 HOUR', '12h': '12 HOUR', '24h': '24 HOUR',
         '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY',
       };
-      const interval = periodMap[period] || '24 HOUR';
+      
+      let bucketFn = 'toStartOfHour';
+      const conditions: string[] = ['project_id = {projectId:String}'];
+      const params: Record<string, string> = { projectId: String(projectId) };
 
-      // Bucket size based on period
-      const bucketFn = ['1h', '6h', '12h'].includes(period) ? 'toStartOfFiveMinutes' : 'toStartOfHour';
+      if (period === 'custom' && start && end) {
+        conditions.push(`timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`);
+        params.start = start.replace('T', ' ').replace('Z', '');
+        params.end = end.replace('T', ' ').replace('Z', '');
+        
+        const s = new Date(start).getTime();
+        const e = new Date(end).getTime();
+        const diffHours = (e - s) / 3600000;
+        if (diffHours <= 12) bucketFn = 'toStartOfFiveMinutes';
+        else if (diffHours <= 72) bucketFn = 'toStartOfHour';
+        else bucketFn = 'toStartOfDay';
+      } else {
+        const interval = periodMap[period] || '24 HOUR';
+        conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+      }
+      bucketFn = getDynamicBucketFn(period, start, end);
 
       try {
-        const conditions = ['project_id = {projectId:String}', `timestamp >= now() - INTERVAL ${interval}`];
-        const params: Record<string, string> = { projectId: String(projectId) };
 
         if (level) {
           conditions.push('level = {level:String}');
           params.level = level;
+        }
+
+        if (search && typeof search === 'string' && search.trim()) {
+          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set());
+          const ast = parser.parse(search);
+          if (ast) {
+            const { where } = parser.generateSQL(ast, params);
+            if (where) conditions.push(`(${where})`);
+          }
         }
 
         const sql = `
@@ -135,30 +168,37 @@ export default async function logsRoutes(app: FastifyInstance) {
     '/:projectId/logs/facets',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h' } = request.query as Record<string, string>;
+      const { period = '24h', start, end } = request.query as Record<string, string>;
 
       const periodMap: Record<string, string> = {
         '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR', '7d': '7 DAY', '30d': '30 DAY',
       };
       const interval = periodMap[period] || '24 HOUR';
-      const qp = { projectId: String(projectId) };
+      const qp: Record<string, string> = { projectId: String(projectId) };
+
+      let timeFilter = `timestamp >= now() - INTERVAL ${interval}`;
+      if (period === 'custom' && start && end) {
+        timeFilter = `timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`;
+        qp.start = start.replace('T', ' ').replace('Z', '');
+        qp.end = end.replace('T', ' ').replace('Z', '');
+      }
 
       try {
         const [levelsRes, servicesRes, envsRes, loggersRes] = await Promise.all([
           clickhouse.query({
-            query: `SELECT level, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} GROUP BY level ORDER BY count DESC`,
+            query: `SELECT level, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} GROUP BY level ORDER BY count DESC`,
             query_params: qp,
           }),
           clickhouse.query({
-            query: `SELECT service, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND service != '' GROUP BY service ORDER BY count DESC LIMIT 20`,
+            query: `SELECT service, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND service != '' GROUP BY service ORDER BY count DESC LIMIT 20`,
             query_params: qp,
           }),
           clickhouse.query({
-            query: `SELECT environment, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND environment != '' GROUP BY environment ORDER BY count DESC LIMIT 10`,
+            query: `SELECT environment, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND environment != '' GROUP BY environment ORDER BY count DESC LIMIT 10`,
             query_params: qp,
           }),
           clickhouse.query({
-            query: `SELECT logger_name, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND logger_name != '' GROUP BY logger_name ORDER BY count DESC LIMIT 20`,
+            query: `SELECT logger_name, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND logger_name != '' GROUP BY logger_name ORDER BY count DESC LIMIT 20`,
             query_params: qp,
           }),
         ]);
@@ -189,6 +229,8 @@ export default async function logsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const {
         period = '24h',
+        start,
+        end,
         groupBy = 'level',
         search,
         service,
@@ -208,7 +250,13 @@ export default async function logsRoutes(app: FastifyInstance) {
       try {
         const conditions: string[] = ['project_id = {projectId:String}'];
         const params: Record<string, string> = { projectId: String(projectId) };
-        conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+        if (period === 'custom' && start && end) {
+          conditions.push(`timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`);
+          params.start = start.replace('T', ' ').replace('Z', '');
+          params.end = end.replace('T', ' ').replace('Z', '');
+        } else {
+          conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+        }
 
         if (service) { conditions.push('service = {service:String}'); params.service = service; }
         if (environment) { conditions.push('environment = {environment:String}'); params.environment = environment; }
@@ -235,7 +283,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         const topValues = await topResult.json() as any[];
 
         // 2) Time series per group value (top 5)
-        const bucketFn = ['1h', '6h', '12h'].includes(period) ? 'toStartOfFiveMinutes' : 'toStartOfHour';
+        const bucketFn = getDynamicBucketFn(period, start, end);
         const top5 = topValues.slice(0, 5).map((r: any) => r.group_value);
 
         let timeSeries: any[] = [];

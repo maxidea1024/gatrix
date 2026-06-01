@@ -391,7 +391,7 @@ export function argusDateRangeToApiParams(value: ArgusDateRangeValue): {
   }
   if (value.type === 'custom' && value.start && value.end) {
     // Use local time format (YYYY-MM-DD HH:MM:SS) for ClickHouse DateTime64 compatibility
-    return { start: formatDateDisplay(value.start), end: formatDateDisplay(value.end) };
+    return { period: 'custom', start: value.start.toISOString(), end: value.end.toISOString() };
   }
   return { period: '24h' };
 }

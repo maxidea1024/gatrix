@@ -122,20 +122,25 @@ export interface ArgusIssueTagGroup {
   topValues: { value: string; count: number }[];
 }
 
+export type SavedQueryType = 'discover' | 'logs' | 'traces' | 'metrics';
+
 export interface ArgusSavedQuery {
   id: number;
   project_id: number;
   name: string;
   description: string | null;
+  query_type: SavedQueryType;
   query_config: {
-    fields: string[];
+    fields?: string[];
     conditions?: string;
     groupBy?: string[];
     orderBy?: string;
     period?: string;
+    [key: string]: any;
   };
   display_type: 'table' | 'bar' | 'line' | 'number';
   is_global: boolean;
+  is_favorite?: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -354,6 +359,20 @@ export interface ArgusFeedbackItem {
   release: string;
   source: string;
   tags: Record<string, string>;
+  // Device context
+  browser: string;
+  browser_version: string;
+  os: string;
+  os_version: string;
+  device: string;
+  // User identity
+  user_id: string;
+  locale: string;
+  // Workflow
+  is_read: number;
+  // AI classification
+  category: string;
+  sentiment: string;
   // Issue linking
   issue_id: number | null;
   issue_title: string | null;
@@ -368,6 +387,15 @@ export interface ArgusFeedbackSummary {
   unresolved_count: number;
   resolved_count: number;
   spam_count: number;
+  // AI classification stats
+  sentiment_positive?: number;
+  sentiment_negative?: number;
+  sentiment_neutral?: number;
+  category_bug?: number;
+  category_feature?: number;
+  category_complaint?: number;
+  category_praise?: number;
+  category_question?: number;
 }
 
 export interface ArgusFeedbackResponse {
@@ -375,6 +403,16 @@ export interface ArgusFeedbackResponse {
   total: number;
   trend: { day: string; count: number }[];
   summary: ArgusFeedbackSummary;
+}
+
+export interface ArgusFeedbackActivity {
+  id: number;
+  project_id: number;
+  feedback_id: string;
+  user_name: string | null;
+  action: 'status_change' | 'assign' | 'comment' | 'mark_spam' | 'unmark_spam';
+  data: Record<string, any> | null;
+  created_at: string;
 }
 
 export interface ArgusRelease {
@@ -466,6 +504,92 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  // --- Trace Explorer ---
+
+  async searchSpans(
+    projectId: number | string,
+    params?: {
+      period?: string; search?: string; op?: string; status?: string;
+      limit?: number; orderBy?: string; start?: string; end?: string;
+    }
+  ): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/traces/${projectId}/spans`, { params });
+    return response.data?.data || response.data || [];
+  }
+
+  async getTraceSamples(
+    projectId: number | string,
+    params?: {
+      period?: string; search?: string; limit?: number;
+      start?: string; end?: string;
+    }
+  ): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/traces/${projectId}/samples`, { params });
+    return response.data?.data || response.data || [];
+  }
+
+  async getSpanAggregates(
+    projectId: number | string,
+    params?: { period?: string; groupBy?: string; start?: string; end?: string }
+  ): Promise<{ groupBy: string; topValues: any[]; timeSeries: any[] }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/traces/${projectId}/aggregate`, { params });
+    return response.data?.data || response.data;
+  }
+
+  async getSpanTags(
+    projectId: number | string,
+    period?: string
+  ): Promise<{ op: any[]; status: any[]; domain: any[] }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/traces/${projectId}/tags`, {
+      params: { period },
+    });
+    return response.data?.data || response.data || { op: [], status: [], domain: [] };
+  }
+
+  async getSpanVolume(
+    projectId: number | string,
+    params?: { period?: string; search?: string; start?: string; end?: string }
+  ): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/traces/${projectId}/volume`, { params });
+    return response.data?.data || response.data || [];
+  }
+
+  // --- Metrics Explorer ---
+
+  async getMetricNames(
+    projectId: number | string,
+    period?: string
+  ): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/metrics/${projectId}/names`, {
+      params: { period },
+    });
+    return response.data?.data || response.data || [];
+  }
+
+  async queryMetric(
+    projectId: number | string,
+    params: { name: string; period?: string; groupBy?: string; agg?: string; start?: string; end?: string }
+  ): Promise<{ timeSeries: any[]; summary: any }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/metrics/${projectId}/query`, { params });
+    return response.data?.data || response.data;
+  }
+
+  async getMetricTags(
+    projectId: number | string,
+    params?: { period?: string; name?: string }
+  ): Promise<{ environment: any[]; release: any[]; metric_type: any[] }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/metrics/${projectId}/tags`, { params });
+    return response.data?.data || response.data || { environment: [], release: [], metric_type: [] };
+  }
+
+  async getMetricVolume(
+    projectId: number | string,
+    params?: { period?: string; start?: string; end?: string }
+  ): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/metrics/${projectId}/volume`, { params });
+    return response.data?.data || response.data || [];
+  }
+
   // --- Sessions ---
 
   async getSessionHealth(
@@ -488,9 +612,50 @@ class ArgusService {
       period?: string; page?: number; limit?: number; search?: string; status?: string;
       start?: string; end?: string; sort?: string;
       filterUrl?: string; filterAssigned?: string; filterEnvironment?: string;
+      filterBrowser?: string; filterOs?: string;
     }
   ): Promise<ArgusFeedbackResponse> {
     const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}`, { params });
+    return response.data?.data || response.data;
+  }
+
+  async getFeedbackFilterOptions(
+    projectId: number | string,
+    period?: string
+  ): Promise<{ environments: string[]; browsers: string[]; os: string[]; assigned: string[] }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}/filter-options`, {
+      params: { period },
+    });
+    return response.data?.data || response.data || { environments: [], browsers: [], os: [], assigned: [] };
+  }
+
+  async markFeedbackRead(
+    projectId: number | string,
+    feedbackIds: string[]
+  ): Promise<void> {
+    await argusApi.post(`${ARGUS_BASE}/feedback/${projectId}/mark-read`, {
+      feedback_ids: feedbackIds,
+    });
+  }
+
+  async getFeedbackActivity(
+    projectId: number | string,
+    feedbackId: string
+  ): Promise<ArgusFeedbackActivity[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/activity`);
+    return response.data?.data || response.data || [];
+  }
+
+  async addFeedbackComment(
+    projectId: number | string,
+    feedbackId: string,
+    text: string,
+    userName?: string
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/comment`, {
+      text,
+      user_name: userName,
+    });
     return response.data?.data || response.data;
   }
 
@@ -700,6 +865,14 @@ class ArgusService {
     };
   }
 
+  async getIssueVolume(
+    projectId: number | string,
+    params?: { period?: string; start?: string; end?: string; status?: string; level?: string }
+  ): Promise<{ day: string; count: number; issue_count: number }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/volume`, { params });
+    return response.data?.data || [];
+  }
+
   async getIssueDetail(
     projectId: number | string,
     issueId: number | string
@@ -774,6 +947,18 @@ class ArgusService {
     return response.data?.data || [];
   }
 
+  async getIssueStats(
+    projectId: number | string,
+    issueId: number | string,
+    period: string = '14d'
+  ): Promise<{ timestamp: string; event_count: number; user_count: number }[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/${projectId}/issues/${issueId}/stats`,
+      { params: { period } }
+    );
+    return response.data?.data || [];
+  }
+
   async listIssueEvents(
     projectId: number | string,
     issueId: number | string,
@@ -825,6 +1010,15 @@ class ArgusService {
     return response.data?.data || response.data || [];
   }
 
+  async getAlertStats(
+    projectId: string | number,
+    days: number = 7
+  ): Promise<{ rule_id: number; bucket: string; count: number }[]> {
+    const params = new URLSearchParams({ days: days.toString() });
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/alerts/stats`, { params });
+    return response.data?.data || [];
+  }
+
   // --- Structured Logs ---
 
   async getLogs(
@@ -850,20 +1044,22 @@ class ArgusService {
 
   async getLogFacets(
     projectId: number | string,
-    period?: string
+    period?: string,
+    start?: string,
+    end?: string
   ): Promise<{
     levels: { level: string; count: number }[];
     services: { service: string; count: number }[];
     environments: { environment: string; count: number }[];
     loggers: { logger_name: string; count: number }[];
   }> {
-    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/facets`, { params: { period } });
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/facets`, { params: { period, start, end } });
     return response.data?.data || { levels: [], services: [], environments: [], loggers: [] };
   }
 
   async getLogVolume(
     projectId: number | string,
-    params?: { period?: string; level?: string }
+    params?: { period?: string; level?: string; start?: string; end?: string; search?: string }
   ): Promise<{ bucket: string; level: string; count: number }[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/volume`, { params });
     return response.data?.data || [];
@@ -871,7 +1067,7 @@ class ArgusService {
 
   async getLogAggregate(
     projectId: number | string,
-    params: { period?: string; groupBy?: string; search?: string; service?: string; environment?: string }
+    params: { period?: string; start?: string; end?: string; groupBy?: string; search?: string; service?: string; environment?: string }
   ): Promise<{
     groupBy: string;
     topValues: { group_value: string; count: number }[];
@@ -951,17 +1147,27 @@ class ArgusService {
     return response.data?.data || [];
   }
 
-  async listSavedQueries(projectId: number | string): Promise<ArgusSavedQuery[]> {
-    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/discover/saved`);
+  async listSavedQueries(projectId: number | string, queryType?: SavedQueryType): Promise<ArgusSavedQuery[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/discover/saved`, {
+      params: queryType ? { query_type: queryType } : undefined,
+    });
     return response.data?.data || [];
   }
 
   async createSavedQuery(
     projectId: number | string,
-    data: { name: string; description?: string; query_config: Record<string, any>; display_type?: string; is_global?: boolean }
+    data: { name: string; description?: string; query_config: Record<string, any>; display_type?: string; is_global?: boolean; query_type?: SavedQueryType }
   ): Promise<{ id: number; name: string }> {
     const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/discover/saved`, data);
     return response.data?.data || response.data;
+  }
+
+  async updateSavedQuery(
+    projectId: number | string,
+    queryId: number,
+    data: { name?: string; description?: string; query_config?: Record<string, any>; display_type?: string; is_favorite?: boolean }
+  ): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/${projectId}/discover/saved/${queryId}`, data);
   }
 
   async deleteSavedQuery(projectId: number | string, queryId: number): Promise<void> {
@@ -1029,10 +1235,12 @@ class ArgusService {
   }
 
   async deleteIntegration(projectId: number | string, integrationId: number): Promise<void> {
-    await argusApi.delete(`${ARGUS_BASE}/${projectId}/integrations/${integrationId}`);
+    const response = await argusApi.delete(`${ARGUS_BASE}/${projectId}/integrations/${integrationId}`);
   }
 
   // === Commits ===
+
+
 
   async listCommits(projectId: number | string, release?: string): Promise<ArgusCommit[]> {
     const params: Record<string, string> = {};
@@ -1073,14 +1281,17 @@ class ArgusService {
 // --- Alert Rule Types ---
 
 export interface ArgusAlertCondition {
-  type: 'new_issue' | 'event_frequency' | 'user_count' | 'regression' | 'new_feedback';
-  value?: number;
+  type: 'new_issue' | 'event_frequency' | 'user_count' | 'regression' | 'new_feedback' | 'high_priority_issue' | 'property_match' | 'project_error_rate';
+  value?: number | string;
   interval?: number; // seconds
+  property?: string;
+  operator?: string;
 }
 
 export interface ArgusAlertAction {
-  type: 'webhook' | 'email';
+  type: 'webhook' | 'email' | 'slack' | 'jira' | 'linear' | 'pagerduty';
   target_url?: string;
+  target_email?: string;
   channel?: string;
 }
 
@@ -1088,12 +1299,15 @@ export interface ArgusAlertRule {
   id: number;
   project_id: number;
   name: string;
+  description?: string;
   conditions: ArgusAlertCondition[];
   actions: ArgusAlertAction[];
   frequency: number;
   environment?: string;
   level?: string;
   tags?: Record<string, string>;
+  dataset?: 'errors' | 'spans' | 'logs' | 'metrics';
+  query_config?: any;
   enabled: boolean;
   last_triggered_at?: string;
   created_at: string;
@@ -1108,6 +1322,8 @@ export interface ArgusAlertHistory {
   issue_id?: number;
   message: string;
   triggered_at: string;
+  status?: string;
+  response_body?: string;
 }
 
 export interface ArgusLogEntry {
