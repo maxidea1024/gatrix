@@ -200,7 +200,11 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
           <Box sx={{
             display: 'flex', alignItems: 'flex-end', gap: '1px',
             ml: 'auto',
-            height: 20,
+            height: 26,
+            p: '3px 5px',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+            borderRadius: 1.5,
+            backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
           }}>
             {timeline.map((bucket, i) => (
               <Box
