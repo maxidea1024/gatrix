@@ -196,15 +196,16 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
 
       {/* Mini timeline chart */}
       {timeline.length > 0 && (
-        <Tooltip title={t('argus.events.last24h', 'Event distribution (last 24h)')}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
+            {t('argus.events.last24h', 'Event distribution (last 24h)')}
+          </Typography>
           <Box sx={{
             display: 'flex', alignItems: 'flex-end', gap: '1px',
-            ml: 'auto',
             height: 26,
             p: '3px 5px',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
             borderRadius: 1.5,
-            backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
           }}>
             {timeline.map((bucket, i) => (
               <Box
@@ -221,7 +222,7 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
               />
             ))}
           </Box>
-        </Tooltip>
+        </Box>
       )}
     </Box>
   );
