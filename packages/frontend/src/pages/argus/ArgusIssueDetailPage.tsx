@@ -71,6 +71,7 @@ import AiRootCausePanel from '@/components/argus/AiRootCausePanel';
 import PresenceIndicator from '@/components/argus/PresenceIndicator';
 import BusinessImpactWidget from '@/components/argus/BusinessImpactWidget';
 import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
+import SuspectCommits from '@/components/argus/SuspectCommits';
 
 
 function stringToColor(str: string): string {
@@ -840,6 +841,15 @@ const ArgusIssueDetailPage: React.FC = () => {
                   </Box>
                 </Box>
               </Box>
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* Suspect Commits */}
+              {projectId && issueId && (
+                <Box sx={{ mb: 2 }}>
+                  <SuspectCommits projectId={projectId} issueId={issueId} isDark={isDark} />
+                </Box>
+              )}
 
               <Divider sx={{ mb: 2 }} />
 
