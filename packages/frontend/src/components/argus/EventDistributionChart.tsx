@@ -3,6 +3,7 @@ import { Box, Typography, Button, CircularProgress, useTheme, alpha } from '@mui
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueTagGroup } from '@/services/argusService';
 import InteractiveTimeSeriesChart from './InteractiveTimeSeriesChart';
+import SafeTooltip from '@/components/common/SafeTooltip';
 
 interface EventDistributionChartProps {
   projectId: string | number;
@@ -82,12 +83,18 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
     });
 
     let rest = null;
+    let restList: { name: string; pct: number }[] = [];
     if (browserTag.topValues.length > 2) {
-      const restCount = browserTag.topValues.slice(2).reduce((a, b) => a + (Number(b.count) || 0), 0);
+      const restItems = browserTag.topValues.slice(2);
+      const restCount = restItems.reduce((a, b) => a + (Number(b.count) || 0), 0);
       const restPct = Math.round((restCount / totalCount) * 100);
-      rest = { count: browserTag.topValues.length - 2, pct: restPct };
+      rest = { count: restItems.length, pct: restPct };
+      restList = restItems.map(item => ({
+        name: String(item.value) || 'Unknown',
+        pct: Math.round(((Number(item.count) || 0) / totalCount) * 100)
+      }));
     }
-    return { top2, rest };
+    return { top2, rest, restList };
   }, [browserTag]);
 
   if (loading && statsData.length === 0) {
@@ -209,19 +216,47 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
             </Box>
           ))}
           {browserData.rest && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', flex: 1, minWidth: 60, whiteSpace: 'nowrap' }}>
-                +{browserData.rest.count} {t('argus.issues.eventDistributionMore', 'more')}
-              </Typography>
-              <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 24, textAlign: 'right' }}>
-                {browserData.rest.pct}%
-              </Typography>
-              <Box sx={{
-                width: 40, height: 3,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                borderRadius: 1,
-              }} />
-            </Box>
+            <SafeTooltip
+              title={
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  {browserData.restList.map((item, i) => (
+                    <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                      <Typography variant="caption">{item.name}</Typography>
+                      <Typography variant="caption" sx={{ opacity: 0.7 }}>{item.pct}%</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              }
+              placement="top"
+              arrow
+            >
+              <Box 
+                onClick={() => {
+                  const el = document.getElementById('argus-tag-distribution');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }}
+                sx={{ 
+                  display: 'flex', alignItems: 'center', gap: 0.75, cursor: 'pointer',
+                  '&:hover Typography': { color: isDark ? '#bb86fc' : '#6200ea' },
+                  '&:hover .bar-bg': { backgroundColor: alpha(isDark ? '#bb86fc' : '#6200ea', 0.2) }
+                }}
+              >
+                <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', flex: 1, minWidth: 60, whiteSpace: 'nowrap', transition: 'color 0.2s' }}>
+                  +{browserData.rest.count} {t('argus.issues.eventDistributionMore', 'more')}
+                </Typography>
+                <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 24, textAlign: 'right', transition: 'color 0.2s' }}>
+                  {browserData.rest.pct}%
+                </Typography>
+                <Box 
+                  className="bar-bg"
+                  sx={{
+                    width: 40, height: 3,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                    borderRadius: 1, transition: 'background-color 0.2s'
+                  }} 
+                />
+              </Box>
+            </SafeTooltip>
           )}
         </Box>
       )}
