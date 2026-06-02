@@ -59,12 +59,16 @@ const IssueDetailActions: React.FC<IssueDetailActionsProps> = ({
 
   const handleShareUrl = () => {
     const url = `${window.location.origin}/argus/issues/${issueId}`;
-    navigator.clipboard.writeText(url);
+    import('@/utils/clipboard').then(({ copyToClipboard }) => {
+      copyToClipboard(url);
+    });
   };
 
   const handleCopyShortId = () => {
     if (shortId) {
-      navigator.clipboard.writeText(shortId);
+      import('@/utils/clipboard').then(({ copyToClipboard }) => {
+        copyToClipboard(shortId);
+      });
     }
   };
 
