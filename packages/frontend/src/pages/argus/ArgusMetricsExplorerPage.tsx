@@ -131,7 +131,7 @@ const MetricChart: React.FC<{
 
 const ArgusMetricsExplorerPage: React.FC = () => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
@@ -338,7 +338,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     
     const formattedLabels = sortedBuckets.map(b => {
       const date = new Date(b);
-      return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+      return date.toLocaleString(i18n.language || 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
     });
 
     const datasets: ChartDataset[] = [];
