@@ -59,6 +59,7 @@ import {
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { copyToClipboard } from '@/utils/clipboard';
 
 const MIN_SPLIT_WIDTH = 250;
 const MAX_SPLIT_WIDTH = 600;
@@ -129,7 +130,6 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [stacktraceMode, setStacktraceMode] = useState<'relevant' | 'full'>('relevant');
   const [stacktraceOrder, setStacktraceOrder] = useState<'recent' | 'oldest'>('recent');
   const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
-  const [copySuccess, setCopySuccess] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Splitter states
@@ -729,9 +729,14 @@ const ArgusIssueDetailPage: React.FC = () => {
                     >
                       <MenuItem onClick={() => {
                         if (latestEvent?.stacktrace_raw) {
-                          const raw = typeof latestEvent.stacktrace_raw === 'string' ? latestEvent.stacktrace_raw : JSON.stringify(latestEvent.stacktrace_raw, null, 2);
-                          navigator.clipboard.writeText(raw);
-                          setCopySuccess(true);
+                          let raw = '';
+                          try {
+                            const parsed = typeof latestEvent.stacktrace_raw === 'string' ? JSON.parse(latestEvent.stacktrace_raw) : latestEvent.stacktrace_raw;
+                            raw = JSON.stringify(parsed, null, 2);
+                          } catch (e) {
+                            raw = String(latestEvent.stacktrace_raw);
+                          }
+                          copyToClipboard(raw);
                         }
                         setMoreMenuAnchor(null);
                       }}>
@@ -1137,17 +1142,6 @@ const ArgusIssueDetailPage: React.FC = () => {
           );
         })}
       </Menu>
-
-      <Snackbar 
-        open={copySuccess} 
-        autoHideDuration={2000} 
-        onClose={() => setCopySuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" sx={{ width: '100%', borderRadius: 2 }}>
-          {t('argus.issues.copySuccess')}
-        </Alert>
-      </Snackbar>
         </Box>
       )}
     </PageContentLoader>
