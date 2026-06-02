@@ -291,12 +291,10 @@ const ArgusIssueDetailPage: React.FC = () => {
           />
 
           {/* Action Bar */}
-          <Paper
-            elevation={0}
+          <Box
             sx={{
-              p: 1.5, mb: 3, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              borderRadius: 2,
+              py: 1.5, mb: 2, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap',
+              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             }}
           >
             <Chip
@@ -464,7 +462,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </Box>
               )}
             </Box>
-          </Paper>
+          </Box>
 
           {/* Event Distribution Chart — Full Width (Sentry: Trends area) */}
           {projectId && issueId && (
@@ -480,33 +478,33 @@ const ArgusIssueDetailPage: React.FC = () => {
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'start' }}>
             {/* Left Column: Main Content */}
             <Box>
-              {/* Business Impact + AI Root Cause */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
-                {projectId && issueId && (
-                  <BusinessImpactWidget
-                    projectId={projectId}
-                    issueId={issueId}
-                    eventCount={issue.event_count || 0}
-                    userCount={issue.user_count || 0}
-                    firstSeen={issue.first_seen}
-                    lastSeen={issue.last_seen}
-                    level={issue.level || 'error'}
-                    isDark={isDark}
-                  />
-                )}
-                {projectId && issueId && (
-                  <AiRootCausePanel
-                    projectId={projectId}
-                    issueId={issueId}
-                    issueTitle={issue.title}
-                    exceptionType={latestEvent?.exception_type}
-                    exceptionValue={latestEvent?.exception_value}
-                    stacktrace={latestEvent?.stacktrace_raw}
-                    tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
-                    isDark={isDark}
-                  />
-                )}
-              </Box>
+              {/* Business Impact — flat section */}
+              {projectId && issueId && (
+                <BusinessImpactWidget
+                  projectId={projectId}
+                  issueId={issueId}
+                  eventCount={issue.event_count || 0}
+                  userCount={issue.user_count || 0}
+                  firstSeen={issue.first_seen}
+                  lastSeen={issue.last_seen}
+                  level={issue.level || 'error'}
+                  isDark={isDark}
+                />
+              )}
+
+              {/* AI Root Cause — flat section */}
+              {projectId && issueId && (
+                <AiRootCausePanel
+                  projectId={projectId}
+                  issueId={issueId}
+                  issueTitle={issue.title}
+                  exceptionType={latestEvent?.exception_type}
+                  exceptionValue={latestEvent?.exception_value}
+                  stacktrace={latestEvent?.stacktrace_raw}
+                  tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
+                  isDark={isDark}
+                />
+              )}
 
               {/* Activity Timeline — moved to sidebar in embedded mode */}
 
@@ -593,12 +591,9 @@ const ArgusIssueDetailPage: React.FC = () => {
               </Paper>
 
               {/* Context Grid */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                 {/* Environment Context */}
-                <Paper elevation={0} sx={{
-                  p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}>
+                <Box>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <DeviceIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
                     {t('argus.issues.context')}
@@ -610,13 +605,10 @@ const ArgusIssueDetailPage: React.FC = () => {
                     latestEvent.os && { label: t('argus.issues.os'), value: `${latestEvent.os} ${latestEvent.os_version || ''}` },
                     latestEvent.transaction && { label: t('argus.issues.transaction'), value: latestEvent.transaction },
                   ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
-                </Paper>
+                </Box>
 
                 {/* User + Tags */}
-                <Paper elevation={0} sx={{
-                  p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}>
+                <Box>
                   {(latestEvent.user_email || latestEvent.user_ip) && (
                     <>
                       <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -653,15 +645,12 @@ const ArgusIssueDetailPage: React.FC = () => {
                       </Box>
                     </>
                   )}
-                </Paper>
+                </Box>
               </Box>
 
               {/* Trace Waterfall */}
               {traceId && (
-                <Paper elevation={0} sx={{
-                  p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}>
+                <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTrace ? 2 : 0 }}>
                     <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <ScheduleIcon fontSize="small" sx={{ color: theme.palette.success.main }} />
@@ -688,22 +677,19 @@ const ArgusIssueDetailPage: React.FC = () => {
                       )}
                     </Box>
                   )}
-                </Paper>
+                </Box>
               )}
 
               {/* Breadcrumbs */}
               {latestEvent.breadcrumbs && Array.isArray(latestEvent.breadcrumbs) && latestEvent.breadcrumbs.length > 0 && (
-                <Paper elevation={0} sx={{
-                  p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}>
+                <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <FolderIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
                     {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
                     <Chip label={latestEvent.breadcrumbs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
                   </Typography>
                   <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} />
-                </Paper>
+                </Box>
               )}
 
               {/* Extra Data */}
@@ -713,10 +699,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                 const jsonString = JSON.stringify(extraData, null, 2);
                 
                 return (
-                  <Paper elevation={0} sx={{
-                    p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                    borderRadius: 2,
-                  }}>
+                  <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                     <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <InfoIcon fontSize="small" sx={{ color: theme.palette.secondary.main }} />
@@ -756,7 +739,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                         return <code dangerouslySetInnerHTML={{ __html: html }} />;
                       })()}
                     </Box>
-                  </Paper>
+                  </Box>
                 );
               })()}
 
@@ -764,10 +747,7 @@ const ArgusIssueDetailPage: React.FC = () => {
               {latestEvent.contexts && (() => {
                 const ctxData = typeof latestEvent.contexts === 'string' ? (() => { try { return JSON.parse(latestEvent.contexts); } catch { return null; } })() : latestEvent.contexts;
                 return ctxData && Object.keys(ctxData).length > 0 ? (
-                  <Paper elevation={0} sx={{
-                    p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                    borderRadius: 2,
-                  }}>
+                  <Box sx={{ py: 2 }}>
                     <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <DeviceIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
                       {t('argus.issues.contexts', 'Contexts')}
@@ -787,7 +767,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                         )}
                       </Box>
                     ))}
-                  </Paper>
+                  </Box>
                 ) : null;
               })()}
             </Box>

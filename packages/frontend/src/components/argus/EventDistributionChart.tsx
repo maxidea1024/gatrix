@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
-  Paper,
+  Divider,
   ToggleButton,
   ToggleButtonGroup,
   CircularProgress,
@@ -19,6 +19,7 @@ interface EventDistributionChartProps {
   projectId: string | number;
   issueId: string | number;
   isDark: boolean;
+  compact?: boolean;
 }
 
 const PERIODS = [
@@ -28,7 +29,7 @@ const PERIODS = [
   { value: '30d', label: '30d' },
 ];
 
-const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ projectId, issueId, isDark }) => {
+const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ projectId, issueId, isDark, compact = false }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   
@@ -82,39 +83,35 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
   });
 
   return (
-    <Paper
-      elevation={0}
+    <Box
       sx={{
-        p: 2,
-        mb: 3,
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2,
-        overflow: 'hidden',
+        pb: compact ? 1.5 : 2,
+        mb: 2,
       }}
     >
       {/* Header and Controls */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: compact ? 1 : 2, flexWrap: 'wrap', gap: compact ? 1 : 2 }}>
         <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <BarChartIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
+          <BarChartIcon fontSize={compact ? "inherit" : "small"} sx={{ color: theme.palette.primary.main }} />
           {t('argus.issues.eventDistribution')}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: compact ? 1 : 2 }}>
           {/* Metric Toggle */}
           <ToggleButtonGroup
             value={metric}
             exclusive
             onChange={handleMetricChange}
             size="small"
-            sx={{ height: 28 }}
+            sx={{ height: compact ? 24 : 28 }}
           >
-            <ToggleButton value="events" sx={{ px: 1.5, py: 0, textTransform: 'none', fontSize: '0.75rem', gap: 0.5 }}>
+            <ToggleButton value="events" sx={{ px: compact ? 1 : 1.5, py: 0, textTransform: 'none', fontSize: '0.75rem', gap: 0.5 }}>
               <BarChartIcon sx={{ fontSize: 14 }} />
-              {t('argus.common.events', 'Events')}
+              {!compact && t('argus.common.events', 'Events')}
             </ToggleButton>
-            <ToggleButton value="users" sx={{ px: 1.5, py: 0, textTransform: 'none', fontSize: '0.75rem', gap: 0.5 }}>
+            <ToggleButton value="users" sx={{ px: compact ? 1 : 1.5, py: 0, textTransform: 'none', fontSize: '0.75rem', gap: 0.5 }}>
               <PeopleIcon sx={{ fontSize: 14 }} />
-              {t('argus.common.users', 'Users')}
+              {!compact && t('argus.common.users', 'Users')}
             </ToggleButton>
           </ToggleButtonGroup>
 
@@ -124,10 +121,10 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
             exclusive
             onChange={handlePeriodChange}
             size="small"
-            sx={{ height: 28 }}
+            sx={{ height: compact ? 24 : 28 }}
           >
             {PERIODS.map(p => (
-              <ToggleButton key={p.value} value={p.value} sx={{ px: 1.5, py: 0, fontSize: '0.75rem', textTransform: 'none' }}>
+              <ToggleButton key={p.value} value={p.value} sx={{ px: compact ? 0.8 : 1.5, py: 0, fontSize: compact ? '0.65rem' : '0.75rem', textTransform: 'none' }}>
                 {p.label}
               </ToggleButton>
             ))}
@@ -136,7 +133,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
       </Box>
 
       {/* Chart */}
-      <Box sx={{ position: 'relative', height: 160 }}>
+      <Box sx={{ position: 'relative', height: compact ? 100 : 160 }}>
         {loading ? (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             <CircularProgress size={24} />
@@ -151,11 +148,12 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
           <InteractiveTimeSeriesChart
             data={chartData}
             type="bar"
-            height={160}
+            height={compact ? 100 : 160}
           />
         )}
       </Box>
-    </Paper>
+      <Divider />
+    </Box>
   );
 };
 

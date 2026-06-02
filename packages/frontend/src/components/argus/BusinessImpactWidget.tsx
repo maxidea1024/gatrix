@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, Paper, Chip, useTheme, alpha, Tooltip, LinearProgress,
+  Box, Typography, Chip, useTheme, alpha, Tooltip, LinearProgress, Divider,
 } from '@mui/material';
 import {
   TrendingDown as ImpactIcon, People as UsersIcon,
@@ -96,8 +96,6 @@ const MetricCard: React.FC<{
 }> = ({ icon, label, value, color, subtitle, isDark }) => (
   <Box sx={{
     p: 1.5, borderRadius: 1.5, flex: 1, minWidth: 100,
-    backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
-    border: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
   }}>
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
       <Box sx={{ color, display: 'flex' }}>{icon}</Box>
@@ -127,17 +125,13 @@ const BusinessImpactWidget: React.FC<BusinessImpactWidgetProps> = ({
   const trendConfig = getTrendConfig(t)[metrics.trend];
 
   return (
-    <Paper elevation={0} sx={{
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      borderRadius: 2, overflow: 'hidden',
-    }}>
+    <Box sx={{ mb: 2 }}>
       {/* Header */}
       <Box sx={{
-        p: 1.5, display: 'flex', alignItems: 'center', gap: 1,
-        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+        display: 'flex', alignItems: 'center', gap: 1, mb: 1.5,
       }}>
-        <ImpactIcon sx={{ fontSize: 20, color: riskColor }} />
-        <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.85rem' }}>
+        <ImpactIcon sx={{ fontSize: 18, color: riskColor }} />
+        <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.82rem' }}>
           {t('argus.impact.title', 'Business Impact')}
         </Typography>
         <Chip label={metrics.riskLevel.toUpperCase()} size="small" sx={{
@@ -150,58 +144,58 @@ const BusinessImpactWidget: React.FC<BusinessImpactWidgetProps> = ({
         }} />
       </Box>
 
-      <Box sx={{ p: 2 }}>
-        {/* Impact Score Bar */}
-        <Box sx={{ mb: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'text.secondary' }}>
-              {t('argus.impact.score', 'Impact Score')}
-            </Typography>
-            <Typography sx={{ fontSize: '0.85rem', fontWeight: 800, color: riskColor }}>
-              {metrics.impactScore}/100
-            </Typography>
-          </Box>
-          <LinearProgress variant="determinate" value={metrics.impactScore}
-            sx={{
-              height: 6, borderRadius: 3,
-              backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-              '& .MuiLinearProgress-bar': {
-                borderRadius: 3,
-                background: metrics.impactScore >= 80
-                  ? 'linear-gradient(90deg, #ff9800, #f44336)'
-                  : metrics.impactScore >= 50
-                    ? 'linear-gradient(90deg, #2196f3, #ff9800)'
-                    : 'linear-gradient(90deg, #4caf50, #2196f3)',
-              },
-            }}
-          />
+      {/* Impact Score Bar */}
+      <Box sx={{ mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'text.secondary' }}>
+            {t('argus.impact.score', 'Impact Score')}
+          </Typography>
+          <Typography sx={{ fontSize: '0.85rem', fontWeight: 800, color: riskColor }}>
+            {metrics.impactScore}/100
+          </Typography>
         </Box>
-
-        {/* Metric Grid */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <MetricCard isDark={isDark}
-            icon={<UsersIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.users', 'Users')}
-            value={userCount.toLocaleString()} color="#2196f3"
-            subtitle={`${metrics.affectedSessions.toLocaleString()} ${t('argus.impact.sessions', 'sessions')}`}
-          />
-          <MetricCard isDark={isDark}
-            icon={<RevenueIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.estLoss', 'Est. Loss')}
-            value={metrics.estimatedRevenueLoss} color="#f44336"
-            subtitle={t('argus.impact.basedOnUserImpact', 'based on user impact')}
-          />
-          <MetricCard isDark={isDark}
-            icon={<TransactionIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.errorBudget', 'Error Budget')}
-            value={`${metrics.errorBudgetUsed}%`} color={metrics.errorBudgetUsed > 80 ? '#f44336' : '#ff9800'}
-            subtitle={t('argus.impact.ofSla', 'of 99.9% SLA')}
-          />
-          <MetricCard isDark={isDark}
-            icon={<LatencyIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.mttr', 'Duration')}
-            value={metrics.mttr} color="#7c4dff"
-            subtitle={t('argus.impact.sinceFirstSeen', 'since first seen')}
-          />
-        </Box>
+        <LinearProgress variant="determinate" value={metrics.impactScore}
+          sx={{
+            height: 6, borderRadius: 3,
+            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            '& .MuiLinearProgress-bar': {
+              borderRadius: 3,
+              background: metrics.impactScore >= 80
+                ? 'linear-gradient(90deg, #ff9800, #f44336)'
+                : metrics.impactScore >= 50
+                  ? 'linear-gradient(90deg, #2196f3, #ff9800)'
+                  : 'linear-gradient(90deg, #4caf50, #2196f3)',
+            },
+          }}
+        />
       </Box>
-    </Paper>
+
+      {/* Metric Grid */}
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+        <MetricCard isDark={isDark}
+          icon={<UsersIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.users', 'Users')}
+          value={userCount.toLocaleString()} color="#2196f3"
+          subtitle={`${metrics.affectedSessions.toLocaleString()} ${t('argus.impact.sessions', 'sessions')}`}
+        />
+        <MetricCard isDark={isDark}
+          icon={<RevenueIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.estLoss', 'Est. Loss')}
+          value={metrics.estimatedRevenueLoss} color="#f44336"
+          subtitle={t('argus.impact.basedOnUserImpact', 'based on user impact')}
+        />
+        <MetricCard isDark={isDark}
+          icon={<TransactionIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.errorBudget', 'Error Budget')}
+          value={`${metrics.errorBudgetUsed}%`} color={metrics.errorBudgetUsed > 80 ? '#f44336' : '#ff9800'}
+          subtitle={t('argus.impact.ofSla', 'of 99.9% SLA')}
+        />
+        <MetricCard isDark={isDark}
+          icon={<LatencyIcon sx={{ fontSize: 14 }} />} label={t('argus.impact.mttr', 'Duration')}
+          value={metrics.mttr} color="#7c4dff"
+          subtitle={t('argus.impact.sinceFirstSeen', 'since first seen')}
+        />
+      </Box>
+
+      <Divider sx={{ mt: 2 }} />
+    </Box>
   );
 };
 

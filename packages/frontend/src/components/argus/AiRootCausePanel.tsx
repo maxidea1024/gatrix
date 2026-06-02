@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import {
-  Box, Typography, Paper, Button, Chip, CircularProgress,
-  useTheme, alpha, LinearProgress, Tooltip, IconButton,
+  Box, Typography, Button, Chip, CircularProgress,
+  useTheme, alpha, LinearProgress, Tooltip, IconButton, Divider,
 } from '@mui/material';
 import {
   AutoAwesome as AiIcon, Psychology as ThinkIcon,
@@ -156,16 +156,13 @@ const AiRootCausePanel: React.FC<AiRootCausePanelProps> = ({
   const severityCfg = analysis ? SEVERITY_CONFIG[analysis.severity] : null;
 
   return (
-    <Paper elevation={0} sx={{
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      borderRadius: 2, overflow: 'hidden',
+    <Box sx={{
       borderLeft: `3px solid ${analysis ? (severityCfg?.color || '#7c4dff') : '#7c4dff'}`,
+      pl: 2, mb: 2,
     }}>
       {/* Header */}
       <Box sx={{
-        p: 1.5, display: 'flex', alignItems: 'center', gap: 1,
-        backgroundColor: isDark ? 'rgba(124,77,255,0.04)' : 'rgba(124,77,255,0.02)',
-        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+        display: 'flex', alignItems: 'center', gap: 1, mb: 1.5,
       }}>
         <AiIcon sx={{ fontSize: 20, color: '#7c4dff' }} />
         <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.85rem' }}>
@@ -306,7 +303,8 @@ const AiRootCausePanel: React.FC<AiRootCausePanelProps> = ({
             )}
           </Box>
       )}
-    </Paper>
+      <Divider sx={{ mt: 2 }} />
+    </Box>
   );
 };
 

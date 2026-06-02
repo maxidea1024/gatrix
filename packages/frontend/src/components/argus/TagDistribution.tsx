@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   useTheme,
   alpha,
   Collapse,
   CircularProgress,
   LinearProgress,
+  Divider,
 } from '@mui/material';
 import {
   LocalOffer as TagIcon,
@@ -68,35 +68,30 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
   if (!loading && tags.length === 0) return null;
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2,
-        overflow: 'hidden',
-        mb: 2,
-      }}
-    >
+    <Box sx={{ mb: 2 }}>
       {/* Header */}
       <Box
         onClick={() => setExpanded(!expanded)}
         sx={{
           display: 'flex', alignItems: 'center', gap: 1,
-          px: 2, py: 1.5, cursor: 'pointer',
-          backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+          py: 0.5, cursor: 'pointer',
           borderBottom: expanded ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` : 'none',
         }}
       >
-        <TagIcon sx={{ fontSize: 18, color: '#2196f3' }} />
-        <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.82rem' }}>
+        <TagIcon sx={{ fontSize: 16, color: '#2196f3' }} />
+        <Typography variant="caption" fontWeight={700} sx={{
+          flex: 1, fontSize: '0.7rem',
+          textTransform: 'uppercase', letterSpacing: '0.05em',
+          color: 'text.secondary',
+        }}>
           {t('argus.tags.title', 'Tags')}
           {tags.length > 0 && (
-            <Typography component="span" sx={{ ml: 0.5, color: 'text.disabled', fontSize: '0.72rem', fontWeight: 500 }}>
+            <Typography component="span" sx={{ ml: 0.5, color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}>
               ({tags.length})
             </Typography>
           )}
         </Typography>
-        {expanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+        {expanded ? <ExpandLessIcon sx={{ fontSize: 16, color: 'text.disabled' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.disabled' }} />}
       </Box>
 
       <Collapse in={expanded}>
@@ -164,7 +159,8 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
           </Box>
         )}
       </Collapse>
-    </Paper>
+      <Divider sx={{ mt: 1 }} />
+    </Box>
   );
 };
 
