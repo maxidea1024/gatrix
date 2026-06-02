@@ -73,6 +73,7 @@ import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
 import SavedSearchesSidebar, { SavedSearch } from '@/components/argus/SavedSearchesSidebar';
+import { useArgusRealtime } from '@/hooks/useArgusRealtime';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTitle, ChartTooltip, ChartLegend);
 
@@ -236,6 +237,19 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [queryBuilderAnchor, setQueryBuilderAnchor] = useState<HTMLElement | null>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [assigneeAnchor, setAssigneeAnchor] = useState<{ el: HTMLElement; issue: ArgusIssue } | null>(null);
+
+  // Real-time SSE connection
+  const { isConnected, newIssueCount, resetNewIssueCount } = useArgusRealtime(
+    String(projectId),
+    {
+      onIssueCreated: () => {
+        // New issue banner will appear via newIssueCount
+      },
+      onIssueUpdated: () => {
+        // Could auto-refresh, but for now just show the banner
+      },
+    }
+  );
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -866,6 +880,43 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             {t('common.cancel')}
           </Button>
         </Paper>
+      )}
+
+      {/* Real-time new issues banner */}
+      {newIssueCount > 0 && (
+        <Box
+          onClick={() => {
+            resetNewIssueCount();
+            fetchIssues();
+          }}
+          sx={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
+            py: 1, px: 2, mb: 1,
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.primary.main, 0.12),
+              borderColor: theme.palette.primary.main,
+            },
+          }}
+        >
+          <Box sx={{
+            width: 8, height: 8, borderRadius: '50%',
+            backgroundColor: theme.palette.primary.main,
+            animation: 'pulse 1.5s infinite',
+            '@keyframes pulse': {
+              '0%': { opacity: 1 },
+              '50%': { opacity: 0.4 },
+              '100%': { opacity: 1 },
+            },
+          }} />
+          <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'primary.main' }}>
+            {t('argus.realtime.newIssues', { count: newIssueCount, defaultValue: '{{count}} new issues — click to refresh' })}
+          </Typography>
+        </Box>
       )}
 
       <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />}>

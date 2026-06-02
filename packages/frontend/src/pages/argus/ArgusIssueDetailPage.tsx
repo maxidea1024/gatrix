@@ -92,6 +92,7 @@ import SuspectCommits from '@/components/argus/SuspectCommits';
 import IssueDetailActions from '@/components/argus/IssueDetailActions';
 import EventHighlights from '@/components/argus/EventHighlights';
 import ExceptionChaining from '@/components/argus/ExceptionChaining';
+import SimilarMergedIssues from '@/components/argus/SimilarMergedIssues';
 
 
 function stringToColor(str: string): string {
@@ -1065,6 +1066,16 @@ const ArgusIssueDetailPage: React.FC = () => {
               )}
 
               <Divider sx={{ mb: 2 }} />
+
+              {/* Similar / Merged Issues */}
+              {projectId && issueId && issue.fingerprint && (
+                <SimilarMergedIssues
+                  projectId={projectId}
+                  issueId={issueId}
+                  fingerprint={issue.fingerprint}
+                  isDark={isDark}
+                />
+              )}
 
               {/* Activity — embedded mode */}
               {projectId && issueId && (
