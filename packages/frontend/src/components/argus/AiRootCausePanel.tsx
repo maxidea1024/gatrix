@@ -156,10 +156,7 @@ const AiRootCausePanel: React.FC<AiRootCausePanelProps> = ({
   const severityCfg = analysis ? SEVERITY_CONFIG[analysis.severity] : null;
 
   return (
-    <Box sx={{
-      borderLeft: `3px solid ${analysis ? (severityCfg?.color || '#7c4dff') : '#7c4dff'}`,
-      pl: 2, mb: 2,
-    }}>
+    <Box sx={{ mb: 2 }}>
       {/* Header */}
       <Box sx={{
         display: 'flex', alignItems: 'center', gap: 1, mb: 1.5,
@@ -222,14 +219,11 @@ const AiRootCausePanel: React.FC<AiRootCausePanelProps> = ({
       {/* Empty state — no analysis yet */}
       {!analysis && !loading && (
         <Box sx={{
-          py: 4, px: 3, textAlign: 'center',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+          py: 1.5, textAlign: 'center',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5,
         }}>
-          <AiIcon sx={{ fontSize: 36, color: alpha('#7c4dff', 0.25), mb: 0.5 }} />
-          <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: 'text.secondary' }}>
-            {t('argus.ai.emptyTitle', 'No analysis yet')}
-          </Typography>
-          <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled', maxWidth: 280, lineHeight: 1.5 }}>
+          <AiIcon sx={{ fontSize: 24, color: alpha('#7c4dff', 0.25) }} />
+          <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled', lineHeight: 1.5 }}>
             {t('argus.ai.emptyHint', 'Click the Analyze button above to get AI-powered root cause analysis, suggestions, and code references for this issue.')}
           </Typography>
         </Box>

@@ -861,9 +861,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                 />
               )}
             </Box>
-          </Box>
-        </Box>
-      )}
 
       {/* Structured Logs Section */}
       {issue && (
@@ -1299,6 +1296,9 @@ const ArgusIssueDetailPage: React.FC = () => {
           </>
         )}
         </Paper>
+      )}
+          </Box>
+        </Box>
       )}
 
 
