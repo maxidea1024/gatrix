@@ -162,23 +162,7 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
   // Is current event the "recommended" one (latest = index 0)?
   const isRecommended = currentIndex === 0;
 
-  // Build mini timeline: bucket events by hour for last 24h
-  const buildTimeline = () => {
-    if (events.length === 0) return [];
-    const now = Date.now();
-    const buckets = new Array(24).fill(0);
-    for (const evt of events) {
-      const evtTime = new Date(evt.timestamp).getTime();
-      const hoursAgo = Math.floor((now - evtTime) / (1000 * 60 * 60));
-      if (hoursAgo >= 0 && hoursAgo < 24) {
-        buckets[23 - hoursAgo]++;
-      }
-    }
-    const max = Math.max(...buckets, 1);
-    return buckets.map(count => ({ count, pct: (count / max) * 100 }));
-  };
 
-  const timeline = buildTimeline();
 
   if (loading) {
     return (
@@ -202,7 +186,7 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
         display: 'flex', alignItems: 'center', gap: 1,
         px: 2, py: 0.8,
         border: `1px solid ${theme.palette.divider}`,
-        borderRadius: showSearch ? '12px 12px 0 0' : 1.5,
+        borderRadius: 1.5,
         backgroundColor: theme.palette.background.paper,
         flexWrap: 'wrap',
       }}>
@@ -275,104 +259,40 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
           />
         )}
 
-        {/* Search toggle + keyboard hint */}
-        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Tooltip title={t('argus.events.searchEvents', 'Search events')}>
-            <IconButton
-              size="small"
-              onClick={() => setShowSearch(!showSearch)}
-              sx={{
-                width: 26, height: 26,
-                color: showSearch ? 'primary.main' : 'text.disabled',
-                backgroundColor: showSearch ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={`${t('argus.events.keyboardShortcuts', 'Keyboard shortcuts')}: J/K ${t('argus.events.navigateEvents', 'navigate')}, [ / ] ${t('argus.events.jumpToEdge', 'jump')}`}>
-            <KeyboardIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
-          </Tooltip>
-        </Box>
-
-        {/* Mini timeline chart */}
-        {timeline.length > 0 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
-              {t('argus.events.last24h', 'Event distribution (last 24h)')}
-            </Typography>
-            <Box sx={{
-              display: 'flex', alignItems: 'flex-end', gap: '1px',
-              height: 26,
-              p: '3px 5px',
-              borderRadius: 1.5,
-              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-            }}>
-              {timeline.map((bucket, i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    width: 4, borderRadius: '1px 1px 0 0',
-                    height: `${Math.max(bucket.pct, bucket.count > 0 ? 15 : 0)}%`,
-                    minHeight: bucket.count > 0 ? 2 : 0,
-                    backgroundColor: bucket.count > 0
-                      ? alpha(theme.palette.primary.main, 0.5 + bucket.pct / 200)
-                      : alpha(theme.palette.text.disabled, 0.15),
-                    transition: 'height 0.2s',
-                  }}
-                />
-              ))}
-            </Box>
-          </Box>
-        )}
-      </Box>
-
-      {/* Event Search Bar (collapsible) */}
-      <Collapse in={showSearch}>
-        <Box sx={{
-          display: 'flex', alignItems: 'center', gap: 1,
-          px: 2, py: 0.5,
-          borderLeft: `1px solid ${theme.palette.divider}`,
-          borderRight: `1px solid ${theme.palette.divider}`,
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          borderRadius: '0 0 12px 12px',
-          backgroundColor: theme.palette.background.paper,
-        }}>
+        {/* Event Search Bar (Inline) + keyboard hint */}
+        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
           <TextField
             size="small"
-            variant="standard"
-            placeholder={t('argus.events.searchPlaceholder', 'Search by exception, user, transaction...')}
+            placeholder={t('argus.events.searchPlaceholder', 'Search events...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSearch();
-              if (e.key === 'Escape') setShowSearch(false);
             }}
             slotProps={{
               input: {
-                disableUnderline: true,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                  </InputAdornment>
-                ),
+                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
                 endAdornment: searchQuery && (
                   <InputAdornment position="end">
-                    <IconButton size="small" onClick={() => setSearchQuery('')}>
+                    <IconButton size="small" onClick={() => setSearchQuery('')} sx={{ p: 0.2 }}>
                       <CloseIcon sx={{ fontSize: 14 }} />
                     </IconButton>
                   </InputAdornment>
                 ),
-                sx: { fontSize: '0.78rem' },
-              },
+              }
             }}
-            sx={{ flex: 1 }}
+            sx={{
+              width: 220,
+              '& .MuiOutlinedInput-root': {
+                height: 26, fontSize: '0.72rem', borderRadius: 1.5,
+              }
+            }}
           />
-          <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', whiteSpace: 'nowrap' }}>
-            Enter ↵
-          </Typography>
+          <Tooltip title={`${t('argus.events.keyboardShortcuts', 'Keyboard shortcuts')}: J/K ${t('argus.events.navigateEvents', 'navigate')}, [ / ] ${t('argus.events.jumpToEdge', 'jump')}`}>
+            <KeyboardIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+          </Tooltip>
         </Box>
-      </Collapse>
+      </Box>
     </Box>
   );
 };
