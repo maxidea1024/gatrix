@@ -52,7 +52,11 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
       } : {}),
     }}>
       {!showLogs ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 5 }}>
+        <EmptyPlaceholder
+          message=""
+          minHeight={250}
+          sx={{ border: 'none' }}
+        >
           <Button
             variant="outlined"
             startIcon={<LogIcon />}
@@ -64,6 +68,7 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
               borderRadius: '8px',
               px: 3.5,
               py: 1.2,
+              mt: 1,
               borderColor: theme.palette.info.main,
               color: theme.palette.info.main,
               '&:hover': {
@@ -74,7 +79,7 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
           >
             {t('argus.issues.loadLogs', 'Load Logs')}
           </Button>
-        </Box>
+        </EmptyPlaceholder>
       ) : (
         <>
           {/* Toolbar */}
@@ -434,13 +439,17 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
               <Button
                 variant="outlined" size="small"
                 disabled={logsLoading || isFetchingMore}
-                startIcon={(logsLoading || isFetchingMore) ? <CircularProgress size={14} color="inherit" /> : undefined}
                 onClick={loadMoreLogs}
                 sx={{
                   textTransform: 'none', fontSize: '0.78rem', fontWeight: 600, minWidth: 160,
+                  height: 32,
                   borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+                  position: 'relative',
                 }}
               >
+                {(logsLoading || isFetchingMore) && (
+                  <CircularProgress size={14} color="inherit" sx={{ position: 'absolute', left: 16 }} />
+                )}
                 {t('argus.logs.loadMore', 'Load More Logs')}
               </Button>
             </Box>
