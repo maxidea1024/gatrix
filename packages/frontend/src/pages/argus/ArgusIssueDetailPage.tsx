@@ -477,19 +477,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   />
                 </Box>
               )}
-              {/* Business Impact — flat section */}
-              {projectId && issueId && (
-                <BusinessImpactWidget
-                  projectId={projectId}
-                  issueId={issueId}
-                  eventCount={issue.event_count || 0}
-                  userCount={issue.user_count || 0}
-                  firstSeen={issue.first_seen}
-                  lastSeen={issue.last_seen}
-                  level={issue.level || 'error'}
-                  isDark={isDark}
-                />
-              )}
+
 
               {/* AI Root Cause — flat section */}
               {projectId && issueId && (
@@ -507,14 +495,7 @@ const ArgusIssueDetailPage: React.FC = () => {
 
               {/* Activity Timeline — moved to sidebar in embedded mode */}
 
-              {/* Tag Distribution */}
-              {projectId && issueId && (
-                <TagDistribution
-                  projectId={projectId}
-                  issueId={issueId}
-                  isDark={isDark}
-                />
-              )}
+
 
               {/* Event Navigator */}
               {projectId && issueId && (
@@ -867,6 +848,17 @@ const ArgusIssueDetailPage: React.FC = () => {
                   </Typography>
                   <PresenceIndicator projectId={projectId} resourceId={issueId} resourceType="issue" currentUser={{ id: 'current-user', name: 'You' }} isDark={isDark} />
                 </Box>
+              )}
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Tag Distribution — sidebar */}
+              {projectId && issueId && (
+                <TagDistribution
+                  projectId={projectId}
+                  issueId={issueId}
+                  isDark={isDark}
+                />
               )}
             </Box>
           </Box>

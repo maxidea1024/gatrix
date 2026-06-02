@@ -100,7 +100,7 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
             <CircularProgress size={20} />
           </Box>
         ) : (
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 0 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             {tags.map((tagGroup) => {
               const color = TAG_COLORS[tagGroup.key] || '#9e9e9e';
               const total = tagGroup.topValues.reduce((sum, v) => sum + v.count, 0);
@@ -108,11 +108,6 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
               return (
                 <Box
                   key={tagGroup.key}
-                  sx={{
-                    p: 1.5,
-                    borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                  }}
                 >
                   <Typography variant="caption" fontWeight={700} sx={{
                     display: 'block', mb: 1, fontSize: '0.68rem',
