@@ -755,62 +755,76 @@ const ArgusIssueDetailPage: React.FC = () => {
                 <StacktraceView stacktrace={latestEvent.stacktrace_raw} mode={stacktraceMode} order={stacktraceOrder} isDark={isDark} />
               </Paper>
 
-              {/* Context Grid */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
-                {/* Environment Context */}
-                <Box>
-                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <DeviceIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
-                    {t('argus.issues.context')}
-                  </Typography>
-                  <ContextGrid items={[
-                    latestEvent.environment && { label: t('argus.issues.environment'), value: latestEvent.environment },
-                    latestEvent.release && { label: t('argus.issues.release'), value: latestEvent.release },
-                    latestEvent.browser && { label: t('argus.issues.browser'), value: `${latestEvent.browser} ${latestEvent.browser_version || ''}` },
-                    latestEvent.os && { label: t('argus.issues.os'), value: `${latestEvent.os} ${latestEvent.os_version || ''}` },
-                    latestEvent.transaction && { label: t('argus.issues.transaction'), value: latestEvent.transaction },
-                  ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
+              {/* Context & Tags Section */}
+              <Box sx={{ py: 3, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                {/* Environment and User Context Row */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+                  {/* Environment Context */}
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <DeviceIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
+                      {t('argus.issues.context')}
+                    </Typography>
+                    <ContextGrid items={[
+                      latestEvent.environment && { label: t('argus.issues.environment'), value: latestEvent.environment },
+                      latestEvent.release && { label: t('argus.issues.release'), value: latestEvent.release },
+                      latestEvent.browser && { label: t('argus.issues.browser'), value: `${latestEvent.browser} ${latestEvent.browser_version || ''}` },
+                      latestEvent.os && { label: t('argus.issues.os'), value: `${latestEvent.os} ${latestEvent.os_version || ''}` },
+                      latestEvent.transaction && { label: t('argus.issues.transaction'), value: latestEvent.transaction },
+                    ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
+                  </Box>
+
+                  {/* User Context */}
+                  <Box>
+                    {(latestEvent.user_email || latestEvent.user_ip) && (
+                      <>
+                        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <PersonIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
+                          {t('argus.issues.user')}
+                        </Typography>
+                        <ContextGrid items={[
+                          latestEvent.user_email && { label: t('argus.issues.email'), value: latestEvent.user_email },
+                          latestEvent.user_ip && { label: t('argus.issues.ip'), value: latestEvent.user_ip },
+                        ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
+                      </>
+                    )}
+                  </Box>
                 </Box>
 
-                {/* User + Tags */}
-                <Box>
-                  {(latestEvent.user_email || latestEvent.user_ip) && (
-                    <>
-                      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <PersonIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
-                        {t('argus.issues.user')}
-                      </Typography>
-                      <ContextGrid items={[
-                        latestEvent.user_email && { label: t('argus.issues.email'), value: latestEvent.user_email },
-                        latestEvent.user_ip && { label: t('argus.issues.ip'), value: latestEvent.user_ip },
-                      ].filter(Boolean) as { label: string; value: string }[]} isDark={isDark} />
-                      <Divider sx={{ my: 1.5 }} />
-                    </>
-                  )}
-                  {latestEvent.tags && Object.keys(typeof latestEvent.tags === 'string' ? JSON.parse(latestEvent.tags) : latestEvent.tags).length > 0 && (
-                    <>
-                      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <TagIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
-                        {t('argus.issues.tags', 'Tags')}
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {Object.entries(typeof latestEvent.tags === 'string' ? JSON.parse(latestEvent.tags) : latestEvent.tags)
-                          .map(([key, val]) => (
-                            <Chip
-                              key={key}
-                              label={`${key}: ${String(val)}`}
-                              size="small"
-                              variant="outlined"
-                              sx={{
-                                borderRadius: 1, fontSize: '0.72rem', height: 24,
-                                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                              }}
-                            />
-                          ))}
-                      </Box>
-                    </>
-                  )}
-                </Box>
+                {/* Tags (Full width) */}
+                {latestEvent.tags && Object.keys(typeof latestEvent.tags === 'string' ? JSON.parse(latestEvent.tags) : latestEvent.tags).length > 0 && (
+                  <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <TagIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
+                      {t('argus.issues.tags', 'Tags')}
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {Object.entries(typeof latestEvent.tags === 'string' ? JSON.parse(latestEvent.tags) : latestEvent.tags)
+                        .map(([key, val]) => (
+                          <Chip
+                            key={key}
+                            label={
+                              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                <Typography component="span" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                                  {key}
+                                </Typography>
+                                <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
+                                  {String(val)}
+                                </Typography>
+                              </Box>
+                            }
+                            size="small"
+                            sx={{
+                              height: 26,
+                              backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                              borderRadius: '6px',
+                            }}
+                          />
+                        ))}
+                    </Box>
+                  </Box>
+                )}
               </Box>
 
               {/* Trace Waterfall */}
