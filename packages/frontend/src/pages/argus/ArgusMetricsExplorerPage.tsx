@@ -52,12 +52,12 @@ export type ChartConfig = {
   showLegend: boolean;
 };
 
-const AGG_OPTIONS = [
-  { value: 'avg', label: 'Average' },
-  { value: 'sum', label: 'Sum' },
-  { value: 'min', label: 'Min' },
-  { value: 'max', label: 'Max' },
-  { value: 'count', label: 'Count' },
+const getAggOptions = (t: any) => [
+  { value: 'avg', label: t('argus.metrics.agg.avg', 'Average') },
+  { value: 'sum', label: t('argus.metrics.agg.sum', 'Sum') },
+  { value: 'min', label: t('argus.metrics.agg.min', 'Min') },
+  { value: 'max', label: t('argus.metrics.agg.max', 'Max') },
+  { value: 'count', label: t('argus.metrics.agg.count', 'Count') },
 ];
 
 const QUERY_COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#14b8a6'];
@@ -136,6 +136,8 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
+
+  const aggOptions = useMemo(() => getAggOptions(t), [t]);
 
   // ─── URL-driven state ───
   const URL_PARAMS = useMemo(() => ({
@@ -452,7 +454,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         backgroundColor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
       }}>
         <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SettingsIcon sx={{ fontSize: 16 }} /> Query Builder
+          <SettingsIcon sx={{ fontSize: 16 }} /> {t('argus.metrics.queryBuilder', 'Query Builder')}
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -471,33 +473,33 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                 onInputChange={(_, newVal) => updateQuery(q.id, { metric: newVal })}
                 onChange={(_, newVal) => { if (newVal) updateQuery(q.id, { metric: newVal }); }}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder="Select metric..." sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }} />
+                  <TextField {...params} placeholder={t('argus.metrics.selectMetric', 'Select metric...')} sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }} />
                 )}
               />
 
               <FormControl size="small">
                 <Select value={q.agg} onChange={(e) => updateQuery(q.id, { agg: e.target.value as string })} sx={{ height: 36, fontSize: '0.75rem', fontWeight: 600, minWidth: 90, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' }}>
-                  {AGG_OPTIONS.map(o => <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>{o.label}</MenuItem>)}
+                  {aggOptions.map(o => <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>{o.label}</MenuItem>)}
                 </Select>
               </FormControl>
 
-              <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>Group by:</Typography>
+              <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>{t('argus.metrics.groupBy', 'Group by:')}</Typography>
               <FormControl size="small">
                 <Select displayEmpty value={q.groupBy} onChange={(e) => updateQuery(q.id, { groupBy: e.target.value as string })} sx={{ height: 36, fontSize: '0.75rem', fontWeight: 600, minWidth: 110, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' }}>
-                  <MenuItem value="" sx={{ fontSize: '0.75rem' }}>None</MenuItem>
-                  <MenuItem value="environment" sx={{ fontSize: '0.75rem' }}>Environment</MenuItem>
-                  <MenuItem value="release" sx={{ fontSize: '0.75rem' }}>Release</MenuItem>
+                  <MenuItem value="" sx={{ fontSize: '0.75rem' }}>{t('common.none', 'None')}</MenuItem>
+                  <MenuItem value="environment" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.environment', 'Environment')}</MenuItem>
+                  <MenuItem value="release" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.release', 'Release')}</MenuItem>
                 </Select>
               </FormControl>
 
               <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5 }}>
-                <Tooltip title={q.isHidden ? "Show series" : "Hide series"}>
+                <Tooltip title={q.isHidden ? t('argus.metrics.showSeries', 'Show series') : t('argus.metrics.hideSeries', 'Hide series')}>
                   <IconButton size="small" onClick={() => updateQuery(q.id, { isHidden: !q.isHidden })} sx={{ color: q.isHidden ? 'text.disabled' : getQueryColor(idx) }}>
                     {q.isHidden ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                   </IconButton>
                 </Tooltip>
                 {queries.length > 1 && (
-                  <Tooltip title="Remove query">
+                  <Tooltip title={t('argus.metrics.removeQuery', 'Remove query')}>
                     <IconButton size="small" onClick={() => removeQuery(q.id)} sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
                       <DeleteIcon sx={{ fontSize: 18 }} />
                     </IconButton>
@@ -516,23 +518,23 @@ const ArgusMetricsExplorerPage: React.FC = () => {
               
               <TextField
                 size="small"
-                placeholder="e.g. a / b * 100"
+                placeholder={t('argus.metrics.equationPlaceholder', 'e.g. a / b * 100')}
                 value={eq.equation}
                 onChange={(e) => updateEquation(eq.id, { equation: e.target.value })}
                 sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, fontFamily: 'monospace', backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }}
               />
 
               <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', ml: 1 }}>
-                Use query IDs (a, b) and math operators (+, -, *, /)
+                {t('argus.metrics.equationHelp', 'Use query IDs (a, b) and math operators (+, -, *, /)')}
               </Typography>
 
               <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5 }}>
-                <Tooltip title={eq.isHidden ? "Show formula" : "Hide formula"}>
+                <Tooltip title={eq.isHidden ? t('argus.metrics.showFormula', 'Show formula') : t('argus.metrics.hideFormula', 'Hide formula')}>
                   <IconButton size="small" onClick={() => updateEquation(eq.id, { isHidden: !eq.isHidden })} sx={{ color: eq.isHidden ? 'text.disabled' : getQueryColor(queries.length + idx) }}>
                     {eq.isHidden ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Remove formula">
+                <Tooltip title={t('argus.metrics.removeFormula', 'Remove formula')}>
                   <IconButton size="small" onClick={() => removeEquation(eq.id)} sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
                     <DeleteIcon sx={{ fontSize: 18 }} />
                   </IconButton>
@@ -543,10 +545,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
 
           <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
             <Button size="small" startIcon={<AddIcon />} onClick={addQuery} sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}>
-              Add Query
+              {t('argus.metrics.addQuery', 'Add Query')}
             </Button>
             <Button size="small" startIcon={<CalculateIcon />} onClick={addEquation} sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>
-              Add Equation
+              {t('argus.metrics.addEquation', 'Add Equation')}
             </Button>
           </Box>
         </Box>
@@ -554,27 +556,27 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         {/* Chart Configuration */}
         <Box sx={{ mt: 3, pt: 2, borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, display: 'flex', alignItems: 'center', gap: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>Chart Type:</Typography>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.chartType', 'Chart Type:')}</Typography>
             <FormControl size="small">
               <Select value={chartConfig.type} onChange={(e) => setChartConfig({ ...chartConfig, type: e.target.value as any })} sx={{ height: 28, fontSize: '0.75rem', fontWeight: 600, minWidth: 100 }}>
-                <MenuItem value="line" sx={{ fontSize: '0.75rem' }}>Line</MenuItem>
-                <MenuItem value="area" sx={{ fontSize: '0.75rem' }}>Area</MenuItem>
-                <MenuItem value="bar" sx={{ fontSize: '0.75rem' }}>Bar</MenuItem>
+                <MenuItem value="line" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.line', 'Line')}</MenuItem>
+                <MenuItem value="area" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.area', 'Area')}</MenuItem>
+                <MenuItem value="bar" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.bar', 'Bar')}</MenuItem>
               </Select>
             </FormControl>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>Y-Axis:</Typography>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.yAxis', 'Y-Axis:')}</Typography>
             <FormControl size="small">
               <Select value={chartConfig.yAxisType} onChange={(e) => setChartConfig({ ...chartConfig, yAxisType: e.target.value as any })} sx={{ height: 28, fontSize: '0.75rem', fontWeight: 600, minWidth: 100 }}>
-                <MenuItem value="linear" sx={{ fontSize: '0.75rem' }}>Linear</MenuItem>
-                <MenuItem value="logarithmic" sx={{ fontSize: '0.75rem' }}>Logarithmic</MenuItem>
+                <MenuItem value="linear" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.linear', 'Linear')}</MenuItem>
+                <MenuItem value="logarithmic" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.logarithmic', 'Logarithmic')}</MenuItem>
               </Select>
             </FormControl>
           </Box>
           <FormControlLabel
             control={<Switch size="small" checked={chartConfig.showLegend} onChange={(e) => setChartConfig({ ...chartConfig, showLegend: e.target.checked })} />}
-            label={<Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>Show Legend</Typography>}
+            label={<Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.showLegend', 'Show Legend')}</Typography>}
             sx={{ m: 0 }}
           />
         </Box>
