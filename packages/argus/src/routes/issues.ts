@@ -548,6 +548,59 @@ export default async function issuesRoutes(app: FastifyInstance) {
     }
   );
 
+  // Get stats for an issue from ClickHouse
+  app.get(
+    '/:projectId/issues/:issueId/stats',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId } = request.params as {
+        projectId: string;
+        issueId: string;
+      };
+      const { period = '14d' } = request.query as { period?: string };
+
+      const periodMap: Record<string, string> = {
+        '24h': '24 HOUR',
+        '7d': '7 DAY',
+        '14d': '14 DAY',
+        '30d': '30 DAY',
+      };
+      const interval = periodMap[period] || '14 DAY';
+      const timeGroup = period === '24h' ? 'toStartOfHour(timestamp)' : 'toStartOfDay(timestamp)';
+
+      try {
+        const result = await clickhouse.query({
+          query: `
+            SELECT
+              ${timeGroup} AS timestamp,
+              count() AS event_count,
+              uniq(user_id) AS user_count
+            FROM argus.errors
+            WHERE project_id = {projectId:String}
+              AND issue_id = {issueId:UInt64}
+              AND timestamp >= now() - INTERVAL ${interval}
+            GROUP BY timestamp
+            ORDER BY timestamp
+          `,
+          query_params: {
+            projectId: String(projectId),
+            issueId: parseInt(issueId, 10),
+          },
+        });
+
+        const stats = await result.json();
+
+        return reply.send({ data: stats.data });
+      } catch (error) {
+        logger.error('Failed to get issue stats', {
+          projectId,
+          issueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get issue stats' });
+      }
+    }
+  );
+
   // Get tag distribution for an issue
   app.get(
     '/:projectId/issues/:issueId/tags',
