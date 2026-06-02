@@ -1,18 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  Divider,
-  ToggleButton,
-  ToggleButtonGroup,
-  CircularProgress,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Box, Typography, Button, CircularProgress, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import PeopleIcon from '@mui/icons-material/People';
-import argusService from '@/services/argusService';
+import argusService, { ArgusIssueTagGroup } from '@/services/argusService';
 import InteractiveTimeSeriesChart from './InteractiveTimeSeriesChart';
 
 interface EventDistributionChartProps {
@@ -22,137 +11,250 @@ interface EventDistributionChartProps {
   compact?: boolean;
 }
 
-const PERIODS = [
-  { value: '24h', label: '24h' },
-  { value: '7d', label: '7d' },
-  { value: '14d', label: '14d' },
-  { value: '30d', label: '30d' },
-];
+function formatCount(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
 
-const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ projectId, issueId, isDark, compact = false }) => {
+const BROWSER_COLORS = ['#7c4dff', '#536dfe', '#448aff', '#40c4ff', '#64ffda'];
+
+const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ projectId, issueId, isDark }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  
-  const [period, setPeriod] = useState<string>('14d');
-  const [metric, setMetric] = useState<'events' | 'users'>('events');
+
   const [loading, setLoading] = useState<boolean>(true);
   const [statsData, setStatsData] = useState<{ timestamp: string; event_count: number; user_count: number }[]>([]);
+  const [browserTag, setBrowserTag] = useState<ArgusIssueTagGroup | null>(null);
+  const [period, setPeriod] = useState<string>('14d');
 
-  const fetchStats = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!projectId || !issueId) return;
     setLoading(true);
     try {
-      const data = await argusService.getIssueStats(projectId, issueId, period);
-      setStatsData(data);
+      const [stats, tags] = await Promise.all([
+        argusService.getIssueStats(projectId, issueId, period),
+        argusService.getIssueTags(projectId, issueId).catch(() => []),
+      ]);
+      setStatsData(stats);
+      setBrowserTag(tags.find((tg: ArgusIssueTagGroup) => tg.key === 'browser_name' || tg.key === 'browser') || null);
     } catch (error) {
-      console.error('Failed to fetch issue stats:', error);
+      console.error('Failed to fetch event distribution data:', error);
     } finally {
       setLoading(false);
     }
   }, [projectId, issueId, period]);
 
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    fetchData();
+  }, [fetchData]);
 
-  const handlePeriodChange = (_: React.MouseEvent<HTMLElement>, newPeriod: string | null) => {
-    if (newPeriod) {
-      setPeriod(newPeriod);
-    }
-  };
+  const { totalEvents, totalUsers } = useMemo(() => {
+    return statsData.reduce(
+      (acc, curr) => {
+        acc.totalEvents += Number(curr.event_count) || 0;
+        acc.totalUsers += Number(curr.user_count) || 0;
+        return acc;
+      },
+      { totalEvents: 0, totalUsers: 0 }
+    );
+  }, [statsData]);
 
-  const handleMetricChange = (_: React.MouseEvent<HTMLElement>, newMetric: 'events' | 'users' | null) => {
-    if (newMetric) {
-      setMetric(newMetric);
-    }
-  };
+  const chartData = useMemo(() => {
+    return statsData.map(d => {
+      const date = new Date(d.timestamp);
+      return {
+        label: `${date.getMonth() + 1}/${date.getDate()}`,
+        count: Number(d.event_count) || 0,
+      };
+    });
+  }, [statsData]);
 
-  // Format data for InteractiveTimeSeriesChart
-  const chartData = statsData.map(d => {
-    const date = new Date(d.timestamp);
-    let label = '';
-    if (period === '24h') {
-      label = `${date.getHours()}:00`;
-    } else {
-      label = `${date.getMonth() + 1}/${date.getDate()}`;
+  // Browser tag computations
+  const browserData = useMemo(() => {
+    if (!browserTag || browserTag.topValues.length === 0) return null;
+    const totalCount = browserTag.topValues.reduce((acc, v) => acc + (Number(v.count) || 0), 0);
+    if (totalCount === 0) return null;
+
+    const top2 = browserTag.topValues.slice(0, 2).map((tv, idx) => {
+      const count = Number(tv.count) || 0;
+      const pct = Math.round((count / totalCount) * 100);
+      return { name: tv.value || 'Unknown', pct, color: BROWSER_COLORS[idx] || BROWSER_COLORS[0] };
+    });
+
+    let rest = null;
+    if (browserTag.topValues.length > 2) {
+      const restCount = browserTag.topValues.slice(2).reduce((a, b) => a + (Number(b.count) || 0), 0);
+      const restPct = Math.round((restCount / totalCount) * 100);
+      rest = { count: browserTag.topValues.length - 2, pct: restPct };
     }
-    return {
-      label,
-      count: metric === 'events' ? d.event_count : d.user_count,
-    };
-  });
+    return { top2, rest };
+  }, [browserTag]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 56, mb: 2 }}>
+        <CircularProgress size={20} />
+      </Box>
+    );
+  }
+
+  if (statsData.length === 0) return null;
 
   return (
     <Box
       sx={{
-        pb: compact ? 1.5 : 2,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        borderRadius: 1.5,
+        px: 2,
+        py: 1,
         mb: 2,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+        minHeight: 56,
+        overflow: 'hidden',
       }}
     >
-      {/* Header and Controls */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: compact ? 1 : 2, flexWrap: 'wrap', gap: compact ? 1 : 2 }}>
-        <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <BarChartIcon fontSize={compact ? "inherit" : "small"} sx={{ color: theme.palette.primary.main }} />
-          {t('argus.issues.eventDistribution')}
-        </Typography>
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: compact ? 1 : 2 }}>
-          {/* Metric Toggle */}
-          <ToggleButtonGroup
-            value={metric}
-            exclusive
-            onChange={handleMetricChange}
-            size="small"
-            sx={{ height: compact ? 24 : 28 }}
-          >
-            <ToggleButton value="events" sx={{ px: compact ? 1 : 1.5, py: 0, textTransform: 'none', fontSize: '0.75rem', gap: 0.5 }}>
-              <BarChartIcon sx={{ fontSize: 14 }} />
-              {!compact && t('argus.common.events', 'Events')}
-            </ToggleButton>
-            <ToggleButton value="users" sx={{ px: compact ? 1 : 1.5, py: 0, textTransform: 'none', fontSize: '0.75rem', gap: 0.5 }}>
-              <PeopleIcon sx={{ fontSize: 14 }} />
-              {!compact && t('argus.common.users', 'Users')}
-            </ToggleButton>
-          </ToggleButtonGroup>
-
-          {/* Period Toggle */}
-          <ToggleButtonGroup
-            value={period}
-            exclusive
-            onChange={handlePeriodChange}
-            size="small"
-            sx={{ height: compact ? 24 : 28 }}
-          >
-            {PERIODS.map(p => (
-              <ToggleButton key={p.value} value={p.value} sx={{ px: compact ? 0.8 : 1.5, py: 0, fontSize: compact ? '0.65rem' : '0.75rem', textTransform: 'none' }}>
-                {p.label}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+      {/* ── 1. Stats (left) ── */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <Box sx={{
+          display: 'inline-flex', alignItems: 'baseline', gap: 0.5,
+          backgroundColor: isDark ? alpha('#7c4dff', 0.15) : alpha('#7c4dff', 0.08),
+          px: 1, py: 0.25, borderRadius: 0.5, mb: 0.25,
+        }}>
+          <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: isDark ? '#bb86fc' : '#6200ea', lineHeight: 1.2 }}>
+            {formatCount(totalEvents)}
+          </Typography>
+          <Typography sx={{ fontSize: '0.65rem', color: isDark ? '#bb86fc' : '#6200ea', fontWeight: 600, lineHeight: 1 }}>
+            {t('argus.common.events', 'events')}
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, px: 0.5 }}>
+          <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', color: 'text.primary', lineHeight: 1.2 }}>
+            {formatCount(totalUsers)}
+          </Typography>
+          <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', lineHeight: 1 }}>
+            {t('argus.common.users', 'users')}
+          </Typography>
+        </Box>
+        {/* Period Selector */}
+        <Box sx={{ display: 'flex', gap: '2px', mt: 0.5 }}>
+          {['24h', '7d', '14d', '30d'].map((p) => (
+            <Box
+              key={p}
+              onClick={() => setPeriod(p)}
+              sx={{
+                px: 0.8, py: 0.15,
+                fontSize: '0.58rem',
+                fontWeight: period === p ? 700 : 500,
+                color: period === p ? (isDark ? '#bb86fc' : '#6200ea') : 'text.disabled',
+                backgroundColor: period === p ? alpha(isDark ? '#bb86fc' : '#6200ea', 0.1) : 'transparent',
+                borderRadius: 0.5,
+                cursor: 'pointer',
+                '&:hover': { backgroundColor: alpha(isDark ? '#bb86fc' : '#6200ea', 0.06) },
+              }}
+            >
+              {p}
+            </Box>
+          ))}
         </Box>
       </Box>
 
-      {/* Chart */}
-      <Box sx={{ position: 'relative', height: compact ? 100 : 160 }}>
-        {loading ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <CircularProgress size={24} />
-          </Box>
-        ) : statsData.length === 0 ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <Typography variant="body2" color="text.disabled">
-              {t('argus.common.noData', 'No data available')}
-            </Typography>
-          </Box>
-        ) : (
-          <InteractiveTimeSeriesChart
-            data={chartData}
-            type="bar"
-            height={compact ? 100 : 160}
-          />
-        )}
+      {/* ── 2. Chart (center, flex) ── */}
+      <Box sx={{ flex: 1, minWidth: 120, height: 44, position: 'relative' }}>
+        <InteractiveTimeSeriesChart
+          data={chartData}
+          type="bar"
+          height={44}
+          showLegend={false}
+        />
       </Box>
-      <Divider />
+
+      {/* ── 3. Browser breakdown (right) ── */}
+      {browserData && (
+        <Box sx={{
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0.25,
+          borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          pl: 2,
+          minWidth: 140,
+        }}>
+          <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.secondary', textTransform: 'lowercase', letterSpacing: 0.3, mb: 0.25 }}>
+            {t('argus.common.browser', 'browser')}
+          </Typography>
+          {browserData.top2.map((b, idx) => (
+            <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <Typography sx={{
+                fontSize: '0.7rem', color: 'text.primary', fontWeight: 500,
+                minWidth: 52, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {b.name}
+              </Typography>
+              <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', minWidth: 24, textAlign: 'right' }}>
+                {b.pct}%
+              </Typography>
+              <Box sx={{
+                width: 48, height: 3,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                borderRadius: 1, overflow: 'hidden',
+              }}>
+                <Box sx={{ width: `${b.pct}%`, height: '100%', backgroundColor: b.color, borderRadius: 1 }} />
+              </Box>
+            </Box>
+          ))}
+          {browserData.rest && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 52 }}>
+                +{browserData.rest.count} {t('argus.issues.eventDistributionMore', 'more')}
+              </Typography>
+              <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 24, textAlign: 'right' }}>
+                {browserData.rest.pct}%
+              </Typography>
+              <Box sx={{
+                width: 48, height: 3,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                borderRadius: 1,
+              }} />
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {/* ── 4. Issue Tags button ── */}
+      <Box sx={{
+        flexShrink: 0,
+        borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        pl: 2,
+      }}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => {
+            // Scroll to TagDistribution section
+            const el = document.getElementById('argus-tag-distribution');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }}
+          sx={{
+            textTransform: 'none',
+            color: 'text.primary',
+            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            px: 1.5,
+            py: 0.5,
+            whiteSpace: 'nowrap',
+            '&:hover': {
+              borderColor: theme.palette.primary.main,
+              backgroundColor: alpha(theme.palette.primary.main, 0.04),
+            },
+          }}
+        >
+          {t('argus.issues.eventDistributionIssueTags', 'Issue Tags')}
+        </Button>
+      </Box>
     </Box>
   );
 };

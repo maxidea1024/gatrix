@@ -4,6 +4,11 @@
  * Shows current event position (e.g., "Event 3 of 47"),
  * Older/Newer buttons, and an event timeline distribution mini-chart.
  * Allows switching between individual error events within an issue.
+ *
+ * Enhanced (Phase 2D):
+ *  - Event search bar (search within events by exception, user, etc.)
+ *  - Keyboard shortcuts: J (older), K (newer), [ (oldest), ] (latest)
+ *  - Recommended event indicator
  */
 import React, { useEffect, useState, useCallback } from 'react';
 import {
@@ -15,12 +20,19 @@ import {
   alpha,
   useTheme,
   Skeleton,
+  TextField,
+  InputAdornment,
+  Collapse,
 } from '@mui/material';
 import {
   ChevronLeft as PrevIcon,
   ChevronRight as NextIcon,
   FirstPage as OldestIcon,
   LastPage as LatestIcon,
+  Search as SearchIcon,
+  Close as CloseIcon,
+  Keyboard as KeyboardIcon,
+  Star as RecommendedIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusErrorEvent } from '@/services/argusService';
@@ -45,6 +57,8 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
   const [events, setEvents] = useState<ArgusErrorEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch all events for this issue (paginated, up to 100)
   useEffect(() => {
@@ -84,9 +98,69 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
     }
   }, [events, onEventChange]);
 
+  // Keyboard shortcuts: J=older, K=newer, [=oldest, ]=latest
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't capture when typing in inputs
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if (e.key === 'j' || e.key === 'J') {
+        e.preventDefault();
+        goToEvent(currentIndex + 1);
+      } else if (e.key === 'k' || e.key === 'K') {
+        e.preventDefault();
+        goToEvent(currentIndex - 1);
+      } else if (e.key === '[') {
+        e.preventDefault();
+        goToEvent(events.length - 1);
+      } else if (e.key === ']') {
+        e.preventDefault();
+        goToEvent(0);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, events.length, goToEvent]);
+
+  // Search within events
+  const handleSearch = useCallback(() => {
+    if (!searchQuery.trim()) return;
+    const query = searchQuery.toLowerCase();
+    const matchIdx = events.findIndex((evt, idx) => {
+      if (idx <= currentIndex) return false;
+      return (
+        evt.exception_type?.toLowerCase().includes(query) ||
+        evt.exception_value?.toLowerCase().includes(query) ||
+        evt.user_email?.toLowerCase().includes(query) ||
+        evt.user_id?.toLowerCase().includes(query) ||
+        evt.transaction?.toLowerCase().includes(query) ||
+        evt.event_id?.toLowerCase().includes(query)
+      );
+    });
+    if (matchIdx >= 0) {
+      goToEvent(matchIdx);
+    } else {
+      // Wrap around: search from beginning
+      const wrapIdx = events.findIndex((evt) => {
+        return (
+          evt.exception_type?.toLowerCase().includes(query) ||
+          evt.exception_value?.toLowerCase().includes(query) ||
+          evt.user_email?.toLowerCase().includes(query) ||
+          evt.user_id?.toLowerCase().includes(query) ||
+          evt.transaction?.toLowerCase().includes(query) ||
+          evt.event_id?.toLowerCase().includes(query)
+        );
+      });
+      if (wrapIdx >= 0) goToEvent(wrapIdx);
+    }
+  }, [searchQuery, events, currentIndex, goToEvent]);
+
   const total = events.length;
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < total - 1;
+
+  // Is current event the "recommended" one (latest = index 0)?
+  const isRecommended = currentIndex === 0;
 
   // Build mini timeline: bucket events by hour for last 24h
   const buildTimeline = () => {
@@ -123,107 +197,182 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
   if (total === 0) return null;
 
   return (
-    <Box sx={{
-      display: 'flex', alignItems: 'center', gap: 1,
-      px: 2, py: 0.8,
-      border: `1px solid ${theme.palette.divider}`,
-      borderRadius: 1.5,
-      backgroundColor: theme.palette.background.paper,
-      flexWrap: 'wrap',
-    }}>
-      {/* Navigation buttons */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-        <Tooltip title={t('argus.events.oldest', 'Oldest')}>
-          <span>
-            <IconButton size="small" onClick={() => goToEvent(total - 1)} disabled={!hasNext}>
-              <OldestIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t('argus.events.older', 'Older')}>
-          <span>
-            <IconButton size="small" onClick={() => goToEvent(currentIndex + 1)} disabled={!hasNext}>
-              <PrevIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
-
-      {/* Event position indicator */}
-      <Typography variant="caption" sx={{
-        fontSize: '0.78rem', fontWeight: 600,
-        color: theme.palette.text.primary,
-        mx: 0.5,
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <Box sx={{
+        display: 'flex', alignItems: 'center', gap: 1,
+        px: 2, py: 0.8,
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: showSearch ? '12px 12px 0 0' : 1.5,
+        backgroundColor: theme.palette.background.paper,
+        flexWrap: 'wrap',
       }}>
-        {t('argus.events.eventOf', {
-          defaultValue: 'Event {{current}} of {{total}}',
-          current: currentIndex + 1,
-          total,
-        })}
-      </Typography>
+        {/* Navigation buttons */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+          <Tooltip title={`${t('argus.events.oldest', 'Oldest')} [ ]`}>
+            <span>
+              <IconButton size="small" onClick={() => goToEvent(total - 1)} disabled={!hasNext}>
+                <OldestIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={`${t('argus.events.older', 'Older')} [J]`}>
+            <span>
+              <IconButton size="small" onClick={() => goToEvent(currentIndex + 1)} disabled={!hasNext}>
+                <PrevIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
 
-      {/* Navigation forward */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-        <Tooltip title={t('argus.events.newer', 'Newer')}>
-          <span>
-            <IconButton size="small" onClick={() => goToEvent(currentIndex - 1)} disabled={!hasPrev}>
-              <NextIcon sx={{ fontSize: 18 }} />
+        {/* Event position indicator */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          {isRecommended && (
+            <Tooltip title={t('argus.events.recommended', 'Recommended')}>
+              <RecommendedIcon sx={{ fontSize: 14, color: 'warning.main' }} />
+            </Tooltip>
+          )}
+          <Typography variant="caption" sx={{
+            fontSize: '0.78rem', fontWeight: 600,
+            color: theme.palette.text.primary,
+          }}>
+            {t('argus.events.eventOf', {
+              defaultValue: 'Event {{current}} of {{total}}',
+              current: currentIndex + 1,
+              total,
+            })}
+          </Typography>
+        </Box>
+
+        {/* Navigation forward */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+          <Tooltip title={`${t('argus.events.newer', 'Newer')} [K]`}>
+            <span>
+              <IconButton size="small" onClick={() => goToEvent(currentIndex - 1)} disabled={!hasPrev}>
+                <NextIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={`${t('argus.events.latest', 'Latest')} [ ] ]`}>
+            <span>
+              <IconButton size="small" onClick={() => goToEvent(0)} disabled={!hasPrev}>
+                <LatestIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+
+        {/* Event timestamp */}
+        {currentEvent && (
+          <Chip
+            label={new Date(currentEvent.timestamp).toLocaleString()}
+            size="small"
+            sx={{
+              height: 20, fontSize: '0.68rem',
+              fontFamily: 'monospace',
+              backgroundColor: alpha(theme.palette.text.primary, 0.05),
+              color: theme.palette.text.secondary,
+            }}
+          />
+        )}
+
+        {/* Search toggle + keyboard hint */}
+        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Tooltip title={t('argus.events.searchEvents', 'Search events')}>
+            <IconButton
+              size="small"
+              onClick={() => setShowSearch(!showSearch)}
+              sx={{
+                width: 26, height: 26,
+                color: showSearch ? 'primary.main' : 'text.disabled',
+                backgroundColor: showSearch ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+              }}
+            >
+              <SearchIcon sx={{ fontSize: 16 }} />
             </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t('argus.events.latest', 'Latest')}>
-          <span>
-            <IconButton size="small" onClick={() => goToEvent(0)} disabled={!hasPrev}>
-              <LatestIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </span>
-        </Tooltip>
+          </Tooltip>
+          <Tooltip title={`${t('argus.events.keyboardShortcuts', 'Keyboard shortcuts')}: J/K ${t('argus.events.navigateEvents', 'navigate')}, [ / ] ${t('argus.events.jumpToEdge', 'jump')}`}>
+            <KeyboardIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+          </Tooltip>
+        </Box>
+
+        {/* Mini timeline chart */}
+        {timeline.length > 0 && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
+              {t('argus.events.last24h', 'Event distribution (last 24h)')}
+            </Typography>
+            <Box sx={{
+              display: 'flex', alignItems: 'flex-end', gap: '1px',
+              height: 26,
+              p: '3px 5px',
+              borderRadius: 1.5,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+            }}>
+              {timeline.map((bucket, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    width: 4, borderRadius: '1px 1px 0 0',
+                    height: `${Math.max(bucket.pct, bucket.count > 0 ? 15 : 0)}%`,
+                    minHeight: bucket.count > 0 ? 2 : 0,
+                    backgroundColor: bucket.count > 0
+                      ? alpha(theme.palette.primary.main, 0.5 + bucket.pct / 200)
+                      : alpha(theme.palette.text.disabled, 0.15),
+                    transition: 'height 0.2s',
+                  }}
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
       </Box>
 
-      {/* Event timestamp */}
-      {currentEvent && (
-        <Chip
-          label={new Date(currentEvent.timestamp).toLocaleString()}
-          size="small"
-          sx={{
-            height: 20, fontSize: '0.68rem',
-            fontFamily: 'monospace',
-            backgroundColor: alpha(theme.palette.text.primary, 0.05),
-            color: theme.palette.text.secondary,
-          }}
-        />
-      )}
-
-      {/* Mini timeline chart */}
-      {timeline.length > 0 && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
-          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
-            {t('argus.events.last24h', 'Event distribution (last 24h)')}
+      {/* Event Search Bar (collapsible) */}
+      <Collapse in={showSearch}>
+        <Box sx={{
+          display: 'flex', alignItems: 'center', gap: 1,
+          px: 2, py: 0.5,
+          borderLeft: `1px solid ${theme.palette.divider}`,
+          borderRight: `1px solid ${theme.palette.divider}`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderRadius: '0 0 12px 12px',
+          backgroundColor: theme.palette.background.paper,
+        }}>
+          <TextField
+            size="small"
+            variant="standard"
+            placeholder={t('argus.events.searchPlaceholder', 'Search by exception, user, transaction...')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSearch();
+              if (e.key === 'Escape') setShowSearch(false);
+            }}
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: searchQuery && (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={() => setSearchQuery('')}>
+                      <CloseIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+                sx: { fontSize: '0.78rem' },
+              },
+            }}
+            sx={{ flex: 1 }}
+          />
+          <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', whiteSpace: 'nowrap' }}>
+            Enter ↵
           </Typography>
-          <Box sx={{
-            display: 'flex', alignItems: 'flex-end', gap: '1px',
-            height: 26,
-            p: '3px 5px',
-            borderRadius: 1.5,
-            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-          }}>
-            {timeline.map((bucket, i) => (
-              <Box
-                key={i}
-                sx={{
-                  width: 4, borderRadius: '1px 1px 0 0',
-                  height: `${Math.max(bucket.pct, bucket.count > 0 ? 15 : 0)}%`,
-                  minHeight: bucket.count > 0 ? 2 : 0,
-                  backgroundColor: bucket.count > 0
-                    ? alpha(theme.palette.primary.main, 0.5 + bucket.pct / 200)
-                    : alpha(theme.palette.text.disabled, 0.15),
-                  transition: 'height 0.2s',
-                }}
-              />
-            ))}
-          </Box>
         </Box>
-      )}
+      </Collapse>
     </Box>
   );
 };
