@@ -90,6 +90,7 @@ import BusinessImpactWidget from '@/components/argus/BusinessImpactWidget';
 import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
 import SuspectCommits from '@/components/argus/SuspectCommits';
 import IssueDetailActions from '@/components/argus/IssueDetailActions';
+import EventHighlights from '@/components/argus/EventHighlights';
 
 
 function stringToColor(str: string): string {
@@ -159,6 +160,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [logGotoTime, setLogGotoTime] = useState('');
   const [wrapLines, setWrapLines] = useState(false);
   const [showLogGoto, setShowLogGoto] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const logContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -445,12 +447,44 @@ const ArgusIssueDetailPage: React.FC = () => {
                     <ListItemText primary={t('argus.issues.resolve')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
                   </MenuItem>
                 )}
+                {issue.status !== 'resolved' && latestEvent?.release && (
+                  <MenuItem
+                    onClick={() => requestStatusChange('resolved')}
+                    sx={{ fontSize: '0.8rem', py: 1, pl: 4 }}
+                  >
+                    <ListItemText
+                      primary={t('argus.detail.resolveInCurrentRelease')}
+                      secondary={latestEvent.release}
+                      primaryTypographyProps={{ fontSize: '0.75rem', fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontSize: '0.65rem', fontFamily: 'monospace' }}
+                    />
+                  </MenuItem>
+                )}
+                {issue.status !== 'resolved' && (
+                  <MenuItem
+                    onClick={() => requestStatusChange('resolved')}
+                    sx={{ fontSize: '0.8rem', py: 1, pl: 4 }}
+                  >
+                    <ListItemText
+                      primary={t('argus.detail.resolveInNextRelease')}
+                      primaryTypographyProps={{ fontSize: '0.75rem', fontWeight: 500 }}
+                    />
+                  </MenuItem>
+                )}
+                <Divider sx={{ my: 0.5 }} />
                 {issue.status !== 'ignored' && (
                   <MenuItem onClick={() => requestStatusChange('ignored')} sx={{ fontSize: '0.8rem', py: 1 }}>
                     <ListItemIcon><IgnoreIcon fontSize="small" color="action" /></ListItemIcon>
                     <ListItemText primary={t('argus.issues.ignore')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
                   </MenuItem>
                 )}
+                {issue.status !== 'archived' && (
+                  <MenuItem onClick={() => requestStatusChange('archived')} sx={{ fontSize: '0.8rem', py: 1 }}>
+                    <ListItemIcon><IgnoreIcon fontSize="small" sx={{ color: 'text.disabled' }} /></ListItemIcon>
+                    <ListItemText primary={t('argus.detail.archive')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
+                  </MenuItem>
+                )}
+                <Divider sx={{ my: 0.5 }} />
                 {issue.status !== 'unresolved' && (
                   <MenuItem onClick={() => requestStatusChange('unresolved')} sx={{ fontSize: '0.8rem', py: 1 }}>
                     <ListItemIcon><ErrorIcon fontSize="small" color="error" /></ListItemIcon>
@@ -625,8 +659,13 @@ const ArgusIssueDetailPage: React.FC = () => {
           </Box>
 
           <Box sx={{
-            display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 350px', xl: '1fr 420px' }, gap: { xs: 3, md: 0 }, alignItems: 'stretch',
+            display: 'grid',
+            gridTemplateColumns: sidebarCollapsed
+              ? { xs: '1fr', md: '1fr 40px' }
+              : { xs: '1fr', md: '1fr 350px', xl: '1fr 420px' },
+            gap: { xs: 3, md: 0 }, alignItems: 'stretch',
             position: 'relative',
+            transition: 'grid-template-columns 0.2s ease',
           }}>
             {/* Left Column: Main Content */}
             <Box sx={{
@@ -657,6 +696,8 @@ const ArgusIssueDetailPage: React.FC = () => {
               </Dialog>
 
               {/* Activity Timeline — moved to sidebar in embedded mode */}
+              {/* Event Highlights */}
+              <EventHighlights event={latestEvent} />
 
               {/* Event Navigator */}
               {projectId && issueId && (
@@ -933,8 +974,31 @@ const ArgusIssueDetailPage: React.FC = () => {
 
             {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
             <Box sx={{
-              pl: { md: 3 },
+              pl: { md: sidebarCollapsed ? 0 : 3 },
+              position: 'relative',
             }}>
+              {/* Sidebar Toggle */}
+              <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar') : t('argus.detail.collapseSidebar')}>
+                <IconButton
+                  size="small"
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  sx={{
+                    position: 'absolute',
+                    left: sidebarCollapsed ? 4 : -16,
+                    top: 0,
+                    width: 24, height: 24,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: '50%',
+                    backgroundColor: isDark ? '#1a1a1a' : '#fff',
+                    zIndex: 2,
+                    '&:hover': { backgroundColor: isDark ? '#333' : '#f5f5f5' },
+                  }}
+                >
+                  {sidebarCollapsed ? <ExpandLessIcon sx={{ fontSize: 14, transform: 'rotate(-90deg)' }} /> : <ExpandMoreIcon sx={{ fontSize: 14, transform: 'rotate(-90deg)' }} />}
+                </IconButton>
+              </Tooltip>
+              <Collapse in={!sidebarCollapsed} orientation="horizontal" sx={{ overflow: sidebarCollapsed ? 'hidden' : 'visible' }}>
               {/* Timing — Last/First Seen */}
               <Box sx={{ mb: 2 }}>
                 <Typography variant="caption" fontWeight={700} sx={{
@@ -1032,6 +1096,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   isDark={isDark}
                 />
               )}
+              </Collapse>
             </Box>
 
       {/* Structured Logs Section */}
