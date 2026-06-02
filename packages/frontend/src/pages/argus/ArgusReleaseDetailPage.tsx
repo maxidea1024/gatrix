@@ -31,7 +31,6 @@ import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import SimplePagination from '@/components/common/SimplePagination';
 
-const VALID_PAGE_SIZES = [20, 50, 100];
 const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
 
 function formatDate(dateStr: string): string {
@@ -71,7 +70,8 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
     const saved = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
-    return saved && VALID_PAGE_SIZES.includes(Number(saved)) ? Number(saved) : 20;
+    const parsed = parseInt(saved || '', 10);
+    return !isNaN(parsed) && parsed > 0 ? parsed : 25;
   });
   const [totalIssues, setTotalIssues] = useState(0);
 
@@ -370,7 +370,6 @@ const ArgusReleaseDetailPage: React.FC = () => {
                       params.set('page', '1');
                       setSearchParams(params);
                     }}
-                    rowsPerPageOptions={VALID_PAGE_SIZES}
                     size="small"
                   />
                 </Box>
