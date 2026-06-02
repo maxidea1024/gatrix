@@ -4,20 +4,23 @@ import {
   useTheme, alpha, CircularProgress,
   Table, TableHead, TableBody, TableRow, TableCell,
   FormControl, Select, MenuItem,
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Drawer, Autocomplete,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Drawer,
+  Autocomplete, Switch, FormControlLabel,
 } from '@mui/material';
 import {
   Search as SearchIcon, Close as CloseIcon,
   BarChart as MetricsIcon, ExpandMore as ExpandMoreIcon,
   TrendingUp as TrendUpIcon, TrendingDown as TrendDownIcon,
   ShowChart as ChartIcon, Bookmark as BookmarkIcon, BookmarkBorder as BookmarkBorderIcon,
-  Save as SaveIcon, Delete as DeleteIcon,
+  Save as SaveIcon, Delete as DeleteIcon, Add as AddIcon,
+  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,
+  Calculate as CalculateIcon, Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
-import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
+import InteractiveTimeSeriesChart, { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
@@ -27,13 +30,26 @@ import ExploreActions from '@/components/argus/ExploreActions';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 
-/* ─── Constants ─── */
+/* ─── Types ─── */
 
-const METRIC_TYPE_COLORS: Record<string, string> = {
-  counter: '#3b82f6',
-  gauge: '#10b981',
-  distribution: '#8b5cf6',
-  set: '#f59e0b',
+export type MetricQuery = {
+  id: string; // 'a', 'b', etc.
+  metric: string;
+  agg: string;
+  groupBy: string;
+  isHidden: boolean;
+};
+
+export type EquationQuery = {
+  id: string; // 'f1', 'f2', etc.
+  equation: string;
+  isHidden: boolean;
+};
+
+export type ChartConfig = {
+  type: 'line' | 'bar' | 'area';
+  yAxisType: 'linear' | 'logarithmic';
+  showLegend: boolean;
 };
 
 const AGG_OPTIONS = [
@@ -44,39 +60,23 @@ const AGG_OPTIONS = [
   { value: 'count', label: 'Count' },
 ];
 
-function formatMetricValue(val: number, unit?: string): string {
-  if (val === undefined || val === null) return '—';
-  const n = Number(val);
-  if (isNaN(n)) return '—';
-  if (unit === 'millisecond' || unit === 'ms') return n < 1000 ? `${n.toFixed(1)}ms` : `${(n / 1000).toFixed(2)}s`;
-  if (unit === 'byte') return n > 1048576 ? `${(n / 1048576).toFixed(1)}MB` : n > 1024 ? `${(n / 1024).toFixed(1)}KB` : `${n}B`;
-  if (unit === 'percent' || unit === '%') return `${n.toFixed(1)}%`;
-  if (n >= 1000000) return `${(n / 1000000).toFixed(2)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n % 1 === 0 ? String(n) : n.toFixed(2);
+const QUERY_COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#14b8a6'];
+
+function getQueryColor(index: number) {
+  return QUERY_COLORS[index % QUERY_COLORS.length];
 }
 
-/* ─── Metric Time Series Chart ─── */
+/* ─── Metric Chart Wrapper ─── */
 
 const MetricChart: React.FC<{
-  data: { bucket: string; value: number; group_value?: string }[];
+  labels: string[];
+  datasets: ChartDataset[];
   isDark: boolean;
   onZoom?: (start: string, end: string) => void;
-  metricName: string;
-  unit?: string;
-}> = ({ data, isDark, onZoom, metricName, unit }) => {
+  config: ChartConfig;
+  buckets: string[];
+}> = ({ labels, datasets, isDark, onZoom, config, buckets }) => {
   const { t } = useTranslation();
-
-  const { chartData, buckets } = useMemo(() => {
-    if (data.length === 0) return { chartData: [], buckets: [] };
-    const sorted = [...data].sort((a, b) => a.bucket.localeCompare(b.bucket));
-    const mapped = sorted.map(d => {
-      const date = new Date(d.bucket);
-      const label = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-      return { label, count: Number(d.value) };
-    });
-    return { chartData: mapped, buckets: sorted.map(d => d.bucket) };
-  }, [data]);
 
   const handleZoom = (startIndex: number, endIndex: number) => {
     if (onZoom && buckets[startIndex] && buckets[endIndex]) {
@@ -94,19 +94,15 @@ const MetricChart: React.FC<{
     }
   };
 
-  if (chartData.length === 0) return (
+  if (datasets.length === 0 || labels.length === 0) return (
     <Paper elevation={0} sx={{
       mb: 2, p: 2, pt: 1.5, borderRadius: 2,
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+      height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center'
     }}>
-      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, mb: 1, color: 'text.disabled' }}>
-        {metricName || t('argus.metrics.noMetricSelected', 'Select a metric')}
+      <Typography sx={{ fontSize: '0.85rem', color: 'text.disabled' }}>
+        {t('argus.metrics.noData', 'No metric data available. Build a query above.')}
       </Typography>
-      <Box sx={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled' }}>
-          {t('argus.metrics.noData', 'No metric data')}
-        </Typography>
-      </Box>
     </Paper>
   );
 
@@ -115,48 +111,19 @@ const MetricChart: React.FC<{
       mb: 2, p: 2, pt: 1.5, borderRadius: 2,
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
     }}>
-      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, mb: 1, color: 'text.secondary' }}>
-        {metricName} {unit ? `(${unit})` : ''}
-      </Typography>
-      <Box sx={{ height: 180 }}>
-        <InteractiveTimeSeriesChart data={chartData} type="bar" height={180} onZoom={onZoom ? handleZoom : undefined} />
+      <Box sx={{ height: 350 }}>
+        <InteractiveTimeSeriesChart 
+          labels={labels}
+          datasets={datasets}
+          height={350} 
+          onZoom={onZoom ? handleZoom : undefined} 
+          type={config.type}
+          yAxisType={config.yAxisType}
+          showLegend={config.showLegend}
+          legendPosition="bottom"
+        />
       </Box>
     </Paper>
-  );
-};
-
-/* ─── Summary Stats Cards ─── */
-
-const SummaryCards: React.FC<{ summary: any; unit?: string; isDark: boolean }> = ({ summary, unit, isDark }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-
-  const stats = [
-    { label: t('argus.metrics.avg', 'Avg'), value: summary.avg_value, key: 'avg' },
-    { label: 'P50', value: summary.p50, key: 'p50' },
-    { label: 'P95', value: summary.p95, key: 'p95' },
-    { label: 'P99', value: summary.p99, key: 'p99' },
-    { label: t('argus.metrics.min', 'Min'), value: summary.min_value, key: 'min' },
-    { label: t('argus.metrics.max', 'Max'), value: summary.max_value, key: 'max' },
-  ];
-
-  return (
-    <Box sx={{ display: 'flex', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-      {stats.map(s => (
-        <Paper key={s.key} elevation={0} sx={{
-          flex: '1 1 100px', minWidth: 100, p: 1.5, borderRadius: 2,
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          textAlign: 'center',
-        }}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.disabled', textTransform: 'uppercase', mb: 0.5 }}>
-            {s.label}
-          </Typography>
-          <Typography sx={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace', color: theme.palette.primary.main }}>
-            {formatMetricValue(Number(s.value), unit)}
-          </Typography>
-        </Paper>
-      ))}
-    </Box>
   );
 };
 
@@ -175,16 +142,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     period:  { key: 'period',  default: '24h', storageKey: 'argus-metrics-period' },
     start:   { key: 'start',   default: '' },
     end:     { key: 'end',     default: '' },
-    metric:  { key: 'metric',  default: '' },
-    agg:     { key: 'agg',     default: 'avg' },
-    groupBy: { key: 'groupBy', default: '' },
     queryId: { key: 'queryId', default: '' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
-
-  const selectedMetric = urlState.metric;
-  const selectedAgg = urlState.agg;
-  const selectedGroupBy = urlState.groupBy;
 
   // Derive filters
   const filters = useMemo<ArgusFilterState>(
@@ -199,12 +159,27 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     [urlState.period, urlState.start, urlState.end],
   );
 
-  // Search
-  const [search, setSearch] = useState('');
-  
-  // Editable Query Name
-  const defaultQueryName = t('argus.metrics.newQuery', 'New Metrics Query');
+  const currentPeriod = useMemo(() => {
+    if (filters.dateRange.type === 'preset' && filters.dateRange.preset) return filters.dateRange.preset;
+    return '24h';
+  }, [filters.dateRange]);
+
+  // ─── State ───
+  const defaultQueryName = t('argus.metrics.newQuery', 'New Metrics Dashboard');
   const [queryName, setQueryName] = useState((location.state as any)?.queryName || defaultQueryName);
+
+  const [queries, setQueries] = useState<MetricQuery[]>([
+    { id: 'a', metric: '', agg: 'avg', groupBy: '', isHidden: false }
+  ]);
+  const [equations, setEquations] = useState<EquationQuery[]>([]);
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    type: 'line', yAxisType: 'linear', showLegend: true
+  });
+
+  const [metricNames, setMetricNames] = useState<any[]>([]);
+  const [queryResults, setQueryResults] = useState<Record<string, { timeSeries: any[]; summary: any }>>({});
+  const [loading, setLoading] = useState(false);
+  const [queryLoading, setQueryLoading] = useState(false);
 
   // Saved Queries State
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -219,22 +194,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       const qId = parseInt(urlState.queryId, 10);
       const matched = savedQueries.find(q => q.id === qId);
       if (matched && currentQueryId !== qId) {
-        setCurrentQueryId(matched.id);
-        setQueryName(matched.name);
+        handleLoadSavedQuery(matched);
       }
     }
   }, [urlState.queryId, savedQueries, currentQueryId]);
-
-  // ─── Data ───
-  const [metricNames, setMetricNames] = useState<any[]>([]);
-  const [queryResult, setQueryResult] = useState<{ timeSeries: any[]; summary: any } | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [queryLoading, setQueryLoading] = useState(false);
-
-  const currentPeriod = useMemo(() => {
-    if (filters.dateRange.type === 'preset' && filters.dateRange.preset) return filters.dateRange.preset;
-    return '24h';
-  }, [filters.dateRange]);
 
   // ─── Fetch ───
   const fetchMetricNames = useCallback(async () => {
@@ -246,33 +209,42 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     finally { setLoading(false); }
   }, [projectId, currentPeriod]);
 
-  const fetchMetricQuery = useCallback(async (metricName?: string) => {
-    const name = metricName || selectedMetric;
-    if (!name) return;
+  const fetchMetricQueries = useCallback(async () => {
+    const activeQueries = queries.filter(q => q.metric);
+    if (activeQueries.length === 0) {
+      setQueryResults({});
+      return;
+    }
     setQueryLoading(true);
     try {
       const apiParams = argusFilterStateToApiParams(filters);
-      const data = await argusService.queryMetric(projectId, {
-        name,
-        period: apiParams.period || currentPeriod,
-        agg: selectedAgg,
-        groupBy: selectedGroupBy || undefined,
-        start: apiParams.start,
-        end: apiParams.end,
-      });
-      setQueryResult(data);
+      
+      const results: Record<string, any> = {};
+      await Promise.all(activeQueries.map(async (q) => {
+        const data = await argusService.queryMetric(projectId, {
+          name: q.metric,
+          period: apiParams.period || currentPeriod,
+          agg: q.agg,
+          groupBy: q.groupBy || undefined,
+          start: apiParams.start,
+          end: apiParams.end,
+        });
+        results[q.id] = data;
+      }));
+      setQueryResults(results);
     } catch (err) { console.error('Failed to query metric', err); }
     finally { setQueryLoading(false); }
-  }, [projectId, filters, currentPeriod, selectedMetric, selectedAgg, selectedGroupBy]);
+  }, [projectId, filters, currentPeriod, queries]);
 
   useEffect(() => {
     fetchMetricNames();
     argusService.listSavedQueries(projectId, 'metrics' as any).then(setSavedQueries).catch(() => setSavedQueries([]));
   }, [fetchMetricNames, projectId]);
 
+  // Trigger fetch when period or base queries change (excluding isHidden)
   useEffect(() => {
-    if (selectedMetric) fetchMetricQuery();
-  }, [selectedMetric, selectedAgg, selectedGroupBy, fetchMetricQuery]);
+    fetchMetricQueries();
+  }, [fetchMetricQueries, queries.map(q => `${q.id}-${q.metric}-${q.agg}-${q.groupBy}`).join('|')]);
 
   // ─── Handlers ───
   const handleFilterChange = (newFilters: ArgusFilterState) => {
@@ -287,8 +259,29 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     setUrlState({ period: 'custom', start, end });
   }, [setUrlState]);
 
-  const handleSelectMetric = (name: string) => {
-    setUrlState({ metric: name });
+  const addQuery = () => {
+    const nextId = String.fromCharCode(97 + queries.length); // 'a', 'b', 'c'
+    setQueries([...queries, { id: nextId, metric: '', agg: 'avg', groupBy: '', isHidden: false }]);
+  };
+
+  const addEquation = () => {
+    const nextId = `f${equations.length + 1}`;
+    setEquations([...equations, { id: nextId, equation: '', isHidden: false }]);
+  };
+
+  const updateQuery = (id: string, updates: Partial<MetricQuery>) => {
+    setQueries(queries.map(q => q.id === id ? { ...q, ...updates } : q));
+  };
+
+  const updateEquation = (id: string, updates: Partial<EquationQuery>) => {
+    setEquations(equations.map(eq => eq.id === id ? { ...eq, ...updates } : eq));
+  };
+
+  const removeQuery = (id: string) => {
+    setQueries(queries.filter(q => q.id !== id));
+  };
+  const removeEquation = (id: string) => {
+    setEquations(equations.filter(eq => eq.id !== id));
   };
 
   const handleSaveQuery = async () => {
@@ -296,7 +289,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     try {
       const res = await argusService.createSavedQuery(projectId, {
         name: saveName.trim(),
-        query_config: { metric: selectedMetric, agg: selectedAgg, period: currentPeriod, groupBy: selectedGroupBy },
+        query_config: { queries, equations, chartConfig, period: currentPeriod },
         display_type: 'chart',
         query_type: 'metrics' as any,
       });
@@ -309,56 +302,115 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     } catch (err) { console.error('Failed to save metrics query:', err); }
   };
 
-  const handleRename = async (newName: string) => {
-    setQueryName(newName);
-    if (currentQueryId) {
-      try {
-        await argusService.updateSavedQuery(projectId, currentQueryId, { name: newName });
-        const updated = await argusService.listSavedQueries(projectId, 'metrics' as any);
-        setSavedQueries(updated);
-      } catch (err) { console.error('Failed to rename query:', err); }
-    }
-  };
-
-  const handleDeleteSavedQuery = async (id: number) => {
-    try {
-      await argusService.deleteSavedQuery(projectId, id);
-      setSavedQueries(prev => prev.filter(q => q.id !== id));
-      if (currentQueryId === id) setCurrentQueryId(null);
-    } catch (err) { console.error('Failed to delete saved query:', err); }
-  };
-
   const handleLoadSavedQuery = (sq: ArgusSavedQuery) => {
     const cfg = typeof sq.query_config === 'string' ? JSON.parse(sq.query_config) : sq.query_config;
-    if (cfg.metric !== undefined) setUrlState({ metric: cfg.metric });
-    if (cfg.agg !== undefined) setUrlState({ agg: cfg.agg });
+    if (cfg.queries) setQueries(cfg.queries);
+    if (cfg.equations) setEquations(cfg.equations);
+    if (cfg.chartConfig) setChartConfig(cfg.chartConfig);
     if (cfg.period) setUrlState({ period: cfg.period });
-    if (cfg.groupBy !== undefined) setUrlState({ groupBy: cfg.groupBy });
     setQueryName(sq.name);
     setCurrentQueryId(sq.id);
     setSavedPanelOpen(false);
   };
 
-  const selectedMetricInfo = metricNames.find(m => m.name === selectedMetric);
+  const handleDeleteSavedQuery = async (id: number) => {
+    if (!window.confirm(t('argus.metrics.confirmDelete', 'Are you sure you want to delete this saved query?'))) return;
+    try {
+      await argusService.deleteSavedQuery(projectId, id);
+      setSavedQueries(savedQueries.filter(q => q.id !== id));
+      if (currentQueryId === id) {
+        setCurrentQueryId(null);
+        setQueryName(defaultQueryName);
+      }
+    } catch (err) { console.error('Failed to delete query:', err); }
+  };
 
-  // Filter metric list
-  const filteredMetrics = useMemo(() => {
-    if (!search.trim()) return metricNames;
-    const q = search.toLowerCase();
-    return metricNames.filter(m => m.name.toLowerCase().includes(q));
-  }, [metricNames, search]);
+  // ─── Data Processing ───
+
+  const { chartLabels, chartDatasets, buckets } = useMemo(() => {
+    const allBuckets = new Set<string>();
+    Object.values(queryResults).forEach(res => {
+      res.timeSeries.forEach((ts: any) => allBuckets.add(ts.bucket));
+    });
+    const sortedBuckets = Array.from(allBuckets).sort();
+    
+    const formattedLabels = sortedBuckets.map(b => {
+      const date = new Date(b);
+      return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+    });
+
+    const datasets: ChartDataset[] = [];
+    
+    // Base Queries
+    queries.forEach((q, idx) => {
+      if (q.isHidden || !q.metric) return;
+      const res = queryResults[q.id];
+      if (!res) return;
+      const bucketMap = new Map();
+      res.timeSeries.forEach((ts: any) => bucketMap.set(ts.bucket, Number(ts.value)));
+      const data = sortedBuckets.map(b => bucketMap.get(b) ?? 0);
+      datasets.push({
+        id: q.id,
+        label: `[${q.id.toUpperCase()}] ${q.metric}`,
+        data,
+        type: chartConfig.type,
+        color: getQueryColor(idx),
+      });
+    });
+
+    // Equations
+    equations.forEach((eq, idx) => {
+      if (eq.isHidden || !eq.equation) return;
+      const data = sortedBuckets.map(b => {
+        const context: Record<string, number> = {};
+        queries.forEach(q => {
+          const res = queryResults[q.id];
+          if (res) {
+            const val = res.timeSeries.find((ts: any) => ts.bucket === b)?.value;
+            context[q.id] = val !== undefined ? Number(val) : 0;
+          } else {
+            context[q.id] = 0;
+          }
+        });
+        try {
+          let expr = eq.equation.toLowerCase();
+          // Allowed chars: a-z (variables), digits, operators
+          if (!/^[a-z0-9\s\+\-\*\/\(\)\.]+$/.test(expr)) return 0;
+          Object.keys(context).forEach(key => {
+            const regex = new RegExp(`\\b${key}\\b`, 'g');
+            expr = expr.replace(regex, String(context[key]));
+          });
+          // eslint-disable-next-line no-new-func
+          const result = new Function(`return ${expr}`)();
+          return isNaN(result) || !isFinite(result) ? 0 : result;
+        } catch {
+          return 0;
+        }
+      });
+      datasets.push({
+        id: eq.id,
+        label: `[${eq.id.toUpperCase()}] ${eq.equation}`,
+        data,
+        type: chartConfig.type,
+        color: getQueryColor(queries.length + idx),
+      });
+    });
+
+    return { chartLabels: formattedLabels, chartDatasets: datasets, buckets: sortedBuckets };
+  }, [queryResults, queries, equations, chartConfig.type]);
+
 
   /* ═══ RENDER ═══ */
   return (
     <Box>
       <PageHeader
         icon={<MetricsIcon />}
-        title={<EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} />}
-        subtitle={t('argus.metrics.subtitle', 'Explore application metrics and custom counters')}
+        title={<EditablePageTitle value={queryName} onChange={setQueryName} placeholder={defaultQueryName} />}
+        subtitle={t('argus.metrics.subtitle', 'Build advanced metric dashboards and expressions')}
         enableAutoBack
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Tooltip title={t('argus.metrics.savedQueries', 'Saved Queries')}>
+            <Tooltip title={t('argus.metrics.savedQueries', 'Saved Dashboards')}>
               <IconButton size="small" onClick={() => setSavedPanelOpen(true)}
                 sx={{ color: savedQueries.length > 0 ? theme.palette.primary.main : 'text.secondary' }}>
                 {savedQueries.length > 0 ? <BookmarkIcon sx={{ fontSize: 20 }} /> : <BookmarkBorderIcon sx={{ fontSize: 20 }} />}
@@ -378,7 +430,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
             <ExploreActions
               dataset="metrics"
               projectId={projectId}
-              queryContext={{ search: selectedMetric, period: currentPeriod }}
+              queryContext={{ search: queries[0]?.metric, period: currentPeriod }}
             />
           </Box>
         }
@@ -388,254 +440,198 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         projectId={projectId}
         value={filters}
         onChange={handleFilterChange}
-        onRefresh={() => { fetchMetricNames(); if (selectedMetric) fetchMetricQuery(); }}
+        onRefresh={() => { fetchMetricNames(); fetchMetricQueries(); }}
         loading={loading || queryLoading}
         hideFilters={['browser', 'os']}
       />
 
-      <Box sx={{ display: 'flex', gap: 2 }}>
-        {/* ═══ Left: Metric List ═══ */}
-        <Paper elevation={0} sx={{
-          width: 280, flexShrink: 0, borderRadius: 2, overflow: 'hidden',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          maxHeight: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column',
-        }}>
-          <Box sx={{
-            p: 1.5, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          }}>
-            <Autocomplete
-              size="small"
-              freeSolo
-              options={metricNames.map(m => m.name)}
-              inputValue={search}
-              onInputChange={(_, newValue) => setSearch(newValue)}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  handleSelectMetric(newValue);
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder={t('argus.metrics.searchMetrics', 'Search metrics...')}
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <>
-                        <SearchIcon sx={{ fontSize: 16, color: 'text.disabled', ml: 0.5, mr: -0.5 }} />
-                        {params.InputProps.startAdornment}
-                      </>
-                    ),
-                    sx: {
-                      fontSize: '0.8rem',
-                      fontWeight: 600, // 두꺼운 폰트 적용 (얇은 폰트 문제 해결)
-                      borderRadius: '6px',
-                      backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                      },
-                    }
-                  }}
-                />
-              )}
-              sx={{ width: '100%' }}
-            />
-          </Box>
-          <Box sx={{ flex: 1, overflow: 'auto' }}>
-            <PageContentLoader loading={loading} skeleton={<TableSkeleton />}>
-              {filteredMetrics.length > 0 ? (
-                filteredMetrics.map((m, idx) => (
-                  <Box key={idx}
-                    onClick={() => handleSelectMetric(m.name)}
-                    sx={{
-                      px: 1.5, py: 1, cursor: 'pointer', transition: 'all 0.15s',
-                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                      backgroundColor: selectedMetric === m.name
-                        ? alpha(theme.palette.primary.main, isDark ? 0.15 : 0.08)
-                        : 'transparent',
-                      borderLeft: selectedMetric === m.name
-                        ? `3px solid ${theme.palette.primary.main}`
-                        : '3px solid transparent',
-                      '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.3 }}>
-                      <Box sx={{
-                        width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
-                        bgcolor: METRIC_TYPE_COLORS[m.metric_type] || '#6b7280',
-                      }} />
-                      <Typography sx={{
-                        fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: 600,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        color: selectedMetric === m.name ? theme.palette.primary.main : 'text.primary',
-                      }}>
-                        {m.name}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', ml: 1.8 }}>
-                      <Chip label={m.metric_type} size="small" sx={{
-                        height: 16, fontSize: '0.6rem', fontFamily: 'monospace',
-                        backgroundColor: alpha(METRIC_TYPE_COLORS[m.metric_type] || '#6b7280', 0.12),
-                        color: METRIC_TYPE_COLORS[m.metric_type] || '#6b7280',
-                        borderRadius: '3px',
-                      }} />
-                      {m.unit && (
-                        <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', fontFamily: 'monospace' }}>
-                          {m.unit}
-                        </Typography>
-                      )}
-                      <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', ml: 'auto' }}>
-                        {Number(m.total_points).toLocaleString()} pts
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))
-              ) : (
-                <Box sx={{ py: 4, textAlign: 'center' }}>
-                  <Typography sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-                    {t('argus.metrics.noMetrics', 'No metrics found')}
-                  </Typography>
-                </Box>
-              )}
-            </PageContentLoader>
-          </Box>
-        </Paper>
+      {/* ═══ Query Builder ═══ */}
+      <Paper elevation={0} sx={{
+        mb: 2, p: 2, borderRadius: 2,
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
+      }}>
+        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <SettingsIcon sx={{ fontSize: 16 }} /> Query Builder
+        </Typography>
 
-        {/* ═══ Right: Metric Detail ═══ */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          {selectedMetric ? (
-            <>
-              {/* Controls */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                <ChartIcon sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace' }}>
-                  {selectedMetric}
-                </Typography>
-                {selectedMetricInfo?.unit && (
-                  <Chip label={selectedMetricInfo.unit} size="small" sx={{
-                    height: 20, fontSize: '0.68rem', borderRadius: '4px',
-                  }} />
-                )}
-                <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>
-                    {t('argus.metrics.aggregation', 'Aggregation')}:
-                  </Typography>
-                  <FormControl size="small">
-                    <Select
-                      value={selectedAgg}
-                      onChange={(e) => setUrlState({ agg: e.target.value as string })}
-                      sx={{ height: 28, fontSize: '0.75rem', fontWeight: 700, minWidth: 90 }}
-                    >
-                      {AGG_OPTIONS.map(o => (
-                        <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>
-                    {t('argus.metrics.groupBy', 'Group by')}:
-                  </Typography>
-                  <FormControl size="small">
-                    <Select
-                      value={selectedGroupBy}
-                      onChange={(e) => setUrlState({ groupBy: e.target.value as string })}
-                      sx={{ height: 28, fontSize: '0.75rem', fontWeight: 700, minWidth: 110 }}
-                      displayEmpty
-                    >
-                      <MenuItem value="" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.none', 'None')}</MenuItem>
-                      <MenuItem value="environment" sx={{ fontSize: '0.75rem' }}>Environment</MenuItem>
-                      <MenuItem value="release" sx={{ fontSize: '0.75rem' }}>Release</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {/* Base Queries */}
+          {queries.map((q, idx) => (
+            <Box key={q.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box sx={{ width: 24, height: 24, borderRadius: 1, backgroundColor: alpha(getQueryColor(idx), 0.1), color: getQueryColor(idx), display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.75rem' }}>
+                {q.id.toUpperCase()}
               </Box>
+              
+              <Autocomplete
+                size="small"
+                freeSolo
+                options={metricNames.map(m => m.name)}
+                value={q.metric}
+                onInputChange={(_, newVal) => updateQuery(q.id, { metric: newVal })}
+                onChange={(_, newVal) => { if (newVal) updateQuery(q.id, { metric: newVal }); }}
+                renderInput={(params) => (
+                  <TextField {...params} placeholder="Select metric..." sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }} />
+                )}
+              />
 
-              {/* Summary Stats */}
-              {queryResult?.summary && (
-                <SummaryCards summary={queryResult.summary} unit={selectedMetricInfo?.unit} isDark={isDark} />
-              )}
+              <FormControl size="small">
+                <Select value={q.agg} onChange={(e) => updateQuery(q.id, { agg: e.target.value as string })} sx={{ height: 36, fontSize: '0.75rem', fontWeight: 600, minWidth: 90, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' }}>
+                  {AGG_OPTIONS.map(o => <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>{o.label}</MenuItem>)}
+                </Select>
+              </FormControl>
 
-              {/* Chart */}
-              <PageContentLoader loading={queryLoading} skeleton={<ArgusChartSkeleton type="bar" height={180} color={theme.palette.primary.main} />}>
-                <MetricChart
-                  data={queryResult?.timeSeries || []}
-                  isDark={isDark}
-                  onZoom={handleZoom}
-                  metricName={selectedMetric}
-                  unit={selectedMetricInfo?.unit}
-                />
-              </PageContentLoader>
+              <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>Group by:</Typography>
+              <FormControl size="small">
+                <Select displayEmpty value={q.groupBy} onChange={(e) => updateQuery(q.id, { groupBy: e.target.value as string })} sx={{ height: 36, fontSize: '0.75rem', fontWeight: 600, minWidth: 110, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' }}>
+                  <MenuItem value="" sx={{ fontSize: '0.75rem' }}>None</MenuItem>
+                  <MenuItem value="environment" sx={{ fontSize: '0.75rem' }}>Environment</MenuItem>
+                  <MenuItem value="release" sx={{ fontSize: '0.75rem' }}>Release</MenuItem>
+                </Select>
+              </FormControl>
 
-              {/* Time series table */}
-              {queryResult?.timeSeries && queryResult.timeSeries.length > 0 && (
-                <Paper elevation={0} sx={{
-                  borderRadius: 2, overflow: 'hidden',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                }}>
-                  <Table size="small" sx={{ '& td, & th': { borderColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' } }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1 }}>
-                          {t('argus.metrics.timestamp', 'TIMESTAMP')}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1 }}>
-                          {t('argus.metrics.value', 'VALUE')}
-                        </TableCell>
-                        {queryResult.timeSeries[0]?.group_value !== undefined && (
-                          <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1 }}>
-                            {selectedGroupBy.toUpperCase()}
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {queryResult.timeSeries.slice(0, 50).map((row, idx) => (
-                        <TableRow key={idx} hover>
-                          <TableCell sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary' }}>
-                              {new Date(row.bucket).toLocaleString('en-US', {
-                                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
-                              })}
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600 }}>
-                              {formatMetricValue(Number(row.value), selectedMetricInfo?.unit)}
-                            </Typography>
-                          </TableCell>
-                          {row.group_value !== undefined && (
-                            <TableCell sx={{ py: 0.6 }}>
-                              <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace' }}>
-                                {row.group_value}
-                              </Typography>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Paper>
-              )}
-            </>
-          ) : (
-            <Paper elevation={0} sx={{
-              borderRadius: 2, p: 6, textAlign: 'center',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-            }}>
-              <MetricsIcon sx={{ fontSize: 56, color: alpha(theme.palette.primary.main, 0.15), mb: 1.5 }} />
-              <Typography sx={{ fontSize: '1rem', fontWeight: 600, mb: 0.5 }}>
-                {t('argus.metrics.selectMetric', 'Select a Metric')}
+              <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5 }}>
+                <Tooltip title={q.isHidden ? "Show series" : "Hide series"}>
+                  <IconButton size="small" onClick={() => updateQuery(q.id, { isHidden: !q.isHidden })} sx={{ color: q.isHidden ? 'text.disabled' : getQueryColor(idx) }}>
+                    {q.isHidden ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
+                  </IconButton>
+                </Tooltip>
+                {queries.length > 1 && (
+                  <Tooltip title="Remove query">
+                    <IconButton size="small" onClick={() => removeQuery(q.id)} sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
+                      <DeleteIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+            </Box>
+          ))}
+
+          {/* Equations */}
+          {equations.map((eq, idx) => (
+            <Box key={eq.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+              <Box sx={{ width: 24, height: 24, borderRadius: 1, backgroundColor: alpha(getQueryColor(queries.length + idx), 0.1), color: getQueryColor(queries.length + idx), display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.75rem' }}>
+                {eq.id.toUpperCase()}
+              </Box>
+              
+              <TextField
+                size="small"
+                placeholder="e.g. a / b * 100"
+                value={eq.equation}
+                onChange={(e) => updateEquation(eq.id, { equation: e.target.value })}
+                sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, fontFamily: 'monospace', backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }}
+              />
+
+              <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', ml: 1 }}>
+                Use query IDs (a, b) and math operators (+, -, *, /)
               </Typography>
-              <Typography color="text.disabled" sx={{ fontSize: '0.82rem' }}>
-                {t('argus.metrics.selectMetricDesc', 'Choose a metric from the sidebar to view its time series, aggregations, and summary statistics.')}
-              </Typography>
-            </Paper>
-          )}
+
+              <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5 }}>
+                <Tooltip title={eq.isHidden ? "Show formula" : "Hide formula"}>
+                  <IconButton size="small" onClick={() => updateEquation(eq.id, { isHidden: !eq.isHidden })} sx={{ color: eq.isHidden ? 'text.disabled' : getQueryColor(queries.length + idx) }}>
+                    {eq.isHidden ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Remove formula">
+                  <IconButton size="small" onClick={() => removeEquation(eq.id)} sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
+                    <DeleteIcon sx={{ fontSize: 18 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+          ))}
+
+          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+            <Button size="small" startIcon={<AddIcon />} onClick={addQuery} sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}>
+              Add Query
+            </Button>
+            <Button size="small" startIcon={<CalculateIcon />} onClick={addEquation} sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>
+              Add Equation
+            </Button>
+          </Box>
         </Box>
-      </Box>
+
+        {/* Chart Configuration */}
+        <Box sx={{ mt: 3, pt: 2, borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, display: 'flex', alignItems: 'center', gap: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>Chart Type:</Typography>
+            <FormControl size="small">
+              <Select value={chartConfig.type} onChange={(e) => setChartConfig({ ...chartConfig, type: e.target.value as any })} sx={{ height: 28, fontSize: '0.75rem', fontWeight: 600, minWidth: 100 }}>
+                <MenuItem value="line" sx={{ fontSize: '0.75rem' }}>Line</MenuItem>
+                <MenuItem value="area" sx={{ fontSize: '0.75rem' }}>Area</MenuItem>
+                <MenuItem value="bar" sx={{ fontSize: '0.75rem' }}>Bar</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>Y-Axis:</Typography>
+            <FormControl size="small">
+              <Select value={chartConfig.yAxisType} onChange={(e) => setChartConfig({ ...chartConfig, yAxisType: e.target.value as any })} sx={{ height: 28, fontSize: '0.75rem', fontWeight: 600, minWidth: 100 }}>
+                <MenuItem value="linear" sx={{ fontSize: '0.75rem' }}>Linear</MenuItem>
+                <MenuItem value="logarithmic" sx={{ fontSize: '0.75rem' }}>Logarithmic</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <FormControlLabel
+            control={<Switch size="small" checked={chartConfig.showLegend} onChange={(e) => setChartConfig({ ...chartConfig, showLegend: e.target.checked })} />}
+            label={<Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>Show Legend</Typography>}
+            sx={{ m: 0 }}
+          />
+        </Box>
+      </Paper>
+
+      {/* ═══ Chart ═══ */}
+      <PageContentLoader loading={queryLoading} skeleton={<ArgusChartSkeleton type={chartConfig.type === 'bar' ? 'bar' : 'line'} height={300} color={theme.palette.primary.main} />}>
+        <MetricChart
+          labels={chartLabels}
+          datasets={chartDatasets}
+          isDark={isDark}
+          onZoom={handleZoom}
+          config={chartConfig}
+          buckets={buckets}
+        />
+      </PageContentLoader>
+
+      {/* ═══ Data Table ═══ */}
+      {chartLabels.length > 0 && (
+        <Paper elevation={0} sx={{
+          borderRadius: 2, overflow: 'hidden',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        }}>
+          <Table size="small" sx={{ '& td, & th': { borderColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' } }}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1 }}>
+                  {t('argus.metrics.timestamp', 'TIMESTAMP')}
+                </TableCell>
+                {chartDatasets.map(ds => (
+                  <TableCell key={ds.id} sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1, color: ds.color }}>
+                    {ds.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {chartLabels.slice(0, 100).map((label, idx) => (
+                <TableRow key={idx} hover>
+                  <TableCell sx={{ py: 0.6 }}>
+                    <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary' }}>
+                      {label}
+                    </Typography>
+                  </TableCell>
+                  {chartDatasets.map(ds => (
+                    <TableCell key={ds.id} sx={{ py: 0.6 }}>
+                      <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                        {Number(ds.data[idx]).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                      </Typography>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
       {/* Save Query Dialog */}
       <Dialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)} maxWidth="xs" fullWidth
@@ -670,7 +666,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         PaperProps={{ sx: { width: 340, p: 2 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
-            {t('argus.metrics.savedQueries', 'Saved Metric Queries')}
+            {t('argus.metrics.savedQueries', 'Saved Dashboards')}
           </Typography>
           <IconButton size="small" onClick={() => setSavedPanelOpen(false)}>
             <CloseIcon fontSize="small" />
