@@ -352,6 +352,7 @@ const ArgusSettingsPage: React.FC = () => {
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
       fontSize: '0.875rem',
+      height: '36px',
     },
   };
 
