@@ -246,6 +246,13 @@ const ArgusFeedbackPage: React.FC = () => {
   const [commentLoading, setCommentLoading] = useState(false);
 
   // ─── Resizable Splitter ───
+  const DETAIL_OPEN_KEY = 'argus-feedback-detail-open';
+  const [isDetailOpen, setIsDetailOpen] = useState(() => localStorage.getItem(DETAIL_OPEN_KEY) !== 'false');
+
+  useEffect(() => {
+    localStorage.setItem(DETAIL_OPEN_KEY, String(isDetailOpen));
+  }, [isDetailOpen]);
+
   const [splitWidth, setSplitWidth] = useState(() => {
     const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
     return !isNaN(saved) && saved >= MIN_SPLIT_WIDTH && saved <= MAX_SPLIT_WIDTH ? saved : DEFAULT_SPLIT_WIDTH;
@@ -870,7 +877,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
         {/* ─── LEFT: Feedback List ─── */}
         <Box sx={{
-          width: selectedItem ? splitWidth : '100%', minWidth: MIN_SPLIT_WIDTH, flexShrink: 0,
+          width: isDetailOpen ? splitWidth : '100%', minWidth: MIN_SPLIT_WIDTH, flexShrink: 0,
           display: 'flex', flexDirection: 'column', transition: isSplitDragging ? 'none' : 'width 0.2s', overflow: 'hidden',
         }}>
           <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -890,6 +897,7 @@ const ArgusFeedbackPage: React.FC = () => {
                       key={item.feedback_id}
                       onClick={() => {
                         setUrlState({ fb: item.feedback_id });
+                        setIsDetailOpen(true);
                         // Mark as read
                         if (!item.is_read) {
                           argusService.markFeedbackRead(projectId, [item.feedback_id]).catch(() => {});
@@ -990,7 +998,7 @@ const ArgusFeedbackPage: React.FC = () => {
         </Box>
 
         {/* ─── Resizable Splitter Handle ─── */}
-        {selectedItem && (
+        {isDetailOpen && (
           <Box
             onMouseDown={handleSplitterMouseDown}
             sx={{
@@ -1024,9 +1032,11 @@ const ArgusFeedbackPage: React.FC = () => {
         )}
 
         {/* ─── RIGHT: Detail Panel ─── */}
-        {selectedItem && (
-          <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-            {/* Detail Header */}
+        {isDetailOpen && (
+          <>
+            {selectedItem ? (
+              <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+                {/* Detail Header */}
             <Box sx={{
               px: 2.5, py: 1.5, display: 'flex', alignItems: 'center', gap: 1.5,
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
@@ -1055,7 +1065,7 @@ const ArgusFeedbackPage: React.FC = () => {
                 {formatRelative(selectedItem.submitted_at, t)}
               </Typography>
               <Tooltip title={t('argus.feedback.closeDetail')}>
-                <IconButton size="small" onClick={() => setUrlState({ fb: '' })} sx={{ ml: 0.5 }}>
+                <IconButton size="small" onClick={() => setIsDetailOpen(false)} sx={{ ml: 0.5 }}>
                   <CloseIcon sx={{ fontSize: 16 }} />
                 </IconButton>
               </Tooltip>
@@ -1293,18 +1303,20 @@ const ArgusFeedbackPage: React.FC = () => {
                   })}
                 </Paper>
               )}
-            </Box>
-          </Box>
-        )}
-
-        {/* Empty Detail Placeholder */}
-        {!selectedItem && items.length > 0 && !loading && (
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'text.disabled' }}>
-            <FeedbackIcon sx={{ fontSize: 56, mb: 1, opacity: 0.3 }} />
-            <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
-              {t('argus.feedback.selectToView')}
-            </Typography>
-          </Box>
+                </Box>
+              </Box>
+            ) : (
+              /* Empty Detail Placeholder */
+              items.length > 0 && !loading && (
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'text.disabled' }}>
+                  <FeedbackIcon sx={{ fontSize: 56, mb: 1, opacity: 0.3 }} />
+                  <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
+                    {t('argus.feedback.emptySelection', '피드백을 선택하면 상세 내용을 확인할 수 있습니다.')}
+                  </Typography>
+                </Box>
+              )
+            )}
+          </>
         )}
       </Box>
 
