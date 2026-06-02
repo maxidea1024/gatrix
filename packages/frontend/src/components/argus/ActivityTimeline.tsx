@@ -11,6 +11,7 @@ import {
   Divider,
   Collapse,
   CircularProgress,
+  Link,
 } from '@mui/material';
 import {
   Timeline as TimelineIcon,
@@ -32,6 +33,8 @@ interface ActivityTimelineProps {
   projectId: string;
   issueId: string;
   isDark: boolean;
+  /** When true, renders without Paper card wrapper for embedding in sidebar */
+  embedded?: boolean;
 }
 
 const ACTION_CONFIG: Record<string, { icon: React.ReactElement; color: string; label: string }> = {
@@ -78,12 +81,13 @@ function getActivityDescription(activity: ArgusIssueActivity, t: any): string {
   }
 }
 
-const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId, isDark }) => {
+const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId, isDark, embedded = false }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [activities, setActivities] = useState<ArgusIssueActivity[]>([]);
   const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(!embedded);
+  const [showAll, setShowAll] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -117,41 +121,51 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
     }
   };
 
+  const Wrapper = embedded ? Box : Paper;
+  const wrapperProps = embedded
+    ? { component: 'div' as const }
+    : {
+        elevation: 0,
+        sx: {
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          borderRadius: 2,
+          overflow: 'hidden',
+          mb: 2,
+        },
+      };
+
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2,
-        overflow: 'hidden',
-        mb: 2,
-      }}
-    >
+    <Wrapper {...(wrapperProps as any)}>
       {/* Header */}
       <Box
         onClick={() => setExpanded(!expanded)}
         sx={{
           display: 'flex', alignItems: 'center', gap: 1,
-          px: 2, py: 1.5, cursor: 'pointer',
-          backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
-          borderBottom: expanded ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` : 'none',
+          px: embedded ? 0 : 2, py: embedded ? 0.5 : 1.5, cursor: 'pointer',
+          backgroundColor: embedded ? 'transparent' : (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)'),
+          borderBottom: expanded && !embedded ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` : 'none',
         }}
       >
-        <TimelineIcon sx={{ fontSize: 18, color: '#ff9800' }} />
-        <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.82rem' }}>
-          {t('argus.activity.title', 'Activity')}
+        <Typography variant="caption" fontWeight={700} sx={{
+          flex: 1,
+          fontSize: '0.7rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          color: 'text.secondary',
+        }}>
+          {t('argus.activity.title')}
           {activities.length > 0 && (
-            <Typography component="span" sx={{ ml: 0.5, color: 'text.disabled', fontSize: '0.72rem', fontWeight: 500 }}>
+            <Typography component="span" sx={{ ml: 0.5, color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}>
               ({activities.length})
             </Typography>
           )}
         </Typography>
-        {expanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+        {expanded ? <ExpandLessIcon sx={{ fontSize: 16, color: 'text.disabled' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.disabled' }} />}
       </Box>
 
       <Collapse in={expanded}>
         {/* Comment input */}
-        <Box sx={{ display: 'flex', gap: 1, px: 2, py: 1.5, alignItems: 'flex-start' }}>
+        <Box sx={{ display: 'flex', gap: 1, px: embedded ? 0 : 2, py: 1, alignItems: 'flex-start' }}>
           <TextField
             size="small"
             fullWidth
@@ -197,70 +211,91 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ px: 2, py: 1 }}>
-            {activities.map((activity, idx) => {
-              const config = ACTION_CONFIG[activity.action] || ACTION_CONFIG.status_change;
-              const isComment = activity.action === 'comment';
+          <Box sx={{ px: embedded ? 0 : 2, py: 1 }}>
+            {(() => {
+              const maxItems = embedded && !showAll ? 5 : activities.length;
+              const visibleActivities = activities.slice(0, maxItems);
+              const hasMore = embedded && activities.length > 5 && !showAll;
               return (
-                <Box
-                  key={activity.id}
-                  sx={{
-                    display: 'flex', gap: 1.5, py: 1,
-                    borderBottom: idx < activities.length - 1
-                      ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`
-                      : 'none',
-                  }}
-                >
-                  {/* Timeline dot */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 0.3 }}>
-                    <Box sx={{
-                      width: 24, height: 24, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      backgroundColor: alpha(config.color, isDark ? 0.15 : 0.08),
-                      color: config.color,
-                    }}>
-                      {config.icon}
-                    </Box>
-                    {idx < activities.length - 1 && (
-                      <Box sx={{ width: 1, flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', mt: 0.5 }} />
-                    )}
-                  </Box>
+                <>
+                  {visibleActivities.map((activity, idx) => {
+                    const config = ACTION_CONFIG[activity.action] || ACTION_CONFIG.status_change;
+                    const isComment = activity.action === 'comment';
+                    return (
+                      <Box
+                        key={activity.id}
+                        sx={{
+                          display: 'flex', gap: 1.5, py: 1,
+                          borderBottom: idx < visibleActivities.length - 1
+                            ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`
+                            : 'none',
+                        }}
+                      >
+                        {/* Timeline dot */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 0.3 }}>
+                          <Box sx={{
+                            width: 24, height: 24, borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            backgroundColor: alpha(config.color, isDark ? 0.15 : 0.08),
+                            color: config.color,
+                          }}>
+                            {config.icon}
+                          </Box>
+                          {idx < visibleActivities.length - 1 && (
+                            <Box sx={{ width: 1, flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', mt: 0.5 }} />
+                          )}
+                        </Box>
 
-                  {/* Content */}
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.3 }}>
-                      {activity.user_name && (
-                        <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
-                          {activity.user_name}
-                        </Typography>
-                      )}
-                      <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
-                        {formatRelativeTime(activity.created_at)}
-                      </Typography>
-                    </Box>
-                    {isComment ? (
-                      <Box sx={{
-                        px: 1.5, py: 1, borderRadius: 1.5,
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                      }}>
-                        <Typography variant="body2" sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap' }}>
-                          {getActivityDescription(activity, t)}
-                        </Typography>
+                        {/* Content */}
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.3 }}>
+                            {activity.user_name && (
+                              <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
+                                {activity.user_name}
+                              </Typography>
+                            )}
+                            <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+                              {formatRelativeTime(activity.created_at)}
+                            </Typography>
+                          </Box>
+                          {isComment ? (
+                            <Box sx={{
+                              px: 1.5, py: 1, borderRadius: 1.5,
+                              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                            }}>
+                              <Typography variant="body2" sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap' }}>
+                                {getActivityDescription(activity, t)}
+                              </Typography>
+                            </Box>
+                          ) : (
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                              {getActivityDescription(activity, t)}
+                            </Typography>
+                          )}
+                        </Box>
                       </Box>
-                    ) : (
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
-                        {getActivityDescription(activity, t)}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
+                    );
+                  })}
+                  {hasMore && (
+                    <Box sx={{ pt: 1, textAlign: 'center' }}>
+                      <Link
+                        component="button"
+                        variant="caption"
+                        onClick={() => setShowAll(true)}
+                        sx={{ fontSize: '0.7rem', cursor: 'pointer' }}
+                      >
+                        {t('argus.activity.showAll', { count: activities.length - 5 })}
+                      </Link>
+                    </Box>
+                  )}
+                </>
               );
-            })}
+            })()}
           </Box>
         )}
       </Collapse>
-    </Paper>
+    </Wrapper>
   );
 };
 
