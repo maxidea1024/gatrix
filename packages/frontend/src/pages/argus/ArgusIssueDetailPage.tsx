@@ -91,6 +91,7 @@ import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
 import SuspectCommits from '@/components/argus/SuspectCommits';
 import IssueDetailActions from '@/components/argus/IssueDetailActions';
 import EventHighlights from '@/components/argus/EventHighlights';
+import ExceptionChaining from '@/components/argus/ExceptionChaining';
 
 
 function stringToColor(str: string): string {
@@ -738,6 +739,12 @@ const ArgusIssueDetailPage: React.FC = () => {
                   </Typography>
                 )}
 
+                {/* Exception Chaining */}
+                <ExceptionChaining
+                  exceptionType={latestEvent.exception_type}
+                  exceptionValue={latestEvent.exception_value}
+                  isDark={isDark}
+                />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0 }}>
                   <Box sx={{ 
                     display: 'inline-flex', backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', 

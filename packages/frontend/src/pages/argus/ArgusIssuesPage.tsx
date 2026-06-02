@@ -837,6 +837,27 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               </Button>
             </span>
           </Tooltip>
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<CloseIcon sx={{ fontSize: 14 }} />}
+            onClick={async () => {
+              if (!confirm(t('argus.detail.deleteConfirmMessage'))) return;
+              try {
+                for (const id of selectedIds) {
+                  await argusService.deleteIssue(String(projectId), String(id));
+                }
+                setSelectedIds(new Set());
+                fetchIssues();
+              } catch (e) {
+                console.error('Failed to delete issues:', e);
+              }
+            }}
+            sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem', borderColor: alpha('#f44336', 0.5), color: '#f44336', '&:hover': { borderColor: '#f44336', backgroundColor: alpha('#f44336', 0.08) } }}
+          >
+            {t('argus.detail.delete')}
+          </Button>
           <Button
             size="small"
             onClick={() => setSelectedIds(new Set())}
