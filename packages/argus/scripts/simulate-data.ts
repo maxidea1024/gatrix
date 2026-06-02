@@ -1443,7 +1443,18 @@ const FEEDBACK_MESSAGES_EN = [
 
 const FEEDBACK_MESSAGES = [...FEEDBACK_MESSAGES_KO, ...FEEDBACK_MESSAGES_EN];
 
-// ═══════════════════ LOG GENERATION ═══════════════════
+// ═══════════════════ METRICS TEMPLATES ═══════════════════
+
+const METRICS_TEMPLATES = [
+  { name: 'system.cpu.utilization', type: 'gauge', unit: 'percent', valMin: 10, valMax: 95 },
+  { name: 'system.memory.used', type: 'gauge', unit: 'byte', valMin: 1024*1024*100, valMax: 1024*1024*8000 },
+  { name: 'http.server.requests', type: 'counter', unit: 'none', valMin: 1, valMax: 100 },
+  { name: 'http.server.duration', type: 'distribution', unit: 'millisecond', valMin: 5, valMax: 500 },
+  { name: 'custom.user.login', type: 'counter', unit: 'none', valMin: 1, valMax: 5 },
+  { name: 'custom.checkout.cart_size', type: 'distribution', unit: 'none', valMin: 1, valMax: 15 },
+  { name: 'game.concurrent_players', type: 'gauge', unit: 'none', valMin: 1000, valMax: 15000 },
+];
+
 
 function generateLogsForEvent(
   issueId: number, timestamp: Date, scenario: ErrorScenario,
@@ -1503,7 +1514,7 @@ async function main() {
   console.log('🗑️  Truncating all existing data...');
 
   // ClickHouse tables
-  const chTables = ['errors', 'transactions', 'spans', 'sessions', 'user_feedback', 'logs', 'metrics_1m', 'metrics_1h', 'metrics_1d'];
+  const chTables = ['errors', 'transactions', 'spans', 'sessions', 'user_feedback', 'logs', 'metrics'];
   for (const table of chTables) {
     try {
       await ch.exec({ query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.${table}` });
@@ -1890,7 +1901,62 @@ async function main() {
     console.log(`   ⚠ Feedback insert failed: ${e.message?.substring(0, 80)}`);
   }
 
-  // ──────── 10. SUMMARY ────────
+  // ──────── 10. GENERATE & INSERT METRICS ────────
+  console.log(`\n📊 Phase 8: Generating metrics data...`);
+  let metricsBatch: any[] = [];
+  let metricsCount = 0;
+  const TOTAL_METRICS = 100000;
+
+  for (let i = 0; i < TOTAL_METRICS; i++) {
+    const tmpl = randomPick(METRICS_TEMPLATES);
+    const timestamp = randomDateWeighted(DAYS_BACK);
+    const env = randomPick(['production', 'production', 'staging']);
+    const release = randomPick(SERVER_RELEASES);
+    
+    let value_counter = 0, value_gauge = 0, value_distribution: number[] = [], value_set: string[] = [];
+    if (tmpl.type === 'counter') value_counter = randomFloat(tmpl.valMin, tmpl.valMax);
+    else if (tmpl.type === 'gauge') value_gauge = randomFloat(tmpl.valMin, tmpl.valMax);
+    else if (tmpl.type === 'distribution') {
+      const len = randomInt(1, 10);
+      for (let j = 0; j < len; j++) value_distribution.push(randomFloat(tmpl.valMin, tmpl.valMax));
+    }
+    
+    metricsBatch.push({
+      project_id: PROJECT_ID,
+      metric_type: tmpl.type,
+      name: tmpl.name,
+      unit: tmpl.unit,
+      timestamp: timestamp.getTime(), // ClickHouse Node.js client handles numbers as Unix timestamp MS for DateTime64
+      value_counter,
+      value_gauge,
+      value_distribution,
+      value_set,
+      environment: env,
+      release,
+      tags: { region: randomPick(['ap-northeast-2', 'eu-west-1', 'us-east-1']) },
+    });
+    
+    if (metricsBatch.length >= CHUNK_SIZE) {
+      try {
+        await ch.insert({ table: `${CH_CONFIG.database}.metrics`, values: metricsBatch, format: 'JSONEachRow' });
+      } catch (e: any) {
+        console.log(`   ⚠ Metrics insert failed: ${e.message?.substring(0, 80)}`);
+      }
+      metricsCount += metricsBatch.length;
+      metricsBatch = [];
+    }
+  }
+  if (metricsBatch.length > 0) {
+    try {
+      await ch.insert({ table: `${CH_CONFIG.database}.metrics`, values: metricsBatch, format: 'JSONEachRow' });
+    } catch (e: any) {
+      console.log(`   ⚠ Metrics insert failed: ${e.message?.substring(0, 80)}`);
+    }
+    metricsCount += metricsBatch.length;
+  }
+  console.log(`   ✓ ${metricsCount.toLocaleString()} metrics inserted`);
+
+  // ──────── 11. SUMMARY ────────
   console.log('\n' + '═'.repeat(60));
   console.log('✅ Simulation Complete!\n');
   console.log(`   Issues:        ${issueMap.size}`);
@@ -1898,6 +1964,7 @@ async function main() {
   console.log(`   Logs:          ${totalLogs.toLocaleString()}`);
   console.log(`   Transactions:  ${txnCount.toLocaleString()}`);
   console.log(`   Sessions:      ${sessCount.toLocaleString()}`);
+  console.log(`   Metrics:       ${metricsCount.toLocaleString()}`);
   console.log(`   Feedback:      ${feedbackBatch.length.toLocaleString()}`);
   console.log(`   Users:         ${USERS.length.toLocaleString()}`);
   console.log(`   Time range:    ${DAYS_BACK} days`);
