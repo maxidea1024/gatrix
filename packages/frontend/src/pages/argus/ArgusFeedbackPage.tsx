@@ -95,6 +95,7 @@ import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import SimplePagination from '@/components/common/SimplePagination';
 import PageHeader from '@/components/common/PageHeader';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
@@ -248,6 +249,16 @@ const ArgusFeedbackPage: React.FC = () => {
     const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
     return !isNaN(saved) && saved >= MIN_SPLIT_WIDTH && saved <= MAX_SPLIT_WIDTH ? saved : DEFAULT_SPLIT_WIDTH;
   });
+  
+  // ─── Confirm Dialog ───
+  const [confirmConfig, setConfirmConfig] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    confirmColor?: 'primary' | 'error' | 'warning' | 'success';
+  }>({ open: false, title: '', message: '', onConfirm: () => {} });
   const [isSplitDragging, setIsSplitDragging] = useState(false);
   const splitContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -337,20 +348,41 @@ const ArgusFeedbackPage: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (feedbackId: string, status: string) => {
-    try {
-      await argusService.updateFeedback(projectId, feedbackId, { status });
-      enqueueSnackbar(t('argus.feedback.statusUpdated'), { variant: 'success' });
-      fetchData();
-    } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+  const handleUpdateStatus = (feedbackId: string, status: string) => {
+    const isResolve = status === 'resolved';
+    setConfirmConfig({
+      open: true,
+      title: isResolve ? t('argus.feedback.resolveTitle', 'Resolve Feedback') : t('argus.feedback.unresolveTitle', 'Unresolve Feedback'),
+      message: isResolve ? t('argus.feedback.resolveConfirm', 'Are you sure you want to mark this feedback as resolved?') : t('argus.feedback.unresolveConfirm', 'Are you sure you want to mark this feedback as unresolved?'),
+      confirmText: isResolve ? t('argus.feedback.resolve', 'Resolve') : t('argus.feedback.unresolve', 'Unresolve'),
+      confirmColor: isResolve ? 'success' : 'warning',
+      onConfirm: async () => {
+        setConfirmConfig(p => ({ ...p, open: false }));
+        try {
+          await argusService.updateFeedback(projectId, feedbackId, { status });
+          enqueueSnackbar(t('argus.feedback.statusUpdated'), { variant: 'success' });
+          fetchData();
+        } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+      }
+    });
   };
 
-  const handleMarkSpam = async (feedbackId: string) => {
-    try {
-      await argusService.updateFeedback(projectId, feedbackId, { is_spam: true });
-      enqueueSnackbar(t('argus.feedback.markedSpam'), { variant: 'success' });
-      fetchData();
-    } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+  const handleMarkSpam = (feedbackId: string) => {
+    setConfirmConfig({
+      open: true,
+      title: t('argus.feedback.spamTitle', 'Mark as Spam'),
+      message: t('argus.feedback.spamConfirm', 'Are you sure you want to mark this feedback as spam?'),
+      confirmText: t('argus.feedback.markSpam', 'Mark Spam'),
+      confirmColor: 'error',
+      onConfirm: async () => {
+        setConfirmConfig(p => ({ ...p, open: false }));
+        try {
+          await argusService.updateFeedback(projectId, feedbackId, { is_spam: true });
+          enqueueSnackbar(t('argus.feedback.markedSpam'), { variant: 'success' });
+          fetchData();
+        } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+      }
+    });
   };
 
   const handleAssignFeedback = async (feedbackId: string, assignee: string) => {
@@ -362,14 +394,47 @@ const ArgusFeedbackPage: React.FC = () => {
     setAssigneeAnchor(null);
   };
 
-  const handleBulkAction = async (action: 'resolve' | 'unresolve' | 'spam') => {
+  const handleBulkAction = (action: 'resolve' | 'unresolve' | 'spam') => {
     if (selectedIds.size === 0) return;
-    try {
-      await argusService.bulkFeedbackAction(projectId, Array.from(selectedIds), action);
-      enqueueSnackbar(t('argus.feedback.bulkDone', { count: selectedIds.size }), { variant: 'success' });
-      setSelectedIds(new Set());
-      fetchData();
-    } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+    
+    let title = '';
+    let message = '';
+    let confirmText = '';
+    let confirmColor: 'primary' | 'error' | 'warning' | 'success' = 'primary';
+    
+    if (action === 'resolve') {
+      title = t('argus.feedback.bulkResolveTitle', 'Resolve Multiple');
+      message = t('argus.feedback.bulkResolveConfirm', { count: selectedIds.size, defaultValue: `Resolve ${selectedIds.size} items?` });
+      confirmText = t('argus.feedback.resolve', 'Resolve');
+      confirmColor = 'success';
+    } else if (action === 'unresolve') {
+      title = t('argus.feedback.bulkUnresolveTitle', 'Unresolve Multiple');
+      message = t('argus.feedback.bulkUnresolveConfirm', { count: selectedIds.size, defaultValue: `Unresolve ${selectedIds.size} items?` });
+      confirmText = t('argus.feedback.unresolve', 'Unresolve');
+      confirmColor = 'warning';
+    } else if (action === 'spam') {
+      title = t('argus.feedback.bulkSpamTitle', 'Mark Multiple as Spam');
+      message = t('argus.feedback.bulkSpamConfirm', { count: selectedIds.size, defaultValue: `Mark ${selectedIds.size} items as spam?` });
+      confirmText = t('argus.feedback.markSpam', 'Mark Spam');
+      confirmColor = 'error';
+    }
+
+    setConfirmConfig({
+      open: true,
+      title,
+      message,
+      confirmText,
+      confirmColor,
+      onConfirm: async () => {
+        setConfirmConfig(p => ({ ...p, open: false }));
+        try {
+          await argusService.bulkFeedbackAction(projectId, Array.from(selectedIds), action);
+          enqueueSnackbar(t('argus.feedback.bulkDone', { count: selectedIds.size }), { variant: 'success' });
+          setSelectedIds(new Set());
+          fetchData();
+        } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+      }
+    });
   };
 
   const handleBulkAssign = async (assignee: string) => {
@@ -1470,6 +1535,16 @@ const ArgusFeedbackPage: React.FC = () => {
           );
         })}
       </Menu>
+
+      <ConfirmDialog
+        open={confirmConfig.open}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onClose={() => setConfirmConfig(p => ({ ...p, open: false }))}
+        onConfirm={confirmConfig.onConfirm}
+        confirmText={confirmConfig.confirmText}
+        confirmColor={confirmConfig.confirmColor}
+      />
     </Box>
   );
 };
