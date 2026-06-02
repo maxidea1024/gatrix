@@ -26,13 +26,13 @@ import {
   Cancel as CancelIcon,
   Warning as WarningIcon,
   HourglassEmpty as HourglassIcon,
-  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import rippleService, { RippleHistoryEvent } from '@/services/rippleService';
+import { CopyButton } from '@/components/common/CopyButton';
 
 const fadeSlideIn = keyframes`
   from {
@@ -421,15 +421,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             {event.handlerKey}
                           </Typography>
                           {event.status !== 'skipped' && (
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.handlerKey)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.handlerKey} size={13} />
                           )}
                         </Box>
                       </TableCell>
@@ -447,15 +439,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             >
                               {event.serviceType}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.serviceType)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.serviceType} size={13} />
                           </Box>
                         ) : null}
                       </TableCell>
@@ -472,15 +456,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             >
                               {event.hostname}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.hostname)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.hostname} size={13} />
                           </Box>
                         ) : event.status !== 'skipped' ? (
                           <Typography
@@ -505,15 +481,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             >
                               {event.serverId}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.serverId)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.serverId} size={13} />
                           </Box>
                         ) : event.status !== 'skipped' ? (
                           <Typography

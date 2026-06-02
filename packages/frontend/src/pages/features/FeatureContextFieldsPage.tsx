@@ -39,7 +39,6 @@ import {
   SettingsSuggest as ContextIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  ContentCopy as CopyIcon,
   ViewColumn as ViewColumnIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
@@ -63,7 +62,6 @@ import {
   formatDateTimeDetailed,
   formatRelativeTime,
 } from '../../utils/dateFormat';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ReferenceCheckDialog, {
   ResourceReference,
@@ -281,6 +279,7 @@ interface FeatureContextField {
 }
 // Convert camelCase/snake_case/kebab-case to Title Case
 import { toTitleCase } from '../../utils/stringUtils';
+import { CopyButton } from '@/components/common/CopyButton';
 
 const FeatureContextFieldsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -1038,44 +1037,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                             >
                                               {field.fieldName}
                                             </Typography>
-                                            <Tooltip title={t('common.copy')}>
-                                              <IconButton
-                                                size="small"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  copyToClipboardWithNotification(
-                                                    field.fieldName,
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t(
-                                                          'common.copySuccess',
-                                                          {
-                                                            type: field.fieldName,
-                                                          }
-                                                        ),
-                                                        {
-                                                          variant: 'success',
-                                                        }
-                                                      ),
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t('common.copyFailed'),
-                                                        {
-                                                          variant: 'error',
-                                                        }
-                                                      )
-                                                  );
-                                                }}
-                                                sx={{
-                                                  opacity: 0.5,
-                                                  '&:hover': { opacity: 1 },
-                                                }}
-                                              >
-                                                <CopyIcon
-                                                  sx={{ fontSize: 13 }}
-                                                />
-                                              </IconButton>
-                                            </Tooltip>
+                                            <CopyButton text={field.fieldName} size={13} />
                                           </Box>
                                           {field.displayName &&
                                             field.displayName !==

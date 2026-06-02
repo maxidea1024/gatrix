@@ -186,6 +186,7 @@ const getTypeIconSmall = (type: string) => getFlagTypeIcon(type, 16);
 
 import { toTitleCase } from '../../utils/stringUtils';
 import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 const FeatureFlagsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -2768,35 +2769,7 @@ const FeatureFlagsPage: React.FC = () => {
                                             title={t('common.copy')}
                                             disableFocusListener
                                           >
-                                            <IconButton
-                                              size="small"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                copyToClipboardWithNotification(
-                                                  flag.flagName,
-                                                  () =>
-                                                    enqueueSnackbar(
-                                                      t('common.copySuccess'),
-                                                      {
-                                                        variant: 'success',
-                                                      }
-                                                    ),
-                                                  () =>
-                                                    enqueueSnackbar(
-                                                      t('common.copyFailed'),
-                                                      {
-                                                        variant: 'error',
-                                                      }
-                                                    )
-                                                );
-                                              }}
-                                              sx={{
-                                                opacity: 0.5,
-                                                '&:hover': { opacity: 1 },
-                                              }}
-                                            >
-                                              <CopyIcon sx={{ fontSize: 13 }} />
-                                            </IconButton>
+                                            <CopyButton text={flag.flagName} size={13} />
                                           </Tooltip>
                                           <SafeTooltip
                                             title={

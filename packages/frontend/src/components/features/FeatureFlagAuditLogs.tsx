@@ -36,7 +36,6 @@ import {
   DragIndicator as DragIndicatorIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
-  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -80,6 +79,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Interfaces & Subcomponents
 interface ColumnConfig {
@@ -1200,19 +1200,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                       justifyContent: 'flex-end',
                                     }}
                                   >
-                                    <Tooltip
-                                      title={t('common.copyToClipboard')}
-                                    >
-                                      <IconButton
-                                        size="small"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleCopyDetails(log);
-                                        }}
-                                      >
-                                        <ContentCopyIcon fontSize="small" />
-                                      </IconButton>
-                                    </Tooltip>
+                                    <CopyButton text={JSON.stringify(log, null, 2)} size={13} />
                                   </Box>
                                 </Box>
                               </Box>

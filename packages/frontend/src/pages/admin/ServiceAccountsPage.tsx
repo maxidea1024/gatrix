@@ -47,7 +47,6 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
-  ContentCopy as CopyIcon,
   VpnKey as TokenIcon,
   Shield as ShieldIcon,
   MoreVert as MoreVertIcon,
@@ -67,7 +66,6 @@ import serviceAccountService, {
   ServiceAccountToken,
 } from '@/services/serviceAccountService';
 import { rbacService, Role, UserRole } from '@/services/rbacService';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -77,6 +75,7 @@ import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import environmentService from '@/services/environmentService';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // ==================== Tab Panel ====================
 
@@ -809,24 +808,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
               InputProps={{
                 readOnly: true,
                 endAdornment: (
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      copyToClipboardWithNotification(
-                        createdToken,
-                        () =>
-                          enqueueSnackbar(t('common.copiedToClipboard'), {
-                            variant: 'success',
-                          }),
-                        () =>
-                          enqueueSnackbar(t('common.copyFailed'), {
-                            variant: 'error',
-                          })
-                      )
-                    }
-                  >
-                    <CopyIcon sx={{ fontSize: 13 }} />
-                  </IconButton>
+                  <CopyButton text={createdToken} size={13} />
                 ),
               }}
             />

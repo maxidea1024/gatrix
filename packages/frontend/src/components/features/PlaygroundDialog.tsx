@@ -58,7 +58,6 @@ import {
   DataObject as JsonIcon,
   Code as CodeIcon,
   SportsEsports as JoystickIcon,
-  ContentCopy as CopyIcon,
   AccountTree as ExtractIcon,
   WarningAmber as WarningAmberIcon,
   ErrorOutline as ErrorOutlineIcon,
@@ -79,12 +78,12 @@ import api from '../../services/api';
 import ConstraintDisplay from './ConstraintDisplay';
 import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
 import JsonEditor from '../common/JsonEditor';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog';
 import ContextFieldChip, { ContextFieldInfo } from '../common/ContextFieldChip';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { CopyButton } from '@/components/common/CopyButton';
 interface ContextField {
   fieldName: string;
   displayName: string;
@@ -4163,36 +4162,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     {t('playground.appliedVariant')}
                   </Typography>
                   {selectedEvaluation.result.variant && (
-                    <Tooltip title={t('common.copy')} disableFocusListener>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const value =
-                            selectedEvaluation.result.variant?.value;
-                          const valueToCopy =
-                            typeof value === 'object' &&
-                            value !== null &&
-                            'value' in value
-                              ? String(value.value)
-                              : typeof value === 'object'
-                                ? JSON.stringify(value)
-                                : String(value ?? '');
-                          copyToClipboardWithNotification(
-                            valueToCopy,
-                            () =>
-                              enqueueSnackbar(t('common.copiedToClipboard'), {
-                                variant: 'success',
-                              }),
-                            () =>
-                              enqueueSnackbar(t('common.copyFailed'), {
-                                variant: 'error',
-                              })
-                          );
-                        }}
-                      >
-                        <CopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <CopyButton text={(() => {
+                      const value = selectedEvaluation.result.variant?.value;
+                      return typeof value === 'object' && value !== null && 'value' in value
+                        ? String((value as any).value)
+                        : typeof value === 'object'
+                          ? JSON.stringify(value)
+                          : String(value ?? '');
+                    })()} size={13} />
                   )}
                 </Box>
                 <Box
@@ -4623,38 +4600,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     <Typography variant="subtitle2" color="text.secondary">
                       {t('playground.rawResponse')}
                     </Typography>
-                    <Tooltip
-                      title={t('common.copyToClipboard')}
-                      disableFocusListener
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const jsonStr = JSON.stringify(
-                            {
-                              enabled: selectedEvaluation.result.enabled,
-                              variant: selectedEvaluation.result.variant,
-                              reason: selectedEvaluation.result.reason,
-                            },
-                            null,
-                            2
-                          );
-                          copyToClipboardWithNotification(
-                            jsonStr,
-                            () =>
-                              enqueueSnackbar(t('common.copiedToClipboard'), {
-                                variant: 'success',
-                              }),
-                            () =>
-                              enqueueSnackbar(t('common.copyFailed'), {
-                                variant: 'error',
-                              })
-                          );
-                        }}
-                      >
-                        <CopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <CopyButton text={JSON.stringify(
+                      {
+                        enabled: selectedEvaluation.result.enabled,
+                        variant: selectedEvaluation.result.variant,
+                        reason: selectedEvaluation.result.reason,
+                      },
+                      null,
+                      2
+                    )} size={13} />
                   </Box>
                   <JsonEditor
                     value={JSON.stringify(

@@ -26,7 +26,6 @@ import {
   alpha,
 } from '@mui/material';
 import {
-  ContentCopy as ContentCopyIcon,
   Person as PersonIcon,
   Dns as DnsIcon,
   Download as DownloadIcon,
@@ -46,6 +45,7 @@ import * as XLSX from 'xlsx';
 import { getDateTimeStr, downloadBlob } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../common/ExportImportMenuItems';
 import ResizableDrawer from '../common/ResizableDrawer';
+import { CopyButton } from '@/components/common/CopyButton';
 
 interface WhitelistFullInfoDrawerProps {
   open: boolean;
@@ -474,13 +474,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                               >
                                 {w.accountId}
                               </Typography>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleCopy(w.accountId)}
-                                sx={{ p: 0.25 }}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
+                              <CopyButton text={w.accountId} size={13} />
                             </Box>
                           </TableCell>
                           <TableCell>
@@ -588,13 +582,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                               >
                                 {ip.ipAddress}
                               </Typography>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleCopy(ip.ipAddress)}
-                                sx={{ p: 0.25 }}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
+                              <CopyButton text={ip.ipAddress} size={13} />
                             </Box>
                           </TableCell>
                           <TableCell>

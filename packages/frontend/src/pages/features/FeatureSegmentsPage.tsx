@@ -35,7 +35,6 @@ import {
   People as SegmentIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  ContentCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   ViewColumn as ViewColumnIcon,
@@ -61,7 +60,6 @@ import {
   formatDateTimeDetailed,
   formatRelativeTime,
 } from '../../utils/dateFormat';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ReferenceCheckDialog, {
   ResourceReference,
@@ -100,6 +98,7 @@ interface FeatureSegment {
 import { toTitleCase } from '../../utils/stringUtils';
 import PageHeader from '@/components/common/PageHeader';
 import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
+import { CopyButton } from '@/components/common/CopyButton';
 
 const FeatureSegmentsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -778,37 +777,7 @@ const FeatureSegmentsPage: React.FC = () => {
                                         >
                                           {segment.segmentName}
                                         </Typography>
-                                        <Tooltip title={t('common.copy')}>
-                                          <IconButton
-                                            size="small"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              copyToClipboardWithNotification(
-                                                segment.segmentName,
-                                                () =>
-                                                  enqueueSnackbar(
-                                                    t('common.copySuccess'),
-                                                    {
-                                                      variant: 'success',
-                                                    }
-                                                  ),
-                                                () =>
-                                                  enqueueSnackbar(
-                                                    t('common.copyFailed'),
-                                                    {
-                                                      variant: 'error',
-                                                    }
-                                                  )
-                                              );
-                                            }}
-                                            sx={{
-                                              opacity: 0.5,
-                                              '&:hover': { opacity: 1 },
-                                            }}
-                                          >
-                                            <CopyIcon sx={{ fontSize: 13 }} />
-                                          </IconButton>
-                                        </Tooltip>
+                                        <CopyButton text={segment.segmentName} size={13} />
                                       </Box>
                                       {segment.displayName &&
                                         segment.displayName !==
