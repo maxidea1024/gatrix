@@ -478,6 +478,41 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </Box>
               )}
 
+          {/* Event Highlights — Sentry-style promoted tags/context */}
+          {latestEvent && (() => {
+            const highlights: { label: string; value: string }[] = [];
+            if (latestEvent.environment) highlights.push({ label: t('argus.issues.environment'), value: latestEvent.environment });
+            if (latestEvent.release) highlights.push({ label: t('argus.issues.release'), value: latestEvent.release });
+            if (latestEvent.browser) highlights.push({ label: t('argus.issues.browser'), value: `${latestEvent.browser} ${latestEvent.browser_version || ''}`.trim() });
+            if (latestEvent.transaction) highlights.push({ label: t('argus.issues.transaction'), value: latestEvent.transaction });
+            if (highlights.length === 0) return null;
+            return (
+              <Box sx={{
+                display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2,
+                p: 1.5, borderRadius: 1.5,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+              }}>
+                {highlights.map((h) => (
+                  <Box key={h.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase' }}>
+                      {h.label}
+                    </Typography>
+                    <Chip
+                      label={h.value}
+                      size="small"
+                      sx={{
+                        height: 20, fontSize: '0.7rem', fontWeight: 600,
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        border: 'none', borderRadius: 1,
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            );
+          })()}
+
           {/* Latest Event */}
           {latestEvent && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
