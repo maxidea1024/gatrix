@@ -358,7 +358,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              backgroundColor: colors.inputBg,
               color: txt.primary,
               '& fieldset': {
                 borderColor: colors.border,
