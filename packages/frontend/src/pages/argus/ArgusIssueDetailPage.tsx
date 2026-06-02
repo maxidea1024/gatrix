@@ -70,6 +70,7 @@ import TagDistribution from '@/components/argus/TagDistribution';
 import AiRootCausePanel from '@/components/argus/AiRootCausePanel';
 import PresenceIndicator from '@/components/argus/PresenceIndicator';
 import BusinessImpactWidget from '@/components/argus/BusinessImpactWidget';
+import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
 
 
 function stringToColor(str: string): string {
@@ -391,81 +392,71 @@ const ArgusIssueDetailPage: React.FC = () => {
             </Box>
           </Paper>
 
-          {/* Summary Stats */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 1.5, mb: 2.5 }}>
-            <StatMini label={t('argus.issues.events')} value={issue.event_count?.toLocaleString() || '0'} color={levelColor} />
-            <StatMini label={t('argus.issues.users')} value={issue.user_count?.toLocaleString() || '0'} color="#ff9800" />
-            <StatMini label={t('argus.issues.firstSeen')} value={issue.first_seen ? formatRelative(issue.first_seen, t) : '-'} color="#7c4dff" />
-            <StatMini label={t('argus.issues.lastSeen')} value={issue.last_seen ? formatRelative(issue.last_seen, t) : '-'} color="#2196f3" />
-          </Box>
-
-          {/* Event Distribution Chart */}
+          {/* Event Distribution Chart — Full Width (Sentry: Trends area) */}
           {projectId && issueId && (
-            <EventDistributionChart
-              projectId={projectId}
-              issueId={issueId}
-              isDark={isDark}
-            />
-          )}
-
-          {/* Business Impact + AI Root Cause */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
-            {projectId && issueId && (
-              <BusinessImpactWidget
+            <Box sx={{ mb: 3 }}>
+              <EventDistributionChart
                 projectId={projectId}
                 issueId={issueId}
-                eventCount={issue.event_count || 0}
-                userCount={issue.user_count || 0}
-                firstSeen={issue.first_seen}
-                lastSeen={issue.last_seen}
-                level={issue.level || 'error'}
-                isDark={isDark}
-              />
-            )}
-            {projectId && issueId && (
-              <AiRootCausePanel
-                projectId={projectId}
-                issueId={issueId}
-                issueTitle={issue.title}
-                exceptionType={latestEvent?.exception_type}
-                exceptionValue={latestEvent?.exception_value}
-                stacktrace={latestEvent?.stacktrace_raw}
-                tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
-                isDark={isDark}
-              />
-            )}
-          </Box>
-
-          {/* Activity Timeline */}
-          {projectId && issueId && (
-            <ActivityTimeline
-              projectId={projectId}
-              issueId={issueId}
-              isDark={isDark}
-            />
-          )}
-
-          {/* Tag Distribution */}
-          {projectId && issueId && (
-            <TagDistribution
-              projectId={projectId}
-              issueId={issueId}
-              isDark={isDark}
-            />
-          )}
-
-          {/* Event Navigator */}
-          {projectId && issueId && (
-            <Box sx={{ mb: 2 }}>
-              <EventNavigator
-                projectId={projectId}
-                issueId={issueId}
-                currentEvent={latestEvent as ArgusErrorEvent | null}
-                onEventChange={(evt) => setCurrentEvent(evt)}
                 isDark={isDark}
               />
             </Box>
           )}
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'start' }}>
+            {/* Left Column: Main Content */}
+            <Box>
+              {/* Business Impact + AI Root Cause */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
+                {projectId && issueId && (
+                  <BusinessImpactWidget
+                    projectId={projectId}
+                    issueId={issueId}
+                    eventCount={issue.event_count || 0}
+                    userCount={issue.user_count || 0}
+                    firstSeen={issue.first_seen}
+                    lastSeen={issue.last_seen}
+                    level={issue.level || 'error'}
+                    isDark={isDark}
+                  />
+                )}
+                {projectId && issueId && (
+                  <AiRootCausePanel
+                    projectId={projectId}
+                    issueId={issueId}
+                    issueTitle={issue.title}
+                    exceptionType={latestEvent?.exception_type}
+                    exceptionValue={latestEvent?.exception_value}
+                    stacktrace={latestEvent?.stacktrace_raw}
+                    tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
+                    isDark={isDark}
+                  />
+                )}
+              </Box>
+
+              {/* Activity Timeline — moved to sidebar in embedded mode */}
+
+              {/* Tag Distribution */}
+              {projectId && issueId && (
+                <TagDistribution
+                  projectId={projectId}
+                  issueId={issueId}
+                  isDark={isDark}
+                />
+              )}
+
+              {/* Event Navigator */}
+              {projectId && issueId && (
+                <Box sx={{ mb: 2 }}>
+                  <EventNavigator
+                    projectId={projectId}
+                    issueId={issueId}
+                    currentEvent={latestEvent as ArgusErrorEvent | null}
+                    onEventChange={(evt) => setCurrentEvent(evt)}
+                    isDark={isDark}
+                  />
+                </Box>
+              )}
 
           {/* Latest Event */}
           {latestEvent && (
@@ -692,6 +683,96 @@ const ArgusIssueDetailPage: React.FC = () => {
               })()}
             </Box>
           )}
+            </Box>
+
+            {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
+            <Box sx={{
+              borderLeft: { md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+              pl: { md: 3 },
+            }}>
+              {/* Timing — Last/First Seen */}
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="caption" fontWeight={700} sx={{
+                  fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em',
+                  color: 'text.secondary', mb: 1, display: 'block',
+                }}>
+                  {t('argus.issues.properties')}
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                      {t('argus.issues.lastSeen')}
+                    </Typography>
+                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
+                      {issue.last_seen ? formatRelative(issue.last_seen, t) : '-'}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                      {t('argus.issues.firstSeen')}
+                    </Typography>
+                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
+                      {issue.first_seen ? formatRelative(issue.first_seen, t) : '-'}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                      {t('argus.issues.events')}
+                    </Typography>
+                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
+                      {issue.event_count?.toLocaleString() || '0'}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                      {t('argus.issues.users')}
+                    </Typography>
+                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
+                      {issue.user_count?.toLocaleString() || '0'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* Issue Tracking */}
+              {projectId && issueId && (
+                <Box sx={{ mb: 2 }}>
+                  <IssueTrackerWidget projectId={projectId} issueId={issueId} isDark={isDark} />
+                </Box>
+              )}
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* Activity — embedded mode */}
+              {projectId && issueId && (
+                <Box sx={{ mb: 2 }}>
+                  <ActivityTimeline
+                    projectId={projectId}
+                    issueId={issueId}
+                    isDark={isDark}
+                    embedded
+                  />
+                </Box>
+              )}
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* People — Presence */}
+              {projectId && issueId && (
+                <Box>
+                  <Typography variant="caption" fontWeight={700} sx={{
+                    fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em',
+                    color: 'text.secondary', mb: 1, display: 'block',
+                  }}>
+                    {t('argus.issues.people', 'People')}
+                  </Typography>
+                  <PresenceIndicator projectId={projectId} issueId={issueId} isDark={isDark} />
+                </Box>
+              )}
+            </Box>
+          </Box>
         </Box>
       )}
 
@@ -1303,21 +1384,6 @@ const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stackt
 
 
 // --- Helpers ---
-const StatMini: React.FC<{ label: string; value: string; color: string }> = ({ label, value, color }) => {
-  const isDark = useTheme().palette.mode === 'dark';
-  return (
-    <Paper elevation={0} sx={{
-      py: 1, px: 1.5, textAlign: 'center',
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      borderRadius: 1.5,
-      borderTop: `3px solid ${alpha(color, 0.6)}`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-    }}>
-      <Typography sx={{ fontSize: '1.05rem', fontWeight: 700, lineHeight: 1.2 }}>{value}</Typography>
-      <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', mt: 0.3 }}>{label}</Typography>
-    </Paper>
-  );
-};
 
 const ContextGrid: React.FC<{ items: { label: string; value: string }[]; isDark: boolean }> = ({ items, isDark }) => (
   <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px' }}>
