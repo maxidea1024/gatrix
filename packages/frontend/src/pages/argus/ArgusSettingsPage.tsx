@@ -354,6 +354,11 @@ const ArgusSettingsPage: React.FC = () => {
       fontSize: '0.875rem',
       height: '36px',
     },
+    '& .MuiInputBase-input': {
+      height: '36px',
+      boxSizing: 'border-box',
+      padding: '8px 14px',
+    },
   };
 
   // ── State ──
