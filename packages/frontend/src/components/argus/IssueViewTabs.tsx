@@ -82,6 +82,15 @@ const DEFAULT_VIEWS: IssueView[] = [
     urlParams: { status: 'unresolved', substatus: 'escalating' },
   },
   {
+    id: 'triage',
+    name: '',
+    query: 'is:unresolved !is:ignored',
+    sort: 'priority',
+    isDefault: true,
+    isCustom: false,
+    urlParams: { status: 'unresolved', mode: 'triage' },
+  },
+  {
     id: 'mine',
     name: '',
     query: 'assigned:me',
@@ -133,6 +142,7 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
     for_review: t('argus.issueViews.forReview'),
     regressed: t('argus.issueViews.regressed'),
     escalating: t('argus.issueViews.escalating'),
+    triage: t('argus.issueViews.triage'),
     mine: t('argus.issueViews.mine'),
   };
 
