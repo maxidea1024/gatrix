@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -28,6 +28,8 @@ import {
   Avatar,
   ButtonGroup,
 } from '@mui/material';
+import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
+import ViewSidebarOutlinedIcon from '@mui/icons-material/ViewSidebarOutlined';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   ArrowBack as ArrowBackIcon,
@@ -58,7 +60,10 @@ import {
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-
+const MIN_SPLIT_WIDTH = 250;
+const MAX_SPLIT_WIDTH = 600;
+const DEFAULT_SPLIT_WIDTH = 320;
+const SPLIT_WIDTH_KEY = 'argus_issue_split_width';
 
 import argusService, { ArgusIssueDetail, ArgusErrorEvent, ArgusTraceDetail, ArgusLogEntry } from '@/services/argusService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -123,6 +128,42 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
   const [stacktraceMode, setStacktraceMode] = useState<'relevant' | 'full'>('relevant');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Splitter states
+  const [splitWidth, setSplitWidth] = useState(() => {
+    const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
+    return !isNaN(saved) && saved >= MIN_SPLIT_WIDTH && saved <= MAX_SPLIT_WIDTH ? saved : DEFAULT_SPLIT_WIDTH;
+  });
+  const [isSplitDragging, setIsSplitDragging] = useState(false);
+
+  const handleSplitterMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsSplitDragging(true);
+    const startX = e.clientX;
+    const startWidth = splitWidth;
+
+    const onMouseMove = (ev: MouseEvent) => {
+      // Invert delta because the sidebar is on the right
+      const delta = startX - ev.clientX;
+      const newWidth = Math.min(MAX_SPLIT_WIDTH, Math.max(MIN_SPLIT_WIDTH, startWidth + delta));
+      setSplitWidth(newWidth);
+    };
+    const onMouseUp = () => {
+      setIsSplitDragging(false);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, [splitWidth]);
+
+  useEffect(() => {
+    localStorage.setItem(SPLIT_WIDTH_KEY, String(splitWidth));
+  }, [splitWidth]);
 
   // --- SWR Trace (lazy) ---
   const latestEvent = currentEvent || issue?.latest_event;
@@ -228,27 +269,43 @@ const ArgusIssueDetailPage: React.FC = () => {
             enableAutoBack={false}
             onBack={location.state?.allowBack ? () => navigate(-1) : undefined}
             actions={
-              <Box sx={{ display: 'flex', gap: 3, pt: 0.5, pr: 1 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Tooltip title={issue.event_count >= 1000 ? issue.event_count.toLocaleString() : ''} arrow placement="top">
-                    <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', cursor: issue.event_count >= 1000 ? 'help' : 'default' }}>
-                      {formatCompactNumber(issue.event_count || 0)}
+              <Box sx={{ display: 'flex', gap: 3, pt: 0.5, pr: 1, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 3 }}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Tooltip title={issue.event_count >= 1000 ? issue.event_count.toLocaleString() : ''} arrow placement="top">
+                      <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', cursor: issue.event_count >= 1000 ? 'help' : 'default' }}>
+                        {formatCompactNumber(issue.event_count || 0)}
+                      </Typography>
+                    </Tooltip>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
+                      {t('argus.issues.events')}
                     </Typography>
-                  </Tooltip>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
-                    {t('argus.issues.events')}
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Tooltip title={issue.user_count >= 1000 ? issue.user_count.toLocaleString() : ''} arrow placement="top">
-                    <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', cursor: issue.user_count >= 1000 ? 'help' : 'default' }}>
-                      {formatCompactNumber(issue.user_count || 0)}
+                  </Box>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Tooltip title={issue.user_count >= 1000 ? issue.user_count.toLocaleString() : ''} arrow placement="top">
+                      <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', cursor: issue.user_count >= 1000 ? 'help' : 'default' }}>
+                        {formatCompactNumber(issue.user_count || 0)}
+                      </Typography>
+                    </Tooltip>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
+                      {t('argus.issues.users')}
                     </Typography>
-                  </Tooltip>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
-                    {t('argus.issues.users')}
-                  </Typography>
+                  </Box>
                 </Box>
+                <Divider orientation="vertical" flexItem sx={{ my: 0.5, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+                <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar', '사이드바 열기') : t('argus.detail.collapseSidebar', '사이드바 닫기')}>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    sx={{ 
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                      backgroundColor: sidebarCollapsed ? (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') : 'transparent',
+                      ml: 1
+                    }}
+                  >
+                    {sidebarCollapsed ? <ViewSidebarIcon sx={{ transform: 'rotate(180deg)' }} /> : <ViewSidebarOutlinedIcon sx={{ transform: 'rotate(180deg)' }} />}
+                  </IconButton>
+                </Tooltip>
               </Box>
             }
           />
@@ -545,19 +602,19 @@ const ArgusIssueDetailPage: React.FC = () => {
           </Box>
 
           <Box sx={{
-            display: 'grid',
-            gridTemplateColumns: sidebarCollapsed
-              ? { xs: '1fr', md: '1fr 40px' }
-              : { xs: '1fr', md: '1fr 350px', xl: '1fr 420px' },
-            gap: { xs: 3, md: 0 }, alignItems: 'stretch',
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: 'stretch',
             position: 'relative',
-            transition: 'grid-template-columns 0.2s ease',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
           }}>
             {/* Left Column: Main Content */}
             <Box sx={{
+              flex: 1,
               minWidth: 0,
-              pr: { md: 3 },
-              borderRight: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+              pr: { md: sidebarCollapsed ? 0 : 3 },
+              py: 2,
+              transition: 'padding 0.2s ease',
             }}>
               {/* AI Root Cause — Dialog */}
               <Dialog open={showAiAnalysis} onClose={() => setShowAiAnalysis(false)} maxWidth="md" fullWidth>
@@ -862,80 +919,57 @@ const ArgusIssueDetailPage: React.FC = () => {
               })()}
             </Box>
           )}
+              {/* Structured Logs Section */}
+              {issue && projectId && issueId && (
+                <Box sx={{ mt: 4 }}>
+                  <IssueLogsSection projectId={projectId} issueId={issueId} isDark={isDark} />
+                </Box>
+              )}
             </Box>
 
-            {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
-            <Box sx={{
-              pl: { md: sidebarCollapsed ? 0 : 3 },
-              position: 'relative',
-            }}>
-              {/* Sidebar Toggle */}
-              <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar') : t('argus.detail.collapseSidebar')}>
-                <IconButton
-                  size="small"
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            {!sidebarCollapsed && (
+              <>
+                {/* ─── Resizable Splitter Handle ─── */}
+                <Box
+                  onMouseDown={handleSplitterMouseDown}
                   sx={{
-                    position: 'absolute',
-                    left: sidebarCollapsed ? 4 : -16,
-                    top: 0,
-                    width: 24, height: 24,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: '50%',
-                    backgroundColor: isDark ? '#1a1a1a' : '#fff',
-                    zIndex: 2,
-                    '&:hover': { backgroundColor: isDark ? '#333' : '#f5f5f5' },
+                    width: '1px',
+                    flexShrink: 0,
+                    cursor: 'col-resize',
+                    bgcolor: isSplitDragging ? 'primary.main' : 'divider',
+                    position: 'relative',
+                    zIndex: 10,
+                    transition: 'background-color 0.15s, transform 0.15s',
+                    transformOrigin: 'center',
+                    ...(isSplitDragging && { 
+                      bgcolor: 'primary.main',
+                      transform: 'scaleX(4)',
+                    }),
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      left: '-5px',
+                      right: '-5px',
+                      cursor: 'col-resize',
+                    },
+                    '&:hover, &:active': {
+                      bgcolor: 'primary.main',
+                      transform: 'scaleX(4)',
+                    },
                   }}
-                >
-                  {sidebarCollapsed ? <ExpandLessIcon sx={{ fontSize: 14, transform: 'rotate(-90deg)' }} /> : <ExpandMoreIcon sx={{ fontSize: 14, transform: 'rotate(-90deg)' }} />}
-                </IconButton>
-              </Tooltip>
-              <Collapse in={!sidebarCollapsed} orientation="horizontal" sx={{ overflow: sidebarCollapsed ? 'hidden' : 'visible' }}>
-              {/* Timing — Last/First Seen */}
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="caption" fontWeight={700} sx={{
-                  fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em',
-                  color: 'text.secondary', mb: 1, display: 'block',
-                }}>
-                  {t('argus.issues.properties')}
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
-                      {t('argus.issues.lastSeen')}
-                    </Typography>
-                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
-                      {issue.last_seen ? formatRelative(issue.last_seen, t) : '-'}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
-                      {t('argus.issues.firstSeen')}
-                    </Typography>
-                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
-                      {issue.first_seen ? formatRelative(issue.first_seen, t) : '-'}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
-                      {t('argus.issues.events')}
-                    </Typography>
-                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
-                      {issue.event_count?.toLocaleString() || '0'}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
-                      {t('argus.issues.users')}
-                    </Typography>
-                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>
-                      {issue.user_count?.toLocaleString() || '0'}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
+                />
 
-              <Divider sx={{ mb: 2 }} />
+                {/* Right Column: Sidebar */}
+                <Box sx={{
+                  width: { xs: '100%', md: splitWidth },
+                  minWidth: { md: MIN_SPLIT_WIDTH },
+                  flexShrink: 0,
+                  pl: { md: 3 },
+                  py: 2,
+                }}>
+
 
               {/* Suspect Commits — renders null if no data */}
               {projectId && issueId && (
@@ -998,14 +1032,10 @@ const ArgusIssueDetailPage: React.FC = () => {
                   isDark={isDark}
                 />
               )}
-            </Collapse>
-          </Box>
-        </Box>
-
-        {/* Structured Logs Section */}
-        {issue && projectId && issueId && (
-          <IssueLogsSection projectId={projectId} issueId={issueId} isDark={isDark} />
+            </Box>
+          </>
         )}
+        </Box>
 
 
       <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, status: '' })} maxWidth="sm" fullWidth>
