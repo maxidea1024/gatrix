@@ -26,6 +26,7 @@ import {
   ListItemIcon,
   ListItemText,
   Avatar,
+  ButtonGroup,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import {
@@ -52,13 +53,28 @@ import {
   AccessTime as GotoTimeIcon,
   Close as CloseIcon,
   WrapText as WrapTextIcon,
+  GitHub as GitHubIcon,
 } from '@mui/icons-material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import tsx from 'react-syntax-highlighter/dist/esm/languages/prism/tsx';
+import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
+import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+
+SyntaxHighlighter.registerLanguage('tsx', tsx);
+SyntaxHighlighter.registerLanguage('typescript', typescript);
+SyntaxHighlighter.registerLanguage('javascript', javascript);
+SyntaxHighlighter.registerLanguage('python', python);
+
 import argusService, { ArgusIssueDetail, ArgusErrorEvent, ArgusTraceDetail, ArgusLogEntry } from '@/services/argusService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { rbacService } from '@/services/rbacService';
+import { formatCompactNumber } from '@/utils/numberFormat';
 import PageHeader from '@/components/common/PageHeader';
 import { CopyButton } from '@/components/common/CopyButton';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
@@ -67,11 +83,13 @@ import EventNavigator from '@/components/argus/EventNavigator';
 import EventDistributionChart from '@/components/argus/EventDistributionChart';
 import ActivityTimeline from '@/components/argus/ActivityTimeline';
 import TagDistribution from '@/components/argus/TagDistribution';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import AiRootCausePanel from '@/components/argus/AiRootCausePanel';
 import PresenceIndicator from '@/components/argus/PresenceIndicator';
 import BusinessImpactWidget from '@/components/argus/BusinessImpactWidget';
 import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
 import SuspectCommits from '@/components/argus/SuspectCommits';
+import IssueDetailActions from '@/components/argus/IssueDetailActions';
 
 
 function stringToColor(str: string): string {
@@ -96,6 +114,7 @@ const LEVEL_COLORS: Record<string, string> = {
 const ArgusIssueDetailPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const { projectId, issueId } = useParams<{ projectId: string; issueId: string }>();
@@ -106,6 +125,8 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [assigneeAnchor, setAssigneeAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(null);
   const [currentEvent, setCurrentEvent] = useState<ArgusErrorEvent | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
@@ -132,6 +153,8 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [logsHasMore, setLogsHasMore] = useState(false);
   const [expandedLogIds, setExpandedLogIds] = useState<Set<string>>(new Set());
   const [logsFullscreen, setLogsFullscreen] = useState(false);
+  const [showAiAnalysis, setShowAiAnalysis] = useState(false);
+  const [stacktraceMode, setStacktraceMode] = useState<'relevant' | 'full'>('relevant');
   const [logSearch, setLogSearch] = useState('');
   const [logGotoTime, setLogGotoTime] = useState('');
   const [wrapLines, setWrapLines] = useState(false);
@@ -156,6 +179,12 @@ const ArgusIssueDetailPage: React.FC = () => {
   }, [projectId, issueId]);
 
   const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status: string }>({ open: false, status: '' });
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const requestStatusChange = (status: string) => {
+    setConfirmDialog({ open: true, status });
+    setStatusMenuAnchor(null);
+  };
 
   const executeStatusChange = async () => {
     if (!projectId || !issueId || !issue || !confirmDialog.status) return;
@@ -168,9 +197,6 @@ const ArgusIssueDetailPage: React.FC = () => {
     }
   };
 
-  const requestStatusChange = (status: string) => {
-    setConfirmDialog({ open: true, status });
-  };
 
   const handleAssign = async (assignee: string) => {
     if (!projectId || !issueId || !issue) return;
@@ -179,6 +205,46 @@ const ArgusIssueDetailPage: React.FC = () => {
       setIssue({ ...issue, assigned_to: assignee || null });
     } catch (error) {
       console.error('Failed to assign issue:', error);
+    }
+  };
+
+  const handleSubscribe = async (subscribe: boolean) => {
+    if (!projectId || !issueId) return;
+    try {
+      await argusService.subscribeIssue(projectId, issueId, subscribe);
+      setIsSubscribed(subscribe);
+    } catch (error) {
+      console.error('Failed to toggle subscription:', error);
+    }
+  };
+
+  const handleBookmark = async (bookmark: boolean) => {
+    if (!projectId || !issueId) return;
+    try {
+      await argusService.bookmarkIssue(projectId, issueId, bookmark);
+      setIsBookmarked(bookmark);
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error);
+    }
+  };
+
+  const handleDeleteIssue = async () => {
+    if (!projectId || !issueId) return;
+    try {
+      await argusService.deleteIssue(projectId, issueId);
+      navigate(-1);
+    } catch (error) {
+      console.error('Failed to delete issue:', error);
+    }
+  };
+
+  const handleDiscardIssue = async () => {
+    if (!projectId || !issueId) return;
+    try {
+      await argusService.discardIssue(projectId, issueId);
+      navigate(-1);
+    } catch (error) {
+      console.error('Failed to discard issue:', error);
     }
   };
 
@@ -252,9 +318,13 @@ const ArgusIssueDetailPage: React.FC = () => {
             icon={<Box sx={{ width: 4, height: 18, borderRadius: 1, backgroundColor: levelColor, ml: 1 }} />}
             title={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="subtitle1" fontWeight={700} sx={{ lineHeight: 1.3 }}>
-                  {issue.title}
-                </Typography>
+                <ArgusBreadcrumbs
+                  paths={[
+                    { label: t('sidebar.argusIssues', 'Issues'), to: `/argus/issues` },
+                    { label: issue.title }
+                  ]}
+                  size="title"
+                />
                 <Chip
                   label={issue.level}
                   size="small"
@@ -267,21 +337,26 @@ const ArgusIssueDetailPage: React.FC = () => {
               </Box>
             }
             subtitle={issue.culprit}
-            enableAutoBack
-            headerActions={
-              <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+            enableAutoBack={false}
+            onBack={location.state?.allowBack ? () => navigate(-1) : undefined}
+            actions={
+              <Box sx={{ display: 'flex', gap: 3, pt: 0.5, pr: 1 }}>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem' }}>
-                    {issue.event_count?.toLocaleString() || '0'}
-                  </Typography>
+                  <Tooltip title={issue.event_count >= 1000 ? issue.event_count.toLocaleString() : ''} arrow placement="top">
+                    <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', cursor: issue.event_count >= 1000 ? 'help' : 'default' }}>
+                      {formatCompactNumber(issue.event_count || 0)}
+                    </Typography>
+                  </Tooltip>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
                     {t('argus.issues.events')}
                   </Typography>
                 </Box>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem' }}>
-                    {issue.user_count?.toLocaleString() || '0'}
-                  </Typography>
+                  <Tooltip title={issue.user_count >= 1000 ? issue.user_count.toLocaleString() : ''} arrow placement="top">
+                    <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', cursor: issue.user_count >= 1000 ? 'help' : 'default' }}>
+                      {formatCompactNumber(issue.user_count || 0)}
+                    </Typography>
+                  </Tooltip>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
                     {t('argus.issues.users')}
                   </Typography>
@@ -297,78 +372,138 @@ const ArgusIssueDetailPage: React.FC = () => {
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             }}
           >
-            <Chip
-              label={t(`argus.issues.${issue.status}`, issue.status)}
-              size="small"
-              sx={{
-                fontWeight: 700, fontSize: '0.72rem', textTransform: 'capitalize',
-                backgroundColor: alpha(
-                  issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12
-                ),
-                color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',
-                border: 'none',
-              }}
-            />
-            {issue.substatus === 'regressed' && (
-              <Chip
-                label={t('argus.issues.regressed', 'Regressed')}
-                size="small"
-                sx={{
-                  fontWeight: 700, fontSize: '0.68rem',
-                  backgroundColor: alpha('#ff9800', 0.15),
-                  color: '#ff9800', border: 'none',
-                }}
-              />
-            )}
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-            {issue.status !== 'resolved' && (
-              <Button variant="outlined" size="small" color="success" startIcon={<CheckCircleIcon />}
-                onClick={() => requestStatusChange('resolved')}
-                sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
-              >
-                {t('argus.issues.resolve')}
-              </Button>
-            )}
-            {issue.status !== 'ignored' && (
-              <Button variant="outlined" size="small" color="inherit" startIcon={<IgnoreIcon />}
-                onClick={() => requestStatusChange('ignored')}
-                sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
-              >
-                {t('argus.issues.ignore')}
-              </Button>
-            )}
-            {issue.status !== 'unresolved' && (
-              <Button variant="outlined" size="small" color="error" startIcon={<ErrorIcon />}
-                onClick={() => requestStatusChange('unresolved')}
-                sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
-              >
-                {t('argus.issues.reopen')}
-              </Button>
-            )}
-            {issue.is_regression && (
-              <Chip label={t('argus.issues.regression')} size="small" sx={{
-                fontWeight: 700, fontSize: '0.68rem',
-                backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',
-              }} />
-            )}
-
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-            {/* Priority */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Chip
-                label={PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
-                size="small"
-                onClick={(e) => setPriorityAnchor(e.currentTarget)}
-                sx={{
-                  height: 22, fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
-                  backgroundColor: alpha(PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800', 0.12),
-                  color: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800',
-                  border: 'none',
-                }}
-              />
+            {/* Status Section - Independent */}
+            <Box sx={{
+              px: 1.5, py: 0.8, display: 'flex', alignItems: 'center', gap: 1,
+              backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12),
+              color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',
+              borderRadius: 1.5,
+            }}>
+              <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {t(`argus.issues.${issue.status}`, issue.status)}
+              </Typography>
+              {issue.substatus === 'regressed' && (
+                <Chip
+                  label={t('argus.issues.regressed', 'Regressed')}
+                  size="small"
+                  sx={{
+                    fontWeight: 700, fontSize: '0.65rem', height: 18,
+                    backgroundColor: alpha('#ff9800', 0.15),
+                    color: '#ff9800', border: 'none',
+                  }}
+                />
+              )}
+              {issue.is_regression && (
+                <Chip label={t('argus.issues.regression')} size="small" sx={{
+                  fontWeight: 700, fontSize: '0.65rem', height: 18,
+                  backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',
+                }} />
+              )}
             </Box>
+
+            {/* Action Buttons Group (Split Button) */}
+            <Box>
+              <ButtonGroup size="small" variant="outlined" disableElevation sx={{ 
+                height: 28,
+                '& .MuiButton-root': {
+                  fontSize: '0.78rem',
+                  textTransform: 'none',
+                  px: 2,
+                  color: 'text.primary',
+                  borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+                  '&:hover': {
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                  }
+                }
+              }}>
+                <Button 
+                  onClick={() => requestStatusChange(issue.status === 'resolved' ? 'unresolved' : 'resolved')}
+                  startIcon={issue.status === 'resolved' ? <ErrorIcon /> : <CheckCircleIcon />}
+                  sx={{ borderTopLeftRadius: 6, borderBottomLeftRadius: 6 }}
+                >
+                  {issue.status === 'resolved' ? t('argus.issues.reopen') : t('argus.issues.resolve')}
+                </Button>
+                <Button
+                  size="small"
+                  onClick={(e) => setStatusMenuAnchor(e.currentTarget)}
+                  sx={{ px: 0.5, borderTopRightRadius: 6, borderBottomRightRadius: 6, minWidth: 0 }}
+                >
+                  <ExpandMoreIcon fontSize="small" />
+                </Button>
+              </ButtonGroup>
+              <Menu
+                anchorEl={statusMenuAnchor}
+                open={Boolean(statusMenuAnchor)}
+                onClose={() => setStatusMenuAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{ '& .MuiPaper-root': { minWidth: 150, mt: 0.5, borderRadius: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, backgroundImage: 'none', backgroundColor: isDark ? '#222' : '#fff' } }}
+              >
+                {issue.status !== 'resolved' && (
+                  <MenuItem onClick={() => requestStatusChange('resolved')} sx={{ fontSize: '0.8rem', py: 1 }}>
+                    <ListItemIcon><CheckCircleIcon fontSize="small" color="success" /></ListItemIcon>
+                    <ListItemText primary={t('argus.issues.resolve')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
+                  </MenuItem>
+                )}
+                {issue.status !== 'ignored' && (
+                  <MenuItem onClick={() => requestStatusChange('ignored')} sx={{ fontSize: '0.8rem', py: 1 }}>
+                    <ListItemIcon><IgnoreIcon fontSize="small" color="action" /></ListItemIcon>
+                    <ListItemText primary={t('argus.issues.ignore')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
+                  </MenuItem>
+                )}
+                {issue.status !== 'unresolved' && (
+                  <MenuItem onClick={() => requestStatusChange('unresolved')} sx={{ fontSize: '0.8rem', py: 1 }}>
+                    <ListItemIcon><ErrorIcon fontSize="small" color="error" /></ListItemIcon>
+                    <ListItemText primary={t('argus.issues.reopen')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
+                  </MenuItem>
+                )}
+              </Menu>
+            </Box>
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+            {/* Unified Control: Priority & Assignee */}
+            <ButtonGroup size="small" variant="outlined" sx={{ 
+              height: 28,
+              '& .MuiButton-root': {
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                px: 1.5,
+                color: 'text.primary',
+                borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+                '&:hover': {
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                }
+              }
+            }}>
+              {/* Priority */}
+              <Button onClick={(e) => setPriorityAnchor(e.currentTarget)}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800', mr: 1 }} />
+                {PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
+              </Button>
+              
+              {/* Assignee */}
+              <Button onClick={(e) => setAssigneeAnchor(e.currentTarget)}>
+                <PersonIcon sx={{ fontSize: 14, mr: 0.5, color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />
+                {issue.assigned_to ? issue.assigned_to : t('argus.issues.unassigned', 'Unassigned')}
+              </Button>
+            </ButtonGroup>
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+            {/* AI Analysis (Independent Flat Button) */}
+            <Button variant="outlined" size="small" onClick={() => setShowAiAnalysis(true)} 
+              sx={{ 
+                height: 28, fontSize: '0.75rem', 
+                borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', 
+                color: 'primary.main', fontWeight: 600,
+                textTransform: 'none', px: 2,
+                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08), borderColor: 'primary.main' } 
+              }}
+            >
+              {t('argus.issues.aiAnalysis', 'AI 분석')}
+            </Button>
+
             <Menu
               anchorEl={priorityAnchor}
               open={Boolean(priorityAnchor)}
@@ -387,37 +522,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </MenuItem>
               ))}
             </Menu>
-
-            {/* Assignee */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <PersonIcon sx={{ fontSize: 16, color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />
-              {issue.assigned_to ? (
-                <Chip
-                  label={issue.assigned_to}
-                  size="small"
-                  onClick={(e) => setAssigneeAnchor(e.currentTarget)}
-                  onDelete={() => handleAssign('')}
-                  sx={{
-                    height: 22, fontSize: '0.72rem', fontWeight: 600,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                    color: 'primary.main', border: 'none',
-                  }}
-                />
-              ) : (
-                <Tooltip title={t('argus.issues.assign', 'Assign')}>
-                  <Chip
-                    label={t('argus.issues.unassigned', 'Unassigned')}
-                    size="small"
-                    onClick={(e) => setAssigneeAnchor(e.currentTarget)}
-                    sx={{
-                      height: 22, fontSize: '0.72rem', cursor: 'pointer',
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                      border: 'none',
-                    }}
-                  />
-                </Tooltip>
-              )}
-            </Box>
 
             <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
               {/* Multiplayer Presence */}
@@ -461,53 +565,98 @@ const ArgusIssueDetailPage: React.FC = () => {
                   <CopyButton text={latestEvent.event_id} size={12} />
                 </Box>
               )}
+              <IssueDetailActions
+                projectId={projectId || ''}
+                issueId={issueId || ''}
+                shortId={issue.short_id}
+                isSubscribed={isSubscribed}
+                isBookmarked={isBookmarked}
+                onSubscribe={handleSubscribe}
+                onBookmark={handleBookmark}
+                onDelete={handleDeleteIssue}
+                onDiscard={handleDiscardIssue}
+                isDark={isDark}
+              />
             </Box>
           </Box>
 
+          {/* First/Last Seen + Release Info */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                {t('argus.issues.firstSeen')}:
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>
+                {issue.first_seen ? new Date(issue.first_seen).toLocaleString() : '—'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                {t('argus.issues.lastSeen')}:
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>
+                {issue.last_seen ? new Date(issue.last_seen).toLocaleString() : '—'}
+              </Typography>
+            </Box>
+            {latestEvent?.release && (
+              <Chip
+                label={`${t('argus.detail.release')}: ${latestEvent.release}`}
+                size="small"
+                sx={{
+                  height: 20, fontSize: '0.65rem', fontWeight: 600,
+                  fontFamily: 'monospace',
+                  backgroundColor: alpha(theme.palette.info.main, 0.08),
+                  color: theme.palette.info.main,
+                  border: 'none',
+                }}
+              />
+            )}
+            {latestEvent?.environment && (
+              <Chip
+                label={latestEvent.environment}
+                size="small"
+                sx={{
+                  height: 20, fontSize: '0.65rem', fontWeight: 600,
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                  border: 'none',
+                }}
+              />
+            )}
+          </Box>
+
           <Box sx={{
-            display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'stretch',
+            display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 350px', xl: '1fr 420px' }, gap: { xs: 3, md: 0 }, alignItems: 'stretch',
             position: 'relative',
-            '&::before': {
-              content: '""',
-              display: { xs: 'none', md: 'block' },
-              position: 'absolute',
-              top: 0, bottom: 0,
-              right: { md: 'calc(33.333% - 12px)', xl: 'calc(25% - 12px)' },
-              width: '1px',
-              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)',
-            },
           }}>
             {/* Left Column: Main Content */}
-            <Box>
-              {/* Event Distribution Chart */}
-              {projectId && issueId && (
-                <Box sx={{ mb: 2 }}>
-                  <EventDistributionChart
-                    projectId={projectId}
-                    issueId={issueId}
-                    isDark={isDark}
-                  />
-                </Box>
-              )}
-
-
-              {/* AI Root Cause — flat section */}
-              {projectId && issueId && (
-                <AiRootCausePanel
-                  projectId={projectId}
-                  issueId={issueId}
-                  issueTitle={issue.title}
-                  exceptionType={latestEvent?.exception_type}
-                  exceptionValue={latestEvent?.exception_value}
-                  stacktrace={latestEvent?.stacktrace_raw}
-                  tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
-                  isDark={isDark}
-                />
-              )}
+            <Box sx={{
+              minWidth: 0,
+              pr: { md: 3 },
+              borderRight: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+            }}>
+              {/* AI Root Cause — Dialog */}
+              <Dialog open={showAiAnalysis} onClose={() => setShowAiAnalysis(false)} maxWidth="md" fullWidth>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 700 }}>
+                  {t('argus.issues.aiAnalysis', 'AI Analysis')}
+                  <IconButton onClick={() => setShowAiAnalysis(false)} size="small"><CloseIcon /></IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ p: 0, overflowX: 'hidden' }}>
+                  {projectId && issueId && (
+                    <AiRootCausePanel
+                      projectId={projectId}
+                      issueId={issueId}
+                      issueTitle={issue.title}
+                      exceptionType={latestEvent?.exception_type}
+                      exceptionValue={latestEvent?.exception_value}
+                      stacktrace={latestEvent?.stacktrace_raw}
+                      tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
+                      isDark={isDark}
+                    />
+                  )}
+                </DialogContent>
+              </Dialog>
 
               {/* Activity Timeline — moved to sidebar in embedded mode */}
-
-
 
               {/* Event Navigator */}
               {projectId && issueId && (
@@ -522,64 +671,80 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </Box>
               )}
 
-          {/* Event Highlights — Sentry-style promoted tags/context */}
-          {latestEvent && (() => {
-            const highlights: { label: string; value: string }[] = [];
-            if (latestEvent.environment) highlights.push({ label: t('argus.issues.environment'), value: latestEvent.environment });
-            if (latestEvent.release) highlights.push({ label: t('argus.issues.release'), value: latestEvent.release });
-            if (latestEvent.browser) highlights.push({ label: t('argus.issues.browser'), value: `${latestEvent.browser} ${latestEvent.browser_version || ''}`.trim() });
-            if (latestEvent.transaction) highlights.push({ label: t('argus.issues.transaction'), value: latestEvent.transaction });
-            if (highlights.length === 0) return null;
-            return (
-              <Box sx={{
-                display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2,
-                p: 1.5, borderRadius: 1.5,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
-              }}>
-                {highlights.map((h) => (
-                  <Box key={h.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase' }}>
-                      {h.label}
-                    </Typography>
-                    <Chip
-                      label={h.value}
-                      size="small"
-                      sx={{
-                        height: 20, fontSize: '0.7rem', fontWeight: 600,
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                        border: 'none', borderRadius: 1,
-                      }}
-                    />
-                  </Box>
-                ))}
-              </Box>
-            );
-          })()}
+              {/* Event Distribution Chart */}
+              {projectId && issueId && (
+                <EventDistributionChart
+                  projectId={projectId}
+                  issueId={issueId}
+                  isDark={isDark}
+                />
+              )}
 
-          {/* Latest Event */}
+
+
+          {/* Latest Event (Stack Trace) */}
           {latestEvent && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {/* Exception + Stacktrace */}
-              <Paper elevation={0} sx={{
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2, overflow: 'hidden',
-              }}>
-                {/* Exception header */}
-                <Box sx={{
-                  p: 2, backgroundColor: alpha(levelColor, 0.06),
-                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                }}>
-                  <Typography variant="body1" fontWeight={700} sx={{ color: levelColor, fontFamily: 'monospace' }}>
-                    {latestEvent.exception_type}
-                  </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5, color: isDark ? '#aaa' : '#666' }}>
+              
+              {/* Stack Trace Header & Controls */}
+              <Box>
+                <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: isDark ? '#fff' : '#000' }}>
+                  {t('argus.issues.stackTraceTitle', 'Stack Trace')}
+                </Typography>
+                {latestEvent.exception_value && (
+                  <Typography variant="body1" sx={{ fontFamily: 'monospace', color: isDark ? '#ddd' : '#333', mb: 2 }}>
                     {latestEvent.exception_value}
                   </Typography>
-                </Box>
+                )}
 
-                {/* Stacktrace */}
-                <StacktraceView stacktrace={latestEvent.stacktrace_raw} isDark={isDark} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0 }}>
+                  <Box sx={{ 
+                    display: 'inline-flex', backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', 
+                    borderRadius: 2, overflow: 'hidden', p: 0.4, gap: 0.5
+                  }}>
+                    <Button size="small" 
+                      onClick={() => setStacktraceMode('relevant')}
+                      sx={{ 
+                        fontSize: '0.75rem', py: 0.4, px: 2, borderRadius: 1.5, textTransform: 'none',
+                        color: stacktraceMode === 'relevant' ? 'text.primary' : 'text.secondary', 
+                        backgroundColor: stacktraceMode === 'relevant' ? (isDark ? 'rgba(255,255,255,0.1)' : '#fff') : 'transparent',
+                        boxShadow: stacktraceMode === 'relevant' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
+                        fontWeight: stacktraceMode === 'relevant' ? 600 : 500,
+                        '&:hover': { backgroundColor: stacktraceMode === 'relevant' ? (isDark ? 'rgba(255,255,255,0.15)' : '#fff') : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') }
+                      }}
+                    >{t('argus.issues.mostRelevant', 'Most Relevant')}</Button>
+                    <Button size="small" 
+                      onClick={() => setStacktraceMode('full')}
+                      sx={{ 
+                        fontSize: '0.75rem', py: 0.4, px: 2, borderRadius: 1.5, textTransform: 'none',
+                        color: stacktraceMode === 'full' ? 'text.primary' : 'text.secondary', 
+                        backgroundColor: stacktraceMode === 'full' ? (isDark ? 'rgba(255,255,255,0.1)' : '#fff') : 'transparent',
+                        boxShadow: stacktraceMode === 'full' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
+                        fontWeight: stacktraceMode === 'full' ? 600 : 500,
+                        '&:hover': { backgroundColor: stacktraceMode === 'full' ? (isDark ? 'rgba(255,255,255,0.15)' : '#fff') : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') }
+                      }}
+                    >{t('argus.issues.fullStackTrace', 'Full Stack Trace')}</Button>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button size="small" variant="outlined" endIcon={<ExpandMoreIcon sx={{ fontSize: 16 }} />} sx={{ textTransform: 'none', color: 'text.primary', borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', fontSize: '0.75rem', height: 32, borderRadius: 1.5 }}>
+                      <Typography component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: 'inherit', fontWeight: 600 }}>
+                        <span style={{ fontSize: '10px' }}>⇅</span> {t('argus.issues.mostRecent', 'Most Recent')}
+                      </Typography>
+                    </Button>
+                    <Button size="small" variant="outlined" sx={{ minWidth: 0, px: 1, borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', color: 'text.primary', height: 32, borderRadius: 1.5 }}>
+                      <Typography component="span" sx={{ fontSize: '12px', lineHeight: 1 }}>•••</Typography>
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Stacktrace Frames Wrapper */}
+              <Paper elevation={0} sx={{
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                borderRadius: 2, overflow: 'hidden',
+              }}>
+                <StacktraceView stacktrace={latestEvent.stacktrace_raw} mode={stacktraceMode} isDark={isDark} />
               </Paper>
 
               {/* Context Grid */}
@@ -1400,7 +1565,8 @@ const ArgusIssueDetailPage: React.FC = () => {
 };
 
 // --- Stacktrace Viewer ---
-const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stacktrace, isDark }) => {
+const StacktraceView: React.FC<{ stacktrace: any; mode?: 'relevant' | 'full'; isDark: boolean }> = ({ stacktrace, mode = 'full', isDark }) => {
+  const { t } = useTranslation();
   const [toggledFrames, setToggledFrames] = useState<Set<number>>(new Set());
 
   let frames: any[] = [];
@@ -1410,6 +1576,8 @@ const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stackt
 
   if (frames.length === 0) return null;
 
+  const displayFrames = mode === 'relevant' ? frames.filter(f => f.in_app) : frames;
+
   const toggleFrame = (idx: number) => {
     setToggledFrames(prev => {
       const next = new Set(prev);
@@ -1418,54 +1586,119 @@ const StacktraceView: React.FC<{ stacktrace: any; isDark: boolean }> = ({ stackt
     });
   };
 
+  if (displayFrames.length === 0 && mode === 'relevant') {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center', color: 'text.secondary' }}>
+        <Typography variant="body2">{t('argus.issues.noInAppFrames', 'No in-app frames found in stacktrace.')}</Typography>
+      </Box>
+    );
+  }
+  
+  const syntaxStyle = isDark ? oneDark : oneLight;
+
   return (
     <Box>
-      {frames.map((frame: any, idx: number) => {
+      {displayFrames.map((frame: any, idx: number) => {
         const isInApp = !!frame.in_app;
-        const hasContext = !!frame.context_line;
-        const isExpanded = hasContext && (toggledFrames.has(idx) ? !isInApp : isInApp);
+        const hasContext = !!frame.context_line || (frame.pre_context && frame.pre_context.length > 0);
+        const isExpanded = hasContext && (isInApp ? !toggledFrames.has(idx) : toggledFrames.has(idx));
+        
+        let codeSnippet = '';
+        let startLine = 1;
+        if (hasContext) {
+          const pre = frame.pre_context || [];
+          const post = frame.post_context || [];
+          const lines = [...pre, frame.context_line || '', ...post];
+          codeSnippet = lines.join('\n');
+          startLine = Math.max(1, (frame.lineno || 1) - pre.length);
+        }
+
         return (
-          <Box key={idx}>
+          <Box key={idx} sx={{ borderBottom: idx < displayFrames.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` : 'none' }}>
+            {/* Frame Header */}
             <Box
-              onClick={hasContext ? () => toggleFrame(idx) : undefined}
               sx={{
                 display: 'flex', alignItems: 'center', gap: 1,
-                px: 2, py: 0.8,
-                cursor: hasContext ? 'pointer' : 'default',
-                backgroundColor: isInApp ? alpha('#7c4dff', isDark ? 0.08 : 0.04) : 'transparent',
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                '&:hover': { backgroundColor: hasContext ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)') : undefined },
+                px: 2, py: 1,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+                '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
                 transition: 'background 0.15s',
               }}
             >
-              {hasContext ? (
-                isExpanded ? <ExpandLessIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              ) : (
-                <Box sx={{ width: 16 }} />
-              )}
-              {isInApp && <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#7c4dff', flexShrink: 0 }} />}
-              <Typography variant="body2" sx={{
-                fontFamily: 'monospace', fontSize: '0.78rem',
-                color: isInApp ? (isDark ? '#bb86fc' : '#6200ea') : (isDark ? '#777' : '#999'),
-                fontWeight: isInApp ? 600 : 400,
-              }}>
-                {frame.function || '<anonymous>'}
-              </Typography>
-              <Typography variant="caption" sx={{ ml: 'auto', fontFamily: 'monospace', fontSize: '0.7rem', color: isDark ? '#555' : '#bbb', flexShrink: 0 }}>
-                {frame.filename ? `${frame.filename}:${frame.lineno || '?'}` : ''}
-              </Typography>
+              <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: isDark ? '#ccc' : '#444' }}>
+                  {frame.filename || frame.abs_path || '<anonymous>'}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
+                  in
+                </Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: isDark ? '#bb86fc' : '#6200ea', fontWeight: 600 }}>
+                  {frame.function || '<anonymous>'}
+                </Typography>
+                {(frame.lineno) && (
+                  <>
+                    <Typography variant="body2" sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
+                      at
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: isDark ? '#aaa' : '#666' }}>
+                      {frame.lineno}{frame.colno ? `:${frame.colno}` : ''}
+                    </Typography>
+                  </>
+                )}
+              </Box>
+
+              {/* Right Icons */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                {frame.abs_path && (
+                  <IconButton size="small" component="a" href={frame.abs_path.startsWith('http') ? frame.abs_path : `https://github.com/search?q=${encodeURIComponent(frame.filename || frame.abs_path)}`} target="_blank" title={t('argus.issues.viewInGithub', 'View in GitHub')} sx={{ color: 'text.secondary' }}>
+                    <GitHubIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                )}
+                {hasContext && (
+                  <IconButton size="small" onClick={() => toggleFrame(idx)} sx={{ color: 'text.secondary', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                    <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                  </IconButton>
+                )}
+              </Box>
             </Box>
-            <Collapse in={isExpanded}>
-              {frame.context_line && (
-                <Box sx={{
-                  px: 2, py: 1, mx: 2, my: 0.5,
-                  backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
-                  borderRadius: 1, borderLeft: `3px solid ${isInApp ? '#7c4dff' : '#555'}`,
+
+            {/* Frame Code (Expanded) */}
+            <Collapse in={isExpanded} unmountOnExit>
+              {hasContext && (
+                <Box sx={{ 
+                  backgroundColor: isDark ? '#1e1e1e' : '#fafafa',
+                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 }}>
-                  <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: isDark ? '#ddd' : '#333', whiteSpace: 'pre' }}>
-                    {frame.lineno && <Box component="span" sx={{ color: isDark ? '#555' : '#bbb', mr: 1, userSelect: 'none' }}>{frame.lineno}</Box>}
-                    {frame.context_line}
-                  </Typography>
+                  {/* @ts-expect-error react-syntax-highlighter type incompatibility */}
+                  <SyntaxHighlighter
+                    language={frame.filename?.endsWith('.ts') || frame.filename?.endsWith('.tsx') ? 'tsx' : (frame.filename?.endsWith('.py') ? 'python' : 'javascript')}
+                    style={syntaxStyle}
+                    showLineNumbers={true}
+                    startingLineNumber={startLine}
+                    wrapLines={true}
+                    lineProps={(lineNumber: number) => {
+                      const isCulprit = lineNumber === frame.lineno;
+                      return {
+                        style: {
+                          display: 'block',
+                          backgroundColor: isCulprit 
+                            ? (isDark ? 'rgba(244, 67, 54, 0.15)' : 'rgba(244, 67, 54, 0.08)') 
+                            : 'transparent',
+                          borderLeft: isCulprit ? '3px solid #f44336' : '3px solid transparent',
+                          paddingLeft: '0px',
+                        }
+                      };
+                    }}
+                    customStyle={{
+                      margin: 0,
+                      padding: '8px 0',
+                      fontSize: '0.8rem',
+                      backgroundColor: 'transparent',
+                      fontFamily: 'D2Coding, monospace',
+                    }}
+                  >
+                    {codeSnippet}
+                  </SyntaxHighlighter>
                 </Box>
               )}
             </Collapse>

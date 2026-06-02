@@ -73,6 +73,9 @@ export interface ArgusIssue {
   stats_24h?: number[];
   external_url?: string | null;
   external_key?: string | null;
+  short_id?: string;
+  is_subscribed?: boolean;
+  is_bookmarked?: boolean;
 }
 
 export interface ArgusIssueDetail extends ArgusIssue {
@@ -160,7 +163,7 @@ export interface ArgusIntegration {
 export interface ArgusIssueTracker {
   id: number;
   project_id: number;
-  provider: 'jira' | 'github' | 'linear';
+  provider: 'jira' | 'github' | 'linear' | 'clickup' | 'asana' | 'notion' | 'shortcut' | 'azure_devops' | 'redmine' | 'youtrack' | 'trello';
   name: string;
   api_url: string;
   config: Record<string, any>;
@@ -695,6 +698,35 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  // --- Feedback-Issue Linking ---
+
+  async linkFeedbackToIssue(
+    projectId: number | string,
+    feedbackId: string,
+    issueId: number
+  ): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/link-issue`, {
+      issue_id: issueId,
+    });
+  }
+
+  async unlinkFeedbackFromIssue(
+    projectId: number | string,
+    feedbackId: string
+  ): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/link-issue`, {
+      issue_id: null,
+    });
+  }
+
+  async getFeedbacksByIssue(
+    projectId: number | string,
+    issueId: number | string
+  ): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}/by-issue/${issueId}`);
+    return response.data?.data || response.data || [];
+  }
+
   // --- Issue Creation (from feedback) ---
 
   async createIssue(
@@ -939,6 +971,40 @@ class ArgusService {
   ): Promise<ArgusIssueActivity[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}/activity`);
     return response.data?.data || [];
+  }
+
+  async subscribeIssue(
+    projectId: number | string,
+    issueId: number | string,
+    subscribe: boolean
+  ): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/${projectId}/issues/${issueId}/subscribe`, {
+      is_subscribed: subscribe,
+    });
+  }
+
+  async bookmarkIssue(
+    projectId: number | string,
+    issueId: number | string,
+    bookmark: boolean
+  ): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/${projectId}/issues/${issueId}/bookmark`, {
+      is_bookmarked: bookmark,
+    });
+  }
+
+  async deleteIssue(
+    projectId: number | string,
+    issueId: number | string
+  ): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/issues/${issueId}`);
+  }
+
+  async discardIssue(
+    projectId: number | string,
+    issueId: number | string
+  ): Promise<void> {
+    await argusApi.post(`${ARGUS_BASE}/${projectId}/issues/${issueId}/discard`);
   }
 
   async addIssueComment(
