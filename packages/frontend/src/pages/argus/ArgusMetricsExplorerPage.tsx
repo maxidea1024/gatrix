@@ -15,7 +15,8 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { TableSkeleton, ChartSkeleton } from '@/components/argus/ArgusSkeletons';
+import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
+import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
@@ -402,27 +403,43 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           <Box sx={{
             p: 1.5, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           }}>
-            <Box sx={{
-              display: 'flex', alignItems: 'center', gap: 0.5,
-              px: 1, py: 0.3, borderRadius: '6px',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-              backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-            }}>
-              <SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-              <Box component="input" value={search}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-                placeholder={t('argus.metrics.searchMetrics', 'Search metrics...')}
-                style={{
-                  flex: 1, border: 'none', outline: 'none', backgroundColor: 'transparent',
-                  color: 'inherit', fontFamily: 'monospace', fontSize: '0.75rem', padding: '4px',
-                }}
-              />
-              {search && (
-                <IconButton size="small" onClick={() => setSearch('')} sx={{ p: 0.2 }}>
-                  <CloseIcon sx={{ fontSize: 12 }} />
-                </IconButton>
+            <Autocomplete
+              size="small"
+              freeSolo
+              options={metricNames.map(m => m.name)}
+              inputValue={search}
+              onInputChange={(_, newValue) => setSearch(newValue)}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  handleSelectMetric(newValue);
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={t('argus.metrics.searchMetrics', 'Search metrics...')}
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <>
+                        <SearchIcon sx={{ fontSize: 16, color: 'text.disabled', ml: 0.5, mr: -0.5 }} />
+                        {params.InputProps.startAdornment}
+                      </>
+                    ),
+                    sx: {
+                      fontSize: '0.8rem',
+                      fontWeight: 600, // 두꺼운 폰트 적용 (얇은 폰트 문제 해결)
+                      borderRadius: '6px',
+                      backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                      },
+                    }
+                  }}
+                />
               )}
-            </Box>
+              sx={{ width: '100%' }}
+            />
           </Box>
           <Box sx={{ flex: 1, overflow: 'auto' }}>
             <PageContentLoader loading={loading} skeleton={<TableSkeleton />}>
@@ -542,7 +559,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
               )}
 
               {/* Chart */}
-              <PageContentLoader loading={queryLoading} skeleton={<ChartSkeleton />}>
+              <PageContentLoader loading={queryLoading} skeleton={<ArgusChartSkeleton type="bar" height={180} color={theme.palette.primary.main} />}>
                 <MetricChart
                   data={queryResult?.timeSeries || []}
                   isDark={isDark}
