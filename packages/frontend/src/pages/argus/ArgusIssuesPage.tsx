@@ -49,6 +49,7 @@ import argusService, {
   ArgusIssue,
   ArgusIssueListParams,
 } from '@/services/argusService';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { rbacService } from '@/services/rbacService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
@@ -69,6 +70,9 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
+import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
+import SavedSearchesSidebar, { SavedSearch } from '@/components/argus/SavedSearchesSidebar';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTitle, ChartTooltip, ChartLegend);
 
@@ -228,7 +232,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [merging, setMerging] = useState(false);
-  const [activeView, setActiveView] = useState<'all' | 'unresolved' | 'regressed' | 'escalating' | 'mine'>('unresolved');
+  const [activeViewId, setActiveViewId] = useState(searchParams.get('view') || 'unresolved');
+  const [queryBuilderAnchor, setQueryBuilderAnchor] = useState<HTMLElement | null>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [assigneeAnchor, setAssigneeAnchor] = useState<{ el: HTMLElement; issue: ArgusIssue } | null>(null);
 
@@ -545,15 +550,57 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { value: 'first_seen', label: t('argus.issues.firstSeen') },
     { value: 'event_count', label: t('argus.issues.events') },
     { value: 'user_count', label: t('argus.issues.users') },
+    { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
+
+  const QUERY_BUILDER_FIELDS = [
+    'level', 'status', 'platform', 'browser', 'os', 'device',
+    'environment', 'release', 'assigned', 'times_seen', 'user_count',
+  ];
+
+  const handleViewChange = (view: IssueView) => {
+    setActiveViewId(view.id);
+    const params = new URLSearchParams(searchParams);
+    params.set('view', view.id);
+    Object.entries(view.urlParams).forEach(([k, v]) => {
+      if (v === '__me__') {
+        params.set(k, user?.name || '');
+      } else {
+        params.set(k, v);
+      }
+    });
+    // Clear params that aren't in this view
+    ['status', 'substatus', 'assigned_to'].forEach(k => {
+      if (!view.urlParams[k]) params.delete(k);
+    });
+    params.set('page', '1');
+    setSearchParams(params);
+    // Sync local filter state
+    setStatus(view.urlParams.status || '');
+  };
+
+  const handleQueryBuilderApply = (query: string) => {
+    setSearch(query);
+    const params = new URLSearchParams(searchParams);
+    if (query) {
+      params.set('search', query);
+    } else {
+      params.delete('search');
+    }
+    params.set('page', '1');
+    setSearchParams(params);
+  };
 
   return (
     <Box>
       <PageHeader
         icon={<BugReportIcon />}
-        title={t('argus.issues.title')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.issues.title') }
+          ]} />
+        }
         subtitle={t('argus.issues.subtitle')}
-        enableAutoBack
         actions={
           !loading && total > 0 && (
             <Chip
@@ -570,63 +617,16 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         }
       />
 
-      {/* Issue Views tabs */}
-      <Box sx={{ display: 'flex', gap: 0.5, mb: 1.5 }}>
-        {[
-          { key: 'all', label: t('argus.issues.viewAll') },
-          { key: 'unresolved', label: t('argus.issues.viewUnresolved') },
-          { key: 'regressed', label: t('argus.issues.viewRegressed') },
-          { key: 'escalating', label: t('argus.issues.viewEscalating') },
-          { key: 'mine', label: t('argus.issues.viewMine') },
-        ].map(({ key, label }) => (
-          <Chip
-            key={key}
-            label={label}
-            size="small"
-            onClick={() => {
-              setActiveView(key as any);
-              const params = new URLSearchParams(searchParams);
-              if (key === 'all') {
-                params.set('status', 'all');
-                params.delete('substatus');
-                params.delete('assigned_to');
-              } else if (key === 'unresolved') {
-                params.set('status', 'unresolved');
-                params.delete('substatus');
-                params.delete('assigned_to');
-              } else if (key === 'regressed') {
-                params.set('status', 'unresolved');
-                params.set('substatus', 'regressed');
-                params.delete('assigned_to');
-              } else if (key === 'escalating') {
-                params.set('status', 'unresolved');
-                params.set('substatus', 'escalating');
-                params.delete('assigned_to');
-              } else if (key === 'mine') {
-                params.set('status', 'all');
-                params.delete('substatus');
-                params.set('assigned_to', user?.name || '');
-              }
-              params.set('page', '1');
-              setSearchParams(params);
-            }}
-            variant={activeView === key ? 'filled' : 'outlined'}
-            sx={{
-              fontSize: '0.76rem',
-              fontWeight: activeView === key ? 700 : 500,
-              borderRadius: '16px',
-              ...(activeView === key ? {
-                backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                color: theme.palette.primary.main,
-                borderColor: 'transparent',
-              } : {
-                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                color: 'text.secondary',
-              }),
-            }}
-          />
-        ))}
-      </Box>
+      <IssueViewTabs
+        activeViewId={activeViewId}
+        onViewChange={handleViewChange}
+        currentUser={user?.name}
+        onSaveCurrentAsView={() => {
+          // Save current search + filters as a custom view
+          const viewName = search || `${t('argus.issueViews.customView', 'Custom View')} ${Date.now()}`;
+          // The IssueViewTabs handles creation internally via the Add button
+        }}
+      />
 
       <ArgusFilterBar
         projectId={String(projectId)}
@@ -674,6 +674,29 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                 },
                 '& .MuiOutlinedInput-input': { py: 0.3 },
               }}
+            />
+            <Tooltip title={t('argus.builder.title', 'Visual Query Builder')}>
+              <IconButton
+                size="small"
+                onClick={(e) => setQueryBuilderAnchor(e.currentTarget)}
+                sx={{
+                  width: 26, height: 26,
+                  border: '1px solid',
+                  borderColor: queryBuilderAnchor ? 'primary.main' : 'divider',
+                  borderRadius: '6px',
+                  backgroundColor: queryBuilderAnchor ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                  '&:hover': { borderColor: 'primary.main', backgroundColor: alpha(theme.palette.primary.main, 0.04) },
+                }}
+              >
+                <SearchIcon sx={{ fontSize: 14, color: queryBuilderAnchor ? 'primary.main' : 'text.disabled' }} />
+              </IconButton>
+            </Tooltip>
+            <ArgusQueryBuilder
+              fields={QUERY_BUILDER_FIELDS}
+              query={search}
+              onApply={handleQueryBuilderApply}
+              anchorEl={queryBuilderAnchor}
+              onClose={() => setQueryBuilderAnchor(null)}
             />
             <FilterChipSelect
               label={t('argus.issues.status')}
@@ -751,6 +774,25 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           </Typography>
         )}
       </Paper>
+
+      {/* Issues content area with sidebar */}
+      <Box sx={{ display: 'flex' }}>
+        <SavedSearchesSidebar
+          currentQuery={search}
+          currentSort={sort}
+          onApply={(saved: SavedSearch) => {
+            setSearch(saved.query);
+            setSort(saved.sort);
+            const params = new URLSearchParams(searchParams);
+            if (saved.query) params.set('search', saved.query);
+            else params.delete('search');
+            params.set('sort', saved.sort);
+            params.set('page', '1');
+            setSearchParams(params);
+          }}
+        />
+
+        <Box sx={{ flex: 1, minWidth: 0 }}>
 
       {selectedIds.size > 0 && (
         <Paper elevation={0} sx={{
@@ -848,7 +890,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                     <Checkbox
                       size="small"
                       checked={selectedIds.has(issue.id)}
-                      onClick={(e) => toggleSelect(issue.id, e)}
+                      onChange={(e) => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          next.has(issue.id) ? next.delete(issue.id) : next.add(issue.id);
+                          return next;
+                        });
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                       sx={{ p: 0.3, '& .MuiSvgIcon-root': { fontSize: 16 } }}
                     />
                   </Box>
@@ -1025,12 +1074,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                 params.set('page', '1');
                 setSearchParams(params);
               }}
-              rowsPerPageOptions={VALID_PAGE_SIZES}
               size="small"
             />
           </Box>
         )}
       </PageContentLoader>
+
+        </Box>{/* end flex content area */}
+      </Box>{/* end flex sidebar container */}
 
       <Menu
         anchorEl={assigneeAnchor?.el}
