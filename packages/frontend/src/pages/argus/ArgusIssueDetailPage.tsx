@@ -806,7 +806,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                             label={
                               <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                 <Typography component="span" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
-                                  {key}
+                                  {key}:
                                 </Typography>
                                 <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
                                   {String(val)}
