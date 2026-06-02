@@ -28,7 +28,7 @@ import {
   Code as CodeIcon,
   ErrorOutline as ErrorOutlineIcon,
   ViewColumn as ViewColumnIcon,} from '@mui/icons-material';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
+
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import useSWR from 'swr';
@@ -69,14 +69,7 @@ const EventRow: React.FC<EventRowProps> = ({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  // Copy helper function
-  const handleCopy = (text: string) => {
-    copyToClipboardWithNotification(
-      text,
-      () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-    );
-  };
+
 
   // Event type color based on status
   const getEventColor = (type: string) => {
@@ -472,7 +465,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           : '-'}
                       </Typography>
                       {event.ports && Object.keys(event.ports).length > 0 && (
-                        <CopyButton text={JSON.stringify(event.ports} size={13} />
+                        <CopyButton text={JSON.stringify(event.ports)} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -589,7 +582,7 @@ const EventRow: React.FC<EventRowProps> = ({
                             variant="outlined"
                           />
                         ))}
-                        <CopyButton text={JSON.stringify(event.labels, null, 2} size={13} />
+                        <CopyButton text={JSON.stringify(event.labels, null, 2)} size={13} />
                       </Box>
                     </Box>
                   )}
@@ -621,7 +614,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         >
                           {JSON.stringify(event.metadata, null, 2)}
                         </Typography>
-                        <CopyButton text={JSON.stringify(event.metadata, null, 2} size={13} />
+                        <CopyButton text={JSON.stringify(event.metadata, null, 2)} size={13} />
                       </Box>
                     </Box>
                   )}

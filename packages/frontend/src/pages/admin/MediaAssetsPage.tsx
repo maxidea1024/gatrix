@@ -70,6 +70,7 @@ import {
   formatRelativeTime,
   formatDateTimeDetailed,
 } from '../../utils/dateFormat';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Format file size
 const formatFileSize = (bytes: number): string => {

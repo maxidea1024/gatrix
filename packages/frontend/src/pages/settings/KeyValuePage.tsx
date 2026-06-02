@@ -335,7 +335,7 @@ const KeyValuePage: React.FC = () => {
                           >
                             {item.varKey.replace('kv:', '')}
                           </Typography>
-                          <CopyButton text={item.varKey.replace('kv:', ''} size={13} />
+                          <CopyButton text={item.varKey.replace('kv:', '')} size={13} />
                           {item.isSystemDefined && (
                             <Tooltip title={t('settings.kv.systemDefined')}>
                               <LockIcon fontSize="small" color="action" />

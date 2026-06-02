@@ -95,6 +95,7 @@ import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {

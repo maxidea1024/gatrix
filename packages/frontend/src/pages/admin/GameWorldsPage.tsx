@@ -1629,7 +1629,7 @@ const GameWorldsPage: React.FC = () => {
             >
               {world.worldId}
             </Typography>
-            <CopyButton text={world.worldId, t('gameWorlds.worldId'} size={13} />
+            <CopyButton text={world.worldId} size={13} />
           </Box>
         );
       case 'name':
@@ -1638,7 +1638,7 @@ const GameWorldsPage: React.FC = () => {
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {world.name}
             </Typography>
-            <CopyButton text={world.name, t('gameWorlds.name'} size={13} />
+            <CopyButton text={world.name} size={13} />
           </Box>
         );
       case 'description':
@@ -1661,8 +1661,7 @@ const GameWorldsPage: React.FC = () => {
               {world.worldServerAddress || '-'}
             </Typography>
             {world.worldServerAddress && (
-              <CopyButton text={world.worldServerAddress || '',
-                      t('gameWorlds.worldServerAddress'} size={13} />
+              <CopyButton text={world.worldServerAddress || ''} size={13} />
             )}
           </Box>
         );
