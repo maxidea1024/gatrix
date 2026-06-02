@@ -966,7 +966,7 @@ class ArgusService {
       `${ARGUS_BASE}/${projectId}/issues/${issueId}/stats`,
       { params: { period } }
     );
-    return response.data || [];
+    return response.data?.data || [];
   }
 
   async listIssueEvents(
