@@ -464,7 +464,19 @@ const ArgusIssueDetailPage: React.FC = () => {
             </Box>
           </Box>
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'stretch' }}>
+          <Box sx={{
+            display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'stretch',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              display: { xs: 'none', md: 'block' },
+              position: 'absolute',
+              top: 0, bottom: 0,
+              right: { md: 'calc(33.333% - 12px)', xl: 'calc(25% - 12px)' },
+              width: '1px',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)',
+            },
+          }}>
             {/* Left Column: Main Content */}
             <Box>
               {/* Event Distribution Chart */}
@@ -756,7 +768,6 @@ const ArgusIssueDetailPage: React.FC = () => {
 
             {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
             <Box sx={{
-              borderLeft: { md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
               pl: { md: 3 },
             }}>
               {/* Timing — Last/First Seen */}
