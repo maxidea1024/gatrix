@@ -90,9 +90,9 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
     return { top2, rest };
   }, [browserTag]);
 
-  if (loading) {
+  if (loading && statsData.length === 0) {
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 56, mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 72, mb: 2 }}>
         <CircularProgress size={20} />
       </Box>
     );
@@ -112,34 +112,37 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
         py: 1,
         mb: 2,
         backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
-        minHeight: 56,
+        minHeight: 72,
         overflow: 'hidden',
+        opacity: loading ? 0.6 : 1,
+        pointerEvents: loading ? 'none' : 'auto',
+        transition: 'opacity 0.2s ease',
       }}
     >
       {/* ── 1. Stats (left) ── */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0, gap: 0.5 }}>
         <Box sx={{
-          display: 'inline-flex', alignItems: 'baseline', gap: 0.5,
+          display: 'flex', alignItems: 'baseline',
           backgroundColor: isDark ? alpha('#7c4dff', 0.15) : alpha('#7c4dff', 0.08),
-          px: 1, py: 0.25, borderRadius: 0.5, mb: 0.25,
+          px: 1, py: 0.25, borderRadius: 0.5,
         }}>
-          <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: isDark ? '#bb86fc' : '#6200ea', lineHeight: 1.2 }}>
+          <Typography sx={{ minWidth: 36, textAlign: 'right', fontWeight: 700, fontSize: '0.95rem', color: isDark ? '#bb86fc' : '#6200ea', lineHeight: 1.2 }}>
             {formatCount(totalEvents)}
           </Typography>
-          <Typography sx={{ fontSize: '0.65rem', color: isDark ? '#bb86fc' : '#6200ea', fontWeight: 600, lineHeight: 1 }}>
+          <Typography sx={{ ml: 0.75, fontSize: '0.65rem', color: isDark ? '#bb86fc' : '#6200ea', fontWeight: 600, lineHeight: 1 }}>
             {t('argus.common.events', 'events')}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, px: 0.5 }}>
-          <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', color: 'text.primary', lineHeight: 1.2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', px: 1 }}>
+          <Typography sx={{ minWidth: 36, textAlign: 'right', fontWeight: 600, fontSize: '0.85rem', color: 'text.primary', lineHeight: 1.2 }}>
             {formatCount(totalUsers)}
           </Typography>
-          <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', lineHeight: 1 }}>
+          <Typography sx={{ ml: 0.75, fontSize: '0.65rem', color: 'text.secondary', lineHeight: 1 }}>
             {t('argus.common.users', 'users')}
           </Typography>
         </Box>
         {/* Period Selector */}
-        <Box sx={{ display: 'flex', gap: '2px', mt: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: '2px', mt: 0.25, px: 0.5 }}>
           {['24h', '7d', '14d', '30d'].map((p) => (
             <Box
               key={p}
@@ -180,7 +183,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
           gap: 0.25,
           borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           pl: 2,
-          minWidth: 140,
+          minWidth: 160,
         }}>
           <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.secondary', textTransform: 'lowercase', letterSpacing: 0.3, mb: 0.25 }}>
             {t('argus.common.browser', 'browser')}
@@ -189,7 +192,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
             <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
               <Typography sx={{
                 fontSize: '0.7rem', color: 'text.primary', fontWeight: 500,
-                minWidth: 52, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                flex: 1, minWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
                 {b.name}
               </Typography>
@@ -197,7 +200,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
                 {b.pct}%
               </Typography>
               <Box sx={{
-                width: 48, height: 3,
+                width: 40, height: 3,
                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
                 borderRadius: 1, overflow: 'hidden',
               }}>
@@ -207,14 +210,14 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
           ))}
           {browserData.rest && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 52 }}>
+              <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', flex: 1, minWidth: 60, whiteSpace: 'nowrap' }}>
                 +{browserData.rest.count} {t('argus.issues.eventDistributionMore', 'more')}
               </Typography>
               <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 24, textAlign: 'right' }}>
                 {browserData.rest.pct}%
               </Typography>
               <Box sx={{
-                width: 48, height: 3,
+                width: 40, height: 3,
                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
                 borderRadius: 1,
               }} />
