@@ -11,7 +11,7 @@ import {
   Box, Typography, Paper, TextField, Button, Slider, Chip, IconButton,
   Divider, useTheme, InputAdornment, alpha, Tooltip, Select, MenuItem,
   FormControl, InputLabel, CircularProgress, Dialog, DialogTitle,
-  DialogContent, DialogActions, Avatar,
+  DialogContent, DialogActions, Avatar, Collapse,
 } from '@mui/material';
 import {
   Settings as SettingsIcon, Add as AddIcon,
@@ -24,6 +24,7 @@ import {
   Notifications as NotificationsIcon, Email as EmailIcon,
   Webhook as WebhookIcon, Chat as ChatIcon, Edit as EditIcon,
   Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -395,6 +396,16 @@ const ArgusSettingsPage: React.FC = () => {
 
   // Ownership form
   const [newRule, setNewRule] = useState({ name: '', type: 'path', pattern: '', owners: '' });
+  const [guideCollapsed, setGuideCollapsed] = useState(() => {
+    try { return localStorage.getItem('argus_ownership_guide_collapsed') === '1'; } catch { return false; }
+  });
+  const toggleGuide = useCallback(() => {
+    setGuideCollapsed(prev => {
+      const next = !prev;
+      try { localStorage.setItem('argus_ownership_guide_collapsed', next ? '1' : '0'); } catch { /* noop */ }
+      return next;
+    });
+  }, []);
 
   // ── Fetch ──
   const fetchProject = useCallback(async () => {
@@ -933,7 +944,6 @@ const ArgusSettingsPage: React.FC = () => {
             {/* ─── OWNERSHIP ─── */}
             {currentSection === 'ownership' && (<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
 
-              {/* ── Guide Panel ── */}
               <Paper elevation={0} sx={{
                 borderRadius: '12px', overflow: 'hidden',
                 border: `1px solid ${bdr}`,
@@ -941,12 +951,24 @@ const ArgusSettingsPage: React.FC = () => {
                   ? 'linear-gradient(135deg, rgba(124,77,255,0.06) 0%, rgba(66,165,245,0.04) 100%)'
                   : 'linear-gradient(135deg, rgba(124,77,255,0.04) 0%, rgba(66,165,245,0.02) 100%)',
               }}>
-                <Box sx={{ px: 3, py: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box
+                  onClick={toggleGuide}
+                  sx={{
+                    px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    cursor: 'pointer', userSelect: 'none',
+                    '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                  }}
+                >
                   <Box>
                     <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>{t('argus.settings.ownershipGuideTitle')}</Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.78rem', mt: 0.3 }}>{t('argus.settings.ownershipGuideDesc')}</Typography>
                   </Box>
+                  <IconButton size="small" sx={{ transition: 'transform 0.2s', transform: guideCollapsed ? 'rotate(0deg)' : 'rotate(180deg)' }}>
+                    <ExpandMoreIcon fontSize="small" />
+                  </IconButton>
                 </Box>
+
+                <Collapse in={!guideCollapsed} timeout={200}>
                 <Divider sx={{ borderColor: bdr }} />
 
                 {/* Syntax Reference */}
@@ -997,6 +1019,7 @@ const ArgusSettingsPage: React.FC = () => {
                     {t('argus.settings.ownershipEvalDesc')}
                   </Typography>
                 </Box>
+                </Collapse>
               </Paper>
 
               {/* ── Rules Card ── */}
