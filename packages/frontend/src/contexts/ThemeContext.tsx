@@ -142,12 +142,18 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
     },
     typography: {
       fontFamily,
+      fontWeightRegular: 500,
       h1: { fontSize: '2.5rem', fontWeight: 600 },
       h2: { fontSize: '2rem', fontWeight: 600 },
       h3: { fontSize: '1.75rem', fontWeight: 600 },
       h4: { fontSize: '1.5rem', fontWeight: 600 },
       h5: { fontSize: '1.25rem', fontWeight: 600 },
       h6: { fontSize: '1rem', fontWeight: 600 },
+      body1: { fontWeight: 500 },
+      body2: { fontWeight: 500 },
+      subtitle1: { fontWeight: 500 },
+      subtitle2: { fontWeight: 500 },
+      caption: { fontWeight: 500 },
     },
     shape: {
       borderRadius: 4,

@@ -1027,13 +1027,6 @@ const ArgusSettingsPage: React.FC = () => {
                 title={t('argus.settings.ownership')}
                 desc={ruleLoaded ? t('argus.settings.rulesCount', { count: rules.length }) : t('argus.settings.ownershipDesc')}
                 isDark={isDark}
-                headerAction={
-                  <Button variant="contained" size="small" startIcon={<AddIcon />}
-                    onClick={() => setNewRule({ name: '', type: 'path', pattern: '', owners: '' })}
-                    sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}>
-                    {t('argus.settings.addRule')}
-                  </Button>
-                }
               >
                 {/* Add Rule Form — collapsible */}
                 {(newRule.name !== undefined) && (
