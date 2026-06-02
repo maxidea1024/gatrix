@@ -41,21 +41,12 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
 
   const { logs, logsHasMore, logsLoading, loadMoreLogs, isFetchingMore } = useLogsData(projectId, issueId, showLogs);
 
-  return (
-    <Paper elevation={0} sx={{
-      p: 2, mt: 2, mb: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      borderRadius: 2,
-      ...(logsFullscreen ? {
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        zIndex: 1300, m: 0, borderRadius: 0, overflow: 'hidden',
-        display: 'flex', flexDirection: 'column',
-      } : {}),
-    }}>
-      {!showLogs ? (
+  if (!showLogs) {
+    return (
+      <Box sx={{ mt: 2, mb: 2 }}>
         <EmptyPlaceholder
           message=""
-          minHeight={250}
-          sx={{ border: 'none' }}
+          minHeight={120}
         >
           <Button
             variant="outlined"
@@ -68,7 +59,6 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
               borderRadius: '8px',
               px: 3.5,
               py: 1.2,
-              mt: 1,
               borderColor: theme.palette.info.main,
               color: theme.palette.info.main,
               '&:hover': {
@@ -80,9 +70,22 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
             {t('argus.issues.loadLogs', 'Load Logs')}
           </Button>
         </EmptyPlaceholder>
-      ) : (
-        <>
-          {/* Toolbar */}
+      </Box>
+    );
+  }
+
+  return (
+    <Paper elevation={0} sx={{
+      p: 2, mt: 2, mb: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+      borderRadius: 2,
+      ...(logsFullscreen ? {
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 1300, m: 0, borderRadius: 0, overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+      } : {}),
+    }}>
+      <>
+        {/* Toolbar */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <LogIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
@@ -455,7 +458,6 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
             </Box>
           )}
         </>
-      )}
     </Paper>
   );
 };
