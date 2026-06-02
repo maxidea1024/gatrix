@@ -1043,7 +1043,7 @@ const ArgusSettingsPage: React.FC = () => {
                         <TextField size="small" placeholder={t('argus.settings.ruleName')}
                           value={newRule.name} onChange={e => setNewRule({ ...newRule, name: e.target.value })}
                           fullWidth
-                          sx={{ ...inpSx, '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
+                          sx={{ ...inpSx, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
                       </Box>
                       <ChipSelect
                         label={t('argus.settings.matchType')}
@@ -1061,14 +1061,14 @@ const ArgusSettingsPage: React.FC = () => {
                       <TextField size="small" placeholder={t('argus.settings.pattern')}
                         value={newRule.pattern} onChange={e => setNewRule({ ...newRule, pattern: e.target.value })}
                         fullWidth
-                        sx={{ ...inpSx, '& .MuiOutlinedInput-root': { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem', borderRadius: '8px' }, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
+                        sx={{ ...inpSx, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontSize: '0.68rem' }}>{t('argus.settings.globHint')}</Typography>
                     </Box>
                     <Box sx={{ mb: 2 }}>
                       <TextField size="small" placeholder={t('argus.settings.owners')}
                         value={newRule.owners} onChange={e => setNewRule({ ...newRule, owners: e.target.value })}
                         fullWidth
-                        sx={{ ...inpSx, '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
+                        sx={{ ...inpSx, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontSize: '0.68rem' }}>{t('argus.settings.ownerHint')}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
