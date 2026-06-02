@@ -4,7 +4,7 @@
  * Replaces manual useState + useEffect data loading with SWR's
  * built-in caching, revalidation, and error handling.
  */
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import argusService, {
   ArgusIssueDetail,
@@ -120,6 +120,7 @@ export function useTraceData(projectId: string | undefined, traceId: string | nu
   };
 }
 
+
 // ==================== Logs Hook ====================
 
 export function useLogsData(projectId: string | undefined, issueId: string | undefined, enabled: boolean) {
@@ -128,6 +129,7 @@ export function useLogsData(projectId: string | undefined, issueId: string | und
     data: logsResult,
     error: logsError,
     isLoading: logsLoading,
+    mutate,
   } = useSWR(
     logsKey,
     logsFetcher as any,
@@ -136,10 +138,43 @@ export function useLogsData(projectId: string | undefined, issueId: string | und
     }
   );
 
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  const loadMoreLogs = useCallback(async () => {
+    if (!projectId || !issueId || !logsResult) return;
+    const currentData = (logsResult as any).data as ArgusLogEntry[];
+    const lastLog = currentData[currentData.length - 1];
+    
+    setIsFetchingMore(true);
+    try {
+      const moreLogs = await argusService.getLogs(projectId, {
+        issue_id: issueId,
+        limit: 200,
+        order: 'DESC',
+        cursor: lastLog?.timestamp,
+      });
+
+      // Mutate SWR cache by appending new logs and updating hasMore
+      mutate(
+        {
+          data: [...currentData, ...moreLogs.data],
+          meta: moreLogs.meta,
+        },
+        false // Don't revalidate immediately
+      );
+    } catch (error) {
+      console.error('Failed to load more logs:', error);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [projectId, issueId, logsResult, mutate]);
+
   return {
     logs: (logsResult as any)?.data as ArgusLogEntry[] ?? [],
     logsHasMore: (logsResult as any)?.meta?.hasMore ?? false,
     logsLoading,
     logsError,
+    loadMoreLogs,
+    isFetchingMore,
   };
 }

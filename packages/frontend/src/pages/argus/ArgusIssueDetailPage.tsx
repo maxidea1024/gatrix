@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -75,6 +75,9 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { rbacService } from '@/services/rbacService';
 import { formatCompactNumber } from '@/utils/numberFormat';
+import { stringToColor, getInitials, formatRelative, LEVEL_COLORS } from '@/utils/argusHelpers';
+import { useIssueDetailData, useTraceData, useLogsData } from '@/hooks/useIssueDetailData';
+import { useIssueActions } from '@/hooks/useIssueActions';
 import PageHeader from '@/components/common/PageHeader';
 import { CopyButton } from '@/components/common/CopyButton';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
@@ -95,24 +98,6 @@ import ExceptionChaining from '@/components/argus/ExceptionChaining';
 import SimilarMergedIssues from '@/components/argus/SimilarMergedIssues';
 
 
-function stringToColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
-  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ff9800'];
-  return colors[Math.abs(hash) % colors.length];
-}
-
-function getInitials(name: string): string {
-  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-}
-
-const LEVEL_COLORS: Record<string, string> = {
-  fatal: '#f44336',
-  error: '#ff5722',
-  warning: '#ff9800',
-  info: '#2196f3',
-  debug: '#9e9e9e',
-};
 
 const ArgusIssueDetailPage: React.FC = () => {
   const theme = useTheme();
@@ -122,38 +107,27 @@ const ArgusIssueDetailPage: React.FC = () => {
   const isDark = theme.palette.mode === 'dark';
   const { projectId, issueId } = useParams<{ projectId: string; issueId: string }>();
 
-  const [issue, setIssue] = useState<ArgusIssueDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [members, setMembers] = useState<any[]>([]);
+  // --- SWR Data Hooks ---
+  const {
+    issue,
+    issueLoading: loading,
+    members,
+    updateIssueOptimistic,
+    revalidateIssue,
+  } = useIssueDetailData({ projectId, issueId });
+
+  // --- UI State ---
   const [assigneeAnchor, setAssigneeAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(null);
   const [currentEvent, setCurrentEvent] = useState<ArgusErrorEvent | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  useEffect(() => {
-    if (!projectId) return;
-    const fetchMembers = async () => {
-      try {
-        const data = await rbacService.getProjectMembers(projectId);
-        setMembers(data);
-      } catch (error) {
-        console.error('Failed to fetch project members:', error);
-      }
-    };
-    fetchMembers();
-  }, [projectId]);
-
   // Trace states
-  const [traceDetail, setTraceDetail] = useState<ArgusTraceDetail | null>(null);
-  const [loadingTrace, setLoadingTrace] = useState(false);
   const [showTrace, setShowTrace] = useState(false);
 
   // Logs state
-  const [logs, setLogs] = useState<ArgusLogEntry[]>([]);
-  const [logsLoading, setLogsLoading] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
-  const [logsHasMore, setLogsHasMore] = useState(false);
   const [expandedLogIds, setExpandedLogIds] = useState<Set<string>>(new Set());
   const [logsFullscreen, setLogsFullscreen] = useState(false);
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
@@ -166,130 +140,9 @@ const ArgusIssueDetailPage: React.FC = () => {
 
   const logContainerRef = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!projectId || !issueId) return;
-    const fetchIssue = async () => {
-      setLoading(true);
-      try {
-        const data = await argusService.getIssueDetail(projectId, issueId);
-        setIssue(data);
-      } catch (error) {
-        console.error('Failed to fetch issue detail:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchIssue();
-  }, [projectId, issueId]);
-
-  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status: string }>({ open: false, status: '' });
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(null);
-
-  const requestStatusChange = (status: string) => {
-    setConfirmDialog({ open: true, status });
-    setStatusMenuAnchor(null);
-  };
-
-  const executeStatusChange = async () => {
-    if (!projectId || !issueId || !issue || !confirmDialog.status) return;
-    try {
-      await argusService.updateIssueStatus(projectId, issueId, confirmDialog.status);
-      setIssue({ ...issue, status: confirmDialog.status });
-      setConfirmDialog({ open: false, status: '' });
-    } catch (error) {
-      console.error('Failed to update status:', error);
-    }
-  };
-
-
-  const handleAssign = async (assignee: string) => {
-    if (!projectId || !issueId || !issue) return;
-    try {
-      await argusService.assignIssue(projectId, issueId, assignee || null);
-      setIssue({ ...issue, assigned_to: assignee || null });
-    } catch (error) {
-      console.error('Failed to assign issue:', error);
-    }
-  };
-
-  const handleSubscribe = async (subscribe: boolean) => {
-    if (!projectId || !issueId) return;
-    try {
-      await argusService.subscribeIssue(projectId, issueId, subscribe);
-      setIsSubscribed(subscribe);
-    } catch (error) {
-      console.error('Failed to toggle subscription:', error);
-    }
-  };
-
-  const handleBookmark = async (bookmark: boolean) => {
-    if (!projectId || !issueId) return;
-    try {
-      await argusService.bookmarkIssue(projectId, issueId, bookmark);
-      setIsBookmarked(bookmark);
-    } catch (error) {
-      console.error('Failed to toggle bookmark:', error);
-    }
-  };
-
-  const handleDeleteIssue = async () => {
-    if (!projectId || !issueId) return;
-    try {
-      await argusService.deleteIssue(projectId, issueId);
-      navigate(-1);
-    } catch (error) {
-      console.error('Failed to delete issue:', error);
-    }
-  };
-
-  const handleDiscardIssue = async () => {
-    if (!projectId || !issueId) return;
-    try {
-      await argusService.discardIssue(projectId, issueId);
-      navigate(-1);
-    } catch (error) {
-      console.error('Failed to discard issue:', error);
-    }
-  };
-
-  const PRIORITY_CONFIG: Record<string, { color: string; label: string }> = {
-    critical: { color: '#f44336', label: t('argus.issues.priority.critical') },
-    high: { color: '#ff5722', label: t('argus.issues.priority.high') },
-    medium: { color: '#ff9800', label: t('argus.issues.priority.medium') },
-    low: { color: '#9e9e9e', label: t('argus.issues.priority.low') },
-  };
-
-  const handlePriorityChange = async (priority: string) => {
-    if (!projectId || !issueId || !issue) return;
-    try {
-      // Use same patch endpoint as assignIssue (PATCH /issues/:id with field)
-      await argusService.updateIssueStatus(projectId, issueId, issue.status);
-      setIssue({ ...issue, priority: priority as any });
-    } catch (error) {
-      console.error('Failed to update priority:', error);
-    }
-    setPriorityAnchor(null);
-  };
-
-  const loadTrace = async (tid: string) => {
-    if (!projectId) return;
-    setLoadingTrace(true);
-    setShowTrace(true);
-    try {
-      const data = await argusService.getTraceDetail(projectId, tid);
-      setTraceDetail(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoadingTrace(false);
-    }
-  };
-
+  // --- SWR Trace + Logs (lazy) ---
   const latestEvent = currentEvent || issue?.latest_event;
-  const levelColor = LEVEL_COLORS[issue?.level || 'error'] || LEVEL_COLORS.error;
-
-  // Extract trace_id
-  let traceId = null;
+  let traceId: string | null = null;
   if (latestEvent) {
     if (latestEvent.contexts) {
       try {
@@ -304,6 +157,54 @@ const ArgusIssueDetailPage: React.FC = () => {
       } catch (e) {}
     }
   }
+
+  const { traceDetail, traceLoading: loadingTrace } = useTraceData(projectId, traceId, showTrace);
+  const { logs, logsHasMore, logsLoading, loadMoreLogs, isFetchingMore } = useLogsData(projectId, issueId, showLogs);
+
+  // --- Actions Hook ---
+  const actions = useIssueActions({
+    projectId,
+    issueId,
+    issue,
+    updateIssueOptimistic,
+    revalidateIssue,
+  });
+
+  const handleAssign = actions.assign;
+  const handleSubscribe = async (sub: boolean) => { await actions.subscribe(sub); setIsSubscribed(sub); };
+  const handleBookmark = async (bm: boolean) => { await actions.bookmark(bm); setIsBookmarked(bm); };
+  const handleDeleteIssue = actions.deleteIssue;
+  const handleDiscardIssue = actions.discardIssue;
+
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status: string }>({ open: false, status: '' });
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const requestStatusChange = (status: string) => {
+    setConfirmDialog({ open: true, status });
+    setStatusMenuAnchor(null);
+  };
+
+  const executeStatusChange = async () => {
+    if (!confirmDialog.status) return;
+    await actions.changeStatus(confirmDialog.status);
+    setConfirmDialog({ open: false, status: '' });
+  };
+
+  const PRIORITY_CONFIG: Record<string, { color: string; label: string }> = {
+    critical: { color: '#f44336', label: t('argus.issues.priority.critical') },
+    high: { color: '#ff5722', label: t('argus.issues.priority.high') },
+    medium: { color: '#ff9800', label: t('argus.issues.priority.medium') },
+    low: { color: '#9e9e9e', label: t('argus.issues.priority.low') },
+  };
+
+  const handlePriorityChange = async (priority: string) => {
+    await actions.changePriority(priority);
+    setPriorityAnchor(null);
+  };
+
+
+  const levelColor = LEVEL_COLORS[issue?.level || 'error'] || LEVEL_COLORS.error;
+
 
   return (
     <PageContentLoader loading={loading}>
@@ -863,7 +764,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                       {t('argus.issues.transactionTrace', 'Transaction Trace')}
                     </Typography>
                     {!showTrace && (
-                      <Button variant="outlined" size="small" onClick={() => loadTrace(traceId)} disabled={loadingTrace}>
+                      <Button variant="outlined" size="small" onClick={() => setShowTrace(true)} disabled={loadingTrace}>
                         {t('argus.issues.viewTrace', 'Trace 보기')}
                       </Button>
                     )}
@@ -1133,19 +1034,7 @@ const ArgusIssueDetailPage: React.FC = () => {
               <Button
                 variant="outlined"
                 startIcon={<LogIcon />}
-                onClick={async () => {
-                  setShowLogs(true);
-                  setLogsLoading(true);
-                  try {
-                    const result = await argusService.getLogs(projectId!, { issue_id: issueId, limit: 200, order: 'DESC' });
-                    setLogs(result.data);
-                    setLogsHasMore(result.meta.hasMore);
-                  } catch (e) {
-                    console.error('Failed to load logs:', e);
-                  } finally {
-                    setLogsLoading(false);
-                  }
-                }}
+                onClick={() => setShowLogs(true)}
                 sx={{
                   textTransform: 'none',
                   fontSize: '0.8rem',
@@ -1521,24 +1410,9 @@ const ArgusIssueDetailPage: React.FC = () => {
             <Box sx={{ py: 2, textAlign: 'center', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
               <Button
                 variant="outlined" size="small"
-                disabled={logsLoading}
-                startIcon={logsLoading ? <CircularProgress size={14} color="inherit" /> : undefined}
-                onClick={async () => {
-                  setLogsLoading(true);
-                  try {
-                    const lastLog = logs[logs.length - 1];
-                    const result = await argusService.getLogs(projectId!, {
-                      issue_id: issueId, limit: 200, order: 'DESC',
-                      cursor: lastLog?.timestamp,
-                    });
-                    setLogs(prev => [...prev, ...result.data]);
-                    setLogsHasMore(result.meta.hasMore);
-                  } catch (e) {
-                    console.error('Failed to load more logs:', e);
-                  } finally {
-                    setLogsLoading(false);
-                  }
-                }}
+                disabled={logsLoading || isFetchingMore}
+                startIcon={(logsLoading || isFetchingMore) ? <CircularProgress size={14} color="inherit" /> : undefined}
+                onClick={loadMoreLogs}
                 sx={{
                   textTransform: 'none', fontSize: '0.78rem', fontWeight: 600, minWidth: 160,
                   borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
@@ -1808,23 +1682,7 @@ const ContextGrid: React.FC<{ items: { label: string; value: string }[]; isDark:
   </Box>
 );
 
-function formatRelative(dateStr: string, t: any): string {
-  try {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const mins = Math.floor(diff / 60000);
-    const hrs = Math.floor(mins / 60);
-    const days = Math.floor(hrs / 24);
 
-    if (mins < 1) return t('common.time.justNow');
-    if (mins < 60) return t('common.time.minutesAgo', { count: mins });
-    if (hrs < 24) return t('common.time.hoursAgo', { count: hrs });
-    if (days < 30) return t('common.time.daysAgo', { count: days });
-    return d.toLocaleDateString();
-  } catch {
-    return dateStr;
-  }
-}
 
 export default ArgusIssueDetailPage;
+
