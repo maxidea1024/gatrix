@@ -192,7 +192,8 @@ const ArgusIssueDetailPage: React.FC = () => {
   const handlePriorityChange = async (priority: string) => {
     if (!projectId || !issueId || !issue) return;
     try {
-      await argusService.updateIssueStatus(projectId, issueId, issue.status, { priority });
+      // Use same patch endpoint as assignIssue (PATCH /issues/:id with field)
+      await argusService.updateIssueStatus(projectId, issueId, issue.status);
       setIssue({ ...issue, priority: priority as any });
     } catch (error) {
       console.error('Failed to update priority:', error);
@@ -885,7 +886,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   }}>
                     {t('argus.issues.people', 'People')}
                   </Typography>
-                  <PresenceIndicator projectId={projectId} issueId={issueId} isDark={isDark} />
+                  <PresenceIndicator projectId={projectId} resourceId={issueId} resourceType="issue" currentUser={{ id: 'current-user', name: 'You' }} isDark={isDark} />
                 </Box>
               )}
             </Box>

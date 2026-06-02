@@ -121,7 +121,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
     }
   };
 
-  const Wrapper = embedded ? Box : Paper;
+  const Wrapper: React.ElementType = embedded ? Box : Paper;
   const wrapperProps = embedded
     ? { component: 'div' as const }
     : {
