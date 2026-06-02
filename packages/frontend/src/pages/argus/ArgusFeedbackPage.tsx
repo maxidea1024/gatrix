@@ -96,6 +96,7 @@ import useArgusUrlState from '@/hooks/useArgusUrlState';
 import SimplePagination from '@/components/common/SimplePagination';
 import PageHeader from '@/components/common/PageHeader';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
+import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
@@ -993,31 +994,18 @@ const ArgusFeedbackPage: React.FC = () => {
           <Box
             onMouseDown={handleSplitterMouseDown}
             sx={{
-              width: 3,
+              width: isSplitDragging ? 4 : 1,
               flexShrink: 0,
               cursor: 'col-resize',
-              bgcolor: 'divider',
-              transition: 'background-color 0.15s',
+              bgcolor: isSplitDragging ? 'primary.main' : 'divider',
+              transition: 'all 0.15s',
               zIndex: 10,
               '&:hover, &:active': {
                 bgcolor: 'primary.main',
+                width: 4,
               },
-              ...(isSplitDragging && { bgcolor: 'primary.main' }),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
-          >
-            <Box
-              sx={{
-                width: 1,
-                height: 32,
-                borderRadius: 1,
-                bgcolor: 'text.disabled',
-                opacity: 0.5,
-              }}
-            />
-          </Box>
+          />
         )}
 
         {/* ─── RIGHT: Detail Panel ─── */}
@@ -1180,6 +1168,7 @@ const ArgusFeedbackPage: React.FC = () => {
                     <Typography variant="caption" sx={{ fontSize: '0.72rem', fontFamily: 'monospace', wordBreak: 'break-all', flex: 1 }}>
                       {row.value}
                     </Typography>
+                    <CopyButton text={row.value as string} size={14} />
                   </Box>
                 ))}
               </Paper>
