@@ -1,8 +1,20 @@
 /* Global styles for the application */
 
-/* Base font weight — prevents thin 400 text across the app */
+/* Global font consistency — all elements inherit the theme font */
+*,
+*::before,
+*::after {
+  font-family: inherit;
+}
+
 body {
   font-weight: 500;
+}
+
+/* Elements that don't inherit font by default in browsers */
+input, button, select, textarea, table, th, td, pre, code {
+  font-family: inherit;
+  font-weight: inherit;
 }
 
 /* Disable autofill styling completely */
