@@ -247,6 +247,26 @@ const ArgusIssueDetailPage: React.FC = () => {
             }
             subtitle={issue.culprit}
             enableAutoBack
+            headerActions={
+              <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem' }}>
+                    {issue.event_count?.toLocaleString() || '0'}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
+                    {t('argus.issues.events')}
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem' }}>
+                    {issue.user_count?.toLocaleString() || '0'}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
+                    {t('argus.issues.users')}
+                  </Typography>
+                </Box>
+              </Box>
+            }
           />
 
           {/* Action Bar */}

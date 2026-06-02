@@ -32,6 +32,8 @@ interface PageHeaderProps {
   subtitle?: string;
   tabs?: React.ReactNode;
   actions?: React.ReactNode;
+  /** Free-form content rendered on the right side of the header, before tabs/actions. */
+  headerActions?: React.ReactNode;
   /** Additional items to render inside the MoreVert menu, above the refresh option. */
   menuItems?: React.ReactNode;
   /** When provided, a MoreVert menu with Refresh is rendered at the end of the header. */
@@ -48,6 +50,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle,
   tabs,
   actions,
+  headerActions,
   menuItems,
   onRefresh,
   enableAutoBack = false,
@@ -60,7 +63,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
   const isFromSidebar = (location.state as any)?.fromSidebar === true;
   const showBackButton = !!onBack || (enableAutoBack && location.key !== 'default' && !isFromSidebar);
-  const showRightSection = tabs || actions || onRefresh;
+  const showRightSection = tabs || actions || headerActions || onRefresh;
 
   return (
     <Box
@@ -203,6 +206,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             },
           }}
         >
+          {headerActions}
           {tabs}
           {actions}
           {onRefresh && (
