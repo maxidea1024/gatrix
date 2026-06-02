@@ -539,20 +539,9 @@ const ArgusIssueDetailPage: React.FC = () => {
                 onDelete={handleDeleteIssue}
                 onDiscard={handleDiscardIssue}
                 isDark={isDark}
+                sidebarCollapsed={sidebarCollapsed}
+                onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
               />
-              <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar', '사이드바 열기') : t('argus.detail.collapseSidebar', '사이드바 닫기')}>
-                <IconButton 
-                  size="small" 
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  sx={{ 
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                    backgroundColor: sidebarCollapsed ? (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') : 'transparent',
-                    ml: 0.5
-                  }}
-                >
-                  {sidebarCollapsed ? <ViewSidebarIcon sx={{ transform: 'rotate(180deg)' }} /> : <ViewSidebarOutlinedIcon sx={{ transform: 'rotate(180deg)' }} />}
-                </IconButton>
-              </Tooltip>
             </Box>
           </Box>
 

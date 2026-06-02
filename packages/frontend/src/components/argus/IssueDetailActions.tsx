@@ -16,6 +16,8 @@ import {
   Archive as ArchiveIcon,
   ContentCopy as CopyIcon,
   Link as LinkIcon,
+  ViewSidebar as ViewSidebarIcon,
+  ViewSidebarOutlined as ViewSidebarOutlinedIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -30,6 +32,8 @@ interface IssueDetailActionsProps {
   onDelete: () => void;
   onDiscard: () => void;
   isDark: boolean;
+  sidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 const IssueDetailActions: React.FC<IssueDetailActionsProps> = ({
@@ -43,6 +47,8 @@ const IssueDetailActions: React.FC<IssueDetailActionsProps> = ({
   onDelete,
   onDiscard,
   isDark,
+  sidebarCollapsed,
+  onToggleSidebar,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -137,6 +143,24 @@ const IssueDetailActions: React.FC<IssueDetailActionsProps> = ({
             <LinkIcon sx={{ fontSize: 16 }} />
           </IconButton>
         </Tooltip>
+
+        {/* Sidebar Toggle */}
+        {onToggleSidebar && (
+          <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar', '사이드바 열기') : t('argus.detail.collapseSidebar', '사이드바 닫기')}>
+            <IconButton
+              size="small"
+              onClick={onToggleSidebar}
+              sx={{
+                width: 28, height: 28,
+                color: sidebarCollapsed ? 'text.primary' : 'text.disabled',
+                backgroundColor: sidebarCollapsed ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
+                '&:hover': { color: 'text.primary', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+              }}
+            >
+              {sidebarCollapsed ? <ViewSidebarIcon sx={{ fontSize: 16, transform: 'rotate(180deg)' }} /> : <ViewSidebarOutlinedIcon sx={{ fontSize: 16, transform: 'rotate(180deg)' }} />}
+            </IconButton>
+          </Tooltip>
+        )}
 
         {/* More actions */}
         <IconButton
