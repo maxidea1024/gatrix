@@ -816,14 +816,10 @@ const ArgusIssueDetailPage: React.FC = () => {
 
               <Divider sx={{ mb: 2 }} />
 
-              {/* Suspect Commits */}
+              {/* Suspect Commits — renders null if no data */}
               {projectId && issueId && (
-                <Box sx={{ mb: 2 }}>
-                  <SuspectCommits projectId={projectId} issueId={issueId} isDark={isDark} />
-                </Box>
+                <SuspectCommits projectId={projectId} issueId={issueId} isDark={isDark} />
               )}
-
-              <Divider sx={{ mb: 2 }} />
 
               {/* Issue Tracking */}
               {projectId && issueId && (

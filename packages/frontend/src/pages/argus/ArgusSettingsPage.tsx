@@ -1031,8 +1031,7 @@ const ArgusSettingsPage: React.FC = () => {
                 {(newRule.name !== undefined) && (
                   <Paper elevation={0} sx={{
                     p: 2.5, mb: 2, borderRadius: '10px',
-                    border: `1px solid ${isDark ? alpha('#7c4dff', 0.2) : alpha('#7c4dff', 0.12)}`,
-                    backgroundColor: isDark ? alpha('#7c4dff', 0.04) : alpha('#7c4dff', 0.02),
+                    border: `1px solid ${bdr}`,
                   }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                       <SecurityIcon sx={{ fontSize: 18, color: '#7c4dff' }} />

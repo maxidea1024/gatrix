@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Link,
   Tooltip,
+  Divider,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -73,7 +74,7 @@ const SuspectCommits: React.FC<SuspectCommitsProps> = ({ projectId, issueId, isD
   if (!loading && commits.length === 0) return null;
 
   return (
-    <Box>
+    <Box sx={{ mb: 2 }}>
       {/* Header */}
       <Box
         onClick={() => setExpanded(!expanded)}
@@ -188,6 +189,7 @@ const SuspectCommits: React.FC<SuspectCommitsProps> = ({ projectId, issueId, isD
           </Box>
         )}
       </Collapse>
+      <Divider sx={{ mt: 2, mb: 2 }} />
     </Box>
   );
 };
