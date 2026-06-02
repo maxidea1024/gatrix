@@ -193,52 +193,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
 
             <Divider sx={{ mb: 3 }} />
 
-            {/* Error Trend — compact inline sparkline */}
-            {r.error_trend && r.error_trend.length > 1 && (
-              <Box sx={{
-                display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5,
-                px: 2, py: 1, borderRadius: 2,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                backgroundColor: isDark ? 'rgba(244,67,54,0.04)' : 'rgba(244,67,54,0.02)',
-              }}>
-                <TrendingUpIcon sx={{ fontSize: 16, color: '#f44336', flexShrink: 0 }} />
-                <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'text.secondary', flexShrink: 0 }}>
-                  {t('argus.releaseDetail.errorTrend', 'Error Trend')}
-                </Typography>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <svg width="100%" height={28} viewBox={`0 0 ${r.error_trend.length * 12} 28`} preserveAspectRatio="none">
-                    {(() => {
-                      const data = r.error_trend as number[];
-                      const max = Math.max(...data, 1);
-                      const w = data.length * 12;
-                      const points = data.map((v: number, i: number) =>
-                        `${(i / (data.length - 1)) * w},${24 - (v / max) * 20}`
-                      ).join(' ');
-                      const fillPoints = `0,24 ${points} ${w},24`;
-                      return (
-                        <>
-                          <defs>
-                            <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#f44336" stopOpacity="0.25" />
-                              <stop offset="100%" stopColor="#f44336" stopOpacity="0" />
-                            </linearGradient>
-                          </defs>
-                          <polygon points={fillPoints} fill="url(#trendFill)" />
-                          <polyline
-                            points={points}
-                            fill="none"
-                            stroke="#f44336"
-                            strokeWidth={1.5}
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                          />
-                        </>
-                      );
-                    })()}
-                  </svg>
-                </Box>
-              </Box>
-            )}
+
 
             {/* Issues in this release */}
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -250,6 +205,44 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 height: 20, fontSize: '0.7rem', fontWeight: 700,
                 backgroundColor: alpha('#f44336', 0.1), color: '#f44336',
               }} />
+
+              {/* Compact Error Trend */}
+              {r.error_trend && r.error_trend.length > 1 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
+                    {t('argus.releaseDetail.errorTrend', 'Error Trend')}
+                  </Typography>
+                  <Box sx={{
+                    display: 'flex', alignItems: 'flex-end', gap: '1px',
+                    height: 26,
+                    p: '3px 5px',
+                    borderRadius: 1.5,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                  }}>
+                    {(() => {
+                      const data = r.error_trend as number[];
+                      const max = Math.max(...data, 1);
+                      return data.map((count, i) => {
+                        const pct = (count / max) * 100;
+                        return (
+                          <Box
+                            key={i}
+                            sx={{
+                              width: 4, borderRadius: '1px 1px 0 0',
+                              height: `${Math.max(pct, count > 0 ? 15 : 0)}%`,
+                              minHeight: count > 0 ? 2 : 0,
+                              backgroundColor: count > 0
+                                ? alpha('#f44336', 0.5 + pct / 200)
+                                : alpha(theme.palette.text.disabled, 0.15),
+                              transition: 'height 0.2s',
+                            }}
+                          />
+                        );
+                      });
+                    })()}
+                  </Box>
+                </Box>
+              )}
             </Box>
 
             <PageContentLoader loading={issuesLoading}>
