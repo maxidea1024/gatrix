@@ -103,6 +103,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<any[]>([]);
   const [assigneeAnchor, setAssigneeAnchor] = useState<HTMLElement | null>(null);
+  const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(null);
   const [currentEvent, setCurrentEvent] = useState<ArgusErrorEvent | null>(null);
 
   useEffect(() => {
@@ -178,6 +179,24 @@ const ArgusIssueDetailPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to assign issue:', error);
     }
+  };
+
+  const PRIORITY_CONFIG: Record<string, { color: string; label: string }> = {
+    critical: { color: '#f44336', label: t('argus.issues.priority.critical') },
+    high: { color: '#ff5722', label: t('argus.issues.priority.high') },
+    medium: { color: '#ff9800', label: t('argus.issues.priority.medium') },
+    low: { color: '#9e9e9e', label: t('argus.issues.priority.low') },
+  };
+
+  const handlePriorityChange = async (priority: string) => {
+    if (!projectId || !issueId || !issue) return;
+    try {
+      await argusService.updateIssueStatus(projectId, issueId, issue.status, { priority });
+      setIssue({ ...issue, priority: priority as any });
+    } catch (error) {
+      console.error('Failed to update priority:', error);
+    }
+    setPriorityAnchor(null);
   };
 
   const loadTrace = async (tid: string) => {
@@ -335,6 +354,39 @@ const ArgusIssueDetailPage: React.FC = () => {
             )}
 
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+            {/* Priority */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Chip
+                label={PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
+                size="small"
+                onClick={(e) => setPriorityAnchor(e.currentTarget)}
+                sx={{
+                  height: 22, fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
+                  backgroundColor: alpha(PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800', 0.12),
+                  color: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800',
+                  border: 'none',
+                }}
+              />
+            </Box>
+            <Menu
+              anchorEl={priorityAnchor}
+              open={Boolean(priorityAnchor)}
+              onClose={() => setPriorityAnchor(null)}
+              slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 140, boxShadow: '0 4px 20px rgba(0,0,0,0.12)' } } }}
+            >
+              {Object.entries(PRIORITY_CONFIG).map(([key, cfg]) => (
+                <MenuItem
+                  key={key}
+                  selected={issue.priority === key}
+                  onClick={() => handlePriorityChange(key)}
+                  sx={{ fontSize: '0.82rem' }}
+                >
+                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: cfg.color, mr: 1 }} />
+                  {cfg.label}
+                </MenuItem>
+              ))}
+            </Menu>
 
             {/* Assignee */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
