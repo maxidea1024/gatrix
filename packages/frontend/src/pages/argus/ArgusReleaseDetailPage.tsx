@@ -208,8 +208,14 @@ const ArgusReleaseDetailPage: React.FC = () => {
 
               {/* Compact Error Trend */}
               {r.error_trend && r.error_trend.length > 1 && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
-                  <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
+                <Box sx={{
+                  display: 'flex', alignItems: 'center', gap: 1.5, ml: 'auto',
+                  px: 2, py: 0.8,
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: 1.5,
+                  backgroundColor: theme.palette.background.paper,
+                }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
                     {t('argus.releaseDetail.errorTrend', 'Error Trend')}
                   </Typography>
                   <Box sx={{
