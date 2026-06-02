@@ -292,20 +292,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Divider orientation="vertical" flexItem sx={{ my: 0.5, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
-                <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar', '사이드바 열기') : t('argus.detail.collapseSidebar', '사이드바 닫기')}>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                    sx={{ 
-                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                      backgroundColor: sidebarCollapsed ? (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') : 'transparent',
-                      ml: 1
-                    }}
-                  >
-                    {sidebarCollapsed ? <ViewSidebarIcon sx={{ transform: 'rotate(180deg)' }} /> : <ViewSidebarOutlinedIcon sx={{ transform: 'rotate(180deg)' }} />}
-                  </IconButton>
-                </Tooltip>
               </Box>
             }
           />
@@ -554,6 +540,19 @@ const ArgusIssueDetailPage: React.FC = () => {
                 onDiscard={handleDiscardIssue}
                 isDark={isDark}
               />
+              <Tooltip title={sidebarCollapsed ? t('argus.detail.expandSidebar', '사이드바 열기') : t('argus.detail.collapseSidebar', '사이드바 닫기')}>
+                <IconButton 
+                  size="small" 
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  sx={{ 
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                    backgroundColor: sidebarCollapsed ? (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') : 'transparent',
+                    ml: 0.5
+                  }}
+                >
+                  {sidebarCollapsed ? <ViewSidebarIcon sx={{ transform: 'rotate(180deg)' }} /> : <ViewSidebarOutlinedIcon sx={{ transform: 'rotate(180deg)' }} />}
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
 
