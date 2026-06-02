@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { CopyButton } from '@/components/common/CopyButton';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { useLogsData } from '@/hooks/useIssueDetailData';
 
 interface IssueLogsSectionProps {
@@ -199,9 +200,10 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
                   <CircularProgress size={20} />
                 </Box>
               ) : logs.length === 0 ? (
-                <Typography variant="body2" color="text.secondary" textAlign="center" py={3}>
-                  {t('argus.issues.noLogs', 'No logs found for this issue')}
-                </Typography>
+                <EmptyPlaceholder 
+                  message={t('argus.issues.noLogs', 'No logs found for this issue')}
+                  minHeight={200}
+                />
               ) : (() => {
                 const searchLower = logSearch.toLowerCase();
                 const filteredLogs = logSearch
