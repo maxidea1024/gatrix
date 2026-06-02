@@ -17,6 +17,16 @@ input, button, select, textarea, table, th, td, pre, code {
   font-weight: inherit;
 }
 
+/* Placeholder text should also follow the theme font */
+::placeholder {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+::-webkit-input-placeholder {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+
 /* Disable autofill styling completely */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

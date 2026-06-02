@@ -389,6 +389,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               color: txt.secondary,
               WebkitTextFillColor: txt.secondary,
               opacity: 1,
+              fontWeight: 500,
             },
           },
         },
@@ -397,10 +398,15 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: `${txt.primary} !important`,
+            fontWeight: 500,
           },
           input: {
             color: `${txt.primary} !important`,
             WebkitTextFillColor: `${txt.primary} !important`,
+            fontWeight: 500,
+            '&::placeholder': {
+              fontWeight: 500,
+            },
           },
         },
       },
@@ -408,6 +414,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: txt.secondary,
+            fontWeight: 500,
             '&.Mui-focused': {
               color: p.main,
             },
