@@ -928,15 +928,15 @@ const ArgusFeedbackPage: React.FC = () => {
           <Box
             onMouseDown={handleSplitterMouseDown}
             sx={{
-              width: 4, flexShrink: 0, cursor: 'col-resize', position: 'relative',
-              backgroundColor: isSplitDragging ? alpha(theme.palette.primary.main, 0.3) : 'transparent',
+              width: '1px', flexShrink: 0, cursor: 'col-resize', position: 'relative',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
               transition: 'background-color 0.15s',
-              '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.2) },
-              '&::after': {
-                content: '""', position: 'absolute', top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)', width: 2, height: 32,
-                borderRadius: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+              zIndex: 10,
+              '&::before': {
+                content: '""', position: 'absolute', top: 0, bottom: 0, left: -4, right: -4, cursor: 'col-resize',
               },
+              '&:hover': { backgroundColor: theme.palette.primary.main },
+              ...(isSplitDragging && { backgroundColor: theme.palette.primary.main }),
             }}
           />
         )}
