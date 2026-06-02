@@ -1,14 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Box, Typography, Button, Chip, CircularProgress,
-  useTheme, alpha, LinearProgress, Tooltip, IconButton, Divider,
+  useTheme, alpha, Tooltip, IconButton, Divider,
 } from '@mui/material';
 import {
   AutoAwesome as AiIcon, Psychology as ThinkIcon,
   Lightbulb as SuggestionIcon, BugReport as BugIcon,
   Code as CodeIcon, TrendingUp as PatternIcon,
-  ContentCopy as CopyIcon, Refresh as RefreshIcon,
-  CheckCircle as CheckIcon, Warning as WarningIcon,
+  Refresh as RefreshIcon, Close as CloseIcon,
+  CheckCircle as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +21,7 @@ interface AiRootCausePanelProps {
   stacktrace?: string;
   tags?: Record<string, any>;
   isDark: boolean;
+  onClose?: () => void;
 }
 
 interface AnalysisResult {
@@ -33,7 +34,7 @@ interface AnalysisResult {
 }
 
 /**
- * Generates a deterministic analysis based on error data.
+ * MOCK: Generates a deterministic analysis based on error data.
  * In production, this would call an LLM API endpoint.
  */
 function generateAnalysis(
@@ -106,7 +107,6 @@ function generateAnalysis(
     severity = 'medium';
   }
 
-  // Add environment-specific suggestions
   if (tags?.environment === 'production') {
     suggestions.push('Deploy hotfix or feature flag to mitigate impact');
     severity = severity === 'medium' ? 'high' : severity;
@@ -123,181 +123,263 @@ const SEVERITY_CONFIG: Record<string, { color: string; label: string }> = {
 };
 
 const AiRootCausePanel: React.FC<AiRootCausePanelProps> = ({
-  projectId, issueId, issueTitle, exceptionType, exceptionValue, stacktrace, tags, isDark,
+  projectId, issueId, issueTitle, exceptionType, exceptionValue, stacktrace, tags, isDark, onClose,
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progressText, setProgressText] = useState('');
 
   const runAnalysis = useCallback(() => {
     setLoading(true);
-    setProgress(0);
     setAnalysis(null);
+    setProgressText('Reading stacktrace...');
 
-    // Simulate AI processing with progress
+    let step = 0;
+    const steps = ['Parsing error signature...', 'Searching similar patterns...', 'Generating actionable insights...'];
+    
     const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 95) { clearInterval(interval); return 95; }
-        return prev + Math.random() * 15;
-      });
-    }, 200);
+      if (step < steps.length) {
+        setProgressText(steps[step]);
+        step++;
+      }
+    }, 600);
 
     // Simulate processing delay
     setTimeout(() => {
       clearInterval(interval);
-      setProgress(100);
       const result = generateAnalysis(exceptionType, exceptionValue, stacktrace, tags);
       setAnalysis(result);
       setLoading(false);
-    }, 1500);
+    }, 2500);
   }, [exceptionType, exceptionValue, stacktrace, tags]);
 
   const severityCfg = analysis ? SEVERITY_CONFIG[analysis.severity] : null;
 
   return (
-    <Box sx={{ mb: 2 }}>
-      {/* Header */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Premium Header */}
       <Box sx={{
-        display: 'flex', alignItems: 'center', gap: 1, mb: 1.5,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        px: 3, py: 2.5,
+        background: isDark ? 'linear-gradient(90deg, rgba(124, 77, 255, 0.15) 0%, rgba(30, 30, 30, 1) 100%)' : 'linear-gradient(90deg, rgba(124, 77, 255, 0.08) 0%, rgba(255, 255, 255, 1) 100%)',
+        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
       }}>
-        <AiIcon sx={{ fontSize: 20, color: '#7c4dff' }} />
-        <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.85rem' }}>
-          {t('argus.ai.title', 'AI Root Cause Analysis')}
-        </Typography>
-        {analysis && severityCfg && (
-          <Chip label={severityCfg.label} size="small" sx={{
-            height: 20, fontSize: '0.62rem', fontWeight: 800,
-            backgroundColor: alpha(severityCfg.color, 0.1), color: severityCfg.color,
-          }} />
-        )}
-        {!analysis && !loading && (
-          <Button size="small" variant="contained" startIcon={<ThinkIcon sx={{ fontSize: 16 }} />}
-            onClick={() => runAnalysis()}
-            sx={{
-              textTransform: 'none', fontSize: '0.72rem', fontWeight: 700, py: 0.3, px: 1.5,
-            }}>
-            {t('argus.ai.analyze', 'Analyze')}
-          </Button>
-        )}
-        {analysis && (
-          <Tooltip title={t('argus.ai.reanalyze', 'Re-analyze')}>
-            <IconButton size="small" onClick={() => runAnalysis()}>
-              <RefreshIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Box>
-
-      {/* Loading bar */}
-      {loading && (
-        <Box sx={{ px: 2, pt: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <CircularProgress size={16} sx={{ color: '#7c4dff' }} />
-            <Typography sx={{ fontSize: '0.75rem', color: '#7c4dff', fontWeight: 600 }}>
-              {t('argus.ai.analyzing', 'Analyzing error patterns...')}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: '10px',
+            background: 'linear-gradient(135deg, #7c4dff, #448aff)',
+            color: '#fff',
+            boxShadow: '0 4px 14px rgba(124, 77, 255, 0.4)'
+          }}>
+            <AiIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" fontWeight={800} sx={{ fontSize: '1.1rem', letterSpacing: '-0.02em' }}>
+              {t('argus.ai.title', 'AI Root Cause Analysis')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+              Gatrix Intelligence
             </Typography>
           </Box>
-          <LinearProgress variant="determinate" value={progress}
-            sx={{ height: 3, borderRadius: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-              '& .MuiLinearProgress-bar': { background: 'linear-gradient(90deg, #7c4dff, #448aff)' },
-            }}
-          />
-          <Box sx={{ display: 'flex', gap: 1, mt: 1.5, mb: 1 }}>
-            {['Parsing stacktrace', 'Finding patterns', 'Generating insights'].map((step, i) => (
-              <Chip key={step} label={step} size="small" sx={{
-                height: 20, fontSize: '0.6rem',
-                backgroundColor: progress > (i + 1) * 30 ? alpha('#7c4dff', 0.1) : 'transparent',
-                color: progress > (i + 1) * 30 ? '#7c4dff' : 'text.disabled',
-                border: `1px solid ${progress > (i + 1) * 30 ? alpha('#7c4dff', 0.2) : isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              }} />
-            ))}
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {analysis && severityCfg && (
+            <Chip label={severityCfg.label} size="small" sx={{
+              height: 24, fontSize: '0.7rem', fontWeight: 800,
+              backgroundColor: alpha(severityCfg.color, 0.1), color: severityCfg.color,
+              border: `1px solid ${alpha(severityCfg.color, 0.2)}`
+            }} />
+          )}
+          {analysis && (
+            <Tooltip title={t('argus.ai.reanalyze', 'Re-analyze')}>
+              <IconButton onClick={() => runAnalysis()} sx={{ border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                <RefreshIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          {onClose && (
+            <IconButton onClick={onClose} sx={{ ml: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }}>
+              <CloseIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          )}
+        </Box>
+      </Box>
+
+      {/* Main Content Area */}
+      <Box sx={{ flex: 1, overflowY: 'auto', p: 4 }}>
+        
+        {/* Initial CTA State */}
+        {!analysis && !loading && (
+          <Box sx={{ 
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            py: 6, px: 2, textAlign: 'center'
+          }}>
+            <Box sx={{ 
+              width: 80, height: 80, borderRadius: '50%', mb: 3,
+              background: alpha('#7c4dff', 0.1),
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: `2px solid ${alpha('#7c4dff', 0.2)}`
+            }}>
+              <ThinkIcon sx={{ fontSize: 40, color: '#7c4dff' }} />
+            </Box>
+            <Typography variant="h5" fontWeight={700} sx={{ mb: 1.5 }}>
+              Let AI investigate this error
+            </Typography>
+            <Typography color="text.secondary" sx={{ maxWidth: 400, mb: 4, lineHeight: 1.6 }}>
+              Our AI engine will analyze the stacktrace, error context, and historical patterns to pinpoint the exact root cause and provide actionable code suggestions.
+            </Typography>
+            <Button 
+              variant="contained" 
+              size="large"
+              startIcon={<AiIcon />}
+              onClick={() => runAnalysis()}
+              sx={{ 
+                px: 4, py: 1.5, borderRadius: '12px',
+                background: 'linear-gradient(135deg, #7c4dff 0%, #448aff 100%)',
+                boxShadow: '0 8px 24px rgba(124, 77, 255, 0.3)',
+                textTransform: 'none', fontSize: '1rem', fontWeight: 700,
+                transition: 'all 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 28px rgba(124, 77, 255, 0.4)',
+                }
+              }}
+            >
+              Start Analysis
+            </Button>
           </Box>
-        </Box>
-      )}
+        )}
 
-      {/* Empty state — no analysis yet */}
-      {!analysis && !loading && (
-        <Box sx={{
-          py: 1.5, textAlign: 'center',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5,
-        }}>
-          <AiIcon sx={{ fontSize: 24, color: alpha('#7c4dff', 0.25) }} />
-          <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled', lineHeight: 1.5 }}>
-            {t('argus.ai.emptyHint', 'Click the Analyze button above to get AI-powered root cause analysis, suggestions, and code references for this issue.')}
-          </Typography>
-        </Box>
-      )}
+        {/* Loading State */}
+        {loading && (
+          <Box sx={{ 
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            py: 8, px: 2, textAlign: 'center'
+          }}>
+            <Box sx={{ position: 'relative', width: 64, height: 64, mb: 3 }}>
+              <CircularProgress size={64} thickness={2} sx={{ color: '#7c4dff', position: 'absolute', top: 0, left: 0 }} />
+              <AiIcon sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#7c4dff', fontSize: 24, animation: 'pulse 1.5s infinite' }} />
+            </Box>
+            <Typography variant="h6" fontWeight={600} sx={{ mb: 1, color: '#7c4dff' }}>
+              Analyzing Error Data...
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {progressText}
+            </Typography>
+          </Box>
+        )}
 
-      {/* Analysis Result */}
-      {analysis && (
-          <Box sx={{ p: 2 }}>
+        {/* Results State */}
+        {analysis && !loading && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            
             {/* Summary */}
-            <Box sx={{ mb: 2, p: 1.5, borderRadius: 1.5, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.015)' }}>
-              <Typography sx={{ fontSize: '0.82rem', lineHeight: 1.6 }}>{analysis.summary}</Typography>
-            </Box>
-
-            {/* Root Cause */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" sx={{ fontWeight: 800, color: '#f44336', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
-                <BugIcon sx={{ fontSize: 14 }} /> {t('argus.ai.rootCause', 'Root Cause')}
+            <Box sx={{ 
+              p: 2.5, borderRadius: 2, 
+              background: isDark ? 'rgba(124, 77, 255, 0.08)' : 'rgba(124, 77, 255, 0.04)',
+              borderLeft: '4px solid #7c4dff'
+            }}>
+              <Typography sx={{ fontSize: '0.95rem', lineHeight: 1.6, fontWeight: 500, color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)' }}>
+                {analysis.summary}
               </Typography>
-              <Typography sx={{ fontSize: '0.8rem', lineHeight: 1.6, color: 'text.secondary' }}>{analysis.rootCause}</Typography>
             </Box>
 
-            {/* Suggestions */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" sx={{ fontWeight: 800, color: '#4caf50', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.75 }}>
-                <SuggestionIcon sx={{ fontSize: 14 }} /> {t('argus.ai.suggestions', 'Suggestions')}
-              </Typography>
-              {analysis.suggestions.map((s, i) => (
-                <Box key={i} sx={{ display: 'flex', gap: 0.75, mb: 0.5, alignItems: 'flex-start' }}>
-                  <CheckIcon sx={{ fontSize: 14, color: '#4caf50', mt: 0.3, flexShrink: 0 }} />
-                  <Typography sx={{ fontSize: '0.78rem', lineHeight: 1.5 }}>{s}</Typography>
-                </Box>
-              ))}
-            </Box>
-
-            {/* Related Patterns */}
-            {analysis.relatedPatterns.length > 0 && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: '#ff9800', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.75 }}>
-                  <PatternIcon sx={{ fontSize: 14 }} /> {t('argus.ai.patterns', 'Detected Patterns')}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {analysis.relatedPatterns.map((p, i) => (
-                    <Chip key={i} label={`${p.label} (${p.confidence}%)`} size="small" sx={{
-                      height: 24, fontSize: '0.7rem', fontWeight: 600,
-                      backgroundColor: alpha('#ff9800', 0.08), color: '#ff9800',
-                      border: `1px solid ${alpha('#ff9800', 0.15)}`,
-                    }} />
-                  ))}
-                </Box>
-              </Box>
-            )}
-
-            {/* Code Pointers */}
-            {analysis.codePointers.length > 0 && (
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: '#7c4dff', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.75 }}>
-                  <CodeIcon sx={{ fontSize: 14 }} /> {t('argus.ai.codePointers', 'Code References')}
-                </Typography>
-                {analysis.codePointers.slice(0, 3).map((cp, i) => (
-                  <Box key={i} sx={{
-                    display: 'flex', alignItems: 'center', gap: 1, py: 0.5,
-                    borderBottom: i < analysis.codePointers.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+              
+              {/* Left Column (Root Cause & Suggestions) */}
+              <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f44336', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                    <BugIcon sx={{ fontSize: 18 }} /> {t('argus.ai.rootCause', 'Root Cause')}
+                  </Typography>
+                  <Box sx={{ 
+                    p: 2.5, borderRadius: 2, 
+                    border: `1px solid ${isDark ? 'rgba(244, 67, 54, 0.2)' : 'rgba(244, 67, 54, 0.3)'}`,
+                    backgroundColor: isDark ? 'rgba(244, 67, 54, 0.05)' : 'rgba(244, 67, 54, 0.02)'
                   }}>
-                    <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace', color: '#7c4dff' }}>
-                      {cp.file}:{cp.line}
+                    <Typography sx={{ fontSize: '0.9rem', lineHeight: 1.7, color: 'text.secondary' }}>
+                      {analysis.rootCause}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>— {cp.hint}</Typography>
                   </Box>
-                ))}
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#4caf50', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                    <SuggestionIcon sx={{ fontSize: 18 }} /> {t('argus.ai.suggestions', 'Actionable Suggestions')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {analysis.suggestions.map((s, i) => (
+                      <Box key={i} sx={{ 
+                        display: 'flex', gap: 1.5, alignItems: 'flex-start',
+                        p: 2, borderRadius: 2,
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)'
+                      }}>
+                        <CheckIcon sx={{ fontSize: 18, color: '#4caf50', mt: 0.2, flexShrink: 0 }} />
+                        <Typography sx={{ fontSize: '0.88rem', lineHeight: 1.6 }}>{s}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+
               </Box>
-            )}
+
+              {/* Right Column (Patterns & Code) */}
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                
+                {analysis.relatedPatterns.length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ff9800', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                      <PatternIcon sx={{ fontSize: 18 }} /> {t('argus.ai.patterns', 'Detected Patterns')}
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {analysis.relatedPatterns.map((p, i) => (
+                        <Box key={i} sx={{ 
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          p: 1.5, borderRadius: 1.5,
+                          backgroundColor: alpha('#ff9800', 0.08), border: `1px solid ${alpha('#ff9800', 0.15)}`
+                        }}>
+                          <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#ff9800' }}>{p.label}</Typography>
+                          <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#ff9800' }}>{p.confidence}%</Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+
+                {analysis.codePointers.length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#7c4dff', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                      <CodeIcon sx={{ fontSize: 18 }} /> {t('argus.ai.codePointers', 'Code References')}
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                      {analysis.codePointers.slice(0, 3).map((cp, i) => (
+                        <Box key={i} sx={{
+                          p: 1.5, borderRadius: 1.5,
+                          backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.03)',
+                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                        }}>
+                          <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#7c4dff', mb: 0.5 }}>
+                            {cp.file}:{cp.line}
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', lineHeight: 1.4 }}>
+                            {cp.hint}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+
+              </Box>
+            </Box>
           </Box>
-      )}
-      <Divider sx={{ mt: 2 }} />
+        )}
+      </Box>
     </Box>
   );
 };

@@ -605,11 +605,7 @@ const ArgusIssueDetailPage: React.FC = () => {
               transition: 'padding 0.2s ease',
             }}>
               {/* AI Root Cause — Dialog */}
-              <Dialog open={showAiAnalysis} onClose={() => setShowAiAnalysis(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 700 }}>
-                  {t('argus.issues.aiAnalysis', 'AI Analysis')}
-                  <IconButton onClick={() => setShowAiAnalysis(false)} size="small"><CloseIcon /></IconButton>
-                </DialogTitle>
+              <Dialog open={showAiAnalysis} onClose={() => setShowAiAnalysis(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden', backgroundImage: 'none' } }}>
                 <DialogContent sx={{ p: 0, overflowX: 'hidden' }}>
                   {projectId && issueId && (
                     <AiRootCausePanel
@@ -621,14 +617,11 @@ const ArgusIssueDetailPage: React.FC = () => {
                       stacktrace={latestEvent?.stacktrace_raw}
                       tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
                       isDark={isDark}
+                      onClose={() => setShowAiAnalysis(false)}
                     />
                   )}
                 </DialogContent>
               </Dialog>
-
-              {/* Activity Timeline — moved to sidebar in embedded mode */}
-              {/* Event Highlights */}
-              <EventHighlights event={latestEvent} />
 
               {/* Event Navigator */}
               {projectId && issueId && (
@@ -645,14 +638,17 @@ const ArgusIssueDetailPage: React.FC = () => {
 
               {/* Event Distribution Chart */}
               {projectId && issueId && (
-                <EventDistributionChart
-                  projectId={projectId}
-                  issueId={issueId}
-                  isDark={isDark}
-                />
+                <Box sx={{ mb: 2 }}>
+                  <EventDistributionChart
+                    projectId={projectId}
+                    issueId={issueId}
+                    isDark={isDark}
+                  />
+                </Box>
               )}
 
-
+              {/* Event Highlights */}
+              <EventHighlights event={latestEvent} />
 
           {/* Latest Event (Stack Trace) */}
           {latestEvent && (
