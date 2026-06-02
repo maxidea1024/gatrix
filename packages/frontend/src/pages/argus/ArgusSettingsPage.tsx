@@ -1038,7 +1038,7 @@ const ArgusSettingsPage: React.FC = () => {
                       <SecurityIcon sx={{ fontSize: 18, color: '#7c4dff' }} />
                       <Typography sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{t('argus.settings.addRule')}</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
                       <Box sx={{ flex: 1 }}>
                         <TextField size="small" placeholder={t('argus.settings.ruleName')}
                           value={newRule.name} onChange={e => setNewRule({ ...newRule, name: e.target.value })}
