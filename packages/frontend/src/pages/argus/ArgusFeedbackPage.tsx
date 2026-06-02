@@ -994,7 +994,7 @@ const ArgusFeedbackPage: React.FC = () => {
           <Box
             onMouseDown={handleSplitterMouseDown}
             sx={{
-              width: 1,
+              width: '1px',
               flexShrink: 0,
               cursor: 'col-resize',
               bgcolor: isSplitDragging ? 'primary.main' : 'divider',
@@ -1011,8 +1011,8 @@ const ArgusFeedbackPage: React.FC = () => {
                 position: 'absolute',
                 top: 0,
                 bottom: 0,
-                left: -5,
-                right: -5,
+                left: '-5px',
+                right: '-5px',
                 cursor: 'col-resize',
               },
               '&:hover, &:active': {
