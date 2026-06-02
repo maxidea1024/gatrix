@@ -121,14 +121,20 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
                     return (
                       <Box key={idx} sx={{ mb: 0.8 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}>
-                          <Typography variant="caption" noWrap sx={{
-                            fontSize: '0.68rem', maxWidth: '60%',
+                          <Typography variant="caption" sx={{
+                            fontSize: '0.68rem',
                             fontFamily: 'monospace',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            flex: 1,
+                            minWidth: 0,
                           }}>
                             {val.value || '(empty)'}
                           </Typography>
                           <Typography variant="caption" sx={{
                             fontSize: '0.62rem', color: 'text.disabled', fontFamily: 'monospace',
+                            flexShrink: 0, ml: 1,
                           }}>
                             {val.count.toLocaleString()} ({pct.toFixed(0)}%)
                           </Typography>
