@@ -11,7 +11,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
     await mysqlPool.query(`
       CREATE TABLE IF NOT EXISTS g_argus_issue_trackers (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        project_id INT NOT NULL,
+        project_id VARCHAR(64) NOT NULL,
         provider ENUM('jira', 'github', 'linear') NOT NULL,
         name VARCHAR(255) NOT NULL,
         api_url VARCHAR(512) NOT NULL,

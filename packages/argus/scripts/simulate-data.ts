@@ -42,16 +42,16 @@ const CH_CONFIG = {
   password: process.env.CLICKHOUSE_PASSWORD || '',
 };
 
-const PROJECT_ID = '1';
+const PROJECT_ID = '01KN8GSHBJ10JTQ9D0HD60RKFV';
 const DAYS_BACK = 14;
 const NOW = new Date();
 
-// Scale controls
-const TOTAL_ERROR_EVENTS = 300_000;
-const TOTAL_TRANSACTIONS = 200_000;
-const TOTAL_SESSIONS = 100_000;
-const TOTAL_FEEDBACK = 2_000;
-const USER_POOL_SIZE = 20_000;
+// Scale controls — doubled for richer data diversity
+const TOTAL_ERROR_EVENTS = 600_000;
+const TOTAL_TRANSACTIONS = 400_000;
+const TOTAL_SESSIONS = 200_000;
+const TOTAL_FEEDBACK = 5_000;
+const USER_POOL_SIZE = 40_000;
 const CHUNK_SIZE = 5_000;
 
 // ═══════════════════ HELPERS ═══════════════════
@@ -82,6 +82,301 @@ function randomDateWeighted(daysBack: number): Date {
   return d;
 }
 function formatDate(d: Date): string { return d.toISOString().replace('T', ' ').replace('Z', ''); }
+
+// ═══════════════════ DYNAMIC TAG / SPAN / LOG HELPERS ═══════════════════
+
+const K8S_NAMESPACES = ['game-prod', 'game-staging', 'infra-prod'];
+const DATACENTERS = ['ap-northeast-2a', 'ap-northeast-2b', 'ap-northeast-2c', 'eu-west-1a', 'us-east-1b'];
+const DEPLOY_SLOTS = ['blue', 'green'];
+const CLIENT_PLATFORMS = ['Steam', 'Epic', 'Direct', 'WeGame', 'PlayStation', 'Xbox'];
+const GAME_SHARDS = Array.from({ length: 20 }, (_, i) => `shard-${String(i + 1).padStart(2, '0')}`);
+const K8S_SUFFIXES = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+function k8sPodName(service: string): string {
+  const suffix = Array.from({ length: 5 }, () => K8S_SUFFIXES[randomInt(0, K8S_SUFFIXES.length - 1)]).join('');
+  const replicaSet = Array.from({ length: 9 }, () => K8S_SUFFIXES[randomInt(0, K8S_SUFFIXES.length - 1)]).join('');
+  return `${service}-${replicaSet}-${suffix}`;
+}
+function instanceId(): string { return `i-${uuid().substring(0, 17)}`; }
+
+function dynamicTags(scenario: ErrorScenario, server: string, env: string): Record<string, string> {
+  const base: Record<string, string> = { ...scenario.tags };
+  const service = randomPick(scenario.services);
+  base['server.name'] = server;
+  base['environment'] = env;
+  base['deployment.slot'] = randomPick(DEPLOY_SLOTS);
+  base['server.datacenter'] = randomPick(DATACENTERS);
+
+  if (scenario.runtime === 'nodejs') {
+    base['kubernetes.pod_name'] = k8sPodName(service);
+    base['kubernetes.namespace'] = randomPick(K8S_NAMESPACES);
+    base['process.pid'] = String(randomInt(1000, 65535));
+    base['node.version'] = randomPick(['v20.14.0', 'v20.12.2', 'v22.2.0']);
+    base['server.instance_id'] = instanceId();
+    base['game.shard'] = randomPick(GAME_SHARDS);
+    if (Math.random() < 0.4) base['db.connection_pool'] = `pool-${randomInt(1, 5)}`;
+    if (Math.random() < 0.3) base['network.rtt_ms'] = String(randomInt(8, 450));
+  } else if (scenario.runtime === 'lua') {
+    base['lua.vm_id'] = `vm-${uuid().substring(0, 8)}`;
+    base['lua.gc_memory_kb'] = String(randomInt(8000, 180000));
+    base['game.world_id'] = randomPick(GAME_SHARDS);
+    base['game.scene'] = randomPick(['port_lisbon', 'port_london', 'port_istanbul', 'sea_atlantic', 'sea_mediterranean', 'sea_caribbean', 'port_amsterdam', 'port_venice', 'sea_indian_ocean', 'port_calicut']);
+    base['game.zone_population'] = String(randomInt(50, 800));
+  } else if (scenario.runtime === 'ue4') {
+    base['gpu.vendor'] = randomPick(['NVIDIA', 'AMD', 'Intel']);
+    base['gpu.vram_mb'] = String(randomPick([4096, 6144, 8192, 12288, 16384]));
+    base['client.platform'] = randomPick(CLIENT_PLATFORMS);
+    base['client.build_number'] = String(randomInt(10000, 99999));
+    base['display.resolution'] = randomPick(['1920x1080', '2560x1440', '3840x2160', '1366x768', '2560x1080']);
+    base['display.fullscreen'] = randomPick(['true', 'false', 'borderless']);
+    base['client.fps_avg'] = String(randomInt(12, 144));
+    if (Math.random() < 0.5) base['network.rtt_ms'] = String(randomInt(15, 600));
+  }
+  // Occasional extra tags for diversity
+  if (Math.random() < 0.2) base['feature_flag.new_combat'] = randomPick(['true', 'false']);
+  if (Math.random() < 0.15) base['ab_test.variant'] = randomPick(['control', 'treatment_a', 'treatment_b']);
+  if (Math.random() < 0.1) base['session.is_returning'] = randomPick(['true', 'false']);
+  return base;
+}
+
+function dynamicExtra(scenario: ErrorScenario): Record<string, string> {
+  const base: Record<string, string> = { ...scenario.extra };
+  if (Math.random() < 0.3) base['request_id'] = uuid();
+  if (Math.random() < 0.4) base['correlation_id'] = uuid().substring(0, 16);
+  if (Math.random() < 0.2) base['cpu_usage_pct'] = String(randomFloat(20, 98).toFixed(1));
+  if (Math.random() < 0.2) base['memory_rss_mb'] = String(randomInt(256, 4096));
+  if (Math.random() < 0.15) base['gc_pause_ms'] = String(randomInt(5, 800));
+  if (Math.random() < 0.1) base['active_goroutines'] = String(randomInt(100, 5000));
+  return base;
+}
+
+// ═══════════════════ REALISTIC SPAN TEMPLATES ═══════════════════
+
+const SPAN_DB_QUERIES = [
+  'SELECT * FROM characters WHERE user_id = ? LIMIT 1',
+  'UPDATE characters SET gold = gold + ?, last_login = NOW() WHERE id = ?',
+  'INSERT INTO trade_logs (seller_id, buyer_id, item_id, price, timestamp) VALUES (?, ?, ?, ?, ?)',
+  'SELECT i.*, e.* FROM inventory i JOIN equipment e ON i.id = e.inv_id WHERE i.character_id = ?',
+  'DELETE FROM expired_sessions WHERE last_activity < DATE_SUB(NOW(), INTERVAL 1 HOUR)',
+  'SELECT g.*, COUNT(gm.id) AS member_count FROM guilds g JOIN guild_members gm ON g.id = gm.guild_id WHERE g.id = ? GROUP BY g.id',
+  'SELECT * FROM auction_listings WHERE status = "active" AND expires_at > NOW() ORDER BY created_at DESC LIMIT 50',
+  'INSERT INTO combat_logs (attacker_id, defender_id, damage, skill_id, timestamp) VALUES (?, ?, ?, ?, ?)',
+  'SELECT * FROM guild_rankings WHERE season = ? ORDER BY score DESC LIMIT 100',
+  'UPDATE user_sessions SET token_expires_at = ?, refresh_token = ? WHERE user_id = ?',
+  'SELECT COUNT(*) AS online FROM characters WHERE is_online = 1 AND server_shard = ?',
+  'INSERT INTO chat_messages (channel_id, sender_id, message, created_at) VALUES (?, ?, ?, ?)',
+  'SELECT * FROM market_orders WHERE item_type = ? AND price BETWEEN ? AND ? ORDER BY price ASC LIMIT 20',
+  'UPDATE guild_bank SET quantity = quantity - ? WHERE guild_id = ? AND item_id = ? AND quantity >= ?',
+];
+
+const SPAN_CACHE_KEYS = [
+  'character:{userId}:profile', 'character:{userId}:inventory',
+  'character:{userId}:equipment', 'guild:{guildId}:members',
+  'market:listings:page:{page}', 'session:{sessionId}:token',
+  'rankings:guild:season:12', 'matchmaking:queue:pvp_fleet',
+  'config:ship_balance:v3', 'npc:dialog:{npcId}:tree',
+  'world:shard:{shardId}:population', 'rate_limit:{ip}:counter',
+  'auction:{auctionId}:lock', 'combat:cooldown:{userId}:{skillId}',
+];
+
+const SPAN_HTTP_CALLS = [
+  'POST https://analytics.internal/v2/events', 'GET https://cdn.internal/config/ship_balance_v3.json',
+  'POST https://payment.internal/verify-receipt', 'POST https://anticheat.internal/validate',
+  'GET https://leaderboard.internal/api/rankings?season=12', 'POST https://notification.internal/push',
+  'POST https://matchmaking.internal/queue/join', 'GET https://auth.internal/token/refresh',
+  'POST https://audit.internal/log', 'GET https://discovery.internal/services/lobbyd',
+];
+
+interface SpanTemplate { op: string; description: string; durMin: number; durMax: number; }
+
+const SPAN_TEMPLATES_BY_TXN: Record<string, SpanTemplate[]> = {
+  'POST /api/auth/login': [
+    { op: 'db.query', description: 'SELECT * FROM users WHERE email = ? LIMIT 1', durMin: 3, durMax: 30 },
+    { op: 'function', description: 'bcrypt.compare(password, hash)', durMin: 80, durMax: 250 },
+    { op: 'db.query', description: 'UPDATE users SET last_login = NOW() WHERE id = ?', durMin: 2, durMax: 15 },
+    { op: 'cache.set', description: 'redis SET session:{sessionId}:token', durMin: 1, durMax: 5 },
+    { op: 'http.client', description: 'POST https://analytics.internal/v2/events', durMin: 5, durMax: 50 },
+  ],
+  'POST /api/character/save': [
+    { op: 'cache.get', description: 'redis GET character:{userId}:lock', durMin: 1, durMax: 3 },
+    { op: 'function', description: 'CharacterSerializer.validate(saveData)', durMin: 2, durMax: 10 },
+    { op: 'db.query', description: 'UPDATE characters SET equipment = ?, gold = ?, position = ? WHERE id = ?', durMin: 5, durMax: 50 },
+    { op: 'cache.set', description: 'redis SET character:{userId}:profile', durMin: 1, durMax: 5 },
+    { op: 'function', description: 'CRC32.compute(saveBlob)', durMin: 1, durMax: 8 },
+  ],
+  'POST /api/trade/complete': [
+    { op: 'cache.get', description: 'redis GET trade:{tradeId}:lock', durMin: 1, durMax: 5 },
+    { op: 'db.query', description: 'SELECT * FROM inventory WHERE character_id = ? FOR UPDATE', durMin: 5, durMax: 40 },
+    { op: 'db.query', description: 'UPDATE inventory SET owner_id = ? WHERE id = ? AND owner_id = ?', durMin: 3, durMax: 30 },
+    { op: 'db.query', description: 'UPDATE characters SET gold = gold - ? WHERE id = ? AND gold >= ?', durMin: 3, durMax: 20 },
+    { op: 'db.query', description: 'INSERT INTO trade_logs (seller, buyer, item, price) VALUES (?, ?, ?, ?)', durMin: 2, durMax: 15 },
+    { op: 'http.client', description: 'POST https://analytics.internal/v2/events', durMin: 5, durMax: 40 },
+  ],
+  'GET /api/rankings/guild': [
+    { op: 'cache.get', description: 'redis GET rankings:guild:season:12', durMin: 1, durMax: 5 },
+    { op: 'db.query', description: 'SELECT g.*, SUM(s.score) FROM guilds g JOIN scores s ON g.id = s.guild_id WHERE s.season = 12 GROUP BY g.id ORDER BY SUM(s.score) DESC LIMIT 100', durMin: 200, durMax: 8000 },
+    { op: 'cache.set', description: 'redis SET rankings:guild:season:12 EX 300', durMin: 1, durMax: 5 },
+    { op: 'function', description: 'RankingFormatter.format(results)', durMin: 2, durMax: 15 },
+  ],
+  'POST /api/matchmaking/queue': [
+    { op: 'cache.get', description: 'redis GET matchmaking:queue:pvp_fleet:size', durMin: 1, durMax: 3 },
+    { op: 'function', description: 'MMRCalculator.computeRange(player)', durMin: 2, durMax: 10 },
+    { op: 'cache.set', description: 'redis ZADD matchmaking:queue:pvp_fleet {mmr} {userId}', durMin: 1, durMax: 5 },
+    { op: 'function', description: 'MatchmakingEngine.tryMatch(queue)', durMin: 100, durMax: 120000 },
+  ],
+  'POST /api/guild/bank/transfer': [
+    { op: 'db.query', description: 'SELECT * FROM guild_members WHERE user_id = ? AND guild_id = ?', durMin: 3, durMax: 15 },
+    { op: 'function', description: 'PermissionChecker.hasPermission(member, "bank.transfer")', durMin: 1, durMax: 5 },
+    { op: 'db.query', description: 'BEGIN TRANSACTION', durMin: 1, durMax: 3 },
+    { op: 'db.query', description: 'UPDATE guild_bank SET quantity = quantity - ? WHERE guild_id = ? AND item_id = ?', durMin: 5, durMax: 50 },
+    { op: 'db.query', description: 'INSERT INTO inventory (character_id, item_id, quantity) VALUES (?, ?, ?)', durMin: 3, durMax: 20 },
+    { op: 'db.query', description: 'COMMIT', durMin: 1, durMax: 10 },
+  ],
+};
+
+function getSpanTemplates(txnName: string): SpanTemplate[] {
+  if (SPAN_TEMPLATES_BY_TXN[txnName]) return SPAN_TEMPLATES_BY_TXN[txnName];
+  // Generic fallback with realistic ops
+  const numSpans = randomInt(2, 5);
+  const spans: SpanTemplate[] = [];
+  for (let i = 0; i < numSpans; i++) {
+    const op = randomPick(['db.query', 'db.query', 'cache.get', 'cache.set', 'http.client', 'function', 'serialize']);
+    let desc: string;
+    switch (op) {
+      case 'db.query': desc = randomPick(SPAN_DB_QUERIES); break;
+      case 'cache.get': case 'cache.set': desc = `redis ${op === 'cache.get' ? 'GET' : 'SET'} ${randomPick(SPAN_CACHE_KEYS).replace(/{\w+}/g, String(randomInt(1000, 99999)))}`; break;
+      case 'http.client': desc = randomPick(SPAN_HTTP_CALLS); break;
+      case 'function': desc = randomPick(['JSON.parse(requestBody)', 'Validator.validate(payload)', 'Serializer.toProtobuf(response)', 'CryptoUtil.hmacSign(data)', 'Compressor.gzip(blob)']); break;
+      default: desc = randomPick(['JSON.stringify(responsePayload)', 'MessagePack.encode(event)', 'ProtoBuf.serialize(packet)']); break;
+    }
+    spans.push({ op, description: desc, durMin: 1, durMax: randomInt(20, 500) });
+  }
+  return spans;
+}
+
+// ═══════════════════ CONTEXTUAL LOG MESSAGES ═══════════════════
+
+interface LogLine { level: string; logger: string; msg: string; body?: string; }
+
+function generateContextualLogs(scenario: ErrorScenario, user: { id: string; ip: string }, server: string, env: string, release: string): LogLine[] {
+  const logs: LogLine[] = [];
+  const shard = randomPick(GAME_SHARDS);
+  const connId = randomInt(10000, 99999);
+  const reqId = uuid().substring(0, 12);
+
+  // Runtime-specific pre-error logs
+  if (scenario.runtime === 'nodejs') {
+    // Common server-side request lifecycle
+    if (scenario.transaction.startsWith('POST') || scenario.transaction.startsWith('GET')) {
+      logs.push({ level: 'info', logger: 'HttpServer', msg: `[req:${reqId}] ${scenario.transaction} from ${user.ip} (${server}/${shard})` });
+      logs.push({ level: 'debug', logger: 'AuthMiddleware', msg: `[req:${reqId}] Token validated for ${user.id} (expires in ${randomInt(300, 7200)}s)` });
+    } else if (scenario.transaction.startsWith('WS')) {
+      logs.push({ level: 'debug', logger: 'WebSocketServer', msg: `[conn:${connId}] Frame received from ${user.id} (${user.ip}), size=${randomInt(64, 4096)}B` });
+    } else if (scenario.transaction.startsWith('INTERNAL')) {
+      logs.push({ level: 'debug', logger: 'Scheduler', msg: `[job:${reqId}] Internal task started: ${scenario.culprit}` });
+    }
+
+    // Scenario-specific context
+    switch (scenario.id) {
+      case 'ws-drop':
+        logs.push({ level: 'info', logger: 'NetworkGateway', msg: `[conn:${connId}] WebSocket keepalive ping sent to ${user.id}` });
+        logs.push({ level: 'warn', logger: 'NetworkGateway', msg: `[conn:${connId}] Pong timeout after ${randomInt(25000, 35000)}ms — marking connection stale` });
+        logs.push({ level: 'info', logger: 'SessionManager', msg: `[conn:${connId}] Saving player state before disconnect (character_id=${randomInt(10000, 999999)}, gold=${randomInt(1000, 500000)})` });
+        logs.push({ level: 'error', logger: 'NetworkGateway', msg: `[conn:${connId}] WebSocket closed abnormally (code=1006) for ${user.id}. Last packet: ${randomInt(20, 45)}s ago` });
+        break;
+      case 'redis-conn':
+        logs.push({ level: 'warn', logger: 'RedisClient', msg: `Health check FAIL (attempt 1/3): ECONNREFUSED 10.0.3.12:6379` });
+        logs.push({ level: 'warn', logger: 'RedisClient', msg: `Health check FAIL (attempt 2/3): ECONNREFUSED 10.0.3.12:6379 (retry in 1s)` });
+        logs.push({ level: 'error', logger: 'RedisClient', msg: `Health check FAIL (attempt 3/3): All retries exhausted. Sentinel unavailable.` });
+        logs.push({ level: 'error', logger: 'RedisSessionStore', msg: `Session store OFFLINE — ${randomInt(200, 5000)} active sessions at risk` });
+        break;
+      case 'mysql-pool':
+        logs.push({ level: 'info', logger: 'ConnectionPool', msg: `[pool:character-primary] Utilization: ${randomInt(85, 95)}/100 connections active` });
+        logs.push({ level: 'warn', logger: 'ConnectionPool', msg: `[pool:character-primary] Utilization: 100/100 — queuing requests (depth: ${randomInt(100, 1500)})` });
+        logs.push({ level: 'warn', logger: 'QueryRunner', msg: `[req:${reqId}] Connection acquire timeout after ${randomInt(8000, 15000)}ms — avgQueryTime=${randomInt(200, 500)}ms` });
+        logs.push({ level: 'error', logger: 'ConnectionPool', msg: `[pool:character-primary] EXHAUSTED: 100/100 active, ${randomInt(500, 2000)} waiting. Oldest waiting: ${randomInt(5, 30)}s` });
+        break;
+      case 'inv-dupe':
+        logs.push({ level: 'info', logger: 'TradeController', msg: `[req:${reqId}] Trade initiated: ${user.id} selling item_id=${randomInt(10000, 99999)} to NPC` });
+        logs.push({ level: 'info', logger: 'InventoryManager', msg: `[req:${reqId}] Server inventory count: ${randomInt(40, 50)} items` });
+        logs.push({ level: 'warn', logger: 'InventoryManager', msg: `[req:${reqId}] Client reports ${randomInt(48, 55)} items — MISMATCH detected` });
+        logs.push({ level: 'error', logger: 'ItemValidator', msg: `[req:${reqId}] Duplicate item_id=${randomInt(20000, 40000)} (Refined Gold Bar) found. Race condition suspected in concurrent trade API.` });
+        break;
+      case 'match-timeout':
+        logs.push({ level: 'info', logger: 'MatchmakingService', msg: `[req:${reqId}] Player ${user.id} entered PvP queue (MMR: ${randomInt(1200, 2400)}, mode: pvp_fleet_battle)` });
+        logs.push({ level: 'info', logger: 'MatchmakingService', msg: `[req:${reqId}] Queue size: ${randomInt(1500, 4000)} players waiting` });
+        logs.push({ level: 'warn', logger: 'MatchmakingService', msg: `[req:${reqId}] 60s elapsed — expanding MMR range: ±200 → ±500` });
+        logs.push({ level: 'warn', logger: 'MatchmakingService', msg: `[req:${reqId}] 90s elapsed — expanding MMR range: ±500 → ±1000 (desperate mode)` });
+        logs.push({ level: 'error', logger: 'MatchmakingService', msg: `[req:${reqId}] Queue timeout after 120s. No suitable opponent found for MMR ${randomInt(1200, 2400)}.` });
+        break;
+      case 'slow-query':
+        logs.push({ level: 'debug', logger: 'QueryExecutor', msg: `[req:${reqId}] Executing: SELECT * FROM guild_rankings WHERE season=12 ORDER BY score DESC` });
+        logs.push({ level: 'warn', logger: 'QueryMonitor', msg: `[req:${reqId}] Query running ${randomInt(3000, 6000)}ms (threshold: 2000ms) — possible full table scan` });
+        logs.push({ level: 'warn', logger: 'QueryMonitor', msg: `[req:${reqId}] Query completed in ${randomInt(6000, 12000)}ms. Rows scanned: ${randomInt(800000, 2000000)}. Missing index suspected on (season, score).` });
+        break;
+      case 'deadlock':
+        logs.push({ level: 'info', logger: 'TransactionRunner', msg: `[req:${reqId}] BEGIN TRANSACTION (guild_bank_transfer, isolation: REPEATABLE READ)` });
+        logs.push({ level: 'debug', logger: 'GuildBankService', msg: `[req:${reqId}] Locking guild_bank_items for guild_id=${randomInt(1000, 9999)}` });
+        logs.push({ level: 'warn', logger: 'TransactionRunner', msg: `[req:${reqId}] Lock wait timeout exceeded (${randomInt(40, 60)}s) — concurrent transactions: ${randomInt(5, 20)}` });
+        logs.push({ level: 'error', logger: 'TransactionRunner', msg: `[req:${reqId}] DEADLOCK DETECTED on table guild_bank_items. Transaction rolled back. Retry #${randomInt(1, 3)}.` });
+        break;
+      default:
+        // Generic contextual logs for other nodejs scenarios
+        logs.push({ level: 'debug', logger: scenario.culprit.split(/[.:]/)[0], msg: `[req:${reqId}] Executing ${scenario.culprit} for ${user.id}` });
+        if (Math.random() < 0.5) logs.push({ level: 'info', logger: 'MetricsCollector', msg: `[req:${reqId}] Request latency: ${randomInt(50, 2000)}ms, memory: ${randomInt(200, 1500)}MB` });
+        logs.push({ level: scenario.level === 'fatal' ? 'error' : scenario.level, logger: 'ErrorHandler', msg: `[req:${reqId}] ${scenario.type}: ${scenario.value.substring(0, 180)}` });
+        break;
+    }
+  } else if (scenario.runtime === 'lua') {
+    logs.push({ level: 'debug', logger: 'LuaVM', msg: `[vm:${uuid().substring(0, 8)}] Script tick #${randomInt(10000, 999999)} (GC: ${randomInt(20, 180)}MB, entities: ${randomInt(100, 5000)})` });
+    switch (scenario.id) {
+      case 'lua-nil':
+        logs.push({ level: 'info', logger: 'UIManager', msg: `Player ${user.id} opened CharacterPanel (scene: ${randomPick(['port_lisbon', 'port_london', 'sea_atlantic'])})` });
+        logs.push({ level: 'debug', logger: 'CharacterUI', msg: `CharacterUI:onOpen() — loading equipment data for character_id=${randomInt(10000, 999999)}` });
+        logs.push({ level: 'error', logger: 'LuaRuntime', msg: `attempt to index a nil value (field 'equipSlots') at CharacterUI.lua:234 — characterData is nil, data not loaded before UI render` });
+        break;
+      case 'lua-cooldown':
+        logs.push({ level: 'info', logger: 'CombatSystem', msg: `Player ${user.id} using skill "Broadside Barrage" (id=2847) on target entity_${randomInt(1000, 9999)}` });
+        logs.push({ level: 'warn', logger: 'SkillCooldownTracker', msg: `Skill 2847 server cooldown remaining: ${randomFloat(2, 8).toFixed(1)}s, client reports 0s — DESYNC` });
+        logs.push({ level: 'error', logger: 'CombatSystem', msg: `CooldownDesyncError: ${randomInt(2, 5)} extra shots fired during desync window. Client clock drift: ${randomInt(100, 2000)}ms.` });
+        break;
+      case 'lua-gc':
+        logs.push({ level: 'info', logger: 'GCMonitor', msg: `GC cycle started (mode: generational, memory: ${randomInt(100, 200)}MB)` });
+        logs.push({ level: 'warn', logger: 'GCMonitor', msg: `GC pause spike: ${randomInt(200, 600)}ms (threshold: 16ms). Freed ${randomInt(20, 80)}MB. ${randomInt(500, 3000)} objects collected.` });
+        logs.push({ level: 'info', logger: 'GCMonitor', msg: `GC cycle complete. Post-GC memory: ${randomInt(60, 120)}MB. Consider incremental GC tuning.` });
+        break;
+      default:
+        logs.push({ level: 'debug', logger: 'LuaRuntime', msg: `Executing: ${scenario.culprit} (frame ${randomInt(1, 60)} of tick)` });
+        logs.push({ level: scenario.level === 'fatal' ? 'error' : scenario.level, logger: 'LuaRuntime', msg: `${scenario.type}: ${scenario.value.substring(0, 180)}` });
+        break;
+    }
+  } else if (scenario.runtime === 'ue4') {
+    logs.push({ level: 'debug', logger: 'UE4Core', msg: `[Frame:${randomInt(100000, 9999999)}] FPS: ${randomInt(15, 120)}, DrawCalls: ${randomInt(500, 5000)}, Triangles: ${randomInt(500000, 5000000)}` });
+    switch (scenario.id) {
+      case 'ue4-gpu-lost':
+        logs.push({ level: 'info', logger: 'Renderer', msg: `VRAM usage: ${randomFloat(4.5, 5.9).toFixed(1)}GB / ${randomPick(['6.0', '8.0'])}GB (${randomInt(85, 98)}%)` });
+        logs.push({ level: 'warn', logger: 'Renderer', msg: `FPS dropped: ${randomInt(40, 60)} → ${randomInt(8, 15)}. GPU stall detected during ocean surface shader.` });
+        logs.push({ level: 'error', logger: 'D3D12RHI', msg: `D3D Device Removed: DXGI_ERROR_DEVICE_HUNG. GPU: ${randomPick(['GeForce RTX 3060', 'GeForce GTX 1660', 'Radeon RX 6700 XT'])}. Driver: ${randomPick(['551.86', '552.12', '24.5.1'])}.` });
+        break;
+      case 'ue4-repl':
+        logs.push({ level: 'info', logger: 'NetDriver', msg: `Network update tick. RTT: ${randomInt(50, 400)}ms, PacketLoss: ${randomFloat(0, 0.15).toFixed(3)}` });
+        logs.push({ level: 'warn', logger: 'ShipActor', msg: `Position desync for BP_PlayerShip_C_${randomInt(1, 100)}: delta ${randomInt(100, 1000)} units. Server correcting client.` });
+        logs.push({ level: 'error', logger: 'NetReplication', msg: `ReplicationError: Persistent desync (${randomInt(3, 10)} corrections in last 30s). Client rubber-banding. Consider lowering net update frequency.` });
+        break;
+      default:
+        logs.push({ level: 'debug', logger: 'UE4Core', msg: `${scenario.culprit} executing (tick ${randomInt(1, 60)})` });
+        logs.push({ level: scenario.level === 'fatal' ? 'error' : scenario.level, logger: 'UE4Crash', msg: `${scenario.type}: ${scenario.value.substring(0, 180)}` });
+        break;
+    }
+  }
+
+  // Always add the final error log
+  if (!logs.some(l => l.level === 'error' || l.level === 'fatal')) {
+    logs.push({ level: scenario.level === 'warning' ? 'warn' : scenario.level, logger: 'ErrorReporter', msg: `${scenario.type}: ${scenario.value.substring(0, 200)}` });
+  }
+
+  return logs;
+}
 
 // ═══════════════════ GAME RELEASES ═══════════════════
 
@@ -1150,48 +1445,40 @@ const FEEDBACK_MESSAGES = [...FEEDBACK_MESSAGES_KO, ...FEEDBACK_MESSAGES_EN];
 
 // ═══════════════════ LOG GENERATION ═══════════════════
 
-function generateLogsForEvent(issueId: number, timestamp: Date, scenario: ErrorScenario): any[] {
+function generateLogsForEvent(
+  issueId: number, timestamp: Date, scenario: ErrorScenario,
+  user: { id: string; ip: string }, server: string, env: string, release: string
+): any[] {
   const traceId = uuid();
   const baseTime = new Date(timestamp.getTime() - randomInt(5000, 30000));
-  const logs: any[] = [];
-  const server = randomPick(scenario.servers);
-  const env = randomPick(scenario.environments);
-  const release = randomPick(scenario.releases);
   const service = randomPick(scenario.services);
+  const pod = k8sPodName(service);
 
-  const templates: { level: string; logger: string; msg: string }[] = [
-    { level: 'debug', logger: 'RoutingService', msg: `Route matched: ${scenario.transaction}` },
-    { level: 'info', logger: 'AuthMiddleware', msg: `Authentication validated for request` },
-    { level: 'info', logger: 'AppLogger', msg: `Processing: ${scenario.transaction}` },
-    { level: 'debug', logger: 'ConnectionPool', msg: `Acquired connection from pool (active: ${randomInt(20, 90)}/${randomInt(90, 100)})` },
-    { level: 'info', logger: 'RequestHandler', msg: `Handler executing: ${scenario.culprit}` },
-    { level: scenario.level === 'fatal' ? 'error' : scenario.level, logger: 'ErrorHandler', msg: `${scenario.type}: ${scenario.value.substring(0, 200)}` },
-  ];
+  const contextualLines = generateContextualLogs(scenario, user, server, env, release);
 
-  templates.forEach((tmpl, i) => {
-    logs.push({
-      log_id: uuid(),
-      project_id: PROJECT_ID,
-      trace_id: traceId,
-      span_id: uuid().substring(0, 16),
-      issue_id: issueId,
-      timestamp: new Date(baseTime.getTime() + i * randomInt(200, 2000)).toISOString(),
-      level: tmpl.level,
-      logger_name: tmpl.logger,
-      message: tmpl.msg,
-      body: '',
-      environment: env,
-      release,
-      service,
-      attributes: {
-        'server.name': server,
-        'environment': env,
-        'trace.id': traceId,
-      },
-    });
-  });
-
-  return logs;
+  return contextualLines.map((line, i) => ({
+    log_id: uuid(),
+    project_id: PROJECT_ID,
+    trace_id: traceId,
+    span_id: uuid().substring(0, 16),
+    issue_id: issueId,
+    timestamp: new Date(baseTime.getTime() + i * randomInt(200, 3000)).toISOString(),
+    level: line.level,
+    logger_name: line.logger,
+    message: line.msg,
+    body: line.body || '',
+    environment: env,
+    release,
+    service,
+    attributes: {
+      'server.name': server,
+      'environment': env,
+      'trace.id': traceId,
+      'kubernetes.pod_name': pod,
+      'service.version': release,
+      'game.shard': randomPick(GAME_SHARDS),
+    },
+  }));
 }
 
 // ═══════════════════ MAIN ═══════════════════
@@ -1259,7 +1546,13 @@ async function main() {
     const env = randomPick(scenario.environments);
     const release = randomPick(scenario.releases);
 
-    const primaryHash = md5(scenario.type + scenario.title);
+    // Fingerprint = hash of in-app callstack frames (filename:function:lineno)
+    const inAppFrames = scenario.frames.filter(f => f.in_app);
+    const primaryHash = md5(
+      inAppFrames.length > 0
+        ? inAppFrames.map(f => `${f.filename}:${f.function}:${f.lineno}`).join('|')
+        : `${scenario.type}:${scenario.culprit}`
+    );
     const eventId = uuid();
 
     if (!issueMap.has(primaryHash)) {
@@ -1321,12 +1614,16 @@ async function main() {
       http_method: scenario.transaction.startsWith('GET') || scenario.transaction.startsWith('WS') ? 'GET' : 'POST',
       http_url: `https://game.unchartedwaters.io${scenario.transaction.replace(/^(GET|POST|PUT|WS)\s+/, '')}`,
       http_referer: 'https://game.unchartedwaters.io',
-      tags: scenario.tags,
-      extra: scenario.extra,
+      tags: dynamicTags(scenario, randomPick(scenario.servers), env),
+      extra: dynamicExtra(scenario),
       contexts: JSON.stringify(scenario.contexts),
       is_handled: scenario.level === 'warning' ? 1 : 0,
       is_symbolicated: 0,
       _primaryHash: primaryHash,
+      _user: user,
+      _server: randomPick(scenario.servers),
+      _env: env,
+      _release: release,
     });
 
     if ((i + 1) % 50000 === 0) {
@@ -1381,10 +1678,16 @@ async function main() {
 
   for (let i = 0; i < allEvents.length; i++) {
     const ev = allEvents[i];
-    const tracker = issueMap.get(ev._primaryHash || md5(ev.type + ev.value))!;
+    const tracker = issueMap.get(ev._primaryHash || '')!;
     if (!tracker) continue;
     const scenario = tracker.scenario;
-    const logs = generateLogsForEvent(tracker.id, new Date(ev.timestamp), scenario);
+    const logs = generateLogsForEvent(
+      tracker.id, new Date(ev.timestamp), scenario,
+      ev._user || { id: 'unknown', ip: '0.0.0.0' },
+      ev._server || randomPick(scenario.servers),
+      ev._env || randomPick(scenario.environments),
+      ev._release || randomPick(scenario.releases)
+    );
     logBatch.push(...logs);
 
     if (logBatch.length >= CHUNK_SIZE) {
@@ -1425,10 +1728,11 @@ async function main() {
     const env = randomPick(['production', 'production', 'production', 'staging']);
     const release = randomPick(SERVER_RELEASES);
 
-    const numSpans = randomInt(2, 6);
+    const spanTemplates = getSpanTemplates(tmpl.name);
     let currentStart = start.getTime();
-    for (let s = 0; s < numSpans; s++) {
-      const spanDur = randomInt(5, Math.max(5, Math.floor(duration / numSpans)));
+    for (let s = 0; s < spanTemplates.length; s++) {
+      const st = spanTemplates[s];
+      const spanDur = randomInt(st.durMin, Math.max(st.durMin, Math.min(st.durMax, Math.floor(duration / spanTemplates.length))));
       spanBatch.push({
         span_id: uuid().substring(0, 16),
         parent_span_id: spanId,
@@ -1438,11 +1742,12 @@ async function main() {
         timestamp: new Date(currentStart + spanDur).toISOString(),
         start_timestamp: new Date(currentStart).toISOString(),
         duration: spanDur,
-        op: randomPick(['db.query', 'http.client', 'cache.get', 'cache.set', 'function', 'serialize']),
-        description: `Operation ${s}`,
-        status: isError && s === numSpans - 1 ? 'internal_error' : 'ok',
-        action: '', domain: '',
-        data: {}, tags: {},
+        op: st.op,
+        description: st.description,
+        status: isError && s === spanTemplates.length - 1 ? 'internal_error' : 'ok',
+        action: st.op.split('.')[1] || '',
+        domain: st.op.startsWith('db') ? 'mysql' : st.op.startsWith('cache') ? 'redis' : st.op.startsWith('http') ? 'internal-api' : '',
+        data: {}, tags: { 'server.region': randomPick(['ap-northeast-2', 'eu-west-1', 'us-east-1']) },
       });
       currentStart += spanDur;
     }
@@ -1465,9 +1770,18 @@ async function main() {
       environment: env,
       release,
       user_id: user.id,
-      measurements: {},
-      tags: { region: randomPick(['ap-northeast-2', 'eu-west-1', 'us-east-1']) },
-      span_count: numSpans,
+      measurements: {
+        'lcp': randomFloat(100, 5000),
+        'fcp': randomFloat(50, 2000),
+        'ttfb': randomFloat(10, 800),
+      },
+      tags: {
+        region: randomPick(['ap-northeast-2', 'eu-west-1', 'us-east-1']),
+        'server.instance': instanceId(),
+        'deployment.slot': randomPick(DEPLOY_SLOTS),
+        'game.shard': randomPick(GAME_SHARDS),
+      },
+      span_count: spanTemplates.length,
     });
 
     if (txnBatch.length >= CHUNK_SIZE) {

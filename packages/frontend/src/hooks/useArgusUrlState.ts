@@ -5,7 +5,7 @@
  * Supports strings, arrays (comma-separated), and optional localStorage persistence.
  */
 import { useCallback, useMemo, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 
 type ParamType = 'string' | 'array';
 
@@ -47,6 +47,7 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
   paramDefs: T,
 ): [UrlState<T>, (updates: Partial<Record<keyof T, string | string[]>>) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const defsRef = useRef(paramDefs);
   defsRef.current = paramDefs;
 
@@ -107,10 +108,10 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
 
           return next;
         },
-        { replace: !shouldPush },
+        { replace: !shouldPush, state: location.state },
       );
     },
-    [setSearchParams],
+    [setSearchParams, location.state],
   );
 
   return [state, setState];

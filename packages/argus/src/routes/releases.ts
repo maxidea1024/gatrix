@@ -16,12 +16,6 @@ export default async function releasesRoutes(app: FastifyInstance) {
       const qp = { projectId: String(projectId) };
 
       try {
-        const [projectsRows] = await mysqlPool.query(
-          'SELECT id FROM g_argus_projects WHERE gatrix_project_id = ?',
-          [projectId]
-        );
-        const internalProjectId = (projectsRows as any[])[0]?.id;
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
         const [errorResult, sessionResult, txnResult, trendResult, newIssuesResult] = await Promise.all([
           // Error stats per release
           clickhouse.query({
@@ -88,7 +82,7 @@ export default async function releasesRoutes(app: FastifyInstance) {
              FROM g_argus_issues 
              WHERE project_id = ? AND first_release IS NOT NULL 
              GROUP BY first_release`,
-            [internalProjectId]
+            [projectId]
           ),
         ]);
 

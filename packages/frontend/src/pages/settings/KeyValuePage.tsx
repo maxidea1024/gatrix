@@ -26,9 +26,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Lock as LockIcon,
-  ContentCopy as CopyIcon,
-  FileCopy as DuplicateIcon,
+  Lock as LockIcon,FileCopy as DuplicateIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +39,7 @@ import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { CopyButton } from '@/components/common/CopyButton';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -336,19 +335,7 @@ const KeyValuePage: React.FC = () => {
                           >
                             {item.varKey.replace('kv:', '')}
                           </Typography>
-                          <Tooltip title={t('common.copy')}>
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                handleCopyKeyName(
-                                  item.varKey.replace('kv:', '')
-                                )
-                              }
-                              sx={{ p: 0.5 }}
-                            >
-                              <CopyIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                          </Tooltip>
+                          <CopyButton text={item.varKey.replace('kv:', ''} size={13} />
                           {item.isSystemDefined && (
                             <Tooltip title={t('settings.kv.systemDefined')}>
                               <LockIcon fontSize="small" color="action" />

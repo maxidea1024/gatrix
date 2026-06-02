@@ -1367,7 +1367,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       if (!options?.skipRecentUpdate) {
         flushSync(() => addRecentPage(path));
       }
-      navigate(path);
+      navigate(path, { state: { fromSidebar: true } });
     }
   };
 

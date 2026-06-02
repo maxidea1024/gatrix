@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -41,8 +41,9 @@ import {
   KeyboardArrowDown as LowPriorityIcon,
   OpenInNew as ExternalLinkIcon,
   Close as CloseIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, {
   ArgusIssue,
@@ -53,9 +54,23 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
-import { formatCompactNumber } from '@/utils/numberFormat';
+import { formatWithCommas as formatNumber, formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title as ChartTitle,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTitle, ChartTooltip, ChartLegend);
 
 const PAGE_SIZE_STORAGE_KEY = 'argusIssues.pageSize';
 const DEFAULT_PAGE_SIZE = 25;
@@ -188,6 +203,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuth();
@@ -233,7 +249,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     try {
       await argusService.assignIssue(projectId, issueId, assignee || null);
       setIssues(prev => prev.map(issue => issue.id === issueId ? { ...issue, assigned_to: assignee || null } : issue));
-      enqueueSnackbar(t('argus.issues.assigneeUpdated', 'Assignee updated'), { variant: 'success' });
+      enqueueSnackbar(t('argus.issues.assigneeUpdated'), { variant: 'success' });
     } catch {
       enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
@@ -330,6 +346,132 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   useEffect(() => { fetchIssues(); }, [fetchIssues]);
 
+  // ─── Volume Chart ───
+  const [volumeData, setVolumeData] = useState<{ day: string; count: number; issue_count: number }[]>([]);
+  const [volumeLoading, setVolumeLoading] = useState(true);
+  const chartRef = React.useRef<any>(null);
+  const [dragStart, setDragStart] = useState<number | null>(null);
+  const [dragEnd, setDragEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const fetchVolume = useCallback(async () => {
+    if (!projectId) return;
+    setVolumeLoading(true);
+    try {
+      const dateParams = argusDateRangeToApiParams(filters.dateRange);
+      const data = await argusService.getIssueVolume(projectId, {
+        ...dateParams,
+        status: status || undefined,
+        level: level || undefined,
+      });
+      setVolumeData(data);
+    } catch (e) {
+      console.error('Failed to fetch issue volume:', e);
+      setVolumeData([]);
+    } finally {
+      setVolumeLoading(false);
+    }
+  }, [projectId, filters, status, level]);
+
+  useEffect(() => { fetchVolume(); }, [fetchVolume]);
+
+  const volumeLabelsRaw = useMemo(() => volumeData.map(d => d.day), [volumeData]);
+
+  const volumeChartData = useMemo(() => {
+    if (!volumeData.length) return { labels: [], datasets: [] };
+    const barColors = volumeData.map((_, idx) => {
+      if (dragStart !== null && dragEnd !== null) {
+        const lo = Math.min(dragStart, dragEnd);
+        const hi = Math.max(dragStart, dragEnd);
+        if (idx >= lo && idx <= hi) return theme.palette.error.main;
+        return alpha(theme.palette.error.main, 0.2);
+      }
+      return alpha(theme.palette.error.main, 0.6);
+    });
+    return {
+      labels: volumeData.map(d => {
+        try { const dt = new Date(d.day); return `${dt.getMonth() + 1}/${dt.getDate()}`; } catch { return d.day; }
+      }),
+      datasets: [{
+        label: t('argus.issues.events'),
+        data: volumeData.map(d => d.count),
+        backgroundColor: barColors,
+        borderColor: 'transparent',
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false as const,
+      }],
+    };
+  }, [volumeData, t, dragStart, dragEnd, theme]);
+
+  const getBarIndex = (e: React.MouseEvent<HTMLElement>) => {
+    const chart = chartRef.current;
+    if (!chart) return null;
+    const elements = chart.getElementsAtEventForMode(e.nativeEvent, 'index', { intersect: false }, false);
+    if (elements.length > 0) return elements[0].index;
+    return null;
+  };
+
+  const handleChartMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    const idx = getBarIndex(e);
+    if (idx !== null) {
+      setDragStart(idx);
+      setDragEnd(idx);
+      setIsDragging(true);
+    }
+  };
+
+  const handleChartMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!isDragging) return;
+    const idx = getBarIndex(e);
+    if (idx !== null) setDragEnd(idx);
+  };
+
+  const handleChartMouseUp = () => {
+    if (!isDragging || dragStart === null || dragEnd === null) {
+      setIsDragging(false);
+      return;
+    }
+    setIsDragging(false);
+    const lo = Math.min(dragStart, dragEnd);
+    const hi = Math.max(dragStart, dragEnd);
+    if (volumeLabelsRaw.length > 0 && lo >= 0 && hi < volumeLabelsRaw.length) {
+      const startDay = volumeLabelsRaw[lo];
+      const endDay = volumeLabelsRaw[hi];
+      try {
+        const startDate = new Date(startDay);
+        const endDate = new Date(endDay);
+        endDate.setHours(23, 59, 59, 999);
+        if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+          setFilters(prev => ({
+            ...prev,
+            dateRange: { type: 'custom', start: startDate, end: endDate },
+          }));
+          const params = new URLSearchParams(searchParams);
+          params.set('start', startDate.toISOString());
+          params.set('end', endDate.toISOString());
+          params.set('page', '1');
+          setSearchParams(params);
+        }
+      } catch { /* ignore */ }
+    }
+  };
+
+  const handleChartReset = () => {
+    setDragStart(null);
+    setDragEnd(null);
+  };
+
+  const chartOpts = useMemo(() => ({
+    responsive: true, maintainAspectRatio: false,
+    animation: { duration: 300 },
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } },
+      y: { beginAtZero: true, border: { display: false }, grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 } } },
+    },
+  }), [isDark]);
+
   const handleFilterChange = (newFilters: ArgusFilterState) => {
     setFilters(newFilters);
   };
@@ -359,7 +501,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     try {
       await argusService.mergeIssues(projectId, Array.from(selectedIds));
       setSelectedIds(new Set());
-      enqueueSnackbar(t('argus.issues.mergeSuccess', 'Issues merged'), { variant: 'success' });
+      enqueueSnackbar(t('argus.issues.mergeSuccess'), { variant: 'success' });
       fetchIssues();
     } catch (e) {
       enqueueSnackbar(t('common.error'), { variant: 'error' });
@@ -386,57 +528,56 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const totalPages = Math.ceil(total / rowsPerPage);
 
   const statusOptions = [
-    { value: '', label: t('common.all', 'All') },
-    { value: 'unresolved', label: t('argus.issues.unresolved', 'Unresolved'), color: '#f44336' },
-    { value: 'resolved', label: t('argus.issues.resolved', 'Resolved'), color: '#4caf50' },
-    { value: 'ignored', label: t('argus.issues.ignored', 'Ignored'), color: '#9e9e9e' },
+    { value: '', label: t('common.all') },
+    { value: 'unresolved', label: t('argus.issues.unresolved'), color: '#f44336' },
+    { value: 'resolved', label: t('argus.issues.resolved'), color: '#4caf50' },
+    { value: 'ignored', label: t('argus.issues.ignored'), color: '#9e9e9e' },
   ];
   const levelOptions = [
-    { value: '', label: t('common.all', 'All') },
+    { value: '', label: t('common.all') },
     { value: 'fatal', label: t('argus.issues.fatal'), color: '#f44336' },
     { value: 'error', label: t('argus.issues.error'), color: '#ff5722' },
     { value: 'warning', label: t('argus.issues.warning'), color: '#ff9800' },
     { value: 'info', label: t('argus.issues.info'), color: '#2196f3' },
   ];
   const sortOptions = [
-    { value: 'last_seen', label: t('argus.issues.lastSeen', 'Last Seen') },
-    { value: 'first_seen', label: t('argus.issues.firstSeen', 'First Seen') },
-    { value: 'event_count', label: t('argus.issues.events', 'Events') },
-    { value: 'user_count', label: t('argus.issues.users', 'Users') },
+    { value: 'last_seen', label: t('argus.issues.lastSeen') },
+    { value: 'first_seen', label: t('argus.issues.firstSeen') },
+    { value: 'event_count', label: t('argus.issues.events') },
+    { value: 'user_count', label: t('argus.issues.users') },
   ];
 
   return (
     <Box>
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <BugReportIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
-        <Typography variant="h5" fontWeight={700}>
-          {t('argus.issues.title')}
-        </Typography>
-        {!loading && total > 0 && (
-          <Chip
-            label={`${formatCompactNumber(total)} ${t('argus.issues.issuesLabel', 'issues')}`}
-            size="small"
-            sx={{
-              fontWeight: 700, fontSize: '0.75rem', height: 22,
-              backgroundColor: alpha(theme.palette.error.main, 0.1),
-              color: theme.palette.error.main,
-              border: 'none',
-            }}
-          />
-        )}
-        <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
-          — {t('argus.issues.subtitle')}
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={<BugReportIcon />}
+        title={t('argus.issues.title')}
+        subtitle={t('argus.issues.subtitle')}
+        enableAutoBack
+        actions={
+          !loading && total > 0 && (
+            <Chip
+              label={`${formatCompactNumber(total)} ${t('argus.issues.issuesLabel')}`}
+              size="small"
+              sx={{
+                fontWeight: 700, fontSize: '0.75rem', height: 22,
+                backgroundColor: alpha(theme.palette.error.main, 0.1),
+                color: theme.palette.error.main,
+                border: 'none',
+              }}
+            />
+          )
+        }
+      />
 
       {/* Issue Views tabs */}
       <Box sx={{ display: 'flex', gap: 0.5, mb: 1.5 }}>
         {[
-          { key: 'all', label: t('argus.issues.viewAll', 'All') },
-          { key: 'unresolved', label: t('argus.issues.viewUnresolved', 'Unresolved') },
-          { key: 'regressed', label: t('argus.issues.viewRegressed', 'Regressed') },
-          { key: 'escalating', label: t('argus.issues.viewEscalating', 'Escalating') },
-          { key: 'mine', label: t('argus.issues.viewMine', 'Assigned to Me') },
+          { key: 'all', label: t('argus.issues.viewAll') },
+          { key: 'unresolved', label: t('argus.issues.viewUnresolved') },
+          { key: 'regressed', label: t('argus.issues.viewRegressed') },
+          { key: 'escalating', label: t('argus.issues.viewEscalating') },
+          { key: 'mine', label: t('argus.issues.viewMine') },
         ].map(({ key, label }) => (
           <Chip
             key={key}
@@ -535,7 +676,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               }}
             />
             <FilterChipSelect
-              label={t('argus.issues.status', 'Status')}
+              label={t('argus.issues.status')}
               value={status}
               options={statusOptions}
               anchorEl={statusAnchor}
@@ -549,7 +690,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               }}
             />
             <FilterChipSelect
-              label={t('argus.issues.level', 'Level')}
+              label={t('argus.issues.level')}
               value={level}
               options={levelOptions}
               anchorEl={levelAnchor}
@@ -563,7 +704,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               }}
             />
             <FilterChipSelect
-              label={t('argus.issues.sort', 'Sort')}
+              label={t('argus.issues.sort')}
               value={sort}
               options={sortOptions}
               anchorEl={sortAnchor}
@@ -580,6 +721,37 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         }
       />
 
+      {/* Volume Chart */}
+      <Paper elevation={0} sx={{ p: 1.5, mb: 1.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, position: 'relative' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
+            {t('argus.issues.volumeChart')}
+          </Typography>
+          {dragStart !== null && dragEnd !== null && (
+            <Chip
+              label={t('argus.issues.clearSelection')}
+              size="small"
+              onDelete={handleChartReset}
+              sx={{ height: 18, fontSize: '0.6rem', '& .MuiChip-deleteIcon': { fontSize: 12 } }}
+            />
+          )}
+        </Box>
+        <Box
+          sx={{ height: 80, cursor: 'crosshair', userSelect: 'none' }}
+          onMouseDown={handleChartMouseDown}
+          onMouseMove={handleChartMouseMove}
+          onMouseUp={handleChartMouseUp}
+          onMouseLeave={() => { if (isDragging) handleChartMouseUp(); }}
+        >
+          {volumeLoading ? <ArgusChartSkeleton type="bar" height={80} color={theme.palette.error.main} /> : <Bar ref={chartRef} data={volumeChartData} options={chartOpts as any} />}
+        </Box>
+        {isDragging && (
+          <Typography variant="caption" sx={{ position: 'absolute', bottom: 4, right: 8, fontSize: '0.58rem', color: 'text.disabled' }}>
+            {t('argus.issues.dragToSelect')}
+          </Typography>
+        )}
+      </Paper>
+
       {selectedIds.size > 0 && (
         <Paper elevation={0} sx={{
           mb: 1.5, p: 1, display: 'flex', alignItems: 'center', gap: 1,
@@ -588,7 +760,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           backgroundColor: alpha(theme.palette.primary.main, 0.04),
         }}>
           <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.8rem', mr: 0.5 }}>
-            {selectedIds.size} {t('argus.issues.selected', 'selected')}
+            {selectedIds.size} {t('argus.issues.selected')}
           </Typography>
           <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           <Button
@@ -598,7 +770,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             onClick={() => handleBulkAction('resolved')}
             sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem', borderColor: alpha('#4caf50', 0.5), color: '#4caf50', '&:hover': { borderColor: '#4caf50', backgroundColor: alpha('#4caf50', 0.08) } }}
           >
-            {t('argus.issues.resolve', 'Resolve')}
+            {t('argus.issues.resolve')}
           </Button>
           <Button
             variant="outlined"
@@ -607,9 +779,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             onClick={() => handleBulkAction('ignored')}
             sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem', borderColor: alpha('#9e9e9e', 0.5), color: '#9e9e9e', '&:hover': { borderColor: '#9e9e9e', backgroundColor: alpha('#9e9e9e', 0.08) } }}
           >
-            {t('argus.issues.ignore', 'Ignore')}
+            {t('argus.issues.ignore')}
           </Button>
-          <Tooltip title={selectedIds.size < 2 ? t('argus.issues.mergeMinTwo', 'Select at least 2 issues') : ''}>
+          <Tooltip title={selectedIds.size < 2 ? t('argus.issues.mergeMinTwo') : ''}>
             <span>
               <Button
                 variant="outlined"
@@ -619,7 +791,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                 onClick={handleMerge}
                 sx={{ textTransform: 'none', borderRadius: '6px', fontSize: '0.76rem' }}
               >
-                {t('argus.issues.merge', 'Merge')}
+                {t('argus.issues.merge')}
               </Button>
             </span>
           </Tooltip>
@@ -628,7 +800,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             onClick={() => setSelectedIds(new Set())}
             sx={{ textTransform: 'none', fontSize: '0.76rem', ml: 'auto' }}
           >
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
         </Paper>
       )}
@@ -701,7 +873,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                           <HighlightText text={issue.title} highlight={searchDebounce} isDark={isDark} />
                         </Typography>
                         {issue.external_url && (
-                          <Tooltip title={`${issue.external_key || 'External'} — ${t('argus.issues.openExternal', 'Open in external tracker')}`}>
+                          <Tooltip title={`${issue.external_key || 'External'} — ${t('argus.issues.openExternal')}`}>
                             <IconButton
                               size="small"
                               onClick={(e) => { e.stopPropagation(); window.open(issue.external_url!, '_blank'); }}
@@ -724,7 +896,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                         )}
                         {issue.substatus === 'escalating' && (
                           <Chip
-                            label={t('argus.issues.escalating', 'Escalating')}
+                            label={t('argus.issues.escalating')}
                             size="small"
                             sx={{
                               height: 18, fontSize: '0.6rem', fontWeight: 700,
@@ -799,7 +971,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
                       <Box sx={{ minWidth: 28, display: 'flex', justifyContent: 'center' }}>
                         {issue.assigned_to ? (
-                          <Tooltip title={`${t('argus.issues.assignedTo', 'Assigned to')}: ${issue.assigned_to}`}>
+                          <Tooltip title={`${t('argus.issues.assignedTo')}: ${issue.assigned_to}`}>
                             <Avatar
                               onClick={(e) => { e.stopPropagation(); setAssigneeAnchor({ el: e.currentTarget, issue }); }}
                               sx={{
@@ -812,7 +984,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                             </Avatar>
                           </Tooltip>
                         ) : (
-                          <Tooltip title={t('argus.issues.unassigned', 'Unassigned')}>
+                          <Tooltip title={t('argus.issues.unassigned')}>
                             <IconButton
                               size="small"
                               onClick={(e) => { e.stopPropagation(); setAssigneeAnchor({ el: e.currentTarget, issue }); }}
@@ -868,7 +1040,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       >
         <MenuItem onClick={() => handleAssignIssue(assigneeAnchor?.issue.id, '')}>
           <ListItemIcon><PersonIcon sx={{ fontSize: 18 }} /></ListItemIcon>
-          <ListItemText primary={t('argus.issues.unassigned', 'Unassigned')} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+          <ListItemText primary={t('argus.issues.unassigned')} primaryTypographyProps={{ fontSize: '0.82rem' }} />
         </MenuItem>
         <Divider />
         {members.map(member => {

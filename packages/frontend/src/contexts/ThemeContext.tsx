@@ -353,6 +353,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             '& .MuiOutlinedInput-root': {
               backgroundColor: colors.inputBg,
+              color: txt.primary,
               '& fieldset': {
                 borderColor: colors.border,
               },
@@ -364,6 +365,36 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
                 borderWidth: '2px',
               },
             },
+            '& .MuiOutlinedInput-input': {
+              color: txt.primary,
+            },
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            color: `${txt.primary} !important`,
+          },
+          input: {
+            color: `${txt.primary} !important`,
+            WebkitTextFillColor: `${txt.primary} !important`,
+            '&::placeholder': {
+              color: txt.secondary,
+              WebkitTextFillColor: txt.secondary,
+              opacity: 1,
+            },
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          root: {
+            color: `${txt.primary} !important`,
+          },
+          input: {
+            color: `${txt.primary} !important`,
+            WebkitTextFillColor: `${txt.primary} !important`,
           },
         },
       },

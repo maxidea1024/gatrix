@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS `g_argus_sourcemap_releases` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `project_id` INT UNSIGNED NOT NULL,
+  `project_id` VARCHAR(64) NOT NULL,
   `release` VARCHAR(200) NOT NULL,
   `dist` VARCHAR(100) DEFAULT '',
   `file_count` INT UNSIGNED NOT NULL DEFAULT 0,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `g_argus_sourcemap_releases` (
 CREATE TABLE IF NOT EXISTS `g_argus_sourcemap_files` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `release_id` INT UNSIGNED NOT NULL,
-  `project_id` INT UNSIGNED NOT NULL,
+  `project_id` VARCHAR(64) NOT NULL,
   `file_path` VARCHAR(500) NOT NULL COMMENT 'Original file path (e.g., ~/static/js/main.abc123.js)',
   `file_name` VARCHAR(255) NOT NULL COMMENT 'File name only',
   `sourcemap_path` VARCHAR(500) NOT NULL COMMENT 'Stored path on disk',

@@ -4,22 +4,21 @@ import {
   Typography,
   Paper,
   Chip,
-  IconButton,
   useTheme,
   alpha,
-  Skeleton,
   Tooltip,
 } from '@mui/material';
 import {
-  Refresh as RefreshIcon,
   Devices as DevicesIcon,
-  CheckCircle as CheckIcon,
   Cancel as CrashIcon,
   People as PeopleIcon,
   Timer as TimerIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
   Warning as WarningIcon,
+  InfoOutlined as InfoIcon,
+  VisibilityOff as HideIcon,
+  Visibility as ShowIcon,
 } from '@mui/icons-material';
 import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useTranslation } from 'react-i18next';
@@ -45,11 +44,22 @@ import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/com
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
+// Session status definitions for tooltips
+const SESSION_STATUS_DEFS: Record<string, string> = {
+  healthy: 'argus.sessions.healthyDef',
+  crashed: 'argus.sessions.crashedDef',
+  errored: 'argus.sessions.erroredDef',
+  abnormal: 'argus.sessions.abnormalDef',
+};
 
+type DisplayMode = 'sessions' | 'users';
 
+// Color palette for release charts
+const RELEASE_COLORS = ['#7c4dff', '#448aff', '#00bcd4', '#26a69a', '#66bb6a', '#ffa726', '#ef5350', '#ab47bc'];
 
 const ArgusSessionHealthPage: React.FC = () => {
   const theme = useTheme();
@@ -67,6 +77,9 @@ const ArgusSessionHealthPage: React.FC = () => {
   const [data, setData] = useState<ArgusSessionHealth | null>(null);
   const [topIssues, setTopIssues] = useState<ArgusIssue[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('sessions');
+  const [hideHealthy, setHideHealthy] = useState(false);
+
   const filters = useMemo<ArgusFilterState>(
     () => defaultArgusFilterState(urlState.period),
     [urlState.period],
@@ -79,7 +92,7 @@ const ArgusSessionHealthPage: React.FC = () => {
       const [healthResult, issuesResult] = await Promise.all([
         argusService.getSessionHealth(projectId, ap.period, ap.start, ap.end),
         argusService.listIssues(projectId, {
-          sort: 'event_count', limit: 5,
+          sort: 'event_count', limit: 5, level: 'error',
           period: ap.period, start: ap.start, end: ap.end
         }).catch(err => { console.error('Failed to fetch top issues:', err); return { data: [], total: 0 }; })
       ]);
@@ -136,18 +149,19 @@ const ArgusSessionHealthPage: React.FC = () => {
     plugins: { legend: { display: false }, tooltip: { enabled: true } },
   }), []);
 
-  // Status timeline (stacked area)
+  // Status timeline (stacked area) - with hide healthy support
   const statusTimelineData = useMemo(() => {
     if (!data?.status_timeline) return { labels: [], datasets: [] };
-    return {
-      labels: data.status_timeline.map(d => formatHour(d.hour)),
-      datasets: [
-        { label: t('argus.sessions.healthy'), data: data.status_timeline.map(d => Number(d.healthy)), borderColor: '#4caf50', backgroundColor: alpha('#4caf50', 0.15), borderWidth: 2, tension: 0.4, fill: true, pointRadius: 0 },
-        { label: t('argus.sessions.errored'), data: data.status_timeline.map(d => Number(d.errored)), borderColor: '#ff9800', backgroundColor: alpha('#ff9800', 0.15), borderWidth: 2, tension: 0.4, fill: true, pointRadius: 0 },
-        { label: t('argus.sessions.crashed'), data: data.status_timeline.map(d => Number(d.crashed)), borderColor: '#f44336', backgroundColor: alpha('#f44336', 0.15), borderWidth: 2, tension: 0.4, fill: true, pointRadius: 0 },
-      ],
-    };
-  }, [data, t]);
+    const datasets = [];
+    if (!hideHealthy) {
+      datasets.push({ label: t('argus.sessions.healthy'), data: data.status_timeline.map(d => Number(d.healthy)), borderColor: '#4caf50', backgroundColor: alpha('#4caf50', 0.15), borderWidth: 2, tension: 0.4, fill: true, pointRadius: 0 });
+    }
+    datasets.push(
+      { label: t('argus.sessions.errored'), data: data.status_timeline.map(d => Number(d.errored)), borderColor: '#ff9800', backgroundColor: alpha('#ff9800', 0.25), borderWidth: 2, tension: 0.4, fill: true, pointRadius: 0 },
+      { label: t('argus.sessions.crashed'), data: data.status_timeline.map(d => Number(d.crashed)), borderColor: '#f44336', backgroundColor: alpha('#f44336', 0.25), borderWidth: 2, tension: 0.4, fill: true, pointRadius: 0 },
+    );
+    return { labels: data.status_timeline.map(d => formatHour(d.hour)), datasets };
+  }, [data, t, hideHealthy]);
 
   // Duration distribution bar chart
   const durationChartData = useMemo(() => {
@@ -170,7 +184,10 @@ const ArgusSessionHealthPage: React.FC = () => {
     responsive: true, maintainAspectRatio: false,
     animation: { duration: 300 },
     plugins: {
-      legend: { display: true, position: 'top' as const, labels: { boxWidth: 8, font: { size: 11 } } },
+      legend: {
+        display: true, position: 'top' as const,
+        labels: { boxWidth: 8, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' },
+      },
     },
     scales: {
       x: { grid: { display: false }, border: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 10 } } },
@@ -189,104 +206,177 @@ const ArgusSessionHealthPage: React.FC = () => {
     },
   }), [isDark]);
 
-  const statCards = [
-    { icon: <DevicesIcon />, color: '#7c4dff', label: t('argus.sessions.totalSessions'), value: s?.total_sessions, prev: pp?.total_sessions, invertChange: false },
-    { icon: <PeopleIcon />, color: '#2196f3', label: t('argus.sessions.uniqueUsers'), value: s?.unique_users, prev: pp?.unique_users, invertChange: false },
-    { icon: <CrashIcon />, color: '#f44336', label: t('argus.sessions.crashed'), value: s?.crashed, prev: pp?.crashed, invertChange: true },
-    { icon: <TimerIcon />, color: '#ff9800', label: t('argus.sessions.avgDuration'), value: s ? `${Math.round(Number(s.avg_duration) / 1000)}s` : undefined, prev: undefined, invertChange: false },
+  // Stat cards — session vs user mode
+  const statCards = useMemo(() => {
+    if (displayMode === 'users') {
+      return [
+        { icon: <PeopleIcon />, color: '#2196f3', label: t('argus.sessions.uniqueUsers'), value: s?.unique_users, prev: pp?.unique_users, invertChange: false },
+        { icon: <CrashIcon />, color: '#f44336', label: t('argus.sessions.crashedUsers'), value: s?.crashed, prev: pp?.crashed, invertChange: true },
+        { icon: <DevicesIcon />, color: '#7c4dff', label: t('argus.sessions.totalSessions'), value: s?.total_sessions, prev: pp?.total_sessions, invertChange: false },
+        { icon: <TimerIcon />, color: '#ff9800', label: t('argus.sessions.avgDuration'), value: s ? `${Math.round(Number(s.avg_duration) / 1000)}s` : undefined, prev: undefined, invertChange: false },
+      ];
+    }
+    return [
+      { icon: <DevicesIcon />, color: '#7c4dff', label: t('argus.sessions.totalSessions'), value: s?.total_sessions, prev: pp?.total_sessions, invertChange: false },
+      { icon: <PeopleIcon />, color: '#2196f3', label: t('argus.sessions.uniqueUsers'), value: s?.unique_users, prev: pp?.unique_users, invertChange: false },
+      { icon: <CrashIcon />, color: '#f44336', label: t('argus.sessions.crashed'), value: s?.crashed, prev: pp?.crashed, invertChange: true },
+      { icon: <TimerIcon />, color: '#ff9800', label: t('argus.sessions.avgDuration'), value: s ? `${Math.round(Number(s.avg_duration) / 1000)}s` : undefined, prev: undefined, invertChange: false },
+    ];
+  }, [displayMode, s, pp, t]);
+
+  const legendItems = [
+    { key: 'healthy', label: t('argus.sessions.healthy'), value: s?.healthy, color: '#4caf50', defKey: SESSION_STATUS_DEFS.healthy },
+    { key: 'crashed', label: t('argus.sessions.crashed'), value: s?.crashed, color: '#f44336', defKey: SESSION_STATUS_DEFS.crashed },
+    { key: 'errored', label: t('argus.sessions.errored'), value: s?.errored, color: '#ff9800', defKey: SESSION_STATUS_DEFS.errored },
+    { key: 'abnormal', label: t('argus.sessions.abnormal'), value: s?.abnormal, color: '#9e9e9e', defKey: SESSION_STATUS_DEFS.abnormal },
   ];
+
+  // Phase 2: Unhealthy sessions combined chart (errored + crashed + abnormal stacked)
+  const unhealthyChartData = useMemo(() => {
+    if (!data?.status_timeline) return { labels: [], datasets: [] };
+    return {
+      labels: data.status_timeline.map(d => formatHour(d.hour)),
+      datasets: [
+        { label: t('argus.sessions.errored'), data: data.status_timeline.map(d => Number(d.errored)), backgroundColor: alpha('#ff9800', 0.7), borderColor: '#ff9800', borderWidth: 0, borderRadius: 2, borderSkipped: false as const },
+        { label: t('argus.sessions.crashed'), data: data.status_timeline.map(d => Number(d.crashed)), backgroundColor: alpha('#f44336', 0.7), borderColor: '#f44336', borderWidth: 0, borderRadius: 2, borderSkipped: false as const },
+        { label: t('argus.sessions.abnormal'), data: data.status_timeline.map(d => Number(d.abnormal)), backgroundColor: alpha('#9e9e9e', 0.7), borderColor: '#9e9e9e', borderWidth: 0, borderRadius: 2, borderSkipped: false as const },
+      ],
+    };
+  }, [data, t]);
+
+  // Phase 2: Release adoption data (percentage of total sessions per release)
+  const adoptionData = useMemo(() => {
+    if (!data?.by_release?.length) return [];
+    const totalAll = data.by_release.reduce((sum, r) => sum + Number(r.total), 0);
+    if (totalAll === 0) return [];
+    return data.by_release.map(r => ({
+      release: r.release,
+      sessions: Number(r.total),
+      pct: (Number(r.total) / totalAll) * 100,
+    }));
+  }, [data]);
 
   return (
     <Box>
-      {/* Header */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <DevicesIcon sx={{ color: theme.palette.info.main }} />
-        <Typography variant="h5" fontWeight={700}>
-          {t('argus.sessions.title')}
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
-          — {t('argus.sessionHealth.subtitle')}
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={<DevicesIcon />}
+        title={t('argus.sessions.title')}
+        subtitle={t('argus.sessionHealth.subtitle')}
+        enableAutoBack
+      />
 
-      {/* Filter Bar */}
       <ArgusFilterBar
         projectId={projectId}
         value={filters}
         onChange={handleFilterChange}
         onRefresh={fetchData}
         loading={loading}
+        extraControls={
+          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+            <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
+            {(['sessions', 'users'] as DisplayMode[]).map(mode => (
+              <Chip
+                key={mode}
+                label={t(`argus.sessions.display${mode === 'sessions' ? 'Sessions' : 'Users'}`)}
+                size="small"
+                onClick={() => setDisplayMode(mode)}
+                variant={displayMode === mode ? 'filled' : 'outlined'}
+                sx={{
+                  fontSize: '0.72rem', fontWeight: displayMode === mode ? 700 : 500,
+                  borderRadius: '14px', height: 24,
+                  ...(displayMode === mode ? {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                    color: theme.palette.primary.main, borderColor: 'transparent',
+                  } : {
+                    borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                    color: 'text.secondary',
+                  }),
+                }}
+              />
+            ))}
+          </Box>
+        }
       />
 
       <PageContentLoader loading={loading}>
         {/* Top Row: Donut + Stats */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '280px 1fr' }, gap: 2, mb: 3 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '260px 1fr' }, gap: 2, mb: 2.5 }}>
           {/* Crash-free Donut */}
           <Paper elevation={0} sx={{
-            p: 3, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Box sx={{ position: 'relative', width: 160, height: 160 }}>
+            <Box sx={{ position: 'relative', width: 140, height: 140 }}>
               <Doughnut data={donutData} options={donutOpts} />
               <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none', zIndex: 0 }}>
-                <Typography variant="h4" fontWeight={800} sx={{ color: rateColor, lineHeight: 1 }}>
+                <Typography variant="h4" fontWeight={800} sx={{ color: rateColor, lineHeight: 1, fontSize: '1.8rem' }}>
                   {crashFreeRate.toFixed(1)}%
                 </Typography>
-                <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', fontSize: '0.65rem' }}>
+                <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', fontSize: '0.6rem' }}>
                   {t('argus.sessions.crashFree')}
                 </Typography>
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', gap: 1.5, mt: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
-              {[
-                { label: t('argus.sessions.healthy'), value: s?.healthy, color: '#4caf50' },
-                { label: t('argus.sessions.crashed'), value: s?.crashed, color: '#f44336' },
-                { label: t('argus.sessions.errored'), value: s?.errored, color: '#ff9800' },
-                { label: t('argus.sessions.abnormal'), value: s?.abnormal, color: '#9e9e9e' },
-              ].map((item, idx) => (
-                <Box key={`legend-${idx}`} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: item.color }} />
-                  <Typography variant="caption" sx={{ fontSize: '0.68rem' }}>
-                    {item.label} <strong>{Number(item.value || 0).toLocaleString()}</strong>
-                  </Typography>
-                </Box>
+            {/* Legend with status tooltips */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.4, mt: 1.5, width: '100%' }}>
+              {legendItems.map((item) => (
+                <Tooltip
+                  key={item.key}
+                  title={t(item.defKey)}
+                  placement="bottom"
+                  arrow
+                >
+                  <Box sx={{
+                    display: 'flex', alignItems: 'center', gap: 0.4, px: 0.5, py: 0.2,
+                    borderRadius: 1, cursor: 'help',
+                    '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+                  }}>
+                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: item.color, flexShrink: 0 }} />
+                    <Typography variant="caption" sx={{ fontSize: '0.64rem', color: 'text.secondary', lineHeight: 1.2 }}>
+                      {item.label}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontSize: '0.64rem', fontWeight: 700, ml: 'auto', lineHeight: 1.2 }}>
+                      {Number(item.value || 0).toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Tooltip>
               ))}
             </Box>
           </Paper>
 
           {/* Stat Cards Grid */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
             {statCards.map((card, idx) => {
               const change = typeof card.value === 'number' && typeof card.prev === 'number' ? calcChange(card.value, card.prev) : null;
               return (
                 <Paper key={idx} elevation={0} sx={{
-                  p: 2.5,
+                  p: 2,
                   background: isDark
                     ? `linear-gradient(135deg, ${alpha(card.color, 0.12)}, ${alpha(card.color, 0.03)})`
                     : `linear-gradient(135deg, ${alpha(card.color, 0.06)}, ${alpha(card.color, 0.01)})`,
-                  border: `1px solid ${alpha(card.color, 0.2)}`,
+                  border: `1px solid ${alpha(card.color, 0.15)}`,
                   borderRadius: 2,
                   display: 'flex', alignItems: 'center', gap: 1.5,
                   transition: 'all 0.2s',
-                  '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha(card.color, 0.1)}` },
+                  '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha(card.color, 0.08)}` },
                 }}>
                   <Box sx={{
-                    width: 40, height: 40, borderRadius: 2,
+                    width: 36, height: 36, borderRadius: 1.5,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1), color: card.color,
                   }}>
-                    {React.cloneElement(card.icon, { sx: { fontSize: 20 } })}
+                    {React.cloneElement(card.icon, { sx: { fontSize: 18 } })}
                   </Box>
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
-                      <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2 }}>
+                      <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, fontSize: '1.1rem' }}>
                         {typeof card.value === 'number' ? card.value.toLocaleString() : card.value ?? '-'}
                       </Typography>
                       {change != null && (
                         <ChangeIndicator value={change} invert={card.invertChange} />
                       )}
                     </Box>
-                    <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', fontWeight: 500 }}>
+                    <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', fontWeight: 500, fontSize: '0.68rem' }}>
                       {card.label}
                     </Typography>
                   </Box>
@@ -297,26 +387,48 @@ const ArgusSessionHealthPage: React.FC = () => {
         </Box>
 
         {/* Session Status Timeline (Stacked Area) */}
-        <Paper elevation={0} sx={{ p: 2.5, mb: 3, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
-          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Box sx={{ width: 3, height: 16, borderRadius: 1, backgroundColor: '#4caf50', mr: 0.5 }} />
-            {t('argus.sessions.crashFreeTrend')}
-          </Typography>
-          <Box sx={{ height: 240 }}>
-            {loading ? <ArgusChartSkeleton type="line" height={240} color="#4caf50" /> : <Line data={statusTimelineData} options={chartOpts} plugins={[getCrosshairPlugin(isDark)]} />}
+        <Paper elevation={0} sx={{ p: 2.5, mb: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ width: 3, height: 16, borderRadius: 1, backgroundColor: '#4caf50', mr: 0.5 }} />
+              {t('argus.sessions.crashFreeTrend')}
+            </Typography>
+            <Tooltip title={hideHealthy ? t('argus.sessions.showHealthy') : t('argus.sessions.hideHealthy')} arrow>
+              <Chip
+                icon={hideHealthy ? <ShowIcon sx={{ fontSize: '14px !important' }} /> : <HideIcon sx={{ fontSize: '14px !important' }} />}
+                label={hideHealthy ? t('argus.sessions.showHealthy') : t('argus.sessions.hideHealthy')}
+                size="small"
+                onClick={() => setHideHealthy(!hideHealthy)}
+                variant={hideHealthy ? 'filled' : 'outlined'}
+                sx={{
+                  fontSize: '0.68rem', height: 24, fontWeight: 600,
+                  ...(hideHealthy ? {
+                    backgroundColor: alpha('#ff9800', 0.15),
+                    color: '#ff9800', borderColor: 'transparent',
+                    '& .MuiChip-icon': { color: '#ff9800' },
+                  } : {
+                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    color: 'text.secondary',
+                  }),
+                }}
+              />
+            </Tooltip>
+          </Box>
+          <Box sx={{ height: 220 }}>
+            {loading ? <ArgusChartSkeleton type="line" height={220} color="#4caf50" /> : <Line data={statusTimelineData} options={chartOpts} plugins={[getCrosshairPlugin(isDark)]} />}
           </Box>
         </Paper>
 
         {/* Duration Distribution + Crash by Browser/OS */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 2.5 }}>
           {/* Duration Distribution */}
           <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <TimerIcon fontSize="small" sx={{ color: '#7c4dff' }} />
               {t('argus.sessions.durationDistribution')}
             </Typography>
-            <Box sx={{ height: 180 }}>
-              {loading ? <ArgusChartSkeleton type="bar" height={180} color="#7c4dff" /> : <Bar data={durationChartData} options={barOpts} />}
+            <Box sx={{ height: 170 }}>
+              {loading ? <ArgusChartSkeleton type="bar" height={170} color="#7c4dff" /> : <Bar data={durationChartData} options={barOpts} />}
             </Box>
           </Paper>
 
@@ -364,11 +476,28 @@ const ArgusSessionHealthPage: React.FC = () => {
         </Box>
 
         {/* Top Crash Issues */}
-        <Paper elevation={0} sx={{ mb: 3, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, overflow: 'hidden' }}>
-          <Box sx={{ px: 2.5, py: 1.5, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
-            <Typography variant="subtitle2" fontWeight={600}>
-              {t('argus.sessions.topCrashIssues', 'Top Crash Issues')}
-            </Typography>
+        <Paper elevation={0} sx={{ mb: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, overflow: 'hidden' }}>
+          <Box sx={{ px: 2.5, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600}>
+                {t('argus.sessions.topCrashIssues')}
+              </Typography>
+              <Tooltip title={t('argus.sessions.topCrashIssuesDesc')} arrow>
+                <InfoIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+              </Tooltip>
+            </Box>
+            <Chip
+              label={t('argus.overview.viewAll')}
+              size="small"
+              onClick={() => navigate('/argus/issues?level=error&sort=event_count')}
+              sx={{
+                fontSize: '0.66rem', height: 22, fontWeight: 600,
+                backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                color: theme.palette.primary.main,
+                cursor: 'pointer',
+                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.15) },
+              }}
+            />
           </Box>
           {!topIssues.length ? (
             <Box sx={{ py: 4, textAlign: 'center' }}>
@@ -382,41 +511,249 @@ const ArgusSessionHealthPage: React.FC = () => {
                   key={issue.id}
                   onClick={() => navigate(`/argus/issues/${projectId}/${issue.id}`)}
                   sx={{
-                    display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.5,
+                    display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.2,
                     borderBottom: idx < topIssues.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
-                    cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'pointer', transition: 'all 0.15s',
                     position: 'relative',
-                    '&:hover': { 
+                    '&:hover': {
                       backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
                       transform: 'translateX(4px)',
                       '&::before': { content: '""', position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, backgroundColor: levelColor, borderTopRightRadius: 3, borderBottomRightRadius: 3 }
                     },
                   }}
                 >
-                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: levelColor, flexShrink: 0, opacity: 0.8 }} />
+                  <Chip
+                    label={issue.level}
+                    size="small"
+                    sx={{
+                      height: 18, fontSize: '0.58rem', fontWeight: 700, minWidth: 40,
+                      backgroundColor: alpha(levelColor, 0.1), color: levelColor, border: 'none',
+                    }}
+                  />
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={600} noWrap sx={{ mb: 0.3 }}>
+                    <Typography variant="body2" fontWeight={600} noWrap sx={{ mb: 0.1 }}>
                       {issue.title}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', display: 'block' }} noWrap>
+                    <Typography variant="caption" sx={{ color: isDark ? '#666' : '#aaa', display: 'block', fontSize: '0.68rem' }} noWrap>
                       {issue.culprit || issue.fingerprint?.slice(0, 16)}
                     </Typography>
                   </Box>
-                  <Box sx={{ textAlign: 'right', minWidth: 70 }}>
-                    <Typography variant="body2" fontWeight={700}>
+                  {/* 24h Sparkline */}
+                  {issue.stats_24h && issue.stats_24h.length > 0 && (() => {
+                    const sparkData = issue.stats_24h!;
+                    const max = Math.max(...sparkData, 1);
+                    const w = 40, h = 16;
+                    const points = sparkData.map((v, i) =>
+                      `${(i / (sparkData.length - 1)) * w},${h - (v / max) * h}`
+                    ).join(' ');
+                    return (
+                      <svg width={w} height={h} style={{ flexShrink: 0 }}>
+                        <polyline points={points} fill="none" stroke={levelColor} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" opacity={0.7} />
+                      </svg>
+                    );
+                  })()}
+                  <Box sx={{ textAlign: 'center', minWidth: 44 }}>
+                    <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1.2, fontSize: '0.82rem' }}>
                       {Number(issue.event_count || 0).toLocaleString()}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999' }}>
+                    <Typography variant="caption" sx={{ fontSize: '0.58rem', color: isDark ? '#666' : '#aaa' }}>
                       {t('argus.issues.events')}
                     </Typography>
                   </Box>
+                  <Box sx={{ textAlign: 'center', minWidth: 36 }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ lineHeight: 1.2, fontSize: '0.82rem' }}>
+                      {Number(issue.user_count || 0).toLocaleString()}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontSize: '0.58rem', color: isDark ? '#666' : '#aaa' }}>
+                      {t('argus.issues.users')}
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" sx={{ fontSize: '0.68rem', color: isDark ? '#555' : '#bbb', minWidth: 30, textAlign: 'right' }}>
+                    {issue.last_seen ? formatRelativeTime(issue.last_seen) : '-'}
+                  </Typography>
                 </Box>
               );
             })
           )}
         </Paper>
 
-        {/* By Release */}
+        {/* ═══ Phase 2: Unhealthy Sessions Combined View ═══ */}
+        <Paper elevation={0} sx={{ p: 2.5, mb: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ width: 3, height: 16, borderRadius: 1, backgroundColor: '#f44336', mr: 0.5 }} />
+              {t('argus.sessions.unhealthyTimeline')}
+            </Typography>
+            <Tooltip title={t('argus.sessions.unhealthyTimelineDesc')} arrow>
+              <InfoIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+            </Tooltip>
+          </Box>
+          <Box sx={{ height: 200 }}>
+            {loading ? <ArgusChartSkeleton type="bar" height={200} color="#f44336" /> : (
+              <Bar
+                data={unhealthyChartData}
+                options={{
+                  responsive: true, maintainAspectRatio: false,
+                  animation: { duration: 300 },
+                  plugins: {
+                    legend: { display: true, position: 'top' as const, labels: { boxWidth: 8, font: { size: 10 }, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: {
+                      callbacks: {
+                        footer: (items: any[]) => {
+                          const total = items.reduce((sum: number, i: any) => sum + (i.raw as number), 0);
+                          return `${t('common.total')}: ${total.toLocaleString()}`;
+                        },
+                      },
+                    },
+                  },
+                  scales: {
+                    x: { stacked: true, grid: { display: false }, border: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12, font: { size: 10 } } },
+                    y: { stacked: true, beginAtZero: true, border: { display: false }, grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 } } },
+                  },
+                  interaction: { mode: 'index' as const, intersect: false },
+                }}
+                plugins={[getCrosshairPlugin(isDark)]}
+              />
+            )}
+          </Box>
+        </Paper>
+
+        {/* ═══ Phase 2: Release Adoption + Comparison (side by side) ═══ */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 2.5 }}>
+          {/* Release Adoption (Horizontal stacked bar) */}
+          <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ width: 3, height: 16, borderRadius: 1, background: 'linear-gradient(180deg, #7c4dff, #448aff)', mr: 0.5 }} />
+              {t('argus.sessions.adoptionChart')}
+            </Typography>
+            {!data?.by_release?.length ? (
+              <Box sx={{ py: 4, textAlign: 'center' }}><Typography variant="body2" color="text.secondary">{t('argus.sessions.noData')}</Typography></Box>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {/* Stacked bar */}
+                <Box sx={{ display: 'flex', height: 28, borderRadius: 2, overflow: 'hidden', border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                  {adoptionData.map((item, idx) => (
+                    <Tooltip key={idx} title={`${item.release}: ${item.sessions.toLocaleString()} ${t('argus.sessions.sessions')} (${item.pct.toFixed(1)}%)`} arrow>
+                      <Box sx={{
+                        width: `${item.pct}%`, minWidth: item.pct > 2 ? 16 : 4,
+                        backgroundColor: RELEASE_COLORS[idx % RELEASE_COLORS.length],
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.3s', cursor: 'pointer',
+                        '&:hover': { filter: 'brightness(1.2)', transform: 'scaleY(1.1)' },
+                      }}
+                        onClick={() => navigate(`/argus/releases/${projectId}/${encodeURIComponent(item.release)}`)}
+                      >
+                        {item.pct > 8 && (
+                          <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                            {item.pct.toFixed(0)}%
+                          </Typography>
+                        )}
+                      </Box>
+                    </Tooltip>
+                  ))}
+                </Box>
+                {/* Legend */}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {adoptionData.map((item, idx) => (
+                    <Box
+                      key={idx}
+                      onClick={() => navigate(`/argus/releases/${projectId}/${encodeURIComponent(item.release)}`)}
+                      sx={{
+                        display: 'flex', alignItems: 'center', gap: 0.4, px: 0.8, py: 0.3,
+                        borderRadius: 1, cursor: 'pointer',
+                        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+                      }}
+                    >
+                      <Box sx={{ width: 8, height: 8, borderRadius: '2px', backgroundColor: RELEASE_COLORS[idx % RELEASE_COLORS.length], flexShrink: 0 }} />
+                      <Typography variant="caption" sx={{ fontSize: '0.64rem', fontWeight: 500 }} noWrap>{item.release}</Typography>
+                      <Typography variant="caption" sx={{ fontSize: '0.62rem', color: 'text.disabled', ml: 0.2 }}>{item.pct.toFixed(1)}%</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
+          </Paper>
+
+          {/* Release Comparison (Grouped bar chart) */}
+          <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ width: 3, height: 16, borderRadius: 1, background: 'linear-gradient(180deg, #4caf50, #ff9800)', mr: 0.5 }} />
+              {t('argus.sessions.releaseComparison')}
+            </Typography>
+            {!data?.by_release?.length ? (
+              <Box sx={{ py: 4, textAlign: 'center' }}><Typography variant="body2" color="text.secondary">{t('argus.sessions.noData')}</Typography></Box>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {/* Comparison table */}
+                <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: `100px repeat(${Math.min(data.by_release.length, 5)}, 1fr)`,
+                  gap: 0, fontSize: '0.68rem',
+                }}>
+                  {/* Header */}
+                  <Box sx={{ py: 0.5, px: 0.8 }} />
+                  {data.by_release.slice(0, 5).map((r, idx) => (
+                    <Box key={idx} sx={{ py: 0.5, px: 0.5, textAlign: 'center' }}>
+                      <Chip
+                        label={r.release}
+                        size="small"
+                        onClick={() => navigate(`/argus/releases/${projectId}/${encodeURIComponent(r.release)}`)}
+                        sx={{
+                          fontSize: '0.58rem', height: 18, fontWeight: 600, cursor: 'pointer', maxWidth: '100%',
+                          backgroundColor: alpha(RELEASE_COLORS[idx % RELEASE_COLORS.length], 0.15),
+                          color: RELEASE_COLORS[idx % RELEASE_COLORS.length], border: 'none',
+                        }}
+                      />
+                    </Box>
+                  ))}
+                  {/* Crash-free rate row */}
+                  {[
+                    { label: t('argus.sessions.crashFree'), key: 'crash_free_rate', format: (v: number) => `${Number(v).toFixed(1)}%`, colorFn: (v: number) => Number(v) >= 99 ? '#4caf50' : Number(v) >= 95 ? '#ff9800' : '#f44336' },
+                    { label: t('argus.sessions.sessions'), key: 'total', format: (v: number) => Number(v).toLocaleString(), colorFn: () => 'text.primary' },
+                    { label: t('argus.sessions.users'), key: 'users', format: (v: number) => Number(v).toLocaleString(), colorFn: () => 'text.primary' },
+                    { label: t('argus.sessions.crashed'), key: 'crashed', format: (v: number) => Number(v).toLocaleString(), colorFn: (v: number) => Number(v) > 0 ? '#f44336' : '#4caf50' },
+                  ].map(row => (
+                    <React.Fragment key={row.key}>
+                      <Box sx={{
+                        py: 0.8, px: 0.8,
+                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                        display: 'flex', alignItems: 'center',
+                      }}>
+                        <Typography variant="caption" sx={{ fontSize: '0.66rem', color: 'text.secondary', fontWeight: 500 }}>{row.label}</Typography>
+                      </Box>
+                      {data.by_release.slice(0, 5).map((r, idx) => {
+                        const val = (r as any)[row.key];
+                        const maxVal = Math.max(...data.by_release.slice(0, 5).map(x => Number((x as any)[row.key])));
+                        const barPct = row.key === 'crash_free_rate' ? Number(val) : maxVal > 0 ? (Number(val) / maxVal) * 100 : 0;
+                        return (
+                          <Box key={idx} sx={{
+                            py: 0.8, px: 0.5, textAlign: 'center',
+                            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                            position: 'relative',
+                          }}>
+                            <Box sx={{
+                              position: 'absolute', bottom: 0, left: 2, right: 2, height: `${Math.min(barPct, 100) * 0.6}%`,
+                              backgroundColor: alpha(RELEASE_COLORS[idx % RELEASE_COLORS.length], 0.06),
+                              borderRadius: '4px 4px 0 0', transition: 'height 0.3s',
+                            }} />
+                            <Typography variant="caption" sx={{
+                              fontSize: '0.7rem', fontWeight: 700, position: 'relative',
+                              color: row.colorFn(val),
+                            }}>
+                              {row.format(val)}
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </React.Fragment>
+                  ))}
+                </Box>
+              </Box>
+            )}
+          </Paper>
+        </Box>
+
+        {/* By Release (existing) */}
         <Paper elevation={0} sx={{ border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, overflow: 'hidden' }}>
           <Box sx={{ px: 2.5, py: 1.5, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
             <Typography variant="subtitle2" fontWeight={600}>
@@ -432,32 +769,32 @@ const ArgusSessionHealthPage: React.FC = () => {
               const rate = Number(r.crash_free_rate);
               const barColor = rate >= 99 ? '#4caf50' : rate >= 95 ? '#ff9800' : '#f44336';
               return (
-                <Tooltip key={`${r.release}-${idx}`} title={t('argus.sessions.viewReleaseDetails', 'View release details')} placement="left">
+                <Tooltip key={`${r.release}-${idx}`} title={t('argus.sessions.viewReleaseDetails')} placement="left">
                   <Box sx={{
-                    display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.2,
+                    display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1,
                     borderBottom: idx < data.by_release.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
-                    cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': { 
+                    cursor: 'pointer', transition: 'all 0.15s',
+                    '&:hover': {
                       backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
                       transform: 'translateX(4px)',
                       boxShadow: isDark ? '-2px 0 0 0 #7c4dff' : '-2px 0 0 0 #7c4dff',
                     },
                   }} onClick={() => navigate(`/argus/releases/${projectId}/${encodeURIComponent(r.release)}`)}>
                     <Chip label={r.release} size="small" sx={{
-                      fontWeight: 600, fontSize: '0.72rem', minWidth: 110,
+                      fontWeight: 600, fontSize: '0.7rem', minWidth: 100,
                       backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
                       cursor: 'pointer',
                     }} />
                     <Box sx={{ flex: 1 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
-                        <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999' }}>
+                        <Typography variant="caption" sx={{ color: isDark ? '#777' : '#999', fontSize: '0.68rem' }}>
                           {Number(r.total).toLocaleString()} {t('argus.sessions.sessions')} · {Number(r.users).toLocaleString()} {t('argus.sessions.users')}
                         </Typography>
-                        <Typography variant="caption" fontWeight={700} sx={{ color: barColor }}>
+                        <Typography variant="caption" fontWeight={700} sx={{ color: barColor, fontSize: '0.72rem' }}>
                           {rate.toFixed(1)}%
                         </Typography>
                       </Box>
-                      <Box sx={{ height: 6, borderRadius: 3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+                      <Box sx={{ height: 5, borderRadius: 3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
                         <Box sx={{
                           height: '100%', borderRadius: 3, width: `${rate}%`,
                           background: `linear-gradient(90deg, ${barColor}, ${alpha(barColor, 0.6)})`,
@@ -466,7 +803,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                       </Box>
                     </Box>
                     <Chip label={`${Number(r.crashed)} ${t('argus.sessions.crashes')}`} size="small" sx={{
-                      height: 20, fontSize: '0.65rem', cursor: 'pointer',
+                      height: 20, fontSize: '0.62rem', cursor: 'pointer',
                       backgroundColor: Number(r.crashed) > 0 ? alpha('#f44336', 0.1) : alpha('#4caf50', 0.1),
                       color: Number(r.crashed) > 0 ? '#f44336' : '#4caf50',
                       border: 'none',
@@ -504,13 +841,13 @@ const CrashDistribution: React.FC<{ data: { label: string; total: number; crashe
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.7 }}>
       {data.slice(0, 5).map((item, idx) => (
-        <Tooltip key={`${item.label}-${idx}`} title={t('argus.sessions.viewRelatedIssues', 'View related issues')} placement="right">
+        <Tooltip key={`${item.label}-${idx}`} title={t('argus.sessions.viewRelatedIssues')} placement="right">
           <Box
             onClick={() => onClick?.(item.label)}
             sx={{
-              p: 0.8, px: 1, borderRadius: 1.5, cursor: onClick ? 'pointer' : 'default', 
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': onClick ? { 
+              p: 0.8, px: 1, borderRadius: 1.5, cursor: onClick ? 'pointer' : 'default',
+              transition: 'all 0.15s',
+              '&:hover': onClick ? {
                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
                 transform: 'scale(1.02) translateX(2px)',
               } : {},
@@ -542,6 +879,18 @@ function formatHour(h: string): string {
     const d = new Date(h);
     return `${String(d.getHours()).padStart(2, '0')}:00`;
   } catch { return h; }
+}
+
+function formatRelativeTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(mins / 60);
+  const days = Math.floor(hours / 24);
+  if (mins < 60) return `${mins}m`;
+  if (hours < 24) return `${hours}h`;
+  return `${days}d`;
 }
 
 export default ArgusSessionHealthPage;

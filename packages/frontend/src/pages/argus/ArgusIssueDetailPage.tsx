@@ -44,7 +44,6 @@ import {
   Language as LanguageIcon,
   Person as PersonIcon,
   Sell as TagIcon,
-  ContentCopy as CopyIcon,
   Article as LogIcon,
   Search as SearchIcon,
   Fullscreen as FullscreenIcon,
@@ -56,11 +55,16 @@ import {
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import argusService, { ArgusIssueDetail, ArgusTraceDetail, ArgusLogEntry, ArgusErrorEvent } from '@/services/argusService';
+import argusService, { ArgusIssueDetail, ArgusErrorEvent, ArgusTraceDetail, ArgusLogEntry } from '@/services/argusService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { rbacService } from '@/services/rbacService';
+import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import BreadcrumbsTimeline from '@/components/argus/BreadcrumbsTimeline';
 import EventNavigator from '@/components/argus/EventNavigator';
+import EventDistributionChart from '@/components/argus/EventDistributionChart';
 import ActivityTimeline from '@/components/argus/ActivityTimeline';
 import TagDistribution from '@/components/argus/TagDistribution';
 import AiRootCausePanel from '@/components/argus/AiRootCausePanel';
@@ -129,7 +133,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [logGotoTime, setLogGotoTime] = useState('');
   const [wrapLines, setWrapLines] = useState(false);
   const [showLogGoto, setShowLogGoto] = useState(false);
-  const [copySnackbar, setCopySnackbar] = useState(false);
+
   const logContainerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -222,33 +226,27 @@ const ArgusIssueDetailPage: React.FC = () => {
       ) : (
         <Box>
           {/* Header */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2 }}>
-            <IconButton onClick={() => navigate(-1)} size="small" sx={{ mt: 0.3 }}>
-              <ArrowBackIcon />
-            </IconButton>
-            <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                <Box sx={{ width: 4, height: 24, borderRadius: 1, backgroundColor: levelColor }} />
-                <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.3 }}>
+          <PageHeader
+            icon={<Box sx={{ width: 4, height: 18, borderRadius: 1, backgroundColor: levelColor, ml: 1 }} />}
+            title={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle1" fontWeight={700} sx={{ lineHeight: 1.3 }}>
                   {issue.title}
                 </Typography>
                 <Chip
                   label={issue.level}
                   size="small"
                   sx={{
-                    fontWeight: 700, fontSize: '0.68rem', height: 20,
+                    fontWeight: 700, fontSize: '0.65rem', height: 18,
                     backgroundColor: alpha(levelColor, 0.12),
                     color: levelColor, border: 'none',
                   }}
                 />
               </Box>
-              {issue.culprit && (
-                <Typography variant="body2" sx={{ color: isDark ? '#777' : '#999', ml: 2, fontSize: '0.85rem' }}>
-                  {issue.culprit}
-                </Typography>
-              )}
-            </Box>
-          </Box>
+            }
+            subtitle={issue.culprit}
+            enableAutoBack
+          />
 
           {/* Action Bar */}
           <Paper
@@ -361,55 +359,54 @@ const ArgusIssueDetailPage: React.FC = () => {
               )}
               <Divider orientation="vertical" flexItem sx={{ mx: 0.3 }} />
               {issue.fingerprint && (
-                <Tooltip title={t('argus.issues.copyFingerprint')}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Chip
-                    icon={<CopyIcon sx={{ fontSize: '12px !important' }} />}
                     label={`FP: ${issue.fingerprint.slice(0, 8)}`}
                     size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(issue.fingerprint);
-                    }}
                     sx={{
-                      cursor: 'pointer', height: 22, fontSize: '0.68rem',
+                      cursor: 'default', height: 22, fontSize: '0.68rem',
                       fontFamily: 'monospace',
                       backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                      '& .MuiChip-icon': { color: isDark ? '#555' : '#bbb' },
                       border: 'none',
                     }}
                   />
-                </Tooltip>
+                  <CopyButton text={issue.fingerprint} size={12} />
+                </Box>
               )}
               {latestEvent?.event_id && (
-                <Tooltip title={t('argus.issues.copyEventId')}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Chip
-                    icon={<CopyIcon sx={{ fontSize: '12px !important' }} />}
                     label={`ID: ${latestEvent.event_id.slice(0, 8)}`}
                     size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(latestEvent.event_id);
-                    }}
                     sx={{
-                      cursor: 'pointer', height: 22, fontSize: '0.68rem',
+                      cursor: 'default', height: 22, fontSize: '0.68rem',
                       fontFamily: 'monospace',
                       backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                      '& .MuiChip-icon': { color: isDark ? '#555' : '#bbb' },
                       border: 'none',
                     }}
                   />
-                </Tooltip>
+                  <CopyButton text={latestEvent.event_id} size={12} />
+                </Box>
               )}
             </Box>
           </Paper>
 
           {/* Summary Stats */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 2, mb: 3 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 1.5, mb: 2.5 }}>
             <StatMini label={t('argus.issues.events')} value={issue.event_count?.toLocaleString() || '0'} color={levelColor} />
             <StatMini label={t('argus.issues.users')} value={issue.user_count?.toLocaleString() || '0'} color="#ff9800" />
             <StatMini label={t('argus.issues.firstSeen')} value={issue.first_seen ? formatRelative(issue.first_seen, t) : '-'} color="#7c4dff" />
             <StatMini label={t('argus.issues.lastSeen')} value={issue.last_seen ? formatRelative(issue.last_seen, t) : '-'} color="#2196f3" />
           </Box>
+
+          {/* Event Distribution Chart */}
+          {projectId && issueId && (
+            <EventDistributionChart
+              projectId={projectId}
+              issueId={issueId}
+              isDark={isDark}
+            />
+          )}
 
           {/* Business Impact + AI Root Cause */}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
@@ -612,26 +609,55 @@ const ArgusIssueDetailPage: React.FC = () => {
               {/* Extra Data */}
               {latestEvent.extra && (() => {
                 const extraData = typeof latestEvent.extra === 'string' ? (() => { try { return JSON.parse(latestEvent.extra); } catch { return null; } })() : latestEvent.extra;
-                return extraData && Object.keys(extraData).length > 0 ? (
+                if (!extraData || Object.keys(extraData).length === 0) return null;
+                const jsonString = JSON.stringify(extraData, null, 2);
+                
+                return (
                   <Paper elevation={0} sx={{
                     p: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                     borderRadius: 2,
                   }}>
-                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <InfoIcon fontSize="small" sx={{ color: theme.palette.secondary.main }} />
-                      {t('argus.issues.extraData', 'Additional Data')}
-                    </Typography>
-                    <Box sx={{
-                      fontFamily: 'monospace', fontSize: '0.78rem',
-                      backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
-                      borderRadius: 1, p: 1.5, maxHeight: 300, overflowY: 'auto',
-                      whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-                      color: isDark ? '#ccc' : '#333',
+                    <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Typography variant="subtitle2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <InfoIcon fontSize="small" sx={{ color: theme.palette.secondary.main }} />
+                        {t('argus.issues.extraData', 'Additional Data')}
+                      </Typography>
+                      <CopyButton text={jsonString} />
+                    </Box>
+                    <Box component="pre" sx={{
+                      margin: 0,
+                      fontFamily: 'monospace',
+                      fontSize: '0.8rem',
+                      lineHeight: 1.5,
+                      backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.02)',
+                      borderRadius: 1.5,
+                      p: 2,
+                      maxHeight: 350,
+                      overflowY: 'auto',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-all',
+                      color: isDark ? '#e2e8f0' : '#334155',
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'}`,
+                      '&::-webkit-scrollbar': { width: '6px', height: '6px' },
+                      '&::-webkit-scrollbar-thumb': { backgroundColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', borderRadius: '3px' },
                     }}>
-                      {JSON.stringify(extraData, null, 2)}
+                      {(() => {
+                        const colors = isDark 
+                          ? { key: '#9cdcfe', str: '#ce9178', num: '#b5cea8', bool: '#569cd6', null: '#569cd6' }
+                          : { key: '#a31515', str: '#0451a5', num: '#098658', bool: '#0000ff', null: '#0000ff' };
+                        const html = jsonString.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+                          let color = colors.num;
+                          if (/^"/.test(match)) {
+                            color = /:$/.test(match) ? colors.key : colors.str;
+                          } else if (/true|false/.test(match)) color = colors.bool;
+                          else if (/null/.test(match)) color = colors.null;
+                          return `<span style="color: ${color}">${match}</span>`;
+                        });
+                        return <code dangerouslySetInnerHTML={{ __html: html }} />;
+                      })()}
                     </Box>
                   </Paper>
-                ) : null;
+                );
               })()}
 
               {/* Contexts */}
@@ -1032,25 +1058,9 @@ const ArgusIssueDetailPage: React.FC = () => {
                               }}>
                                 {highlightText(log.message)}
                               </Typography>
-                              <Tooltip title={t('argus.logs.copyMessage', 'Copy Message')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigator.clipboard.writeText(log.message);
-                                    setCopySnackbar(true);
-                                  }}
-                                  sx={{
-                                    position: 'absolute',
-                                    right: 8,
-                                    top: 8,
-                                    opacity: 0.4,
-                                    '&:hover': { opacity: 1 }
-                                  }}
-                                >
-                                  <CopyIcon sx={{ fontSize: 14 }} />
-                                </IconButton>
-                              </Tooltip>
+                              <CopyButton text={log.message} size={14}
+                                sx={{ position: 'absolute', right: 8, top: 8, opacity: 0.4, '&:hover': { opacity: 1 } }}
+                              />
                             </Box>
 
                             {/* Metadata Fields Grid */}
@@ -1063,19 +1073,9 @@ const ArgusIssueDetailPage: React.FC = () => {
                                   <Typography sx={{ fontSize: '0.68rem', color: isDark ? '#c9d1d9' : '#24292f', fontFamily: 'inherit', py: 0.2, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                                     {highlightText(field.value)}
                                   </Typography>
-                                  <Tooltip title={t('argus.logs.copyValue')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigator.clipboard.writeText(field.value);
-                                        setCopySnackbar(true);
-                                      }}
-                                      sx={{ p: 0.2, opacity: 0.4, '&:hover': { opacity: 1 } }}
-                                    >
-                                      <CopyIcon sx={{ fontSize: 12 }} />
-                                    </IconButton>
-                                  </Tooltip>
+                                  <CopyButton text={field.value} size={12}
+                                    sx={{ p: 0.2, opacity: 0.4, '&:hover': { opacity: 1 } }}
+                                  />
                                 </React.Fragment>
                               ))}
                             </Box>
@@ -1130,10 +1130,7 @@ const ArgusIssueDetailPage: React.FC = () => {
         )}
         </Paper>
       )}
-      {/* Copy snackbar */}
-      <Snackbar open={copySnackbar} autoHideDuration={1500} onClose={() => setCopySnackbar(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="success" sx={{ py: 0, fontSize: '0.75rem' }} onClose={() => setCopySnackbar(false)}>{t('argus.common.copiedToClipboard')}</Alert>
-      </Snackbar>
+
 
       <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, status: '' })} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 700 }}>
@@ -1310,13 +1307,14 @@ const StatMini: React.FC<{ label: string; value: string; color: string }> = ({ l
   const isDark = useTheme().palette.mode === 'dark';
   return (
     <Paper elevation={0} sx={{
-      p: 2, textAlign: 'center',
+      py: 1, px: 1.5, textAlign: 'center',
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      borderRadius: 2,
+      borderRadius: 1.5,
       borderTop: `3px solid ${alpha(color, 0.6)}`,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
     }}>
-      <Typography variant="h6" fontWeight={700}>{value}</Typography>
-      <Typography variant="caption" color="text.secondary">{label}</Typography>
+      <Typography sx={{ fontSize: '1.05rem', fontWeight: 700, lineHeight: 1.2 }}>{value}</Typography>
+      <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', mt: 0.3 }}>{label}</Typography>
     </Paper>
   );
 };

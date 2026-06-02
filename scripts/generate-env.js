@@ -236,7 +236,7 @@ function generateEnv(cfg, opts) {
   section('Admin Configuration');
   const admin = svc.backend?.admin || {};
   env('ADMIN_EMAIL', admin.email || 'admin@gatrix.com');
-  env('ADMIN_PASSWORD', admin.password || 'admin123');
+  env('ADMIN_PASSWORD', admin.password || '');
   env('ADMIN_NAME', admin.name || 'Administrator');
 
   // -- Logging

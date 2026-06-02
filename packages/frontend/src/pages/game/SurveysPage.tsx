@@ -36,9 +36,10 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
-  ContentCopy as ContentCopyIcon,
+
   History as HistoryIcon,
 } from '@mui/icons-material';
+import { CopyButton } from '@/components/common/CopyButton';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
@@ -695,23 +696,7 @@ const SurveysPage: React.FC = () => {
                                   >
                                     {survey.platformSurveyId}
                                   </Typography>
-                                  <Tooltip title={t('common.copy')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigator.clipboard.writeText(
-                                          survey.platformSurveyId
-                                        );
-                                        enqueueSnackbar(t('common.copied'), {
-                                          variant: 'success',
-                                          autoHideDuration: 1500,
-                                        });
-                                      }}
-                                    >
-                                      <ContentCopyIcon sx={{ fontSize: 13 }} />
-                                    </IconButton>
-                                  </Tooltip>
+                                  <CopyButton text={survey.platformSurveyId} size={13} />
                                 </Box>
                               </TableCell>
                             );

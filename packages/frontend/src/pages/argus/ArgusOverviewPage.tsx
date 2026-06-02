@@ -24,10 +24,11 @@ import {
   DevicesOther as DevicesIcon,
   Cloud as EnvIcon,
   NewReleases as ReleaseIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { getCrosshairPlugin, getDragSelectPlugin } from '../../utils/chartPlugins';
 import { formatCompactNumber } from '../../utils/numberFormat';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Chart as ChartJS,
@@ -49,6 +50,7 @@ import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePick
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -62,6 +64,7 @@ const DAY_KEYS = ['common.day.mon', 'common.day.tue', 'common.day.wed', 'common.
 const ArgusOverviewPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
@@ -266,7 +269,7 @@ const ArgusOverviewPage: React.FC = () => {
         : `linear-gradient(135deg, ${alpha('#ef5350', 0.08)}, ${alpha('#e53935', 0.02)})`,
       borderColor: alpha('#ef5350', 0.3),
       color: '#ef5350',
-      label: t('argus.overview.unhandledRate', 'Unhandled Rate'),
+      label: t('argus.overview.unhandledRate'),
       value: data ? `${Number(data.unhandled_rate || 0).toFixed(1)}%` : undefined,
       change: null,
       sparkData: [],
@@ -280,15 +283,12 @@ const ArgusOverviewPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <BugReportIcon sx={{ color: theme.palette.error.main }} />
-        <Typography variant="h5" fontWeight={700}>
-          {t('argus.overview.title')}
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
-          — {t('argus.overview.subtitle')}
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={<BugReportIcon />}
+        title={t('argus.overview.title')}
+        subtitle={t('argus.overview.subtitle')}
+        enableAutoBack
+      />
 
       {/* Filter Bar */}
       <ArgusFilterBar
@@ -406,12 +406,15 @@ const ArgusOverviewPage: React.FC = () => {
 
       {/* NEW: Error Heatmap */}
       <Paper elevation={0} sx={{ p: 2.5, mb: 3, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
-        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <HeatmapIcon fontSize="small" sx={{ color: theme.palette.error.main }} />
-          {t('argus.overview.errorHeatmap', 'Error Heatmap')}
+          {t('argus.overview.errorHeatmap')}
           <Typography variant="caption" sx={{ ml: 1, color: isDark ? '#666' : '#aaa' }}>
-            {t('argus.overview.last7Days', 'Last 7 days')}
+            {t('argus.overview.last7Days')}
           </Typography>
+        </Typography>
+        <Typography variant="caption" sx={{ display: 'block', mb: 1.5, color: isDark ? '#555' : '#bbb', fontSize: '0.68rem' }}>
+          {t('argus.overview.heatmapDesc')}
         </Typography>
         {loading ? (
           <Skeleton variant="rounded" height={180} />
@@ -438,7 +441,7 @@ const ArgusOverviewPage: React.FC = () => {
                     const count = Number(cell?.count || 0);
                     const intensity = heatmapMax > 0 ? count / heatmapMax : 0;
                     return (
-                      <Tooltip key={`${dayIdx}-${h}`} title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count} ${t('argus.overview.errors')}`} arrow>
+                      <Tooltip key={`${dayIdx}-${h}`} title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count.toLocaleString()} ${t('argus.overview.errorEvents')}`} arrow>
                         <Box sx={{
                           height: 20,
                           borderRadius: 0.5,
@@ -473,7 +476,7 @@ const ArgusOverviewPage: React.FC = () => {
       {/* NEW: Distribution Row — Environment / Browser / OS */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
         <DistributionCard
-          title={t('argus.overview.errorByEnv', 'By Environment')}
+          title={t('argus.overview.errorByEnv')}
           icon={<EnvIcon fontSize="small" sx={{ color: '#7c4dff' }} />}
           data={data?.error_by_environment?.map(d => ({ label: d.environment, value: Number(d.count) })) || []}
           loading={loading}
@@ -482,7 +485,7 @@ const ArgusOverviewPage: React.FC = () => {
           onItemClick={(label) => navigate(`/argus/issues?environment=${encodeURIComponent(label)}`)}
         />
         <DistributionCard
-          title={t('argus.overview.errorByBrowser', 'By Browser')}
+          title={t('argus.overview.errorByBrowser')}
           icon={<DevicesIcon fontSize="small" sx={{ color: '#2196f3' }} />}
           data={data?.error_by_browser?.map(d => ({ label: d.browser, value: Number(d.count) })) || []}
           loading={loading}
@@ -491,7 +494,7 @@ const ArgusOverviewPage: React.FC = () => {
           onItemClick={(label) => navigate(`/argus/issues?browser=${encodeURIComponent(label)}`)}
         />
         <DistributionCard
-          title={t('argus.overview.errorByOS', 'By OS')}
+          title={t('argus.overview.errorByOS')}
           icon={<DevicesIcon fontSize="small" sx={{ color: '#ff9800' }} />}
           data={data?.error_by_os?.map(d => ({ label: d.os, value: Number(d.count) })) || []}
           loading={loading}
@@ -524,13 +527,13 @@ const ArgusOverviewPage: React.FC = () => {
         <Paper elevation={0} sx={{ p: 2.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2 }}>
           <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <ReleaseIcon fontSize="small" sx={{ color: '#7c4dff' }} />
-            {t('argus.overview.errorByRelease', 'Errors by Release')}
+            {t('argus.overview.errorByRelease')}
           </Typography>
           {loading ? (
             <Skeleton variant="rounded" height={160} />
           ) : !data?.error_by_release?.length ? (
             <Box sx={{ py: 4, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">{t('argus.overview.noData', 'No data')}</Typography>
+              <Typography variant="body2" color="text.secondary">{t('argus.overview.noData')}</Typography>
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

@@ -5,18 +5,75 @@ import { createLogger } from '../utils/logger';
 
 const logger = createLogger('issues-api');
 
-async function getInternalProjectId(projectId: string): Promise<number | null> {
-  const isNumeric = /^\d+$/.test(projectId);
-  const [rows] = await mysqlPool.query(
-    isNumeric
-      ? 'SELECT id FROM g_argus_projects WHERE id = ?'
-      : 'SELECT id FROM g_argus_projects WHERE gatrix_project_id = ?',
-    [projectId]
-  );
-  return (rows as any[])[0]?.id || null;
-}
+
 
 export default async function issuesRoutes(app: FastifyInstance) {
+  // Issue volume chart data (daily error counts)
+  app.get(
+    '/:projectId/issues/volume',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { period = '24h', status, level, start, end } = request.query as Record<string, string>;
+
+      try {
+        const periodMap: Record<string, string> = {
+          '1h': '1 HOUR', '24h': '24 HOUR', '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
+        };
+        let interval = periodMap[period] || '24 HOUR';
+        let timeCondition = `timestamp >= now() - INTERVAL ${interval}`;
+
+        if (start && end) {
+          timeCondition = `timestamp >= {start:String} AND timestamp <= {end:String}`;
+        }
+
+        const conditions = [`project_id = {projectId:String}`, timeCondition];
+        const qp: Record<string, string> = { projectId: String(projectId) };
+        if (start && end) { qp.start = start; qp.end = end; }
+
+        // Optional: filter by issue status from MySQL
+        if (status && status !== 'all') {
+          const [issueRows] = await mysqlPool.query(
+            'SELECT id FROM g_argus_issues WHERE project_id = ? AND status = ?',
+            [projectId, status]
+          );
+          const issueIds = (issueRows as any[]).map((r: any) => r.id);
+          if (issueIds.length === 0) {
+            return reply.send({ data: [] });
+          }
+          conditions.push(`issue_id IN (${issueIds.join(',')})`);
+        }
+
+        if (level) {
+          conditions.push(`level = {level:String}`);
+          qp.level = level;
+        }
+
+        // Use appropriate bucketing based on range
+        const bucketFn = period === '1h' ? 'toStartOfFiveMinutes' :
+                         (period === '24h' ? 'toStartOfHour' : 'toStartOfDay');
+
+        const result = await clickhouse.query({
+          query: `
+            SELECT
+              ${bucketFn}(timestamp) AS day,
+              count() AS count,
+              uniqExact(issue_id) AS issue_count
+            FROM argus.errors
+            WHERE ${conditions.join(' AND ')}
+            GROUP BY day
+            ORDER BY day
+          `,
+          query_params: qp,
+        });
+        const data = await result.json<any>();
+        return reply.send({ data: data.data || [] });
+      } catch (error) {
+        logger.error('Failed to get issue volume', { projectId, error: String(error) });
+        return reply.code(500).send({ error: 'Failed to get issue volume' });
+      }
+    }
+  );
+
   // List issues for a project
   app.get(
     '/:projectId/issues',
@@ -40,8 +97,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
       } = request.query as Record<string, string>;
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         // Resolve issue_ids from ClickHouse when contextual or time filters are set
         let issueIdFilter: number[] | null = null;
@@ -99,7 +155,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           SELECT * FROM g_argus_issues
           WHERE project_id = ?
         `;
-        const params: any[] = [internalProjectId];
+        const params: any[] = [projectId];
 
         if (status && status !== 'all') {
           sql += ' AND status = ?';
@@ -188,7 +244,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
         // Total count
         let countSql = `SELECT COUNT(*) as total FROM g_argus_issues WHERE project_id = ?`;
-        const countParams: any[] = [internalProjectId];
+        const countParams: any[] = [projectId];
         if (status && status !== 'all') {
           countSql += ' AND status = ?';
           countParams.push(status);
@@ -234,8 +290,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         // Generate a fingerprint from title
         const crypto = require('crypto');
@@ -252,7 +307,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
             (project_id, title, culprit, level, status, priority, primary_hash, times_seen, first_seen, last_seen)
            VALUES (?, ?, ?, ?, 'unresolved', 'medium', ?, 0, NOW(), NOW())`,
           [
-            internalProjectId,
+            projectId,
             body.title.trim(),
             body.culprit || '',
             body.level || 'info',
@@ -272,7 +327,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
             const { createExternalIssue } = require('../services/trackerAdapter');
             const [trackerRows] = await mysqlPool.query(
               'SELECT * FROM g_argus_issue_trackers WHERE id = ? AND project_id = ?',
-              [body.tracker_id, internalProjectId]
+              [body.tracker_id, projectId]
             );
             const tracker = (trackerRows as any[])[0];
 
@@ -340,12 +395,11 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         const [rows] = await mysqlPool.query(
           'SELECT * FROM g_argus_issues WHERE id = ? AND project_id = ?',
-          [issueId, internalProjectId]
+          [issueId, projectId]
         );
 
         const results = rows as any[];
@@ -567,8 +621,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         const updates: string[] = [];
         const params: any[] = [];
@@ -593,7 +646,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           return reply.code(400).send({ error: 'No fields to update' });
         }
 
-        params.push(issueId, internalProjectId);
+        params.push(issueId, projectId);
 
         await mysqlPool.query(
           `UPDATE g_argus_issues SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
@@ -606,19 +659,19 @@ export default async function issuesRoutes(app: FastifyInstance) {
           if (body.status) {
             await mysqlPool.query(
               `INSERT INTO g_argus_issue_activity (project_id, issue_id, user_name, action, data) VALUES (?, ?, ?, 'status_change', ?)`,
-              [internalProjectId, issueId, userName, JSON.stringify({ to: body.status })]
+              [projectId, issueId, userName, JSON.stringify({ to: body.status })]
             );
           }
           if (body.assigned_to !== undefined) {
             await mysqlPool.query(
               `INSERT INTO g_argus_issue_activity (project_id, issue_id, user_name, action, data) VALUES (?, ?, ?, 'assign', ?)`,
-              [internalProjectId, issueId, userName, JSON.stringify({ to: body.assigned_to })]
+              [projectId, issueId, userName, JSON.stringify({ to: body.assigned_to })]
             );
           }
           if (body.priority) {
             await mysqlPool.query(
               `INSERT INTO g_argus_issue_activity (project_id, issue_id, user_name, action, data) VALUES (?, ?, ?, 'priority_change', ?)`,
-              [internalProjectId, issueId, userName, JSON.stringify({ to: body.priority })]
+              [projectId, issueId, userName, JSON.stringify({ to: body.priority })]
             );
           }
         } catch (actErr) {
@@ -653,8 +706,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         const updates: string[] = [];
         const params: any[] = [];
@@ -676,7 +728,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
         }
 
         const placeholders = body.issue_ids.map(() => '?').join(',');
-        params.push(...body.issue_ids, internalProjectId);
+        params.push(...body.issue_ids, projectId);
 
         const [result] = await mysqlPool.query(
           `UPDATE g_argus_issues SET ${updates.join(', ')} WHERE id IN (${placeholders}) AND project_id = ?`,
@@ -716,11 +768,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
       const connection = await mysqlPool.getConnection();
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) {
-          connection.release();
-          return reply.code(404).send({ error: 'Project not found' });
-        }
+
 
         await connection.beginTransaction();
 
@@ -730,7 +778,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
            FROM g_argus_issues
            WHERE project_id = ? AND id IN (${issue_ids.map(() => '?').join(',')})
            ORDER BY times_seen DESC`,
-          [internalProjectId, ...issue_ids]
+          [projectId, ...issue_ids]
         );
         const issues = rows as any[];
 
@@ -760,7 +808,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           `UPDATE g_argus_issues
            SET status = 'merged', substatus = ?, times_seen = 0
            WHERE id IN (${mergedIds.map(() => '?').join(',')}) AND project_id = ?`,
-          [String(primary.id), ...mergedIds, internalProjectId]
+          [String(primary.id), ...mergedIds, projectId]
         );
 
         await connection.commit();
@@ -802,15 +850,14 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         const [rows] = await mysqlPool.query(
           `SELECT * FROM g_argus_issue_activity
            WHERE project_id = ? AND issue_id = ?
            ORDER BY created_at DESC
            LIMIT 50`,
-          [internalProjectId, issueId]
+          [projectId, issueId]
         );
         return reply.send({ data: rows });
       } catch (error) {
@@ -839,12 +886,11 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-        const internalProjectId = await getInternalProjectId(projectId);
-        if (!internalProjectId) return reply.code(404).send({ error: 'Project not found' });
+
 
         await mysqlPool.query(
           `INSERT INTO g_argus_issue_activity (project_id, issue_id, user_name, action, data) VALUES (?, ?, ?, 'comment', ?)`,
-          [internalProjectId, issueId, userName, JSON.stringify({ text: text.trim() })]
+          [projectId, issueId, userName, JSON.stringify({ text: text.trim() })]
         );
         return reply.send({ success: true });
       } catch (error) {

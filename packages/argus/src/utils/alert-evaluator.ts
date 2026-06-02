@@ -1,0 +1,590 @@
+import { mysqlPool } from '../config/mysql';
+import { clickhouse } from '../config/clickhouse';
+import { createLogger } from './logger';
+import { IssueGroupResult } from '../processing/issue-grouper';
+
+const logger = createLogger('alert-evaluator');
+
+interface FeedbackData {
+  feedback_id: string;
+  project_id: string;
+  name: string;
+  email: string;
+  message: string;
+  url: string;
+  environment: string;
+  source: string;
+  tags: Record<string, string>;
+}
+
+interface AlertRule {
+  id: number;
+  project_id: number;
+  name: string;
+  conditions: string;
+  actions: string;
+  frequency: number;
+  environment: string | null;
+  level: string | null;
+  enabled: boolean;
+  tags: string | null;
+  last_triggered_at: string | null;
+}
+
+/**
+ * Evaluate feedback-specific alert rules and fire matching ones.
+ * Called by feedback-worker after a successful ClickHouse insert.
+ */
+export async function evaluateFeedbackAlerts(
+  feedback: FeedbackData
+): Promise<void> {
+  try {
+    // Fetch enabled rules for this project that contain 'new_feedback' conditions
+    const [rows] = await mysqlPool.query(
+      `SELECT * FROM g_argus_alert_rules
+       WHERE project_id = ? AND enabled = 1
+       AND conditions LIKE '%new_feedback%'`,
+      [feedback.project_id]
+    );
+
+    const rules = (rows as AlertRule[]) || [];
+
+    for (const rule of rules) {
+      try {
+        // Skip muted rules
+        if ((rule as any).muted_until && new Date((rule as any).muted_until) > new Date()) continue;
+
+        if (!shouldFire(rule, feedback)) continue;
+
+        const actions = parseJSON(rule.actions);
+        const actionResults = await fireActions(actions, rule, feedback);
+        const worstStatus = actionResults.length > 0 && actionResults.some((r: any) => r.status === 'failed') ? 'failed' : 'success';
+        const responseBodies = actionResults.map((r: any) => r.response_body).filter(Boolean).join('\\n');
+
+        const triggerReason = `New feedback from ${feedback.name || feedback.email || 'anonymous'}: "${truncate(feedback.message, 100)}"`;
+
+        // Record alert history
+        await mysqlPool.query(
+          `INSERT INTO g_argus_alert_history (project_id, rule_id, message, triggered_at, status, response_body)
+           VALUES (?, ?, ?, NOW(), ?, ?)`,
+          [
+            rule.project_id,
+            rule.id,
+            triggerReason,
+            worstStatus,
+            truncate(responseBodies, 5000) || null,
+          ]
+        );
+
+        // Update last_triggered_at
+        await mysqlPool.query(
+          `UPDATE g_argus_alert_rules SET last_triggered_at = NOW() WHERE id = ?`,
+          [rule.id]
+        );
+
+        logger.info('Feedback alert fired', {
+          ruleId: rule.id,
+          ruleName: rule.name,
+          feedbackId: feedback.feedback_id,
+        });
+      } catch (e) {
+        logger.error('Failed to evaluate alert rule', {
+          ruleId: rule.id,
+          error: (e as Error).message,
+        });
+      }
+    }
+  } catch (error: any) {
+    // Gracefully handle if table doesn't exist yet
+    if (error?.code === 'ER_NO_SUCH_TABLE') {
+      return;
+    }
+    logger.error('Failed to evaluate feedback alerts', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+// ─── Error / Issue Alert Evaluation ───
+
+interface ErrorEventData {
+  event_id: string;
+  project_id: string;
+  internal_project_id: number;
+  issue_id: number;
+  level: string;
+  environment?: string;
+  platform?: string;
+  release?: string;
+  title?: string;
+  culprit?: string;
+  tags?: Record<string, string>;
+}
+
+/**
+ * Evaluate error-related alert rules after an event is processed.
+ * Called by error-worker after issue grouping.
+ * Handles: new_issue, regression, event_frequency, user_count conditions.
+ */
+export async function evaluateErrorAlerts(
+  event: ErrorEventData,
+  groupResult: IssueGroupResult
+): Promise<void> {
+  try {
+    // Fetch all enabled rules for this project that have error-related conditions
+    const [rows] = await mysqlPool.query(
+      `SELECT * FROM g_argus_alert_rules
+       WHERE project_id = ? AND enabled = 1
+       AND (conditions LIKE '%new_issue%'
+         OR conditions LIKE '%regression%'
+         OR conditions LIKE '%event_frequency%'
+         OR conditions LIKE '%user_count%'
+         OR conditions LIKE '%project_error_rate%')`,
+      [event.internal_project_id]
+    );
+
+    const rules = (rows as AlertRule[]) || [];
+    if (rules.length === 0) return;
+
+    for (const rule of rules) {
+      try {
+        // Skip muted rules
+        if ((rule as any).muted_until && new Date((rule as any).muted_until) > new Date()) continue;
+
+        // Check throttle (frequency) and environment/tag filters
+        if (!shouldFireForError(rule, event)) continue;
+
+        const conditions = parseJSON(rule.conditions) as any[];
+        const logic = (rule as any).condition_logic || 'any';
+        let matchCount = 0;
+        let triggerReasons: string[] = [];
+
+        for (const cond of conditions) {
+          let condMatched = false;
+          let condReason = '';
+
+          if (cond.type === 'new_issue' && groupResult.is_new) {
+            condMatched = true;
+            condReason = `New issue created: ${event.title || 'Unknown'}`;
+          } else if (cond.type === 'regression' && groupResult.is_regression) {
+            condMatched = true;
+            condReason = `Issue regression: ${event.title || 'Unknown'}`;
+          } else if (cond.type === 'event_frequency') {
+            const threshold = cond.value || 10;
+            const interval = cond.interval || 3600;
+            const count = await getEventCountInWindow(event.project_id, event.issue_id, interval);
+            if (count >= threshold) {
+              condMatched = true;
+              condReason = `Event frequency threshold: ${count} events in ${formatInterval(interval)}`;
+            }
+          } else if (cond.type === 'user_count') {
+            const threshold = cond.value || 10;
+            const interval = cond.interval || 3600;
+            const count = await getUniqueUserCountInWindow(event.project_id, event.issue_id, interval);
+            if (count >= threshold) {
+              condMatched = true;
+              condReason = `User count threshold: ${count} users in ${formatInterval(interval)}`;
+            }
+          } else if (cond.type === 'high_priority_issue' && groupResult.is_new) {
+            if (event.level === 'fatal' || event.level === 'error') {
+              condMatched = true;
+              condReason = `High priority issue: ${event.title || 'Unknown'} (${event.level})`;
+            }
+          } else if (cond.type === 'property_match') {
+            const val = (event as any)[cond.property] || event.tags?.[cond.property];
+            const op = cond.operator || 'equals';
+            const target = cond.value || '';
+            let isMatch = false;
+            if (val !== undefined && val !== null) {
+              const strVal = String(val).toLowerCase();
+              const strTarget = String(target).toLowerCase();
+              switch (op) {
+                case 'equals': isMatch = strVal === strTarget; break;
+                case 'not_equals': isMatch = strVal !== strTarget; break;
+                case 'contains': isMatch = strVal.includes(strTarget); break;
+                case 'starts_with': isMatch = strVal.startsWith(strTarget); break;
+                case 'ends_with': isMatch = strVal.endsWith(strTarget); break;
+              }
+            }
+            if (isMatch) {
+              condMatched = true;
+              condReason = `Property ${cond.property} ${op} ${target}`;
+            }
+          } else if (cond.type === 'project_error_rate') {
+            const threshold = cond.value || 100;
+            const interval = cond.interval || 3600;
+            const count = await getProjectEventCountInWindow(event.project_id, interval);
+            if (count >= threshold) {
+              condMatched = true;
+              condReason = `Project error rate threshold: ${count} events in ${formatInterval(interval)}`;
+            }
+          }
+
+          if (condMatched) {
+            matchCount++;
+            triggerReasons.push(condReason);
+          }
+        }
+
+        const matched = logic === 'all' ? (matchCount === conditions.length && conditions.length > 0) : matchCount > 0;
+        if (!matched) continue;
+        const triggerReason = triggerReasons.join(' AND ');
+
+        // Fire actions
+        const actions = parseJSON(rule.actions);
+        const actionResults = await fireActionsForError(actions, rule, event, triggerReason);
+        const worstStatus = actionResults.length > 0 && actionResults.some((r: any) => r.status === 'failed') ? 'failed' : 'success';
+        const responseBodies = actionResults.map((r: any) => r.response_body).filter(Boolean).join('\\n');
+
+        // Record alert history
+        await mysqlPool.query(
+          `INSERT INTO g_argus_alert_history (project_id, rule_id, issue_id, message, triggered_at, status, response_body)
+           VALUES (?, ?, ?, ?, NOW(), ?, ?)`,
+          [rule.project_id, rule.id, event.issue_id, truncate(triggerReason, 500), worstStatus, truncate(responseBodies, 5000) || null]
+        );
+
+        // Update last_triggered_at
+        await mysqlPool.query(
+          `UPDATE g_argus_alert_rules SET last_triggered_at = NOW() WHERE id = ?`,
+          [rule.id]
+        );
+
+        logger.info('Error alert fired', {
+          ruleId: rule.id,
+          ruleName: rule.name,
+          issueId: event.issue_id,
+          reason: triggerReason,
+        });
+      } catch (e) {
+        logger.error('Failed to evaluate error alert rule', {
+          ruleId: rule.id,
+          error: (e as Error).message,
+        });
+      }
+    }
+  } catch (error: any) {
+    if (error?.code === 'ER_NO_SUCH_TABLE') return;
+    logger.error('Failed to evaluate error alerts', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+async function getEventCountInWindow(
+  projectId: string, issueId: number, intervalSeconds: number
+): Promise<number> {
+  try {
+    const result = await clickhouse.query({
+      query: `SELECT count() as cnt FROM argus.errors
+              WHERE project_id = {projectId:String}
+                AND issue_id = {issueId:UInt64}
+                AND timestamp >= now() - INTERVAL {interval:UInt32} SECOND`,
+      query_params: { projectId, issueId, interval: intervalSeconds },
+    });
+    const data = (await result.json()) as any;
+    return Number(data?.[0]?.cnt || 0);
+  } catch (e) {
+    logger.warn('Failed to query event count', { error: (e as Error).message });
+    return 0;
+  }
+}
+
+async function getProjectEventCountInWindow(
+  projectId: string, intervalSeconds: number
+): Promise<number> {
+  try {
+    const result = await clickhouse.query({
+      query: `SELECT count() as cnt FROM argus.errors
+              WHERE project_id = {projectId:String}
+                AND timestamp >= now() - INTERVAL {interval:UInt32} SECOND`,
+      query_params: { projectId, interval: intervalSeconds },
+    });
+    const data = (await result.json()) as any;
+    return Number(data?.[0]?.cnt || 0);
+  } catch (e) {
+    logger.warn('Failed to query project event count', { error: (e as Error).message });
+    return 0;
+  }
+}
+
+async function getUniqueUserCountInWindow(
+  projectId: string, issueId: number, intervalSeconds: number
+): Promise<number> {
+  try {
+    const result = await clickhouse.query({
+      query: `SELECT uniq(user_id) as cnt FROM argus.errors
+              WHERE project_id = {projectId:String}
+                AND issue_id = {issueId:UInt64}
+                AND timestamp >= now() - INTERVAL {interval:UInt32} SECOND
+                AND user_id != ''`,
+      query_params: { projectId, issueId, interval: intervalSeconds },
+    });
+    const data = (await result.json()) as any;
+    return Number(data?.[0]?.cnt || 0);
+  } catch (e) {
+    logger.warn('Failed to query user count', { error: (e as Error).message });
+    return 0;
+  }
+}
+
+function shouldFireForError(rule: AlertRule, event: ErrorEventData): boolean {
+  // Check environment filter
+  if (rule.environment && event.environment && rule.environment !== event.environment) {
+    return false;
+  }
+
+  // Check level filter
+  if (rule.level) {
+    const levelPriority: Record<string, number> = { debug: 0, info: 1, warning: 2, error: 3, fatal: 4 };
+    const ruleLevel = levelPriority[rule.level] ?? 0;
+    const eventLevel = levelPriority[event.level] ?? 0;
+    if (eventLevel < ruleLevel) return false;
+  }
+
+  // Check tag filters
+  if (rule.tags) {
+    const ruleTags = parseJSON(rule.tags) as Record<string, string>;
+    for (const [key, value] of Object.entries(ruleTags)) {
+      if (event.tags?.[key] !== value) return false;
+    }
+  }
+
+  // Check frequency throttle
+  if (rule.last_triggered_at && rule.frequency > 0) {
+    const lastTriggered = new Date(rule.last_triggered_at).getTime();
+    if (Date.now() - lastTriggered < rule.frequency * 1000) return false;
+  }
+
+  return true;
+}
+
+async function fireActionsForError(
+  actions: any[], rule: AlertRule, event: ErrorEventData, reason: string
+): Promise<Array<{ status: string; response_body: string }>> {
+  if (!Array.isArray(actions)) return [];
+
+  const results: Array<{ status: string; response_body: string }> = [];
+
+  for (const action of actions) {
+    if ((action.type === 'webhook' || action.type === 'email') && action.target_url) {
+      try {
+        const response = await fetchWithRetry(action.target_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(buildErrorWebhookPayload(rule, event, reason)),
+        });
+        const responseText = await response.text();
+        results.push({ status: response.ok ? 'success' : 'failed', response_body: truncate(`[${response.status}] ${responseText}`, 500) });
+      } catch (e) {
+        const errorMsg = (e as Error).message;
+        logger.warn('Webhook/Email delivery failed', {
+          url: action.target_url,
+          error: errorMsg,
+        });
+        results.push({ status: 'failed', response_body: `Error: ${errorMsg}` });
+      }
+    }
+  }
+  return results;
+}
+
+function buildErrorWebhookPayload(
+  rule: AlertRule, event: ErrorEventData, reason: string
+): Record<string, any> {
+  const emoji = event.level === 'fatal' ? '🔴' : event.level === 'error' ? '🟠' : '🟡';
+  return {
+    // Slack-compatible format
+    text: `${emoji} Alert — *${rule.name}*`,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${emoji} *${rule.name}*\n*Reason:* ${reason}\n*Issue:* ${event.title || 'Unknown'}\n*Level:* ${event.level}\n*Culprit:* ${event.culprit || 'N/A'}`,
+        },
+      },
+      ...(event.environment ? [{
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: `🏷️ Environment: ${event.environment}` }],
+      }] : []),
+      ...(event.release ? [{
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: `📦 Release: ${event.release}` }],
+      }] : []),
+    ],
+    // Generic fields
+    rule_name: rule.name,
+    rule_id: rule.id,
+    project_id: event.project_id,
+    event_id: event.event_id,
+    issue_id: event.issue_id,
+    level: event.level,
+    title: event.title,
+    culprit: event.culprit,
+    environment: event.environment,
+    release: event.release,
+    trigger_reason: reason,
+  };
+}
+
+function formatInterval(seconds: number): string {
+  if (seconds >= 86400) return `${Math.round(seconds / 86400)}d`;
+  if (seconds >= 3600) return `${Math.round(seconds / 3600)}h`;
+  if (seconds >= 60) return `${Math.round(seconds / 60)}m`;
+  return `${seconds}s`;
+}
+
+function shouldFire(rule: AlertRule, feedback: FeedbackData): boolean {
+  // Check environment filter
+  if (rule.environment && feedback.environment && rule.environment !== feedback.environment) {
+    return false;
+  }
+
+  // Check tag filters
+  if (rule.tags) {
+    const ruleTags = parseJSON(rule.tags) as Record<string, string>;
+    for (const [key, value] of Object.entries(ruleTags)) {
+      if (feedback.tags?.[key] !== value) {
+        return false;
+      }
+    }
+  }
+
+  // Check frequency throttle
+  if (rule.last_triggered_at && rule.frequency > 0) {
+    const lastTriggered = new Date(rule.last_triggered_at).getTime();
+    const now = Date.now();
+    if (now - lastTriggered < rule.frequency * 1000) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function fireActions(
+  actions: any[],
+  rule: AlertRule,
+  feedback: FeedbackData
+): Promise<Array<{ status: string; response_body: string }>> {
+  if (!Array.isArray(actions)) return [];
+
+  const results: Array<{ status: string; response_body: string }> = [];
+
+  for (const action of actions) {
+    if ((action.type === 'webhook' || action.type === 'email' || action.type === 'slack' || action.type === 'jira' || action.type === 'linear' || action.type === 'pagerduty') && (action.target_url || action.type === 'slack' || action.type === 'jira' || action.type === 'linear')) {
+      try {
+        if (action.type === 'slack' && action.channel) {
+          // Mock Slack
+          logger.info(`Mock sending slack message to ${action.channel}`);
+          results.push({ status: 'success', response_body: `[Mock] Delivered to Slack channel ${action.channel}` });
+        } else if (action.type === 'jira' && action.channel) {
+          // Mock Jira
+          logger.info(`Mock creating Jira issue in project ${action.channel}`);
+          results.push({ status: 'success', response_body: `[Mock] Created Jira issue ${action.channel}-1001` });
+        } else if (action.type === 'linear' && action.channel) {
+          // Mock Linear
+          logger.info(`Mock creating Linear issue in team ${action.channel}`);
+          results.push({ status: 'success', response_body: `[Mock] Created Linear issue ${action.channel}-1001` });
+        } else if (action.type === 'pagerduty' && action.target_url) {
+          // Mock PagerDuty Incident
+          logger.info(`Mock creating PagerDuty incident using key ${action.target_url}`);
+          results.push({ status: 'success', response_body: `[Mock] Triggered PagerDuty incident for key ${action.target_url.substring(0, 4)}...` });
+        } else if (action.target_url) {
+          const response = await fetchWithRetry(action.target_url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildWebhookPayload(rule, feedback)),
+          });
+          const responseText = await response.text();
+          results.push({ status: response.ok ? 'success' : 'failed', response_body: truncate(`[${response.status}] ${responseText}`, 500) });
+        }
+      } catch (e) {
+        const errorMsg = (e as Error).message;
+        logger.warn('Action delivery failed', {
+          type: action.type,
+          url: action.target_url,
+          error: errorMsg,
+        });
+        results.push({ status: 'failed', response_body: `Error: ${errorMsg}` });
+      }
+    }
+  }
+  return results;
+}
+
+function buildWebhookPayload(rule: AlertRule, feedback: FeedbackData): Record<string, any> {
+  const displayName = feedback.name || feedback.email || 'Anonymous';
+  const messagePreview = truncate(feedback.message, 300);
+
+  return {
+    // Slack-compatible format
+    text: `📬 New User Feedback — *${rule.name}*`,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `📬 *New User Feedback*\n*Rule:* ${rule.name}\n*From:* ${displayName}${feedback.email ? ` (${feedback.email})` : ''}\n*Message:* ${messagePreview}`,
+        },
+      },
+      ...(feedback.url ? [{
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: `🔗 URL: ${feedback.url}` }],
+      }] : []),
+      ...(feedback.environment ? [{
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: `🏷️ Environment: ${feedback.environment}` }],
+      }] : []),
+    ],
+    // Generic fields for other webhook consumers
+    rule_name: rule.name,
+    rule_id: rule.id,
+    project_id: feedback.project_id,
+    feedback_id: feedback.feedback_id,
+    user_name: feedback.name,
+    user_email: feedback.email,
+    message: feedback.message,
+    url: feedback.url,
+    environment: feedback.environment,
+    source: feedback.source,
+  };
+}
+
+function parseJSON(value: any): any {
+  if (!value) return [];
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); }
+    catch { return []; }
+  }
+  return value;
+}
+
+function truncate(str: string, maxLen: number): string {
+  if (!str) return '';
+  return str.length <= maxLen ? str : str.slice(0, maxLen) + '…';
+}
+
+/**
+ * Fetch with exponential backoff retry.
+ * Max 2 retries with 1s, 2s delays.
+ */
+async function fetchWithRetry(
+  url: string, options: RequestInit, maxRetries = 2
+): Promise<Response> {
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok || attempt === maxRetries) return response;
+      // Server error — retry
+      lastError = new Error(`HTTP ${response.status}`);
+    } catch (e) {
+      lastError = e as Error;
+      if (attempt === maxRetries) throw lastError;
+    }
+    // Exponential backoff: 1s, 2s
+    await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+  }
+  throw lastError;
+}

@@ -845,9 +845,19 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  async updateDsnKey(
+    projectId: number | string,
+    keyId: number | string,
+    data: { label: string }
+  ): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}`, data);
+  }
+
   async revokeDsnKey(projectId: number | string, keyId: number | string): Promise<void> {
     await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}`);
   }
+
+
 
   // --- Issues ---
 
@@ -1236,6 +1246,22 @@ class ArgusService {
 
   async deleteIntegration(projectId: number | string, integrationId: number): Promise<void> {
     const response = await argusApi.delete(`${ARGUS_BASE}/${projectId}/integrations/${integrationId}`);
+  }
+
+  // === Global Integrations ===
+
+  async getGlobalIntegrationConfig(provider: string): Promise<{ configured: boolean; config: any }> {
+    const response = await argusApi.get(`${ARGUS_BASE}/global-integrations/${provider}/config`);
+    return response.data?.data || response.data;
+  }
+
+  async saveGlobalIntegrationConfig(provider: string, data: { name?: string; url?: string; credentials: any }): Promise<void> {
+    await argusApi.post(`${ARGUS_BASE}/global-integrations/${provider}/config`, data);
+  }
+
+  async getGithubRepositories(): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/integrations/github/repositories`);
+    return response.data?.data || [];
   }
 
   // === Commits ===

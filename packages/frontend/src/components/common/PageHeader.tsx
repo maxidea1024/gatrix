@@ -21,12 +21,14 @@ import {
 import {
   MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface PageHeaderProps {
   icon?: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
   subtitle?: string;
   tabs?: React.ReactNode;
   actions?: React.ReactNode;
@@ -34,6 +36,10 @@ interface PageHeaderProps {
   menuItems?: React.ReactNode;
   /** When provided, a MoreVert menu with Refresh is rendered at the end of the header. */
   onRefresh?: () => void;
+  /** Automatically display a back button if the user arrived via in-app navigation */
+  enableAutoBack?: boolean;
+  /** Custom handler for back button. Trumps enableAutoBack if provided. */
+  onBack?: () => void;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -44,10 +50,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   actions,
   menuItems,
   onRefresh,
+  enableAutoBack = false,
+  onBack,
 }) => {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  const isFromSidebar = (location.state as any)?.fromSidebar === true;
+  const showBackButton = !!onBack || (enableAutoBack && location.key !== 'default' && !isFromSidebar);
   const showRightSection = tabs || actions || onRefresh;
 
   return (
@@ -56,15 +68,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        mb: 2,
-        px: 1.5,
-        py: 0,
-        height: 48,
+        mb: 1.5,
+        px: 0.5,
+        py: 0.5,
+        minHeight: 36,
         borderRadius: '6px',
-        bgcolor: (theme: any) =>
+        bgcolor: 'transparent',
+        borderBottom: (theme: any) =>
           theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.03)'
-            : 'rgba(0, 0, 0, 0.02)',
+            ? '1px solid rgba(255, 255, 255, 0.04)'
+            : '1px solid rgba(0, 0, 0, 0.04)',
       }}
     >
       {/* Left: icon + title + subtitle */}
@@ -78,6 +91,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           overflow: 'hidden',
         }}
       >
+        {showBackButton && (
+          <IconButton 
+            size="small" 
+            onClick={onBack ? onBack : () => navigate(-1)}
+            sx={{ mr: 0.5, color: 'text.secondary', '&:hover': { color: 'text.primary', backgroundColor: 'action.hover' } }}
+          >
+            <ArrowBackIcon fontSize="small" />
+          </IconButton>
+        )}
         {icon && (
           <Box
             sx={{
@@ -97,18 +119,22 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             {icon}
           </Box>
         )}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            fontSize: '1.1rem',
-            lineHeight: 1.4,
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          {title}
-        </Typography>
+        {typeof title === 'string' ? (
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 700,
+              fontSize: '1rem',
+              lineHeight: 1.4,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            {title}
+          </Typography>
+        ) : (
+          title
+        )}
         {subtitle && (
           <>
             <Box

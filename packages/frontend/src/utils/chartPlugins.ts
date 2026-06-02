@@ -97,10 +97,7 @@ export const getDragSelectPlugin = (
         }
       };
 
-      canvas.addEventListener('mousedown', onMouseDown);
-      canvas.addEventListener('mousemove', onMouseMove);
-      canvas.addEventListener('mouseup', onMouseUp);
-      canvas.addEventListener('mouseleave', () => {
+      const onMouseLeave = () => {
         if (dragging) {
           dragging = false;
           if (chart.options.plugins?.tooltip) {
@@ -108,10 +105,26 @@ export const getDragSelectPlugin = (
           }
           chart.draw();
         }
-      });
+      };
+
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      canvas.addEventListener('mouseleave', onMouseLeave);
 
       // Store handlers for cleanup
-      (chart as any).__dragHandlers = { onMouseDown, onMouseMove, onMouseUp };
+      (chart as any).__dragHandlers = { onMouseDown, onMouseMove, onMouseUp, onMouseLeave };
+    },
+
+    beforeDestroy(chart: any) {
+      const handlers = (chart as any).__dragHandlers;
+      if (handlers) {
+        const canvas = chart.canvas as HTMLCanvasElement;
+        canvas.removeEventListener('mousedown', handlers.onMouseDown);
+        canvas.removeEventListener('mousemove', handlers.onMouseMove);
+        canvas.removeEventListener('mouseup', handlers.onMouseUp);
+        canvas.removeEventListener('mouseleave', handlers.onMouseLeave);
+      }
     },
 
     afterDraw(chart: any) {

@@ -34,11 +34,10 @@ import {
   Shield as ShieldIcon,
   People as PeopleIcon,
   Group as GroupIcon,
-  MoreVert as MoreVertIcon,
-  ContentCopy as CopyIcon,
-} from '@mui/icons-material';
+  MoreVert as MoreVertIcon,} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { CopyButton } from '@/components/common/CopyButton';
 
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
@@ -423,15 +422,7 @@ const RolesPage: React.FC = () => {
                         >
                           {role.roleName}
                         </Typography>
-                        <Tooltip title={t('common.copy')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleCopyText(role.roleName)}
-                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
-                          >
-                            <CopyIcon sx={{ fontSize: 13 }} />
-                          </IconButton>
-                        </Tooltip>
+                        <CopyButton text={role.roleName} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>

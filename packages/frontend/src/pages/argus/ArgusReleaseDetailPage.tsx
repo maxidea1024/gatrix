@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusIssue } from '@/services/argusService';
+import PageHeader from '@/components/common/PageHeader';
 
 function formatDate(dateStr: string): string {
   try {
@@ -110,28 +111,26 @@ const ArgusReleaseDetailPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <IconButton onClick={() => navigate('/argus/releases')} size="small" sx={{ mr: 0.5 }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <ReleaseIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
-        <Typography variant="h5" fontWeight={700} sx={{ fontFamily: 'monospace' }}>
-          {decodedRelease}
-        </Typography>
-        {r && (
-          <Chip
-            icon={<CheckIcon sx={{ fontSize: '14px !important' }} />}
-            label={`${crashFree.toFixed(1)}% ${t('argus.releases.crashFreeRate', 'Crash Free')}`}
-            size="small"
-            sx={{
-              height: 24, fontWeight: 700, fontSize: '0.72rem',
-              backgroundColor: alpha(statusColor, isDark ? 0.15 : 0.08),
-              color: statusColor, border: `1px solid ${alpha(statusColor, 0.3)}`,
-              '& .MuiChip-icon': { color: statusColor },
-            }}
-          />
-        )}
-      </Box>
+      <PageHeader
+        icon={<ReleaseIcon />}
+        title={decodedRelease}
+        onBack={() => navigate('/argus/releases')}
+        actions={
+          r && (
+            <Chip
+              icon={<CheckIcon sx={{ fontSize: '14px !important' }} />}
+              label={`${crashFree.toFixed(1)}% ${t('argus.releases.crashFreeRate', 'Crash Free')}`}
+              size="small"
+              sx={{
+                height: 24, fontWeight: 700, fontSize: '0.72rem',
+                backgroundColor: alpha(statusColor, isDark ? 0.15 : 0.08),
+                color: statusColor, border: `1px solid ${alpha(statusColor, 0.3)}`,
+                '& .MuiChip-icon': { color: statusColor },
+              }}
+            />
+          )
+        }
+      />
 
       <PageContentLoader loading={loading}>
         {!r ? (
@@ -193,6 +192,53 @@ const ArgusReleaseDetailPage: React.FC = () => {
             </Box>
 
             <Divider sx={{ mb: 3 }} />
+
+            {/* Error Trend — compact inline sparkline */}
+            {r.error_trend && r.error_trend.length > 1 && (
+              <Box sx={{
+                display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5,
+                px: 2, py: 1, borderRadius: 2,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                backgroundColor: isDark ? 'rgba(244,67,54,0.04)' : 'rgba(244,67,54,0.02)',
+              }}>
+                <TrendingUpIcon sx={{ fontSize: 16, color: '#f44336', flexShrink: 0 }} />
+                <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'text.secondary', flexShrink: 0 }}>
+                  {t('argus.releaseDetail.errorTrend', 'Error Trend')}
+                </Typography>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <svg width="100%" height={28} viewBox={`0 0 ${r.error_trend.length * 12} 28`} preserveAspectRatio="none">
+                    {(() => {
+                      const data = r.error_trend as number[];
+                      const max = Math.max(...data, 1);
+                      const w = data.length * 12;
+                      const points = data.map((v: number, i: number) =>
+                        `${(i / (data.length - 1)) * w},${24 - (v / max) * 20}`
+                      ).join(' ');
+                      const fillPoints = `0,24 ${points} ${w},24`;
+                      return (
+                        <>
+                          <defs>
+                            <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#f44336" stopOpacity="0.25" />
+                              <stop offset="100%" stopColor="#f44336" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+                          <polygon points={fillPoints} fill="url(#trendFill)" />
+                          <polyline
+                            points={points}
+                            fill="none"
+                            stroke="#f44336"
+                            strokeWidth={1.5}
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                          />
+                        </>
+                      );
+                    })()}
+                  </svg>
+                </Box>
+              </Box>
+            )}
 
             {/* Issues in this release */}
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -289,54 +335,6 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 </Paper>
               )}
             </PageContentLoader>
-
-            {/* Error Trend */}
-            {r.error_trend && r.error_trend.length > 1 && (
-              <>
-                <Box sx={{ mt: 4, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <TrendingUpIcon sx={{ fontSize: 20, color: '#f44336' }} />
-                  <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1rem' }}>
-                    {t('argus.releaseDetail.errorTrend', 'Error Trend')}
-                  </Typography>
-                </Box>
-                <Paper elevation={0} sx={{
-                  p: 2,
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}>
-                  <svg width="100%" height={80} viewBox={`0 0 ${r.error_trend.length * 20} 80`} preserveAspectRatio="none">
-                    {(() => {
-                      const data = r.error_trend as number[];
-                      const max = Math.max(...data, 1);
-                      const w = data.length * 20;
-                      const points = data.map((v: number, i: number) =>
-                        `${(i / (data.length - 1)) * w},${72 - (v / max) * 64}`
-                      ).join(' ');
-                      const fillPoints = `0,72 ${points} ${w},72`;
-                      return (
-                        <>
-                          <defs>
-                            <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#f44336" stopOpacity="0.3" />
-                              <stop offset="100%" stopColor="#f44336" stopOpacity="0" />
-                            </linearGradient>
-                          </defs>
-                          <polygon points={fillPoints} fill="url(#trendFill)" />
-                          <polyline
-                            points={points}
-                            fill="none"
-                            stroke="#f44336"
-                            strokeWidth={2}
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                          />
-                        </>
-                      );
-                    })()}
-                  </svg>
-                </Paper>
-              </>
-            )}
           </>
         )}
       </PageContentLoader>

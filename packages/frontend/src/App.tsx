@@ -342,6 +342,15 @@ const ArgusDashboardsPage = React.lazy(
 const ArgusLogsPage = React.lazy(
   () => import('./pages/argus/ArgusLogsPage')
 );
+const ArgusTraceExplorerPage = React.lazy(
+  () => import('./pages/argus/ArgusTraceExplorerPage')
+);
+const ArgusMetricsExplorerPage = React.lazy(
+  () => import('./pages/argus/ArgusMetricsExplorerPage')
+);
+const ArgusExplorePage = React.lazy(
+  () => import('./pages/argus/ArgusExplorePage')
+);
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 
@@ -1219,7 +1228,7 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="discover"
-                                          element={<ArgusDiscoverPage />}
+                                          element={<Navigate to="/argus/explore/discover" replace />}
                                         />
                                         <Route
                                           path="dashboards"
@@ -1227,7 +1236,36 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="logs"
+                                          element={<Navigate to="/argus/explore/logs" replace />}
+                                        />
+                                        <Route
+                                          path="traces"
+                                          element={<Navigate to="/argus/explore/traces" replace />}
+                                        />
+                                        <Route
+                                          path="metrics"
+                                          element={<Navigate to="/argus/explore/metrics" replace />}
+                                        />
+                                        {/* Explore Routes */}
+                                        <Route
+                                          path="explore"
+                                          element={<ArgusExplorePage />}
+                                        />
+                                        <Route
+                                          path="explore/traces"
+                                          element={<ArgusTraceExplorerPage />}
+                                        />
+                                        <Route
+                                          path="explore/logs"
                                           element={<ArgusLogsPage />}
+                                        />
+                                        <Route
+                                          path="explore/metrics"
+                                          element={<ArgusMetricsExplorerPage />}
+                                        />
+                                        <Route
+                                          path="explore/discover"
+                                          element={<ArgusDiscoverPage />}
                                         />
                                       </Routes>
                                     </MainLayout>

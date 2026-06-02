@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS g_argus_projects (
 
 CREATE TABLE IF NOT EXISTS g_argus_dsnKeys (
   id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
+  project_id          VARCHAR(64) NOT NULL,
   label               VARCHAR(255) DEFAULT 'Default',
   public_key          VARCHAR(64) NOT NULL,
   secret_key          VARCHAR(64) NOT NULL,
@@ -28,12 +28,12 @@ CREATE TABLE IF NOT EXISTS g_argus_dsnKeys (
   rate_limit_count    INT DEFAULT 1000,
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_public_key (public_key),
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  INDEX idx_project_id (project_id)
 );
 
 CREATE TABLE IF NOT EXISTS g_argus_issues (
   id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
+  project_id          VARCHAR(64) NOT NULL,
   short_id            INT NOT NULL,
   title               VARCHAR(512) NOT NULL,
   culprit             VARCHAR(512),
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS g_argus_issues (
   substatus           VARCHAR(32),
   resolved_at         TIMESTAMP NULL,
   resolved_by         INT NULL,
-  assigned_to         INT NULL,
+  assigned_to         VARCHAR(255) DEFAULT NULL,
   first_release       VARCHAR(255),
   last_release        VARCHAR(255),
   priority            VARCHAR(16) DEFAULT 'medium',
@@ -59,13 +59,12 @@ CREATE TABLE IF NOT EXISTS g_argus_issues (
   UNIQUE KEY uk_project_hash (project_id, primary_hash),
   INDEX idx_project_status (project_id, status),
   INDEX idx_project_last_seen (project_id, last_seen DESC),
-  INDEX idx_project_times_seen (project_id, times_seen DESC),
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  INDEX idx_project_times_seen (project_id, times_seen DESC)
 );
 
 CREATE TABLE IF NOT EXISTS g_argus_releases (
   id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id            BIGINT NOT NULL,
+  project_id            VARCHAR(64) NOT NULL,
   version               VARCHAR(255) NOT NULL,
   short_version         VARCHAR(128),
   total_errors          INT DEFAULT 0,
@@ -82,8 +81,7 @@ CREATE TABLE IF NOT EXISTS g_argus_releases (
   date_deployed         TIMESTAMP NULL,
   created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_project_version (project_id, version),
-  INDEX idx_project_released (project_id, date_released DESC),
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  INDEX idx_project_released (project_id, date_released DESC)
 );
 
 CREATE TABLE IF NOT EXISTS g_argus_releaseCommits (
@@ -98,25 +96,9 @@ CREATE TABLE IF NOT EXISTS g_argus_releaseCommits (
   FOREIGN KEY (release_id) REFERENCES g_argus_releases(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS g_argus_alertRules (
-  id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
-  name                VARCHAR(255) NOT NULL,
-  type                VARCHAR(32) NOT NULL,
-  is_active           TINYINT(1) DEFAULT 1,
-  conditions          JSON NOT NULL,
-  filters             JSON,
-  actions             JSON NOT NULL,
-  frequency           INT DEFAULT 1800,
-  owner_id            INT NULL,
-  created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS g_argus_sourceMaps (
   id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
+  project_id          VARCHAR(64) NOT NULL,
   release_id          BIGINT NULL,
   name                VARCHAR(512) NOT NULL,
   debug_id            VARCHAR(64),
@@ -126,13 +108,12 @@ CREATE TABLE IF NOT EXISTS g_argus_sourceMaps (
   artifact_type       VARCHAR(32) DEFAULT 'source_map',
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_project_release (project_id, release_id),
-  INDEX idx_debug_id (debug_id),
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  INDEX idx_debug_id (debug_id)
 );
 
 CREATE TABLE IF NOT EXISTS g_argus_cronMonitors (
   id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
+  project_id          VARCHAR(64) NOT NULL,
   name                VARCHAR(255) NOT NULL,
   slug                VARCHAR(128) NOT NULL,
   status              VARCHAR(32) DEFAULT 'active',
@@ -149,8 +130,7 @@ CREATE TABLE IF NOT EXISTS g_argus_cronMonitors (
   owner_id            INT NULL,
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_project_slug (project_id, slug),
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  UNIQUE KEY uk_project_slug (project_id, slug)
 );
 
 CREATE TABLE IF NOT EXISTS g_argus_cronCheckins (
@@ -170,21 +150,20 @@ CREATE TABLE IF NOT EXISTS g_argus_cronCheckins (
 
 CREATE TABLE IF NOT EXISTS g_argus_environments (
   id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
+  project_id          VARCHAR(64) NOT NULL,
   name                VARCHAR(64) NOT NULL,
   is_hidden           TINYINT(1) DEFAULT 0,
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_project_name (project_id, name),
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  UNIQUE KEY uk_project_name (project_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS g_argus_fingerprintRules (
   id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-  project_id          BIGINT NOT NULL,
+  project_id          VARCHAR(64) NOT NULL,
   matchers            JSON NOT NULL,
   fingerprint         JSON NOT NULL,
   is_active           TINYINT(1) DEFAULT 1,
   priority            INT DEFAULT 0,
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES g_argus_projects(id) ON DELETE CASCADE
+  INDEX idx_project_id (project_id)
 );

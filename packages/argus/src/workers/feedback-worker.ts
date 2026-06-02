@@ -3,6 +3,8 @@ import { config } from '../config';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { ArgusFeedbackEvent } from '../types/events';
+import { evaluateFeedbackAlerts } from '../utils/alert-evaluator';
+import { classifyFeedback } from '../utils/ai-classifier';
 
 const logger = createLogger('feedback-worker');
 
@@ -27,6 +29,19 @@ interface NormalizedFeedback {
   source: string;
   tags: Record<string, string>;
   attachments: string[];
+  // Device context
+  browser: string;
+  browser_version: string;
+  os: string;
+  os_version: string;
+  device: string;
+  // User identity
+  user_id: string;
+  locale: string;
+  // AI classification
+  sentiment: string;
+  category: string;
+  is_spam: number;
 }
 
 export class FeedbackWorker {
@@ -154,6 +169,22 @@ export class FeedbackWorker {
     }
 
     if (batch.length > 0) {
+      // AI classification (non-blocking — enrich before insert)
+      try {
+        await Promise.all(batch.map(async (item) => {
+          const classification = await classifyFeedback(item.project_id, item.message);
+          if (classification) {
+            item.sentiment = classification.sentiment;
+            item.category = classification.category;
+            if (classification.spam_score > 0.7) {
+              (item as any).is_spam = 1;
+            }
+          }
+        }));
+      } catch (e) {
+        logger.warn('AI classification batch failed (non-fatal)', { error: (e as Error).message });
+      }
+
       try {
         await clickhouse.insert({
           table: 'argus.user_feedback',
@@ -161,6 +192,23 @@ export class FeedbackWorker {
           format: 'JSONEachRow',
         });
         logger.info('Feedback inserted', { count: batch.length });
+
+        // Evaluate feedback alert rules for each item
+        for (const item of batch) {
+          evaluateFeedbackAlerts({
+            feedback_id: item.feedback_id,
+            project_id: item.project_id,
+            name: item.name,
+            email: item.email,
+            message: item.message,
+            url: item.url,
+            environment: item.environment,
+            source: item.source,
+            tags: item.tags,
+          }).catch((e) => {
+            logger.warn('Feedback alert evaluation failed', { feedbackId: item.feedback_id, error: (e as Error).message });
+          });
+        }
       } catch (error) {
         logger.error('ClickHouse feedback insert failed', {
           count: batch.length,
@@ -175,13 +223,16 @@ export class FeedbackWorker {
   }
 
   private normalize(event: ArgusFeedbackEvent & { project_id: string }): NormalizedFeedback {
+    const contexts = event.contexts || {};
+    const user = event.user || {};
+
     return {
       feedback_id: event.feedback_id || event.event_id,
       project_id: event.project_id,
       event_id: event.linked_event_id || '',
       timestamp: event.timestamp || new Date().toISOString(),
-      name: event.name || '',
-      email: event.email || '',
+      name: event.name || user.username || '',
+      email: event.email || user.email || '',
       message: event.message || '',
       contact_email: event.contact_email || '',
       url: event.url || '',
@@ -190,6 +241,19 @@ export class FeedbackWorker {
       source: event.source || 'widget',
       tags: event.tags || {},
       attachments: (event as any).attachments || [],
+      // Device context
+      browser: (contexts.browser as any)?.name || '',
+      browser_version: (contexts.browser as any)?.version || '',
+      os: (contexts.os as any)?.name || '',
+      os_version: (contexts.os as any)?.version || '',
+      device: (contexts.device as any)?.family || (contexts.device as any)?.name || '',
+      // User identity
+      user_id: user.id || '',
+      locale: event.tags?.locale || (contexts as any).locale || '',
+      // AI classification (will be enriched by classifyFeedback before insert)
+      sentiment: '',
+      category: '',
+      is_spam: 0,
     };
   }
 

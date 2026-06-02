@@ -51,6 +51,7 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 import { TableSkeleton, ChartSkeleton, StatsRowSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import argusService, {
@@ -286,20 +287,13 @@ const ArgusPerformancePage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        {viewMode !== 'list' && (
-          <IconButton onClick={handleBack} size="small"><ArrowBackIcon /></IconButton>
-        )}
-        <SpeedIcon sx={{ fontSize: 26, color: theme.palette.primary.main }} />
-        <Typography variant="h5" fontWeight={700} noWrap sx={{ maxWidth: 500 }}>
-          {headerTitle}
-        </Typography>
-        {viewMode === 'list' && (
-          <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
-            — {t('argus.performance.subtitle')}
-          </Typography>
-        )}
-      </Box>
+      <PageHeader
+        icon={<SpeedIcon />}
+        title={headerTitle}
+        subtitle={viewMode === 'list' ? t('argus.performance.subtitle') : undefined}
+        enableAutoBack={viewMode === 'list'}
+        onBack={viewMode !== 'list' ? handleBack : undefined}
+      />
 
       {/* Filter Bar + Sort */}
       <ArgusFilterBar

@@ -21,11 +21,11 @@ import {
 } from '@mui/material';
 import {
   Close as CloseIcon,
-  ContentCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { CopyButton } from '@/components/common/CopyButton';
 import { ArgusTraceSpan } from '@/services/argusService';
 import { getOpColor } from './TraceWaterfall';
 
@@ -68,7 +68,6 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [expandedTags, setExpandedTags] = useState<Set<string>>(new Set());
 
   if (!span) return null;
@@ -77,12 +76,6 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
   const durationPct = totalDuration > 0 ? (duration / totalDuration) * 100 : 0;
   const isError = span.status !== 'ok' && span.status !== '';
   const opColor = getOpColor(span.op);
-
-  const handleCopy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
 
   const toggleTagExpand = (key: string) => {
     setExpandedTags(prev => {
@@ -110,17 +103,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
 
   // ---- Sub-components ----
 
-  const CopyBtn: React.FC<{ text: string; id: string }> = ({ text, id }) => (
-    <Tooltip title={copiedKey === id ? t('argus.spanDetail.copied') : t('common.copy', 'Copy')} placement="top">
-      <IconButton
-        size="small"
-        onClick={(e) => { e.stopPropagation(); handleCopy(text, id); }}
-        sx={{ p: 0.3, opacity: 0.4, '&:hover': { opacity: 1 } }}
-      >
-        <CopyIcon sx={{ fontSize: 12 }} />
-      </IconButton>
-    </Tooltip>
-  );
+
 
   /** General section row */
   const InfoRow: React.FC<{ label: string; value: string | React.ReactNode; copyable?: boolean }> = ({ label, value, copyable }) => (
@@ -144,7 +127,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
             {value}
           </Typography>
         ) : value}
-        {copyable && typeof value === 'string' && <CopyBtn text={value} id={label} />}
+        {copyable && typeof value === 'string' && <CopyButton text={value} size={12} sx={{ p: 0.3, opacity: 0.4, '&:hover': { opacity: 1 } }} />}
       </Box>
     </Box>
   );
@@ -381,40 +364,19 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
               }}>
                 {span.data?.['db.statement'] || span.data?.['db.query']}
               </Box>
-              <Button
-                size="small"
-                startIcon={<CopyIcon sx={{ fontSize: 12 }} />}
-                onClick={() => handleCopy(
-                  (span.data?.['db.statement'] || span.data?.['db.query'])!,
-                  'sql'
-                )}
-                sx={{
-                  textTransform: 'none', fontSize: '0.68rem', mt: 0.5, px: 1,
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {copiedKey === 'sql' ? t('argus.spanDetail.copied') : t('argus.spanDetail.copySql')}
-              </Button>
+              <CopyButton text={(span.data?.['db.statement'] || span.data?.['db.query'])!} size={12}
+                tooltip={t('argus.spanDetail.copySql')}
+                sx={{ mt: 0.5 }}
+              />
             </Box>
           )}
 
           {/* HTTP cURL inline */}
           {span.data?.['http.url'] && (
             <Box sx={{ mt: 1 }}>
-              <Button
-                size="small"
-                startIcon={<CopyIcon sx={{ fontSize: 12 }} />}
-                onClick={() => handleCopy(
-                  `curl -X ${span.data?.['http.method'] || 'GET'} '${span.data?.['http.url']}'`,
-                  'curl'
-                )}
-                sx={{
-                  textTransform: 'none', fontSize: '0.68rem', px: 1,
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {copiedKey === 'curl' ? t('argus.spanDetail.copied') : t('argus.spanDetail.copyAsCurl')}
-              </Button>
+              <CopyButton text={`curl -X ${span.data?.['http.method'] || 'GET'} '${span.data?.['http.url']}'`} size={12}
+                tooltip={t('argus.spanDetail.copyAsCurl')}
+              />
             </Box>
           )}
         </Box>

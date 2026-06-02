@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import {
   History as HistoryIcon,
-  ContentCopy as ContentCopyIcon,
   ViewColumn as ViewColumnIcon,
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
@@ -31,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import SimplePagination from '@/components/common/SimplePagination';
 import SearchTextField from '@/components/common/SearchTextField';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { CopyButton } from '@/components/common/CopyButton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePageState } from '@/hooks/usePageState';
 import RewardDisplay from '@/components/game/RewardDisplay';
@@ -345,16 +344,7 @@ const SurveyLogsPage: React.FC = () => {
     localStorage.setItem('surveyLogsColumns', JSON.stringify(defaultColumns));
   };
 
-  // Copy to clipboard handler
-  const handleCopy = (text: string | undefined) => {
-    if (!text) return;
-    copyToClipboardWithNotification(
-      text,
-      () =>
-        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-    );
-  };
+
 
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters((prev) => [...prev, filter]);
@@ -457,11 +447,7 @@ const SurveyLogsPage: React.FC = () => {
             <Typography variant="body2">
               {getSurveyTitle(r.surveyId)}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => handleCopy(r.surveyId)}>
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.surveyId} size={13} />
           </Box>
         );
       case 'action':
@@ -487,11 +473,7 @@ const SurveyLogsPage: React.FC = () => {
             >
               {r.accountId}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => handleCopy(r.accountId)}>
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.accountId} size={13} />
           </Box>
         );
       case 'userName':
@@ -508,14 +490,7 @@ const SurveyLogsPage: React.FC = () => {
             >
               {r.userName}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={() => handleCopy(r.userName || '')}
-              >
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.userName || ''} size={13} />
           </Box>
         ) : (
           '-'
@@ -534,14 +509,7 @@ const SurveyLogsPage: React.FC = () => {
             >
               {r.characterId}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={() => handleCopy(r.characterId!)}
-              >
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.characterId!} size={13} />
           </Box>
         ) : (
           '-'

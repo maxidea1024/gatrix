@@ -89,7 +89,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
         return reply.code(201).send({
           data: {
             ...project,
-            dsn: buildDsnUrl(project.public_key, projectId),
+            dsn: buildDsnUrl(project.public_key, project.gatrix_project_id),
           },
         });
       } catch (error: any) {
@@ -138,7 +138,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
         const project = results[0];
         project.dsn_keys = (dsnRows as any[]).map((d: any) => ({
           ...d,
-          dsn: buildDsnUrl(d.public_key, parseInt(projectId, 10)),
+          dsn: buildDsnUrl(d.public_key, project.gatrix_project_id),
         }));
 
         return reply.send({ data: project });
@@ -221,13 +221,16 @@ export default async function projectsRoutes(app: FastifyInstance) {
 
         const dsnKeyId = (result as any).insertId;
 
+        const [projRows] = await mysqlPool.query('SELECT gatrix_project_id FROM g_argus_projects WHERE id = ?', [projectId]);
+        const gatrixProjectId = (projRows as any[])[0]?.gatrix_project_id || projectId;
+
         return reply.code(201).send({
           data: {
             id: dsnKeyId,
             label: body.label || 'Default',
             public_key: publicKey,
             secret_key: secretKey,
-            dsn: buildDsnUrl(publicKey, parseInt(projectId, 10)),
+            dsn: buildDsnUrl(publicKey, gatrixProjectId),
           },
         });
       } catch (error) {
@@ -262,6 +265,37 @@ export default async function projectsRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to revoke DSN key' });
+      }
+    }
+  );
+
+  // Rename DSN key
+  app.patch(
+    '/projects/:projectId/dsn-keys/:keyId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, keyId } = request.params as {
+        projectId: string;
+        keyId: string;
+      };
+      const body = request.body as { label: string };
+
+      if (!body.label || !body.label.trim()) {
+        return reply.code(400).send({ error: 'Bad Request', message: 'Label is required' });
+      }
+
+      try {
+        await mysqlPool.query(
+          'UPDATE g_argus_dsnKeys SET label = ? WHERE id = ? AND project_id = ?',
+          [body.label.trim(), keyId, projectId]
+        );
+        return reply.send({ success: true });
+      } catch (error) {
+        logger.error('Failed to rename DSN key', {
+          projectId,
+          keyId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to rename DSN key' });
       }
     }
   );
@@ -318,7 +352,7 @@ function generateKey(length: number): string {
   return crypto.randomBytes(length).toString('hex').slice(0, length);
 }
 
-function buildDsnUrl(publicKey: string, projectId: number): string {
+function buildDsnUrl(publicKey: string, projectId: string | number): string {
   // DSN format: https://<publicKey>@<host>/argus/<projectId>
   const host = process.env.ARGUS_PUBLIC_HOST || 'localhost:45300';
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';

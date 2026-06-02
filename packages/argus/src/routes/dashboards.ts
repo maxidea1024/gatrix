@@ -25,6 +25,7 @@ interface WidgetConfig {
     orderBy?: string;
     limit?: number;
     period?: string;
+    dataset?: 'errors' | 'spans' | 'logs' | 'metrics';
   };
   layout: { x: number; y: number; w: number; h: number };
 }
@@ -188,7 +189,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       try {
         const [rows] = await mysqlPool.query(
           `SELECT id, project_id, title, description, widgets_config, created_at, updated_at
-           FROM argus_dashboards WHERE project_id = ? ORDER BY updated_at DESC`,
+           FROM g_argus_dashboards WHERE project_id = ? ORDER BY updated_at DESC`,
           [projectId]
         );
         return reply.send({ data: rows });
@@ -206,7 +207,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
       try {
         const [rows] = await mysqlPool.query(
-          `SELECT * FROM argus_dashboards WHERE id = ? AND project_id = ?`,
+          `SELECT * FROM g_argus_dashboards WHERE id = ? AND project_id = ?`,
           [dashboardId, projectId]
         );
         const arr = rows as any[];
@@ -242,7 +243,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         }
 
         const [result] = await mysqlPool.query(
-          `INSERT INTO argus_dashboards (project_id, title, description, widgets_config)
+          `INSERT INTO g_argus_dashboards (project_id, title, description, widgets_config)
            VALUES (?, ?, ?, ?)`,
           [projectId, title, description || '', JSON.stringify(widgets)]
         );
@@ -276,7 +277,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
 
         values.push(dashboardId, projectId);
         await mysqlPool.query(
-          `UPDATE argus_dashboards SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ? AND project_id = ?`,
+          `UPDATE g_argus_dashboards SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ? AND project_id = ?`,
           values
         );
         return reply.send({ success: true });
@@ -294,7 +295,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
       try {
         await mysqlPool.query(
-          `DELETE FROM argus_dashboards WHERE id = ? AND project_id = ?`,
+          `DELETE FROM g_argus_dashboards WHERE id = ? AND project_id = ?`,
           [dashboardId, projectId]
         );
         return reply.send({ success: true });
@@ -313,13 +314,22 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       const { query } = request.body as { query: WidgetConfig['query'] };
 
       try {
-        const { fields = ['count()'], conditions, groupBy, orderBy, limit = 20, period = '24h' } = query;
+        const { fields = ['count()'], conditions, groupBy, orderBy, limit = 20, period = '24h', dataset = 'errors' } = query;
 
         const periodMap: Record<string, string> = {
           '1h': '1 HOUR', '6h': '6 HOUR', '12h': '12 HOUR', '24h': '24 HOUR',
           '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
         };
         const interval = periodMap[period] || '24 HOUR';
+
+        // Determine table based on dataset
+        const datasetTableMap: Record<string, string> = {
+          errors: 'argus.errors',
+          spans: 'argus.spans',
+          logs: 'argus.logs',
+          metrics: 'argus.metrics',
+        };
+        const tableName = datasetTableMap[dataset] || 'argus.errors';
 
         // Build simple query (reuse discover logic)
         const selectParts = fields.map(f => {
@@ -337,7 +347,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           return f;
         });
 
-        let sql = `SELECT ${selectParts.join(', ')} FROM argus.errors WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}`;
+        let sql = `SELECT ${selectParts.join(', ')} FROM ${tableName} WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}`;
 
         if (conditions) {
           sql += ` AND ${conditions}`;

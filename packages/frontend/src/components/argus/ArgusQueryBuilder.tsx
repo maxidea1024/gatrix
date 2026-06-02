@@ -77,7 +77,7 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, on
       }
 
       setIsComplex(false);
-      const tokens = q.match(/("[^"]+"|[^"\s]+)/g) || [];
+      const tokens: string[] = q.match(/("[^"]+"|[^"\s]+)/g) || [];
       const newTags: TagRule[] = [];
       const newTexts: TextRule[] = [];
 

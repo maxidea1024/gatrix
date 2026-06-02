@@ -1,7 +1,7 @@
 -- Alert Rules table for Argus
 CREATE TABLE IF NOT EXISTS `g_argus_alert_rules` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `project_id` INT UNSIGNED NOT NULL,
+  `project_id` VARCHAR(64) NOT NULL,
   `name` VARCHAR(200) NOT NULL,
   `conditions` JSON NOT NULL COMMENT 'Array of conditions: [{type, value, interval}]',
   `actions` JSON NOT NULL COMMENT 'Array of actions: [{type, target_url, channel}]',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `g_argus_alert_rules` (
 CREATE TABLE IF NOT EXISTS `g_argus_alert_history` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `rule_id` INT UNSIGNED NOT NULL,
-  `project_id` INT UNSIGNED NOT NULL,
+  `project_id` VARCHAR(64) NOT NULL,
   `issue_id` INT UNSIGNED DEFAULT NULL,
   `message` TEXT,
   `triggered_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

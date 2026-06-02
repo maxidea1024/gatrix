@@ -21,9 +21,10 @@ import {
   Warning as WarningIcon,
   CheckCircle as CheckIcon,
   Schedule as ScheduleIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusRelease } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
@@ -31,12 +32,14 @@ import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/com
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 
 const ArgusReleasesPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
@@ -84,21 +87,20 @@ const ArgusReleasesPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <ReleaseIcon sx={{ fontSize: 26, color: '#7c4dff' }} />
-        <Typography variant="h5" fontWeight={700}>
-          {t('argus.releases.title')}
-        </Typography>
-        {!loading && releases.length > 0 && (
-          <Chip label={`${releases.length} ${t('argus.releases.releasesLabel')}`} size="small" sx={{
-            fontWeight: 700, fontSize: '0.75rem', height: 22,
-            backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
-          }} />
-        )}
-        <Typography variant="body2" sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>
-          — {t('argus.releases.subtitle')}
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={<ReleaseIcon />}
+        title={t('argus.releases.title')}
+        subtitle={t('argus.releases.subtitle')}
+        enableAutoBack
+        actions={
+          !loading && releases.length > 0 && (
+            <Chip label={`${releases.length} ${t('argus.releases.releasesLabel')}`} size="small" sx={{
+              fontWeight: 700, fontSize: '0.75rem', height: 22,
+              backgroundColor: alpha('#7c4dff', 0.1), color: '#7c4dff', border: 'none',
+            }} />
+          )
+        }
+      />
 
       {/* Filter Bar */}
       <ArgusFilterBar

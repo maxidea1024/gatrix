@@ -765,7 +765,7 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                   >
                                     {whitelist.accountId}
                                   </Typography>
-                                  <Tooltip title={t('whitelist.copyAccountId')}>
+                                  <Tooltip title={t('common.copy')}>
                                     <IconButton
                                       size="small"
                                       onClick={() =>

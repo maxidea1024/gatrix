@@ -305,10 +305,17 @@ export class QueryParser {
 
       if (n.type === 'RAW_SEARCH') {
         const pName = `raw_${Math.random().toString(36).substring(7)}`;
-        // If wildcard used
         const val = n.value.replace(/\*/g, '%');
         params[pName] = val.includes('%') ? val : `%${val}%`;
-        return { w: `(message ILIKE {${pName}:String} OR title ILIKE {${pName}:String})`, h: '' };
+        // Only search text columns that are in allowedColumns
+        const textCandidates = ['message', 'body', 'value', 'type', 'transaction', 'logger_name'];
+        const textCols = textCandidates.filter(c => this.allowedColumns.has(c));
+        if (textCols.length === 0) {
+          // No searchable text column available — return no-match
+          return { w: '1=0', h: '' };
+        }
+        const conds = textCols.map(c => `${c} ILIKE {${pName}:String}`).join(' OR ');
+        return { w: `(${conds})`, h: '' };
       }
 
       if (n.type === 'CONDITION') {

@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -52,6 +52,7 @@ import argusService from '@/services/argusService';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -502,20 +503,18 @@ const ArgusDashboardsPage: React.FC = () => {
     return (
       <Box>
         {/* Header */}
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <DashboardIcon sx={{ fontSize: 24, color: '#7c4dff' }} />
-            <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
-              {t('argus.dashboards.title', 'Dashboards')}
-            </Typography>
-          </Box>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}
-            sx={{
-              textTransform: 'none', fontWeight: 600,
-            }}>
-            {t('argus.dashboards.create', 'Create Dashboard')}
-          </Button>
-        </Box>
+        <PageHeader
+          icon={<DashboardIcon />}
+          title={t('argus.dashboards.title', 'Dashboards')}
+          actions={
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}
+              sx={{
+                textTransform: 'none', fontWeight: 600,
+              }}>
+              {t('argus.dashboards.create', 'Create Dashboard')}
+            </Button>
+          }
+        />
 
         {loading ? (
           <Box sx={{ py: 8, textAlign: 'center' }}><CircularProgress /></Box>
@@ -640,48 +639,41 @@ const ArgusDashboardsPage: React.FC = () => {
   return (
     <Box>
       {/* Dashboard Header */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton size="small" onClick={() => setActiveDashboard(null)}>
-            <BackIcon sx={{ fontSize: 20 }} />
-          </IconButton>
-          <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1rem' }}>
-            {activeDashboard.title}
-          </Typography>
-          {activeDashboard.description && (
-            <Typography variant="caption" sx={{ color: 'text.disabled', ml: 1 }}>
-              — {activeDashboard.description}
-            </Typography>
-          )}
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {isEditing ? (
-            <>
-              <Button size="small" startIcon={<AddIcon />} onClick={handleAddWidget}
+      <PageHeader
+        icon={<DashboardIcon />}
+        title={activeDashboard.title}
+        subtitle={activeDashboard.description}
+        onBack={() => setActiveDashboard(null)}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {isEditing ? (
+              <>
+                <Button size="small" startIcon={<AddIcon />} onClick={handleAddWidget}
+                  sx={{ textTransform: 'none', fontSize: '0.78rem', fontWeight: 600 }}>
+                  {t('argus.dashboards.addWidget', 'Add Widget')}
+                </Button>
+                <Button size="small" variant="outlined" onClick={() => setIsEditing(false)}
+                  sx={{ textTransform: 'none', fontSize: '0.78rem' }}>
+                  {t('common.cancel', 'Cancel')}
+                </Button>
+                <Button size="small" variant="contained" startIcon={<SaveIcon sx={{ fontSize: 16 }} />}
+                  onClick={handleSaveDashboard}
+                  sx={{
+                    textTransform: 'none', fontSize: '0.78rem', fontWeight: 700,
+                  }}>
+                  {t('common.save', 'Save')}
+                </Button>
+              </>
+            ) : (
+              <Button size="small" variant="outlined" startIcon={<EditIcon sx={{ fontSize: 16 }} />}
+                onClick={() => setIsEditing(true)}
                 sx={{ textTransform: 'none', fontSize: '0.78rem', fontWeight: 600 }}>
-                {t('argus.dashboards.addWidget', 'Add Widget')}
+                {t('argus.dashboards.editLayout', 'Edit')}
               </Button>
-              <Button size="small" variant="outlined" onClick={() => setIsEditing(false)}
-                sx={{ textTransform: 'none', fontSize: '0.78rem' }}>
-                {t('common.cancel', 'Cancel')}
-              </Button>
-              <Button size="small" variant="contained" startIcon={<SaveIcon sx={{ fontSize: 16 }} />}
-                onClick={handleSaveDashboard}
-                sx={{
-                  textTransform: 'none', fontSize: '0.78rem', fontWeight: 700,
-                }}>
-                {t('common.save', 'Save')}
-              </Button>
-            </>
-          ) : (
-            <Button size="small" variant="outlined" startIcon={<EditIcon sx={{ fontSize: 16 }} />}
-              onClick={() => setIsEditing(true)}
-              sx={{ textTransform: 'none', fontSize: '0.78rem', fontWeight: 600 }}>
-              {t('argus.dashboards.editLayout', 'Edit')}
-            </Button>
-          )}
-        </Box>
-      </Box>
+            )}
+          </Box>
+        }
+      />
 
       {/* Widget Grid */}
       {activeDashboard.widgets_config.length > 0 ? (

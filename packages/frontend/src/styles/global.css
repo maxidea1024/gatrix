@@ -11,6 +11,14 @@ input:-webkit-autofill:active {
   caret-color: inherit !important;
 }
 
+[data-theme='dark'] input:-webkit-autofill,
+[data-theme='dark'] input:-webkit-autofill:hover,
+[data-theme='dark'] input:-webkit-autofill:focus,
+[data-theme='dark'] input:-webkit-autofill:active {
+  -webkit-text-fill-color: #e4e4e7 !important;
+}
+
+
 /* Remove autofill background transition delay */
 input:-webkit-autofill {
   -webkit-transition: background-color 5000s ease-in-out 0s !important;

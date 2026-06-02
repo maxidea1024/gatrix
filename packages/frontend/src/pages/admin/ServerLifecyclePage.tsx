@@ -27,9 +27,7 @@ import {
   Cloud as CloudIcon,
   Code as CodeIcon,
   ErrorOutline as ErrorOutlineIcon,
-  ViewColumn as ViewColumnIcon,
-  ContentCopy as ContentCopyIcon,
-} from '@mui/icons-material';
+  ViewColumn as ViewColumnIcon,} from '@mui/icons-material';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -53,6 +51,7 @@ import ColumnSettingsDialog, {
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 
+import { CopyButton } from '@/components/common/CopyButton';
 // Event row component
 interface EventRowProps {
   event: ServerLifecycleEvent;
@@ -320,13 +319,7 @@ const EventRow: React.FC<EventRowProps> = ({
                       >
                         {event.instanceId}
                       </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleCopy(event.instanceId)}
-                        sx={{ p: 0.25 }}
-                      >
-                        <ContentCopyIcon sx={{ fontSize: 13 }} />
-                      </IconButton>
+                      <CopyButton text={event.instanceId} size={13} />
                     </Box>
                   </Box>
                   {/* Service */}
@@ -344,13 +337,7 @@ const EventRow: React.FC<EventRowProps> = ({
                       <Typography variant="body2">
                         {event.serviceType}
                       </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleCopy(event.serviceType)}
-                        sx={{ p: 0.25 }}
-                      >
-                        <ContentCopyIcon sx={{ fontSize: 13 }} />
-                      </IconButton>
+                      <CopyButton text={event.serviceType} size={13} />
                     </Box>
                   </Box>
                   {/* Group */}
@@ -369,13 +356,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.serviceGroup || '-'}
                       </Typography>
                       {event.serviceGroup && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.serviceGroup!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.serviceGroup!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -398,13 +379,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.hostname || '-'}
                       </Typography>
                       {event.hostname && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.hostname!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.hostname!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -424,13 +399,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.environmentId || '-'}
                       </Typography>
                       {event.environmentId && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.environmentId!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.environmentId!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -453,13 +422,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.externalAddress || '-'}
                       </Typography>
                       {event.externalAddress && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.externalAddress!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.externalAddress!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -482,13 +445,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.internalAddress || '-'}
                       </Typography>
                       {event.internalAddress && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.internalAddress!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.internalAddress!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -515,15 +472,7 @@ const EventRow: React.FC<EventRowProps> = ({
                           : '-'}
                       </Typography>
                       {event.ports && Object.keys(event.ports).length > 0 && (
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleCopy(JSON.stringify(event.ports))
-                          }
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={JSON.stringify(event.ports} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -546,17 +495,7 @@ const EventRow: React.FC<EventRowProps> = ({
                       {(event.cloudProvider ||
                         event.cloudRegion ||
                         event.cloudZone) && (
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleCopy(
-                              `${event.cloudProvider || ''} / ${event.cloudRegion || ''} / ${event.cloudZone || ''}`
-                            )
-                          }
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={`${event.cloudProvider || ''} / ${event.cloudRegion || ''} / ${event.cloudZone || ''}`} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -576,13 +515,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.sdkVersion || '-'}
                       </Typography>
                       {event.sdkVersion && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.sdkVersion!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.sdkVersion!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -602,13 +535,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         {event.appVersion || '-'}
                       </Typography>
                       {event.appVersion && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(event.appVersion!)}
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={event.appVersion!} size={13} />
                       )}
                     </Box>
                   </Box>
@@ -662,15 +589,7 @@ const EventRow: React.FC<EventRowProps> = ({
                             variant="outlined"
                           />
                         ))}
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleCopy(JSON.stringify(event.labels, null, 2))
-                          }
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={JSON.stringify(event.labels, null, 2} size={13} />
                       </Box>
                     </Box>
                   )}
@@ -702,15 +621,7 @@ const EventRow: React.FC<EventRowProps> = ({
                         >
                           {JSON.stringify(event.metadata, null, 2)}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleCopy(JSON.stringify(event.metadata, null, 2))
-                          }
-                          sx={{ p: 0.25 }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={JSON.stringify(event.metadata, null, 2} size={13} />
                       </Box>
                     </Box>
                   )}

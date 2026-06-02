@@ -15,7 +15,7 @@ import {
   FileDownload as ExportIcon, Terminal as LogIcon,
   TableChart as EditTableIcon, ArrowDownward as SortDescIcon,
   FiberManualRecord as DotIcon, ViewColumn as ViewIcon,
-  FilterList as FilterIcon, Block as ExcludeIcon, ContentCopy as CopyIcon,
+  FilterList as FilterIcon, Block as ExcludeIcon,
   Fullscreen as FullscreenIcon, FullscreenExit as FullscreenExitIcon,
   WrapText as WrapTextIcon, AccessTime as GotoTimeIcon,
   Save as SaveIcon, Bookmark as BookmarkIcon, BookmarkBorder as BookmarkBorderIcon,
@@ -36,6 +36,7 @@ import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import FeatureSwitch from '@/components/common/FeatureSwitch';
+import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip, Legend);
@@ -94,9 +95,7 @@ const LogDetail: React.FC<{
   const left = attrs.slice(0, mid);
   const right = attrs.slice(mid);
 
-  const handleCopy = (val: string) => {
-    navigator.clipboard.writeText(val);
-  };
+
 
   const renderColumn = (items: [string, any][]) => (
     <Box sx={{ flex: 1 }}>
@@ -120,11 +119,7 @@ const LogDetail: React.FC<{
               {typeof val === 'object' ? JSON.stringify(val) : String(val)}
             </Typography>
             <Box className="detail-actions" sx={{ opacity: 0, transition: 'opacity 0.2s', display: 'flex', gap: 0.5, flexShrink: 0 }}>
-              <Tooltip title={t('argus.logs.action.copy', 'Copy')}>
-                <IconButton size="small" onClick={() => handleCopy(typeof val === 'object' ? JSON.stringify(val) : String(val))} sx={{ p: 0.2 }}>
-                  <CopyIcon sx={{ fontSize: 13, color: 'text.secondary' }} />
-                </IconButton>
-              </Tooltip>
+              <CopyButton text={typeof val === 'object' ? JSON.stringify(val) : String(val)} size={13} sx={{ p: 0.2 }} />
               <Tooltip title={t('argus.logs.action.addFilter', 'Add to filter')}>
                 <IconButton size="small" onClick={() => onFilter(key, String(val), false)} sx={{ p: 0.2, color: 'primary.main' }}>
                   <FilterIcon sx={{ fontSize: 13 }} />

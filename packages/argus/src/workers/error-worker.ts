@@ -5,6 +5,7 @@ import { createLogger } from '../utils/logger';
 import { normalizeErrorEvent, NormalizedError } from '../processing/normalizer';
 import { computeFingerprint } from '../processing/fingerprinter';
 import { groupIntoIssue } from '../processing/issue-grouper';
+import { evaluateErrorAlerts } from '../utils/alert-evaluator';
 import { ArgusErrorEvent } from '../types/events';
 
 const logger = createLogger('error-worker');
@@ -197,7 +198,32 @@ export class ErrorWorker {
         fingerprint
       );
 
-      // 4. Assemble final record
+      // 4. Evaluate alert rules (fire-and-forget — never block event processing)
+      evaluateErrorAlerts(
+        {
+          event_id: rawEvent.event_id,
+          project_id: rawEvent.project_id,
+          internal_project_id: rawEvent.internal_project_id,
+          issue_id: groupResult.issue_id,
+          level: rawEvent.level || 'error',
+          environment: rawEvent.environment,
+          platform: rawEvent.platform,
+          release: rawEvent.release,
+          title: rawEvent.exception?.type
+            ? `${rawEvent.exception.type}: ${rawEvent.exception.value || ''}`
+            : 'Unknown Error',
+          culprit: rawEvent.exception?.stacktrace?.frames?.slice(-1)?.[0]?.function || '',
+          tags: rawEvent.tags,
+        },
+        groupResult
+      ).catch((e) => {
+        logger.warn('Alert evaluation failed (non-blocking)', {
+          eventId: rawEvent.event_id,
+          error: e instanceof Error ? e.message : String(e),
+        });
+      });
+
+      // 5. Assemble final record
       const record: NormalizedError = {
         ...normalized,
         fingerprint,

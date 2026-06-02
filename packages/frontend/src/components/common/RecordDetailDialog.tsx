@@ -15,11 +15,11 @@ import {
   Button,
 } from '@mui/material';
 import {
-  ContentCopy as CopyIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
+import { CopyButton } from '@/components/common/CopyButton';
+import { copyToClipboard } from '@/utils/clipboard';
 
 export interface DetailField {
   key: string;
@@ -46,15 +46,6 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
   fields,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
-
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    enqueueSnackbar(t('common.copied'), {
-      variant: 'success',
-      autoHideDuration: 1500,
-    });
-  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -136,18 +127,9 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
                             {displayValue}
                           </Typography>
                           {displayValue !== '-' && (
-                            <IconButton
-                              size="small"
-                              onClick={() => handleCopy(String(rawValue ?? ''))}
-                              sx={{
-                                opacity: 0.4,
-                                '&:hover': { opacity: 1 },
-                                ml: 1,
-                                flexShrink: 0,
-                              }}
-                            >
-                              <CopyIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
+                            <CopyButton text={String(rawValue ?? '')} size={13}
+                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, ml: 1, flexShrink: 0 }}
+                            />
                           )}
                         </Box>
                       </TableCell>
@@ -160,22 +142,10 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions sx={{ px: 2, pb: 2 }}>
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={<CopyIcon />}
-          onClick={() => {
-            if (data) {
-              navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-              enqueueSnackbar(t('common.copied'), {
-                variant: 'success',
-                autoHideDuration: 1500,
-              });
-            }
-          }}
-        >
-          {t('common.copyJson')}
-        </Button>
+        <CopyButton
+          text={data ? JSON.stringify(data, null, 2) : ''}
+          tooltip={t('common.copyJson')}
+        />
       </DialogActions>
     </Dialog>
   );

@@ -35,14 +35,18 @@ export default async function alertsRoutes(app: FastifyInstance) {
     '/:projectId/alerts',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { name, conditions, actions, frequency, environment, level, tags } = request.body as {
+      const { name, description, conditions, actions, frequency, environment, level, tags, dataset, query_config, condition_logic } = request.body as {
         name: string;
+        description?: string;
         conditions: any[];
         actions: any[];
         frequency?: number;
         environment?: string;
         level?: string;
         tags?: Record<string, string>;
+        dataset?: string;
+        query_config?: any;
+        condition_logic?: 'any' | 'all';
       };
 
       if (!name || !conditions || !actions) {
@@ -50,18 +54,32 @@ export default async function alertsRoutes(app: FastifyInstance) {
       }
 
       try {
+        // Ensure new columns exist
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS description TEXT DEFAULT NULL AFTER name`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS condition_logic VARCHAR(10) DEFAULT 'any' AFTER name`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS muted_until DATETIME DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS tags JSON DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS dataset VARCHAR(50) DEFAULT 'errors'`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS query_config JSON DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_history ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'success'`); } catch { /* may already exist */ }
+        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_history ADD COLUMN IF NOT EXISTS response_body TEXT DEFAULT NULL`); } catch { /* may already exist */ }
+
         const [result] = await mysqlPool.query(
-          `INSERT INTO g_argus_alert_rules (project_id, name, conditions, actions, frequency, environment, level, tags)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO g_argus_alert_rules (project_id, name, description, conditions, actions, frequency, environment, level, tags, condition_logic, dataset, query_config)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             projectId,
             name,
+            description || null,
             JSON.stringify(conditions),
             JSON.stringify(actions),
             frequency || 60,
             environment || null,
             level || null,
             tags ? JSON.stringify(tags) : null,
+            condition_logic || 'any',
+            dataset || 'errors',
+            query_config ? JSON.stringify(query_config) : null,
           ]
         );
         const insertId = (result as any).insertId;
@@ -81,8 +99,9 @@ export default async function alertsRoutes(app: FastifyInstance) {
     '/:projectId/alerts/:ruleId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, ruleId } = request.params as { projectId: string; ruleId: string };
-      const { name, conditions, actions, frequency, environment, level, enabled, tags } = request.body as {
+      const { name, description, conditions, actions, frequency, environment, level, enabled, tags, dataset, query_config, condition_logic } = request.body as {
         name?: string;
+        description?: string;
         conditions?: any[];
         actions?: any[];
         frequency?: number;
@@ -90,6 +109,10 @@ export default async function alertsRoutes(app: FastifyInstance) {
         level?: string;
         enabled?: boolean;
         tags?: Record<string, string>;
+        dataset?: string;
+        query_config?: any;
+        condition_logic?: 'any' | 'all';
+        muted_until?: string;
       };
 
       try {
@@ -97,6 +120,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         const params: any[] = [];
 
         if (name !== undefined) { updates.push('name = ?'); params.push(name); }
+        if (description !== undefined) { updates.push('description = ?'); params.push(description || null); }
         if (conditions !== undefined) { updates.push('conditions = ?'); params.push(JSON.stringify(conditions)); }
         if (actions !== undefined) { updates.push('actions = ?'); params.push(JSON.stringify(actions)); }
         if (frequency !== undefined) { updates.push('frequency = ?'); params.push(frequency); }
@@ -104,6 +128,10 @@ export default async function alertsRoutes(app: FastifyInstance) {
         if (level !== undefined) { updates.push('level = ?'); params.push(level || null); }
         if (enabled !== undefined) { updates.push('enabled = ?'); params.push(enabled ? 1 : 0); }
         if (tags !== undefined) { updates.push('tags = ?'); params.push(tags ? JSON.stringify(tags) : null); }
+        if (dataset !== undefined) { updates.push('dataset = ?'); params.push(dataset); }
+        if (query_config !== undefined) { updates.push('query_config = ?'); params.push(query_config ? JSON.stringify(query_config) : null); }
+        if (condition_logic !== undefined) { updates.push('condition_logic = ?'); params.push(condition_logic); }
+        if ((request.body as any).muted_until !== undefined) { updates.push('muted_until = ?'); params.push((request.body as any).muted_until || null); }
 
         if (updates.length === 0) {
           return reply.code(400).send({ error: 'No fields to update' });
@@ -179,6 +207,32 @@ export default async function alertsRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get alert history' });
+      }
+    }
+  );
+
+  // Get alert stats (for mini charts & timeline)
+  app.get(
+    '/:projectId/alerts/stats',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { days = '7' } = request.query as Record<string, string>;
+      try {
+        const daysInt = parseInt(days, 10);
+        const formatStr = daysInt > 14 ? '%Y-%m-%d 00:00:00' : '%Y-%m-%d %H:00:00';
+        
+        const sql = `
+          SELECT rule_id, DATE_FORMAT(triggered_at, ?) as bucket, COUNT(*) as count
+          FROM g_argus_alert_history
+          WHERE project_id = ? AND triggered_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+          GROUP BY rule_id, bucket
+          ORDER BY bucket ASC
+        `;
+        const [rows] = await mysqlPool.query(sql, [formatStr, projectId, daysInt]);
+        return reply.send({ success: true, data: rows });
+      } catch (error) {
+        logger.error('Failed to get alert stats', { projectId, error: String(error) });
+        return reply.code(500).send({ error: 'Failed to get alert stats' });
       }
     }
   );

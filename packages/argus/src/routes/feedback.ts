@@ -14,13 +14,14 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       const {
         period = '7d', page = '1', limit = '20', search = '', status = '',
         start, end, sort = 'newest',
-        filterUrl, filterAssigned, filterEnvironment,
+        filterUrl, filterAssigned, filterEnvironment, filterBrowser, filterOs,
       } = request.query as {
         period?: string; page?: string; limit?: string;
         search?: string; status?: string;
         start?: string; end?: string;
         sort?: string;
         filterUrl?: string; filterAssigned?: string; filterEnvironment?: string;
+        filterBrowser?: string; filterOs?: string;
       };
 
       const limitNum = parseInt(limit, 10);
@@ -72,6 +73,14 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         structuredClause += ` AND environment = {filterEnvironment:String}`;
         qp.filterEnvironment = filterEnvironment;
       }
+      if (filterBrowser) {
+        structuredClause += ` AND browser = {filterBrowser:String}`;
+        qp.filterBrowser = filterBrowser;
+      }
+      if (filterOs) {
+        structuredClause += ` AND os = {filterOs:String}`;
+        qp.filterOs = filterOs;
+      }
 
       // Sort
       const orderBy = sort === 'oldest' ? 'timestamp ASC' : 'timestamp DESC';
@@ -93,7 +102,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               feedback_id, event_id, email, name, message, contact_email,
               timestamp AS submitted_at, url,
               status, assigned_to, is_spam, attachments,
-              environment, release, source, tags
+              environment, release, source, tags,
+              browser, browser_version, os, os_version, device,
+              user_id, locale, is_read, category, sentiment
             FROM argus.user_feedback
             WHERE ${whereBase}
             ORDER BY ${orderBy}
@@ -121,7 +132,15 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               avg(length(message)) AS avg_message_length,
               countIf(status = 'unresolved' AND is_spam = 0) AS unresolved_count,
               countIf(status = 'resolved') AS resolved_count,
-              countIf(is_spam = 1) AS spam_count
+              countIf(is_spam = 1) AS spam_count,
+              countIf(sentiment = 'positive') AS sentiment_positive,
+              countIf(sentiment = 'negative') AS sentiment_negative,
+              countIf(sentiment = 'neutral') AS sentiment_neutral,
+              countIf(category = 'bug') AS category_bug,
+              countIf(category = 'feature_request') AS category_feature,
+              countIf(category = 'complaint') AS category_complaint,
+              countIf(category = 'praise') AS category_praise,
+              countIf(category = 'question') AS category_question
             FROM argus.user_feedback
             WHERE ${baseConditionNoStatus}`,
             query_params: qp,
@@ -246,6 +265,31 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             WHERE project_id = {projectId:String} AND feedback_id = {feedbackId:String}`,
           query_params: params,
         });
+
+        // Record activity
+        try {
+          await ensureActivityTable();
+          if (body.status) {
+            await mysqlPool.query(
+              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data) VALUES (?, ?, ?, ?)',
+              [projectId, feedbackId, 'status_change', JSON.stringify({ from: '', to: body.status })]
+            );
+          }
+          if (body.assigned_to !== undefined) {
+            await mysqlPool.query(
+              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data) VALUES (?, ?, ?, ?)',
+              [projectId, feedbackId, 'assign', JSON.stringify({ assigned_to: body.assigned_to })]
+            );
+          }
+          if (body.is_spam !== undefined) {
+            await mysqlPool.query(
+              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data) VALUES (?, ?, ?, ?)',
+              [projectId, feedbackId, body.is_spam ? 'mark_spam' : 'unmark_spam', null]
+            );
+          }
+        } catch (e) {
+          logger.warn('Failed to record feedback activity', { error: (e as Error).message });
+        }
 
         return reply.send({ success: true });
       } catch (error) {
@@ -376,7 +420,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           await mysqlPool.query(`
             CREATE TABLE IF NOT EXISTS g_argus_spam_keywords (
               id INT AUTO_INCREMENT PRIMARY KEY,
-              project_id INT NOT NULL,
+              project_id VARCHAR(64) NOT NULL,
               keyword VARCHAR(255) NOT NULL,
               is_regex TINYINT(1) DEFAULT 0,
               created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -407,7 +451,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         await mysqlPool.query(`
           CREATE TABLE IF NOT EXISTS g_argus_spam_keywords (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            project_id INT NOT NULL,
+            project_id VARCHAR(64) NOT NULL,
             keyword VARCHAR(255) NOT NULL,
             is_regex TINYINT(1) DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -505,6 +549,151 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  // ─── Feedback Filter Options ───
+
+  // Get distinct filter values for feedback
+  app.get(
+    '/feedback/:projectId/filter-options',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { period = '30d' } = request.query as { period?: string };
+
+      const interval = periodToInterval(period);
+
+      try {
+        const [envResult, browserResult, osResult, assignedResult] = await Promise.all([
+          clickhouse.query({
+            query: `SELECT DISTINCT environment FROM argus.user_feedback
+              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              AND environment != '' ORDER BY environment`,
+            query_params: { projectId: String(projectId) },
+          }),
+          clickhouse.query({
+            query: `SELECT DISTINCT browser FROM argus.user_feedback
+              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              AND browser != '' ORDER BY browser`,
+            query_params: { projectId: String(projectId) },
+          }),
+          clickhouse.query({
+            query: `SELECT DISTINCT os FROM argus.user_feedback
+              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              AND os != '' ORDER BY os`,
+            query_params: { projectId: String(projectId) },
+          }),
+          clickhouse.query({
+            query: `SELECT DISTINCT assigned_to FROM argus.user_feedback
+              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              AND assigned_to != '' ORDER BY assigned_to`,
+            query_params: { projectId: String(projectId) },
+          }),
+        ]);
+
+        const [envData, browserData, osData, assignedData] = await Promise.all([
+          envResult.json(), browserResult.json(), osResult.json(), assignedResult.json(),
+        ]);
+
+        return reply.send({
+          data: {
+            environments: ((envData.data || []) as any[]).map((r: any) => r.environment),
+            browsers: ((browserData.data || []) as any[]).map((r: any) => r.browser),
+            os: ((osData.data || []) as any[]).map((r: any) => r.os),
+            assigned: ((assignedData.data || []) as any[]).map((r: any) => r.assigned_to),
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to get feedback filter options', {
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get feedback filter options' });
+      }
+    }
+  );
+
+  // ─── Mark Feedback as Read ───
+
+  app.post(
+    '/feedback/:projectId/mark-read',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { feedback_ids } = request.body as { feedback_ids: string[] };
+
+      if (!feedback_ids?.length) {
+        return reply.code(400).send({ error: 'No feedback IDs provided' });
+      }
+
+      try {
+        await clickhouse.command({
+          query: `ALTER TABLE argus.user_feedback UPDATE is_read = 1
+            WHERE project_id = {projectId:String} AND feedback_id IN ({ids:Array(String)})`,
+          query_params: { projectId: String(projectId), ids: feedback_ids },
+        });
+        return reply.send({ success: true });
+      } catch (error) {
+        logger.error('Failed to mark feedback as read', {
+          projectId,
+          error: (error as Error).message,
+        });
+        return reply.code(500).send({ error: 'Failed to mark feedback as read' });
+      }
+    }
+  );
+
+  // ─── Feedback Activity History ───
+
+  app.get(
+    '/feedback/:projectId/:feedbackId/activity',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
+
+      try {
+        await ensureActivityTable();
+        const [rows] = await mysqlPool.query(
+          `SELECT * FROM g_argus_feedback_activity
+           WHERE project_id = ? AND feedback_id = ?
+           ORDER BY created_at DESC LIMIT 50`,
+          [projectId, feedbackId]
+        );
+        return reply.send({ data: rows });
+      } catch (error) {
+        logger.error('Failed to get feedback activity', {
+          projectId, feedbackId,
+          error: (error as Error).message,
+        });
+        return reply.code(500).send({ error: 'Failed to get feedback activity' });
+      }
+    }
+  );
+
+  // ─── Add Comment to Feedback ───
+
+  app.post(
+    '/feedback/:projectId/:feedbackId/comment',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
+      const { text, user_name } = request.body as { text: string; user_name?: string };
+
+      if (!text?.trim()) {
+        return reply.code(400).send({ error: 'Comment text is required' });
+      }
+
+      try {
+        await ensureActivityTable();
+        const [result] = await mysqlPool.query(
+          'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, user_name, action, data) VALUES (?, ?, ?, ?, ?)',
+          [projectId, feedbackId, user_name || null, 'comment', JSON.stringify({ text: text.trim() })]
+        );
+        return reply.code(201).send({ data: { id: (result as any).insertId } });
+      } catch (error) {
+        logger.error('Failed to add feedback comment', {
+          projectId, feedbackId,
+          error: (error as Error).message,
+        });
+        return reply.code(500).send({ error: 'Failed to add feedback comment' });
+      }
+    }
+  );
 }
 
 function periodToInterval(period: string): string {
@@ -518,4 +707,27 @@ function periodToInterval(period: string): string {
     '90d': '90 DAY',
   };
   return map[period] || '7 DAY';
+}
+
+let activityTableChecked = false;
+async function ensureActivityTable(): Promise<void> {
+  if (activityTableChecked) return;
+  try {
+    await mysqlPool.query(`
+      CREATE TABLE IF NOT EXISTS g_argus_feedback_activity (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        project_id VARCHAR(64) NOT NULL,
+        feedback_id VARCHAR(64) NOT NULL,
+        user_name VARCHAR(255) DEFAULT NULL,
+        action ENUM('status_change','assign','comment','mark_spam','unmark_spam') NOT NULL,
+        data JSON DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_feedback (project_id, feedback_id),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+    activityTableChecked = true;
+  } catch (e) {
+    logger.warn('Failed to ensure activity table', { error: (e as Error).message });
+  }
 }
