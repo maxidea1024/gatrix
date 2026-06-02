@@ -928,7 +928,7 @@ const ArgusFeedbackPage: React.FC = () => {
           <Box
             onMouseDown={handleSplitterMouseDown}
             sx={{
-              width: 6,
+              width: 3,
               flexShrink: 0,
               cursor: 'col-resize',
               bgcolor: 'divider',
@@ -945,7 +945,7 @@ const ArgusFeedbackPage: React.FC = () => {
           >
             <Box
               sx={{
-                width: 2,
+                width: 1,
                 height: 32,
                 borderRadius: 1,
                 bgcolor: 'text.disabled',
