@@ -351,7 +351,6 @@ const ArgusSettingsPage: React.FC = () => {
   const inpSx = {
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
-      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
       fontSize: '0.875rem',
     },
   };
@@ -1062,7 +1061,7 @@ const ArgusSettingsPage: React.FC = () => {
                       <TextField size="small" placeholder={t('argus.settings.pattern')}
                         value={newRule.pattern} onChange={e => setNewRule({ ...newRule, pattern: e.target.value })}
                         fullWidth
-                        sx={{ ...inpSx, '& .MuiOutlinedInput-root': { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem', borderRadius: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
+                        sx={{ ...inpSx, '& .MuiOutlinedInput-root': { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem', borderRadius: '8px' }, '& .MuiOutlinedInput-notchedOutline legend': { display: 'none' }, '& .MuiInputLabel-root': { display: 'none' } }} />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontSize: '0.68rem' }}>{t('argus.settings.globHint')}</Typography>
                     </Box>
                     <Box sx={{ mb: 2 }}>
