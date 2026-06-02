@@ -1,5 +1,10 @@
 /* Global styles for the application */
 
+/* Base font weight — prevents thin 400 text across the app */
+body {
+  font-weight: 500;
+}
+
 /* Disable autofill styling completely */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
