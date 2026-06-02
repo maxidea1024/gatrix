@@ -464,7 +464,7 @@ const ArgusIssueDetailPage: React.FC = () => {
             </Box>
           </Box>
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'start' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'stretch' }}>
             {/* Left Column: Main Content */}
             <Box>
               {/* Event Distribution Chart */}
