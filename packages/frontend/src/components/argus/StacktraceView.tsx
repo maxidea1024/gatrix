@@ -17,10 +17,11 @@ SyntaxHighlighter.registerLanguage('python', python);
 interface StacktraceViewProps {
   stacktrace: any;
   mode?: 'relevant' | 'full';
+  order?: 'recent' | 'oldest';
   isDark: boolean;
 }
 
-const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'full', isDark }) => {
+const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'full', order = 'recent', isDark }) => {
   const { t } = useTranslation();
   const [toggledFrames, setToggledFrames] = useState<Set<number>>(new Set());
 
@@ -31,7 +32,10 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
 
   if (frames.length === 0) return null;
 
-  const displayFrames = mode === 'relevant' ? frames.filter(f => f.in_app) : frames;
+  let displayFrames = mode === 'relevant' ? frames.filter(f => f.in_app) : [...frames];
+  if (order === 'oldest') {
+    displayFrames = displayFrames.reverse();
+  }
 
   const toggleFrame = (idx: number) => {
     setToggledFrames(prev => {

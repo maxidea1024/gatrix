@@ -127,6 +127,9 @@ const ArgusIssueDetailPage: React.FC = () => {
   // Other UI states
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
   const [stacktraceMode, setStacktraceMode] = useState<'relevant' | 'full'>('relevant');
+  const [stacktraceOrder, setStacktraceOrder] = useState<'recent' | 'oldest'>('recent');
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Splitter states
@@ -701,14 +704,40 @@ const ArgusIssueDetailPage: React.FC = () => {
                   </Box>
 
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button size="small" variant="outlined" endIcon={<ExpandMoreIcon sx={{ fontSize: 16 }} />} sx={{ textTransform: 'none', color: 'text.primary', borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', fontSize: '0.75rem', height: 32, borderRadius: 1.5 }}>
+                    <Button size="small" variant="outlined" 
+                      onClick={() => setStacktraceOrder(prev => prev === 'recent' ? 'oldest' : 'recent')}
+                      endIcon={<ExpandMoreIcon sx={{ fontSize: 16, transform: stacktraceOrder === 'oldest' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />} 
+                      sx={{ textTransform: 'none', color: 'text.primary', borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', fontSize: '0.75rem', height: 32, borderRadius: 1.5 }}
+                    >
                       <Typography component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: 'inherit', fontWeight: 600 }}>
-                        <span style={{ fontSize: '10px' }}>⇅</span> {t('argus.issues.mostRecent', 'Most Recent')}
+                        <span style={{ fontSize: '10px' }}>⇅</span> {stacktraceOrder === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
                       </Typography>
                     </Button>
-                    <Button size="small" variant="outlined" sx={{ minWidth: 0, px: 1, borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', color: 'text.primary', height: 32, borderRadius: 1.5 }}>
+                    <Button size="small" variant="outlined" 
+                      onClick={(e) => setMoreMenuAnchor(e.currentTarget)}
+                      sx={{ minWidth: 0, px: 1, borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', color: 'text.primary', height: 32, borderRadius: 1.5 }}
+                    >
                       <Typography component="span" sx={{ fontSize: '12px', lineHeight: 1 }}>•••</Typography>
                     </Button>
+                    
+                    <Menu
+                      anchorEl={moreMenuAnchor}
+                      open={Boolean(moreMenuAnchor)}
+                      onClose={() => setMoreMenuAnchor(null)}
+                      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    >
+                      <MenuItem onClick={() => {
+                        if (latestEvent?.stacktrace_raw) {
+                          const raw = typeof latestEvent.stacktrace_raw === 'string' ? latestEvent.stacktrace_raw : JSON.stringify(latestEvent.stacktrace_raw, null, 2);
+                          navigator.clipboard.writeText(raw);
+                          setCopySuccess(true);
+                        }
+                        setMoreMenuAnchor(null);
+                      }}>
+                        <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>{t('argus.issues.copyRawStacktrace')}</ListItemText>
+                      </MenuItem>
+                    </Menu>
                   </Box>
                 </Box>
               </Box>
@@ -718,7 +747,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
                 borderRadius: 2, overflow: 'hidden',
               }}>
-                <StacktraceView stacktrace={latestEvent.stacktrace_raw} mode={stacktraceMode} isDark={isDark} />
+                <StacktraceView stacktrace={latestEvent.stacktrace_raw} mode={stacktraceMode} order={stacktraceOrder} isDark={isDark} />
               </Paper>
 
               {/* Context Grid */}
@@ -1108,6 +1137,17 @@ const ArgusIssueDetailPage: React.FC = () => {
           );
         })}
       </Menu>
+
+      <Snackbar 
+        open={copySuccess} 
+        autoHideDuration={2000} 
+        onClose={() => setCopySuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" sx={{ width: '100%', borderRadius: 2 }}>
+          {t('argus.issues.copySuccess')}
+        </Alert>
+      </Snackbar>
         </Box>
       )}
     </PageContentLoader>
