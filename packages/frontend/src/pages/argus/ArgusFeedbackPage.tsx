@@ -106,7 +106,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 const DEFAULT_SPLIT_WIDTH = 380;
 const MIN_SPLIT_WIDTH = 280;
-const MAX_SPLIT_WIDTH = 1200;
+const MAX_SPLIT_WIDTH = 1000;
 
 // ─── Helpers ───
 function stringToColor(str: string): string {
