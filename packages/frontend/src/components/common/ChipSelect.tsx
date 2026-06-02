@@ -79,7 +79,7 @@ const ChipSelect: React.FC<ChipSelectProps> = ({
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          height: '38px',
+          height: '37px',
           borderRadius: '4px',
           border: '1px solid',
           borderColor: open ? 'primary.main' : 'divider',
