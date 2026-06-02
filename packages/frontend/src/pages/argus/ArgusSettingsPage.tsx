@@ -588,7 +588,7 @@ const ArgusSettingsPage: React.FC = () => {
             {/* ─── GENERAL ─── */}
             {currentSection === 'general' && (
               <SettingsCard title={t('argus.settings.general')} desc={t('argus.settings.generalDesc')} isDark={isDark}
-                footer={<Button variant="contained" size="small" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !isDirty}
+                headerAction={<Button variant="contained" size="small" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !isDirty}
                   sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, px: 3, boxShadow: 'none' }}>
                   {saving ? t('argus.settings.saving') : t('common.save')}
                 </Button>}
@@ -621,7 +621,7 @@ const ArgusSettingsPage: React.FC = () => {
             {/* ─── SAMPLING ─── */}
             {currentSection === 'sampling' && (<>
               <SettingsCard title={t('argus.settings.samplingQuotas')} desc={t('argus.settings.samplingDesc')} isDark={isDark}
-                footer={<Button variant="contained" size="small" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !isDirty}
+                headerAction={<Button variant="contained" size="small" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !isDirty}
                   sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, px: 3, boxShadow: 'none' }}>
                   {saving ? t('argus.settings.saving') : t('common.save')}
                 </Button>}

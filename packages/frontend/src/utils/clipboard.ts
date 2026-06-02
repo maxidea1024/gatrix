@@ -130,29 +130,15 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 /**
- * Copy text to clipboard and show snackbar notification
- * @param text - Text to copy
- * @param onSuccess - Callback when copy is successful
- * @param onError - Callback when copy fails
+ * Copy text to clipboard with notification callbacks.
+ *
+ * @deprecated Use `copyToClipboard` directly or `<CopyButton>` component instead.
+ * Callbacks are ignored — inline ✓ feedback via CopyButton replaces toast notifications.
  */
 export const copyToClipboardWithNotification = async (
   text: string,
-  onSuccess: () => void,
-  onError: () => void
+  _onSuccess?: () => void,
+  _onError?: () => void
 ): Promise<void> => {
-  console.log('[ClipboardNotification] Starting copy with notification');
-  try {
-    const success = await copyToClipboard(text);
-    console.log('[ClipboardNotification] Copy result:', success);
-    if (success) {
-      console.log('[ClipboardNotification] Calling onSuccess');
-      onSuccess();
-    } else {
-      console.log('[ClipboardNotification] Calling onError - copy failed');
-      onError();
-    }
-  } catch (error) {
-    console.error('[ClipboardNotification] Copy to clipboard error:', error);
-    onError();
-  }
+  await copyToClipboard(text);
 };
