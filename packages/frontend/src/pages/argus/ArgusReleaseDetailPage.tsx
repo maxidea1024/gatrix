@@ -25,10 +25,14 @@ import {
   TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
+import SimplePagination from '@/components/common/SimplePagination';
+
+const VALID_PAGE_SIZES = [20, 50, 100];
+const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
 
 function formatDate(dateStr: string): string {
   try {
@@ -62,6 +66,18 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const [releaseData, setReleaseData] = useState<any>(null);
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
   const [issuesLoading, setIssuesLoading] = useState(true);
+  
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+    const saved = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
+    return saved && VALID_PAGE_SIZES.includes(Number(saved)) ? Number(saved) : 20;
+  });
+  const [totalIssues, setTotalIssues] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
+  }, [rowsPerPage]);
 
   const decodedRelease = release ? decodeURIComponent(release) : '';
 
@@ -88,16 +104,19 @@ const ArgusReleaseDetailPage: React.FC = () => {
       const result = await argusService.listIssues(projectId, {
         status: 'unresolved',
         sort: 'last_seen',
-        limit: 20,
-        offset: 0,
+        limit: rowsPerPage,
+        offset: (page - 1) * rowsPerPage,
       });
       setIssues(result.data);
+      setTotalIssues(result.total || 0);
     } catch (error) {
       console.error('Failed to fetch issues:', error);
+      setIssues([]);
+      setTotalIssues(0);
     } finally {
       setIssuesLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, page, rowsPerPage]);
 
   useEffect(() => {
     fetchReleaseData();
@@ -332,6 +351,29 @@ const ArgusReleaseDetailPage: React.FC = () => {
                     );
                   })}
                 </Paper>
+              )}
+
+              {totalIssues > 0 && (
+                <Box sx={{ mt: 3 }}>
+                  <SimplePagination
+                    count={totalIssues}
+                    page={page - 1}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={(_, newPage) => {
+                      const params = new URLSearchParams(searchParams);
+                      params.set('page', String(newPage + 1));
+                      setSearchParams(params);
+                    }}
+                    onRowsPerPageChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      const params = new URLSearchParams(searchParams);
+                      params.set('page', '1');
+                      setSearchParams(params);
+                    }}
+                    rowsPerPageOptions={VALID_PAGE_SIZES}
+                    size="small"
+                  />
+                </Box>
               )}
             </PageContentLoader>
           </>
