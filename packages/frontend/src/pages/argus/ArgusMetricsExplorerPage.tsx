@@ -22,6 +22,7 @@ import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import InteractiveTimeSeriesChart, { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
+import SingleSelectFilterChip from '@/components/common/SingleSelectFilterChip';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useLocation } from 'react-router-dom';
@@ -477,20 +478,23 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                 )}
               />
 
-              <FormControl size="small">
-                <Select value={q.agg} onChange={(e) => updateQuery(q.id, { agg: e.target.value as string })} sx={{ height: 36, fontSize: '0.75rem', fontWeight: 600, minWidth: 90, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' }}>
-                  {aggOptions.map(o => <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>{o.label}</MenuItem>)}
-                </Select>
-              </FormControl>
+              <SingleSelectFilterChip
+                label={t('argus.metrics.aggregation', 'Aggregation')}
+                value={q.agg}
+                onChange={(val) => updateQuery(q.id, { agg: val })}
+                options={aggOptions}
+              />
 
-              <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>{t('argus.metrics.groupBy', 'Group by:')}</Typography>
-              <FormControl size="small">
-                <Select displayEmpty value={q.groupBy} onChange={(e) => updateQuery(q.id, { groupBy: e.target.value as string })} sx={{ height: 36, fontSize: '0.75rem', fontWeight: 600, minWidth: 110, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' }}>
-                  <MenuItem value="" sx={{ fontSize: '0.75rem' }}>{t('common.none', 'None')}</MenuItem>
-                  <MenuItem value="environment" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.environment', 'Environment')}</MenuItem>
-                  <MenuItem value="release" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.release', 'Release')}</MenuItem>
-                </Select>
-              </FormControl>
+              <SingleSelectFilterChip
+                label={t('argus.metrics.groupBy', 'Group by:')}
+                value={q.groupBy}
+                onChange={(val) => updateQuery(q.id, { groupBy: val })}
+                options={[
+                  { value: '', label: t('common.none', 'None') },
+                  { value: 'environment', label: t('argus.metrics.environment', 'Environment') },
+                  { value: 'release', label: t('argus.metrics.release', 'Release') }
+                ]}
+              />
 
               <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5 }}>
                 <Tooltip title={q.isHidden ? t('argus.metrics.showSeries', 'Show series') : t('argus.metrics.hideSeries', 'Hide series')}>
@@ -555,25 +559,25 @@ const ArgusMetricsExplorerPage: React.FC = () => {
 
         {/* Chart Configuration */}
         <Box sx={{ mt: 3, pt: 2, borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, display: 'flex', alignItems: 'center', gap: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.chartType', 'Chart Type:')}</Typography>
-            <FormControl size="small">
-              <Select value={chartConfig.type} onChange={(e) => setChartConfig({ ...chartConfig, type: e.target.value as any })} sx={{ height: 28, fontSize: '0.75rem', fontWeight: 600, minWidth: 100 }}>
-                <MenuItem value="line" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.line', 'Line')}</MenuItem>
-                <MenuItem value="area" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.area', 'Area')}</MenuItem>
-                <MenuItem value="bar" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.bar', 'Bar')}</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.yAxis', 'Y-Axis:')}</Typography>
-            <FormControl size="small">
-              <Select value={chartConfig.yAxisType} onChange={(e) => setChartConfig({ ...chartConfig, yAxisType: e.target.value as any })} sx={{ height: 28, fontSize: '0.75rem', fontWeight: 600, minWidth: 100 }}>
-                <MenuItem value="linear" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.linear', 'Linear')}</MenuItem>
-                <MenuItem value="logarithmic" sx={{ fontSize: '0.75rem' }}>{t('argus.metrics.logarithmic', 'Logarithmic')}</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+          <SingleSelectFilterChip
+            label={t('argus.metrics.chartType', 'Chart Type:')}
+            value={chartConfig.type}
+            onChange={(val) => setChartConfig({ ...chartConfig, type: val as any })}
+            options={[
+              { value: 'line', label: t('argus.metrics.line', 'Line') },
+              { value: 'area', label: t('argus.metrics.area', 'Area') },
+              { value: 'bar', label: t('argus.metrics.bar', 'Bar') }
+            ]}
+          />
+          <SingleSelectFilterChip
+            label={t('argus.metrics.yAxis', 'Y-Axis:')}
+            value={chartConfig.yAxisType}
+            onChange={(val) => setChartConfig({ ...chartConfig, yAxisType: val as any })}
+            options={[
+              { value: 'linear', label: t('argus.metrics.linear', 'Linear') },
+              { value: 'logarithmic', label: t('argus.metrics.logarithmic', 'Logarithmic') }
+            ]}
+          />
           <FormControlLabel
             control={<Switch size="small" checked={chartConfig.showLegend} onChange={(e) => setChartConfig({ ...chartConfig, showLegend: e.target.checked })} />}
             label={<Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.showLegend', 'Show Legend')}</Typography>}
