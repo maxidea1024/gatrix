@@ -351,6 +351,12 @@ const ArgusMetricsExplorerPage = React.lazy(
 const ArgusExplorePage = React.lazy(
   () => import('./pages/argus/ArgusExplorePage')
 );
+const ArgusCronsPage = React.lazy(
+  () => import('./pages/argus/ArgusCronsPage')
+);
+const ArgusUptimePage = React.lazy(
+  () => import('./pages/argus/ArgusUptimePage')
+);
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 
@@ -1246,10 +1252,17 @@ const AppContent: React.FC = () => {
                                           path="metrics"
                                           element={<Navigate to="/argus/explore/metrics" replace />}
                                         />
-                                        {/* Explore Routes */}
                                         <Route
                                           path="explore"
                                           element={<ArgusExplorePage />}
+                                        />
+                                        <Route
+                                          path="crons"
+                                          element={<ArgusCronsPage />}
+                                        />
+                                        <Route
+                                          path="uptime"
+                                          element={<ArgusUptimePage />}
                                         />
                                         <Route
                                           path="explore/traces"

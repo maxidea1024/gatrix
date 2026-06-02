@@ -479,6 +479,18 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.CRASH_EVENTS_READ,
       },
       {
+        text: 'sidebar.argusCrons',
+        icon: 'Schedule',
+        path: '/argus/crons',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusUptime',
+        icon: 'MonitorHeart',
+        path: '/argus/uptime',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
         text: 'sidebar.argusDashboards',
         icon: 'Dashboard',
         path: '/argus/dashboards',
