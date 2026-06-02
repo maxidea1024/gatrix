@@ -43,23 +43,33 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
 
   if (!showLogs) {
     return (
-      <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
-        <Typography
-          variant="body2"
-          component="span"
-          onClick={() => setShowLogs(true)}
-          sx={{
-            cursor: 'pointer',
-            color: 'text.secondary',
-            textDecoration: 'underline',
-            fontSize: '0.8rem',
-            '&:hover': {
-              color: 'text.primary'
-            }
-          }}
+      <Box sx={{ mt: 2, mb: 2 }}>
+        <EmptyPlaceholder
+          message=""
+          minHeight={120}
         >
-          {t('argus.issues.loadLogs')}
-        </Typography>
+          <Button
+            variant="outlined"
+            startIcon={<LogIcon />}
+            onClick={() => setShowLogs(true)}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              borderRadius: '8px',
+              px: 3.5,
+              py: 1.2,
+              borderColor: theme.palette.info.main,
+              color: theme.palette.info.main,
+              '&:hover': {
+                borderColor: theme.palette.info.dark,
+                backgroundColor: alpha(theme.palette.info.main, 0.04),
+              }
+            }}
+          >
+            {t('argus.issues.loadLogs', 'Load Logs')}
+          </Button>
+        </EmptyPlaceholder>
       </Box>
     );
   }
