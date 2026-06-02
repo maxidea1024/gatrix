@@ -30,7 +30,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
   const isChinese = language.startsWith('zh');
   const fontFamily = isChinese
     ? '"Inter", "Rubik", "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
-    : '"Inter", "Rubik", "Roboto", "Helvetica", "Arial", sans-serif';
+    : '"Pretendard", "Inter", "Noto Sans KR", "Rubik", "Roboto", "Helvetica", "Arial", sans-serif';
 
   // -- Sentry-inspired color palette --
   const colors = {
@@ -381,10 +381,12 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: `${txt.primary} !important`,
+            fontWeight: 500,
           },
           input: {
             color: `${txt.primary} !important`,
             WebkitTextFillColor: `${txt.primary} !important`,
+            fontWeight: 500,
             '&::placeholder': {
               color: txt.secondary,
               WebkitTextFillColor: txt.secondary,
