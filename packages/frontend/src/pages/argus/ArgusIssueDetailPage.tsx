@@ -464,20 +464,19 @@ const ArgusIssueDetailPage: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Event Distribution Chart — Full Width (Sentry: Trends area) */}
-          {projectId && issueId && (
-            <Box sx={{ mb: 3 }}>
-              <EventDistributionChart
-                projectId={projectId}
-                issueId={issueId}
-                isDark={isDark}
-              />
-            </Box>
-          )}
-
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'start' }}>
             {/* Left Column: Main Content */}
             <Box>
+              {/* Event Distribution Chart */}
+              {projectId && issueId && (
+                <Box sx={{ mb: 2 }}>
+                  <EventDistributionChart
+                    projectId={projectId}
+                    issueId={issueId}
+                    isDark={isDark}
+                  />
+                </Box>
+              )}
               {/* Business Impact — flat section */}
               {projectId && issueId && (
                 <BusinessImpactWidget
