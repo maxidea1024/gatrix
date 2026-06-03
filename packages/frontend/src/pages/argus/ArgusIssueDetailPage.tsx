@@ -860,16 +860,25 @@ const ArgusIssueDetailPage: React.FC = () => {
               )}
 
               {/* Breadcrumbs */}
-              {latestEvent.breadcrumbs && Array.isArray(latestEvent.breadcrumbs) && latestEvent.breadcrumbs.length > 0 && (
-                <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
-                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <FolderIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
-                    {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
-                    <Chip label={latestEvent.breadcrumbs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
-                  </Typography>
-                  <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} />
-                </Box>
-              )}
+              {latestEvent.breadcrumbs && (() => {
+                let breadcrumbsArr: any[] = [];
+                try {
+                  breadcrumbsArr = typeof latestEvent.breadcrumbs === 'string'
+                    ? JSON.parse(latestEvent.breadcrumbs)
+                    : latestEvent.breadcrumbs;
+                } catch { /* ignore */ }
+                if (!Array.isArray(breadcrumbsArr) || breadcrumbsArr.length === 0) return null;
+                return (
+                  <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <FolderIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
+                      {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
+                      <Chip label={breadcrumbsArr.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
+                    </Typography>
+                    <BreadcrumbsTimeline breadcrumbs={breadcrumbsArr} />
+                  </Box>
+                );
+              })()}
 
               {/* Extra Data */}
               {latestEvent.extra && (() => {
