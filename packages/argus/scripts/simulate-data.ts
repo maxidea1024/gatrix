@@ -1578,10 +1578,59 @@ async function main() {
     if (timestamp < tracker.firstSeen) tracker.firstSeen = timestamp;
     if (timestamp > tracker.lastSeen) tracker.lastSeen = timestamp;
 
-    const breadcrumbs = scenario.breadcrumbTemplates.map((tmpl, idx) => ({
-      ...tmpl,
-      timestamp: new Date(timestamp.getTime() - (scenario.breadcrumbTemplates.length - idx) * randomInt(1000, 5000)).toISOString(),
-    }));
+    // Generate 1-100 breadcrumbs dynamically (templates as seed + random extras)
+    const EXTRA_BREADCRUMB_POOL: { type: string; category: string; messages: string[]; levels: string[] }[] = [
+      { type: 'http', category: 'http', messages: ['GET /api/character/info → 200 (45ms)', 'POST /api/inventory/move → 200 (120ms)', 'GET /api/guild/members → 200 (89ms)', 'PUT /api/settings/save → 200 (67ms)', 'POST /api/chat/send → 200 (33ms)', 'GET /api/market/listings → 200 (156ms)', 'POST /api/trade/confirm → 200 (210ms)', 'DELETE /api/session/expire → 204 (12ms)', 'GET /api/leaderboard/top → 200 (340ms)', 'POST /api/pvp/queue → 202 (78ms)'], levels: ['info', 'info', 'info', 'warning'] },
+      { type: 'http', category: 'fetch', messages: ['fetch /api/world/state → 200', 'fetch /api/weather/current → 200', 'fetch /api/events/active → 200', 'fetch /api/notifications → 200', 'fetch /api/friends/online → 200'], levels: ['info'] },
+      { type: 'http', category: 'ws', messages: ['WS message: player_position_update', 'WS message: chat_broadcast', 'WS message: inventory_sync', 'WS keepalive ping sent', 'WS keepalive pong received', 'WS message: guild_notification', 'WS message: trade_request', 'WS reconnect attempt #1', 'WS message: weather_change', 'WS message: server_announcement'], levels: ['info', 'info', 'debug'] },
+      { type: 'default', category: 'navigation', messages: ['Navigated to /game/world', 'Navigated to /game/inventory', 'Navigated to /game/guild', 'Navigated to /game/market', 'Navigated to /game/pvp', 'Navigated to /game/settings', 'Navigated to /game/character', 'Navigated to /game/quest', 'Navigated to /game/map', 'Navigated to /game/social'], levels: ['info'] },
+      { type: 'default', category: 'console', messages: ['[Debug] Frame time: 16.4ms', '[Debug] Draw calls: 1247', '[Debug] Memory: 412MB / 2048MB', '[Info] Asset bundle loaded: world_assets_03', '[Info] Texture streaming: 89% complete', '[Warn] GC pause: 12ms', '[Debug] Physics step: 8.2ms', '[Info] Audio: 24 active sources', '[Debug] Network RTT: 45ms'], levels: ['debug', 'info', 'info', 'warning'] },
+      { type: 'default', category: 'db', messages: ['SELECT * FROM characters WHERE id = ?', 'UPDATE inventory SET quantity = ? WHERE slot_id = ?', 'INSERT INTO chat_log (sender, message, channel) VALUES (?, ?, ?)', 'SELECT COUNT(*) FROM guild_members WHERE guild_id = ?', 'BEGIN TRANSACTION', 'COMMIT', 'SELECT * FROM market_listings WHERE expires_at > NOW()'], levels: ['info', 'debug'] },
+      { type: 'default', category: 'redis', messages: ['GET session:user:12345', 'SET player:position:12345', 'PUBLISH chat:channel:global', 'EXPIRE session:user:12345 3600', 'HGETALL guild:info:567', 'ZADD leaderboard:pvp 1500 user:12345'], levels: ['info', 'debug'] },
+      { type: 'default', category: 'auth', messages: ['Token refresh successful', 'Session validated', 'Permission check: inventory.write → allowed', 'Rate limit check: 42/1000 requests', 'JWT claims verified', 'OAuth token exchange completed'], levels: ['info', 'debug'] },
+      { type: 'default', category: 'network', messages: ['Connection quality: GOOD (45ms RTT)', 'Packet loss rate: 0.1%', 'Bandwidth usage: 12.4 KB/s', 'DNS resolution: game.server.io → 10.0.1.5', 'TCP keepalive sent', 'SSL handshake completed'], levels: ['info', 'debug', 'warning'] },
+      { type: 'default', category: 'save', messages: ['Character data saved', 'Inventory snapshot created', 'Quest progress saved', 'Settings synchronized', 'Game state checkpoint created'], levels: ['info'] },
+      { type: 'default', category: 'anticheat', messages: ['Position validation: OK', 'Speed check: within threshold', 'Input frequency check: normal', 'Memory scan: clean', 'Asset integrity: verified'], levels: ['info', 'debug'] },
+      { type: 'default', category: 'matchmaking', messages: ['Queue joined: PvP Ranked', 'Match found: 5v5 Arena', 'ELO rating check: 1450', 'Team balance score: 0.92', 'Map selected: Coral Harbor'], levels: ['info'] },
+      { type: 'default', category: 'inventory', messages: ['Item equipped: Steel Cutlass +2', 'Item moved: slot 3 → slot 7', 'Stack merged: Healing Potion x5', 'Item durability check: 78%', 'Crafting materials consumed'], levels: ['info', 'debug'] },
+      { type: 'default', category: 'payment', messages: ['Premium currency balance checked: 1250', 'Shop catalog loaded: 47 items', 'Purchase validation started', 'Receipt verified with store API'], levels: ['info', 'warning'] },
+      { type: 'default', category: 'chat', messages: ['Message sent to guild channel', 'Whisper received from player', 'Chat filter: message approved', 'Emote triggered: /wave', 'Chat history loaded: 50 messages'], levels: ['info', 'debug'] },
+    ];
+
+    const templateCount = scenario.breadcrumbTemplates.length;
+    // Random breadcrumb count: weighted towards lower numbers
+    // 70% chance: 1-15, 20% chance: 15-50, 10% chance: 50-100
+    const roll = Math.random();
+    const extraCount = roll < 0.7
+      ? randomInt(0, Math.max(0, 12 - templateCount))
+      : roll < 0.9
+        ? randomInt(12, Math.max(12, 47 - templateCount))
+        : randomInt(47, Math.max(47, 97 - templateCount));
+    const totalCount = templateCount + extraCount;
+
+    const breadcrumbs: { type: string; category: string; message: string; level: string; timestamp: string }[] = [];
+
+    // Add extra breadcrumbs first (earlier timestamps)
+    for (let bi = 0; bi < extraCount; bi++) {
+      const pool = EXTRA_BREADCRUMB_POOL[randomInt(0, EXTRA_BREADCRUMB_POOL.length - 1)];
+      const msg = pool.messages[randomInt(0, pool.messages.length - 1)];
+      const lvl = pool.levels[randomInt(0, pool.levels.length - 1)];
+      breadcrumbs.push({
+        type: pool.type,
+        category: pool.category,
+        message: msg,
+        level: lvl,
+        timestamp: new Date(timestamp.getTime() - (totalCount - bi) * randomInt(500, 8000)).toISOString(),
+      });
+    }
+
+    // Add template breadcrumbs (closer to error time)
+    scenario.breadcrumbTemplates.forEach((tmpl, idx) => {
+      breadcrumbs.push({
+        ...tmpl,
+        timestamp: new Date(timestamp.getTime() - (templateCount - idx) * randomInt(1000, 5000)).toISOString(),
+      });
+    });
 
     allEvents.push({
       event_id: eventId,

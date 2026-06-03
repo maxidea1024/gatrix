@@ -875,7 +875,16 @@ const ArgusIssueDetailPage: React.FC = () => {
                       {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
                       <Chip label={breadcrumbsArr.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
                     </Typography>
-                    <BreadcrumbsTimeline breadcrumbs={breadcrumbsArr} />
+                    <BreadcrumbsTimeline
+                      breadcrumbs={breadcrumbsArr}
+                      summaryMode
+                      summaryCount={5}
+                      errorEvent={{
+                        type: latestEvent.exception_type,
+                        value: latestEvent.exception_value,
+                        timestamp: latestEvent.timestamp,
+                      }}
+                    />
                   </Box>
                 );
               })()}
