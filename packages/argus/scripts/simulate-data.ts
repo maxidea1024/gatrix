@@ -1598,8 +1598,57 @@ async function main() {
       fingerprint: [primaryHash],
       primary_hash: primaryHash,
       exception: JSON.stringify({ type: scenario.type, value: scenario.value }),
-      stacktrace_frames: JSON.stringify(scenario.frames),
-      breadcrumbs: JSON.stringify(breadcrumbs),
+      stacktrace_frames: JSON.stringify(scenario.frames.map(f => {
+        const isCpp = f.filename && (f.filename.endsWith('.cpp') || f.filename.endsWith('.h') || f.filename.endsWith('.cs'));
+        const isLua = f.filename && f.filename.endsWith('.lua');
+        
+        let preContext = [];
+        let contextLine = '';
+        let postContext = [];
+
+        if (isCpp) {
+          preContext = [
+            `void ${f.function}() {`,
+            `    // Engine subsystem initialization`,
+            `    bool bIsReady = false;`,
+          ];
+          contextLine = f.in_app ? `    check(bIsReady); // [Error: ${scenario.type}]` : `    // Internal engine execution`;
+          postContext = [
+            `    return;`,
+            `}`
+          ];
+        } else if (isLua) {
+          preContext = [
+            `function ${f.function}()`,
+            `    -- Game logic execution`,
+            `    local ready = false`,
+          ];
+          contextLine = f.in_app ? `    assert(ready, "${scenario.type}") -- [Error occurred here]` : `    -- Library code`;
+          postContext = [
+            `    return ready`,
+            `end`
+          ];
+        } else {
+          // JS / Node
+          preContext = [
+            `async function ${f.function}() {`,
+            `    // System logic`,
+            `    let isReady = false;`,
+          ];
+          contextLine = f.in_app ? `    throw new Error("${scenario.type}"); // [Error occurred here]` : `    // System execution`;
+          postContext = [
+            `    return isReady;`,
+            `}`
+          ];
+        }
+
+        return {
+          ...f,
+          context_line: contextLine,
+          pre_context: preContext,
+          post_context: postContext,
+        };
+      })),
       user_id: user.id,
       user_email: user.email,
       user_ip: user.ip,
@@ -1628,6 +1677,7 @@ async function main() {
       tags: dynamicTags(scenario, randomPick(scenario.servers), env),
       extra: dynamicExtra(scenario),
       contexts: JSON.stringify(scenario.contexts),
+      breadcrumbs: JSON.stringify(breadcrumbs),
       is_handled: scenario.level === 'warning' ? 1 : 0,
       is_symbolicated: 0,
       _primaryHash: primaryHash,
