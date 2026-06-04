@@ -433,10 +433,10 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
             : isError ? alpha('#f44336', 0.03) : 'transparent',
           transition: 'background 0.1s',
           '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
-          cursor: 'pointer',
+          cursor: hasData ? 'pointer' : 'default',
 
         }}
-        onClick={() => !fullyExpanded && setExpandedIdx(isExpanded ? null : idx)}
+        onClick={() => hasData && !fullyExpanded && setExpandedIdx(isExpanded ? null : idx)}
       >
         {/* Timeline line */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 20, alignSelf: 'stretch' }}>
@@ -491,7 +491,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
                 sx={{ height: 16, fontSize: '0.58rem', fontWeight: 700, backgroundColor: alpha('#f44336', 0.1), color: '#f44336', border: 'none' }}
               />
             )}
-            {!fullyExpanded && (
+            {hasData && !fullyExpanded && (
               <ExpandMoreIcon sx={{
                 fontSize: 14, color: 'text.disabled',
                 transform: isExpanded ? 'rotate(180deg)' : 'none',
@@ -549,9 +549,11 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           )}
 
           {/* Expanded data — uses BreadcrumbExpandedDetail */}
-          <Collapse in={isExpanded}>
-            <BreadcrumbExpandedDetail crumb={crumb} isDark={isDark} fullyExpanded={fullyExpanded} />
-          </Collapse>
+          {hasData && (
+            <Collapse in={isExpanded}>
+              <BreadcrumbExpandedDetail crumb={crumb} isDark={isDark} fullyExpanded={fullyExpanded} />
+            </Collapse>
+          )}
         </Box>
 
         {/* Timestamp */}

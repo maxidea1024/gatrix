@@ -1594,11 +1594,63 @@ async function main() {
     if (timestamp > tracker.lastSeen) tracker.lastSeen = timestamp;
 
     // Generate 1-100 breadcrumbs dynamically (templates as seed + random extras)
+    // HTTP breadcrumb data generators
+    const HTTP_ENDPOINTS: { method: string; url: string; statuses: number[]; durMin: number; durMax: number; sizeMin: number; sizeMax: number }[] = [
+      { method: 'GET', url: '/api/character/info', statuses: [200, 200, 200, 304], durMin: 20, durMax: 150, sizeMin: 512, sizeMax: 4096 },
+      { method: 'POST', url: '/api/inventory/move', statuses: [200, 200, 400], durMin: 50, durMax: 250, sizeMin: 128, sizeMax: 1024 },
+      { method: 'GET', url: '/api/guild/members', statuses: [200, 200, 200], durMin: 30, durMax: 200, sizeMin: 2048, sizeMax: 16384 },
+      { method: 'PUT', url: '/api/settings/save', statuses: [200, 200, 204], durMin: 30, durMax: 120, sizeMin: 64, sizeMax: 512 },
+      { method: 'POST', url: '/api/chat/send', statuses: [200, 200, 429], durMin: 15, durMax: 80, sizeMin: 64, sizeMax: 256 },
+      { method: 'GET', url: '/api/market/listings', statuses: [200, 200, 200, 500], durMin: 80, durMax: 400, sizeMin: 4096, sizeMax: 32768 },
+      { method: 'POST', url: '/api/trade/confirm', statuses: [200, 200, 409, 500], durMin: 100, durMax: 350, sizeMin: 256, sizeMax: 2048 },
+      { method: 'DELETE', url: '/api/session/expire', statuses: [204, 204, 404], durMin: 8, durMax: 30, sizeMin: 0, sizeMax: 64 },
+      { method: 'GET', url: '/api/leaderboard/top', statuses: [200, 200, 304], durMin: 150, durMax: 600, sizeMin: 8192, sizeMax: 65536 },
+      { method: 'POST', url: '/api/pvp/queue', statuses: [202, 202, 503], durMin: 30, durMax: 150, sizeMin: 128, sizeMax: 512 },
+      { method: 'GET', url: '/api/friends/online', statuses: [200, 200, 200], durMin: 20, durMax: 100, sizeMin: 512, sizeMax: 8192 },
+      { method: 'POST', url: '/api/payment/verify', statuses: [200, 200, 400, 402], durMin: 200, durMax: 800, sizeMin: 256, sizeMax: 2048 },
+      { method: 'GET', url: '/api/world/state', statuses: [200, 200, 304], durMin: 40, durMax: 250, sizeMin: 1024, sizeMax: 16384 },
+      { method: 'POST', url: '/api/combat/action', statuses: [200, 200, 200, 422], durMin: 10, durMax: 60, sizeMin: 128, sizeMax: 512 },
+    ];
+
+    function generateHttpBreadcrumb(ts: string): { type: string; category: string; message: string; level: string; timestamp: string; data: Record<string, any> } {
+      const ep = HTTP_ENDPOINTS[randomInt(0, HTTP_ENDPOINTS.length - 1)];
+      const status = ep.statuses[randomInt(0, ep.statuses.length - 1)];
+      const duration = randomInt(ep.durMin, ep.durMax);
+      const size = randomInt(ep.sizeMin, ep.sizeMax);
+      const isError = status >= 400;
+      return {
+        type: 'http',
+        category: randomPick(['http', 'fetch', 'xhr']),
+        message: `${ep.method} ${ep.url} → ${status} (${duration}ms)`,
+        level: isError ? (status >= 500 ? 'error' : 'warning') : 'info',
+        timestamp: ts,
+        data: {
+          method: ep.method,
+          url: `https://game.unchartedwaters.io${ep.url}`,
+          status_code: status,
+          duration: duration,
+          response_body_size: size,
+          ...(isError ? { reason: status === 429 ? 'Too Many Requests' : status === 500 ? 'Internal Server Error' : status === 503 ? 'Service Unavailable' : status === 409 ? 'Conflict' : status === 404 ? 'Not Found' : status === 402 ? 'Payment Required' : 'Bad Request' } : {}),
+        },
+      };
+    }
+
+    // Navigation breadcrumb data generator
+    const NAV_PAGES = [
+      { from: '/game/world', to: '/game/inventory' },
+      { from: '/game/inventory', to: '/game/guild' },
+      { from: '/game/guild', to: '/game/market' },
+      { from: '/game/market', to: '/game/pvp' },
+      { from: '/game/pvp', to: '/game/settings' },
+      { from: '/game/settings', to: '/game/character' },
+      { from: '/game/character', to: '/game/quest' },
+      { from: '/game/quest', to: '/game/map' },
+      { from: '/game/map', to: '/game/social' },
+      { from: '/game/social', to: '/game/world' },
+    ];
+
     const EXTRA_BREADCRUMB_POOL: { type: string; category: string; messages: string[]; levels: string[] }[] = [
-      { type: 'http', category: 'http', messages: ['GET /api/character/info → 200 (45ms)', 'POST /api/inventory/move → 200 (120ms)', 'GET /api/guild/members → 200 (89ms)', 'PUT /api/settings/save → 200 (67ms)', 'POST /api/chat/send → 200 (33ms)', 'GET /api/market/listings → 200 (156ms)', 'POST /api/trade/confirm → 200 (210ms)', 'DELETE /api/session/expire → 204 (12ms)', 'GET /api/leaderboard/top → 200 (340ms)', 'POST /api/pvp/queue → 202 (78ms)'], levels: ['info', 'info', 'info', 'warning'] },
-      { type: 'http', category: 'fetch', messages: ['fetch /api/world/state → 200', 'fetch /api/weather/current → 200', 'fetch /api/events/active → 200', 'fetch /api/notifications → 200', 'fetch /api/friends/online → 200'], levels: ['info'] },
       { type: 'http', category: 'ws', messages: ['WS message: player_position_update', 'WS message: chat_broadcast', 'WS message: inventory_sync', 'WS keepalive ping sent', 'WS keepalive pong received', 'WS message: guild_notification', 'WS message: trade_request', 'WS reconnect attempt #1', 'WS message: weather_change', 'WS message: server_announcement'], levels: ['info', 'info', 'debug'] },
-      { type: 'default', category: 'navigation', messages: ['Navigated to /game/world', 'Navigated to /game/inventory', 'Navigated to /game/guild', 'Navigated to /game/market', 'Navigated to /game/pvp', 'Navigated to /game/settings', 'Navigated to /game/character', 'Navigated to /game/quest', 'Navigated to /game/map', 'Navigated to /game/social'], levels: ['info'] },
       { type: 'default', category: 'console', messages: ['[Debug] Frame time: 16.4ms', '[Debug] Draw calls: 1247', '[Debug] Memory: 412MB / 2048MB', '[Info] Asset bundle loaded: world_assets_03', '[Info] Texture streaming: 89% complete', '[Warn] GC pause: 12ms', '[Debug] Physics step: 8.2ms', '[Info] Audio: 24 active sources', '[Debug] Network RTT: 45ms'], levels: ['debug', 'info', 'info', 'warning'] },
       { type: 'default', category: 'db', messages: ['SELECT * FROM characters WHERE id = ?', 'UPDATE inventory SET quantity = ? WHERE slot_id = ?', 'INSERT INTO chat_log (sender, message, channel) VALUES (?, ?, ?)', 'SELECT COUNT(*) FROM guild_members WHERE guild_id = ?', 'BEGIN TRANSACTION', 'COMMIT', 'SELECT * FROM market_listings WHERE expires_at > NOW()'], levels: ['info', 'debug'] },
       { type: 'default', category: 'redis', messages: ['GET session:user:12345', 'SET player:position:12345', 'PUBLISH chat:channel:global', 'EXPIRE session:user:12345 3600', 'HGETALL guild:info:567', 'ZADD leaderboard:pvp 1500 user:12345'], levels: ['info', 'debug'] },
@@ -1623,10 +1675,32 @@ async function main() {
         : randomInt(47, Math.max(47, 97 - templateCount));
     const totalCount = templateCount + extraCount;
 
-    const breadcrumbs: { type: string; category: string; message: string; level: string; timestamp: string }[] = [];
+    const breadcrumbs: { type: string; category: string; message: string; level: string; timestamp: string; data?: Record<string, any> }[] = [];
 
     // Add extra breadcrumbs first (earlier timestamps)
     for (let bi = 0; bi < extraCount; bi++) {
+      const ts = new Date(timestamp.getTime() - (totalCount - bi) * randomInt(500, 8000)).toISOString();
+
+      // 30% chance: generate structured HTTP breadcrumb
+      if (Math.random() < 0.3) {
+        breadcrumbs.push(generateHttpBreadcrumb(ts));
+        continue;
+      }
+
+      // 10% chance: generate navigation breadcrumb with data
+      if (Math.random() < 0.1) {
+        const nav = NAV_PAGES[randomInt(0, NAV_PAGES.length - 1)];
+        breadcrumbs.push({
+          type: 'navigation',
+          category: 'navigation',
+          message: `Navigated to ${nav.to}`,
+          level: 'info',
+          timestamp: ts,
+          data: { from: nav.from, to: nav.to },
+        });
+        continue;
+      }
+
       const pool = EXTRA_BREADCRUMB_POOL[randomInt(0, EXTRA_BREADCRUMB_POOL.length - 1)];
       const msg = pool.messages[randomInt(0, pool.messages.length - 1)];
       const lvl = pool.levels[randomInt(0, pool.levels.length - 1)];
@@ -1635,7 +1709,7 @@ async function main() {
         category: pool.category,
         message: msg,
         level: lvl,
-        timestamp: new Date(timestamp.getTime() - (totalCount - bi) * randomInt(500, 8000)).toISOString(),
+        timestamp: ts,
       });
     }
 

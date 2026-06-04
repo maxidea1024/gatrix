@@ -328,15 +328,7 @@ const BreadcrumbExpandedDetail: React.FC<BreadcrumbExpandedDetailProps> = ({
             <DataNode key={k} keyName={k} value={v} depth={0} isDark={isDark} defaultExpanded={fullyExpanded} />
           ))}
         </Box>
-      ) : crumb.message ? (
-        <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', wordBreak: 'break-word' }}>
-          {crumb.message}
-        </Typography>
-      ) : (
-        <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', fontStyle: 'italic' }}>
-          No additional data
-        </Typography>
-      )}
+      ) : null}
     </Box>
   );
 };
