@@ -154,14 +154,33 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           summaryResult.json(),
         ]);
 
-        // Enrich items with issue info via event_id
+        // Enrich items with issue info via event_id + manual links
         const items = (itemsData.data || []) as any[];
+        const feedbackIds = items.map((i: any) => i.feedback_id).filter(Boolean);
         const eventIds = [...new Set(items.map((i: any) => i.event_id).filter(Boolean))];
 
         let eventToIssue: Record<string, { id: number; title: string; status: string }> = {};
+        let manualLinks: Record<string, number> = {};
+
+        // Manual links from MySQL (take priority)
+        if (feedbackIds.length > 0) {
+          try {
+            await ensureIssueLinkTable();
+            const [linkRows] = await mysqlPool.query(
+              `SELECT feedback_id, issue_id FROM g_argus_feedback_issue_links WHERE project_id = ? AND feedback_id IN (${feedbackIds.map(() => '?').join(',')})`,
+              [projectId, ...feedbackIds]
+            );
+            for (const row of (linkRows as any[])) {
+              manualLinks[row.feedback_id] = row.issue_id;
+            }
+          } catch (e) {
+            logger.warn('Failed to get manual issue links', { error: (e as Error).message });
+          }
+        }
+
+        // Auto-detected links via event_id
         if (eventIds.length > 0) {
           try {
-            // Step 1: Get issue_ids for event_ids from ClickHouse (argus.errors)
             const issueResultCH = await clickhouse.query({
               query: `SELECT event_id, issue_id FROM argus.errors
                 WHERE project_id = {projectId:String} AND event_id IN ({eventIds:Array(String)})`,
@@ -173,19 +192,21 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               eventToIssueId[row.event_id] = Number(row.issue_id);
             }
 
-            // Step 2: Get issue details from MySQL (g_argus_issues)
-            const issueIds = [...new Set(Object.values(eventToIssueId).filter(Boolean))];
-            if (issueIds.length > 0) {
+            // Collect all issue IDs (auto + manual)
+            const allIssueIds = [...new Set([
+              ...Object.values(eventToIssueId).filter(Boolean),
+              ...Object.values(manualLinks).filter(Boolean),
+            ])];
+
+            if (allIssueIds.length > 0) {
               const [issueRows] = await mysqlPool.query(
-                `SELECT id, title, status FROM g_argus_issues WHERE id IN (${issueIds.map(() => '?').join(',')})`,
-                [...issueIds]
+                `SELECT id, title, status FROM g_argus_issues WHERE id IN (${allIssueIds.map(() => '?').join(',')})`,
+                [...allIssueIds]
               );
-              
               const issueMap: Record<number, { id: number; title: string; status: string }> = {};
               for (const row of (issueRows as any[])) {
                 issueMap[row.id] = { id: row.id, title: row.title, status: row.status };
               }
-              
               for (const [eid, issueId] of Object.entries(eventToIssueId)) {
                 if (issueMap[issueId]) {
                   eventToIssue[eid] = issueMap[issueId];
@@ -197,7 +218,37 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           }
         }
 
+        // Build issueMap for manual links that weren't fetched yet
+        const manualIssueIdsNotFetched = Object.values(manualLinks).filter(id => {
+          return id && !Object.values(eventToIssue).some(i => i.id === id);
+        });
+        let extraIssueMap: Record<number, { id: number; title: string; status: string }> = {};
+        if (manualIssueIdsNotFetched.length > 0) {
+          try {
+            const [rows] = await mysqlPool.query(
+              `SELECT id, title, status FROM g_argus_issues WHERE id IN (${manualIssueIdsNotFetched.map(() => '?').join(',')})`,
+              [...manualIssueIdsNotFetched]
+            );
+            for (const row of (rows as any[])) {
+              extraIssueMap[row.id] = { id: row.id, title: row.title, status: row.status };
+            }
+          } catch { /* ok */ }
+        }
+
         const enrichedItems = items.map((item: any) => {
+          // Manual link takes priority
+          const manualIssueId = manualLinks[item.feedback_id];
+          if (manualIssueId) {
+            const issue = Object.values(eventToIssue).find(i => i.id === manualIssueId) || extraIssueMap[manualIssueId];
+            return {
+              ...item,
+              issue_id: issue?.id || manualIssueId,
+              issue_title: issue?.title || null,
+              issue_status: issue?.status || null,
+              attachments: item.attachments || [],
+            };
+          }
+          // Auto link via event_id
           const issue = item.event_id ? eventToIssue[item.event_id] : null;
           return {
             ...item,
@@ -222,6 +273,46 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get feedback' });
+      }
+    }
+  );
+
+  // Get feedbacks linked to a specific issue
+  app.get(
+    '/feedback/:projectId/by-issue/:issueId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId } = request.params as { projectId: string; issueId: string };
+      try {
+        await ensureIssueLinkTable();
+
+        // 1) Get manually linked feedback IDs from MySQL
+        const [linkRows] = await mysqlPool.query(
+          'SELECT feedback_id FROM g_argus_feedback_issue_links WHERE project_id = ? AND issue_id = ?',
+          [projectId, Number(issueId)]
+        );
+        const feedbackIds = (linkRows as any[]).map(r => r.feedback_id);
+
+        if (feedbackIds.length === 0) {
+          return reply.send({ data: [] });
+        }
+
+        // 2) Fetch feedback details from ClickHouse
+        const result = await clickhouse.query({
+          query: `SELECT * FROM argus.user_feedback
+            WHERE project_id = {projectId:String}
+              AND feedback_id IN ({feedbackIds:Array(String)})
+            ORDER BY timestamp DESC`,
+          query_params: { projectId: String(projectId), feedbackIds },
+        });
+        const data = await result.json();
+
+        return reply.send({ data: data.data || [] });
+      } catch (error) {
+        logger.error('Failed to get feedbacks by issue', {
+          projectId, issueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get feedbacks by issue' });
       }
     }
   );
@@ -271,19 +362,19 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           await ensureActivityTable();
           if (body.status) {
             await mysqlPool.query(
-              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data) VALUES (?, ?, ?, ?)',
+              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
               [projectId, feedbackId, 'status_change', JSON.stringify({ from: '', to: body.status })]
             );
           }
           if (body.assigned_to !== undefined) {
             await mysqlPool.query(
-              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data) VALUES (?, ?, ?, ?)',
+              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
               [projectId, feedbackId, 'assign', JSON.stringify({ assigned_to: body.assigned_to })]
             );
           }
           if (body.is_spam !== undefined) {
             await mysqlPool.query(
-              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data) VALUES (?, ?, ?, ?)',
+              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
               [projectId, feedbackId, body.is_spam ? 'mark_spam' : 'unmark_spam', null]
             );
           }
@@ -423,7 +514,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               project_id VARCHAR(64) NOT NULL,
               keyword VARCHAR(255) NOT NULL,
               is_regex TINYINT(1) DEFAULT 0,
-              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+              created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
               INDEX idx_project (project_id)
             )
           `);
@@ -454,7 +545,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             project_id VARCHAR(64) NOT NULL,
             keyword VARCHAR(255) NOT NULL,
             is_regex TINYINT(1) DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
             INDEX idx_project (project_id)
           )
         `);
@@ -681,7 +772,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       try {
         await ensureActivityTable();
         const [result] = await mysqlPool.query(
-          'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, user_name, action, data) VALUES (?, ?, ?, ?, ?)',
+          'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, user_name, action, data, created_at) VALUES (?, ?, ?, ?, ?, UTC_TIMESTAMP())',
           [projectId, feedbackId, user_name || null, 'comment', JSON.stringify({ text: text.trim() })]
         );
         return reply.code(201).send({ data: { id: (result as any).insertId } });
@@ -691,6 +782,46 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           error: (error as Error).message,
         });
         return reply.code(500).send({ error: 'Failed to add feedback comment' });
+      }
+    }
+  );
+
+  // ─── Link / Unlink Issue to Feedback ───
+
+  app.patch(
+    '/feedback/:projectId/:feedbackId/link-issue',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
+      const { issue_id } = request.body as { issue_id: number | null };
+
+      try {
+        await ensureIssueLinkTable();
+
+        if (issue_id) {
+          // Upsert link
+          await mysqlPool.query(
+            `INSERT INTO g_argus_feedback_issue_links (project_id, feedback_id, issue_id)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE issue_id = VALUES(issue_id), updated_at = UTC_TIMESTAMP()`,
+            [projectId, feedbackId, issue_id]
+          );
+          logger.info('Linked feedback to issue', { projectId, feedbackId, issueId: issue_id });
+        } else {
+          // Unlink
+          await mysqlPool.query(
+            'DELETE FROM g_argus_feedback_issue_links WHERE project_id = ? AND feedback_id = ?',
+            [projectId, feedbackId]
+          );
+          logger.info('Unlinked feedback from issue', { projectId, feedbackId });
+        }
+
+        return reply.send({ success: true });
+      } catch (error) {
+        logger.error('Failed to link/unlink feedback issue', {
+          projectId, feedbackId,
+          error: (error as Error).message,
+        });
+        return reply.code(500).send({ error: 'Failed to link/unlink issue' });
       }
     }
   );
@@ -721,7 +852,7 @@ async function ensureActivityTable(): Promise<void> {
         user_name VARCHAR(255) DEFAULT NULL,
         action ENUM('status_change','assign','comment','mark_spam','unmark_spam') NOT NULL,
         data JSON DEFAULT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
         INDEX idx_feedback (project_id, feedback_id),
         INDEX idx_created (created_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
@@ -729,5 +860,27 @@ async function ensureActivityTable(): Promise<void> {
     activityTableChecked = true;
   } catch (e) {
     logger.warn('Failed to ensure activity table', { error: (e as Error).message });
+  }
+}
+
+let issueLinkTableChecked = false;
+async function ensureIssueLinkTable(): Promise<void> {
+  if (issueLinkTableChecked) return;
+  try {
+    await mysqlPool.query(`
+      CREATE TABLE IF NOT EXISTS g_argus_feedback_issue_links (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        project_id VARCHAR(64) NOT NULL,
+        feedback_id VARCHAR(64) NOT NULL,
+        issue_id INT NOT NULL,
+        created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
+        updated_at DATETIME DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_feedback (project_id, feedback_id),
+        INDEX idx_issue (issue_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+    issueLinkTableChecked = true;
+  } catch (e) {
+    logger.warn('Failed to ensure issue link table', { error: (e as Error).message });
   }
 }

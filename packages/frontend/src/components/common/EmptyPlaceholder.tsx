@@ -51,7 +51,6 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         border: '2px dashed',
         borderColor: 'divider',
         borderRadius: '4px',
-        bgcolor: 'action.hover',
         ...sx,
       }}
     >

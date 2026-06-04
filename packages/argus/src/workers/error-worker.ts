@@ -148,6 +148,7 @@ export class ErrorWorker {
           const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusErrorEvent & {
             project_id: string;
             internal_project_id: number;
+            dsn_key_id: number;
           };
 
           // Process the event
@@ -180,7 +181,7 @@ export class ErrorWorker {
   }
 
   private async processEvent(
-    rawEvent: ArgusErrorEvent & { project_id: string; internal_project_id: number }
+    rawEvent: ArgusErrorEvent & { project_id: string; internal_project_id: number; dsn_key_id: number }
   ): Promise<NormalizedError | null> {
     try {
       // 1. Normalize
@@ -229,6 +230,7 @@ export class ErrorWorker {
         fingerprint,
         primary_hash,
         issue_id: groupResult.issue_id,
+        dsn_key_id: rawEvent.dsn_key_id || 0,
       };
 
       return record;

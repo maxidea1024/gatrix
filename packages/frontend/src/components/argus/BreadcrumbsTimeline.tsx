@@ -430,7 +430,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           transition: 'background 0.1s',
           '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
           cursor: hasData ? 'pointer' : 'default',
-          borderLeft: isVirtual ? `3px solid #f44336` : 'none',
+
         }}
         onClick={() => hasData && setExpandedIdx(isExpanded ? null : idx)}
       >
@@ -442,7 +442,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
             <Box sx={{ height: '8px', flexShrink: 0 }} />
           )}
           <Box sx={{
-            width: isVirtual ? 24 : 20, height: isVirtual ? 24 : 20, borderRadius: '50%',
+            width: 20, height: 20, borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backgroundColor: alpha(levelColor || cfg.color, isVirtual ? 0.2 : 0.12),
             color: levelColor || cfg.color,

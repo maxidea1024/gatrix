@@ -47,7 +47,9 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
   const { t } = useTranslation();
   const [tags, setTags] = useState<ArgusIssueTagGroup[]>([]);
   const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(() => {
+    try { return localStorage.getItem('argus:issue:tags-expanded') !== 'false'; } catch { return true; }
+  });
 
   const fetchTags = useCallback(async () => {
     setLoading(true);
@@ -68,10 +70,14 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
   if (!loading && tags.length === 0) return null;
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box id="argus-tag-distribution" sx={{ mb: 2 }}>
       {/* Header */}
       <Box
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          const next = !expanded;
+          setExpanded(next);
+          try { localStorage.setItem('argus:issue:tags-expanded', String(next)); } catch {}
+        }}
         sx={{
           display: 'flex', alignItems: 'center', gap: 1,
           py: 0.5, cursor: 'pointer',
@@ -103,26 +109,27 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             {tags.map((tagGroup) => {
               const color = TAG_COLORS[tagGroup.key] || '#9e9e9e';
-              const total = tagGroup.topValues.reduce((sum, v) => sum + v.count, 0);
+              const total = tagGroup.topValues.reduce((sum, v) => sum + (Number(v.count) || 0), 0);
 
               return (
                 <Box
                   key={tagGroup.key}
                 >
                   <Typography variant="caption" fontWeight={700} sx={{
-                    display: 'block', mb: 1, fontSize: '0.68rem',
+                    display: 'block', mb: 1, fontSize: '0.75rem',
                     color, textTransform: 'uppercase', letterSpacing: 0.5,
                   }}>
                     {TAG_LABELS[tagGroup.key] || tagGroup.key}
                   </Typography>
 
                   {tagGroup.topValues.slice(0, 5).map((val, idx) => {
-                    const pct = total > 0 ? (val.count / total) * 100 : 0;
+                    const count = Number(val.count) || 0;
+                    const pct = total > 0 ? (count / total) * 100 : 0;
                     return (
                       <Box key={idx} sx={{ mb: 0.8 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}>
                           <Typography variant="caption" sx={{
-                            fontSize: '0.68rem',
+                            fontSize: '0.75rem',
                             fontFamily: 'monospace',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -133,10 +140,10 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
                             {val.value || '(empty)'}
                           </Typography>
                           <Typography variant="caption" sx={{
-                            fontSize: '0.62rem', color: 'text.disabled', fontFamily: 'monospace',
-                            flexShrink: 0, ml: 1,
+                            fontSize: '0.75rem', color: 'text.secondary', fontFamily: 'monospace',
+                            flexShrink: 0, ml: 1, textAlign: 'right',
                           }}>
-                            {val.count.toLocaleString()} ({pct.toFixed(0)}%)
+                            {count.toLocaleString()} ({pct.toFixed(0)}%)
                           </Typography>
                         </Box>
                         <LinearProgress

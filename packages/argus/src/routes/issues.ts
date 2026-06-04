@@ -305,7 +305,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
         const [result] = await mysqlPool.query(
           `INSERT INTO g_argus_issues
             (project_id, title, culprit, level, status, priority, primary_hash, times_seen, first_seen, last_seen)
-           VALUES (?, ?, ?, ?, 'unresolved', 'medium', ?, 0, NOW(), NOW())`,
+           VALUES (?, ?, ?, ?, 'unresolved', 'medium', ?, 0, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
           [
             projectId,
             body.title.trim(),
@@ -683,7 +683,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           updates.push('status = ?');
           params.push(body.status);
           if (body.status === 'resolved') {
-            updates.push('resolved_at = NOW()');
+            updates.push('resolved_at = UTC_TIMESTAMP()');
           }
         }
         if (body.assigned_to !== undefined) {
@@ -768,7 +768,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           updates.push('status = ?');
           params.push(body.status);
           if (body.status === 'resolved') {
-            updates.push('resolved_at = NOW()');
+            updates.push('resolved_at = UTC_TIMESTAMP()');
           }
         }
         if (body.assigned_to !== undefined) {

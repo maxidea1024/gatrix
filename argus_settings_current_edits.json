@@ -1,0 +1,595 @@
+[
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Add Slack App to the integration wizard flow: update wizardProvider type to include 'slack', add Slack App card in the Integrations section as a global integration alongside GitHub/GitLab/Bitbucket, and handle the wizard success for Slack (don't open addIntDialog since Slack doesn't need project-level config).\\\"\"",
+      "Instruction": "\"1. Update wizardProvider state type to include 'slack'. 2. Add Slack App global integration card after REPO_PROVIDERS section. 3. Handle wizard success for slack differently.\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":524,\"ReplacementContent\":\"  const [wizardProvider, setWizardProvider] = useState<'github' | 'gitlab' | 'bitbucket' | 'slack'>('github');\",\"StartLine\":524,\"TargetContent\":\"  const [wizardProvider, setWizardProvider] = useState<'github' | 'gitlab' | 'bitbucket'>('github');\"},{\"AllowMultiple\":false,\"EndLine\":963,\"ReplacementContent\":\"                  </Box>\\n                </SettingsCard>\\n\\n                {/* Slack App (Global Integration) */}\\n                <SettingsCard title={t('argus.settings.slackApp', 'Slack App')} desc={t('argus.settings.slackAppDesc', 'Connect a Slack App to send alert notifications directly via Slack API.')} isDark={isDark}>\\n                  <SlackAppCard isDark={isDark} t={t}\\n                    onSetup={() => { setWizardProvider('slack'); setWizardOpen(true); }}\\n                    onDisconnect={async () => {\\n                      try {\\n                        await argusService.deleteGlobalIntegrationConfig('slack');\\n                        enqueueSnackbar(t('common.deleted'), { variant: 'success' });\\n                      } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }\\n                    }}\\n                  />\\n                </SettingsCard>\",\"StartLine\":962,\"TargetContent\":\"                  </Box>\\n                </SettingsCard>\"},{\"AllowMultiple\":false,\"EndLine\":1434,\"ReplacementContent\":\"      <GlobalIntegrationWizardModal\\n        open={wizardOpen}\\n        provider={wizardProvider}\\n        onClose={() => setWizardOpen(false)}\\n        onSuccess={() => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            setAddIntDialog(wizardProvider);\\n            setFormData({});\\n          }\\n        }}\\n      />\",\"StartLine\":1424,\"TargetContent\":\"      <GlobalIntegrationWizardModal\\n        open={wizardOpen}\\n        provider={wizardProvider}\\n        onClose={() => setWizardOpen(false)}\n<truncated 251 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding Slack App to settings\"",
+      "toolSummary": "\"Add Slack settings card\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add SlackAppCard sub-component that fetches and displays Slack integration status. Shows a setup button if not connected, or team info + disconnect if connected.\\\"\"",
+      "EndLine": "1738",
+      "Instruction": "\"Add SlackAppCard component before the export default\"",
+      "ReplacementContent": "\"/** Slack App \uc5f0\ub3d9 \uce74\ub4dc \u2014 \uae00\ub85c\ubc8c integration */\\nconst SlackAppCard: React.FC<{\\n  isDark: boolean; t: any;\\n  onSetup: () => void; onDisconnect: () => void;\\n}> = ({ isDark, t, onSetup, onDisconnect }) => {\\n  const [status, setStatus] = React.useState<{ configured: boolean; config?: any } | null>(null);\\n  const [loading, setLoading] = React.useState(true);\\n\\n  React.useEffect(() => {\\n    argusService.getGlobalIntegrationConfig('slack')\\n      .then(s => { setStatus(s); setLoading(false); })\\n      .catch(() => setLoading(false));\\n  }, []);\\n\\n  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}><CircularProgress size={20} /></Box>;\\n\\n  const connected = status?.configured;\\n\\n  return (\\n    <Box sx={{\\n      display: 'flex', alignItems: 'center', gap: 2.5, p: 2.5,\\n      borderRadius: '10px',\\n      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,\\n      backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',\\n    }}>\\n      <Avatar sx={{\\n        width: 44, height: 44,\\n        backgroundColor: connected ? alpha('#36C5F0', 0.12) : alpha('#9e9e9e', 0.1),\\n        color: connected ? '#36C5F0' : '#9e9e9e',\\n      }}>\\n        <SlackIcon sx={{ fontSize: 24 }} />\\n      </Avatar>\\n      <Box sx={{ flex: 1 }}>\\n        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>\\n          <Typography sx={{ fontWeight: 700, fontSize: '0.88rem' }}>Slack App</Typography>\\n          {connected && (\\n            <Chip\\n              label={t('common.connected', 'Connected')}\\n              size=\\\"small\\\"\\n              sx={{\\n                height: 20, fontSize: '0.6rem', fontWeight: 700,\\n                backgroundColor: alpha('#4caf50', 0.1), color: '#4caf50', border: 'none',\\n              }}\\n            />\\n          )}\\n        </Box>\\n        <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.75rem' }}>\\n          {connected\\n            ? t('argus.settings.slackConnected', 'Bot Token configure\n<truncated 1364 bytes>",
+      "StartLine": "1737",
+      "TargetContent": "\"export default ArgusSettingsPage;\\n\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding SlackAppCard component\"",
+      "toolSummary": "\"Add SlackAppCard\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Move Slack App from Integrations tab to Notifications tab: 1) Add 'slack_app' to NOTIFICATION_PROVIDERS as a regular card (renamed existing 'slack' to 'Slack Webhook'). 2) Remove SlackAppCard from integrations section. 3) Handle slack_app click to open wizard instead of dialog. 4) Remove unused SlackAppCard sub-component.\\\"\"",
+      "Instruction": "\"1. Rename existing Slack to 'Slack Webhook (Legacy)' and add slack_app entry to NOTIFICATION_PROVIDERS. 2. Remove SlackAppCard from integrations section. 3. Handle slack_app in onAdd. 4. Remove SlackAppCard component.\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":358,\"ReplacementContent\":\"  {\\n    id: 'slack_app', name: 'Slack App', color: '#4A154B',\\n    gradient: 'linear-gradient(160deg, #4A154B 0%, #3D1142 30%, #2D0E35 60%, #1A0A20 100%)',\\n    accentColor: '#36C5F0',\\n    descKey: 'argus.settings.slackAppDesc',\\n    icon: <SlackIcon />,\\n    fields: [],\\n  },\\n  {\\n    id: 'slack', name: 'Slack Webhook', color: '#4A154B',\\n    gradient: 'linear-gradient(160deg, #2C0E31 0%, #4A154B 40%, #611f69 100%)',\\n    accentColor: '#36C5F0',\\n    guideUrl: 'https://api.slack.com/messaging/webhooks',\\n    guideButtonKey: 'argus.settings.providerWizard.slackGuideBtn',\\n    guideDescKey: 'argus.settings.providerWizard.slackGuideDesc',\\n    descKey: 'argus.settings.slackWebhookDesc',\\n    icon: <SlackIcon />,\\n    fields: [\\n      { key: 'name', labelKey: 'argus.settings.channelName', labelFallback: 'Name', placeholder: '#error-alerts' },\\n      { key: 'webhook_url', labelKey: 'argus.settings.webhookUrl', labelFallback: 'Webhook URL', placeholder: 'https://hooks.slack.com/services/...' },\\n      { key: 'channel', labelKey: 'argus.settings.slackChannel', labelFallback: 'Channel', placeholder: '#general' },\\n    ],\\n  },\",\"StartLine\":344,\"TargetContent\":\"  {\\n    id: 'slack', name: 'Slack', color: '#4A154B',\\n    gradient: 'linear-gradient(160deg, #2C0E31 0%, #4A154B 40%, #611f69 100%)',\\n    accentColor: '#36C5F0',\\n    guideUrl: 'https://api.slack.com/messaging/webhooks',\\n    guideButtonKey: 'argus.settings.providerWizard.slackGuideBtn',\\n    guideDescKey: 'argus.settings.providerWizard.slackGuideDesc',\\n    descKey: 'argus.settings.slackDesc',\\n    icon: <SlackIcon />,\\n    fields: [\\n      { key: 'name', labelKey: 'argus.settings.channelName', labelFallback: 'Name', placeholder: '#error-alerts' },\\n      { key: 'webhook_url', labelKey: 'argus.settings.webhookUrl', labelFallback: 'Webhook URL', placeholder: 'https://hooks.slack.com/services/...' },\\n      { key: 'channel', labelKey: 'argus.settings.slackChannel', labelFallback: 'Channel', placehold\n<truncated 1614 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Moving Slack App to Notifications\"",
+      "toolSummary": "\"Move to Notifications tab\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Remove unused SlackAppCard sub-component \u2014 it was replaced by a standard ProviderCard in the Notifications grid.\\\"\"",
+      "EndLine": "1826",
+      "Instruction": "\"Delete the entire SlackAppCard component\"",
+      "ReplacementContent": "\"\\nexport default ArgusSettingsPage;\\n\"",
+      "StartLine": "1739",
+      "TargetContent": "\"\\n/** Slack App \uc5f0\ub3d9 \uce74\ub4dc \u2014 \uae00\ub85c\ubc8c integration */\\nconst SlackAppCard: React.FC<{\\n  isDark: boolean; t: any;\\n  onSetup: () => void; onDisconnect: () => void;\\n}> = ({ isDark, t, onSetup, onDisconnect }) => {\\n  const [status, setStatus] = React.useState<{ configured: boolean; config?: any } | null>(null);\\n  const [loading, setLoading] = React.useState(true);\\n\\n  React.useEffect(() => {\\n    argusService.getGlobalIntegrationConfig('slack')\\n      .then(s => { setStatus(s); setLoading(false); })\\n      .catch(() => setLoading(false));\\n  }, []);\\n\\n  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}><CircularProgress size={20} /></Box>;\\n\\n  const connected = status?.configured;\\n\\n  return (\\n    <Box sx={{\\n      display: 'flex', alignItems: 'center', gap: 2.5, p: 2.5,\\n      borderRadius: '10px',\\n      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,\\n      backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',\\n    }}>\\n      <Avatar sx={{\\n        width: 44, height: 44,\\n        backgroundColor: connected ? alpha('#36C5F0', 0.12) : alpha('#9e9e9e', 0.1),\\n        color: connected ? '#36C5F0' : '#9e9e9e',\\n      }}>\\n        <SlackIcon sx={{ fontSize: 24 }} />\\n      </Avatar>\\n      <Box sx={{ flex: 1 }}>\\n        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>\\n          <Typography sx={{ fontWeight: 700, fontSize: '0.88rem' }}>Slack App</Typography>\\n          {connected && (\\n            <Chip\\n              label={t('common.connected', 'Connected')}\\n              size=\\\"small\\\"\\n              sx={{\\n                height: 20, fontSize: '0.6rem', fontWeight: 700,\\n                backgroundColor: alpha('#4caf50', 0.1), color: '#4caf50', border: 'none',\\n              }}\\n            />\\n          )}\\n        </Box>\\n        <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.75rem' }}>\\n          {connected\\n            ? t('argus.settings.slackConnected', 'Bot Token configu\n<truncated 1366 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Removing unused SlackAppCard\"",
+      "toolSummary": "\"Remove unused component\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Replace the dynamic typeof check with a direct call now that listNotificationChannels is properly implemented in argusService\\\"\"",
+      "EndLine": "587",
+      "Instruction": "\"Remove the typeof check and call directly\"",
+      "ReplacementContent": "\"    if (currentSection === 'notifications' && !notifLoaded) {\\n      argusService.listNotificationChannels(projectId).then(d => { setNotifChannels(d); setNotifLoaded(true); }).catch(() => setNotifLoaded(true));\\n    }\"",
+      "StartLine": "579",
+      "TargetContent": "\"    if (currentSection === 'notifications' && !notifLoaded) {\\n      // Backend: GET /:projectId/notification-channels (to be implemented)\\n      const svc = argusService as any;\\n      if (typeof svc.listNotificationChannels === 'function') {\\n        svc.listNotificationChannels(projectId).then((d: any[]) => { setNotifChannels(d); setNotifLoaded(true); }).catch(() => setNotifLoaded(true));\\n      } else {\\n        setNotifLoaded(true);\\n      }\\n    }\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing notification loading\"",
+      "toolSummary": "\"Fix notif loading\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Remove 'as any' casts now that createNotificationChannel and listNotificationChannels are properly typed in argusService. Also restructure the data payload to match the backend schema (provider, name, config object).\\\"\"",
+      "EndLine": "1427",
+      "Instruction": "\"Fix the onSubmit handler to use properly typed service methods\"",
+      "ReplacementContent": "\"            onSubmit={async (data) => {\\n              await argusService.createNotificationChannel(projectId, {\\n                provider: addNotifDialog!, name: data.name?.trim() || '',\\n                config: {\\n                  webhook_url: data.webhook_url?.trim(), channel: data.channel?.trim(),\\n                  recipients: data.recipients?.trim(), secret: data.secret?.trim(),\\n                  api_token: data.api_token?.trim(), severity: data.severity?.trim(),\\n                },\\n              });\\n              const updated = await argusService.listNotificationChannels(projectId);\\n              setNotifChannels(updated);\\n              setAddNotifDialog(null);\\n              enqueueSnackbar(t('argus.settings.channelAdded'), { variant: 'success' });\"",
+      "StartLine": "1417",
+      "TargetContent": "\"            onSubmit={async (data) => {\\n              await (argusService as any).createNotificationChannel?.(projectId, {\\n                provider: addNotifDialog, name: data.name?.trim() || '',\\n                webhook_url: data.webhook_url?.trim(), channel: data.channel?.trim(),\\n                recipients: data.recipients?.trim(), secret: data.secret?.trim(),\\n                api_token: data.api_token?.trim(), severity: data.severity?.trim(),\\n                config: data,\\n              });\\n              const updated = await (argusService as any).listNotificationChannels?.(projectId);\\n              if (updated) setNotifChannels(updated);\\n              setAddNotifDialog(null);\\n              enqueueSnackbar(t('argus.settings.channelAdded'), { variant: 'success' });\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing add notification handler\"",
+      "toolSummary": "\"Fix add handler\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Fix configured channels section: remove 'as any' casts, access config.webhook_url/config.recipients from the nested config object, remove test handler (not implemented yet)\\\"\"",
+      "EndLine": "1037",
+      "Instruction": "\"Fix ConnectedItem props and handlers for notification channels\"",
+      "ReplacementContent": "\"                      {notifChannels.map((ch: any) => {\\n                        const prov = NOTIFICATION_PROVIDERS.find(p => p.id === ch.provider);\\n                        const cfg = ch.config || {};\\n                        return (\\n                          <ConnectedItem key={ch.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <SlackIcon sx={{ fontSize: 18 }} />}\\n                            title={ch.name || cfg.name || ch.provider} chipLabel={prov?.name || ch.provider}\\n                            subtitle={`${ch.provider} \u00b7 ${cfg.webhook_url || cfg.recipients || cfg.channel || ''} \u00b7 ${new Date(ch.created_at).toLocaleDateString()}`}\\n                            active={ch.enabled} t={t}\\n                            onToggle={async () => {\\n                              try {\\n                                await argusService.updateNotificationChannel(projectId, ch.id, { enabled: !ch.enabled });\\n                                const updated = await argusService.listNotificationChannels(projectId);\\n                                setNotifChannels(updated);\\n                              } catch { /* */ }\\n                            }}\\n                            onDelete={async () => {\\n                              try {\\n                                await argusService.deleteNotificationChannel(projectId, ch.id);\\n                                setNotifChannels(p => p.filter((i: any) => i.id !== ch.id));\\n                                enqueueSnackbar(t('common.deleted'), { variant: 'success' });\\n                              } catch { /* */ }\\n                            }}\\n                          />\"",
+      "StartLine": "1010",
+      "TargetContent": "\"                      {notifChannels.map((ch: any) => {\\n                        const prov = NOTIFICATION_PROVIDERS.find(p => p.id === ch.provider);\\n                        return (\\n                          <ConnectedItem key={ch.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <SlackIcon sx={{ fontSize: 18 }} />}\\n                            title={ch.name} chipLabel={prov?.name || ch.provider}\\n                            subtitle={ch.webhook_url || ch.recipients || ''}\\n                            active={ch.enabled} t={t}\\n                            onToggle={async () => {\\n                              try {\\n                                await (argusService as any).updateNotificationChannel?.(projectId, ch.id, { enabled: !ch.enabled });\\n                                const updated = await (argusService as any).listNotificationChannels?.(projectId);\\n                                if (updated) setNotifChannels(updated);\\n                              } catch { /* */ }\\n                            }}\\n                            onTest={async () => {\\n                              try {\\n                                const r = await (argusService as any).testNotificationChannel?.(projectId, ch.id);\\n                                enqueueSnackbar(r?.ok ? r.message : t('argus.settings.testFailed'), { variant: r?.ok ? 'success' : 'error' });\\n                              } catch { enqueueSnackbar(t('argus.settings.testFailed'), { variant: 'error' }); }\\n                            }}\\n                            onDelete={async () => {\\n                              try {\\n                                await (argusService as any).deleteNotificationChannel?.(projectId, ch.id);\\n                                setNotifChannels(p => p.filter((i: any) => i.id !== ch.id));\\n                                enqueueSnackbar(t('common.deleted'), { variant: 'success' });\\n                              } catch { /* */ }\\n                            }}\\n                          />\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing configured channels display\"",
+      "toolSummary": "\"Fix channel display\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add editNotifChannel state to track which notification channel is being edited, to support edit mode in the wizard\\\"\"",
+      "EndLine": "528",
+      "Instruction": "\"Add edit state for notification channels\"",
+      "ReplacementContent": "\"  const [addNotifDialog, setAddNotifDialog] = useState<string | null>(null);\\n  const [editNotifData, setEditNotifData] = useState<{ id: number; provider: string; data: Record<string, string> } | null>(null);\\n  const [formData, setFormData] = useState<Record<string, string>>({});\\n  const [dynamicFields, setDynamicFields] = useState<ProviderFieldDef[]>([]);\"",
+      "StartLine": "526",
+      "TargetContent": "\"  const [addNotifDialog, setAddNotifDialog] = useState<string | null>(null);\\n  const [formData, setFormData] = useState<Record<string, string>>({});\\n  const [dynamicFields, setDynamicFields] = useState<ProviderFieldDef[]>([]);\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding edit state\"",
+      "toolSummary": "\"Add edit state\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Replace integrations configured section: change from ConnectedItem list to card grid, add EmptyState when no integrations are configured\\\"\"",
+      "EndLine": "983",
+      "Instruction": "\"Replace integration configured section with card grid + empty state\"",
+      "ReplacementContent": "\"                </SettingsCard>\\n                <SettingsCard title={t('argus.settings.configuredIntegrations')} desc={t('argus.settings.configuredIntegrationsDesc')} isDark={isDark}>\\n                  {intLoaded && integrations.length === 0 && (\\n                    <EmptyState icon={<GitHubIcon />} text={t('argus.settings.noConfiguredIntegrations', '\uc5f0\ub3d9\ub41c \ub9ac\ud3ec\uc9c0\ud1a0\ub9ac\uac00 \uc5c6\uc2b5\ub2c8\ub2e4')} hint={t('argus.settings.noConfiguredIntegrationsHint', '\uc704\uc5d0\uc11c \ud504\ub85c\ubc14\uc774\ub354\ub97c \uc120\ud0dd\ud558\uc5ec \uc5f0\ub3d9\uc744 \ucd94\uac00\ud558\uc138\uc694')} />\\n                  )}\\n                  {intLoaded && integrations.length > 0 && (\\n                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>\\n                      {integrations.map(intg => {\\n                        const prov = REPO_PROVIDERS.find(p => p.id === intg.provider);\\n                        return (\\n                          <ConfiguredCard key={intg.id} isDark={isDark}\\n                            icon={prov?.icon || <GitHubIcon sx={{ fontSize: 18 }} />}\\n                            color={prov?.color || '#666'}\\n                            name={intg.repo_url} provider={prov?.name || intg.provider}\\n                            subtitle={`${intg.default_branch} \u00b7 ${new Date(intg.created_at).toLocaleDateString()}`}\\n                            enabled={intg.enabled} t={t}\\n                            onToggle={async () => {\\n                              await argusService.updateIntegration(projectId, intg.id, { enabled: !intg.enabled });\\n                              setIntegrations(await argusService.listIntegrations(projectId));\\n                            }}\\n                            onDelete={async () => {\\n                              await argusService.deleteIntegration(projectId, intg.id);\\n                              setIntegrations(p => p.filter(i => i.id !== intg.id));\\n                              enqueueSnackbar(t('common.deleted'), { variant: 'success' });\\n                            }}\\n \n<truncated 211 bytes>",
+      "StartLine": "966",
+      "TargetContent": "\"                </SettingsCard>\\n                {intLoaded && integrations.length > 0 && (\\n                  <SettingsCard title={t('argus.settings.configuredIntegrations')} desc={t('argus.settings.configuredIntegrationsDesc')} isDark={isDark}>\\n                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>\\n                      {integrations.map(intg => {\\n                        const prov = REPO_PROVIDERS.find(p => p.id === intg.provider);\\n                        return (\\n                          <ConnectedItem key={intg.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <GitHubIcon sx={{ fontSize: 18 }} />}\\n                            title={intg.repo_url} subtitle={`${intg.provider} \u00b7 ${intg.default_branch} \u00b7 ${new Date(intg.created_at).toLocaleDateString()}`}\\n                            active={intg.enabled} t={t}\\n                            onDelete={async () => { await argusService.deleteIntegration(projectId, intg.id); setIntegrations(p => p.filter(i => i.id !== intg.id)); enqueueSnackbar(t('common.deleted'), { variant: 'success' }); }}\\n                          />\\n                        );\\n                      })}\\n                    </Box>\\n                  </SettingsCard>\\n                )}\\n                {!intLoaded && <Spinner />}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Updating integrations section\"",
+      "toolSummary": "\"Update integrations\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Replace notification configured section: card grid + empty state + edit button. Replace issue tracker section similarly.\\\"\"",
+      "EndLine": "1094",
+      "Instruction": "\"Replace notifications configured + issue trackers configured sections with card grid + empty state\"",
+      "ReplacementContent": "\"                </SettingsCard>\\n                <SettingsCard title={t('argus.settings.configuredChannels')} desc={t('argus.settings.configuredChannelsDesc')} isDark={isDark}>\\n                  {notifLoaded && notifChannels.length === 0 && (\\n                    <EmptyState icon={<SlackIcon />} text={t('argus.settings.noConfiguredChannels', '\uc5f0\ub3d9\ub41c \uc54c\ub9bc \ucc44\ub110\uc774 \uc5c6\uc2b5\ub2c8\ub2e4')} hint={t('argus.settings.noConfiguredChannelsHint', '\uc704\uc5d0\uc11c \uc54c\ub9bc \ud504\ub85c\ubc14\uc774\ub354\ub97c \uc120\ud0dd\ud558\uc5ec \ucc44\ub110\uc744 \ucd94\uac00\ud558\uc138\uc694')} />\\n                  )}\\n                  {notifLoaded && notifChannels.length > 0 && (\\n                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>\\n                      {notifChannels.map((ch: any) => {\\n                        const prov = NOTIFICATION_PROVIDERS.find(p => p.id === ch.provider);\\n                        const cfg = ch.config || {};\\n                        return (\\n                          <ConfiguredCard key={ch.id} isDark={isDark}\\n                            icon={prov?.icon || <SlackIcon sx={{ fontSize: 18 }} />}\\n                            color={prov?.color || '#666'}\\n                            name={ch.name || cfg.name || ch.provider} provider={prov?.name || ch.provider}\\n                            subtitle={cfg.webhook_url || cfg.recipients || cfg.channel || new Date(ch.created_at).toLocaleDateString()}\\n                            enabled={ch.enabled} t={t}\\n                            onToggle={async () => {\\n                              await argusService.updateNotificationChannel(projectId, ch.id, { enabled: !ch.enabled });\\n                              setNotifChannels(await argusService.listNotificationChannels(projectId));\\n                            }}\\n                            onEdit={() => {\\n                              const editData: Record<string, string> = { name: ch.name || '', ...cfg };\\n                              setEditNotifData({ id: ch.id, provider: ch.provider, data: editData \n<truncated 4279 bytes>",
+      "StartLine": "1021",
+      "TargetContent": "\"                </SettingsCard>\\n                {notifLoaded && notifChannels.length > 0 && (\\n                  <SettingsCard title={t('argus.settings.configuredChannels')} desc={t('argus.settings.configuredChannelsDesc')} isDark={isDark}>\\n                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>\\n                      {notifChannels.map((ch: any) => {\\n                        const prov = NOTIFICATION_PROVIDERS.find(p => p.id === ch.provider);\\n                        const cfg = ch.config || {};\\n                        return (\\n                          <ConnectedItem key={ch.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <SlackIcon sx={{ fontSize: 18 }} />}\\n                            title={ch.name || cfg.name || ch.provider} chipLabel={prov?.name || ch.provider}\\n                            subtitle={`${ch.provider} \u00b7 ${cfg.webhook_url || cfg.recipients || cfg.channel || ''} \u00b7 ${new Date(ch.created_at).toLocaleDateString()}`}\\n                            active={ch.enabled} t={t}\\n                            onToggle={async () => {\\n                              try {\\n                                await argusService.updateNotificationChannel(projectId, ch.id, { enabled: !ch.enabled });\\n                                const updated = await argusService.listNotificationChannels(projectId);\\n                                setNotifChannels(updated);\\n                              } catch { /* */ }\\n                            }}\\n                            onDelete={async () => {\\n                              try {\\n                                await argusService.deleteNotificationChannel(projectId, ch.id);\\n                                setNotifChannels(p => p.filter((i: any) => i.id !== ch.id));\\n                                enqueueSnackbar(t('common.deleted'), { variant: 'success' });\\n                              } catch { /* */ }\\n                            }}\\n                          />\\n                        );\\n               \n<truncated 3062 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Updating notif + tracker sections\"",
+      "toolSummary": "\"Update configured sections\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Wire up edit mode for notification wizard: pass initialData when editing, use update API instead of create, clear editNotifData on close\\\"\"",
+      "EndLine": "1460",
+      "Instruction": "\"Add initialData and edit-mode handling to notification wizard\"",
+      "ReplacementContent": "\"      {/* \u2550\u2550\u2550 ADD/EDIT NOTIFICATION WIZARD \u2550\u2550\u2550 */}\\n      {(() => {\\n        const np = NOTIFICATION_PROVIDERS.find(p => p.id === addNotifDialog);\\n        if (!np) return null;\\n        const wizardCfg: WizardProviderConfig = {\\n          id: np.id, name: np.name, color: np.color,\\n          gradient: np.gradient, accentColor: np.accentColor,\\n          icon: np.icon, descKey: np.descKey,\\n          guideUrl: np.guideUrl, guideButtonKey: np.guideButtonKey,\\n          guideDescKey: np.guideDescKey,\\n        };\\n        const wizardFields: WizardFieldDef[] = np.fields.map(f => ({\\n          ...f, required: f.key === 'name',\\n        }));\\n        const isEditing = !!editNotifData;\\n        return (\\n          <ProviderWizardModal\\n            open={!!addNotifDialog}\\n            onClose={() => { setAddNotifDialog(null); setEditNotifData(null); }}\\n            provider={wizardCfg}\\n            fields={wizardFields}\\n            initialData={editNotifData?.data}\\n            wizardTitleKey={isEditing ? 'argus.settings.providerWizard.editNotification' : 'argus.settings.providerWizard.addNotification'}\\n            onSubmit={async (data) => {\\n              if (isEditing && editNotifData) {\\n                await argusService.updateNotificationChannel(projectId, editNotifData.id, {\\n                  name: data.name?.trim() || '',\\n                  config: {\\n                    webhook_url: data.webhook_url?.trim(), channel: data.channel?.trim(),\\n                    recipients: data.recipients?.trim(), secret: data.secret?.trim(),\\n                    api_token: data.api_token?.trim(), severity: data.severity?.trim(),\\n                  },\\n                });\\n                enqueueSnackbar(t('common.saved'), { variant: 'success' });\\n              } else {\\n                await argusService.createNotificationChannel(projectId, {\\n                  provider: addNotifDialog!, name: data.name?.trim() || '',\\n                  config: {\\n                    webhook_url: data.webhook_url?.trim(), channe\n<truncated 551 bytes>",
+      "StartLine": "1425",
+      "TargetContent": "\"      {/* \u2550\u2550\u2550 ADD NOTIFICATION WIZARD \u2550\u2550\u2550 */}\\n      {(() => {\\n        const np = NOTIFICATION_PROVIDERS.find(p => p.id === addNotifDialog);\\n        if (!np) return null;\\n        const wizardCfg: WizardProviderConfig = {\\n          id: np.id, name: np.name, color: np.color,\\n          gradient: np.gradient, accentColor: np.accentColor,\\n          icon: np.icon, descKey: np.descKey,\\n          guideUrl: np.guideUrl, guideButtonKey: np.guideButtonKey,\\n          guideDescKey: np.guideDescKey,\\n        };\\n        const wizardFields: WizardFieldDef[] = np.fields.map(f => ({\\n          ...f, required: f.key === 'name',\\n        }));\\n        return (\\n          <ProviderWizardModal\\n            open={!!addNotifDialog}\\n            onClose={() => { setAddNotifDialog(null); }}\\n            provider={wizardCfg}\\n            fields={wizardFields}\\n            wizardTitleKey=\\\"argus.settings.providerWizard.addNotification\\\"\\n            onSubmit={async (data) => {\\n              await argusService.createNotificationChannel(projectId, {\\n                provider: addNotifDialog!, name: data.name?.trim() || '',\\n                config: {\\n                  webhook_url: data.webhook_url?.trim(), channel: data.channel?.trim(),\\n                  recipients: data.recipients?.trim(), secret: data.secret?.trim(),\\n                  api_token: data.api_token?.trim(), severity: data.severity?.trim(),\\n                },\\n              });\\n              const updated = await argusService.listNotificationChannels(projectId);\\n              setNotifChannels(updated);\\n              setAddNotifDialog(null);\\n              enqueueSnackbar(t('argus.settings.channelAdded'), { variant: 'success' });\\n            }}\\n          />\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Wiring edit mode\"",
+      "toolSummary": "\"Wire edit mode\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add ConfiguredCard sub-component: a card-style display for configured integrations/channels/trackers with toggle, edit, test, and delete actions. Designed to match the ProviderCard grid layout.\\\"\"",
+      "EndLine": "1748",
+      "Instruction": "\"Add ConfiguredCard component before EmptyState\"",
+      "ReplacementContent": "\");\\n\\n/** \uad6c\uc131\ub41c \uc5f0\ub3d9 \uce74\ub4dc \u2014 \uce74\ub4dc \uadf8\ub9ac\ub4dc\uc6a9 */\\nconst ConfiguredCard: React.FC<{\\n  isDark: boolean; icon: React.ReactNode; color: string;\\n  name: string; provider: string; subtitle: string;\\n  enabled: boolean; t: any;\\n  onToggle?: () => void; onEdit?: () => void; onTest?: () => void; onDelete: () => void;\\n}> = ({ isDark, icon, color, name, provider, subtitle, enabled, t, onToggle, onEdit, onTest, onDelete }) => {\\n  const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';\\n  return (\\n    <Paper elevation={0}\\n      sx={{\\n        p: 2.5, border: `1px solid ${bdr}`, borderRadius: '12px',\\n        display: 'flex', flexDirection: 'column', gap: 1.5,\\n        opacity: enabled ? 1 : 0.6,\\n        transition: 'all 0.15s',\\n        '&:hover': { borderColor: alpha(color, 0.4), boxShadow: `0 2px 12px ${alpha(color, 0.08)}` },\\n      }}>\\n      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n        <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha(color, isDark ? 0.2 : 0.08), color, '& .MuiSvgIcon-root': { fontSize: 20 } }}>\\n          {icon}\\n        </Avatar>\\n        <Box sx={{ flex: 1, minWidth: 0 }}>\\n          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>\\n            <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }} noWrap>{name}</Typography>\\n          </Box>\\n          <Chip label={provider} size=\\\"small\\\"\\n            sx={{ height: 18, fontSize: '0.58rem', fontWeight: 600, backgroundColor: alpha(color, 0.1), color, border: 'none', mt: 0.3 }}\\n          />\\n        </Box>\\n        <StatusBadge active={enabled} t={t} />\\n      </Box>\\n      <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.73rem', lineHeight: 1.5 }} noWrap>\\n        {subtitle}\\n      </Typography>\\n      <Box sx={{ display: 'flex', gap: 0.5, mt: 'auto' }}>\\n        {onToggle && (\\n          <Button size=\\\"small\\\" onClick={onToggle}\\n            sx={{ flex: 1, textTransform: 'none', fontWeight: 600, fontSize: '0.72rem', borderRadius: '8px', co\n<truncated 1141 bytes>",
+      "StartLine": "1746",
+      "TargetContent": "\");\\n\\nconst EmptyState: React.FC<{ icon: React.ReactNode; text: string; hint?: string }> = ({ icon, text, hint }) => (\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding ConfiguredCard component\"",
+      "toolSummary": "\"Add ConfiguredCard\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Fix webhook/pagerduty field definitions: add proper placeholders and hints. For webhook secret, use a placeholder string. For pagerduty severity, make it a select dropdown instead of free text. Add hint text for fields lacking explanation.\\\"\"",
+      "Instruction": "\"1. Add placeholder and hint for webhook secret. 2. Fix pagerduty severity to have proper placeholder. 3. Add hint for pagerduty api_token.\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":403,\"ReplacementContent\":\"    fields: [\\n      { key: 'name', labelKey: 'argus.settings.channelName', labelFallback: 'Name', placeholder: 'Custom Hook' },\\n      { key: 'webhook_url', labelKey: 'argus.settings.webhookUrl', labelFallback: 'URL', placeholder: 'https://api.example.com/webhook' },\\n      { key: 'secret', labelKey: 'argus.settings.webhookSecret', labelFallback: 'Secret', placeholder: '', type: 'password', hint: 'HMAC \uc11c\uba85 \uac80\uc99d\uc6a9 \uc2dc\ud06c\ub9bf (\uc120\ud0dd)' },\\n    ],\",\"StartLine\":398,\"TargetContent\":\"    fields: [\\n      { key: 'name', labelKey: 'argus.settings.channelName', labelFallback: 'Name', placeholder: 'Custom Hook' },\\n      { key: 'webhook_url', labelKey: 'argus.settings.webhookUrl', labelFallback: 'URL', placeholder: 'https://api.example.com/hook' },\\n      { key: 'secret', labelKey: 'argus.settings.webhookSecret', labelFallback: 'Secret', placeholder: '', type: 'password' },\\n    ],\"},{\"AllowMultiple\":false,\"EndLine\":426,\"ReplacementContent\":\"    fields: [\\n      { key: 'name', labelKey: 'argus.settings.channelName', labelFallback: 'Name', placeholder: 'On-Call Alerts' },\\n      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Integration Key', placeholder: '', type: 'password', hint: 'PagerDuty Events API v2 Integration Key' },\\n      { key: 'severity', labelKey: 'argus.settings.pdSeverity', labelFallback: 'Default Severity', placeholder: 'critical / error / warning / info', type: 'select', options: [\\n        { value: 'critical', label: 'Critical' }, { value: 'error', label: 'Error' },\\n        { value: 'warning', label: 'Warning' }, { value: 'info', label: 'Info' },\\n      ] },\\n    ],\",\"StartLine\":421,\"TargetContent\":\"    fields: [\\n      { key: 'name', labelKey: 'argus.settings.channelName', labelFallback: 'Name', placeholder: 'On-Call Alerts' },\\n      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Integration Key', placeholder: '', type: 'password' },\\n      { key: 'severity', labelKey: 'a\n<truncated 99 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing webhook/pagerduty fields\"",
+      "toolSummary": "\"Fix field placeholders\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add optional hint field to ProviderFieldDef type for field-level help text\\\"\"",
+      "EndLine": "105",
+      "Instruction": "\"Add hint to ProviderFieldDef\"",
+      "ReplacementContent": "\"interface ProviderFieldDef {\\n  key: string;\\n  labelKey: string;\\n  labelFallback: string;\\n  placeholder: string;\\n  type?: string;\\n  options?: { value: string; label: string }[];\\n  width?: number;\\n  hint?: string;\\n}\"",
+      "StartLine": "97",
+      "TargetContent": "\"interface ProviderFieldDef {\\n  key: string;\\n  labelKey: string;\\n  labelFallback: string;\\n  placeholder: string;\\n  type?: string;\\n  options?: { value: string; label: string }[];\\n  width?: number;\\n}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding hint to type\"",
+      "toolSummary": "\"Fix type def\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Add Menu, ListItemIcon, ListItemText to MUI imports and MoreVert icon for the context menu in ConfiguredCard.\\\"\"",
+      "Instruction": "\"Add missing MUI imports for context menu\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":15,\"ReplacementContent\":\"import {\\n  Box, Typography, Paper, TextField, Button, Slider, Chip, IconButton,\\n  Divider, useTheme, InputAdornment, alpha, Tooltip, Select, MenuItem,\\n  FormControl, InputLabel, CircularProgress, Dialog, DialogTitle,\\n  DialogContent, DialogActions, Avatar, Collapse, Menu, ListItemIcon, ListItemText,\\n} from '@mui/material';\",\"StartLine\":10,\"TargetContent\":\"import {\\n  Box, Typography, Paper, TextField, Button, Slider, Chip, IconButton,\\n  Divider, useTheme, InputAdornment, alpha, Tooltip, Select, MenuItem,\\n  FormControl, InputLabel, CircularProgress, Dialog, DialogTitle,\\n  DialogContent, DialogActions, Avatar, Collapse,\\n} from '@mui/material';\"},{\"AllowMultiple\":false,\"EndLine\":27,\"ReplacementContent\":\"  Email as EmailIcon, Webhook as WebhookIcon, Edit as EditIcon,\\n  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,\\n  ExpandMore as ExpandMoreIcon, MoreVert as MoreVertIcon,\\n  PowerSettingsNew as PowerIcon,\\n} from '@mui/icons-material';\",\"StartLine\":24,\"TargetContent\":\"  Email as EmailIcon, Webhook as WebhookIcon, Edit as EditIcon,\\n  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,\\n  ExpandMore as ExpandMoreIcon,\\n} from '@mui/icons-material';\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding MUI imports\"",
+      "toolSummary": "\"Add imports\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Completely rewrite ConfiguredCard to match ProviderCard's look (same border, hover, avatar color #667eea), replace action buttons with MoreVert context menu (edit, toggle, test, delete), and add a built-in confirmation dialog for destructive actions (toggle/delete).\\\"\"",
+      "EndLine": "1813",
+      "Instruction": "\"Replace ConfiguredCard with ProviderCard-matching style + MoreVert menu + confirmation dialog\"",
+      "ReplacementContent": "\"/** \uad6c\uc131\ub41c \uc5f0\ub3d9 \uce74\ub4dc \u2014 ProviderCard\uc640 \ub3d9\uc77c\ud55c \ub8e9 + MoreVert \uba54\ub274 */\\nconst ConfiguredCard: React.FC<{\\n  isDark: boolean; icon: React.ReactNode; color: string;\\n  name: string; provider: string; subtitle: string;\\n  enabled: boolean; t: any;\\n  onToggle?: () => Promise<void> | void;\\n  onEdit?: () => void;\\n  onTest?: () => Promise<void> | void;\\n  onDelete: () => Promise<void> | void;\\n}> = ({ isDark, icon, color, name, provider, subtitle, enabled, t, onToggle, onEdit, onTest, onDelete }) => {\\n  const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';\\n  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);\\n  const [confirmAction, setConfirmAction] = React.useState<'toggle' | 'delete' | null>(null);\\n  const [actionLoading, setActionLoading] = React.useState(false);\\n\\n  const handleConfirm = async () => {\\n    setActionLoading(true);\\n    try {\\n      if (confirmAction === 'toggle' && onToggle) await onToggle();\\n      if (confirmAction === 'delete') await onDelete();\\n    } finally {\\n      setActionLoading(false);\\n      setConfirmAction(null);\\n    }\\n  };\\n\\n  return (\\n    <>\\n      <Paper elevation={0}\\n        sx={{\\n          p: 2.5, border: `1px solid ${bdr}`, borderRadius: '12px',\\n          display: 'flex', flexDirection: 'column', gap: 1.5,\\n          opacity: enabled ? 1 : 0.55,\\n          transition: 'all 0.15s',\\n          '&:hover': { borderColor: alpha('#667eea', 0.5), transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha('#667eea', 0.1)}` },\\n        }}>\\n        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n          <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha('#667eea', isDark ? 0.2 : 0.08), color: '#667eea', '& .MuiSvgIcon-root': { fontSize: 20 } }}>\\n            {icon}\\n          </Avatar>\\n          <Box sx={{ flex: 1, minWidth: 0 }}>\\n            <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }} noWrap>{name}</Typography>\\n            <Chip label={provider} size=\\\"small\\\"\\n              sx=\n<truncated 4166 bytes>",
+      "StartLine": "1752",
+      "TargetContent": "\"/** \uad6c\uc131\ub41c \uc5f0\ub3d9 \uce74\ub4dc \u2014 \uce74\ub4dc \uadf8\ub9ac\ub4dc\uc6a9 */\\nconst ConfiguredCard: React.FC<{\\n  isDark: boolean; icon: React.ReactNode; color: string;\\n  name: string; provider: string; subtitle: string;\\n  enabled: boolean; t: any;\\n  onToggle?: () => void; onEdit?: () => void; onTest?: () => void; onDelete: () => void;\\n}> = ({ isDark, icon, color, name, provider, subtitle, enabled, t, onToggle, onEdit, onTest, onDelete }) => {\\n  const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';\\n  return (\\n    <Paper elevation={0}\\n      sx={{\\n        p: 2.5, border: `1px solid ${bdr}`, borderRadius: '12px',\\n        display: 'flex', flexDirection: 'column', gap: 1.5,\\n        opacity: enabled ? 1 : 0.6,\\n        transition: 'all 0.15s',\\n        '&:hover': { borderColor: alpha(color, 0.4), boxShadow: `0 2px 12px ${alpha(color, 0.08)}` },\\n      }}>\\n      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n        <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha(color, isDark ? 0.2 : 0.08), color, '& .MuiSvgIcon-root': { fontSize: 20 } }}>\\n          {icon}\\n        </Avatar>\\n        <Box sx={{ flex: 1, minWidth: 0 }}>\\n          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>\\n            <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }} noWrap>{name}</Typography>\\n          </Box>\\n          <Chip label={provider} size=\\\"small\\\"\\n            sx={{ height: 18, fontSize: '0.58rem', fontWeight: 600, backgroundColor: alpha(color, 0.1), color, border: 'none', mt: 0.3 }}\\n          />\\n        </Box>\\n        <StatusBadge active={enabled} t={t} />\\n      </Box>\\n      <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.73rem', lineHeight: 1.5 }} noWrap>\\n        {subtitle}\\n      </Typography>\\n      <Box sx={{ display: 'flex', gap: 0.5, mt: 'auto' }}>\\n        {onToggle && (\\n          <Button size=\\\"small\\\" onClick={onToggle}\\n            sx={{ flex: 1, textTransform: 'none', fontWeight: 600, fontSize: '0.72rem', borderRadius: '8px', color: '\n<truncated 1019 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Rewriting ConfiguredCard\"",
+      "toolSummary": "\"Rewrite ConfiguredCard\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Fix wizard onSuccess: after global integration setup (GitHub/GitLab/Bitbucket), create a project-level integration record automatically and refresh the list. Don't open the old ConfigDialog. For Slack, just refresh notification channels.\\\"\"",
+      "EndLine": "1494",
+      "Instruction": "\"Replace onSuccess to auto-create integration and refresh list\"",
+      "ReplacementContent": "\"        onSuccess={async () => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            // Global integration configured \u2014 create a project-level integration record & refresh\\n            try {\\n              await argusService.createIntegration(projectId, {\\n                provider: wizardProvider,\\n                repo_url: '',\\n                default_branch: 'main',\\n              });\\n            } catch { /* may already exist */ }\\n            setIntegrations(await argusService.listIntegrations(projectId));\\n          }\\n        }}\"",
+      "StartLine": "1487",
+      "TargetContent": "\"        onSuccess={() => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            setAddIntDialog(wizardProvider);\\n            setFormData({});\\n          }\\n        }}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing wizard onSuccess\"",
+      "toolSummary": "\"Fix onSuccess\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Fix GitHub/GitLab/Bitbucket 'Add' flow: if already configured, show a snackbar informing user the integration is already set up instead of opening the confusing ConfigDialog. Always open the wizard for first-time setup.\\\"\"",
+      "EndLine": "967",
+      "Instruction": "\"When configured=true, show snackbar instead of ConfigDialog\"",
+      "ReplacementContent": "\"                        onAdd={async () => {\\n                          if (prov.id === 'github' || prov.id === 'gitlab' || prov.id === 'bitbucket') {\\n                            try {\\n                              const { configured } = await argusService.getGlobalIntegrationConfig(prov.id);\\n                              if (configured) {\\n                                enqueueSnackbar(t('argus.settings.alreadyConfigured', '\uc774\ubbf8 \uc5f0\ub3d9\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4. \ud558\ub2e8 \uce74\ub4dc\uc5d0\uc11c \uad00\ub9ac\ud558\uc138\uc694.'), { variant: 'info' });\\n                                return;\\n                              }\\n                            } catch (e) {\\n                              console.error('Failed to check config', e);\\n                            }\\n                            setWizardProvider(prov.id as 'github' | 'gitlab' | 'bitbucket');\\n                            setWizardOpen(true);\\n                          } else {\\n                            setDynamicFields(prov.fields);\\n                            setAddIntDialog(prov.id);\\n                            setFormData({});\\n                          }\\n                        }}\"",
+      "StartLine": "935",
+      "TargetContent": "\"                        onAdd={async () => {\\n                          let finalFields = prov.fields;\\n                          if (prov.id === 'github' || prov.id === 'gitlab' || prov.id === 'bitbucket') {\\n                            try {\\n                              const { configured } = await argusService.getGlobalIntegrationConfig(prov.id);\\n                              if (!configured) {\\n                                setWizardProvider(prov.id as 'github' | 'gitlab' | 'bitbucket');\\n                                setWizardOpen(true);\\n                                return;\\n                              }\\n                              \\n                              if (prov.id === 'github') {\\n                                const repos = await argusService.getGithubRepositories();\\n                                finalFields = finalFields.map(f => {\\n                                  if (f.key === 'repo_url') {\\n                                    return {\\n                                      ...f,\\n                                      type: 'select',\\n                                      options: repos.map(r => ({ value: r.url, label: r.full_name }))\\n                                    };\\n                                  }\\n                                  if (f.key === 'access_token') return null; // GitHub App doesn't need manual access token\\n                                  return f;\\n                                }).filter(Boolean) as ProviderFieldDef[];\\n                              }\\n                            } catch (e) {\\n                              console.error('Failed to check config', e);\\n                            }\\n                          }\\n                          setDynamicFields(finalFields);\\n                          setAddIntDialog(prov.id);\\n                          setFormData({});\\n                        }}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing add integration flow\"",
+      "toolSummary": "\"Fix add flow\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Phase 1 step 1-2: Add globalConfigs state and useEffect to load global integration configs when entering integrations section. Also add configureProvider state for Phase 2 Configure dialog.\\\"\"",
+      "Instruction": "\"Add globalConfigs state after wizardProvider, and add global config loading to the integrations useEffect\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":538,\"ReplacementContent\":\"  // Setup Wizard Modal\\n  const [wizardOpen, setWizardOpen] = useState(false);\\n  const [wizardProvider, setWizardProvider] = useState<'github' | 'gitlab' | 'bitbucket' | 'slack'>('github');\\n\\n  // Global integration status (GitHub App, GitLab App, etc.)\\n  const [globalConfigs, setGlobalConfigs] = useState<Record<string, boolean>>({});\\n  const [configureProvider, setConfigureProvider] = useState<string | null>(null);\\n\\n  const loadGlobalConfigs = React.useCallback(async () => {\\n    const results = await Promise.all(\\n      ['github', 'gitlab', 'bitbucket'].map(async p => {\\n        try {\\n          const { configured } = await argusService.getGlobalIntegrationConfig(p);\\n          return [p, configured] as [string, boolean];\\n        } catch { return [p, false] as [string, boolean]; }\\n      })\\n    );\\n    setGlobalConfigs(Object.fromEntries(results));\\n  }, []);\",\"StartLine\":536,\"TargetContent\":\"  // Setup Wizard Modal\\n  const [wizardOpen, setWizardOpen] = useState(false);\\n  const [wizardProvider, setWizardProvider] = useState<'github' | 'gitlab' | 'bitbucket' | 'slack'>('github');\"},{\"AllowMultiple\":false,\"EndLine\":591,\"ReplacementContent\":\"    if (currentSection === 'integrations' && !intLoaded) {\\n      argusService.listIntegrations(projectId).then(d => { setIntegrations(d); setIntLoaded(true); }).catch(() => setIntLoaded(true));\\n      loadGlobalConfigs();\\n    }\",\"StartLine\":590,\"TargetContent\":\"    if (currentSection === 'integrations' && !intLoaded)\\n      argusService.listIntegrations(projectId).then(d => { setIntegrations(d); setIntLoaded(true); }).catch(() => setIntLoaded(true));\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding globalConfigs state\"",
+      "toolSummary": "\"Add global state\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Rewrite ProviderCard to support 2 states: uninstalled (Install button) and installed (Installed badge + Configure button + MoreVert with Uninstall). Uses confirmation dialog for uninstall.\\\"\"",
+      "EndLine": "1598",
+      "Instruction": "\"Replace ProviderCard with 2-state version\"",
+      "ReplacementContent": "\"/** \ud504\ub85c\ubc14\uc774\ub354 \uce74\ub4dc (\ub9c8\ucf13\ud50c\ub808\uc774\uc2a4 \uadf8\ub9ac\ub4dc\uc6a9) \u2014 Install / Installed 2-state */\\nconst ProviderCard: React.FC<{\\n  prov: { id: string; name: string; descKey: string; color: string; icon: React.ReactNode };\\n  isDark: boolean; t: any; count: number; onAdd: () => void;\\n  configured?: boolean; onConfigure?: () => void; onUninstall?: () => Promise<void> | void;\\n}> = ({ prov, isDark, t, count, onAdd, configured, onConfigure, onUninstall }) => {\\n  const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';\\n  const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);\\n  const [confirmUninstall, setConfirmUninstall] = React.useState(false);\\n  const [uninstalling, setUninstalling] = React.useState(false);\\n\\n  const handleUninstall = async () => {\\n    setUninstalling(true);\\n    try { if (onUninstall) await onUninstall(); }\\n    finally { setUninstalling(false); setConfirmUninstall(false); }\\n  };\\n\\n  return (\\n    <>\\n      <Paper elevation={0}\\n        onClick={configured ? onConfigure : onAdd}\\n        sx={{\\n          p: 2.5, border: `1px solid ${bdr}`, borderRadius: '12px',\\n          display: 'flex', flexDirection: 'column', gap: 1.5, cursor: 'pointer',\\n          transition: 'all 0.15s',\\n          '&:hover': { borderColor: alpha('#667eea', 0.5), transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha('#667eea', 0.1)}` },\\n        }}>\\n        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n          <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha('#667eea', isDark ? 0.2 : 0.08), color: '#667eea', '& .MuiSvgIcon-root': { fontSize: 20 } }}>\\n            {prov.icon}\\n          </Avatar>\\n          <Box sx={{ flex: 1, minWidth: 0 }}>\\n            <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }}>{prov.name}</Typography>\\n            {configured ? (\\n              <Chip label={`\u2713 ${t('argus.settings.installed', '\uc5f0\ub3d9\ub428')}`} size=\\\"small\\\"\\n                sx={{ height: 18, fontSize: '0.58rem', fontWeight: 600, backgroundCo\n<truncated 3991 bytes>",
+      "StartLine": "1561",
+      "TargetContent": "\"/** \ud504\ub85c\ubc14\uc774\ub354 \uce74\ub4dc (\ub9c8\ucf13\ud50c\ub808\uc774\uc2a4 \uadf8\ub9ac\ub4dc\uc6a9) */\\nconst ProviderCard: React.FC<{\\n  prov: { id: string; name: string; descKey: string; color: string; icon: React.ReactNode };\\n  isDark: boolean; t: any; count: number; onAdd: () => void;\\n}> = ({ prov, isDark, t, count, onAdd }) => {\\n  const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';\\n  return (\\n    <Paper elevation={0} onClick={onAdd}\\n      sx={{\\n        p: 2.5, border: `1px solid ${bdr}`, borderRadius: '12px',\\n        display: 'flex', flexDirection: 'column', gap: 1.5, cursor: 'pointer',\\n        transition: 'all 0.15s',\\n        '&:hover': { borderColor: alpha('#667eea', 0.5), transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha('#667eea', 0.1)}` },\\n      }}>\\n      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n        <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha('#667eea', isDark ? 0.2 : 0.08), color: '#667eea', '& .MuiSvgIcon-root': { fontSize: 20 } }}>\\n          {prov.icon}\\n        </Avatar>\\n        <Box>\\n          <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }}>{prov.name}</Typography>\\n          {count > 0 && <Chip label={`${count} ${t('argus.settings.configured')}`} size=\\\"small\\\"\\n            sx={{ height: 18, fontSize: '0.58rem', fontWeight: 600, backgroundColor: alpha('#4caf50', 0.1), color: '#4caf50', border: 'none', mt: 0.3 }} />}\\n        </Box>\\n      </Box>\\n      <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.73rem', lineHeight: 1.5, flex: 1 }}>\\n        {t(prov.descKey)}\\n      </Typography>\\n      <Button size=\\\"small\\\" variant=\\\"contained\\\" fullWidth startIcon={<AddIcon />}\\n        onClick={e => { e.stopPropagation(); onAdd(); }}\\n        sx={{\\n          mt: 'auto', borderRadius: '8px', textTransform: 'none', fontWeight: 600, fontSize: '0.78rem',\\n        }}\\n      >\\n        {t('argus.settings.addConnection')}\\n      </Button>\\n    </Paper>\\n  );\\n};\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Rewriting ProviderCard\"",
+      "toolSummary": "\"Rewrite ProviderCard\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Replace the entire integrations section: remove 'configured integrations' card, update ProviderCard props to pass configured/onConfigure/onUninstall based on globalConfigs state. For App-type providers (github/gitlab/bitbucket), the card shows Install or Installed state. For non-App providers, keeps the old simple dialog flow.\\\"\"",
+      "EndLine": "1008",
+      "Instruction": "\"Remove configured section, wire ProviderCard to globalConfigs\"",
+      "ReplacementContent": "\"            {/* \u2500\u2500\u2500 INTEGRATIONS \u2500\u2500\u2500 */}\\n            {currentSection === 'integrations' && (\\n              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>\\n                <SettingsCard title={t('argus.settings.availableProviders')} desc={t('argus.settings.availableProvidersDesc')} isDark={isDark}>\\n                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 2 }}>\\n                    {REPO_PROVIDERS.map(prov => {\\n                      const isAppType = prov.id === 'github' || prov.id === 'gitlab' || prov.id === 'bitbucket';\\n                      const isConfigured = isAppType && !!globalConfigs[prov.id];\\n                      return (\\n                        <ProviderCard key={prov.id} prov={prov} isDark={isDark} t={t}\\n                          count={integrations.filter(i => i.provider === prov.id).length}\\n                          configured={isConfigured}\\n                          onAdd={() => {\\n                            if (isAppType) {\\n                              setWizardProvider(prov.id as 'github' | 'gitlab' | 'bitbucket');\\n                              setWizardOpen(true);\\n                            } else {\\n                              setDynamicFields(prov.fields);\\n                              setAddIntDialog(prov.id);\\n                              setFormData({});\\n                            }\\n                          }}\\n                          onConfigure={() => setConfigureProvider(prov.id)}\\n                          onUninstall={async () => {\\n                            await argusService.deleteGlobalIntegrationConfig(prov.id);\\n                            // Also remove project-level integrations for this provider\\n                            const provInts = integrations.filter(i => i.provider === prov.id);\\n                            for (const intg of provInts) {\\n                              try { await argusService.deleteIntegration(projectId, intg.id); } catch { /* */ }\\n      \n<truncated 597 bytes>",
+      "StartLine": "945",
+      "TargetContent": "\"            {/* \u2500\u2500\u2500 INTEGRATIONS \u2500\u2500\u2500 */}\\n            {currentSection === 'integrations' && (\\n              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>\\n                <SettingsCard title={t('argus.settings.availableProviders')} desc={t('argus.settings.availableProvidersDesc')} isDark={isDark}>\\n                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 2 }}>\\n                    {REPO_PROVIDERS.map(prov => (\\n                      <ProviderCard key={prov.id} prov={prov} isDark={isDark} t={t}\\n                        count={integrations.filter(i => i.provider === prov.id).length}\\n                        onAdd={async () => {\\n                          if (prov.id === 'github' || prov.id === 'gitlab' || prov.id === 'bitbucket') {\\n                            try {\\n                              const { configured } = await argusService.getGlobalIntegrationConfig(prov.id);\\n                              if (configured) {\\n                                enqueueSnackbar(t('argus.settings.alreadyConfigured', '\uc774\ubbf8 \uc5f0\ub3d9\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4. \ud558\ub2e8 \uce74\ub4dc\uc5d0\uc11c \uad00\ub9ac\ud558\uc138\uc694.'), { variant: 'info' });\\n                                return;\\n                              }\\n                            } catch (e) {\\n                              console.error('Failed to check config', e);\\n                            }\\n                            setWizardProvider(prov.id as 'github' | 'gitlab' | 'bitbucket');\\n                            setWizardOpen(true);\\n                          } else {\\n                            setDynamicFields(prov.fields);\\n                            setAddIntDialog(prov.id);\\n                            setFormData({});\\n                          }\\n                        }}\\n                      />\\n                    ))}\\n                  </Box>\\n                </SettingsCard>\\n                <SettingsCard title={t('argus.settings.configuredIntegrations')} desc={t('argus.settings.confi\n<truncated 2153 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Replacing integrations section\"",
+      "toolSummary": "\"Replace integrations\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Fix wizard onSuccess: instead of creating a dummy integration record, just update globalConfigs so the ProviderCard switches to 'Installed' state.\\\"\"",
+      "EndLine": "1483",
+      "Instruction": "\"Replace onSuccess to update globalConfigs instead of createIntegration\"",
+      "ReplacementContent": "\"        onSuccess={async () => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            // Update card state \u2192 \\\"Installed\\\"\\n            setGlobalConfigs(prev => ({ ...prev, [wizardProvider]: true }));\\n          }\\n        }}\"",
+      "StartLine": "1469",
+      "TargetContent": "\"        onSuccess={async () => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            // Global integration configured \u2014 create a project-level integration record & refresh\\n            try {\\n              await argusService.createIntegration(projectId, {\\n                provider: wizardProvider,\\n                repo_url: '',\\n                default_branch: 'main',\\n              });\\n            } catch { /* may already exist */ }\\n            setIntegrations(await argusService.listIntegrations(projectId));\\n          }\\n        }}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing onSuccess\"",
+      "toolSummary": "\"Fix onSuccess\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Import IntegrationConfigureDialog component\\\"\"",
+      "EndLine": "50",
+      "Instruction": "\"Add import for IntegrationConfigureDialog\"",
+      "ReplacementContent": "\"import { GlobalIntegrationWizardModal } from './components/GlobalIntegrationWizardModal';\\nimport { ProviderWizardModal, WizardProviderConfig, WizardFieldDef } from './components/ProviderWizardModal';\\nimport { IntegrationConfigureDialog } from './components/IntegrationConfigureDialog';\"",
+      "StartLine": "49",
+      "TargetContent": "\"import { GlobalIntegrationWizardModal } from './components/GlobalIntegrationWizardModal';\\nimport { ProviderWizardModal, WizardProviderConfig, WizardFieldDef } from './components/ProviderWizardModal';\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding import\"",
+      "toolSummary": "\"Add import\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add IntegrationConfigureDialog render next to the wizard modal. It opens when configureProvider is set, passes project integrations for management.\\\"\"",
+      "EndLine": "1479",
+      "Instruction": "\"Add IntegrationConfigureDialog after GlobalIntegrationWizardModal\"",
+      "ReplacementContent": "\"      <GlobalIntegrationWizardModal\\n        open={wizardOpen}\\n        provider={wizardProvider}\\n        onClose={() => setWizardOpen(false)}\\n        onSuccess={async () => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            // Update card state \u2192 \\\"Installed\\\"\\n            setGlobalConfigs(prev => ({ ...prev, [wizardProvider]: true }));\\n          }\\n        }}\\n      />\\n\\n      <IntegrationConfigureDialog\\n        open={!!configureProvider}\\n        onClose={() => setConfigureProvider(null)}\\n        provider={configureProvider}\\n        projectId={projectId}\\n        integrations={integrations}\\n        onIntegrationsChange={setIntegrations}\\n        isDark={isDark}\\n      />\\n    </Box>\"",
+      "StartLine": "1466",
+      "TargetContent": "\"      <GlobalIntegrationWizardModal\\n        open={wizardOpen}\\n        provider={wizardProvider}\\n        onClose={() => setWizardOpen(false)}\\n        onSuccess={async () => {\\n          setWizardOpen(false);\\n          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });\\n          if (wizardProvider !== 'slack') {\\n            // Update card state \u2192 \\\"Installed\\\"\\n            setGlobalConfigs(prev => ({ ...prev, [wizardProvider]: true }));\\n          }\\n        }}\\n      />\\n    </Box>\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding configure dialog render\"",
+      "toolSummary": "\"Add dialog render\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Fix flash: add globalConfigsLoaded flag, set it after loadGlobalConfigs completes, and show Spinner instead of cards while loading. This prevents the button color flash from 'contained' to 'outlined'.\\\"\"",
+      "Instruction": "\"Add globalConfigsLoaded state, set it after load, guard SettingsCard rendering on it\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":555,\"ReplacementContent\":\"  // Global integration status (GitHub App, GitLab App, etc.)\\n  const [globalConfigs, setGlobalConfigs] = useState<Record<string, boolean>>({});\\n  const [globalConfigsLoaded, setGlobalConfigsLoaded] = useState(false);\\n  const [configureProvider, setConfigureProvider] = useState<string | null>(null);\\n\\n  const loadGlobalConfigs = React.useCallback(async () => {\\n    const results = await Promise.all(\\n      ['github', 'gitlab', 'bitbucket'].map(async p => {\\n        try {\\n          const { configured } = await argusService.getGlobalIntegrationConfig(p);\\n          return [p, configured] as [string, boolean];\\n        } catch { return [p, false] as [string, boolean]; }\\n      })\\n    );\\n    setGlobalConfigs(Object.fromEntries(results));\\n    setGlobalConfigsLoaded(true);\\n  }, []);\",\"StartLine\":541,\"TargetContent\":\"  // Global integration status (GitHub App, GitLab App, etc.)\\n  const [globalConfigs, setGlobalConfigs] = useState<Record<string, boolean>>({});\\n  const [configureProvider, setConfigureProvider] = useState<string | null>(null);\\n\\n  const loadGlobalConfigs = React.useCallback(async () => {\\n    const results = await Promise.all(\\n      ['github', 'gitlab', 'bitbucket'].map(async p => {\\n        try {\\n          const { configured } = await argusService.getGlobalIntegrationConfig(p);\\n          return [p, configured] as [string, boolean];\\n        } catch { return [p, false] as [string, boolean]; }\\n      })\\n    );\\n    setGlobalConfigs(Object.fromEntries(results));\\n  }, []);\"},{\"AllowMultiple\":false,\"EndLine\":985,\"ReplacementContent\":\"                </SettingsCard>\\n                {(!intLoaded || !globalConfigsLoaded) && <Spinner />}\",\"StartLine\":984,\"TargetContent\":\"                </SettingsCard>\\n                {!intLoaded && <Spinner />}\"},{\"AllowMultiple\":false,\"EndLine\":949,\"ReplacementContent\":\"                {globalConfigsLoaded && <SettingsCard title={t('argus.settings.availableProviders')} desc={t('argus.settings.availabl\n<truncated 215 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing button flash\"",
+      "toolSummary": "\"Fix button flash\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Close the conditional rendering block for globalConfigsLoaded\\\"\"",
+      "EndLine": "986",
+      "Instruction": "\"Add closing brace for conditional SettingsCard\"",
+      "ReplacementContent": "\"                </SettingsCard>}\"",
+      "StartLine": "986",
+      "TargetContent": "\"                </SettingsCard>\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing conditional close\"",
+      "toolSummary": "\"Fix close brace\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"1) Convert DSN key handlers to optimistic updates - no more fetchProject() calls that cause page flash. Instead, directly mutate project.dsn_keys in state. 2) Redesign DSN key cards to Sentry-style: show key name with icon, DSN/Public Key/Secret Key as labeled rows with copy buttons, creation date, and revoke button with confirmation dialog.\\\"\"",
+      "Instruction": "\"Replace DSN handlers with optimistic update versions, then replace DSN keys section UI with premium Sentry-style design\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":654,\"ReplacementContent\":\"  const handleCreateKey = async () => {\\n    try {\\n      const created = await argusService.createDsnKey(projectId, 'New Key');\\n      // Optimistic: append new key to project state\\n      setProject(prev => prev ? { ...prev, dsn_keys: [...(prev.dsn_keys || []), created] } : prev);\\n      enqueueSnackbar(t('argus.settings.keyCreated'), { variant: 'success' });\\n    } catch { enqueueSnackbar(t('argus.settings.keyCreateFailed'), { variant: 'error' }); }\\n  };\\n\\n  const handleRevokeKey = async (keyId: number) => {\\n    try {\\n      await argusService.revokeDsnKey(projectId, keyId);\\n      // Optimistic: remove key from project state\\n      setProject(prev => prev ? { ...prev, dsn_keys: (prev.dsn_keys || []).filter(k => k.id !== keyId) } : prev);\\n      enqueueSnackbar(t('argus.settings.keyRevoked'), { variant: 'success' });\\n    } catch { enqueueSnackbar(t('argus.settings.keyRevokeFailed'), { variant: 'error' }); }\\n  };\\n\\n  const [editingKeyId, setEditingKeyId] = useState<number | null>(null);\\n  const [editingKeyLabel, setEditingKeyLabel] = useState<string>('');\\n\\n  const handleRenameKey = async (keyId: number) => {\\n    if (!editingKeyLabel.trim()) return;\\n    const newLabel = editingKeyLabel.trim();\\n    try {\\n      await argusService.updateDsnKey(projectId, keyId, { label: newLabel });\\n      // Optimistic: update label in project state\\n      setProject(prev => prev ? {\\n        ...prev,\\n        dsn_keys: (prev.dsn_keys || []).map(k => k.id === keyId ? { ...k, label: newLabel } : k),\\n      } : prev);\\n      enqueueSnackbar(t('common.saved'), { variant: 'success' });\\n      setEditingKeyId(null);\\n    } catch {\\n      enqueueSnackbar(t('common.saveFailed', { defaultValue: 'Failed to save' }), { variant: 'error' });\\n    }\\n  };\",\"StartLine\":631,\"TargetContent\":\"  const handleCreateKey = async () => {\\n    try { await argusService.createDsnKey(projectId, 'New Key'); enqueueSnackbar(t('argus.settings.keyCreated'), { variant: 'success' }); fetchPr\n<truncated 10908 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Optimistic update + redesign DSN\"",
+      "toolSummary": "\"Redesign DSN keys\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add DsnFieldRow sub-component for Sentry-style labeled DSN field rows with copy button. Shows label, monospace value with optional masking, and a copy button.\\\"\"",
+      "EndLine": "1858",
+      "Instruction": "\"Add DsnFieldRow component after StatusBadge\"",
+      "ReplacementContent": "\");\\n\\n/** DSN \ud544\ub4dc \ud589 \u2014 \ub77c\ubca8 + \ubaa8\ub178\uc2a4\ud398\uc774\uc2a4 \uac12 + \ubcf5\uc0ac \ubc84\ud2bc */\\nconst DsnFieldRow: React.FC<{\\n  label: string; value: string; isDark: boolean; masked?: boolean;\\n}> = ({ label, value, isDark, masked }) => {\\n  const [revealed, setRevealed] = React.useState(false);\\n  const display = masked && !revealed ? '\u2022'.repeat(Math.min(value.length, 32)) : value;\\n  return (\\n    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n      <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary', minWidth: 80, flexShrink: 0 }}>\\n        {label}\\n      </Typography>\\n      <Box sx={{\\n        flex: 1, minWidth: 0, px: 1.5, py: 0.7, borderRadius: '8px',\\n        backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',\\n        border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,\\n      }}>\\n        <Typography sx={{\\n          fontFamily: '\\\"JetBrains Mono\\\", \\\"Fira Code\\\", monospace', fontSize: '0.73rem',\\n          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',\\n          color: isDark ? '#bbb' : '#555', userSelect: masked && !revealed ? 'none' : 'all',\\n        }}>{display}</Typography>\\n      </Box>\\n      {masked && (\\n        <IconButton size=\\\"small\\\" onClick={() => setRevealed(r => !r)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}>\\n          {revealed ? <VisibilityOffIcon sx={{ fontSize: 16 }} /> : <VisibilityIcon sx={{ fontSize: 16 }} />}\\n        </IconButton>\\n      )}\\n      <CopyButton text={value} />\\n    </Box>\\n  );\\n};\\n\\n/** \uad6c\uc131\ub41c \uc5f0\ub3d9 \uce74\ub4dc \u2014 ProviderCard\uc640 \ub3d9\uc77c\ud55c \ub8e9 + MoreVert \uba54\ub274 */\"",
+      "StartLine": "1857",
+      "TargetContent": "\");\\n\\n/** \uad6c\uc131\ub41c \uc5f0\ub3d9 \uce74\ub4dc \u2014 ProviderCard\uc640 \ub3d9\uc77c\ud55c \ub8e9 + MoreVert \uba54\ub274 */\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding DsnFieldRow component\"",
+      "toolSummary": "\"Add DsnFieldRow\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"1) Remove all success toasts from DSN key handlers (create/revoke/rename) - only show errors. 2) Replace static rate limit display with inline editable fields using small number inputs + optimistic save on blur.\\\"\"",
+      "Instruction": "\"Remove success toasts from DSN handlers, replace rate limit static display with editable inputs\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":667,\"ReplacementContent\":\"  const handleCreateKey = async () => {\\n    try {\\n      const created = await argusService.createDsnKey(projectId, 'New Key');\\n      setProject(prev => prev ? { ...prev, dsn_keys: [...(prev.dsn_keys || []), created] } : prev);\\n    } catch { enqueueSnackbar(t('argus.settings.keyCreateFailed'), { variant: 'error' }); }\\n  };\\n\\n  const handleRevokeKey = async (keyId: number) => {\\n    try {\\n      await argusService.revokeDsnKey(projectId, keyId);\\n      setProject(prev => prev ? { ...prev, dsn_keys: (prev.dsn_keys || []).filter(k => k.id !== keyId) } : prev);\\n    } catch { enqueueSnackbar(t('argus.settings.keyRevokeFailed'), { variant: 'error' }); }\\n  };\\n\\n  const [editingKeyId, setEditingKeyId] = useState<number | null>(null);\\n  const [editingKeyLabel, setEditingKeyLabel] = useState<string>('');\\n\\n  const handleRenameKey = async (keyId: number) => {\\n    if (!editingKeyLabel.trim()) return;\\n    const newLabel = editingKeyLabel.trim();\\n    try {\\n      await argusService.updateDsnKey(projectId, keyId, { label: newLabel });\\n      setProject(prev => prev ? {\\n        ...prev,\\n        dsn_keys: (prev.dsn_keys || []).map(k => k.id === keyId ? { ...k, label: newLabel } : k),\\n      } : prev);\\n      setEditingKeyId(null);\\n    } catch {\\n      enqueueSnackbar(t('common.saveFailed', { defaultValue: 'Failed to save' }), { variant: 'error' });\\n    }\\n  };\\n\\n  const handleUpdateRateLimit = async (keyId: number, field: 'rate_limit_count' | 'rate_limit_window', value: number) => {\\n    try {\\n      await argusService.updateDsnKey(projectId, keyId, { [field]: value });\\n      setProject(prev => prev ? {\\n        ...prev,\\n        dsn_keys: (prev.dsn_keys || []).map(k => k.id === keyId ? { ...k, [field]: value } : k),\\n      } : prev);\\n    } catch {\\n      enqueueSnackbar(t('common.saveFailed', { defaultValue: 'Failed to save' }), { variant: 'error' });\\n    }\\n  };\",\"StartLine\":631,\"TargetContent\":\"  const handleCreateKey = async () => {\\n    try {\\n \n<truncated 5424 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Removing toasts, adding rate limit edit\"",
+      "toolSummary": "\"Fix toasts + rate limit\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Replace handleCreateKey with dialog-based flow: add state for create key dialog (open, label, rate limit count/window), and handleCreateKey now reads from dialog state instead of hardcoding 'New Key'.\\\"\"",
+      "EndLine": "636",
+      "Instruction": "\"Add create key dialog state and modify handleCreateKey to use it\"",
+      "ReplacementContent": "\"\\n  // Create Key Dialog state\\n  const [createKeyOpen, setCreateKeyOpen] = useState(false);\\n  const [newKeyLabel, setNewKeyLabel] = useState('');\\n  const [newKeyRateCount, setNewKeyRateCount] = useState(0);\\n  const [newKeyRateWindow, setNewKeyRateWindow] = useState(0);\\n\\n  const handleCreateKey = async () => {\\n    const label = newKeyLabel.trim() || 'New Key';\\n    try {\\n      const created = await argusService.createDsnKey(projectId, label, {\\n        rate_limit_count: newKeyRateCount,\\n        rate_limit_window: newKeyRateWindow,\\n      });\\n      setProject(prev => prev ? { ...prev, dsn_keys: [...(prev.dsn_keys || []), created] } : prev);\\n      setCreateKeyOpen(false);\\n      setNewKeyLabel(''); setNewKeyRateCount(0); setNewKeyRateWindow(0);\\n    } catch { enqueueSnackbar(t('argus.settings.keyCreateFailed'), { variant: 'error' }); }\\n  };\"",
+      "StartLine": "630",
+      "TargetContent": "\"\\n  const handleCreateKey = async () => {\\n    try {\\n      const created = await argusService.createDsnKey(projectId, 'New Key');\\n      setProject(prev => prev ? { ...prev, dsn_keys: [...(prev.dsn_keys || []), created] } : prev);\\n    } catch { enqueueSnackbar(t('argus.settings.keyCreateFailed'), { variant: 'error' }); }\\n  };\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding create key dialog state\"",
+      "toolSummary": "\"Add dialog state\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Change create key button to open dialog instead of directly creating\\\"\"",
+      "EndLine": "859",
+      "Instruction": "\"Change onClick to open dialog\"",
+      "ReplacementContent": "\"                headerAction={<Button size=\\\"small\\\" startIcon={<AddIcon />} onClick={() => setCreateKeyOpen(true)} variant=\\\"contained\\\"\\n                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}>{t('argus.settings.createKey')}</Button>}\"",
+      "StartLine": "858",
+      "TargetContent": "\"                headerAction={<Button size=\\\"small\\\" startIcon={<AddIcon />} onClick={handleCreateKey} variant=\\\"contained\\\"\\n                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}>{t('argus.settings.createKey')}</Button>}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Changing button to open dialog\"",
+      "toolSummary": "\"Fix button\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add Create DSN Key dialog with fields for label, rate limit count, and rate limit window. Dialog appears when user clicks the create key button.\\\"\"",
+      "EndLine": "1570",
+      "Instruction": "\"Add Create Key dialog before closing Box\"",
+      "ReplacementContent": "\"\\n      <IntegrationConfigureDialog\\n        open={!!configureProvider}\\n        onClose={() => setConfigureProvider(null)}\\n        provider={configureProvider}\\n        projectId={projectId}\\n        integrations={integrations}\\n        onIntegrationsChange={setIntegrations}\\n        isDark={isDark}\\n      />\\n\\n      {/* Create DSN Key Dialog */}\\n      <Dialog open={createKeyOpen} onClose={() => setCreateKeyOpen(false)} maxWidth=\\\"xs\\\" fullWidth\\n        PaperProps={{ sx: { borderRadius: '14px' } }}>\\n        <DialogTitle sx={{ fontWeight: 700, fontSize: '1rem', pb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>\\n          <KeyIcon sx={{ fontSize: 20, color: '#667eea' }} />\\n          {t('argus.settings.createKey', '\ud0a4 \uc0dd\uc131')}\\n        </DialogTitle>\\n        <DialogContent sx={{ pt: '12px !important', display: 'flex', flexDirection: 'column', gap: 2.5 }}>\\n          <TextField\\n            label={t('argus.settings.keyLabel', '\ud0a4 \uc774\ub984')}\\n            placeholder=\\\"e.g. Production, Staging\\\"\\n            value={newKeyLabel}\\n            onChange={e => setNewKeyLabel(e.target.value)}\\n            size=\\\"small\\\" fullWidth autoFocus\\n            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}\\n          />\\n          <Box>\\n            <Typography variant=\\\"caption\\\" sx={{ fontWeight: 600, color: 'text.secondary', mb: 1, display: 'block' }}>\\n              {t('argus.settings.rateLimit', '\uc18d\ub3c4 \uc81c\ud55c')}\\n            </Typography>\\n            <Typography variant=\\\"caption\\\" color=\\\"text.disabled\\\" sx={{ display: 'block', mb: 1.5, fontSize: '0.72rem' }}>\\n              {t('argus.settings.rateLimitHint', '0\uc73c\ub85c \uc124\uc815\ud558\uba74 \uc81c\ud55c \uc5c6\uc774 \ub3d9\uc791\ud569\ub2c8\ub2e4')}\\n            </Typography>\\n            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n              <TextField size=\\\"small\\\" type=\\\"number\\\" label={t('argus.settings.rateLimitCount', '\uc774\ubca4\ud2b8 \uc218')}\\n                value={newKeyRateCount} onChange={e => setNewKeyRateCount(parseInt(e.target.value) || 0)}\\n     \n<truncated 1215 bytes>",
+      "StartLine": "1560",
+      "TargetContent": "\"\\n      <IntegrationConfigureDialog\\n        open={!!configureProvider}\\n        onClose={() => setConfigureProvider(null)}\\n        provider={configureProvider}\\n        projectId={projectId}\\n        integrations={integrations}\\n        onIntegrationsChange={setIntegrations}\\n        isDark={isDark}\\n      />\\n    </Box>\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding create key dialog\"",
+      "toolSummary": "\"Add create dialog\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Fix classic React JSX bug: `count > 0 && <Chip>` renders literal '0' when count is 0 because 0 is falsy but React renders numbers. Changed to ternary `count > 0 ? <Chip> : null`.\\\"\"",
+      "EndLine": "1713",
+      "Instruction": "\"Fix 0-rendering bug with ternary\"",
+      "ReplacementContent": "\"              count > 0 ? <Chip label={`${count} ${t('argus.settings.configured')}`} size=\\\"small\\\"\\n                sx={{ height: 18, fontSize: '0.58rem', fontWeight: 600, backgroundColor: alpha('#4caf50', 0.1), color: '#4caf50', border: 'none', mt: 0.3 }} /> : null\"",
+      "StartLine": "1712",
+      "TargetContent": "\"              count > 0 && <Chip label={`${count} ${t('argus.settings.configured')}`} size=\\\"small\\\"\\n                sx={{ height: 18, fontSize: '0.58rem', fontWeight: 600, backgroundColor: alpha('#4caf50', 0.1), color: '#4caf50', border: 'none', mt: 0.3 }} />\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fixing zero rendering bug\"",
+      "toolSummary": "\"Fix zero bug\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"1) Always show delete button (not just for active keys) \u2014 inactive keys should also be deletable. 2) Add 'showActiveKeysOnly' filter toggle in the header. 3) Fix tooltip text from 'deactivateKey' to 'deleteKey'. The API is actually DELETE so calling it 'deactivate' was misleading.\\\"\"",
+      "EndLine": "960",
+      "Instruction": "\"Show delete button always, add active-only filter toggle, fix labels\"",
+      "ReplacementContent": "\"            {/* \u2500\u2500\u2500 DSN KEYS \u2500\u2500\u2500 */}\\n            {currentSection === 'dsn-keys' && (\\n              <SettingsCard title={t('argus.settings.dsnKeys')} desc={t('argus.settings.dsnKeysDesc')} isDark={isDark}\\n                headerAction={<Button size=\\\"small\\\" startIcon={<AddIcon />} onClick={() => setCreateKeyOpen(true)} variant=\\\"contained\\\"\\n                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}>{t('argus.settings.createKey')}</Button>}\\n              >\\n                {!project?.dsn_keys?.length ? (\\n                  <EmptyState icon={<KeyIcon />} text={t('argus.settings.noKeys')} />\\n                ) : (() => {\\n                  const filteredKeys = showActiveKeysOnly ? project.dsn_keys!.filter(k => k.is_active) : project.dsn_keys!;\\n                  return (\\n                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>\\n                      {/* Filter toolbar */}\\n                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>\\n                        <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.75rem' }}>\\n                          {t('argus.settings.totalKeys', '\ucd1d {{total}}\uac1c \ud0a4').replace('{{total}}', String(project.dsn_keys!.length))}\\n                          {showActiveKeysOnly && ` \u00b7 ${t('argus.settings.showingActiveOnly', '\ud65c\uc131 \ud0a4\ub9cc \ud45c\uc2dc \uc911')}`}\\n                        </Typography>\\n                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>\\n                          <Typography variant=\\\"caption\\\" color=\\\"text.secondary\\\" sx={{ fontSize: '0.72rem' }}>\\n                            {t('argus.settings.activeOnly', '\ud65c\uc131\ub9cc')}\\n                          </Typography>\\n                          <Switch size=\\\"small\\\" checked={showActiveKeysOnly}\\n                            onChange={(_, v) => setShowActiveKeysOnly(v)}\\n                            sx={{ '& .MuiSwitch-switchBase': { py: 0.5 } }}\\\n<truncated 7451 bytes>",
+      "StartLine": "855",
+      "TargetContent": "\"            {/* \u2500\u2500\u2500 DSN KEYS \u2500\u2500\u2500 */}\\n            {currentSection === 'dsn-keys' && (\\n              <SettingsCard title={t('argus.settings.dsnKeys')} desc={t('argus.settings.dsnKeysDesc')} isDark={isDark}\\n                headerAction={<Button size=\\\"small\\\" startIcon={<AddIcon />} onClick={() => setCreateKeyOpen(true)} variant=\\\"contained\\\"\\n                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}>{t('argus.settings.createKey')}</Button>}\\n              >\\n                {!project?.dsn_keys?.length ? (\\n                  <EmptyState icon={<KeyIcon />} text={t('argus.settings.noKeys')} />\\n                ) : (\\n                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>\\n                    {project.dsn_keys.map(key => (\\n                      <Paper key={key.id} elevation={0} sx={{\\n                        border: `1px solid ${bdr}`, borderRadius: '12px', overflow: 'hidden',\\n                        transition: 'border-color 0.15s',\\n                        '&:hover': { borderColor: alpha('#667eea', 0.3) },\\n                      }}>\\n                        {/* Header row */}\\n                        <Box sx={{\\n                          display: 'flex', alignItems: 'center', gap: 1.5, px: 2.5, py: 1.5,\\n                          borderBottom: `1px solid ${bdr}`,\\n                          backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',\\n                        }}>\\n                          <KeyIcon sx={{ fontSize: 18, color: key.is_active ? '#667eea' : 'text.disabled' }} />\\n                          {editingKeyId === key.id ? (\\n                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1 }}>\\n                              <TextField\\n                                value={editingKeyLabel}\\n                                onChange={e => setEditingKeyLabel(e.target.value)}\\n                                onKeyDown={e => { if (e.key === 'Enter') handleRenameKey(k\n<truncated 5552 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Rewriting DSN section\"",
+      "toolSummary": "\"Rewrite DSN\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add Switch to MUI imports for the active-only filter toggle\\\"\"",
+      "EndLine": "14",
+      "Instruction": "\"Add Switch import\"",
+      "ReplacementContent": "\"  DialogContent, DialogActions, Avatar, Collapse, Menu, ListItemIcon, ListItemText, Switch,\"",
+      "StartLine": "14",
+      "TargetContent": "\"  DialogContent, DialogActions, Avatar, Collapse, Menu, ListItemIcon, ListItemText,\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding Switch import\"",
+      "toolSummary": "\"Add import\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add showActiveKeysOnly state for the DSN keys active-only filter toggle\\\"\"",
+      "EndLine": "658",
+      "Instruction": "\"Add showActiveKeysOnly state\"",
+      "ReplacementContent": "\"  const [editingKeyId, setEditingKeyId] = useState<number | null>(null);\\n  const [editingKeyLabel, setEditingKeyLabel] = useState<string>('');\\n  const [showActiveKeysOnly, setShowActiveKeysOnly] = useState(false);\"",
+      "StartLine": "657",
+      "TargetContent": "\"  const [editingKeyId, setEditingKeyId] = useState<number | null>(null);\\n  const [editingKeyLabel, setEditingKeyLabel] = useState<string>('');\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding filter state\"",
+      "toolSummary": "\"Add state\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Import useLocalStorage hook and replace useState with useLocalStorage for showActiveKeysOnly so it persists across page navigations.\\\"\"",
+      "Instruction": "\"Add useLocalStorage import and replace the state declaration\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":51,\"ReplacementContent\":\"import { IntegrationConfigureDialog } from './components/IntegrationConfigureDialog';\\nimport { useLocalStorage } from '@/hooks/useLocalStorage';\",\"StartLine\":51,\"TargetContent\":\"import { IntegrationConfigureDialog } from './components/IntegrationConfigureDialog';\"},{\"AllowMultiple\":false,\"EndLine\":659,\"ReplacementContent\":\"  const [showActiveKeysOnly, setShowActiveKeysOnly] = useLocalStorage('argus_dsn_active_only', false);\",\"StartLine\":659,\"TargetContent\":\"  const [showActiveKeysOnly, setShowActiveKeysOnly] = useState(false);\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Wiring useLocalStorage\"",
+      "toolSummary": "\"Wire hook\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"1) Add DsnKeySparkline and formatRelativeTime imports\\\\n2) Add sparkline chart and first_seen/last_seen info to DSN key card body\\\"\"",
+      "Instruction": "\"Add imports and sparkline chart + seen timestamps to DSN key card\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":52,\"ReplacementContent\":\"import argusService, {\\n  ArgusProject, ArgusSourcemapRelease,\\n  ArgusIntegration, ArgusOwnershipRule, ArgusIssueTracker,\\n} from '@/services/argusService';\\nimport { useOrgProject } from '@/contexts/OrgProjectContext';\\nimport { useNavigate, useLocation } from 'react-router-dom';\\nimport { GlobalIntegrationWizardModal } from './components/GlobalIntegrationWizardModal';\\nimport { ProviderWizardModal, WizardProviderConfig, WizardFieldDef } from './components/ProviderWizardModal';\\nimport { IntegrationConfigureDialog } from './components/IntegrationConfigureDialog';\\nimport { DsnKeySparkline } from './components/DsnKeySparkline';\\nimport { useLocalStorage } from '@/hooks/useLocalStorage';\\nimport { formatRelativeTime } from '@/utils/dateFormat';\",\"StartLine\":43,\"TargetContent\":\"import argusService, {\\n  ArgusProject, ArgusSourcemapRelease,\\n  ArgusIntegration, ArgusOwnershipRule, ArgusIssueTracker,\\n} from '@/services/argusService';\\nimport { useOrgProject } from '@/contexts/OrgProjectContext';\\nimport { useNavigate, useLocation } from 'react-router-dom';\\nimport { GlobalIntegrationWizardModal } from './components/GlobalIntegrationWizardModal';\\nimport { ProviderWizardModal, WizardProviderConfig, WizardFieldDef } from './components/ProviderWizardModal';\\nimport { IntegrationConfigureDialog } from './components/IntegrationConfigureDialog';\\nimport { useLocalStorage } from '@/hooks/useLocalStorage';\"},{\"AllowMultiple\":false,\"EndLine\":978,\"ReplacementContent\":\"                            {/* Created date + Rate limit */}\\n                            <Divider sx={{ my: 0.5 }} />\\n\\n                            {/* Sparkline Chart */}\\n                            <DsnKeySparkline\\n                              projectId={project.id}\\n                              keyId={key.id}\\n                              isActive={key.is_active}\\n                              isDark={isDark}\\n                            />\\n\\n                            <Divider sx={{ my: 0.\n<truncated 2120 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding sparkline to settings\"",
+      "toolSummary": "\"Modify settings page\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Replace hardcoded Korean '\ucd5c\ucd08 \uc811\uadfc' and '\ub9c8\uc9c0\ub9c9 \uc811\uadfc' with t() calls. Also remove fallback from createdAt per workflow rule (no fallbacks).\\\"\"",
+      "Instruction": "\"Localize hardcoded first_seen/last_seen labels and remove createdAt fallback\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":960,\"ReplacementContent\":\"                                {t('argus.settings.createdAt')}: {new Date(key.created_at).toLocaleDateString()}\",\"StartLine\":960,\"TargetContent\":\"                                {t('argus.settings.createdAt', '\uc0dd\uc131\uc77c')}: {new Date(key.created_at).toLocaleDateString()}\"},{\"AllowMultiple\":false,\"EndLine\":965,\"ReplacementContent\":\"                                    {t('argus.settings.dsnKeyFirstSeen')}: {formatRelativeTime(key.first_seen)}\",\"StartLine\":965,\"TargetContent\":\"                                    \ucd5c\ucd08 \uc811\uadfc: {formatRelativeTime(key.first_seen)}\"},{\"AllowMultiple\":false,\"EndLine\":972,\"ReplacementContent\":\"                                    {t('argus.settings.dsnKeyLastSeen')}: {formatRelativeTime(key.last_seen)}\",\"StartLine\":972,\"TargetContent\":\"                                    \ub9c8\uc9c0\ub9c9 \uc811\uadfc: {formatRelativeTime(key.last_seen)}\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Localizing settings page\"",
+      "toolSummary": "\"Localize settings\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Replace inline editing state/handlers with a dialog-based edit form for DSN keys. The form holds label, rate_limit_count, rate_limit_window, and saves all at once on submit.\\\"\"",
+      "EndLine": "689",
+      "Instruction": "\"Replace editingKeyId/editingKeyLabel/handleRenameKey/handleUpdateRateLimit with a single dialog-based edit form\"",
+      "ReplacementContent": "\"\\n  // DSN Key Edit Dialog state\\n  const [editKeyDialog, setEditKeyDialog] = useState<{ id: number; label: string; rate_limit_count: number; rate_limit_window: number } | null>(null);\\n  const [editKeySaving, setEditKeySaving] = useState(false);\\n  const [showActiveKeysOnly, setShowActiveKeysOnly] = useLocalStorage('argus_dsn_active_only', false);\\n\\n  const openEditKeyDialog = (key: any) => {\\n    setEditKeyDialog({\\n      id: key.id,\\n      label: key.label,\\n      rate_limit_count: key.rate_limit_count ?? 0,\\n      rate_limit_window: key.rate_limit_window ?? 0,\\n    });\\n  };\\n\\n  const handleSaveKeyEdit = async () => {\\n    if (!editKeyDialog) return;\\n    const { id, label, rate_limit_count, rate_limit_window } = editKeyDialog;\\n    if (!label.trim()) return;\\n    setEditKeySaving(true);\\n    try {\\n      await argusService.updateDsnKey(projectId, id, {\\n        label: label.trim(),\\n        rate_limit_count,\\n        rate_limit_window,\\n      });\\n      setProject(prev => prev ? {\\n        ...prev,\\n        dsn_keys: (prev.dsn_keys || []).map(k => k.id === id ? { ...k, label: label.trim(), rate_limit_count, rate_limit_window } : k),\\n      } : prev);\\n      setEditKeyDialog(null);\\n      enqueueSnackbar(t('common.saved'), { variant: 'success' });\\n    } catch {\\n      enqueueSnackbar(t('common.saveFailed'), { variant: 'error' });\\n    } finally {\\n      setEditKeySaving(false);\\n    }\\n  };\"",
+      "StartLine": "659",
+      "TargetContent": "\"\\n  const [editingKeyId, setEditingKeyId] = useState<number | null>(null);\\n  const [editingKeyLabel, setEditingKeyLabel] = useState<string>('');\\n  const [showActiveKeysOnly, setShowActiveKeysOnly] = useLocalStorage('argus_dsn_active_only', false);\\n\\n  const handleRenameKey = async (keyId: number) => {\\n    if (!editingKeyLabel.trim()) return;\\n    const newLabel = editingKeyLabel.trim();\\n    try {\\n      await argusService.updateDsnKey(projectId, keyId, { label: newLabel });\\n      setProject(prev => prev ? {\\n        ...prev,\\n        dsn_keys: (prev.dsn_keys || []).map(k => k.id === keyId ? { ...k, label: newLabel } : k),\\n      } : prev);\\n      setEditingKeyId(null);\\n    } catch {\\n      enqueueSnackbar(t('common.saveFailed', { defaultValue: 'Failed to save' }), { variant: 'error' });\\n    }\\n  };\\n\\n  const handleUpdateRateLimit = async (keyId: number, field: 'rate_limit_count' | 'rate_limit_window', value: number) => {\\n    try {\\n      await argusService.updateDsnKey(projectId, keyId, { [field]: value });\\n      setProject(prev => prev ? {\\n        ...prev,\\n        dsn_keys: (prev.dsn_keys || []).map(k => k.id === keyId ? { ...k, [field]: value } : k),\\n      } : prev);\\n    } catch {\\n      enqueueSnackbar(t('common.saveFailed', { defaultValue: 'Failed to save' }), { variant: 'error' });\\n    }\\n  };\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Replacing with dialog state\"",
+      "toolSummary": "\"Replace state\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Replace inline editing (header + rate limit) with read-only display and a single edit button that opens a dialog. Rate limit is now shown as read-only text.\\\"\"",
+      "Instruction": "\"Replace inline editing with edit button and read-only display in DSN key cards\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":940,\"ReplacementContent\":\"                            <KeyIcon sx={{ fontSize: 18, color: key.is_active ? '#667eea' : 'text.disabled' }} />\\n                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>\\n                              <Typography sx={{ fontWeight: 700, fontSize: '0.9rem' }} noWrap>{key.label}</Typography>\\n                              <IconButton size=\\\"small\\\" onClick={() => openEditKeyDialog(key)}\\n                                sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}>\\n                                <EditIcon sx={{ fontSize: 15 }} />\\n                              </IconButton>\\n                            </Box>\\n                            <StatusBadge active={key.is_active} t={t} />\\n                            <Tooltip title={t('argus.settings.deleteKey')}>\\n                              <IconButton size=\\\"small\\\" sx={{ '&:hover': { color: '#ef4444' } }}\\n                                onClick={() => handleRevokeKey(key.id)}>\\n                                <DeleteIcon fontSize=\\\"small\\\" />\\n                              </IconButton>\\n                            </Tooltip>\",\"StartLine\":912,\"TargetContent\":\"                            <KeyIcon sx={{ fontSize: 18, color: key.is_active ? '#667eea' : 'text.disabled' }} />\\n                            {editingKeyId === key.id ? (\\n                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1 }}>\\n                                <TextField\\n                                  value={editingKeyLabel}\\n                                  onChange={e => setEditingKeyLabel(e.target.value)}\\n                                  onKeyDown={e => { if (e.key === 'Enter') handleRenameKey(key.id); if (e.key === 'Escape') setEditingKeyId(null); }}\\n                                  size=\\\"small\\\" autoFocus\\n                                  sx={{ flex: 1, maxWidth: 280, '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: \n<truncated 4257 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Replacing inline editing\"",
+      "toolSummary": "\"Replace inline edit\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add DSN key edit dialog after the create key dialog. Uses same design pattern as the create dialog but for editing existing key's label and rate limits.\\\"\"",
+      "EndLine": "1640",
+      "Instruction": "\"Add edit key dialog after create key dialog closing tag\"",
+      "ReplacementContent": "\"      </Dialog>\\n\\n      {/* Edit DSN Key Dialog */}\\n      <Dialog open={!!editKeyDialog} onClose={() => setEditKeyDialog(null)} maxWidth=\\\"xs\\\" fullWidth\\n        PaperProps={{ sx: { borderRadius: '14px' } }}>\\n        <DialogTitle sx={{ fontWeight: 700, fontSize: '1rem', pb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>\\n          <EditIcon sx={{ fontSize: 20, color: '#667eea' }} />\\n          {t('argus.settings.editKey')}\\n        </DialogTitle>\\n        <DialogContent sx={{ pt: '12px !important', display: 'flex', flexDirection: 'column', gap: 2.5 }}>\\n          <TextField\\n            label={t('argus.settings.keyLabel')}\\n            value={editKeyDialog?.label || ''}\\n            onChange={e => setEditKeyDialog(prev => prev ? { ...prev, label: e.target.value } : prev)}\\n            size=\\\"small\\\" fullWidth autoFocus\\n            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}\\n          />\\n          <Box>\\n            <Typography variant=\\\"caption\\\" sx={{ fontWeight: 600, color: 'text.secondary', mb: 1, display: 'block' }}>\\n              {t('argus.settings.rateLimit')}\\n            </Typography>\\n            <Typography variant=\\\"caption\\\" color=\\\"text.disabled\\\" sx={{ display: 'block', mb: 1.5, fontSize: '0.72rem' }}>\\n              {t('argus.settings.rateLimitHint')}\\n            </Typography>\\n            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n              <TextField size=\\\"small\\\" type=\\\"number\\\" label={t('argus.settings.rateLimitCount')}\\n                value={editKeyDialog?.rate_limit_count ?? 0}\\n                onChange={e => setEditKeyDialog(prev => prev ? { ...prev, rate_limit_count: parseInt(e.target.value) || 0 } : prev)}\\n                inputProps={{ min: 0 }}\\n                sx={{ flex: 1, '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}\\n              />\\n              <Typography color=\\\"text.secondary\\\" sx={{ fontWeight: 600 }}>/</Typography>\\n              <TextField size=\\\"small\\\" type=\\\"number\\\" label={t('argus.settings.rateLi\n<truncated 1039 bytes>",
+      "StartLine": "1639",
+      "TargetContent": "\"      </Dialog>\\n    </Box>\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Adding edit dialog\"",
+      "toolSummary": "\"Add edit dialog\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Wire up onTestConnection callbacks for both issue tracker and notification channel wizards. Tracker test sends raw form data; notification test sends provider + config.\\\"\"",
+      "Instruction": "\"Add onTestConnection prop to both ProviderWizardModal usages\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":1510,\"ReplacementContent\":\"          <ProviderWizardModal\\n            open={!!addTrkDialog}\\n            onClose={() => { setAddTrkDialog(null); }}\\n            provider={wizardCfg}\\n            fields={allFields}\\n            wizardTitleKey=\\\"argus.settings.providerWizard.addTracker\\\"\\n            onTestConnection={async (data) => {\\n              const prov = TRACKER_PROVIDERS.find(p => p.id === addTrkDialog);\\n              if (!prov || !addTrkDialog) return { ok: false, message: 'Unknown provider' };\\n              const config: Record<string, string> = {};\\n              prov.configFields.forEach(f => { if (data[f.key]) config[f.key] = data[f.key]; });\\n              return argusService.testTrackerConnectionPreSave(projectId, {\\n                provider: addTrkDialog,\\n                api_url: data.api_url?.trim() || '',\\n                api_token: data.api_token?.trim() || '',\\n                config,\\n              });\\n            }}\\n            onSubmit={async (data) => {\\n              const prov = TRACKER_PROVIDERS.find(p => p.id === addTrkDialog);\\n              if (!prov || !addTrkDialog) return;\\n              const config: Record<string, string> = {};\\n              prov.configFields.forEach(f => { if (data[f.key]) config[f.key] = data[f.key]; });\\n              await argusService.createIssueTracker(projectId, {\\n                provider: addTrkDialog as any, name: data.name?.trim() || '',\\n                api_url: data.api_url?.trim() || '', api_token: data.api_token?.trim() || '',\\n                config: Object.keys(config).length > 0 ? config : undefined,\\n              });\\n              setTrackers(await argusService.listIssueTrackers(projectId));\\n              setAddTrkDialog(null);\\n              enqueueSnackbar(t('argus.settings.trackerAdded'), { variant: 'success' });\\n            }}\\n          />\",\"StartLine\":1490,\"TargetContent\":\"          <ProviderWizardModal\\n            open={!!addTrkDialog}\\n            onClose={() => { setAddTrkDialog(null); }}\\\n<truncated 5552 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Wiring test callbacks\"",
+      "toolSummary": "\"Wire callbacks\""
+    }
+  }
+]

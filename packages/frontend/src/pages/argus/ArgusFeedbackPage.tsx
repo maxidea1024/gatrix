@@ -30,6 +30,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  ButtonGroup,
 } from '@mui/material';
 import {
   Feedback as FeedbackIcon,
@@ -86,10 +87,11 @@ import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
-import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse, ArgusFeedbackActivity, ArgusIssueTracker } from '@/services/argusService';
+import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse, ArgusFeedbackActivity, ArgusIssueTracker, ArgusIssue } from '@/services/argusService';
 import { rbacService } from '@/services/rbacService';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import { formatCompactNumber, formatWithCommas, needsCompactTooltip } from '@/utils/numberFormat';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
@@ -98,6 +100,7 @@ import PageHeader from '@/components/common/PageHeader';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
@@ -146,21 +149,7 @@ function HighlightText({ text, highlight, isDark }: { text: string; highlight: s
   );
 }
 
-function formatRelative(ts: string, t: any): string {
-  if (!ts) return '';
-  try {
-    const diffSec = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
-    if (diffSec < 0) return t('common.time.justNow');
-    const mins = Math.floor(diffSec / 60);
-    const hrs = Math.floor(mins / 60);
-    const days = Math.floor(hrs / 24);
-    if (mins < 1) return t('common.time.justNow');
-    if (mins < 60) return t('common.time.minutesAgo', { count: mins });
-    if (hrs < 24) return t('common.time.hoursAgo', { count: hrs });
-    if (days < 30) return t('common.time.daysAgo', { count: days });
-    return new Date(ts).toLocaleDateString();
-  } catch { return ts; }
-}
+
 
 const statusColor = (s: string) => {
   if (s === 'resolved') return '#4caf50';
@@ -206,10 +195,16 @@ const ArgusFeedbackPage: React.FC = () => {
     localStorage.setItem(PAGE_SIZE_KEY, String(rowsPerPage));
   }, [rowsPerPage]);
 
-  const filters = useMemo<ArgusFilterState>(
-    () => defaultArgusFilterState(urlState.period),
-    [urlState.period],
+  const [filters, setFilters] = useState<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period)
   );
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      dateRange: { type: 'preset', preset: urlState.period }
+    }));
+  }, [urlState.period]);
   const [search, setSearch] = useState('');
   const [searchDebounce, setSearchDebounce] = useState('');
   const statusTab = urlState.status as FeedbackStatusTab;
@@ -233,6 +228,13 @@ const ArgusFeedbackPage: React.FC = () => {
   const [issueTrackers, setIssueTrackers] = useState<ArgusIssueTracker[]>([]);
   const [selectedTrackerId, setSelectedTrackerId] = useState<number | ''>('');
 
+  // ─── Link Existing Issue Dialog ───
+  const [linkIssueOpen, setLinkIssueOpen] = useState(false);
+  const [linkIssueSearch, setLinkIssueSearch] = useState('');
+  const [linkIssueResults, setLinkIssueResults] = useState<ArgusIssue[]>([]);
+  const [linkIssueLoading, setLinkIssueLoading] = useState(false);
+  const [linkedIssueDetail, setLinkedIssueDetail] = useState<ArgusIssue | null>(null);
+
   // ─── Spam Filter Dialog ───
   const [spamFilterOpen, setSpamFilterOpen] = useState(false);
   const [spamKeywords, setSpamKeywords] = useState<{ id: number; keyword: string; is_regex: boolean; created_at: string }[]>([]);
@@ -246,12 +248,6 @@ const ArgusFeedbackPage: React.FC = () => {
   const [commentLoading, setCommentLoading] = useState(false);
 
   // ─── Resizable Splitter ───
-  const DETAIL_OPEN_KEY = 'argus-feedback-detail-open';
-  const [isDetailOpen, setIsDetailOpen] = useState(() => localStorage.getItem(DETAIL_OPEN_KEY) !== 'false');
-
-  useEffect(() => {
-    localStorage.setItem(DETAIL_OPEN_KEY, String(isDetailOpen));
-  }, [isDetailOpen]);
 
   const [splitWidth, setSplitWidth] = useState(() => {
     const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
@@ -351,8 +347,9 @@ const ArgusFeedbackPage: React.FC = () => {
 
   // ─── Handlers ───
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      setUrlState({ period: newFilters.dateRange.preset, page: '1' });
+      setUrlState({ period: newFilters.dateRange.preset, page: '1', fb: '' });
     }
   };
 
@@ -360,9 +357,9 @@ const ArgusFeedbackPage: React.FC = () => {
     const isResolve = status === 'resolved';
     setConfirmConfig({
       open: true,
-      title: isResolve ? t('argus.feedback.resolveTitle', 'Resolve Feedback') : t('argus.feedback.unresolveTitle', 'Unresolve Feedback'),
-      message: isResolve ? t('argus.feedback.resolveConfirm', 'Are you sure you want to mark this feedback as resolved?') : t('argus.feedback.unresolveConfirm', 'Are you sure you want to mark this feedback as unresolved?'),
-      confirmText: isResolve ? t('argus.feedback.resolve', 'Resolve') : t('argus.feedback.unresolve', 'Unresolve'),
+      title: isResolve ? t('argus.feedback.resolveTitle') : t('argus.feedback.unresolveTitle'),
+      message: isResolve ? t('argus.feedback.resolveConfirm') : t('argus.feedback.unresolveConfirm'),
+      confirmText: isResolve ? t('argus.feedback.resolve') : t('argus.feedback.unresolve'),
       confirmColor: isResolve ? 'success' : 'warning',
       onConfirm: async () => {
         setConfirmConfig(p => ({ ...p, open: false }));
@@ -378,9 +375,9 @@ const ArgusFeedbackPage: React.FC = () => {
   const handleMarkSpam = (feedbackId: string) => {
     setConfirmConfig({
       open: true,
-      title: t('argus.feedback.spamTitle', 'Mark as Spam'),
-      message: t('argus.feedback.spamConfirm', 'Are you sure you want to mark this feedback as spam?'),
-      confirmText: t('argus.feedback.markSpam', 'Mark Spam'),
+      title: t('argus.feedback.spamTitle'),
+      message: t('argus.feedback.spamConfirm'),
+      confirmText: t('argus.feedback.markSpam'),
       confirmColor: 'error',
       onConfirm: async () => {
         setConfirmConfig(p => ({ ...p, open: false }));
@@ -411,19 +408,19 @@ const ArgusFeedbackPage: React.FC = () => {
     let confirmColor: 'primary' | 'error' | 'warning' | 'success' = 'primary';
     
     if (action === 'resolve') {
-      title = t('argus.feedback.bulkResolveTitle', 'Resolve Multiple');
-      message = t('argus.feedback.bulkResolveConfirm', { count: selectedIds.size, defaultValue: `Resolve ${selectedIds.size} items?` });
-      confirmText = t('argus.feedback.resolve', 'Resolve');
+      title = t('argus.feedback.bulkResolveTitle');
+      message = t('argus.feedback.bulkResolveConfirm', { count: selectedIds.size });
+      confirmText = t('argus.feedback.resolve');
       confirmColor = 'success';
     } else if (action === 'unresolve') {
-      title = t('argus.feedback.bulkUnresolveTitle', 'Unresolve Multiple');
-      message = t('argus.feedback.bulkUnresolveConfirm', { count: selectedIds.size, defaultValue: `Unresolve ${selectedIds.size} items?` });
-      confirmText = t('argus.feedback.unresolve', 'Unresolve');
+      title = t('argus.feedback.bulkUnresolveTitle');
+      message = t('argus.feedback.bulkUnresolveConfirm', { count: selectedIds.size });
+      confirmText = t('argus.feedback.unresolve');
       confirmColor = 'warning';
     } else if (action === 'spam') {
-      title = t('argus.feedback.bulkSpamTitle', 'Mark Multiple as Spam');
-      message = t('argus.feedback.bulkSpamConfirm', { count: selectedIds.size, defaultValue: `Mark ${selectedIds.size} items as spam?` });
-      confirmText = t('argus.feedback.markSpam', 'Mark Spam');
+      title = t('argus.feedback.bulkSpamTitle');
+      message = t('argus.feedback.bulkSpamConfirm', { count: selectedIds.size });
+      confirmText = t('argus.feedback.markSpam');
       confirmColor = 'error';
     }
 
@@ -481,6 +478,44 @@ const ArgusFeedbackPage: React.FC = () => {
     } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
   };
 
+  // ─── Link / Unlink Issue ───
+  const handleLinkIssue = async (issueId: number) => {
+    if (!selectedItem) return;
+    try {
+      await argusService.linkFeedbackToIssue(projectId, selectedItem.feedback_id, issueId);
+      enqueueSnackbar(t('argus.feedback.issueLinked'), { variant: 'success' });
+      setLinkIssueOpen(false);
+      setLinkIssueSearch('');
+      fetchData();
+    } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+  };
+
+  const handleUnlinkIssue = async () => {
+    if (!selectedItem) return;
+    try {
+      await argusService.unlinkFeedbackFromIssue(projectId, selectedItem.feedback_id);
+      enqueueSnackbar(t('argus.feedback.issueUnlinked'), { variant: 'success' });
+      setLinkedIssueDetail(null);
+      fetchData();
+    } catch { enqueueSnackbar(t('common.error'), { variant: 'error' }); }
+  };
+
+  const linkSearchTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchIssuesForLink = useCallback(async (search: string) => {
+    setLinkIssueLoading(true);
+    try {
+      const result = await argusService.listIssues(projectId, { search, limit: 15 });
+      setLinkIssueResults(result.data || []);
+    } catch { setLinkIssueResults([]); }
+    finally { setLinkIssueLoading(false); }
+  }, [projectId]);
+
+  const debouncedSearchIssues = useCallback((search: string) => {
+    if (linkSearchTimerRef.current) clearTimeout(linkSearchTimerRef.current);
+    linkSearchTimerRef.current = setTimeout(() => searchIssuesForLink(search), 300);
+  }, [searchIssuesForLink]);
+
   const fetchSpamKeywords = async () => {
     try { setSpamKeywords(await argusService.getSpamKeywords(projectId)); }
     catch { /* ignore */ }
@@ -532,6 +567,17 @@ const ArgusFeedbackPage: React.FC = () => {
   const summary = data?.summary;
   const selectedFbId = urlState.fb;
   const selectedItem = items.find(i => i.feedback_id === selectedFbId) || null;
+
+  // Lazy-fetch linked issue detail when selectedItem changes
+  useEffect(() => {
+    if (selectedItem?.issue_id) {
+      argusService.getIssueDetail(projectId, selectedItem.issue_id)
+        .then(detail => setLinkedIssueDetail(detail))
+        .catch(() => setLinkedIssueDetail(null));
+    } else {
+      setLinkedIssueDetail(null);
+    }
+  }, [selectedItem?.issue_id, selectedItem?.feedback_id, projectId]);
 
   const unresolvedCount = summary?.unresolved_count || 0;
   const resolvedCount = summary?.resolved_count || 0;
@@ -613,7 +659,7 @@ const ArgusFeedbackPage: React.FC = () => {
         if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
           // Update filter to custom date range
           const ap = { start: start.toISOString(), end: end.toISOString() };
-          setUrlState({ period: `${ap.start}|${ap.end}`, page: '1' });
+          setUrlState({ period: `${ap.start}|${ap.end}`, page: '1', fb: '' });
         }
       } catch { /* ignore */ }
     }
@@ -651,9 +697,12 @@ const ArgusFeedbackPage: React.FC = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)' }}>
       {/* Header */}
       <PageHeader
-        icon={<FeedbackIcon sx={{ color: '#7c4dff' }} />}
-        title={t('argus.feedback.title')}
-        enableAutoBack
+        icon={<FeedbackIcon />}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.feedback.title') }
+          ]} />
+        }
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {!loading && total > 0 && (
@@ -699,12 +748,12 @@ const ArgusFeedbackPage: React.FC = () => {
                 size="small"
                 placeholder={t('argus.feedback.searchPlaceholder')}
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setUrlState({ page: '1' }); }}
+                onChange={(e) => { setSearch(e.target.value); setUrlState({ page: '1', fb: '' }); }}
                 InputProps={{
                   startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
                   endAdornment: search ? (
                     <InputAdornment position="end">
-                      <IconButton size="small" onClick={() => { setSearch(''); setUrlState({ page: '1' }); }} sx={{ p: 0.2 }}>
+                      <IconButton size="small" onClick={() => { setSearch(''); setUrlState({ page: '1', fb: '' }); }} sx={{ p: 0.2 }}>
                         <CloseIcon sx={{ fontSize: 14 }} />
                       </IconButton>
                     </InputAdornment>
@@ -743,7 +792,7 @@ const ArgusFeedbackPage: React.FC = () => {
                 {SORT_OPTIONS.map(opt => (
                   <Box
                     key={opt.value}
-                    onClick={() => { setUrlState({ sort: opt.value, page: '1' }); setSortAnchor(null); }}
+                    onClick={() => { setUrlState({ sort: opt.value, page: '1', fb: '' }); setSortAnchor(null); }}
                     sx={{
                       px: 1.5, py: 0.6, cursor: 'pointer', fontSize: '0.78rem',
                       fontWeight: opt.value === sortOrder ? 700 : 400,
@@ -877,7 +926,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
         {/* ─── LEFT: Feedback List ─── */}
         <Box sx={{
-          width: isDetailOpen ? splitWidth : '100%', minWidth: MIN_SPLIT_WIDTH, flexShrink: 0,
+          width: splitWidth, minWidth: MIN_SPLIT_WIDTH, flexShrink: 0,
           display: 'flex', flexDirection: 'column', transition: isSplitDragging ? 'none' : 'width 0.2s', overflow: 'hidden',
         }}>
           <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -897,7 +946,6 @@ const ArgusFeedbackPage: React.FC = () => {
                       key={item.feedback_id}
                       onClick={() => {
                         setUrlState({ fb: item.feedback_id });
-                        setIsDetailOpen(true);
                         // Mark as read
                         if (!item.is_read) {
                           argusService.markFeedbackRead(projectId, [item.feedback_id]).catch(() => {});
@@ -921,7 +969,13 @@ const ArgusFeedbackPage: React.FC = () => {
                       <Checkbox
                         size="small"
                         checked={isSelected}
-                        onChange={(e) => { e.stopPropagation(); toggleSelect(item.feedback_id); }}
+                        onChange={(e) => {
+                          setSelectedIds(prev => {
+                            const next = new Set(prev);
+                            next.has(item.feedback_id) ? next.delete(item.feedback_id) : next.add(item.feedback_id);
+                            return next;
+                          });
+                        }}
                         onClick={(e) => e.stopPropagation()}
                         sx={{ p: 0.2, mt: 0.2 }}
                       />
@@ -935,7 +989,7 @@ const ArgusFeedbackPage: React.FC = () => {
                             <HighlightText text={displayName} highlight={searchDebounce} isDark={isDark} />
                           </Typography>
                           <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.62rem', flexShrink: 0 }}>
-                            {formatRelative(item.submitted_at, t)}
+                            {formatRelativeTime(item.submitted_at)}
                           </Typography>
                         </Box>
                         <Typography variant="caption" noWrap sx={{
@@ -945,10 +999,15 @@ const ArgusFeedbackPage: React.FC = () => {
                           <HighlightText text={item.message} highlight={searchDebounce} isDark={isDark} />
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 0.5, mt: 0.4, flexWrap: 'wrap' }}>
-                          {item.issue_id && (
-                            <Chip icon={<BugReportIcon sx={{ fontSize: '10px !important' }} />} label={`#${item.issue_id}`}
-                              size="small" sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha('#f44336', 0.08), color: '#f44336', border: 'none', '& .MuiChip-icon': { color: '#f44336' } }} />
-                          )}
+                          {item.issue_id && (() => {
+                            const issueColor = item.issue_status === 'resolved' ? '#4caf50'
+                              : item.issue_status === 'ignored' ? '#9e9e9e' : '#ff9800';
+                            return (
+                              <Chip icon={<BugReportIcon sx={{ fontSize: '10px !important' }} />}
+                                label={`#${item.issue_id} ${item.issue_status || ''}`}
+                                size="small" sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha(issueColor, 0.08), color: issueColor, border: 'none', '& .MuiChip-icon': { color: issueColor } }} />
+                            );
+                          })()}
                           {item.attachments?.length > 0 && (
                             <Chip icon={<ImageIcon sx={{ fontSize: '10px !important' }} />} label={item.attachments.length}
                               size="small" sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha('#2196f3', 0.08), color: '#2196f3', border: 'none', '& .MuiChip-icon': { color: '#2196f3' } }} />
@@ -984,10 +1043,10 @@ const ArgusFeedbackPage: React.FC = () => {
                   count={total}
                   page={page - 1}
                   rowsPerPage={rowsPerPage}
-                  onPageChange={(_, newPage) => setUrlState({ page: String(newPage + 1) })}
+                  onPageChange={(_, newPage) => setUrlState({ page: String(newPage + 1), fb: '' })}
                   onRowsPerPageChange={(e) => {
                     setRowsPerPage(Number(e.target.value));
-                    setUrlState({ page: '1' });
+                    setUrlState({ page: '1', fb: '' });
                   }}
                   rowsPerPageOptions={VALID_PAGE_SIZES}
                   size="small"
@@ -998,8 +1057,7 @@ const ArgusFeedbackPage: React.FC = () => {
         </Box>
 
         {/* ─── Resizable Splitter Handle ─── */}
-        {isDetailOpen && (
-          <Box
+        <Box
             onMouseDown={handleSplitterMouseDown}
             sx={{
               width: '1px',
@@ -1029,11 +1087,8 @@ const ArgusFeedbackPage: React.FC = () => {
               },
             }}
           />
-        )}
 
         {/* ─── RIGHT: Detail Panel ─── */}
-        {isDetailOpen && (
-          <>
             {selectedItem ? (
               <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
                 {/* Detail Header */}
@@ -1062,65 +1117,126 @@ const ArgusFeedbackPage: React.FC = () => {
                 sx={{ height: 22, fontSize: '0.68rem', fontWeight: 700, backgroundColor: alpha(statusColor(selectedItem.status), 0.12), color: statusColor(selectedItem.status), border: 'none' }}
               />
               <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.68rem' }}>
-                {formatRelative(selectedItem.submitted_at, t)}
+                {formatRelativeTime(selectedItem.submitted_at)}
               </Typography>
-              <Tooltip title={t('argus.feedback.closeDetail')}>
-                <IconButton size="small" onClick={() => setIsDetailOpen(false)} sx={{ ml: 0.5 }}>
-                  <CloseIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Tooltip>
+
             </Box>
 
             {/* Detail Actions */}
             <Box sx={{
-              px: 2.5, py: 1, display: 'flex', alignItems: 'center', gap: 1,
+              px: 2, py: 0.8, display: 'flex', alignItems: 'center', gap: 0.75,
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              flexShrink: 0,
+              flexShrink: 0, flexWrap: 'wrap',
             }}>
               {selectedItem.status !== 'resolved' ? (
-                <Button size="small" variant="contained" startIcon={<ResolveIcon />}
+                <Button size="small" startIcon={<ResolveIcon sx={{ fontSize: '15px !important' }} />}
                   onClick={() => handleUpdateStatus(selectedItem.feedback_id, 'resolved')}
-                  sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px', backgroundColor: '#4caf50', '&:hover': { backgroundColor: '#43a047' } }}>
+                  sx={{
+                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, borderRadius: '6px', px: 1.5, minHeight: 28,
+                    backgroundColor: alpha('#4caf50', isDark ? 0.15 : 0.1),
+                    color: isDark ? '#66bb6a' : '#2e7d32',
+                    border: `1px solid ${alpha('#4caf50', isDark ? 0.3 : 0.25)}`,
+                    '&:hover': { backgroundColor: alpha('#4caf50', isDark ? 0.25 : 0.18) },
+                  }}>
                   {t('argus.feedback.resolve')}
                 </Button>
               ) : (
-                <Button size="small" variant="outlined" startIcon={<UnresolveIcon />}
+                <Button size="small" startIcon={<UnresolveIcon sx={{ fontSize: '15px !important' }} />}
                   onClick={() => handleUpdateStatus(selectedItem.feedback_id, 'unresolved')}
-                  sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}>
+                  sx={{
+                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, borderRadius: '6px', px: 1.5, minHeight: 28,
+                    backgroundColor: alpha('#ff9800', isDark ? 0.15 : 0.1),
+                    color: isDark ? '#ffb74d' : '#e65100',
+                    border: `1px solid ${alpha('#ff9800', isDark ? 0.3 : 0.25)}`,
+                    '&:hover': { backgroundColor: alpha('#ff9800', isDark ? 0.25 : 0.18) },
+                  }}>
                   {t('argus.feedback.unresolve')}
                 </Button>
               )}
               {!selectedItem.is_spam && (
-                <Button size="small" variant="outlined" startIcon={<SpamIcon />}
+                <Button size="small" startIcon={<SpamIcon sx={{ fontSize: '15px !important' }} />}
                   onClick={() => handleMarkSpam(selectedItem.feedback_id)}
-                  sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px', color: '#9e9e9e', borderColor: '#9e9e9e' }}>
+                  sx={{
+                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                    color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)'}`,
+                    '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' },
+                  }}>
                   {t('argus.feedback.markSpam')}
                 </Button>
               )}
-              <Button size="small" variant="outlined" startIcon={<AssignIcon />}
+              <Button size="small" startIcon={<AssignIcon sx={{ fontSize: '15px !important' }} />}
                 onClick={(e) => setAssigneeAnchor({ el: e.currentTarget, feedbackId: selectedItem.feedback_id })}
-                sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}>
+                sx={{
+                  textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
+                  backgroundColor: alpha('#7c4dff', isDark ? 0.12 : 0.08),
+                  color: isDark ? '#b388ff' : '#5e35b1',
+                  border: `1px solid ${alpha('#7c4dff', isDark ? 0.25 : 0.2)}`,
+                  '&:hover': { backgroundColor: alpha('#7c4dff', isDark ? 0.2 : 0.14) },
+                }}>
                 {selectedItem.assigned_to || t('argus.feedback.assign')}
               </Button>
+
               <Box sx={{ flex: 1 }} />
-              {selectedItem.issue_id ? (
-                <Button size="small" variant="outlined" startIcon={<BugReportIcon />}
-                  onClick={() => navigate(`/argus/issues/${projectId}/${selectedItem.issue_id}`)}
-                  sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px', color: '#f44336', borderColor: alpha('#f44336', 0.3) }}>
-                  {t('argus.feedback.viewIssue')} #{selectedItem.issue_id}
-                </Button>
-              ) : (
-                <Button size="small" variant="outlined" startIcon={<AddIcon />}
-                  onClick={async () => {
-                    setCreateIssueFeedbackId(selectedItem.feedback_id);
-                    setCreateIssueTitle(`[Feedback] ${selectedItem.message.slice(0, 80)}`);
-                    setSelectedTrackerId('');
-                    try { setIssueTrackers(await argusService.listIssueTrackers(projectId)); } catch { /* ok */ }
-                    setCreateIssueOpen(true);
-                  }}
-                  sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}>
-                  {t('argus.feedback.createIssue')}
-                </Button>
+
+              {selectedItem.issue_id ? (() => {
+                const issueColor = selectedItem.issue_status === 'resolved' ? '#4caf50'
+                  : selectedItem.issue_status === 'ignored' ? '#9e9e9e' : '#ff9800';
+                const issueTextColor = selectedItem.issue_status === 'resolved'
+                  ? (isDark ? '#66bb6a' : '#2e7d32')
+                  : selectedItem.issue_status === 'ignored'
+                    ? (isDark ? '#bdbdbd' : '#616161')
+                    : (isDark ? '#ffb74d' : '#e65100');
+                return (
+                  <Button size="small" startIcon={<BugReportIcon sx={{ fontSize: '15px !important' }} />}
+                    onClick={() => navigate(`/argus/issues/${projectId}/${selectedItem.issue_id}`, { state: { from: 'feedback' } })}
+                    sx={{
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, borderRadius: '6px', px: 1.5, minHeight: 28,
+                      backgroundColor: alpha(issueColor, isDark ? 0.15 : 0.1),
+                      color: issueTextColor,
+                      border: `1px solid ${alpha(issueColor, isDark ? 0.3 : 0.25)}`,
+                      '&:hover': { backgroundColor: alpha(issueColor, isDark ? 0.25 : 0.18) },
+                    }}>
+                    #{selectedItem.issue_id} {selectedItem.issue_status || ''}
+                  </Button>
+                );
+              })() : (
+                <>
+                  <Button size="small" startIcon={<LinkIcon sx={{ fontSize: '15px !important' }} />}
+                    onClick={() => {
+                      setLinkIssueSearch('');
+                      setLinkIssueResults([]);
+                      setLinkIssueOpen(true);
+                      searchIssuesForLink('');
+                    }}
+                    sx={{
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
+                      backgroundColor: alpha('#2196f3', isDark ? 0.12 : 0.08),
+                      color: isDark ? '#64b5f6' : '#1565c0',
+                      border: `1px solid ${alpha('#2196f3', isDark ? 0.25 : 0.2)}`,
+                      '&:hover': { backgroundColor: alpha('#2196f3', isDark ? 0.2 : 0.14) },
+                    }}>
+                    {t('argus.feedback.linkExistingIssue')}
+                  </Button>
+                  <Button size="small" startIcon={<AddIcon sx={{ fontSize: '15px !important' }} />}
+                    onClick={async () => {
+                      setCreateIssueFeedbackId(selectedItem.feedback_id);
+                      setCreateIssueTitle(`[Feedback] ${selectedItem.message.slice(0, 80)}`);
+                      setSelectedTrackerId('');
+                      try { setIssueTrackers(await argusService.listIssueTrackers(projectId)); } catch { /* ok */ }
+                      setCreateIssueOpen(true);
+                    }}
+                    sx={{
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
+                      backgroundColor: alpha('#3f51b5', isDark ? 0.12 : 0.08),
+                      color: isDark ? '#7986cb' : '#283593',
+                      border: `1px solid ${alpha('#3f51b5', isDark ? 0.25 : 0.2)}`,
+                      '&:hover': { backgroundColor: alpha('#3f51b5', isDark ? 0.2 : 0.14) },
+                    }}>
+                    {t('argus.feedback.createIssue')}
+                  </Button>
+                </>
               )}
             </Box>
 
@@ -1137,6 +1253,88 @@ const ArgusFeedbackPage: React.FC = () => {
                 </Typography>
               </Paper>
 
+              {/* Linked Issue Card */}
+              {selectedItem.issue_id && (
+                <Paper elevation={0} sx={{
+                  mb: 2, borderRadius: 2, overflow: 'hidden',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                }}>
+                  <Box sx={{
+                    px: 1.5, py: 0.6, display: 'flex', alignItems: 'center', gap: 0.5,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                  }}>
+                    <BugReportIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                    <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.7rem', color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      {t('argus.feedback.linkedIssue', 'Linked Issue')}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ px: 2, py: 1.5 }}>
+                    {/* Issue title + status */}
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
+                      {(() => {
+                        const issueColor = selectedItem.issue_status === 'resolved' ? '#4caf50'
+                          : selectedItem.issue_status === 'ignored' ? '#9e9e9e' : '#ff9800';
+                        return (
+                          <Chip label={selectedItem.issue_status || 'unresolved'} size="small"
+                            sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha(issueColor, 0.12), color: issueColor, border: 'none', flexShrink: 0 }} />
+                        );
+                      })()}
+                      <Typography variant="body2" sx={{
+                        fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', lineHeight: 1.4,
+                        '&:hover': { textDecoration: 'underline' },
+                      }}
+                        onClick={() => navigate(`/argus/issues/${projectId}/${selectedItem.issue_id}`, { state: { from: 'feedback' } })}>
+                        {selectedItem.issue_title || `Issue #${selectedItem.issue_id}`}
+                      </Typography>
+                    </Box>
+
+                    {/* Issue meta from lazy-fetched detail */}
+                    <Box sx={{ display: 'flex', gap: 2, mb: 1.5, flexWrap: 'wrap' }}>
+                      <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                        #{selectedItem.issue_id}
+                      </Typography>
+                      {linkedIssueDetail && (
+                        <>
+                          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                            {t('argus.issues.events', 'Events')}: {formatWithCommas(linkedIssueDetail.event_count)}
+                          </Typography>
+                          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                            {t('argus.issues.users', 'Users')}: {formatWithCommas(linkedIssueDetail.user_count)}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+
+                    {/* Actions */}
+                    <Box sx={{ display: 'flex', gap: 0.75 }}>
+                      <Button size="small" startIcon={<OpenIcon sx={{ fontSize: '14px !important' }} />}
+                        onClick={() => navigate(`/argus/issues/${projectId}/${selectedItem.issue_id}`, { state: { from: 'feedback' } })}
+                        sx={{
+                          textTransform: 'none', fontSize: '0.68rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 26,
+                          backgroundColor: alpha('#2196f3', isDark ? 0.12 : 0.08),
+                          color: isDark ? '#64b5f6' : '#1565c0',
+                          border: `1px solid ${alpha('#2196f3', isDark ? 0.25 : 0.2)}`,
+                          '&:hover': { backgroundColor: alpha('#2196f3', isDark ? 0.2 : 0.14) },
+                        }}>
+                        {t('argus.feedback.viewIssue')}
+                      </Button>
+                      <Button size="small"
+                        onClick={handleUnlinkIssue}
+                        sx={{
+                          textTransform: 'none', fontSize: '0.68rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 26,
+                          backgroundColor: alpha('#f44336', isDark ? 0.12 : 0.08),
+                          color: isDark ? '#ef9a9a' : '#c62828',
+                          border: `1px solid ${alpha('#f44336', isDark ? 0.25 : 0.2)}`,
+                          '&:hover': { backgroundColor: alpha('#f44336', isDark ? 0.2 : 0.14) },
+                        }}>
+                        {t('argus.feedback.unlinkIssue')}
+                      </Button>
+                    </Box>
+                  </Box>
+                </Paper>
+              )}
+
               {/* Attachments */}
               {selectedItem.attachments?.length > 0 && (
                 <Box sx={{ mb: 2 }}>
@@ -1149,7 +1347,7 @@ const ArgusFeedbackPage: React.FC = () => {
                         key={ai}
                         onClick={() => setLightboxUrl(url)}
                         sx={{
-                          width: 100, height: 75, borderRadius: 1.5, overflow: 'hidden',
+                          width: 125, height: 94, borderRadius: 1.5, overflow: 'hidden',
                           border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                           cursor: 'pointer', transition: 'all 0.15s',
                           '&:hover': { borderColor: '#7c4dff', transform: 'scale(1.03)' },
@@ -1221,94 +1419,179 @@ const ArgusFeedbackPage: React.FC = () => {
               {/* Activity Timeline */}
               <Typography variant="caption" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1, fontSize: '0.72rem', color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {t('argus.feedback.activity')}
+                {activities.length > 0 && (
+                  <Typography component="span" sx={{ color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}>
+                    ({activities.length})
+                  </Typography>
+                )}
               </Typography>
 
               {/* Comment Input */}
-              <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
+              <Box sx={{ display: 'flex', gap: 1, mb: 1.5, alignItems: 'flex-start' }}>
                 <TextField
                   size="small"
                   fullWidth
+                  multiline
+                  maxRows={3}
                   placeholder={t('argus.feedback.addComment')}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   onKeyDown={async (e) => {
-                    if (e.key === 'Enter' && commentText.trim() && !commentLoading) {
+                    if (e.key === 'Enter' && !e.shiftKey && commentText.trim() && !commentLoading) {
+                      e.preventDefault();
                       setCommentLoading(true);
+                      const text = commentText.trim();
+                      // Get user name from localStorage
+                      let userName: string | undefined;
+                      try { const u = JSON.parse(localStorage.getItem('user') || '{}'); userName = u.name || undefined; } catch { /* ignore */ }
+                      setCommentText('');
                       try {
-                        await argusService.addFeedbackComment(projectId, selectedItem.feedback_id, commentText.trim());
-                        setCommentText('');
+                        await argusService.addFeedbackComment(projectId, selectedItem.feedback_id, text, userName);
                         const updated = await argusService.getFeedbackActivity(projectId, selectedItem.feedback_id);
                         setActivities(updated);
-                      } catch { enqueueSnackbar('Failed to add comment', { variant: 'error' }); }
+                      } catch {
+                        enqueueSnackbar(t('common.error'), { variant: 'error' });
+                        setCommentText(text);
+                      }
                       finally { setCommentLoading(false); }
                     }
                   }}
                   disabled={commentLoading}
-                  sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.78rem' } }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      fontSize: '0.78rem', borderRadius: '8px',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)',
+                      '& fieldset': { borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' },
+                      '&:hover fieldset': { borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)' },
+                    },
+                    '& .MuiOutlinedInput-input': { py: 0.8 },
+                  }}
                 />
               </Box>
 
-              {/* Activity Items */}
+              {/* Activity Items — Sentry style */}
               {activities.length > 0 && (
-                <Paper elevation={0} sx={{
-                  mb: 2, borderRadius: 2, overflow: 'hidden',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                }}>
-                  {activities.map((act) => {
-                    let label = '';
-                    let color = 'text.secondary';
+                <Box sx={{ mb: 2 }}>
+                  {activities.map((act, idx) => {
                     const actData = typeof act.data === 'string' ? JSON.parse(act.data) : act.data;
+                    const isComment = act.action === 'comment';
+                    const isLast = idx === activities.length - 1;
+                    const displayName = act.user_name || t('argus.activity.system');
+
+                    // Build localized label + color for system actions
+                    let label = '';
+                    let iconColor = 'text.secondary';
                     switch (act.action) {
                       case 'status_change':
-                        label = `Status → ${actData?.to || 'unknown'}`;
-                        color = statusColor(actData?.to || '');
+                        label = t('argus.activity.statusChanged', { to: actData?.to || '?' });
+                        iconColor = statusColor(actData?.to || '');
                         break;
                       case 'assign':
-                        label = actData?.assigned_to ? `Assigned to ${actData.assigned_to}` : 'Unassigned';
-                        color = '#2196f3';
+                        label = actData?.assigned_to
+                          ? t('argus.activity.assigned', { to: actData.assigned_to })
+                          : t('argus.activity.unassigned');
+                        iconColor = '#2196f3';
                         break;
                       case 'comment':
                         label = actData?.text || '';
-                        color = theme.palette.text.primary;
+                        iconColor = '#ff9800';
                         break;
                       case 'mark_spam':
-                        label = 'Marked as spam';
-                        color = '#9e9e9e';
+                        label = t('argus.feedback.markedAsSpam');
+                        iconColor = '#9e9e9e';
                         break;
                       case 'unmark_spam':
-                        label = 'Unmarked from spam';
-                        color = '#4caf50';
+                        label = t('argus.feedback.unmarkedFromSpam');
+                        iconColor = '#4caf50';
                         break;
                     }
+
                     return (
-                      <Box key={act.id} sx={{
-                        display: 'flex', alignItems: 'flex-start', gap: 1, px: 1.5, py: 0.8,
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                        '&:last-child': { borderBottom: 'none' },
-                      }}>
+                      <Box key={act.id} sx={{ display: 'flex', gap: 1.5, position: 'relative' }}>
+                        {/* Timeline column: avatar/icon + vertical line */}
                         <Box sx={{
-                          width: 6, height: 6, borderRadius: '50%', mt: 0.8, flexShrink: 0,
-                          backgroundColor: act.action === 'comment' ? '#2196f3' : alpha(color, 0.5),
-                        }} />
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="caption" sx={{ fontSize: '0.72rem', color, wordBreak: 'break-word' }}>
-                            {label}
-                          </Typography>
-                          <Typography variant="caption" sx={{ display: 'block', fontSize: '0.62rem', color: 'text.disabled' }}>
-                            {act.user_name ? `${act.user_name} · ` : ''}{formatRelative(act.created_at, t)}
-                          </Typography>
+                          display: 'flex', flexDirection: 'column', alignItems: 'center',
+                          position: 'relative', minWidth: 28, pt: 0.2,
+                        }}>
+                          {!isLast && (
+                            <Box sx={{
+                              position: 'absolute',
+                              top: isComment ? 28 : 24,
+                              bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                              width: '2px',
+                              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                            }} />
+                          )}
+                          {isComment ? (
+                            <Avatar sx={{
+                              width: 26, height: 26, fontSize: '0.6rem', fontWeight: 700,
+                              backgroundColor: stringToColor(displayName),
+                              color: '#fff', zIndex: 1,
+                            }}>
+                              {getInitials(displayName)}
+                            </Avatar>
+                          ) : (
+                            <Box sx={{
+                              width: 22, height: 22, borderRadius: '50%',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              backgroundColor: alpha(iconColor, isDark ? 0.15 : 0.08),
+                              color: iconColor, zIndex: 1,
+                            }}>
+                              {act.action === 'status_change' && <ResolveIcon sx={{ fontSize: 14 }} />}
+                              {act.action === 'assign' && <AssignIcon sx={{ fontSize: 14 }} />}
+                              {act.action === 'mark_spam' && <SpamIcon sx={{ fontSize: 14 }} />}
+                              {act.action === 'unmark_spam' && <ResolveIcon sx={{ fontSize: 14 }} />}
+                            </Box>
+                          )}
+                        </Box>
+
+                        {/* Content */}
+                        <Box sx={{ flex: 1, minWidth: 0, pb: isLast ? 0 : 1.5 }}>
+                          {isComment ? (
+                            <>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.4 }}>
+                                <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.primary' }}>
+                                  {displayName}
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.62rem', color: 'text.disabled' }}>
+                                  {formatRelativeTime(act.created_at)}
+                                </Typography>
+                              </Box>
+                              <Box sx={{
+                                px: 1.5, py: 1, borderRadius: '8px',
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.025)',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                              }}>
+                                <Typography sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.5 }}>
+                                  {label}
+                                </Typography>
+                              </Box>
+                            </>
+                          ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 22, flexWrap: 'wrap' }}>
+                              <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
+                                {displayName}
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
+                                {label}
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', ml: 'auto', whiteSpace: 'nowrap' }}>
+                                {formatRelativeTime(act.created_at)}
+                              </Typography>
+                            </Box>
+                          )}
                         </Box>
                       </Box>
                     );
                   })}
-                </Paper>
+                </Box>
               )}
                 </Box>
               </Box>
             ) : (
               /* Empty Detail Placeholder */
               items.length > 0 && !loading && (
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'text.disabled' }}>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'text.disabled', height: '100%', minHeight: 0 }}>
                   <FeedbackIcon sx={{ fontSize: 56, mb: 1, opacity: 0.3 }} />
                   <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
                     {t('argus.feedback.emptySelection', '피드백을 선택하면 상세 내용을 확인할 수 있습니다.')}
@@ -1316,8 +1599,6 @@ const ArgusFeedbackPage: React.FC = () => {
                 </Box>
               )
             )}
-          </>
-        )}
       </Box>
 
       {/* ═══════ DIALOGS & MENUS ═══════ */}
@@ -1484,6 +1765,75 @@ const ArgusFeedbackPage: React.FC = () => {
           <Button variant="contained" onClick={handleCreateIssue} disabled={!createIssueTitle.trim()}
             sx={{ textTransform: 'none' }}>
             {t('argus.feedback.createIssue')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Link Existing Issue Dialog */}
+      <Dialog open={linkIssueOpen} onClose={() => setLinkIssueOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontSize: '0.9rem', fontWeight: 700 }}>
+          {t('argus.feedback.linkExistingIssue', 'Link Existing Issue')}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder={t('argus.feedback.searchIssue', 'Search issues...')}
+            value={linkIssueSearch}
+            onChange={(e) => {
+              setLinkIssueSearch(e.target.value);
+              debouncedSearchIssues(e.target.value);
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ mt: 1, mb: 1 }}
+          />
+          <Box sx={{ height: 350, overflow: 'auto' }}>
+            {linkIssueLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                <Typography variant="caption" color="text.disabled">{t('common.loading')}...</Typography>
+              </Box>
+            ) : linkIssueResults.length === 0 ? (
+              <Box sx={{ py: 3, textAlign: 'center' }}>
+                <Typography variant="caption" color="text.disabled">{t('argus.feedback.noIssuesFound', 'No issues found')}</Typography>
+              </Box>
+            ) : (
+              linkIssueResults.map(issue => {
+                const issueColor = issue.status === 'resolved' ? '#4caf50'
+                  : issue.status === 'ignored' ? '#9e9e9e' : '#ff9800';
+                return (
+                  <Box key={issue.id}
+                    onClick={() => handleLinkIssue(issue.id)}
+                    sx={{
+                      px: 1.5, py: 1, cursor: 'pointer', borderRadius: '6px',
+                      display: 'flex', alignItems: 'flex-start', gap: 1,
+                      '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+                    }}
+                  >
+                    <Chip label={issue.status} size="small"
+                      sx={{ height: 18, fontSize: '0.55rem', fontWeight: 700, backgroundColor: alpha(issueColor, 0.12), color: issueColor, border: 'none', flexShrink: 0, mt: 0.2 }} />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {issue.title}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
+                        #{issue.id} · {t('argus.issues.events', 'Events')}: {issue.event_count} · {issue.culprit}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLinkIssueOpen(false)} sx={{ textTransform: 'none' }}>
+            {t('common.cancel')}
           </Button>
         </DialogActions>
       </Dialog>

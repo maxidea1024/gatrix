@@ -277,7 +277,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
 
         values.push(dashboardId, projectId);
         await mysqlPool.query(
-          `UPDATE g_argus_dashboards SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ? AND project_id = ?`,
+          `UPDATE g_argus_dashboards SET ${updates.join(', ')}, updated_at = UTC_TIMESTAMP() WHERE id = ? AND project_id = ?`,
           values
         );
         return reply.send({ success: true });

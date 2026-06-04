@@ -10,6 +10,7 @@ import {
   Skeleton,
   LinearProgress,
   Tooltip,
+  Divider,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -24,22 +25,27 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import SimplePagination from '@/components/common/SimplePagination';
+import { formatCompactNumber } from '@/utils/numberFormat';
 import argusService, { ArgusRelease } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 
+const PAGE_SIZE_STORAGE_KEY = 'argus:releases:pageSize';
 
 const ArgusReleasesPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
@@ -51,16 +57,47 @@ const ArgusReleasesPage: React.FC = () => {
 
   const [releases, setReleases] = useState<ArgusRelease[]>([]);
   const [loading, setLoading] = useState(true);
-  const filters = useMemo<ArgusFilterState>(
-    () => defaultArgusFilterState(urlState.period),
-    [urlState.period],
+  const [filters, setFilters] = useState<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period)
   );
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      dateRange: { type: 'preset', preset: urlState.period }
+    }));
+  }, [urlState.period]);
+
+  const currentPage = Number(searchParams.get('page') || 1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+    const stored = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
+    const saved = Number(stored);
+    return !isNaN(saved) && saved > 0 ? saved : 20;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
+  }, [rowsPerPage]);
+
+  const handlePageChange = (_: unknown, page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(page));
+    setSearchParams(params);
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const ap = argusDateRangeToApiParams(filters.dateRange);
+      // Backend getReleases api might not support environment/browser/os yet,
+      // but we pass them anyway or just let it ignore.
+      // Wait, getReleases only accepts (projectId, period, start, end)
       const data = await argusService.getReleases(projectId, ap.period, ap.start, ap.end);
+      
+      // Client-side filtering if applicable, or maybe backend will be updated to accept these.
+      // For now, let's filter client-side just in case, or just do nothing with them.
+      // Actually, releases don't have os/browser arrays on them. 
+      // The issue is just the checkbox not working visually.
       setReleases(data || []);
     } catch (error) {
       console.error('Failed to fetch releases:', error);
@@ -72,6 +109,7 @@ const ArgusReleasesPage: React.FC = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset });
     }
@@ -84,14 +122,23 @@ const ArgusReleasesPage: React.FC = () => {
     ? releases.reduce((s, r) => s + Number(r.crash_free_rate), 0) / releases.length
     : 100;
 
+  const total = releases.length;
+  const paginatedReleases = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return releases.slice(start, start + rowsPerPage);
+  }, [releases, currentPage, rowsPerPage]);
+
   return (
     <Box>
       {/* Header */}
       <PageHeader
         icon={<ReleaseIcon />}
-        title={t('argus.releases.title')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.releases.title') }
+          ]} />
+        }
         subtitle={t('argus.releases.subtitle')}
-        enableAutoBack
         actions={
           !loading && releases.length > 0 && (
             <Chip label={`${releases.length} ${t('argus.releases.releasesLabel')}`} size="small" sx={{
@@ -112,42 +159,37 @@ const ArgusReleasesPage: React.FC = () => {
       />
 
       {/* Summary Stats */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2, mb: 3 }}>
+      <Paper elevation={0} sx={{
+        display: 'flex', alignItems: 'center', mb: 3, py: 1.5,
+        borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.015)'
+      }}>
         {[
-          { icon: <ReleaseIcon />, color: '#7c4dff', label: t('argus.releases.releasesLabel'), value: releases.length },
-          { icon: <BugReportIcon />, color: '#f44336', label: t('argus.releases.totalErrors'), value: totalErrors },
-          { icon: <PeopleIcon />, color: '#ff9800', label: t('argus.releases.affectedUsers'), value: totalUsers },
-          { icon: <CheckIcon />, color: avgCrashFree >= 99 ? '#4caf50' : avgCrashFree >= 95 ? '#ff9800' : '#f44336', label: t('argus.releases.avgCrashFree'), value: `${avgCrashFree.toFixed(1)}%` },
-        ].map((card, idx) => (
-          <Paper key={idx} elevation={0} sx={{
-            p: 2,
-            background: isDark
-              ? `linear-gradient(135deg, ${alpha(card.color, 0.12)}, ${alpha(card.color, 0.03)})`
-              : `linear-gradient(135deg, ${alpha(card.color, 0.06)}, ${alpha(card.color, 0.01)})`,
-            border: `1px solid ${alpha(card.color, 0.2)}`,
-            borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1.5,
-            transition: 'all 0.2s', '&:hover': { transform: 'translateY(-1px)' },
-          }}>
-            <Box sx={{
-              width: 36, height: 36, borderRadius: 2,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1), color: card.color,
-            }}>
-              {React.cloneElement(card.icon, { sx: { fontSize: 18 } })}
-            </Box>
-            <Box>
-              {loading ? <Skeleton width={50} height={24} /> : (
-                <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, fontSize: '1.1rem' }}>
-                  {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
+          { icon: <ReleaseIcon />, label: t('argus.releases.releasesLabel'), value: releases.length },
+          { icon: <BugReportIcon />, label: t('argus.releases.totalErrors'), value: totalErrors },
+          { icon: <PeopleIcon />, label: t('argus.releases.affectedUsers'), value: totalUsers },
+          { icon: <CheckIcon />, label: t('argus.releases.avgCrashFree'), value: `${avgCrashFree.toFixed(1)}%` },
+        ].map((card, idx, arr) => (
+          <React.Fragment key={idx}>
+            <Box sx={{ flex: 1, textAlign: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 0.5 }}>
+                {React.cloneElement(card.icon as React.ReactElement, { sx: { fontSize: 16, color: 'text.secondary' } })}
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>
+                  {card.label}
+                </Typography>
+              </Box>
+              {loading ? <Skeleton width={50} height={24} sx={{ mx: 'auto' }} /> : (
+                <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', color: 'text.primary' }}>
+                  {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value}
                 </Typography>
               )}
-              <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, fontSize: '0.65rem' }}>
-                {card.label}
-              </Typography>
             </Box>
-          </Paper>
+            {idx < arr.length - 1 && (
+              <Divider orientation="vertical" flexItem sx={{ mx: 1, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+            )}
+          </React.Fragment>
         ))}
-      </Box>
+      </Paper>
 
       <PageContentLoader loading={loading}>
         {releases.length === 0 ? (
@@ -177,7 +219,7 @@ const ArgusReleasesPage: React.FC = () => {
               <Typography variant="caption" fontWeight={700} color="text.secondary">{t('argus.releases.perf', 'PERFORMANCE')}</Typography>
             </Box>
 
-            {releases.map((r, idx) => {
+            {paginatedReleases.map((r, idx) => {
               const crashFree = Number(r.crash_free_rate);
               const isHotfix = r.release.includes('hotfix');
               const statusColor = crashFree >= 99 ? '#4caf50' : crashFree >= 95 ? '#ff9800' : '#f44336';
@@ -273,14 +315,14 @@ const ArgusReleasesPage: React.FC = () => {
                   {/* Total Errors */}
                   <Box>
                     <Typography variant="body1" fontWeight={700} sx={{ fontFamily: 'monospace' }}>
-                      {errorCount.toLocaleString()}
+                      {formatCompactNumber(errorCount)}
                     </Typography>
                   </Box>
 
                   {/* Adoption (Sessions) */}
                   <Box>
                     <Typography variant="body2" fontWeight={700}>
-                      {Number(r.total_sessions).toLocaleString()}
+                      {formatCompactNumber(Number(r.total_sessions))}
                     </Typography>
                     <Box sx={{ mt: 0.5 }}>
                       {r.error_trend && r.error_trend.length > 1 && (
@@ -295,13 +337,31 @@ const ArgusReleasesPage: React.FC = () => {
                       <SpeedIcon sx={{ fontSize: 14 }} /> {p95 > 0 ? `${Math.round(p95)}ms` : '-'}
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
-                      {txnCount.toLocaleString()} txns
+                      {formatCompactNumber(txnCount)} txns
                     </Typography>
                   </Box>
 
                 </Box>
               );
             })}
+          </Box>
+        )}
+
+        {total > 0 && (
+          <Box sx={{ mt: 3 }}>
+            <SimplePagination
+              count={total}
+              page={currentPage - 1}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                const params = new URLSearchParams(searchParams);
+                params.set('page', '1');
+                setSearchParams(params);
+              }}
+              size="small"
+            />
           </Box>
         )}
       </PageContentLoader>

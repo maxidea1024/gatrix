@@ -46,6 +46,7 @@ import { Line, Bar } from 'react-chartjs-2';
 import argusService, { ArgusOverviewData } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
@@ -75,10 +76,16 @@ const ArgusOverviewPage: React.FC = () => {
 
   const [data, setData] = useState<ArgusOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
-  const filters = useMemo<ArgusFilterState>(
-    () => defaultArgusFilterState(urlState.period),
-    [urlState.period],
+  const [filters, setFilters] = useState<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period)
   );
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      dateRange: { type: 'preset', preset: urlState.period }
+    }));
+  }, [urlState.period]);
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
 
@@ -98,6 +105,7 @@ const ArgusOverviewPage: React.FC = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset });
     }
@@ -285,9 +293,12 @@ const ArgusOverviewPage: React.FC = () => {
       {/* Header */}
       <PageHeader
         icon={<BugReportIcon />}
-        title={t('argus.overview.title')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.overview.title') }
+          ]} />
+        }
         subtitle={t('argus.overview.subtitle')}
-        enableAutoBack
       />
 
       {/* Filter Bar */}

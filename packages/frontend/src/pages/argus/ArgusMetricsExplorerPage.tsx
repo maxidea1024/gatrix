@@ -5,7 +5,7 @@ import {
   Table, TableHead, TableBody, TableRow, TableCell,
   FormControl, Select, MenuItem,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, Drawer,
-  Autocomplete, Switch, FormControlLabel,
+  Autocomplete,
 } from '@mui/material';
 import {
   Search as SearchIcon, Close as CloseIcon,
@@ -26,10 +26,13 @@ import SingleSelectFilterChip from '@/components/common/SingleSelectFilterChip';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useLocation } from 'react-router-dom';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ExploreActions from '@/components/argus/ExploreActions';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
+import PillSwitch from '@/components/common/PillSwitch';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 /* ─── Types ─── */
 
@@ -96,15 +99,7 @@ const MetricChart: React.FC<{
   };
 
   if (datasets.length === 0 || labels.length === 0) return (
-    <Paper elevation={0} sx={{
-      mb: 2, p: 2, pt: 1.5, borderRadius: 2,
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center'
-    }}>
-      <Typography sx={{ fontSize: '0.85rem', color: 'text.disabled' }}>
-        {t('argus.metrics.noData', 'No metric data available. Build a query above.')}
-      </Typography>
-    </Paper>
+    <EmptyPlaceholder message={t('argus.metrics.noData')} minHeight={300} />
   );
 
   return (
@@ -150,17 +145,29 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
   // Derive filters
-  const filters = useMemo<ArgusFilterState>(
-    () => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
+    if (urlState.period === 'custom' && urlState.start && urlState.end) {
+      const base = defaultArgusFilterState('custom');
+      base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
+      return base;
+    }
+    return defaultArgusFilterState(urlState.period);
+  });
+
+  useEffect(() => {
+    setFilters(prev => {
       if (urlState.period === 'custom' && urlState.start && urlState.end) {
-        const base = defaultArgusFilterState('custom');
-        base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
-        return base;
+        return {
+          ...prev,
+          dateRange: { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) }
+        };
       }
-      return defaultArgusFilterState(urlState.period);
-    },
-    [urlState.period, urlState.start, urlState.end],
-  );
+      return {
+        ...prev,
+        dateRange: { type: 'preset', preset: urlState.period }
+      };
+    });
+  }, [urlState.period, urlState.start, urlState.end]);
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset) return filters.dateRange.preset;
@@ -251,6 +258,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
 
   // ─── Handlers ───
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
     } else if (newFilters.dateRange.type === 'custom' && newFilters.dateRange.start && newFilters.dateRange.end) {
@@ -408,9 +416,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     <Box>
       <PageHeader
         icon={<MetricsIcon />}
-        title={<EditablePageTitle value={queryName} onChange={setQueryName} placeholder={defaultQueryName} />}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.explore.title', 'Explore'), to: `/argus/explore` },
+            { label: <EditablePageTitle value={queryName} onChange={setQueryName} placeholder={defaultQueryName} /> }
+          ]} />
+        }
         subtitle={t('argus.metrics.subtitle', 'Build advanced metric dashboards and expressions')}
-        enableAutoBack
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Tooltip title={t('argus.metrics.savedQueries', 'Saved Dashboards')}>
@@ -578,10 +590,11 @@ const ArgusMetricsExplorerPage: React.FC = () => {
               { value: 'logarithmic', label: t('argus.metrics.logarithmic', 'Logarithmic') }
             ]}
           />
-          <FormControlLabel
-            control={<Switch size="small" checked={chartConfig.showLegend} onChange={(e) => setChartConfig({ ...chartConfig, showLegend: e.target.checked })} />}
-            label={<Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.metrics.showLegend', 'Show Legend')}</Typography>}
-            sx={{ m: 0 }}
+          <PillSwitch
+            checked={chartConfig.showLegend}
+            onChange={() => setChartConfig({ ...chartConfig, showLegend: !chartConfig.showLegend })}
+            label={t('argus.metrics.showLegend', '범례 표시')}
+            size="small"
           />
         </Box>
       </Paper>
@@ -679,9 +692,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           </IconButton>
         </Box>
         {savedQueries.length === 0 ? (
-          <Typography sx={{ color: 'text.disabled', fontSize: '0.82rem', textAlign: 'center', py: 4 }}>
-            {t('argus.metrics.noSavedQueries', 'No saved metric queries yet')}
-          </Typography>
+          <EmptyPlaceholder message={t('argus.metrics.noSavedQueries')} />
         ) : (
           savedQueries.map((sq) => (
             <Paper key={sq.id} elevation={0} sx={{

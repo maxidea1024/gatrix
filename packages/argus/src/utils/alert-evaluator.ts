@@ -66,7 +66,7 @@ export async function evaluateFeedbackAlerts(
         // Record alert history
         await mysqlPool.query(
           `INSERT INTO g_argus_alert_history (project_id, rule_id, message, triggered_at, status, response_body)
-           VALUES (?, ?, ?, NOW(), ?, ?)`,
+           VALUES (?, ?, ?, UTC_TIMESTAMP(), ?, ?)`,
           [
             rule.project_id,
             rule.id,
@@ -78,7 +78,7 @@ export async function evaluateFeedbackAlerts(
 
         // Update last_triggered_at
         await mysqlPool.query(
-          `UPDATE g_argus_alert_rules SET last_triggered_at = NOW() WHERE id = ?`,
+          `UPDATE g_argus_alert_rules SET last_triggered_at = UTC_TIMESTAMP() WHERE id = ?`,
           [rule.id]
         );
 
@@ -239,13 +239,13 @@ export async function evaluateErrorAlerts(
         // Record alert history
         await mysqlPool.query(
           `INSERT INTO g_argus_alert_history (project_id, rule_id, issue_id, message, triggered_at, status, response_body)
-           VALUES (?, ?, ?, ?, NOW(), ?, ?)`,
+           VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), ?, ?)`,
           [rule.project_id, rule.id, event.issue_id, truncate(triggerReason, 500), worstStatus, truncate(responseBodies, 5000) || null]
         );
 
         // Update last_triggered_at
         await mysqlPool.query(
-          `UPDATE g_argus_alert_rules SET last_triggered_at = NOW() WHERE id = ?`,
+          `UPDATE g_argus_alert_rules SET last_triggered_at = UTC_TIMESTAMP() WHERE id = ?`,
           [rule.id]
         );
 
@@ -358,6 +358,71 @@ function shouldFireForError(rule: AlertRule, event: ErrorEventData): boolean {
   return true;
 }
 
+// ─── Slack Bot Token helpers ───
+
+let _slackBotTokenCache: { token: string | null; fetchedAt: number } = { token: null, fetchedAt: 0 };
+const SLACK_TOKEN_CACHE_TTL = 60_000; // 1 min
+
+async function getSlackBotToken(): Promise<string | null> {
+  if (_slackBotTokenCache.token && Date.now() - _slackBotTokenCache.fetchedAt < SLACK_TOKEN_CACHE_TTL) {
+    return _slackBotTokenCache.token;
+  }
+  try {
+    const [rows] = await mysqlPool.execute(
+      `SELECT credentials FROM g_argus_global_integrations WHERE provider = 'slack' AND is_active = 1 LIMIT 1`
+    );
+    const row = (rows as any[])[0];
+    if (!row) { _slackBotTokenCache = { token: null, fetchedAt: Date.now() }; return null; }
+    const creds = typeof row.credentials === 'string' ? JSON.parse(row.credentials) : row.credentials;
+    const token = creds?.bot_token || null;
+    _slackBotTokenCache = { token, fetchedAt: Date.now() };
+    return token;
+  } catch (e) {
+    logger.warn('Failed to fetch Slack bot token', { error: (e as Error).message });
+    return null;
+  }
+}
+
+async function sendSlackMessage(
+  botToken: string, channel: string, payload: { text: string; blocks?: any[] }
+): Promise<{ ok: boolean; error?: string }> {
+  const response = await fetch('https://slack.com/api/chat.postMessage', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${botToken}`,
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify({ channel, ...payload }),
+  });
+  return response.json() as Promise<{ ok: boolean; error?: string }>;
+}
+
+async function handleSlackAction(
+  action: any, payload: { text: string; blocks?: any[] }
+): Promise<{ status: string; response_body: string }> {
+  const botToken = await getSlackBotToken();
+  if (!botToken) {
+    return { status: 'failed', response_body: 'Slack App not configured. Add Bot Token in Settings > Integrations.' };
+  }
+  const channel = action.channel?.replace(/^#/, '') || '';
+  if (!channel) {
+    return { status: 'failed', response_body: 'Slack channel not specified' };
+  }
+  try {
+    const result = await sendSlackMessage(botToken, channel, payload);
+    if (result.ok) {
+      return { status: 'success', response_body: `Delivered to Slack #${channel}` };
+    } else {
+      logger.warn('Slack API error', { channel, error: result.error });
+      return { status: 'failed', response_body: `Slack API error: ${result.error}` };
+    }
+  } catch (e) {
+    const errorMsg = (e as Error).message;
+    logger.warn('Slack delivery failed', { channel, error: errorMsg });
+    return { status: 'failed', response_body: `Error: ${errorMsg}` };
+  }
+}
+
 async function fireActionsForError(
   actions: any[], rule: AlertRule, event: ErrorEventData, reason: string
 ): Promise<Array<{ status: string; response_body: string }>> {
@@ -366,7 +431,11 @@ async function fireActionsForError(
   const results: Array<{ status: string; response_body: string }> = [];
 
   for (const action of actions) {
-    if ((action.type === 'webhook' || action.type === 'email') && action.target_url) {
+    if (action.type === 'slack' && action.channel) {
+      // Slack App — real chat.postMessage
+      const payload = buildErrorWebhookPayload(rule, event, reason);
+      results.push(await handleSlackAction(action, { text: payload.text, blocks: payload.blocks }));
+    } else if ((action.type === 'webhook' || action.type === 'email') && action.target_url) {
       try {
         const response = await fetchWithRetry(action.target_url, {
           method: 'POST',
@@ -475,9 +544,9 @@ async function fireActions(
     if ((action.type === 'webhook' || action.type === 'email' || action.type === 'slack' || action.type === 'jira' || action.type === 'linear' || action.type === 'pagerduty') && (action.target_url || action.type === 'slack' || action.type === 'jira' || action.type === 'linear')) {
       try {
         if (action.type === 'slack' && action.channel) {
-          // Mock Slack
-          logger.info(`Mock sending slack message to ${action.channel}`);
-          results.push({ status: 'success', response_body: `[Mock] Delivered to Slack channel ${action.channel}` });
+          // Slack App — real chat.postMessage
+          const payload = buildWebhookPayload(rule, feedback);
+          results.push(await handleSlackAction(action, { text: payload.text, blocks: payload.blocks }));
         } else if (action.type === 'jira' && action.channel) {
           // Mock Jira
           logger.info(`Mock creating Jira issue in project ${action.channel}`);

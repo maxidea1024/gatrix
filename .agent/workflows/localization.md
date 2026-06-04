@@ -87,9 +87,8 @@ t('argus.settings.issueTrackers', 'Issue Trackers')
 t('argus.feedback.issueCreatedExternal', 'Issue created: {{key}}', { key: 'PROJ-123' })
 ```
 
-## Do not fallback
+## fallback 은 영어로만
 
-```tsx
-const localizedText = t('localization.key', 'some fallback text');   <-- do not
-const localizedText = t('localization.key');
+```
+const localizedText = _t('key', 'hello');
 ```

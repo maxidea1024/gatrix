@@ -18,8 +18,8 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         api_token VARCHAR(512) NOT NULL,
         config JSON DEFAULT NULL,
         enabled TINYINT(1) DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
+        updated_at DATETIME DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_project (project_id)
       )
     `);
@@ -145,6 +145,38 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       } catch (error) {
         logger.error('Failed to delete issue tracker', { trackerId, error: (error as Error).message });
         return reply.code(500).send({ error: 'Failed to delete issue tracker' });
+      }
+    }
+  );
+
+  // Pre-save connection test (no DB record required)
+  app.post(
+    '/:projectId/issue-trackers/test-connection',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = request.body as {
+        provider: string;
+        api_url: string;
+        api_token: string;
+        config?: Record<string, any>;
+      };
+
+      if (!body.provider || !body.api_url || !body.api_token) {
+        return reply.code(400).send({ error: 'provider, api_url, and api_token are required' });
+      }
+
+      try {
+        const config: TrackerConfig = {
+          provider: body.provider as TrackerConfig['provider'],
+          apiUrl: body.api_url,
+          apiToken: body.api_token,
+          config: body.config || {},
+        };
+
+        const result = await testTrackerConnection(config);
+        return reply.send({ data: result });
+      } catch (error) {
+        logger.error('Pre-save tracker connection test failed', { error: (error as Error).message });
+        return reply.send({ data: { ok: false, message: (error as Error).message } });
       }
     }
   );

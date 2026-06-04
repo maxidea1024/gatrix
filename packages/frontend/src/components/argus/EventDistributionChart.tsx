@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, Typography, Button, CircularProgress, useTheme, alpha } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, useTheme, alpha, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueTagGroup } from '@/services/argusService';
 import InteractiveTimeSeriesChart from './InteractiveTimeSeriesChart';
@@ -216,7 +216,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
             </Box>
           ))}
           {browserData.rest && (
-            <SafeTooltip
+            <Tooltip
               title={
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                   {browserData.restList.map((item, i) => (
@@ -230,33 +230,36 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
               placement="top"
               arrow
             >
-              <Box 
+              <Box
                 onClick={() => {
                   const el = document.getElementById('argus-tag-distribution');
                   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }}
-                sx={{ 
+                sx={{
                   display: 'flex', alignItems: 'center', gap: 0.75, cursor: 'pointer',
                   '&:hover Typography': { color: isDark ? '#bb86fc' : '#6200ea' },
                   '&:hover .bar-bg': { backgroundColor: alpha(isDark ? '#bb86fc' : '#6200ea', 0.2) }
                 }}
               >
-                <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', flex: 1, minWidth: 60, whiteSpace: 'nowrap', transition: 'color 0.2s' }}>
+                <Typography sx={{
+                  fontSize: '0.7rem', color: 'text.disabled', fontWeight: 500,
+                  flex: 1, minWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', transition: 'color 0.2s',
+                }}>
                   +{browserData.rest.count} {t('argus.issues.eventDistributionMore', 'more')}
                 </Typography>
                 <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 24, textAlign: 'right', transition: 'color 0.2s' }}>
                   {browserData.rest.pct}%
                 </Typography>
-                <Box 
+                <Box
                   className="bar-bg"
                   sx={{
                     width: 40, height: 3,
                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
                     borderRadius: 1, transition: 'background-color 0.2s'
-                  }} 
+                  }}
                 />
               </Box>
-            </SafeTooltip>
+            </Tooltip>
           )}
         </Box>
       )}

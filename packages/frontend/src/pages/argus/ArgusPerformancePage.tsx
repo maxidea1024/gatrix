@@ -61,6 +61,7 @@ import argusService, {
   ArgusTraceSpan,
 } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 import { formatCompactNumber } from '@/utils/numberFormat';
@@ -114,10 +115,16 @@ const ArgusPerformancePage: React.FC = () => {
   const sort = urlState.sort;
 
   // Derive ArgusFilterState from URL period (for ArgusFilterBar compatibility)
-  const filters = useMemo<ArgusFilterState>(
-    () => defaultArgusFilterState(urlState.period),
-    [urlState.period],
+  const [filters, setFilters] = useState<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period)
   );
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      dateRange: { type: 'preset', preset: urlState.period }
+    }));
+  }, [urlState.period]);
 
   const [transactions, setTransactions] = useState<ArgusTransaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -209,6 +216,7 @@ const ArgusPerformancePage: React.FC = () => {
   };
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset });
     }
@@ -284,15 +292,31 @@ const ArgusPerformancePage: React.FC = () => {
     : viewMode === 'detail' ? (selectedTxn || urlState.txn)
     : t('argus.performance.title');
 
+  const breadcrumbPaths = useMemo(() => {
+    const paths: { label: string; to?: string }[] = [
+      { label: t('argus.performance.title'), to: viewMode !== 'list' ? `/argus/performance` : undefined }
+    ];
+    if (viewMode === 'detail' || viewMode === 'trace') {
+      paths.push({ 
+        label: (selectedTxn || urlState.txn) as string, 
+        to: viewMode === 'trace' ? `/argus/performance?txn=${encodeURIComponent(selectedTxn || urlState.txn)}` : undefined 
+      });
+    }
+    if (viewMode === 'trace') {
+      paths.push({ label: `Trace ${(traceData?.trace_id || urlState.trace || '')?.slice(0, 8)}...` });
+    }
+    return paths;
+  }, [viewMode, projectId, t, selectedTxn, urlState.txn, urlState.trace, traceData]);
+
   return (
     <Box>
       {/* Header */}
       <PageHeader
         icon={<SpeedIcon />}
-        title={headerTitle}
+        title={
+          <ArgusBreadcrumbs size="title" paths={breadcrumbPaths} />
+        }
         subtitle={viewMode === 'list' ? t('argus.performance.subtitle') : undefined}
-        enableAutoBack={viewMode === 'list'}
-        onBack={viewMode !== 'list' ? handleBack : undefined}
       />
 
       {/* Filter Bar + Sort */}

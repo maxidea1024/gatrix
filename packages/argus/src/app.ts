@@ -23,6 +23,7 @@ import tracesRoutes from './routes/traces';
 import metricsRoutes from './routes/metrics';
 import globalIntegrationsRoutes from './routes/global-integrations';
 import githubAppRoutes from './routes/github-app';
+import notificationChannelsRoutes from './routes/notification-channels';
 
 const logger = createLogger('app');
 
@@ -95,6 +96,7 @@ export async function createApp(): Promise<FastifyInstance> {
   await app.register(metricsRoutes, { prefix: '/argus/api' });
   await app.register(globalIntegrationsRoutes, { prefix: '/argus/api' });
   await app.register(githubAppRoutes, { prefix: '/argus/api' });
+  await app.register(notificationChannelsRoutes, { prefix: '/argus/api' });
 
   // 404 handler
   app.setNotFoundHandler((request, reply) => {

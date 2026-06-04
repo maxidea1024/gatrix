@@ -41,6 +41,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import argusService, {
   ArgusAlertRule, ArgusAlertCondition, ArgusAlertAction, ArgusAlertHistory,
 } from '@/services/argusService';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageHeader from '@/components/common/PageHeader';
 import { useSnackbar } from 'notistack';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
@@ -61,7 +62,7 @@ const getConditionTypes = (t: (key: string) => string): { value: ArgusAlertCondi
 const getActionTypes = (t: (key: string) => string): { value: ArgusAlertAction['type']; label: string; icon: React.ReactElement; color: string }[] => [
   { value: 'webhook', label: t('argus.alerts.webhook'), icon: <WebhookIcon sx={{ fontSize: 18 }} />, color: '#7c4dff' },
   { value: 'email', label: t('argus.alerts.email'), icon: <EmailIcon sx={{ fontSize: 18 }} />, color: '#00bcd4' },
-  { value: 'slack', label: 'Slack Integration', icon: <SlackIcon sx={{ fontSize: 18 }} />, color: '#e51c50' },
+  { value: 'slack', label: 'Slack App', icon: <SlackIcon sx={{ fontSize: 18 }} />, color: '#36C5F0' },
   { value: 'jira', label: 'Jira Software', icon: <JiraIcon sx={{ fontSize: 18 }} />, color: '#0052cc' },
   { value: 'linear', label: 'Linear', icon: <LinearIcon sx={{ fontSize: 18 }} />, color: '#5e6ad2' },
   { value: 'pagerduty', label: 'PagerDuty', icon: <PagerDutyIcon sx={{ fontSize: 18 }} />, color: '#06ac38' },
@@ -615,7 +616,11 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
       {/* Header */}
       <PageHeader
         icon={<AlertIcon />}
-        title={t('argus.alerts.title')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.alerts.title', 'Alerts') }
+          ]} />
+        }
         subtitle={
           rules.length > 0
             ? t('argus.alerts.activeCount', { active: rules.filter((r) => r.enabled).length, total: rules.length })

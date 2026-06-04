@@ -19,6 +19,16 @@ argusApi.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Pass logged-in user name for activity tracking
+  try {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      if (user?.name) {
+        config.headers['x-user-name'] = user.name;
+      }
+    }
+  } catch { /* ignore */ }
   return config;
 });
 
@@ -49,8 +59,21 @@ export interface ArgusDsnKey {
   is_active: boolean;
   rate_limit_window: number;
   rate_limit_count: number;
+  first_seen: string | null;
+  last_seen: string | null;
   created_at: string;
   dsn: string;
+}
+
+export interface ArgusDsnKeyStatsPoint {
+  timestamp: string;
+  errors: number;
+  transactions: number;
+}
+
+export interface ArgusDsnKeyStatsResponse {
+  data: ArgusDsnKeyStatsPoint[];
+  totals: { errors: number; transactions: number };
 }
 
 export interface ArgusIssue {
@@ -777,6 +800,24 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  /** Pre-save connection test — uses raw form data, no DB record needed */
+  async testTrackerConnectionPreSave(
+    projectId: number | string,
+    data: { provider: string; api_url: string; api_token: string; config?: Record<string, any> }
+  ): Promise<{ ok: boolean; message: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issue-trackers/test-connection`, data);
+    return response.data?.data || response.data;
+  }
+
+  /** Pre-save connection test for notification channels */
+  async testNotificationChannelPreSave(
+    projectId: number | string,
+    data: { provider: string; config: Record<string, any> }
+  ): Promise<{ ok: boolean; message: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/notification-channels/test-connection`, data);
+    return response.data?.data || response.data;
+  }
+
   // --- Spam Filter Keywords ---
 
   async getSpamKeywords(
@@ -869,10 +910,12 @@ class ArgusService {
 
   async createDsnKey(
     projectId: number | string,
-    label?: string
+    label?: string,
+    rateLimit?: { rate_limit_count?: number; rate_limit_window?: number }
   ): Promise<ArgusDsnKey> {
     const response = await argusApi.post(`${ARGUS_BASE}/projects/${projectId}/dsn-keys`, {
       label,
+      ...rateLimit,
     });
     return response.data?.data || response.data;
   }
@@ -880,7 +923,7 @@ class ArgusService {
   async updateDsnKey(
     projectId: number | string,
     keyId: number | string,
-    data: { label: string }
+    data: { label?: string; rate_limit_window?: number; rate_limit_count?: number }
   ): Promise<void> {
     await argusApi.patch(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}`, data);
   }
@@ -889,7 +932,21 @@ class ArgusService {
     await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}`);
   }
 
+  async deleteDsnKey(projectId: number | string, keyId: number | string): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}/hard`);
+  }
 
+  async getDsnKeyStats(
+    projectId: number | string,
+    keyId: number | string,
+    period: '24h' | '7d' | '30d' = '7d'
+  ): Promise<ArgusDsnKeyStatsResponse> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/dsn-keys/${keyId}/stats`,
+      { params: { period } }
+    );
+    return response.data?.data ? { data: response.data.data, totals: response.data.totals } : response.data;
+  }
 
   // --- Issues ---
 
@@ -1325,9 +1382,60 @@ class ArgusService {
     await argusApi.post(`${ARGUS_BASE}/global-integrations/${provider}/config`, data);
   }
 
+  async deleteGlobalIntegrationConfig(provider: string): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/global-integrations/${provider}/config`);
+  }
+
+  async testSlackConnection(botToken: string): Promise<{ ok: boolean; team?: string; user?: string; bot_id?: string; error?: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/global-integrations/slack/test`, { bot_token: botToken });
+    return response.data?.data || response.data;
+  }
+
+  async testGithubConnection(appId: string, privateKey: string): Promise<{ ok: boolean; name?: string; html_url?: string; error?: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/global-integrations/github/test`, { app_id: appId, private_key: privateKey });
+    return response.data?.data || response.data;
+  }
+
+  async testBitbucketConnection(username: string, appPassword: string): Promise<{ ok: boolean; display_name?: string; account_id?: string; error?: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/global-integrations/bitbucket/test`, { username, app_password: appPassword });
+    return response.data?.data || response.data;
+  }
+
+  async testGitlabConnection(instanceUrl: string, applicationId: string, applicationSecret: string): Promise<{ ok: boolean; message?: string; error?: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/global-integrations/gitlab/test`, { instance_url: instanceUrl, application_id: applicationId, application_secret: applicationSecret });
+    return response.data?.data || response.data;
+  }
+
   async getGithubRepositories(): Promise<any[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/integrations/github/repositories`);
     return response.data?.data || [];
+  }
+
+  // === Notification Channels ===
+
+  async listNotificationChannels(projectId: number | string): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/notification-channels`);
+    return response.data?.data || [];
+  }
+
+  async createNotificationChannel(
+    projectId: number | string,
+    data: { provider: string; name?: string; config: Record<string, any> }
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/notification-channels`, data);
+    return response.data?.data || response.data;
+  }
+
+  async updateNotificationChannel(
+    projectId: number | string,
+    channelId: number,
+    data: Record<string, any>
+  ): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/${projectId}/notification-channels/${channelId}`, data);
+  }
+
+  async deleteNotificationChannel(projectId: number | string, channelId: number): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/${projectId}/notification-channels/${channelId}`);
   }
 
   // === Commits ===

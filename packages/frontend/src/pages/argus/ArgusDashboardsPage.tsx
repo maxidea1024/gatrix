@@ -53,6 +53,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -505,7 +506,11 @@ const ArgusDashboardsPage: React.FC = () => {
         {/* Header */}
         <PageHeader
           icon={<DashboardIcon />}
-          title={t('argus.dashboards.title', 'Dashboards')}
+          title={
+            <ArgusBreadcrumbs size="title" paths={[
+              { label: t('argus.dashboards.title', 'Dashboards') }
+            ]} />
+          }
           actions={
             <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}
               sx={{
@@ -641,7 +646,12 @@ const ArgusDashboardsPage: React.FC = () => {
       {/* Dashboard Header */}
       <PageHeader
         icon={<DashboardIcon />}
-        title={activeDashboard.title}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.dashboards.title', 'Dashboards'), to: `/argus/dashboards` },
+            { label: activeDashboard.title }
+          ]} />
+        }
         subtitle={activeDashboard.description}
         onBack={() => setActiveDashboard(null)}
         actions={

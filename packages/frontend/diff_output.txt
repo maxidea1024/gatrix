@@ -1,0 +1,64 @@
+
+--- STEP 1874 (replace_file_content) ---
+TARGET:
+"            <Chip\n              label={t(`argus.issues.${issue.status}`, issue.status)}\n              size=\"small\"\n              sx={{\n                fontWeight: 700, fontSize: '0.72rem', textTransform: 'capitalize',\n                backgroundColor: alpha(\n                  issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12\n                ),\n                color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',\n                border: 'none',\n              }}\n            />\n            {issue.substatus === 'regressed' && (\n              <Chip\n                label={t('argus.issues.regressed', 'Regressed')}\n                size=\"small\"\n                sx={{\n                  fontWeight: 700, fontSize: '0.68rem',\n                  backgroundColor: alpha('#ff9800', 0.15),\n                  color: '#ff9800', border: 'none',\n                }}\n              />\n            )}\n            <Divider orientation=\"vertical\" flexItem sx={{ mx: 0.5 }} />\n\n            {issue.status !== 'resolved' && (\n              <Button variant=\"outlined\" size=\"small\" color=\"success\" startIcon={<CheckCircleIcon />}\n                onClick={() => requestStatusChange('resolved')}\n                sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}\n              >\n                {t('argus.issues.resolve')}\n              </Button>\n            )}\n            {issue.status !== 'ignored' && (\n              <Button variant=\"outlined\" size=\"small\" color=\"inherit\" startIcon={<IgnoreIcon />}\n                onClick={() => requestStatusChange('ignored')}\n                sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}\n              >\n                {t('argus.issues.ignore')}\n              </Button>\n            )}\n            {issue.status !== 'unresolved' && (\n              <Button variant=\"outlined\" size=\"small\" color=\"error\" startIcon={<ErrorIcon />
+<truncated 3617 bytes>
+REPLACEMENT:
+"            <Box\n              sx={{\n                display: 'flex', alignItems: 'stretch',\n                border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'}`,\n                borderRadius: 1.5,\n                overflow: 'hidden',\n                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',\n              }}\n            >\n              {/* Status Section */}\n              <Box sx={{\n                px: 1.5, py: 0.8, display: 'flex', alignItems: 'center', gap: 1,\n                backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.1),\n                color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',\n              }}>\n                <Typography variant=\"caption\" fontWeight={700} sx={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>\n                  {t(`argus.issues.${issue.status}`, issue.status)}\n                </Typography>\n                {issue.substatus === 'regressed' && (\n                  <Chip\n                    label={t('argus.issues.regressed', 'Regressed')}\n                    size=\"small\"\n                    sx={{\n                      fontWeight: 700, fontSize: '0.65rem', height: 18,\n                      backgroundColor: alpha('#ff9800', 0.15),\n                      color: '#ff9800', border: 'none',\n                    }}\n                  />\n                )}\n                {issue.is_regression && (\n                  <Chip label={t('argus.issues.regression')} size=\"small\" sx={{\n                    fontWeight: 700, fontSize: '0.65rem', height: 18,\n                    backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',\n                  }} />\n                )}\n              </Box>\n\n              <Divider orientation=\"vertical\" flexItem />\n\n              {/* Action Buttons */}\n              {issue.status !== 'resolved' && (\n  
+<truncated 3942 bytes>
+
+--- STEP 1910 (multi) ---
+CHUNK 0:
+TARGET:
+            {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
+            <Box sx={{
+              pl: { md: 3 },
+              borderLeft: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+              minWidth: 0,
+              overflow: 'hidden',
+            }}>
+REPLACEMENT:
+            {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
+            <Box sx={{
+              pl: { md: 3 },
+              borderLeft: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+              minWidth: 0,
+              overflow: 'hidden',
+              height: '100%',
+            }}>
+
+--- STEP 1964 (multi) ---
+CHUNK 0:
+TARGET:
+            {/* Left Column: Main Content */}
+            <Box sx={{ minWidth: 0 }}>
+REPLACEMENT:
+            {/* Left Column: Main Content */}
+            <Box sx={{
+              minWidth: 0,
+              pr: { md: 3 },
+              borderRight: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+            }}>
+CHUNK 1:
+TARGET:
+            {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
+            <Box sx={{
+              pl: { md: 3 },
+              borderLeft: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` },
+              minWidth: 0,
+              overflow: 'hidden',
+              height: '100%',
+            }}>
+REPLACEMENT:
+            {/* Right Column: Sidebar — Sentry style: flat sections with Dividers */}
+            <Box sx={{
+              minWidth: 0,
+              overflow: 'hidden',
+              height: '100%',
+            }}>
+
+--- STEP 1970 (replace_file_content) ---
+TARGET:
+"            <Box\n              sx={{\n                display: 'flex', alignItems: 'stretch',\n                border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'}`,\n                borderRadius: 1.5,\n                overflow: 'hidden',\n                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',\n              }}\n            >\n              {/* Status Section */}\n              <Box sx={{\n                px: 1.5, py: 0.8, display: 'flex', alignItems: 'center', gap: 1,\n                backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.1),\n                color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',\n              }}>\n                <Typography variant=\"caption\" fontWeight={700} sx={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>\n                  {t(`argus.issues.${issue.status}`, issue.status)}\n                </Typography>\n                {issue.substatus === 'regressed' && (\n                  <Chip\n                    label={t('argus.issues.regressed', 'Regressed')}\n                    size=\"small\"\n                    sx={{\n                      fontWeight: 700, fontSize: '0.65rem', height: 18,\n                      backgroundColor: alpha('#ff9800', 0.15),\n                      color: '#ff9800', border: 'none',\n                    }}\n                  />\n                )}\n                {issue.is_regression && (\n                  <Chip label={t('argus.issues.regression')} size=\"small\" sx={{\n                    fontWeight: 700, fontSize: '0.65rem', height: 18,\n                    backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',\n                  }} />\n                )}\n              </Box>\n\n              <Divider orientation=\"vertical\" flexItem />"
+REPLACEMENT:
+"            {/* Status Section - Independent */}\n            <Box sx={{\n              px: 1.5, py: 0.8, display: 'flex', alignItems: 'center', gap: 1,\n              backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12),\n              color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',\n              borderRadius: 1.5,\n            }}>\n              <Typography variant=\"caption\" fontWeight={700} sx={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>\n                {t(`argus.issues.${issue.status}`, issue.status)}\n              </Typography>\n              {issue.substatus === 'regressed' && (\n                <Chip\n                  label={t('argus.issues.regressed', 'Regressed')}\n                  size=\"small\"\n                  sx={{\n                    fontWeight: 700, fontSize: '0.65rem', height: 18,\n                    backgroundColor: alpha('#ff9800', 0.15),\n                    color: '#ff9800', border: 'none',\n                  }}\n                />\n              )}\n              {issue.is_regression && (\n                <Chip label={t('argus.issues.regression')} size=\"small\" sx={{\n                  fontWeight: 700, fontSize: '0.65rem', height: 18,\n                  backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',\n                }} />\n              )}\n            </Box>\n\n            {/* Action Buttons Group */}\n            <Box\n              sx={{\n                display: 'flex', alignItems: 'stretch',\n                border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'}`,\n                borderRadius: 1.5,\n                overflow: 'hidden',\n                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',\n              }}\n            >"

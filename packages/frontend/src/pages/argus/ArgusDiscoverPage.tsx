@@ -22,6 +22,8 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as Ch
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import FeatureSwitch from '@/components/common/FeatureSwitch';
 import { TableSkeleton, ChartSkeleton } from '@/components/argus/ArgusSkeletons';
@@ -51,18 +53,21 @@ const DISPLAY_OPTIONS_KEYS = [
 
 const Y_AXIS_OPTIONS = [
   { value: 'count()', label: 'count()' },
-  { value: 'avg(timestamp)', label: 'avg(timestamp)' },
-  { value: 'p75(timestamp)', label: 'p75()' },
-  { value: 'p95(timestamp)', label: 'p95()' },
-  { value: 'uniq(event_id)', label: 'count_unique()' },
+  { value: 'uniq(event_id)', label: 'count_unique(event_id)' },
+  { value: 'uniq(user_id)', label: 'count_unique(user_id)' },
 ];
 
 /* ─── Volume Chart ─── */
 
-const VolumeChart: React.FC<{ data: { bucket: string; level: string; count: number }[]; isDark: boolean; period: string }> = ({ data, isDark }) => {
-  const { t } = useTranslation();
-  const chartData = useMemo(() => {
-    if (data.length === 0) return null;
+const VolumeChart: React.FC<{
+  data: { bucket: string; level: string; count: number }[];
+  isDark: boolean;
+  period: string;
+  onZoom?: (start: string, end: string) => void;
+}> = ({ data, isDark, onZoom }) => {
+  const { t, i18n } = useTranslation();
+  const { sortedBuckets, chartData } = useMemo(() => {
+    if (data.length === 0) return { sortedBuckets: [] as string[], chartData: null };
     const bucketMap = new Map<string, number>();
     data.forEach(p => {
       const count = Number(p.count) || 0;
@@ -71,34 +76,41 @@ const VolumeChart: React.FC<{ data: { bucket: string; level: string; count: numb
     const sorted = [...bucketMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
     const labels = sorted.map(([b]) => {
       const d = new Date(b);
-      return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+      return d.toLocaleString(i18n.language || 'en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
     });
     const values = sorted.map(([, c]) => c);
     return {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: alpha('#7c4dff', 0.55),
-        hoverBackgroundColor: '#7c4dff',
-        borderRadius: 1,
-        barPercentage: 0.9,
-        categoryPercentage: 0.92,
-      }],
+      sortedBuckets: sorted.map(([b]) => b),
+      chartData: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: alpha('#7c4dff', 0.55),
+          hoverBackgroundColor: '#7c4dff',
+          borderRadius: 1,
+          barPercentage: 0.9,
+          categoryPercentage: 0.92,
+        }],
+      },
     };
   }, [data]);
 
+  const chartRef = useRef<any>(null);
+  const dragRef = useRef<{ startIdx: number; active: boolean }>({ startIdx: -1, active: false });
+
+  const handleChartClick = useCallback((_event: any, elements: any[]) => {
+    if (!onZoom || sortedBuckets.length === 0 || elements.length === 0) return;
+    const idx = elements[0].index;
+    const bucket = sortedBuckets[idx];
+    if (bucket) {
+      const start = new Date(bucket);
+      const end = new Date(start.getTime() + 3600_000); // 1hr bucket
+      onZoom(start.toISOString(), end.toISOString());
+    }
+  }, [onZoom, sortedBuckets]);
+
   if (!chartData) return (
-    <Paper elevation={0} sx={{
-      mb: 2, p: 2, pt: 1.5, borderRadius: 2,
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-    }}>
-      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, mb: 1, color: 'text.disabled' }}>
-        count(events)
-      </Typography>
-      <Box sx={{ height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled' }}>{t('argus.discover.noEventData')}</Typography>
-      </Box>
-    </Paper>
+    <EmptyPlaceholder message={t('argus.discover.noEventData')} minHeight={130} />
   );
 
   return (
@@ -107,12 +119,13 @@ const VolumeChart: React.FC<{ data: { bucket: string; level: string; count: numb
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
     }}>
       <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, mb: 1, color: 'text.secondary' }}>
-        count(events)
+        {t('argus.discover.volumeTitle', 'count(events)')}
       </Typography>
-      <Box sx={{ height: 130 }}>
-        <Bar data={chartData} options={{
+      <Box sx={{ height: 130, cursor: onZoom ? 'crosshair' : undefined }}>
+        <Bar ref={chartRef} data={chartData} options={{
           responsive: true, maintainAspectRatio: false,
           animation: { duration: 300 },
+          onClick: handleChartClick,
           plugins: { legend: { display: false }, tooltip: { enabled: true } },
           scales: {
             x: {
@@ -285,10 +298,16 @@ const ArgusDiscoverPage: React.FC = () => {
   const orderDir: 'asc' | 'desc' = orderBy.startsWith('-') ? 'desc' : 'asc';
 
   // Derive ArgusFilterState from URL period
-  const filters = useMemo<ArgusFilterState>(
-    () => defaultArgusFilterState(urlState.period),
-    [urlState.period],
+  const [filters, setFilters] = useState<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period)
   );
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      dateRange: { type: 'preset', preset: urlState.period }
+    }));
+  }, [urlState.period]);
 
   // Search conditions (raw input)
   const [conditions, setConditions] = useState<string>(urlState.q || '');
@@ -400,7 +419,7 @@ const ArgusDiscoverPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [fields, groupBy, buildConditions, orderBy, filters, currentPeriod, projectId, t, fetchVolume]);
+  }, [fields, groupBy, buildConditions, orderBy, filters, currentPeriod, projectId, t, fetchVolume, yAxis]);
 
   useEffect(() => {
     argusService.listSavedQueries(projectId).then(setSavedQueries).catch(() => setSavedQueries([]));
@@ -421,6 +440,15 @@ const ArgusDiscoverPage: React.FC = () => {
     runQuery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Re-run query when yAxis changes (only after initial query)
+  const yAxisRef = useRef(yAxis);
+  useEffect(() => {
+    if (yAxisRef.current !== yAxis) {
+      yAxisRef.current = yAxis;
+      if (hasQueried) runQuery();
+    }
+  }, [yAxis, hasQueried, runQuery]);
 
   const handleSaveQuery = async () => {
     if (!saveName.trim()) return;
@@ -523,6 +551,7 @@ const ArgusDiscoverPage: React.FC = () => {
   };
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset });
     }
@@ -641,9 +670,13 @@ const ArgusDiscoverPage: React.FC = () => {
     <Box>
       <PageHeader
         icon={<DiscoverIcon />}
-        title={<EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} />}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.explore.title', 'Explore'), to: `/argus/explore` },
+            { label: <EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} /> }
+          ]} />
+        }
         subtitle={t('argus.discover.subtitle', 'Query and explore your error data')}
-        enableAutoBack
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Tooltip title={t('argus.discover.savedQueries', 'Saved Queries')}>
@@ -796,7 +829,6 @@ const ArgusDiscoverPage: React.FC = () => {
                         <Box key={idx}
                           onClick={() => {
                             addSearchTag(fieldKey, v.value);
-                            setConditions('');
                           }}
                           sx={{
                             position: 'relative', px: 1.5, py: 0.4, cursor: 'pointer', borderRadius: '4px',

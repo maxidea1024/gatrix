@@ -1533,6 +1533,21 @@ async function main() {
     } catch { console.log(`   ⚠ MySQL ${table} not found (skip)`); }
   }
 
+  // ──────── 1.5. FETCH DSN KEYS ────────
+  console.log('\n🔑 Fetching DSN keys from MySQL...');
+  const [dsnKeyRows] = await pool.query(
+    'SELECT id, is_active FROM g_argus_dsn_keys WHERE project_id = ?',
+    [PROJECT_ID]
+  ) as any[];
+  const activeDsnKeys: number[] = (dsnKeyRows as any[]).filter((k: any) => k.is_active).map((k: any) => k.id);
+  if (activeDsnKeys.length === 0) {
+    console.log('   ⚠ No active DSN keys found. Events will use dsn_key_id=0.');
+    activeDsnKeys.push(0);
+  } else {
+    console.log(`   ✓ Found ${activeDsnKeys.length} active DSN keys: [${activeDsnKeys.join(', ')}]`);
+  }
+  const dsnKeyTimestamps = new Map<number, { min: Date; max: Date }>();
+
   // ──────── 2. BUILD WEIGHTED SCENARIO POOL ────────
   const weightedScenarios: ErrorScenario[] = [];
   for (const s of SCENARIOS) {
@@ -1632,10 +1647,21 @@ async function main() {
       });
     });
 
+    // Assign a random active DSN key
+    const dsnKeyId = randomPick(activeDsnKeys);
+    const dsnTs = dsnKeyTimestamps.get(dsnKeyId);
+    if (!dsnTs) {
+      dsnKeyTimestamps.set(dsnKeyId, { min: timestamp, max: timestamp });
+    } else {
+      if (timestamp < dsnTs.min) dsnTs.min = timestamp;
+      if (timestamp > dsnTs.max) dsnTs.max = timestamp;
+    }
+
     allEvents.push({
       event_id: eventId,
       project_id: PROJECT_ID,
       issue_id: 0,
+      dsn_key_id: dsnKeyId,
       timestamp: timestamp.toISOString(),
       received_at: new Date(timestamp.getTime() + randomInt(50, 500)).toISOString(),
       platform: scenario.platform,
@@ -1862,12 +1888,23 @@ async function main() {
       currentStart += spanDur;
     }
 
+    // Assign a random active DSN key for this transaction
+    const txnDsnKeyId = randomPick(activeDsnKeys);
+    const txnDsnTs = dsnKeyTimestamps.get(txnDsnKeyId);
+    if (!txnDsnTs) {
+      dsnKeyTimestamps.set(txnDsnKeyId, { min: timestamp, max: timestamp });
+    } else {
+      if (timestamp < txnDsnTs.min) txnDsnTs.min = timestamp;
+      if (timestamp > txnDsnTs.max) txnDsnTs.max = timestamp;
+    }
+
     txnBatch.push({
       event_id: uuid(),
       trace_id: traceId,
       span_id: spanId,
       parent_span_id: '0000000000000000',
       project_id: PROJECT_ID,
+      dsn_key_id: txnDsnKeyId,
       timestamp: timestamp.toISOString(),
       start_timestamp: start.toISOString(),
       duration,
@@ -2055,12 +2092,26 @@ async function main() {
   }
   console.log(`   ✓ ${metricsCount.toLocaleString()} metrics inserted`);
 
+  // ──────── 10.5. UPDATE DSN KEY first_seen/last_seen ────────
+  if (dsnKeyTimestamps.size > 0) {
+    console.log(`\n🔑 Updating DSN key first_seen/last_seen for ${dsnKeyTimestamps.size} keys...`);
+    for (const [keyId, ts] of dsnKeyTimestamps) {
+      if (keyId === 0) continue;
+      await pool.query(
+        `UPDATE g_argus_dsn_keys SET first_seen = ?, last_seen = ? WHERE id = ?`,
+        [formatDate(ts.min), formatDate(ts.max), keyId]
+      );
+      console.log(`   ✓ DSN key ${keyId}: first=${formatDate(ts.min)}, last=${formatDate(ts.max)}`);
+    }
+  }
+
   // ──────── 11. SUMMARY ────────
   console.log('\n' + '═'.repeat(60));
   console.log('✅ Simulation Complete!\n');
   console.log(`   Issues:        ${issueMap.size}`);
   console.log(`   Error Events:  ${allEvents.length.toLocaleString()}`);
   console.log(`   Logs:          ${totalLogs.toLocaleString()}`);
+  console.log(`   DSN Keys:      ${dsnKeyTimestamps.size} keys with traffic`);
   console.log(`   Transactions:  ${txnCount.toLocaleString()}`);
   console.log(`   Sessions:      ${sessCount.toLocaleString()}`);
   console.log(`   Metrics:       ${metricsCount.toLocaleString()}`);

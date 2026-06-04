@@ -10,6 +10,7 @@ import {
   ArrowBack as ArrowBackIcon, Save as SaveIcon,
   OpenInNew as OpenInNewIcon,
   Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,
+  PlayArrow as TestIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -52,6 +53,10 @@ interface ProviderWizardModalProps {
   onSubmit: (data: Record<string, string>) => Promise<void>;
   /** Title override for the wizard (e.g., "알림 채널 추가") */
   wizardTitleKey?: string;
+  /** Pre-fill data for edit mode */
+  initialData?: Record<string, string>;
+  /** Connection test callback. If provided, a test button appears on the last step */
+  onTestConnection?: (data: Record<string, string>) => Promise<{ ok: boolean; message: string }>;
 }
 
 // ─── Styled Input ───────────────────────────────────────────────────
@@ -72,6 +77,8 @@ const WizardInput: React.FC<{
         fullWidth size="small" value={value} placeholder={placeholder}
         onChange={e => onChange(e.target.value)}
         type={isPassword && !showPassword ? 'password' : 'text'}
+        autoComplete={isPassword ? 'new-password' : 'off'}
+        inputProps={{ autoComplete: isPassword ? 'new-password' : 'off' }}
         InputProps={{
           ...(isPassword ? {
             endAdornment: (
@@ -98,16 +105,22 @@ const WizardInput: React.FC<{
 // ─── Main Component ─────────────────────────────────────────────────
 
 export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
-  open, onClose, provider, fields, onSubmit, wizardTitleKey,
+  open, onClose, provider, fields, onSubmit, wizardTitleKey, initialData, onTestConnection,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
+  // Unified colors — solid flat sidebar
+  const sidebarBg = isDark ? '#1e1e2e' : '#2d2b55';
+  const accent = isDark ? '#667eea' : '#667eea';
+
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   // Determine step count based on fields & guide
   // Step 0: Introduction (provider info + guide)
@@ -149,15 +162,33 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
   const firstFields = needsSplit ? fields.slice(0, splitThreshold) : fields;
   const secondFields = needsSplit ? fields.slice(splitThreshold) : [];
 
+  const isEditMode = !!initialData;
+
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
-      setActiveStep(0);
+      setActiveStep(isEditMode ? 1 : 0);
       setError('');
       setLoading(false);
-      setFormData({});
+      setFormData(initialData || {});
+      setTestResult(null);
+      setTesting(false);
     }
-  }, [open]);
+  }, [open, isEditMode, initialData]);
+
+  const handleTestConnection = async () => {
+    if (!onTestConnection) return;
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const result = await onTestConnection(formData);
+      setTestResult(result);
+    } catch (err: any) {
+      setTestResult({ ok: false, message: err.message || 'Test failed' });
+    } finally {
+      setTesting(false);
+    }
+  };
 
   if (!provider) return null;
 
@@ -204,8 +235,8 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
           <Box sx={{
             width: 56, height: 56, borderRadius: '14px', mx: 'auto', mb: 2,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backgroundColor: alpha(cfg.color, 0.1),
-            '& .MuiSvgIcon-root': { fontSize: 30, color: cfg.color },
+            backgroundColor: alpha(accent, 0.1),
+            '& .MuiSvgIcon-root': { fontSize: 30, color: accent },
           }}>
             {cfg.icon}
           </Box>
@@ -219,8 +250,8 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
             href={cfg.guideUrl} target="_blank" rel="noopener noreferrer"
             sx={{
               borderRadius: '10px', textTransform: 'none', fontWeight: 700, px: 4, py: 1.2,
-              backgroundColor: cfg.accentColor, color: '#fff',
-              '&:hover': { backgroundColor: alpha(cfg.accentColor, 0.85) },
+              backgroundColor: accent, color: '#fff',
+              '&:hover': { backgroundColor: alpha(accent, 0.85) },
             }}
           >
             {t(cfg.guideButtonKey || 'argus.settings.providerWizard.openGuide', '가이드 열기')}
@@ -237,8 +268,8 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
           <Box sx={{
             width: 56, height: 56, borderRadius: '14px', mx: 'auto', mb: 2,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backgroundColor: alpha(cfg.color, 0.1),
-            '& .MuiSvgIcon-root': { fontSize: 30, color: cfg.color },
+            backgroundColor: alpha(accent, 0.1),
+            '& .MuiSvgIcon-root': { fontSize: 30, color: accent },
           }}>
             {cfg.icon}
           </Box>
@@ -254,7 +285,7 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
   );
 
   // ─── Render Config Fields ─────────────────────────────────────────
-  const renderFieldsStep = (fieldsToRender: WizardFieldDef[]) => (
+  const renderFieldsStep = (fieldsToRender: WizardFieldDef[], showTest: boolean = false) => (
     <Box>
       <Typography sx={{ fontSize: '0.88rem', lineHeight: 1.7, color: 'text.secondary', mb: 3 }}>
         {t('argus.settings.providerWizard.fillFields', '아래 항목을 입력하여 연동을 완료하세요.')}
@@ -295,7 +326,7 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
               key={f.key}
               label={t(f.labelKey, f.labelFallback)}
               value={formData[f.key] || ''}
-              onChange={v => setFormData(prev => ({ ...prev, [f.key]: v }))}
+              onChange={v => { setFormData(prev => ({ ...prev, [f.key]: v })); setTestResult(null); }}
               isDark={isDark}
               type={f.type}
               placeholder={f.placeholder}
@@ -305,14 +336,64 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
           );
         })}
       </Box>
+
+      {/* ─── Connection Test Section ─── */}
+      {showTest && onTestConnection && (
+        <Box sx={{
+          mt: 3, p: 2.5, borderRadius: '12px',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+          backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: testResult ? 1.5 : 0 }}>
+            <Box>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, mb: 0.3 }}>
+                {t('argus.settings.providerWizard.testConnection', '연결 테스트')}
+              </Typography>
+              <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled' }}>
+                {t('argus.settings.providerWizard.testHint', '저장 전에 연결 상태를 확인합니다 (선택사항)')}
+              </Typography>
+            </Box>
+            <Button
+              size="small" variant="outlined"
+              onClick={handleTestConnection}
+              disabled={testing || !canProceed()}
+              startIcon={testing ? <CircularProgress size={14} color="inherit" /> : <TestIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                textTransform: 'none', fontWeight: 600, borderRadius: '8px', px: 2, py: 0.6,
+                borderColor: testResult?.ok ? '#4caf50' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+                color: testResult?.ok ? '#4caf50' : 'text.secondary',
+                '&:hover': {
+                  borderColor: testResult?.ok ? '#4caf50' : accent,
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                },
+              }}
+            >
+              {testing
+                ? t('argus.settings.providerWizard.testing', '테스트 중...')
+                : testResult?.ok
+                  ? t('argus.settings.providerWizard.testAgain', '다시 테스트')
+                  : t('argus.settings.providerWizard.testConnection', '연결 테스트')}
+            </Button>
+          </Box>
+          {testResult && (
+            <Alert
+              severity={testResult.ok ? 'success' : 'error'}
+              sx={{ borderRadius: '8px', fontSize: '0.82rem' }}
+              icon={testResult.ok ? <CheckIcon sx={{ fontSize: 18 }} /> : undefined}
+            >
+              {testResult.message}
+            </Alert>
+          )}
+        </Box>
+      )}
     </Box>
   );
 
   // ─── Render Step Content ──────────────────────────────────────────
   const renderStepContent = () => {
     if (activeStep === 0) return renderIntroStep();
-    if (activeStep === 1) return renderFieldsStep(firstFields);
-    if (activeStep === 2) return renderFieldsStep(secondFields);
+    if (activeStep === 1) return renderFieldsStep(firstFields, !needsSplit && isLastStep);
+    if (activeStep === 2) return renderFieldsStep(secondFields, true);
     return null;
   };
 
@@ -330,14 +411,14 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
       {/* ═══ LEFT SIDEBAR — Always Dark ═══ */}
       <Box sx={{
         width: 260, minWidth: 260, flexShrink: 0,
-        background: cfg.gradient,
+        background: sidebarBg,
         color: '#fff',
         display: 'flex', flexDirection: 'column',
         position: 'relative', overflow: 'hidden',
       }}>
         {/* Decorative elements */}
-        <Box sx={{ position: 'absolute', top: -50, right: -50, width: 160, height: 160, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(cfg.accentColor, 0.12)} 0%, transparent 70%)` }} />
-        <Box sx={{ position: 'absolute', bottom: -70, left: -40, width: 180, height: 180, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(cfg.accentColor, 0.08)} 0%, transparent 70%)` }} />
+        <Box sx={{ position: 'absolute', top: -50, right: -50, width: 160, height: 160, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(accent, 0.12)} 0%, transparent 70%)` }} />
+        <Box sx={{ position: 'absolute', bottom: -70, left: -40, width: 180, height: 180, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(accent, 0.08)} 0%, transparent 70%)` }} />
 
         {/* Provider Header */}
         <Box sx={{ p: 3, pb: 2 }}>
@@ -372,7 +453,7 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
                   <Box sx={{
                     position: 'absolute', left: 15, top: 32, width: 2, height: 'calc(100% - 16px)',
                     zIndex: 0,
-                    backgroundColor: isCompleted ? alpha(cfg.accentColor, 0.5) : 'rgba(255,255,255,0.08)',
+                    backgroundColor: isCompleted ? alpha(accent, 0.5) : 'rgba(255,255,255,0.08)',
                     transition: 'background-color 0.3s',
                   }} />
                 )}
@@ -383,12 +464,12 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
                   fontSize: '0.75rem', fontWeight: 700, zIndex: 1,
                   transition: 'all 0.3s ease',
                   ...(isCompleted ? {
-                    backgroundColor: cfg.accentColor, color: '#fff',
+                    backgroundColor: accent, color: '#fff',
                   } : isActive ? {
                     backgroundColor: '#1e3a5f',
-                    border: `2px solid ${cfg.accentColor}`,
+                    border: `2px solid ${accent}`,
                     color: '#fff',
-                    boxShadow: `0 0 0 4px ${alpha(cfg.accentColor, 0.15)}`,
+                    boxShadow: `0 0 0 4px ${alpha(accent, 0.15)}`,
                   } : {
                     backgroundColor: '#1a2030',
                     border: '2px solid #2a3444',
@@ -425,7 +506,7 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
             {steps.map((_, idx) => (
               <Box key={idx} sx={{
                 flex: 1, height: 3, borderRadius: 2,
-                backgroundColor: idx <= activeStep ? cfg.accentColor : 'rgba(255,255,255,0.08)',
+                backgroundColor: idx <= activeStep ? accent : 'rgba(255,255,255,0.08)',
                 transition: 'background-color 0.3s',
               }} />
             ))}
@@ -469,7 +550,7 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
           borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1.5,
         }}>
-          {activeStep > 0 && (
+          {activeStep > (isEditMode ? 1 : 0) && (
             <Button
               onClick={() => setActiveStep(s => s - 1)}
               disabled={loading}
@@ -487,16 +568,16 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
           {isLastStep ? (
             <Button
               onClick={handleSave} variant="contained"
-              disabled={loading || !canProceed()}
+              disabled={loading || !canProceed() || (isEditMode && JSON.stringify(formData) === JSON.stringify(initialData || {}))}
               startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <SaveIcon sx={{ fontSize: 18 }} />}
               sx={{
                 textTransform: 'none', fontWeight: 700, borderRadius: '10px', px: 4, py: 1,
-                backgroundColor: cfg.accentColor,
-                '&:hover': { backgroundColor: alpha(cfg.accentColor, 0.85) },
-                '&.Mui-disabled': { backgroundColor: alpha(cfg.accentColor, 0.3) },
+                backgroundColor: accent,
+                '&:hover': { backgroundColor: alpha(accent, 0.85) },
+                '&.Mui-disabled': { backgroundColor: alpha(accent, 0.3) },
               }}
             >
-              {t('argus.settings.providerWizard.save', '연동 완료')}
+              {t(isEditMode ? 'common.save' : 'argus.settings.providerWizard.save', isEditMode ? '저장' : '연동 완료')}
             </Button>
           ) : (
             <Button
@@ -504,8 +585,8 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
               endIcon={<ArrowForwardIcon />}
               sx={{
                 textTransform: 'none', fontWeight: 700, borderRadius: '10px', px: 4, py: 1,
-                backgroundColor: cfg.accentColor,
-                '&:hover': { backgroundColor: alpha(cfg.accentColor, 0.85) },
+                backgroundColor: accent,
+                '&:hover': { backgroundColor: alpha(accent, 0.85) },
               }}
             >
               {t('common.next', '다음')}

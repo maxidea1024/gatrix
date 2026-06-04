@@ -31,9 +31,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { type ArgusSavedQuery, type SavedQueryType } from '@/services/argusService';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { formatRelativeTime } from '@/utils/dateFormat';
 
 /* ─── Dataset Config ─── */
 
@@ -107,17 +109,7 @@ const QueryCard: React.FC<{
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(query.name);
 
-  const formatRelative = (dateStr: string) => {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const days = Math.floor(diff / 86400000);
-    if (days === 0) return t('argus.explore.today');
-    if (days === 1) return t('argus.explore.yesterday');
-    if (days < 7) return `${days}d ago`;
-    if (days < 30) return `${Math.floor(days / 7)}w ago`;
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  };
+
 
   const periodLabel = query.query_config?.period || '24h';
 
@@ -270,7 +262,7 @@ const QueryCard: React.FC<{
             <PersonIcon sx={{ fontSize: 11, color: theme.palette.primary.main }} />
           </Box>
           <Typography sx={{ fontSize: '0.62rem', color: 'text.disabled' }}>
-            {formatRelative(query.updated_at || query.created_at)}
+            {formatRelativeTime(query.updated_at || query.created_at)}
           </Typography>
         </Box>
       </Box>
@@ -465,9 +457,12 @@ const ArgusExplorePage: React.FC = () => {
     <Box>
       <PageHeader
         icon={<ExploreIcon />}
-        title={t('argus.explore.title')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.explore.title') }
+          ]} />
+        }
         subtitle={t('argus.explore.subtitle')}
-        enableAutoBack
       />
 
       {/* Quick Actions — "New" cards */}

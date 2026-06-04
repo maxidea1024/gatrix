@@ -4,6 +4,7 @@ import { dsnAuthHook, DsnAuthResult } from '../middleware/dsn-auth';
 import { createLogger } from '../utils/logger';
 import { ulid } from 'ulid';
 import { ArgusEvent, ArgusBatchPayload } from '../types/events';
+import { updateDsnKeyLastSeen } from '../utils/dsn-seen-tracker';
 
 const logger = createLogger('ingest');
 
@@ -35,7 +36,8 @@ export default async function ingestRoutes(app: FastifyInstance) {
       const eventId = event.event_id || ulid();
 
       try {
-        await enqueueEvent(auth.projectId, { ...event, event_id: eventId, internal_project_id: auth.dsnKey.project_id } as any);
+        await enqueueEvent(auth.projectId, { ...event, event_id: eventId, internal_project_id: auth.dsnKey.project_id, dsn_key_id: auth.dsnKey.id } as any);
+        updateDsnKeyLastSeen(auth.dsnKey.id);
 
         return reply.code(202).send({ event_id: eventId });
       } catch (error) {
@@ -82,12 +84,13 @@ export default async function ingestRoutes(app: FastifyInstance) {
               streamKey,
               'MAXLEN', '~', '500000',
               '*',
-              'data', JSON.stringify({ ...event, event_id: eventId, project_id: String(auth.projectId), internal_project_id: auth.dsnKey.project_id }),
+              'data', JSON.stringify({ ...event, event_id: eventId, project_id: String(auth.projectId), internal_project_id: auth.dsnKey.project_id, dsn_key_id: auth.dsnKey.id }),
             );
           }
         }
 
         await pipeline.exec();
+        updateDsnKeyLastSeen(auth.dsnKey.id);
 
         logger.debug('Batch ingested', {
           projectId: auth.projectId,
@@ -129,7 +132,7 @@ async function enqueueEvent(projectId: string, event: ArgusEvent): Promise<void>
     streamKey,
     'MAXLEN', '~', '500000',
     '*',
-    'data', JSON.stringify({ ...event, project_id: String(projectId), internal_project_id: (event as any).internal_project_id }),
+    'data', JSON.stringify({ ...event, project_id: String(projectId), internal_project_id: (event as any).internal_project_id, dsn_key_id: (event as any).dsn_key_id || 0 }),
   );
 
   logger.debug('Event enqueued', {

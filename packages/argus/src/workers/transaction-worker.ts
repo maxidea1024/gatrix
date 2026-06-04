@@ -131,11 +131,13 @@ export class TransactionWorker {
 
           const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusTransactionEvent & {
             project_id: string;
+            dsn_key_id: number;
           };
 
           const { transaction, spans } = normalizeTransactionEvent(
             rawEvent,
-            rawEvent.project_id
+            rawEvent.project_id,
+            rawEvent.dsn_key_id || 0
           );
 
           txnBatch.push(transaction);

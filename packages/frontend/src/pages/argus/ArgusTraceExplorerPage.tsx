@@ -16,6 +16,7 @@ import {
   Save as SaveIcon, Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
@@ -23,12 +24,14 @@ import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterS
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import FeatureSwitch from '@/components/common/FeatureSwitch';
 import { CopyButton } from '@/components/common/CopyButton';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { formatWith } from '@/utils/dateFormat';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ExploreActions from '@/components/argus/ExploreActions';
 
@@ -104,19 +107,7 @@ const SpanVolumeChart: React.FC<{
   };
 
   if (chartData.length === 0) return (
-    <Paper elevation={0} sx={{
-      mb: 2, p: 2, pt: 1.5, borderRadius: 2,
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-    }}>
-      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, mb: 1, color: 'text.disabled' }}>
-        count(spans)
-      </Typography>
-      <Box sx={{ height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled' }}>
-          {t('argus.traces.noSpanData', 'No span data')}
-        </Typography>
-      </Box>
-    </Paper>
+    <EmptyPlaceholder message={t('argus.traces.noSpanData')} minHeight={130} />
   );
 
   return (
@@ -165,17 +156,29 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const orderCol = orderBy.replace(/^-/, '');
 
   // Derive filters
-  const filters = useMemo<ArgusFilterState>(
-    () => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
+    if (urlState.period === 'custom' && urlState.start && urlState.end) {
+      const base = defaultArgusFilterState('custom');
+      base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
+      return base;
+    }
+    return defaultArgusFilterState(urlState.period);
+  });
+
+  useEffect(() => {
+    setFilters(prev => {
       if (urlState.period === 'custom' && urlState.start && urlState.end) {
-        const base = defaultArgusFilterState('custom');
-        base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
-        return base;
+        return {
+          ...prev,
+          dateRange: { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) }
+        };
       }
-      return defaultArgusFilterState(urlState.period);
-    },
-    [urlState.period, urlState.start, urlState.end],
-  );
+      return {
+        ...prev,
+        dateRange: { type: 'preset', preset: urlState.period }
+      };
+    });
+  }, [urlState.period, urlState.start, urlState.end]);
 
   // Search
   const [search, setSearch] = useState<string>(urlState.q || '');
@@ -322,6 +325,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   };
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
     } else if (newFilters.dateRange.type === 'custom' && newFilters.dateRange.start && newFilters.dateRange.end) {
@@ -440,7 +444,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
             }}>
               <TableCell sx={{ py: 0.8 }}>
                 <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>
-                  {new Date(span.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                  {formatWith(span.timestamp, 'MMM D, HH:mm:ss')}
                 </Typography>
               </TableCell>
               <TableCell sx={{ py: 0.8 }}>
@@ -528,9 +532,13 @@ const ArgusTraceExplorerPage: React.FC = () => {
     <Box>
       <PageHeader
         icon={<TraceIcon />}
-        title={<EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} />}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.explore.title', 'Explore'), to: `/argus/explore` },
+            { label: <EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} /> }
+          ]} />
+        }
         subtitle={t('argus.traces.subtitle', 'Search and analyze spans across all traces')}
-        enableAutoBack
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Tooltip title={t('argus.traces.savedQueries', 'Saved Queries')}>

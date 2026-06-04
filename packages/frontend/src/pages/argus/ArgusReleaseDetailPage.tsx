@@ -27,6 +27,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -132,8 +133,12 @@ const ArgusReleaseDetailPage: React.FC = () => {
       {/* Header */}
       <PageHeader
         icon={<ReleaseIcon />}
-        title={decodedRelease}
-        onBack={() => navigate('/argus/releases')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.releases.title', 'Releases'), to: `/argus/releases` },
+            { label: decodedRelease }
+          ]} />
+        }
         actions={
           r && (
             <Chip

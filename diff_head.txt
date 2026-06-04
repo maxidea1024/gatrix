@@ -1,0 +1,327 @@
+﻿diff --git a/packages/frontend/src/pages/argus/ArgusIssueDetailPage.tsx b/packages/frontend/src/pages/argus/ArgusIssueDetailPage.tsx
+index c883e79e9..12adfdbb1 100644
+--- a/packages/frontend/src/pages/argus/ArgusIssueDetailPage.tsx
++++ b/packages/frontend/src/pages/argus/ArgusIssueDetailPage.tsx
+@@ -53,13 +53,15 @@ import {
+   Close as CloseIcon,
+   WrapText as WrapTextIcon,
+ } from '@mui/icons-material';
+-import { useParams, useNavigate } from 'react-router-dom';
++import { useParams, useNavigate, useLocation } from 'react-router-dom';
+ import { useTranslation } from 'react-i18next';
+ import argusService, { ArgusIssueDetail, ArgusErrorEvent, ArgusTraceDetail, ArgusLogEntry } from '@/services/argusService';
+ import { useOrgProject } from '@/contexts/OrgProjectContext';
+ import { useAuth } from '@/contexts/AuthContext';
+ import { rbacService } from '@/services/rbacService';
+ import PageHeader from '@/components/common/PageHeader';
++import SegmentedTabs from '@/components/common/SegmentedTabs';
++import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
+ import { CopyButton } from '@/components/common/CopyButton';
+ import TraceWaterfall from '@/components/argus/TraceWaterfall';
+ import BreadcrumbsTimeline from '@/components/argus/BreadcrumbsTimeline';
+@@ -72,6 +74,7 @@ import PresenceIndicator from '@/components/argus/PresenceIndicator';
+ import BusinessImpactWidget from '@/components/argus/BusinessImpactWidget';
+ import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
+ import SuspectCommits from '@/components/argus/SuspectCommits';
++import { useArgusUrlState } from '@/hooks/useArgusUrlState';
+ 
+ 
+ function stringToColor(str: string): string {
+@@ -100,6 +103,14 @@ const ArgusIssueDetailPage: React.FC = () => {
+   const isDark = theme.palette.mode === 'dark';
+   const { projectId, issueId } = useParams<{ projectId: string; issueId: string }>();
+ 
++  const location = useLocation();
++  const URL_PARAMS = React.useMemo(() => ({
++    tab: { key: 'tab', default: 'details' },
++  }), []);
++  const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
++  const activeTab = urlState.tab;
++
++
+   const [issue, setIssue] = useState<ArgusIssueDetail | null>(null);
+   const [loading, setLoading] = useState(true);
+   const [members, setMembers] = useState<any[]>([]);
+@@ -464,7 +475,24 @@ const ArgusIssueDetailPage: React.FC = () => {
+             </Box>
+           </Box>
+ 
+-          <Box sx={{
++          
++          {/* New Tabs Container */}
++          <Box sx={{ mb: 3 }}>
++            <SegmentedTabs
++              items={[
++                { key: 'details', label: t('argus.issues.tabs.details', 'Details') },
++                { key: 'activity', label: t('argus.issues.tabs.activity', 'Activity') },
++                { key: 'feedback', label: t('argus.issues.tabs.feedback', 'User Feedback') },
++                { key: 'traces', label: t('argus.issues.tabs.traces', 'Traces & Logs') },
++                { key: 'ai', label: t('argus.issues.tabs.ai', 'AI Analysis') },
++              ]}
++              value={activeTab}
++              onChange={(k) => setUrlState({ tab: k })}
++            />
++          </Box>
++
++          {activeTab === 'details' && (
++<Box sx={{
+             display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr', xl: '3fr 1fr' }, gap: 3, alignItems: 'stretch',
+             position: 'relative',
+             '&::before': {
+@@ -479,48 +507,16 @@ const ArgusIssueDetailPage: React.FC = () => {
+           }}>
+             {/* Left Column: Main Content */}
+             <Box>
+-              {/* Event Distribution Chart */}
+-              {projectId && issueId && (
+-                <Box sx={{ mb: 2 }}>
+-                  <EventDistributionChart
+-                    projectId={projectId}
+-                    issueId={issueId}
+-                    isDark={isDark}
+-                  />
+-                </Box>
+-              )}
++              
++
+ 
+ 
+-              {/* AI Root Cause ??flat section */}
+-              {projectId && issueId && (
+-                <AiRootCausePanel
+-                  projectId={projectId}
+-                  issueId={issueId}
+-                  issueTitle={issue.title}
+-                  exceptionType={latestEvent?.exception_type}
+-                  exceptionValue={latestEvent?.exception_value}
+-                  stacktrace={latestEvent?.stacktrace_raw}
+-                  tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
+-                  isDark={isDark}
+-                />
+-              )}
+ 
+               {/* Activity Timeline ??moved to sidebar in embedded mode */}
+ 
+ 
+ 
+-              {/* Event Navigator */}
+-              {projectId && issueId && (
+-                <Box sx={{ mb: 2 }}>
+-                  <EventNavigator
+-                    projectId={projectId}
+-                    issueId={issueId}
+-                    currentEvent={latestEvent as ArgusErrorEvent | null}
+-                    onEventChange={(evt) => setCurrentEvent(evt)}
+-                    isDark={isDark}
+-                  />
+-                </Box>
+-              )}
++              
+ 
+           {/* Event Highlights ??Sentry-style promoted tags/context */}
+           {latestEvent && (() => {
+@@ -582,6 +578,18 @@ const ArgusIssueDetailPage: React.FC = () => {
+                 <StacktraceView stacktrace={latestEvent.stacktrace_raw} isDark={isDark} />
+               </Paper>
+ 
++              {/* Breadcrumbs */}
++              {latestEvent.breadcrumbs && Array.isArray(latestEvent.breadcrumbs) && latestEvent.breadcrumbs.length > 0 && (
++                <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
++                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
++                    <FolderIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
++                    {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
++                    <Chip label={latestEvent.breadcrumbs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
++                  </Typography>
++                  <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} />
++                </Box>
++              )}
++
+               {/* Context Grid */}
+               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                 {/* Environment Context */}
+@@ -672,17 +680,7 @@ const ArgusIssueDetailPage: React.FC = () => {
+                 </Box>
+               )}
+ 
+-              {/* Breadcrumbs */}
+-              {latestEvent.breadcrumbs && Array.isArray(latestEvent.breadcrumbs) && latestEvent.breadcrumbs.length > 0 && (
+-                <Box sx={{ py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+-                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+-                    <FolderIcon fontSize="small" sx={{ color: theme.palette.warning.main }} />
+-                    {t('argus.issues.breadcrumbs', 'Breadcrumbs')}
+-                    <Chip label={latestEvent.breadcrumbs.length} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, ml: 0.5 }} />
+-                  </Typography>
+-                  <BreadcrumbsTimeline breadcrumbs={latestEvent.breadcrumbs} />
+-                </Box>
+-              )}
++              
+ 
+               {/* Extra Data */}
+               {latestEvent.extra && (() => {
+@@ -770,6 +768,26 @@ const ArgusIssueDetailPage: React.FC = () => {
+             <Box sx={{
+               pl: { md: 3 },
+             }}>
++              {/* Event Distribution Chart */}
++              {projectId && issueId && (
++                <Box sx={{ mb: 2 }}>
++                  <EventDistributionChart
++                    projectId={projectId}
++                    issueId={issueId}
++                    isDark={isDark}
++                  />
++                </Box>
++              )}
++
++              {/* Tag Distribution ??sidebar */}
++              {projectId && issueId && (
++                <TagDistribution
++                  projectId={projectId}
++                  issueId={issueId}
++                  isDark={isDark}
++                />
++              )}
++
+               {/* Timing ??Last/First Seen */}
+               <Box sx={{ mb: 2 }}>
+                 <Typography variant="caption" fontWeight={700} sx={{
+@@ -814,22 +832,49 @@ const ArgusIssueDetailPage: React.FC = () => {
+                 </Box>
+               </Box>
+ 
+-              <Divider sx={{ mb: 2 }} />
++                            
+ 
+-              {/* Suspect Commits ??renders null if no data */}
++              
++
++                            
++
++                            {/* People ??Presence */}
+               {projectId && issueId && (
+-                <SuspectCommits projectId={projectId} issueId={issueId} isDark={isDark} />
++                <Box>
++                  <Typography variant="caption" fontWeight={700} sx={{
++                    fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em',
++                    color: 'text.secondary', mb: 1, display: 'block',
++                  }}>
++                    {t('argus.issues.people', 'People')}
++                  </Typography>
++                  <PresenceIndicator projectId={projectId} resourceId={issueId} resourceType="issue" currentUser={{ id: 'current-user', name: 'You' }} isDark={isDark} />
++                </Box>
+               )}
+ 
+-              {/* Issue Tracking */}
++                            
++            </Box>
++
++      
++
++          {/* ====== END OF DETAILS TAB ====== */}
++          </Box>
++          )}
++
++          {activeTab === 'activity' && (
++          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '5fr 2fr', xl: '5fr 2fr' }, gap: 3, alignItems: 'stretch' }}>
++            <Box sx={{ minWidth: 0, pr: { md: 3 }, borderRight: { xs: 'none', md: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` } }}>
++              {/* Event Navigator */}
+               {projectId && issueId && (
+                 <Box sx={{ mb: 2 }}>
+-                  <IssueTrackerWidget projectId={projectId} issueId={issueId} isDark={isDark} />
++                  <EventNavigator
++                    projectId={projectId}
++                    issueId={issueId}
++                    currentEvent={latestEvent as ArgusErrorEvent | null}
++                    onEventChange={(evt) => setCurrentEvent(evt)}
++                    isDark={isDark}
++                  />
+                 </Box>
+               )}
+-
+-              <Divider sx={{ mb: 2 }} />
+-
+               {/* Activity ??embedded mode */}
+               {projectId && issueId && (
+                 <Box sx={{ mb: 2 }}>
+@@ -841,35 +886,31 @@ const ArgusIssueDetailPage: React.FC = () => {
+                   />
+                 </Box>
+               )}
+-
+-              <Divider sx={{ mb: 2 }} />
+-
+-              {/* People ??Presence */}
++            </Box>
++            <Box sx={{ minWidth: 0, overflow: 'hidden', height: '100%' }}>
++              {/* Suspect Commits ??renders null if no data */}
+               {projectId && issueId && (
+-                <Box>
+-                  <Typography variant="caption" fontWeight={700} sx={{
+-                    fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em',
+-                    color: 'text.secondary', mb: 1, display: 'block',
+-                  }}>
+-                    {t('argus.issues.people', 'People')}
+-                  </Typography>
+-                  <PresenceIndicator projectId={projectId} resourceId={issueId} resourceType="issue" currentUser={{ id: 'current-user', name: 'You' }} isDark={isDark} />
+-                </Box>
++                <SuspectCommits projectId={projectId} issueId={issueId} isDark={isDark} />
+               )}
+-
+-              <Divider sx={{ my: 2 }} />
+-
+-              {/* Tag Distribution ??sidebar */}
++              {/* Issue Tracking */}
+               {projectId && issueId && (
+-                <TagDistribution
+-                  projectId={projectId}
+-                  issueId={issueId}
+-                  isDark={isDark}
+-                />
++                <Box sx={{ mb: 2 }}>
++                  <IssueTrackerWidget projectId={projectId} issueId={issueId} isDark={isDark} />
++                </Box>
+               )}
+             </Box>
++          </Box>
++          )}
+ 
+-      {/* Structured Logs Section */}
++          {activeTab === 'feedback' && (
++          <Box>
++              
++          </Box>
++          )}
++
++          {activeTab === 'traces' && (
++          <Box>
++              {/* Structured Logs Section */}
+       {issue && (
+         <Paper elevation={0} sx={{
+           p: 2, mt: 2, mb: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+@@ -1305,6 +1346,26 @@ const ArgusIssueDetailPage: React.FC = () => {
+         </Paper>
+       )}
+           </Box>
++          )}
++
++          {activeTab === 'ai' && (
++          <Box>
++              {/* AI Root Cause ??flat section */}
++              {projectId && issueId && (
++                <AiRootCausePanel
++                  projectId={projectId}
++                  issueId={issueId}
++                  issueTitle={issue.title}
++                  exceptionType={latestEvent?.exception_type}
++                  exceptionValue={latestEvent?.exception_value}
++                  stacktrace={latestEvent?.stacktrace_raw}
++                  tags={latestEvent?.tags ? (typeof latestEvent.tags === 'string' ? (() => { try { return JSON.parse(latestEvent.tags); } catch { return undefined; } })() : latestEvent.tags) : undefined}
++                  isDark={isDark}
++                />
++              )}
++          </Box>
++          )}
++
+         </Box>
+       )}
+ 

@@ -9,6 +9,7 @@ const logger = createLogger('normalizer');
 export interface NormalizedError {
   event_id: string;
   project_id: string;
+  dsn_key_id: number;
   issue_id: number;
   timestamp: string;
   received_at: string;
@@ -71,7 +72,7 @@ export interface NormalizedError {
 export function normalizeErrorEvent(
   event: ArgusErrorEvent,
   projectId: string
-): Omit<NormalizedError, 'issue_id' | 'primary_hash'> {
+): Omit<NormalizedError, 'issue_id' | 'primary_hash' | 'dsn_key_id'> {
   const contexts = event.contexts || {};
   const user = event.user || {};
   const sdk = event.sdk || { name: '', version: '' };

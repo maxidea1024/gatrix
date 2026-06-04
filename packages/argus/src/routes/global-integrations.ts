@@ -70,4 +70,138 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  // Test Slack connection
+  app.post(
+    '/global-integrations/slack/test',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = request.body as { bot_token: string };
+      if (!body.bot_token) {
+        return reply.code(400).send({ error: 'bot_token is required' });
+      }
+      try {
+        const response = await fetch('https://slack.com/api/auth.test', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${body.bot_token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        const result = await response.json() as { ok: boolean; team?: string; user?: string; bot_id?: string; error?: string };
+        if (result.ok) {
+          return reply.send({ data: { ok: true, team: result.team, user: result.user, bot_id: result.bot_id } });
+        } else {
+          return reply.send({ data: { ok: false, error: result.error } });
+        }
+      } catch (error) {
+        logger.error('Slack auth.test failed', { error: error instanceof Error ? error.message : String(error) });
+        return reply.code(500).send({ error: 'Failed to test Slack connection' });
+      }
+    }
+  );
+
+  // Test GitHub connection
+  app.post(
+    '/global-integrations/github/test',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = request.body as { app_id: string; private_key: string };
+      if (!body.app_id || !body.private_key) {
+        return reply.code(400).send({ error: 'app_id and private_key are required' });
+      }
+      try {
+        const jwt = require('jsonwebtoken');
+        const payload = {
+          iat: Math.floor(Date.now() / 1000) - 60,
+          exp: Math.floor(Date.now() / 1000) + (10 * 60),
+          iss: body.app_id
+        };
+        const token = jwt.sign(payload, body.private_key, { algorithm: 'RS256' });
+        const response = await fetch('https://api.github.com/app', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'Gatrix-Argus'
+          }
+        });
+        const result = await response.json();
+        if (response.ok) {
+          return reply.send({ data: { ok: true, name: result.name, html_url: result.html_url } });
+        } else {
+          return reply.send({ data: { ok: false, error: result.message || 'Unauthorized' } });
+        }
+      } catch (error) {
+        logger.error('GitHub app test failed', { error: error instanceof Error ? error.message : String(error) });
+        return reply.code(500).send({ error: 'Failed to test GitHub App (invalid private key format?)' });
+      }
+    }
+  );
+
+  // Test Bitbucket connection
+  app.post(
+    '/global-integrations/bitbucket/test',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = request.body as { username: string; app_password: string };
+      if (!body.username || !body.app_password) {
+        return reply.code(400).send({ error: 'username and app_password are required' });
+      }
+      try {
+        const auth = Buffer.from(`${body.username}:${body.app_password}`).toString('base64');
+        const response = await fetch('https://api.bitbucket.org/2.0/user', {
+          headers: {
+            'Authorization': `Basic ${auth}`
+          }
+        });
+        const result = await response.json();
+        if (response.ok) {
+          return reply.send({ data: { ok: true, display_name: result.display_name, account_id: result.account_id } });
+        } else {
+          return reply.send({ data: { ok: false, error: result.error?.message || 'Unauthorized' } });
+        }
+      } catch (error) {
+        logger.error('Bitbucket test failed', { error: error instanceof Error ? error.message : String(error) });
+        return reply.code(500).send({ error: 'Failed to test Bitbucket connection' });
+      }
+    }
+  );
+
+  // Test GitLab connection
+  app.post(
+    '/global-integrations/gitlab/test',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = request.body as { instance_url: string; application_id: string; application_secret: string };
+      if (!body.instance_url) {
+        return reply.code(400).send({ error: 'instance_url is required' });
+      }
+      try {
+        // Test if the instance is reachable. Full OAuth test requires browser redirect.
+        const response = await fetch(`${body.instance_url.replace(/\/$/, '')}/api/v4/version`);
+        if (response.ok || response.status === 401 || response.status === 403) {
+          return reply.send({ data: { ok: true, message: 'Instance reachable. Client ID/Secret will be verified upon first use.' } });
+        } else {
+          return reply.send({ data: { ok: false, error: 'Invalid GitLab instance URL or instance is not reachable' } });
+        }
+      } catch (error) {
+        logger.error('GitLab test failed', { error: error instanceof Error ? error.message : String(error) });
+        return reply.code(500).send({ error: 'Failed to reach GitLab instance' });
+      }
+    }
+  );
+
+  // Delete (deactivate) integration
+  app.delete(
+    '/global-integrations/:provider/config',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { provider } = request.params as { provider: string };
+      try {
+        await mysqlPool.execute(
+          'UPDATE g_argus_global_integrations SET is_active = 0 WHERE provider = ?',
+          [provider]
+        );
+        return reply.send({ success: true });
+      } catch (error) {
+        logger.error('Failed to delete global integration', { provider, error: error instanceof Error ? error.message : String(error) });
+        return reply.code(500).send({ error: 'Failed to delete' });
+      }
+    }
+  );
 }

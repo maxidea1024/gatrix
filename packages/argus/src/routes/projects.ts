@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
 import { mysqlPool } from '../config/mysql';
+import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('projects-api');
@@ -131,7 +132,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
 
         // Get DSN keys
         const [dsnRows] = await mysqlPool.query(
-          'SELECT id, label, public_key, is_active, rate_limit_window, rate_limit_count, created_at FROM g_argus_dsnKeys WHERE project_id = ?',
+          'SELECT id, label, public_key, is_active, rate_limit_window, rate_limit_count, first_seen, last_seen, created_at FROM g_argus_dsnKeys WHERE project_id = ?',
           [projectId]
         );
 
@@ -207,16 +208,20 @@ export default async function projectsRoutes(app: FastifyInstance) {
     '/projects/:projectId/dsn-keys',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const body = request.body as { label?: string };
+      const body = request.body as { 
+        label?: string;
+        rate_limit_count?: number;
+        rate_limit_window?: number;
+      };
 
       const publicKey = generateKey(32);
       const secretKey = generateKey(32);
 
       try {
         const [result] = await mysqlPool.query(
-          `INSERT INTO g_argus_dsnKeys (project_id, label, public_key, secret_key)
-           VALUES (?, ?, ?, ?)`,
-          [projectId, body.label || 'Default', publicKey, secretKey]
+          `INSERT INTO g_argus_dsnKeys (project_id, label, public_key, secret_key, rate_limit_count, rate_limit_window)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [projectId, body.label || 'Default', publicKey, secretKey, body.rate_limit_count ?? 0, body.rate_limit_window ?? 0]
         );
 
         const dsnKeyId = (result as any).insertId;
@@ -230,6 +235,8 @@ export default async function projectsRoutes(app: FastifyInstance) {
             label: body.label || 'Default',
             public_key: publicKey,
             secret_key: secretKey,
+            rate_limit_count: body.rate_limit_count ?? 0,
+            rate_limit_window: body.rate_limit_window ?? 0,
             dsn: buildDsnUrl(publicKey, gatrixProjectId),
           },
         });
@@ -239,6 +246,32 @@ export default async function projectsRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to create DSN key' });
+      }
+    }
+  );
+
+  // Hard Delete DSN key
+  app.delete(
+    '/projects/:projectId/dsn-keys/:keyId/hard',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, keyId } = request.params as {
+        projectId: string;
+        keyId: string;
+      };
+
+      try {
+        await mysqlPool.query(
+          'DELETE FROM g_argus_dsnKeys WHERE id = ? AND project_id = ?',
+          [keyId, projectId]
+        );
+        return reply.send({ success: true });
+      } catch (error) {
+        logger.error('Failed to hard delete DSN key', {
+          projectId,
+          keyId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to delete DSN key' });
       }
     }
   );
@@ -269,7 +302,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
     }
   );
 
-  // Rename DSN key
+  // Update DSN key
   app.patch(
     '/projects/:projectId/dsn-keys/:keyId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -277,20 +310,38 @@ export default async function projectsRoutes(app: FastifyInstance) {
         projectId: string;
         keyId: string;
       };
-      const body = request.body as { label: string };
+      const body = request.body as { 
+        label?: string;
+        rate_limit_count?: number;
+        rate_limit_window?: number;
+      };
 
       if (!body.label || !body.label.trim()) {
         return reply.code(400).send({ error: 'Bad Request', message: 'Label is required' });
       }
 
       try {
+        const updates: string[] = ['label = ?'];
+        const params: any[] = [body.label.trim()];
+
+        if (body.rate_limit_count !== undefined) {
+          updates.push('rate_limit_count = ?');
+          params.push(body.rate_limit_count);
+        }
+        if (body.rate_limit_window !== undefined) {
+          updates.push('rate_limit_window = ?');
+          params.push(body.rate_limit_window);
+        }
+
+        params.push(keyId, projectId);
+
         await mysqlPool.query(
-          'UPDATE g_argus_dsnKeys SET label = ? WHERE id = ? AND project_id = ?',
-          [body.label.trim(), keyId, projectId]
+          `UPDATE g_argus_dsnKeys SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
+          params
         );
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to rename DSN key', {
+        logger.error('Failed to update DSN key', {
           projectId,
           keyId,
           error: error instanceof Error ? error.message : String(error),
@@ -318,8 +369,6 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const interval = periodMap[period] || '24 HOUR';
 
       try {
-        const { clickhouse } = await import('../config/clickhouse');
-
         const result = await clickhouse.query({
           query: `
             SELECT
@@ -343,6 +392,93 @@ export default async function projectsRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get stats' });
+      }
+    }
+  );
+
+  // Get DSN key usage stats from ClickHouse
+  app.get(
+    '/projects/:projectId/dsn-keys/:keyId/stats',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, keyId } = request.params as {
+        projectId: string;
+        keyId: string;
+      };
+      const { period = '7d' } = request.query as { period?: string };
+
+      const periodMap: Record<string, { interval: string; resolution: string }> = {
+        '24h': { interval: '24 HOUR', resolution: 'toStartOfHour(timestamp)' },
+        '7d':  { interval: '7 DAY',   resolution: 'toStartOfHour(timestamp)' },
+        '30d': { interval: '30 DAY',  resolution: 'toStartOfDay(timestamp)' },
+      };
+      const config = periodMap[period] || periodMap['7d'];
+
+      try {
+        // Query errors
+        const errorsResult = await clickhouse.query({
+          query: `
+            SELECT
+              ${config.resolution} AS ts,
+              count() AS accepted
+            FROM argus.errors
+            WHERE project_id = {projectId:String}
+              AND dsn_key_id = {dsnKeyId:UInt32}
+              AND timestamp >= now() - INTERVAL ${config.interval}
+            GROUP BY ts
+            ORDER BY ts
+          `,
+          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId) },
+        });
+
+        // Query transactions
+        const txnResult = await clickhouse.query({
+          query: `
+            SELECT
+              ${config.resolution} AS ts,
+              count() AS accepted
+            FROM argus.transactions
+            WHERE project_id = {projectId:String}
+              AND dsn_key_id = {dsnKeyId:UInt32}
+              AND timestamp >= now() - INTERVAL ${config.interval}
+            GROUP BY ts
+            ORDER BY ts
+          `,
+          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId) },
+        });
+
+        const errors = (await errorsResult.json()).data as { ts: string; accepted: string }[];
+        const transactions = (await txnResult.json()).data as { ts: string; accepted: string }[];
+
+        // Merge into unified timeline
+        const timeMap = new Map<string, { errors: number; transactions: number }>();
+        for (const row of errors) {
+          const entry = timeMap.get(row.ts) || { errors: 0, transactions: 0 };
+          entry.errors = Number(row.accepted);
+          timeMap.set(row.ts, entry);
+        }
+        for (const row of transactions) {
+          const entry = timeMap.get(row.ts) || { errors: 0, transactions: 0 };
+          entry.transactions = Number(row.accepted);
+          timeMap.set(row.ts, entry);
+        }
+
+        const data = Array.from(timeMap.entries())
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([ts, counts]) => ({ timestamp: ts, ...counts }));
+
+        const totals = data.reduce(
+          (acc, d) => ({ errors: acc.errors + d.errors, transactions: acc.transactions + d.transactions }),
+          { errors: 0, transactions: 0 }
+        );
+
+        return reply.send({ data, totals });
+      } catch (error) {
+        logger.error('Failed to get DSN key stats', {
+          projectId,
+          keyId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get DSN key stats' });
       }
     }
   );

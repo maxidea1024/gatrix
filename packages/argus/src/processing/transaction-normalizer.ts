@@ -12,6 +12,7 @@ export interface NormalizedTransaction {
   span_id: string;
   parent_span_id: string;
   project_id: string;
+  dsn_key_id: number;
 
   timestamp: string;
   start_timestamp: string;
@@ -63,7 +64,8 @@ export interface NormalizedSpan {
  */
 export function normalizeTransactionEvent(
   event: ArgusTransactionEvent,
-  projectId: string
+  projectId: string,
+  dsnKeyId: number = 0
 ): { transaction: NormalizedTransaction; spans: NormalizedSpan[] } {
   const user = event.user || {};
   const spans = event.spans || [];
@@ -74,6 +76,7 @@ export function normalizeTransactionEvent(
     span_id: event.span_id || '',
     parent_span_id: event.parent_span_id || '',
     project_id: projectId,
+    dsn_key_id: dsnKeyId,
 
     timestamp: event.timestamp || new Date().toISOString(),
     start_timestamp: event.start_timestamp || event.timestamp || new Date().toISOString(),

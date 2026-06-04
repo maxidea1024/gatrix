@@ -7,6 +7,8 @@ import {
   Table, TableHead, TableBody, TableRow, TableCell,
   FormControl, Select, MenuItem,
 } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import {
@@ -34,10 +36,12 @@ import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
 import argusService, { ArgusLogEntry, ArgusSavedQuery } from '@/services/argusService';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import FeatureSwitch from '@/components/common/FeatureSwitch';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { formatWith } from '@/utils/dateFormat';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip, Legend);
 
@@ -214,17 +218,7 @@ const VolumeChart = React.memo(({ data, isDark, period, onZoom }: { data: Volume
   };
 
   if (chartData.length === 0) return (
-    <Paper elevation={0} sx={{
-      mb: 2, p: 2, pt: 1.5, borderRadius: 2,
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-    }}>
-      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, mb: 1, color: 'text.disabled' }}>
-        count(logs)
-      </Typography>
-      <Box sx={{ height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography sx={{ fontSize: '0.75rem', color: 'text.disabled' }}>{t('argus.logs.noLogData', 'No log data')}</Typography>
-      </Box>
-    </Paper>
+    <EmptyPlaceholder message={t('argus.logs.noLogData')} minHeight={130} />
   );
 
   return (
@@ -269,17 +263,29 @@ const ArgusLogsPage: React.FC = () => {
   const aggGroupBy = urlState.groupBy;
 
   // Derive filters from URL period
-  const filters = useMemo<ArgusFilterState>(
-    () => {
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
+    if (urlState.period === 'custom' && urlState.start && urlState.end) {
+      const base = defaultArgusFilterState('custom');
+      base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
+      return base;
+    }
+    return defaultArgusFilterState(urlState.period);
+  });
+
+  useEffect(() => {
+    setFilters(prev => {
       if (urlState.period === 'custom' && urlState.start && urlState.end) {
-        const base = defaultArgusFilterState('custom');
-        base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
-        return base;
+        return {
+          ...prev,
+          dateRange: { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) }
+        };
       }
-      return defaultArgusFilterState(urlState.period);
-    },
-    [urlState.period, urlState.start, urlState.end],
-  );
+      return {
+        ...prev,
+        dateRange: { type: 'preset', preset: urlState.period }
+      };
+    });
+  }, [urlState.period, urlState.start, urlState.end]);
 
   // Search state
   const [search, setSearch] = useState<string>(urlState.q || '');
@@ -507,6 +513,7 @@ const ArgusLogsPage: React.FC = () => {
   };
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
     } else if (newFilters.dateRange.type === 'custom' && newFilters.dateRange.start && newFilters.dateRange.end) {
@@ -583,11 +590,8 @@ const ArgusLogsPage: React.FC = () => {
   const renderCell = useCallback((log: ArgusLogEntry, col: string) => {
     switch (col) {
       case 'timestamp': {
-        const d = new Date(log.timestamp);
-        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const timeStr = d.toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit', second: '2-digit' });
-        const ms = '.' + String(d.getMilliseconds()).padStart(3, '0');
-        return <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>{dateStr}, {timeStr}{ms}</Typography>;
+        const formatted = formatWith(log.timestamp, 'MMM D, h:mm:ss A') + '.' + String(new Date(log.timestamp + 'Z').getMilliseconds()).padStart(3, '0');
+        return <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatted}</Typography>;
       }
       case 'severity':
         return (
@@ -707,9 +711,13 @@ const ArgusLogsPage: React.FC = () => {
     <Box>
       <PageHeader
         icon={<LogIcon />}
-        title={<EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} />}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.explore.title', 'Explore'), to: `/argus/explore` },
+            { label: <EditablePageTitle value={queryName} onChange={handleRename} placeholder={defaultQueryName} /> }
+          ]} />
+        }
         subtitle={t('argus.logs.subtitle', 'Structured log explorer with trace-connected debugging')}
-        enableAutoBack
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Tooltip title={t('argus.logs.savedQueries', 'Saved Queries')}>

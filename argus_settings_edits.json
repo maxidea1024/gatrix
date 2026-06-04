@@ -1,0 +1,200 @@
+[
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Add breadcrumbs to ArgusSettingsPage\"",
+      "Instruction": "\"Import ArgusBreadcrumbs and add it to PageHeader\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":43,\"ReplacementContent\":\"import FeatureSwitch from '@/components/common/FeatureSwitch';\\nimport { CopyButton } from '@/components/common/CopyButton';\\nimport { useOrgProject } from '@/contexts/OrgProjectContext';\\nimport ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';\",\"StartLine\":41,\"TargetContent\":\"import FeatureSwitch from '@/components/common/FeatureSwitch';\\nimport { CopyButton } from '@/components/common/CopyButton';\\nimport { useOrgProject } from '@/contexts/OrgProjectContext';\"},{\"AllowMultiple\":false,\"EndLine\":540,\"ReplacementContent\":\"  return (\\n    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>\\n      <PageHeader\\n        breadcrumbs={<ArgusBreadcrumbs paths={[\\n          { label: 'Argus', to: `/project/${projectId}/argus/overview` },\\n          { label: t('argus.settings.title', 'Settings') }\\n        ]} />}\\n        icon={<SettingsIcon />}\\n        title={t('argus.settings.title')}\",\"StartLine\":536,\"TargetContent\":\"  return (\\n    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>\\n      <PageHeader\\n        icon={<SettingsIcon />}\\n        title={t('argus.settings.title')}\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "TargetLintErrorIds": "[]",
+      "toolAction": "\"Update ArgusSettingsPage\"",
+      "toolSummary": "\"Update ArgusSettingsPage\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Merge breadcrumbs into title and remove Argus entry for Settings\"",
+      "EndLine": "546",
+      "Instruction": "\"Merge breadcrumbs into title, remove Argus\"",
+      "ReplacementContent": "\"      <PageHeader\\n        icon={<SettingsIcon />}\\n        title={\\n          <ArgusBreadcrumbs size=\\\"title\\\" paths={[\\n            { label: t('argus.settings.title', 'Settings') }\\n          ]} />\\n        }\\n        subtitle={t('argus.settings.subtitle')}\"",
+      "StartLine": "539",
+      "TargetContent": "\"      <PageHeader\\n        breadcrumbs={<ArgusBreadcrumbs paths={[\\n          { label: 'Argus', to: `/project/${projectId}/argus/overview` },\\n          { label: t('argus.settings.title', 'Settings') }\\n        ]} />}\\n        icon={<SettingsIcon />}\\n        title={t('argus.settings.title')}\\n        subtitle={t('argus.settings.subtitle')}\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Update SettingsPage\"",
+      "toolSummary": "\"Update SettingsPage\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add 8 new issue tracker provider definitions (ClickUp, Asana, Notion, Shortcut, Azure DevOps, Redmine, YouTrack, Trello) to the TRACKER_PROVIDERS array with proper gradients, colors, and field configurations\\\"\"",
+      "EndLine": "202",
+      "Instruction": "\"Add 8 new tracker providers after Linear\"",
+      "ReplacementContent": "\"    configFields: [\\n      { key: 'team_id', labelKey: 'argus.settings.linearTeamId', labelFallback: 'Team ID', placeholder: 'team-uuid' },\\n    ],\\n  },\\n  {\\n    id: 'clickup', name: 'ClickUp', color: '#7B68EE',\\n    gradient: 'linear-gradient(160deg, #4B3F8E 0%, #6454B8 40%, #7B68EE 100%)',\\n    accentColor: '#A78BFA',\\n    descKey: 'argus.settings.clickupDesc',\\n    icon: <BugIcon />,\\n    baseFields: [\\n      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'ClickUp' },\\n      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://api.clickup.com' },\\n      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'API Token', placeholder: '', type: 'password' },\\n    ],\\n    configFields: [\\n      { key: 'list_id', labelKey: 'argus.settings.clickupListId', labelFallback: 'List ID', placeholder: '12345678' },\\n    ],\\n  },\\n  {\\n    id: 'asana', name: 'Asana', color: '#F06A6A',\\n    gradient: 'linear-gradient(160deg, #8B3A3A 0%, #D05555 40%, #F06A6A 100%)',\\n    accentColor: '#FF9A9A',\\n    descKey: 'argus.settings.asanaDesc',\\n    icon: <BugIcon />,\\n    baseFields: [\\n      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Asana' },\\n      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://app.asana.com' },\\n      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Personal Access Token', placeholder: '', type: 'password' },\\n    ],\\n    configFields: [\\n      { key: 'project_gid', labelKey: 'argus.settings.asanaProjectGid', labelFallback: 'Project GID', placeholder: '1234567890' },\\n    ],\\n  },\\n  {\\n    id: 'notion', name: 'Notion', color: '#000000',\\n    gradient: 'linear-gradient(160deg, #1a1a1a 0%, #2d2d2d 40%, #404040 100%)',\\n    accentColor: '#999999',\\n    descKey: 'argus.settings.notionDesc',\\n    icon: <BugIcon />,\\n    baseFields: [\\n    \n<truncated 5074 bytes>",
+      "StartLine": "198",
+      "TargetContent": "\"    configFields: [\\n      { key: 'team_id', labelKey: 'argus.settings.linearTeamId', labelFallback: 'Team ID', placeholder: 'team-uuid' },\\n    ],\\n  },\\n];\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Add 8 frontend providers\"",
+      "toolSummary": "\"Frontend providers\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Add autoComplete='off' and new-password hints to prevent browser autofill from pre-populating tracker config fields with saved passwords\\\"\"",
+      "EndLine": "1607",
+      "Instruction": "\"Add autoComplete=\\\"off\\\" and autoComplete=\\\"new-password\\\" for password fields to prevent browser autofill\"",
+      "ReplacementContent": "\"            return (\\n              <TextField key={f.key} size=\\\"small\\\" fullWidth label={t(f.labelKey)} placeholder={f.placeholder}\\n                type={isSecret && !showPlain ? 'password' : 'text'} value={formData[f.key] || ''}\\n                onChange={e => setFormData({ ...formData, [f.key]: e.target.value })} sx={inpSx}\\n                autoComplete={isSecret ? 'new-password' : 'off'}\\n                inputProps={{ autoComplete: isSecret ? 'new-password' : 'off' }}\\n                InputProps={isSecret ? {\"",
+      "StartLine": "1603",
+      "TargetContent": "\"            return (\\n              <TextField key={f.key} size=\\\"small\\\" fullWidth label={t(f.labelKey)} placeholder={f.placeholder}\\n                type={isSecret && !showPlain ? 'password' : 'text'} value={formData[f.key] || ''}\\n                onChange={e => setFormData({ ...formData, [f.key]: e.target.value })} sx={inpSx}\\n                InputProps={isSecret ? {\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Disable autofill\"",
+      "toolSummary": "\"Disable autofill\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "true",
+      "Description": "\"Remove pre-filled default_branch value from formData - the placeholder 'main' already hints the expected value\\\"\"",
+      "EndLine": "1427",
+      "Instruction": "\"Replace setFormData({ default_branch: 'main' }) with setFormData({})\"",
+      "ReplacementContent": "\"          setFormData({});\"",
+      "StartLine": "953",
+      "TargetContent": "\"          setFormData({ default_branch: 'main' });\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Remove pre-filled values\"",
+      "toolSummary": "\"Remove defaults\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Unify ConfigDialog avatar color to use login form palette (#667eea) instead of per-provider color\\\"\"",
+      "EndLine": "1574",
+      "Instruction": "\"Replace provider.color with unified accent color\"",
+      "ReplacementContent": "\"        <Avatar sx={{ width: 28, height: 28, backgroundColor: alpha('#667eea', 0.1), color: '#667eea' }}>{provider.icon}</Avatar>\"",
+      "StartLine": "1574",
+      "TargetContent": "\"        <Avatar sx={{ width: 28, height: 28, backgroundColor: alpha(provider.color, 0.1), color: provider.color }}>{provider.icon}</Avatar>\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Unify dialog color\"",
+      "toolSummary": "\"Dialog color\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Unify ProviderCard avatar and hover colors to use #667eea instead of per-provider colors\\\"\"",
+      "EndLine": "1499",
+      "Instruction": "\"Replace prov.color with unified #667eea\"",
+      "ReplacementContent": "\"        '&:hover': { borderColor: alpha('#667eea', 0.5), transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha('#667eea', 0.1)}` },\\n      }}>\\n      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n        <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha('#667eea', isDark ? 0.2 : 0.08), color: '#667eea', '& .MuiSvgIcon-root': { fontSize: 20 } }}>\"",
+      "StartLine": "1496",
+      "TargetContent": "\"        '&:hover': { borderColor: alpha(prov.color, 0.5), transform: 'translateY(-1px)', boxShadow: `0 4px 16px ${alpha(prov.color, 0.1)}` },\\n      }}>\\n      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>\\n        <Avatar sx={{ width: 36, height: 36, backgroundColor: alpha(prov.color, isDark ? 0.2 : 0.08), color: prov.color, '& .MuiSvgIcon-root': { fontSize: 20 } }}>\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Unify card colors\"",
+      "toolSummary": "\"Card color unify\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Unify ConnectedItem avatar and chip colors to #667eea instead of per-provider colors\\\"\"",
+      "Instruction": "\"Replace color prop usage with unified #667eea in avatar and chip\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":1536,\"ReplacementContent\":\"      <Avatar sx={{ width: 32, height: 32, backgroundColor: alpha('#667eea', isDark ? 0.2 : 0.08), color: '#667eea' }}>\",\"StartLine\":1536,\"TargetContent\":\"      <Avatar sx={{ width: 32, height: 32, backgroundColor: alpha(color, isDark ? 0.2 : 0.08), color }}>\"},{\"AllowMultiple\":false,\"EndLine\":1542,\"ReplacementContent\":\"          {chipLabel && <Chip label={chipLabel} size=\\\"small\\\" sx={{ height: 20, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha('#667eea', 0.1), color: '#667eea', border: 'none' }} />}\",\"StartLine\":1542,\"TargetContent\":\"          {chipLabel && <Chip label={chipLabel} size=\\\"small\\\" sx={{ height: 20, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha(color, 0.1), color, border: 'none' }} />}\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Unify item colors\"",
+      "toolSummary": "\"Item color unify\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Add service-specific icons and replace generic BugIcon with distinctive icons for each tracker provider\\\"\"",
+      "Instruction": "\"1) Add new icon imports 2) Replace BugIcon on each tracker provider with service-specific icons\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":28,\"ReplacementContent\":\"  Settings as SettingsIcon, Add as AddIcon,\\n  Delete as DeleteIcon, Save as SaveIcon, VpnKey as KeyIcon,\\n  Tune as TuneIcon, Code as CodeIcon, CheckCircle as CheckIcon,\\n  Cancel as CancelIcon, UploadFile as UploadIcon, GitHub as GitHubIcon,\\n  Security as SecurityIcon, BugReport as BugIcon,\\n  PlayArrow as TestConnectionIcon, ArrowBack as ArrowBackIcon,\\n  Close as CloseIcon, Storage as StorageIcon, Cloud as CloudIcon,\\n  Notifications as NotificationsIcon, Email as EmailIcon,\\n  Webhook as WebhookIcon, Chat as ChatIcon, Edit as EditIcon,\\n  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,\\n  ExpandMore as ExpandMoreIcon,\\n  Bolt as BoltIcon,\\n  TaskAlt as TaskAltIcon,\\n  Article as ArticleIcon,\\n  AutoStories as AutoStoriesIcon,\\n  DeviceHub as DeviceHubIcon,\\n  BuildCircle as BuildCircleIcon,\\n  Terminal as TerminalIcon,\\n  ViewKanban as ViewKanbanIcon,\\n} from '@mui/icons-material';\",\"StartLine\":16,\"TargetContent\":\"  Settings as SettingsIcon, Add as AddIcon,\\n  Delete as DeleteIcon, Save as SaveIcon, VpnKey as KeyIcon,\\n  Tune as TuneIcon, Code as CodeIcon, CheckCircle as CheckIcon,\\n  Cancel as CancelIcon, UploadFile as UploadIcon, GitHub as GitHubIcon,\\n  Security as SecurityIcon, BugReport as BugIcon,\\n  PlayArrow as TestConnectionIcon, ArrowBack as ArrowBackIcon,\\n  Close as CloseIcon, Storage as StorageIcon, Cloud as CloudIcon,\\n  Notifications as NotificationsIcon, Email as EmailIcon,\\n  Webhook as WebhookIcon, Chat as ChatIcon, Edit as EditIcon,\\n  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,\\n  ExpandMore as ExpandMoreIcon,\\n} from '@mui/icons-material';\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Add icon imports\"",
+      "toolSummary": "\"Icon imports\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Replace generic BugIcon with service-specific icons: ClickUp=BoltIcon, Asana=TaskAltIcon, Notion=ArticleIcon, Shortcut=AutoStoriesIcon, Azure=CloudIcon(already), Redmine=BuildCircleIcon, YouTrack=TerminalIcon, Trello=ViewKanbanIcon\\\"\"",
+      "Instruction": "\"Replace icons for each tracker provider\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":215,\"ReplacementContent\":\"    icon: <BoltIcon />,\",\"StartLine\":215,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":230,\"ReplacementContent\":\"    icon: <TaskAltIcon />,\",\"StartLine\":230,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":245,\"ReplacementContent\":\"    icon: <ArticleIcon />,\",\"StartLine\":245,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":261,\"ReplacementContent\":\"    icon: <AutoStoriesIcon />,\",\"StartLine\":261,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":292,\"ReplacementContent\":\"    icon: <BuildCircleIcon />,\",\"StartLine\":292,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":307,\"ReplacementContent\":\"    icon: <TerminalIcon />,\",\"StartLine\":307,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":322,\"ReplacementContent\":\"    icon: <ViewKanbanIcon />,\",\"StartLine\":322,\"TargetContent\":\"    icon: <BugIcon />,\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Replace provider icons\"",
+      "toolSummary": "\"Provider icons\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Import all service SVG icons from the new ServiceIcons module\\\"\"",
+      "EndLine": "44",
+      "Instruction": "\"Add import for service icons after ArgusBreadcrumbs\"",
+      "ReplacementContent": "\"import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';\\nimport {\\n  JiraIcon, LinearIcon, ClickUpIcon, AsanaIcon, NotionIcon,\\n  ShortcutIcon, AzureDevOpsIcon, RedmineIcon, YouTrackIcon, TrelloIcon,\\n  GitLabIcon, BitbucketIcon,\\n  SlackIcon, DiscordIcon, MSTeamsIcon, PagerDutyIcon,\\n} from './components/ServiceIcons';\"",
+      "StartLine": "44",
+      "TargetContent": "\"import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Import service icons\"",
+      "toolSummary": "\"Import icons\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Replace all generic MUI icons with proper SVG service brand icons from ServiceIcons module\\\"\"",
+      "Instruction": "\"Replace icons for integrations, trackers, and notification providers with brand SVG icons\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":149,\"ReplacementContent\":\"    icon: <GitLabIcon />,\",\"StartLine\":149,\"TargetContent\":\"    icon: <CloudIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":159,\"ReplacementContent\":\"    icon: <BitbucketIcon />,\",\"StartLine\":159,\"TargetContent\":\"    icon: <StorageIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":174,\"ReplacementContent\":\"    icon: <JiraIcon />,\",\"StartLine\":174,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":206,\"ReplacementContent\":\"    icon: <LinearIcon />,\",\"StartLine\":206,\"TargetContent\":\"    icon: <BugIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":221,\"ReplacementContent\":\"    icon: <ClickUpIcon />,\",\"StartLine\":221,\"TargetContent\":\"    icon: <BoltIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":236,\"ReplacementContent\":\"    icon: <AsanaIcon />,\",\"StartLine\":236,\"TargetContent\":\"    icon: <TaskAltIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":251,\"ReplacementContent\":\"    icon: <NotionIcon />,\",\"StartLine\":251,\"TargetContent\":\"    icon: <ArticleIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":267,\"ReplacementContent\":\"    icon: <ShortcutIcon />,\",\"StartLine\":267,\"TargetContent\":\"    icon: <AutoStoriesIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":282,\"ReplacementContent\":\"    icon: <AzureDevOpsIcon />,\",\"StartLine\":282,\"TargetContent\":\"    icon: <CloudIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":298,\"ReplacementContent\":\"    icon: <RedmineIcon />,\",\"StartLine\":298,\"TargetContent\":\"    icon: <BuildCircleIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":313,\"ReplacementContent\":\"    icon: <YouTrackIcon />,\",\"StartLine\":313,\"TargetContent\":\"    icon: <TerminalIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":328,\"ReplacementContent\":\"    icon: <TrelloIcon />,\",\"StartLine\":328,\"TargetContent\":\"    icon: <ViewKanbanIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":361,\"ReplacementContent\":\"    icon: <SlackIcon />,\",\"StartLine\":361,\"TargetContent\":\"    icon: <ChatIcon />,\"},{\"AllowMultiple\":false,\"EndLine\":376,\"ReplacementContent\":\"    icon: <DiscordIcon />,\",\"StartLine\":376,\"TargetContent\":\n<truncated 330 bytes>",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Replace all icons\"",
+      "toolSummary": "\"Replace all icons\""
+    }
+  },
+  {
+    "name": "replace_file_content",
+    "args": {
+      "AllowMultiple": "false",
+      "Description": "\"Remove now-unused MUI icon imports that were replaced by ServiceIcons SVGs\\\"\"",
+      "EndLine": "36",
+      "Instruction": "\"Clean up unused icon imports\"",
+      "ReplacementContent": "\"import {\\n  Settings as SettingsIcon, Add as AddIcon,\\n  Delete as DeleteIcon, Save as SaveIcon, VpnKey as KeyIcon,\\n  Tune as TuneIcon, Code as CodeIcon, CheckCircle as CheckIcon,\\n  Cancel as CancelIcon, UploadFile as UploadIcon, GitHub as GitHubIcon,\\n  Security as SecurityIcon,\\n  PlayArrow as TestConnectionIcon, ArrowBack as ArrowBackIcon,\\n  Close as CloseIcon,\\n  Email as EmailIcon, Webhook as WebhookIcon, Edit as EditIcon,\\n  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,\\n  ExpandMore as ExpandMoreIcon,\\n} from '@mui/icons-material';\"",
+      "StartLine": "16",
+      "TargetContent": "\"import {\\n  Settings as SettingsIcon, Add as AddIcon,\\n  Delete as DeleteIcon, Save as SaveIcon, VpnKey as KeyIcon,\\n  Tune as TuneIcon, Code as CodeIcon, CheckCircle as CheckIcon,\\n  Cancel as CancelIcon, UploadFile as UploadIcon, GitHub as GitHubIcon,\\n  Security as SecurityIcon, BugReport as BugIcon,\\n  PlayArrow as TestConnectionIcon, ArrowBack as ArrowBackIcon,\\n  Close as CloseIcon, Storage as StorageIcon, Cloud as CloudIcon,\\n  Notifications as NotificationsIcon, Email as EmailIcon,\\n  Webhook as WebhookIcon, Chat as ChatIcon, Edit as EditIcon,\\n  Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,\\n  ExpandMore as ExpandMoreIcon,\\n  Bolt as BoltIcon,\\n  TaskAlt as TaskAltIcon,\\n  Article as ArticleIcon,\\n  AutoStories as AutoStoriesIcon,\\n  DeviceHub as DeviceHubIcon,\\n  BuildCircle as BuildCircleIcon,\\n  Terminal as TerminalIcon,\\n  ViewKanban as ViewKanbanIcon,\\n} from '@mui/icons-material';\"",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Clean unused imports\"",
+      "toolSummary": "\"Clean imports\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Replace nav sidebar icons with SlackIcon/JiraIcon to match the sections they represent\\\"\"",
+      "Instruction": "\"Fix nav section icons\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":444,\"ReplacementContent\":\"      { id: 'notifications' as SectionId, labelKey: 'argus.settings.notifications', icon: <SlackIcon sx={{ fontSize: 18 }} /> },\",\"StartLine\":444,\"TargetContent\":\"      { id: 'notifications' as SectionId, labelKey: 'argus.settings.notifications', icon: <NotificationsIcon sx={{ fontSize: 18 }} /> },\"},{\"AllowMultiple\":false,\"EndLine\":445,\"ReplacementContent\":\"      { id: 'issue-trackers' as SectionId, labelKey: 'argus.settings.issueTrackers', icon: <JiraIcon sx={{ fontSize: 18 }} /> },\",\"StartLine\":445,\"TargetContent\":\"      { id: 'issue-trackers' as SectionId, labelKey: 'argus.settings.issueTrackers', icon: <BugIcon sx={{ fontSize: 18 }} /> },\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fix nav icons\"",
+      "toolSummary": "\"Fix nav icons\""
+    }
+  },
+  {
+    "name": "multi_replace_file_content",
+    "args": {
+      "Description": "\"Replace fallback icons with SlackIcon/JiraIcon to match the sections\\\"\"",
+      "Instruction": "\"Replace fallback NotificationsIcon and BugIcon\"",
+      "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":1003,\"ReplacementContent\":\"                          <ConnectedItem key={ch.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <SlackIcon sx={{ fontSize: 18 }} />}\",\"StartLine\":1003,\"TargetContent\":\"                          <ConnectedItem key={ch.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <NotificationsIcon sx={{ fontSize: 18 }} />}\"},{\"AllowMultiple\":false,\"EndLine\":1056,\"ReplacementContent\":\"                          <ConnectedItem key={trk.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <JiraIcon sx={{ fontSize: 18 }} />}\",\"StartLine\":1056,\"TargetContent\":\"                          <ConnectedItem key={trk.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <BugIcon sx={{ fontSize: 18 }} />}\"}]",
+      "TargetFile": "\"c:\\\\work\\\\uwo\\\\gatrix\\\\packages\\\\frontend\\\\src\\\\pages\\\\argus\\\\ArgusSettingsPage.tsx\"",
+      "toolAction": "\"Fix fallback icons\"",
+      "toolSummary": "\"Fallback icons\""
+    }
+  }
+]

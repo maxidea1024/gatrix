@@ -39,7 +39,9 @@ import {
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusSessionHealth, ArgusIssue } from '@/services/argusService';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
@@ -80,10 +82,16 @@ const ArgusSessionHealthPage: React.FC = () => {
   const [displayMode, setDisplayMode] = useState<DisplayMode>('sessions');
   const [hideHealthy, setHideHealthy] = useState(false);
 
-  const filters = useMemo<ArgusFilterState>(
-    () => defaultArgusFilterState(urlState.period),
-    [urlState.period],
+  const [filters, setFilters] = useState<ArgusFilterState>(
+    () => defaultArgusFilterState(urlState.period)
   );
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      dateRange: { type: 'preset', preset: urlState.period }
+    }));
+  }, [urlState.period]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -108,6 +116,7 @@ const ArgusSessionHealthPage: React.FC = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setUrlState({ period: newFilters.dateRange.preset });
     }
@@ -260,9 +269,12 @@ const ArgusSessionHealthPage: React.FC = () => {
     <Box>
       <PageHeader
         icon={<DevicesIcon />}
-        title={t('argus.sessions.title')}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('argus.sessions.title', 'Session Health') }
+          ]} />
+        }
         subtitle={t('argus.sessionHealth.subtitle')}
-        enableAutoBack
       />
 
       <ArgusFilterBar
@@ -881,16 +893,6 @@ function formatHour(h: string): string {
   } catch { return h; }
 }
 
-function formatRelativeTime(dateStr: string): string {
-  const d = new Date(dateStr);
-  const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(mins / 60);
-  const days = Math.floor(hours / 24);
-  if (mins < 60) return `${mins}m`;
-  if (hours < 24) return `${hours}h`;
-  return `${days}d`;
-}
+
 
 export default ArgusSessionHealthPage;

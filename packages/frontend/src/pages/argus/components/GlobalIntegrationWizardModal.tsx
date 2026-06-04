@@ -11,6 +11,7 @@ import {
   ArrowForward as ArrowForwardIcon,
   ArrowBack as ArrowBackIcon, Lock as LockIcon,
   Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,
+  Chat as SlackIcon, PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { argusService } from '@/services/argusService';
@@ -70,6 +71,22 @@ const PROVIDER_CONFIG = {
     steps: [
       { titleKey: 'argus.settings.bitbucketWizard.step1Title', subtitleKey: 'argus.settings.bitbucketWizard.step1Subtitle', icon: '🚀' },
       { titleKey: 'argus.settings.bitbucketWizard.step2Title', subtitleKey: 'argus.settings.bitbucketWizard.step2Subtitle', icon: '🔑' },
+    ] as StepDef[],
+  },
+  slack: {
+    name: 'Slack',
+    color: '#4A154B',
+    accentColor: '#36C5F0',
+    gradient: 'linear-gradient(160deg, #4A154B 0%, #3D1142 30%, #2D0E35 60%, #1A0A20 100%)',
+    icon: <SlackIcon />,
+    settingsUrl: 'https://api.slack.com/apps',
+    titleKey: 'argus.settings.slackWizard.title',
+    subtitleKey: 'argus.settings.slackWizard.subtitle',
+    saveKey: 'argus.settings.slackWizard.saveConfig',
+    steps: [
+      { titleKey: 'argus.settings.slackWizard.step1Title', subtitleKey: 'argus.settings.slackWizard.step1Subtitle', icon: '🚀' },
+      { titleKey: 'argus.settings.slackWizard.step2Title', subtitleKey: 'argus.settings.slackWizard.step2Subtitle', icon: '🔐' },
+      { titleKey: 'argus.settings.slackWizard.step3Title', subtitleKey: 'argus.settings.slackWizard.step3Subtitle', icon: '🔑' },
     ] as StepDef[],
   },
 };
@@ -163,6 +180,8 @@ const WizardInput: React.FC<{
         onChange={e => onChange(e.target.value)}
         type={isPassword && !showPassword ? 'password' : 'text'}
         multiline={multiline} rows={rows}
+        autoComplete={isPassword ? 'new-password' : 'off'}
+        inputProps={{ autoComplete: isPassword ? 'new-password' : 'off' }}
         InputProps={{
           ...(isPassword ? {
             endAdornment: (
@@ -187,12 +206,19 @@ const WizardInput: React.FC<{
   );
 };
 
+// Helper form element that wraps WizardInput with autoComplete off
+const WizardFormContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <form autoComplete="off" onSubmit={e => e.preventDefault()} style={{ display: 'contents' }}>
+    {children}
+  </form>
+);
+
 // ─── Main Component ─────────────────────────────────────────────────
 interface GlobalIntegrationWizardModalProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  provider: 'github' | 'gitlab' | 'bitbucket';
+  provider: 'github' | 'gitlab' | 'bitbucket' | 'slack';
 }
 
 export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModalProps> = ({
@@ -210,10 +236,26 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
 
   // GitHub form
   const [ghForm, setGhForm] = useState({ appId: '', clientId: '', clientSecret: '', webhookSecret: '', privateKey: '' });
-  // GitLab form
-  const [glForm, setGlForm] = useState({ instanceUrl: 'https://gitlab.com', applicationId: '', applicationSecret: '', webhookSecret: '' });
+  // GitLab form — instanceUrl is empty; placeholder shows 'https://gitlab.com'
+  const [glForm, setGlForm] = useState({ instanceUrl: '', applicationId: '', applicationSecret: '', webhookSecret: '' });
   // Bitbucket form
   const [bbForm, setBbForm] = useState({ workspace: '', username: '', appPassword: '' });
+  // Slack form
+  const [slackForm, setSlackForm] = useState({ botToken: '', signingSecret: '' });
+  const [slackTestResult, setSlackTestResult] = useState<{ ok: boolean; team?: string; user?: string; error?: string } | null>(null);
+  const [slackTesting, setSlackTesting] = useState(false);
+
+  // GitHub Test State
+  const [ghTestResult, setGhTestResult] = useState<{ ok: boolean; name?: string; html_url?: string; error?: string } | null>(null);
+  const [ghTesting, setGhTesting] = useState(false);
+
+  // GitLab Test State
+  const [glTestResult, setGlTestResult] = useState<{ ok: boolean; message?: string; error?: string } | null>(null);
+  const [glTesting, setGlTesting] = useState(false);
+
+  // Bitbucket Test State
+  const [bbTestResult, setBbTestResult] = useState<{ ok: boolean; display_name?: string; account_id?: string; error?: string } | null>(null);
+  const [bbTesting, setBbTesting] = useState(false);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -221,10 +263,23 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
       setActiveStep(0);
       setError('');
       setLoading(false);
+      // Reset ALL form data to prevent stale values / browser autofill artifacts
+      setGhForm({ appId: '', clientId: '', clientSecret: '', webhookSecret: '', privateKey: '' });
+      setGlForm({ instanceUrl: '', applicationId: '', applicationSecret: '', webhookSecret: '' });
+      setBbForm({ workspace: '', username: '', appPassword: '' });
+      setSlackForm({ botToken: '', signingSecret: '' });
+      setSlackTestResult(null);
+      setSlackTesting(false);
+      setGhTestResult(null);
+      setGhTesting(false);
+      setGlTestResult(null);
+      setGlTesting(false);
+      setBbTestResult(null);
+      setBbTesting(false);
     }
   }, [open]);
 
-  const baseUrl = window.location.origin;
+  const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
 
   const handleSave = useCallback(async () => {
     setLoading(true);
@@ -246,6 +301,14 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
           credentials: {
             instance_url: glForm.instanceUrl, application_id: glForm.applicationId,
             application_secret: glForm.applicationSecret, webhook_secret: glForm.webhookSecret,
+          },
+        });
+      } else if (provider === 'slack') {
+        await argusService.saveGlobalIntegrationConfig(provider, {
+          name: 'Slack App',
+          credentials: {
+            bot_token: slackForm.botToken,
+            signing_secret: slackForm.signingSecret || undefined,
           },
         });
       } else {
@@ -271,6 +334,7 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
     if (activeStep < lastStep) return true;
     if (provider === 'github') return !!(ghForm.appId && ghForm.clientId && ghForm.clientSecret && ghForm.privateKey);
     if (provider === 'gitlab') return !!(glForm.instanceUrl && glForm.applicationId && glForm.applicationSecret);
+    if (provider === 'slack') return !!slackForm.botToken;
     return !!(bbForm.workspace && bbForm.username && bbForm.appPassword);
   }, [activeStep, provider, ghForm, glForm, bbForm, cfg.steps.length]);
 
@@ -360,6 +424,54 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
               multiline rows={5} required
               hint={t('argus.settings.githubWizard.privateKeyHint', 'Paste the full contents of the .pem file')}
               placeholder="-----BEGIN RSA PRIVATE KEY-----" />
+              
+            {/* Connection Test Section */}
+            <Box sx={{
+              mt: 3, p: 2, borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: ghTestResult ? 2 : 0 }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.88rem' }}>
+                    {t('argus.settings.providerWizard.testTitle', '연결 테스트')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                    {t('argus.settings.providerWizard.testDesc', '저장 전에 연결 상태를 확인합니다 (선택사항)')}
+                  </Typography>
+                </Box>
+                <Button
+                  onClick={async () => {
+                    if (!ghForm.appId || !ghForm.privateKey) return;
+                    setGhTesting(true);
+                    setGhTestResult(null);
+                    try {
+                      const result = await argusService.testGithubConnection(ghForm.appId, ghForm.privateKey);
+                      setGhTestResult(result);
+                    } catch {
+                      setGhTestResult({ ok: false, error: 'Network error' });
+                    } finally {
+                      setGhTesting(false);
+                    }
+                  }}
+                  disabled={ghTesting || !ghForm.appId || !ghForm.privateKey}
+                  variant="outlined" size="small"
+                  startIcon={ghTesting ? <CircularProgress size={16} /> : <PlayArrowIcon />}
+                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+                >
+                  {t('argus.settings.providerWizard.testBtn', '연결 테스트')}
+                </Button>
+              </Box>
+              {ghTestResult && (
+                <Alert
+                  severity={ghTestResult.ok ? 'success' : 'error'}
+                  sx={{ borderRadius: '8px', fontSize: '0.82rem' }}
+                  icon={ghTestResult.ok ? <CheckIcon sx={{ fontSize: 18 }} /> : undefined}
+                >
+                  {ghTestResult.ok ? `연결 성공! (${ghTestResult.name})` : `연결 실패: ${ghTestResult.error}`}
+                </Alert>
+              )}
+            </Box>
           </Box>
         );
       default: return null;
@@ -448,6 +560,54 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
             <WizardInput label={t('argus.settings.gitlabWizard.webhookSecret', 'Webhook Secret')} value={glForm.webhookSecret}
               onChange={v => setGlForm(p => ({ ...p, webhookSecret: v }))} isDark={isDark} type="password"
               hint="선택 사항이지만 보안을 위해 권장됩니다" />
+
+            {/* Connection Test Section */}
+            <Box sx={{
+              mt: 3, p: 2, borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: glTestResult ? 2 : 0 }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.88rem' }}>
+                    {t('argus.settings.providerWizard.testTitle', '연결 테스트')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                    {t('argus.settings.providerWizard.testDesc', '저장 전에 연결 상태를 확인합니다 (선택사항)')}
+                  </Typography>
+                </Box>
+                <Button
+                  onClick={async () => {
+                    if (!glForm.applicationId || !glForm.applicationSecret) return;
+                    setGlTesting(true);
+                    setGlTestResult(null);
+                    try {
+                      const result = await argusService.testGitlabConnection(glForm.instanceUrl || 'https://gitlab.com', glForm.applicationId, glForm.applicationSecret);
+                      setGlTestResult(result);
+                    } catch {
+                      setGlTestResult({ ok: false, error: 'Network error' });
+                    } finally {
+                      setGlTesting(false);
+                    }
+                  }}
+                  disabled={glTesting || !glForm.applicationId || !glForm.applicationSecret}
+                  variant="outlined" size="small"
+                  startIcon={glTesting ? <CircularProgress size={16} /> : <PlayArrowIcon />}
+                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+                >
+                  {t('argus.settings.providerWizard.testBtn', '연결 테스트')}
+                </Button>
+              </Box>
+              {glTestResult && (
+                <Alert
+                  severity={glTestResult.ok ? 'success' : 'error'}
+                  sx={{ borderRadius: '8px', fontSize: '0.82rem' }}
+                  icon={glTestResult.ok ? <CheckIcon sx={{ fontSize: 18 }} /> : undefined}
+                >
+                  {glTestResult.ok ? `연결 성공! (${glTestResult.message})` : `연결 실패: ${glTestResult.error}`}
+                </Alert>
+              )}
+            </Box>
           </Box>
         );
       default: return null;
@@ -508,6 +668,168 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
             <WizardInput label={t('argus.settings.bitbucketWizard.appPassword', 'App Password')} value={bbForm.appPassword}
               onChange={v => setBbForm(p => ({ ...p, appPassword: v }))} isDark={isDark} type="password" required
               hint={t('argus.settings.bitbucketWizard.appPasswordHint', '방금 생성한 App Password를 붙여넣으세요')} />
+
+            {/* Connection Test Section */}
+            <Box sx={{
+              mt: 3, p: 2, borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: bbTestResult ? 2 : 0 }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.88rem' }}>
+                    {t('argus.settings.providerWizard.testTitle', '연결 테스트')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                    {t('argus.settings.providerWizard.testDesc', '저장 전에 연결 상태를 확인합니다 (선택사항)')}
+                  </Typography>
+                </Box>
+                <Button
+                  onClick={async () => {
+                    if (!bbForm.username || !bbForm.appPassword) return;
+                    setBbTesting(true);
+                    setBbTestResult(null);
+                    try {
+                      const result = await argusService.testBitbucketConnection(bbForm.username, bbForm.appPassword);
+                      setBbTestResult(result);
+                    } catch {
+                      setBbTestResult({ ok: false, error: 'Network error' });
+                    } finally {
+                      setBbTesting(false);
+                    }
+                  }}
+                  disabled={bbTesting || !bbForm.username || !bbForm.appPassword}
+                  variant="outlined" size="small"
+                  startIcon={bbTesting ? <CircularProgress size={16} /> : <PlayArrowIcon />}
+                  sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+                >
+                  {t('argus.settings.providerWizard.testBtn', '연결 테스트')}
+                </Button>
+              </Box>
+              {bbTestResult && (
+                <Alert
+                  severity={bbTestResult.ok ? 'success' : 'error'}
+                  sx={{ borderRadius: '8px', fontSize: '0.82rem' }}
+                  icon={bbTestResult.ok ? <CheckIcon sx={{ fontSize: 18 }} /> : undefined}
+                >
+                  {bbTestResult.ok ? `연결 성공! (${bbTestResult.display_name})` : `연결 실패: ${bbTestResult.error}`}
+                </Alert>
+              )}
+            </Box>
+          </Box>
+        );
+      default: return null;
+    }
+  };
+
+  const handleSlackTest = async () => {
+    if (!slackForm.botToken) return;
+    setSlackTesting(true);
+    setSlackTestResult(null);
+    try {
+      const result = await argusService.testSlackConnection(slackForm.botToken);
+      setSlackTestResult(result);
+    } catch {
+      setSlackTestResult({ ok: false, error: 'Network error' });
+    } finally {
+      setSlackTesting(false);
+    }
+  };
+
+  const renderSlackStep = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box>
+            <Typography sx={{ fontSize: '0.88rem', lineHeight: 1.7, color: 'text.secondary', mb: 2 }}>
+              {t('argus.settings.slackWizard.step1Instruction', 'Go to Slack API Dashboard to create a new Slack App for your workspace.')}
+            </Typography>
+            <Box sx={{
+              p: 3, borderRadius: '12px', textAlign: 'center',
+              border: `2px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+            }}>
+              <SlackIcon sx={{ fontSize: 48, color: '#36C5F0', mb: 2, opacity: 0.7 }} />
+              <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary', mb: 2.5 }}>
+                {t('argus.settings.slackWizard.step1Desc', 'Create a new Slack App from the "From scratch" option.')}
+              </Typography>
+              <Button
+                variant="contained" size="large" endIcon={<OpenInNewIcon />}
+                href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer"
+                sx={{
+                  borderRadius: '10px', textTransform: 'none', fontWeight: 700, px: 4, py: 1.2,
+                  backgroundColor: '#58a6ff', color: '#fff',
+                  '&:hover': { backgroundColor: '#4090e0' },
+                }}
+              >
+                {t('argus.settings.slackWizard.goToSlack', 'Open Slack API Dashboard')}
+              </Button>
+            </Box>
+          </Box>
+        );
+      case 1:
+        return (
+          <Box>
+            <Typography sx={{ fontSize: '0.88rem', lineHeight: 1.7, color: 'text.secondary', mb: 3 }}>
+              {t('argus.settings.slackWizard.step2Desc', 'Navigate to OAuth & Permissions and add the following Bot Token Scopes:')}
+            </Typography>
+            <PermissionItem
+              title={t('argus.settings.slackWizard.botScopes', 'Bot Token Scopes')}
+              items={['chat:write', 'channels:read', 'groups:read', 'chat:write.customize']}
+              isDark={isDark} color={cfg.accentColor}
+            />
+            <Box sx={{ mt: 2, p: 2, borderRadius: '8px', backgroundColor: alpha(cfg.accentColor, 0.06), border: `1px solid ${alpha(cfg.accentColor, 0.15)}` }}>
+              <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', lineHeight: 1.6 }}>
+                💡 {t('argus.settings.slackWizard.step2Hint', 'After adding scopes, click "Install to Workspace" and authorize. Then copy the Bot User OAuth Token (starts with xoxb-).')}
+              </Typography>
+            </Box>
+          </Box>
+        );
+      case 2:
+        return (
+          <Box>
+            <Typography sx={{ fontSize: '0.88rem', lineHeight: 1.7, color: 'text.secondary', mb: 3 }}>
+              {t('argus.settings.slackWizard.step3Desc', 'Paste the Bot User OAuth Token and optionally the Signing Secret.')}
+            </Typography>
+            <WizardInput
+              label={t('argus.settings.slackWizard.botToken', 'Bot User OAuth Token')}
+              value={slackForm.botToken}
+              onChange={v => setSlackForm(p => ({ ...p, botToken: v }))}
+              isDark={isDark} type="password" required
+              placeholder="xoxb-..."
+              hint={t('argus.settings.slackWizard.botTokenHint', 'Found in OAuth & Permissions after installing the app to your workspace')}
+            />
+            <WizardInput
+              label={t('argus.settings.slackWizard.signingSecret', 'Signing Secret')}
+              value={slackForm.signingSecret}
+              onChange={v => setSlackForm(p => ({ ...p, signingSecret: v }))}
+              isDark={isDark} type="password"
+              hint={t('argus.settings.slackWizard.signingSecretHint', 'Optional. Found in Basic Information > App Credentials')}
+            />
+            <Button
+              variant="contained" size="small"
+              disabled={!slackForm.botToken || slackTesting}
+              onClick={handleSlackTest}
+              startIcon={slackTesting ? <CircularProgress size={14} color="inherit" /> : undefined}
+              sx={{
+                textTransform: 'none', fontWeight: 600, borderRadius: '8px',
+                backgroundColor: '#58a6ff', color: '#fff',
+                '&:hover': { backgroundColor: '#4090e0' },
+              }}
+            >
+              {t('argus.settings.slackWizard.testConnection', 'Test Connection')}
+            </Button>
+            {slackTestResult && (
+              <Alert
+                severity={slackTestResult.ok ? 'success' : 'error'}
+                sx={{ mt: 2, borderRadius: '8px' }}
+              >
+                {slackTestResult.ok
+                  ? t('argus.settings.slackWizard.testSuccess', 'Connected to {{team}}').replace('{{team}}', slackTestResult.team || 'Slack')
+                  : `${t('argus.settings.slackWizard.testFailed', 'Connection failed')}: ${slackTestResult.error}`
+                }
+              </Alert>
+            )}
           </Box>
         );
       default: return null;
@@ -655,7 +977,7 @@ export const GlobalIntegrationWizardModal: React.FC<GlobalIntegrationWizardModal
               </Box>
 
               {/* Step Body */}
-              {provider === 'github' ? renderGithubStep(activeStep) : provider === 'gitlab' ? renderGitlabStep(activeStep) : renderBitbucketStep(activeStep)}
+              {provider === 'github' ? renderGithubStep(activeStep) : provider === 'gitlab' ? renderGitlabStep(activeStep) : provider === 'slack' ? renderSlackStep(activeStep) : renderBitbucketStep(activeStep)}
               {error && <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>{error}</Alert>}
             </Box>
           </Fade>

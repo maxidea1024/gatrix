@@ -59,7 +59,7 @@ export async function groupIntoIssue(
       await connection.query(
         `UPDATE g_argus_issues
          SET times_seen = times_seen + 1,
-             last_seen = NOW(),
+             last_seen = UTC_TIMESTAMP(),
              last_release = ?,
              status = IF(status = 'resolved', 'unresolved', status),
              substatus = ${substatusClause}
@@ -98,7 +98,7 @@ export async function groupIntoIssue(
        (project_id, short_id, title, culprit, type, level, platform,
         primary_hash, fingerprint, first_seen, last_seen, times_seen,
         first_release, last_release, status, priority)
-       VALUES (?, ?, ?, ?, 'error', ?, ?, ?, ?, NOW(), NOW(), 1, ?, ?, 'unresolved', 'medium')`,
+       VALUES (?, ?, ?, ?, 'error', ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP(), 1, ?, ?, 'unresolved', 'medium')`,
       [
         internalProjectId,
         nextShortId,

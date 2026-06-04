@@ -8,7 +8,10 @@ let pool: mysql.Pool | null = null;
 
 export function getMySQLPool(): mysql.Pool {
   if (!pool) {
-    pool = mysql.createPool(config.mysql);
+    pool = mysql.createPool({
+      ...config.mysql,
+      timezone: '+00:00',
+    });
   }
 
   return pool;
