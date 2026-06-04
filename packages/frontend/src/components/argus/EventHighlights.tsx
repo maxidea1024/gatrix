@@ -1,13 +1,11 @@
 import React from 'react';
 import { Box, Typography, alpha, useTheme } from '@mui/material';
 import {
-  Language as BrowserIcon,
-  DesktopWindows as OsIcon,
-  PhoneAndroid as DeviceIcon,
   Code as SdkIcon,
   Public as GeoIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { getBrowserIcon, getOsIcon, getDeviceIcon } from '@/utils/brandIcons';
 
 interface HighlightItem {
   icon: React.ReactNode;
@@ -32,7 +30,7 @@ interface EventHighlightsProps {
   } | null;
 }
 
-const ICON_SIZE = 28;
+const ICON_SIZE = 32;
 
 const EventHighlights: React.FC<EventHighlightsProps> = ({ event }) => {
   const theme = useTheme();
@@ -60,7 +58,7 @@ const EventHighlights: React.FC<EventHighlightsProps> = ({ event }) => {
 
   if (event.browser) {
     highlights.push({
-      icon: <BrowserIcon sx={{ fontSize: ICON_SIZE }} />,
+      icon: getBrowserIcon(event.browser, ICON_SIZE),
       label: t('argus.highlights.browser'),
       value: `${event.browser}${event.browser_version ? ` ${event.browser_version}` : ''}`,
       color: '#2196f3',
@@ -69,7 +67,7 @@ const EventHighlights: React.FC<EventHighlightsProps> = ({ event }) => {
 
   if (event.os) {
     highlights.push({
-      icon: <OsIcon sx={{ fontSize: ICON_SIZE }} />,
+      icon: getOsIcon(event.os, ICON_SIZE),
       label: t('argus.highlights.os'),
       value: `${event.os}${event.os_version ? ` ${event.os_version}` : ''}`,
       color: '#7c4dff',
@@ -78,7 +76,7 @@ const EventHighlights: React.FC<EventHighlightsProps> = ({ event }) => {
 
   if (event.device && event.device !== 'Other') {
     highlights.push({
-      icon: <DeviceIcon sx={{ fontSize: ICON_SIZE }} />,
+      icon: getDeviceIcon(event.device, ICON_SIZE),
       label: t('argus.highlights.device'),
       value: event.device,
       color: '#ff9800',

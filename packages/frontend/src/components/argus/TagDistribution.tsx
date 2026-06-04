@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueTagGroup } from '@/services/argusService';
+import { getBrowserIcon, getOsIcon } from '@/utils/brandIcons';
 
 interface TagDistributionProps {
   projectId: string;
@@ -128,16 +129,31 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
                     return (
                       <Box key={idx} sx={{ mb: 0.8 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}>
-                          <Typography variant="caption" sx={{
-                            fontSize: '0.75rem',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            flex: 1,
-                            minWidth: 0,
+                          <Box sx={{
+                            display: 'flex', alignItems: 'center', gap: 0.6,
+                            flex: 1, minWidth: 0, overflow: 'hidden',
                           }}>
-                            {val.value || '(empty)'}
-                          </Typography>
+                            {tagGroup.key === 'browser' && (
+                              <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                                {getBrowserIcon(val.value, 16)}
+                              </Box>
+                            )}
+                            {tagGroup.key === 'os' && (
+                              <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                                {getOsIcon(val.value, 16)}
+                              </Box>
+                            )}
+                            <Typography variant="caption" sx={{
+                              fontSize: '0.75rem',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              flex: 1,
+                              minWidth: 0,
+                            }}>
+                              {val.value || '(empty)'}
+                            </Typography>
+                          </Box>
                           <Typography variant="caption" sx={{
                             fontSize: '0.75rem', color: 'text.secondary', flexShrink: 0, ml: 1, textAlign: 'right',
                           }}>
