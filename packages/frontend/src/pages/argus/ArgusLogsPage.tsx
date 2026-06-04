@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   Box, Typography, Button, IconButton, Tooltip,
-  useTheme, alpha, CircularProgress, Collapse, Popover,
+  useTheme, alpha, CircularProgress, Collapse,
 } from '@mui/material';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -21,6 +21,7 @@ import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
+import SearchAutocompletePopover from '@/components/argus/SearchAutocompletePopover';
 import argusService, { ArgusLogEntry, ArgusSavedQuery } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
@@ -639,171 +640,32 @@ const ArgusLogsPage: React.FC = () => {
             />
 
             {/* Search Autocomplete Popover */}
-            <Popover
+            <SearchAutocompletePopover
               open={searchFocused}
               anchorEl={searchContainerRef.current}
+              query={search}
+              fields={['severity', 'service', 'environment', 'logger', 'trace_id', 'message']}
+              facets={mappedFacets}
+              isDark={isDark}
+              onSelectTag={(field, value) => {
+                addSearchTag(field, value);
+                setSearch('');
+                setSearchFocused(false);
+              }}
+              onSelectField={(field) => {
+                const tokens = search.split(/\s+/);
+                const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + field + ':';
+                setSearch(newCond);
+                searchContainerRef.current?.querySelector('input')?.focus();
+              }}
+              onSelectSyntax={(syntax) => {
+                const tokens = search.split(/\s+/);
+                const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + syntax + ' ';
+                setSearch(newCond);
+                searchContainerRef.current?.querySelector('input')?.focus();
+              }}
               onClose={() => setSearchFocused(false)}
-              disableAutoFocus disableEnforceFocus
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              slotProps={{ paper: { sx: { width: searchContainerRef.current?.offsetWidth || 300, mt: 0.5, borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', maxHeight: 320, overflow: 'auto' } } }}
-            >
-              <Box sx={{ p: 1 }}>
-                {(() => {
-                  const colonMatch = search.match(/([\w.-]+):([^\s]*)$/);
-                  const FIELD_KEYS = ['severity', 'service', 'environment', 'logger', 'trace_id', 'message'];
-
-                  if (colonMatch) {
-                    const fieldKey = colonMatch[1];
-                    const partialValue = colonMatch[2].toLowerCase();
-                    const values = (mappedFacets as Record<string, {value:string;count:number}[]>)[fieldKey] || [];
-                    const filtered = partialValue
-                      ? values.filter(v => v.value.toLowerCase().includes(partialValue))
-                      : values;
-
-                    if (filtered.length === 0) {
-                      return (
-                        <Typography sx={{ px: 1, py: 1, fontSize: '0.75rem', color: 'text.disabled', fontStyle: 'italic' }}>
-                          {partialValue
-                            ? t('argus.discover.pressEnterToUse', { val: partialValue })
-                            : t('argus.discover.typeValue', 'Type a value and press Enter')}
-                        </Typography>
-                      );
-                    }
-
-                    return (
-                      <>
-                        <Typography variant="caption" sx={{ px: 1, color: 'text.disabled', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                          {fieldKey} {t('argus.discover.values', 'values')}
-                        </Typography>
-                        {(() => {
-                          const totalCount = filtered.reduce((s, x) => s + x.count, 0);
-                          return filtered.slice(0, 10).map((v, idx) => {
-                            const pctOfTotal = totalCount > 0 ? ((v.count / totalCount) * 100) : 0;
-                            return (
-                              <Box key={idx}
-                                onClick={() => {
-                                  addSearchTag(fieldKey, v.value);
-                                  setSearch('');
-                                  setSearchFocused(false);
-                                }}
-                                sx={{
-                                  position: 'relative', px: 1.5, py: 0.6, cursor: 'pointer', borderRadius: '4px',
-                                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                  overflow: 'hidden',
-                                  '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
-                                }}
-                              >
-                                <Box sx={{
-                                  position: 'absolute', left: 8, top: 2, bottom: 2,
-                                  width: `${pctOfTotal}%`, minWidth: pctOfTotal > 0 ? 4 : 0,
-                                  backgroundColor: alpha(theme.palette.primary.main, isDark ? 0.18 : 0.12),
-                                  borderRadius: '0 3px 3px 0',
-                                  transition: 'width 0.3s ease',
-                                }} />
-                                <Typography sx={{
-                                  zIndex: 1, fontSize: '0.78rem',
-                                  color: theme.palette.primary.main, fontWeight: 600,
-                                }}>
-                                  {v.value || '(empty)'}
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, zIndex: 1 }}>
-                                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: theme.palette.primary.main }}>
-                                    {pctOfTotal.toFixed(0)}%
-                                  </Typography>
-                                  <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
-                                    {v.count.toLocaleString()}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                            );
-                          });
-                        })()}
-                      </>
-                    );
-                  }
-
-                  const tokens = search.split(/\s+/);
-                  const lastToken = tokens[tokens.length - 1].toLowerCase();
-                  const syntax = ['AND', 'OR'];
-
-                  const filteredFields = lastToken
-                    ? FIELD_KEYS.filter(f => f.toLowerCase().includes(lastToken))
-                    : FIELD_KEYS;
-                  const filteredSyntax = lastToken
-                    ? syntax.filter(s => s.toLowerCase().includes(lastToken))
-                    : syntax;
-
-                  return (
-                    <>
-                      {filteredSyntax.length > 0 && (
-                        <>
-                          <Typography variant="caption" sx={{ px: 1, color: 'text.disabled', fontWeight: 600, display: 'block', mb: 0.5, mt: 0.5 }}>
-                            {t('argus.discover.syntax', 'Syntax')}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1, px: 1, mb: 1 }}>
-                            {filteredSyntax.map(s => (
-                              <Box key={s}
-                                onClick={() => {
-                                  const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + s + ' ';
-                                  setSearch(newCond);
-                                  searchContainerRef.current?.querySelector('input')?.focus();
-                                }}
-                                sx={{
-                                  px: 1.2, py: 0.4, cursor: 'pointer', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700,
-                                  backgroundColor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main,
-                                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                                  '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.2) },
-                                }}
-                              >
-                                {s}
-                              </Box>
-                            ))}
-                          </Box>
-                        </>
-                      )}
-
-                      <Typography variant="caption" sx={{ px: 1, color: 'text.disabled', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                        {t('argus.discover.suggestions', 'Suggested Fields')}
-                      </Typography>
-                      {(!lastToken || 'has:'.includes(lastToken)) && (
-                        <Box onClick={() => {
-                            const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + 'has:';
-                            setSearch(newCond);
-                            searchContainerRef.current?.querySelector('input')?.focus();
-                          }}
-                          sx={{
-                            px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
-                          }}
-                        >
-                          <span style={{ color: theme.palette.primary.main }}>has</span>:
-                          <span style={{ color: 'text.disabled', fontSize: '0.7rem', marginLeft: 8 }}>{t('argus.discover.hasDesc', 'Find events with this tag')}</span>
-                        </Box>
-                      )}
-                      {filteredFields.map(field => (
-                        <Box key={field}
-                          onClick={() => {
-                            const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + field + ':';
-                            setSearch(newCond);
-                            searchContainerRef.current?.querySelector('input')?.focus();
-                          }}
-                          sx={{
-                            px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
-                          }}
-                        >
-                          <span style={{ color: theme.palette.primary.main }}>{field}</span>:
-                        </Box>
-                      ))}
-                      {filteredFields.length === 0 && (!lastToken || !'has:'.includes(lastToken)) && (
-                        <Typography sx={{ px: 1, py: 1, fontSize: '0.75rem', color: 'text.disabled', fontStyle: 'italic' }}>
-                          {t('argus.discover.noValues', 'No matching values')}
-                        </Typography>
-                      )}
-                    </>
-                  );
-                })()}
-              </Box>
-            </Popover>
+            />
           </Box>
         }
       />
