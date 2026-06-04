@@ -167,13 +167,12 @@ const ArgusIssueDetailPage: React.FC = () => {
             flexDirection: { xs: 'column', md: 'row' },
             alignItems: 'stretch',
             position: 'relative',
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
           }}>
             {/* Left Column: Main Content */}
             <Box sx={{
               flex: 1, minWidth: 0,
               pr: { md: sidebarCollapsed ? 0 : 3 },
-              py: 2,
+              py: 1,
               transition: 'padding 0.2s ease',
             }}>
               {/* AI Analysis Dialog */}
