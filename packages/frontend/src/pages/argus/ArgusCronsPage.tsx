@@ -21,98 +21,50 @@ import {
   Schedule as ScheduleIcon,
   Pause as PausedIcon,
   Refresh as RefreshIcon,
-  MoreVert as MoreVertIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageHeader from '@/components/common/PageHeader';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import argusService from '@/services/argusService';
 
 // Types
 interface CronMonitor {
   id: string;
   name: string;
   slug: string;
-  schedule: string;
-  schedule_type: 'crontab' | 'interval';
-  status: 'ok' | 'error' | 'missed' | 'timeout' | 'disabled';
-  last_checkin: string | null;
-  next_checkin: string | null;
+  schedule_type: string;
+  schedule_value: string;
+  status: string;
+  last_checkin_at: string | null;
+  next_checkin_at: string | null;
+  last_status: string | null;
   environment: string;
-  owner: string | null;
+  checkin_margin: number;
+  max_runtime: number;
   created_at: string;
-  config: {
-    checkin_margin?: number;
-    max_runtime?: number;
-    timezone?: string;
-    failure_issue_threshold?: number;
-    recovery_threshold?: number;
-  };
 }
 
-const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactElement; label: string }> = {
-  ok: { color: '#4caf50', icon: <HealthyIcon sx={{ fontSize: 16 }} />, label: 'Healthy' },
-  error: { color: '#f44336', icon: <ErrorIcon sx={{ fontSize: 16 }} />, label: 'Error' },
-  missed: { color: '#ff9800', icon: <WarningIcon sx={{ fontSize: 16 }} />, label: 'Missed' },
-  timeout: { color: '#ff5722', icon: <ScheduleIcon sx={{ fontSize: 16 }} />, label: 'Timeout' },
-  disabled: { color: '#9e9e9e', icon: <PausedIcon sx={{ fontSize: 16 }} />, label: 'Disabled' },
-};
-
-// Demo data
-const DEMO_MONITORS: CronMonitor[] = [
-  {
-    id: '1', name: 'daily-digest-email', slug: 'daily-digest', schedule: '0 9 * * *',
-    schedule_type: 'crontab', status: 'ok', last_checkin: new Date(Date.now() - 3600000).toISOString(),
-    next_checkin: new Date(Date.now() + 82800000).toISOString(), environment: 'production',
-    owner: null, created_at: '2025-01-15T00:00:00Z',
-    config: { checkin_margin: 5, max_runtime: 300, timezone: 'UTC' },
-  },
-  {
-    id: '2', name: 'cleanup-old-sessions', slug: 'cleanup-sessions', schedule: '*/30 * * * *',
-    schedule_type: 'crontab', status: 'ok', last_checkin: new Date(Date.now() - 900000).toISOString(),
-    next_checkin: new Date(Date.now() + 900000).toISOString(), environment: 'production',
-    owner: null, created_at: '2025-02-01T00:00:00Z',
-    config: { checkin_margin: 2, max_runtime: 120 },
-  },
-  {
-    id: '3', name: 'process-payment-queue', slug: 'payment-queue', schedule: '*/5 * * * *',
-    schedule_type: 'crontab', status: 'error', last_checkin: new Date(Date.now() - 600000).toISOString(),
-    next_checkin: new Date(Date.now() + 300000).toISOString(), environment: 'production',
-    owner: 'backend-team', created_at: '2025-03-10T00:00:00Z',
-    config: { checkin_margin: 1, max_runtime: 60, failure_issue_threshold: 3 },
-  },
-  {
-    id: '4', name: 'nightly-backup', slug: 'nightly-backup', schedule: '0 2 * * *',
-    schedule_type: 'crontab', status: 'missed', last_checkin: new Date(Date.now() - 86400000).toISOString(),
-    next_checkin: new Date(Date.now() + 50400000).toISOString(), environment: 'production',
-    owner: 'infra-team', created_at: '2025-01-01T00:00:00Z',
-    config: { checkin_margin: 10, max_runtime: 7200, timezone: 'Asia/Seoul' },
-  },
-  {
-    id: '5', name: 'weekly-report', slug: 'weekly-report', schedule: '0 8 * * 1',
-    schedule_type: 'crontab', status: 'disabled', last_checkin: null,
-    next_checkin: null, environment: 'staging',
-    owner: null, created_at: '2025-04-01T00:00:00Z',
-    config: {},
-  },
-];
-
-function formatRelativeTime(isoStr: string | null): string {
+function formatRelativeTime(isoStr: string | null, t: any): string {
   if (!isoStr) return '-';
   const diff = Date.now() - new Date(isoStr).getTime();
   const absDiff = Math.abs(diff);
-  const prefix = diff < 0 ? 'in ' : '';
-  const suffix = diff >= 0 ? ' ago' : '';
-  if (absDiff < 60000) return `${prefix}${Math.floor(absDiff / 1000)}s${suffix}`;
-  if (absDiff < 3600000) return `${prefix}${Math.floor(absDiff / 60000)}m${suffix}`;
-  if (absDiff < 86400000) return `${prefix}${Math.floor(absDiff / 3600000)}h${suffix}`;
-  return `${prefix}${Math.floor(absDiff / 86400000)}d${suffix}`;
+  const prefix = diff < 0 ? t('common.time.in', 'in ') : '';
+  const suffix = diff >= 0 ? t('common.time.ago', ' ago') : '';
+  if (absDiff < 60000) return `${prefix}${Math.floor(absDiff / 1000)}${t('common.time.s', 's')}${suffix}`;
+  if (absDiff < 3600000) return `${prefix}${Math.floor(absDiff / 60000)}${t('common.time.m', 'm')}${suffix}`;
+  if (absDiff < 86400000) return `${prefix}${Math.floor(absDiff / 3600000)}${t('common.time.h', 'h')}${suffix}`;
+  return `${prefix}${Math.floor(absDiff / 86400000)}${t('common.time.d', 'd')}${suffix}`;
 }
 
 const ArgusCronsPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const isDark = theme.palette.mode === 'dark';
   const [searchParams] = useSearchParams();
   const { currentProject } = useOrgProject();
@@ -121,37 +73,119 @@ const ArgusCronsPage: React.FC = () => {
   const [monitors, setMonitors] = useState<CronMonitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+  
+  // Dialog State
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    schedule_value: '*/5 * * * *',
+    environment: 'production',
+    checkin_margin: 5,
+    max_runtime: 300,
+  });
+  const [formErrors, setFormErrors] = useState({ name: false, schedule_value: false });
+
+  const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactElement; label: string }> = {
+    ok: { color: '#4caf50', icon: <HealthyIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.ok', 'Healthy') },
+    error: { color: '#f44336', icon: <ErrorIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.error', 'Error') },
+    missed: { color: '#ff9800', icon: <WarningIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.missed', 'Missed') },
+    timeout: { color: '#ff5722', icon: <ScheduleIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.timeout', 'Timeout') },
+    disabled: { color: '#9e9e9e', icon: <PausedIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.disabled', 'Disabled') },
+    active: { color: '#2196f3', icon: <HealthyIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.active', 'Active') },
+  };
 
   const fetchMonitors = useCallback(async () => {
     setLoading(true);
-    // TODO: Replace with actual API call when backend supports crons
-    await new Promise(r => setTimeout(r, 500));
-    setMonitors(DEMO_MONITORS);
-    setLoading(false);
-  }, [projectId]);
+    try {
+      const data = await argusService.getCrons(projectId);
+      setMonitors(data);
+    } catch (error) {
+      console.error('Failed to load crons', error);
+      enqueueSnackbar(t('common.error', 'An error occurred'), { variant: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, enqueueSnackbar, t]);
 
   useEffect(() => { fetchMonitors(); }, [fetchMonitors]);
 
+  const handleCreate = async () => {
+    const errors = {
+      name: !formData.name.trim(),
+      schedule_value: !formData.schedule_value.trim()
+    };
+    setFormErrors(errors);
+    if (errors.name || errors.schedule_value || !formData.slug) return;
+
+    setIsSubmitting(true);
+    try {
+      const newMonitor = await argusService.createCron(projectId, {
+        ...formData,
+        schedule_type: 'crontab'
+      });
+      // Optimistic update
+      setMonitors([newMonitor, ...monitors]);
+      setCreateDialogOpen(false);
+      setFormData({
+        name: '', slug: '', schedule_value: '*/5 * * * *',
+        environment: 'production', checkin_margin: 5, max_runtime: 300
+      });
+      enqueueSnackbar(t('argus.crons.createSuccess', 'Monitor created successfully'), { variant: 'success' });
+    } catch (error) {
+      console.error('Create failed', error);
+      enqueueSnackbar(t('argus.crons.createFailed', 'Failed to create monitor.'), { variant: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      await argusService.deleteCron(projectId, id);
+      setMonitors(prev => prev.filter(m => m.id !== id));
+      enqueueSnackbar(t('common.deleteSuccess', 'Deleted successfully'), { variant: 'success' });
+    } catch (error) {
+      console.error('Delete failed', error);
+      enqueueSnackbar(t('common.deleteFailed', 'Failed to delete'), { variant: 'error' });
+    }
+  };
+
   const filtered = monitors.filter(m => {
-    if (statusFilter !== 'all' && m.status !== statusFilter) return false;
-    if (search && !m.name.toLowerCase().includes(search.toLowerCase())) return false;
+    const s = m.last_status || m.status || 'active';
+    if (statusFilter !== 'all' && s !== statusFilter) return false;
+    if (debouncedSearch && !m.name.toLowerCase().includes(debouncedSearch.toLowerCase())) return false;
     return true;
   });
 
   const statusCounts = monitors.reduce((acc, m) => {
-    acc[m.status] = (acc[m.status] || 0) + 1;
+    const s = m.last_status || m.status || 'active';
+    acc[s] = (acc[s] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   return (
     <Box>
-      <ArgusBreadcrumbs paths={[
-        { label: t('argus.nav.argus', 'Argus'), to: '/argus/overview' },
-        { label: t('argus.nav.crons', 'Crons') },
-      ]} />
-      <PageHeader title={t('argus.crons.title', 'Cron Monitors')} />
+      <PageHeader
+        icon={<ScheduleIcon />}
+        title={
+          <ArgusBreadcrumbs size="title" paths={[
+            { label: t('sidebar.argusCrons', 'Cron Monitors') },
+          ]} />
+        }
+        subtitle={t('argus.crons.subtitle', 'Manage scheduled jobs and background tasks')}
+      />
 
       {/* Status Summary */}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
@@ -197,7 +231,10 @@ const ArgusCronsPage: React.FC = () => {
           variant="contained"
           size="small"
           startIcon={<AddIcon />}
-          onClick={() => setCreateDialogOpen(true)}
+          onClick={() => {
+            setFormErrors({ name: false, schedule_value: false });
+            setCreateDialogOpen(true);
+          }}
           sx={{ textTransform: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600 }}
         >
           {t('argus.crons.createMonitor', 'Create Monitor')}
@@ -216,12 +253,10 @@ const ArgusCronsPage: React.FC = () => {
             ))}
           </Box>
         ) : filtered.length === 0 ? (
-          <Box sx={{ py: 6, textAlign: 'center' }}>
-            <ScheduleIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
-            <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-              {t('argus.crons.noMonitors', 'No cron monitors found')}
-            </Typography>
-          </Box>
+          <EmptyPlaceholder 
+            icon={<ScheduleIcon sx={{ fontSize: 40 }} />} 
+            message={t('argus.crons.noMonitors', 'No cron monitors found')} 
+          />
         ) : (
           <Table size="small">
             <TableHead>
@@ -249,7 +284,8 @@ const ArgusCronsPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {filtered.map((monitor) => {
-                const statusCfg = STATUS_CONFIG[monitor.status] || STATUS_CONFIG.ok;
+                const s = monitor.last_status || monitor.status || 'active';
+                const statusCfg = STATUS_CONFIG[s] || STATUS_CONFIG.active;
                 return (
                   <TableRow
                     key={monitor.id}
@@ -261,11 +297,9 @@ const ArgusCronsPage: React.FC = () => {
                         <Typography sx={{ fontSize: '0.82rem', fontWeight: 600 }}>
                           {monitor.name}
                         </Typography>
-                        {monitor.owner && (
-                          <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
-                            {monitor.owner}
-                          </Typography>
-                        )}
+                        <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
+                          {monitor.slug}
+                        </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -284,28 +318,30 @@ const ArgusCronsPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'text.secondary' }}>
-                        {monitor.schedule}
+                        {monitor.schedule_value}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
-                        {formatRelativeTime(monitor.last_checkin)}
+                        {formatRelativeTime(monitor.last_checkin_at, t)}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
-                        {formatRelativeTime(monitor.next_checkin)}
+                        {formatRelativeTime(monitor.next_checkin_at, t)}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={monitor.environment}
+                        label={t(`common.environment.${monitor.environment}`, monitor.environment)}
                         size="small"
                         sx={{ height: 18, fontSize: '0.6rem', fontWeight: 600 }}
                       />
                     </TableCell>
                     <TableCell>
-                      <IconButton size="small"><MoreVertIcon sx={{ fontSize: 16 }} /></IconButton>
+                      <IconButton size="small" onClick={(e) => handleDelete(e, monitor.id)}>
+                        <DeleteIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 );
@@ -326,25 +362,76 @@ const ArgusCronsPage: React.FC = () => {
         <DialogTitle sx={{ fontWeight: 700 }}>
           {t('argus.crons.createMonitor', 'Create Monitor')}
         </DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '8px !important' }}>
-          <TextField size="small" label={t('argus.crons.monitorName', 'Monitor Name')} fullWidth />
-          <TextField size="small" label={t('argus.crons.cronExpression', 'Cron Expression')} placeholder="*/5 * * * *" fullWidth />
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: '16px !important' }}>
+          <TextField 
+            size="small" 
+            label={t('argus.crons.monitorName', 'Monitor Name')} 
+            fullWidth 
+            value={formData.name}
+            onChange={e => {
+              const name = e.target.value;
+              setFormData({ ...formData, name, slug: name.toLowerCase().replace(/[^a-z0-9]/g, '-') });
+              if (name.trim()) setFormErrors(p => ({ ...p, name: false }));
+            }}
+            error={formErrors.name}
+            helperText={formErrors.name ? t('common.required', 'Required') : ''}
+          />
+          <TextField 
+            size="small" 
+            label={t('argus.crons.slug', 'Slug')} 
+            fullWidth 
+            value={formData.slug}
+            disabled
+          />
+          <TextField 
+            size="small" 
+            label={t('argus.crons.cronExpression', 'Cron Expression')} 
+            placeholder="*/5 * * * *" 
+            fullWidth 
+            value={formData.schedule_value}
+            onChange={e => {
+              setFormData({ ...formData, schedule_value: e.target.value });
+              if (e.target.value.trim()) setFormErrors(p => ({ ...p, schedule_value: false }));
+            }}
+            error={formErrors.schedule_value}
+            helperText={formErrors.schedule_value ? t('common.required', 'Required') : t('argus.crons.cronExpressionHelper', 'UTC Timezone. Next run will be calculated upon creation.')}
+          />
           <FormControl size="small" fullWidth>
             <InputLabel>{t('argus.crons.environment', 'Environment')}</InputLabel>
-            <Select label={t('argus.crons.environment', 'Environment')} defaultValue="production">
-              <MenuItem value="production">Production</MenuItem>
-              <MenuItem value="staging">Staging</MenuItem>
-              <MenuItem value="development">Development</MenuItem>
+            <Select 
+              label={t('argus.crons.environment', 'Environment')} 
+              value={formData.environment}
+              onChange={e => setFormData({ ...formData, environment: e.target.value })}
+            >
+              <MenuItem value="production">{t('common.environment.production', 'Production')}</MenuItem>
+              <MenuItem value="staging">{t('common.environment.staging', 'Staging')}</MenuItem>
+              <MenuItem value="development">{t('common.environment.development', 'Development')}</MenuItem>
             </Select>
           </FormControl>
-          <TextField size="small" label={t('argus.crons.checkinMargin', 'Check-in Margin (min)')} type="number" defaultValue={5} fullWidth />
-          <TextField size="small" label={t('argus.crons.maxRuntime', 'Max Runtime (sec)')} type="number" defaultValue={300} fullWidth />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField 
+              size="small" 
+              label={t('argus.crons.checkinMargin', 'Check-in Margin (min)')} 
+              type="number" 
+              fullWidth 
+              value={formData.checkin_margin}
+              onChange={e => setFormData({ ...formData, checkin_margin: Number(e.target.value) })}
+            />
+            <TextField 
+              size="small" 
+              label={t('argus.crons.maxRuntime', 'Max Runtime (sec)')} 
+              type="number" 
+              fullWidth 
+              value={formData.max_runtime}
+              onChange={e => setFormData({ ...formData, max_runtime: Number(e.target.value) })}
+            />
+          </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setCreateDialogOpen(false)} sx={{ textTransform: 'none' }}>
+          <Button onClick={() => setCreateDialogOpen(false)} sx={{ textTransform: 'none' }} disabled={isSubmitting}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={() => setCreateDialogOpen(false)} sx={{ textTransform: 'none' }}>
+          <Button variant="contained" onClick={handleCreate} sx={{ textTransform: 'none' }} disabled={isSubmitting}>
             {t('common.save')}
           </Button>
         </DialogActions>

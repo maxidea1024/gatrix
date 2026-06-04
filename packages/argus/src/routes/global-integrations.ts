@@ -123,7 +123,7 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
             'User-Agent': 'Gatrix-Argus'
           }
         });
-        const result = await response.json();
+        const result: any = await response.json();
         if (response.ok) {
           return reply.send({ data: { ok: true, name: result.name, html_url: result.html_url } });
         } else {
@@ -151,7 +151,7 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
             'Authorization': `Basic ${auth}`
           }
         });
-        const result = await response.json();
+        const result: any = await response.json();
         if (response.ok) {
           return reply.send({ data: { ok: true, display_name: result.display_name, account_id: result.account_id } });
         } else {

@@ -1476,6 +1476,45 @@ class ArgusService {
   async deleteOwnershipRule(projectId: number | string, ruleId: number): Promise<void> {
     await argusApi.delete(`${ARGUS_BASE}/${projectId}/ownership/${ruleId}`);
   }
+  // --- Crons ---
+
+  async getCrons(projectId: number | string): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/projects/${projectId}/crons`);
+    return response.data?.data || response.data || [];
+  }
+
+  async createCron(projectId: number | string, data: any): Promise<any> {
+    const response = await argusApi.post(`${ARGUS_BASE}/projects/${projectId}/crons`, data);
+    return response.data?.data || response.data;
+  }
+
+  async updateCron(projectId: number | string, monitorId: string, data: any): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/projects/${projectId}/crons/${monitorId}`, data);
+  }
+
+  async deleteCron(projectId: number | string, monitorId: string): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/crons/${monitorId}`);
+  }
+
+  // --- Uptime ---
+
+  async getUptimes(projectId: number | string): Promise<any[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/projects/${projectId}/uptime`);
+    return response.data?.data || response.data || [];
+  }
+
+  async createUptime(projectId: number | string, data: any): Promise<any> {
+    const response = await argusApi.post(`${ARGUS_BASE}/projects/${projectId}/uptime`, data);
+    return response.data?.data || response.data;
+  }
+
+  async updateUptime(projectId: number | string, monitorId: string, data: any): Promise<void> {
+    await argusApi.put(`${ARGUS_BASE}/projects/${projectId}/uptime/${monitorId}`, data);
+  }
+
+  async deleteUptime(projectId: number | string, monitorId: string): Promise<void> {
+    await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/uptime/${monitorId}`);
+  }
 }
 
 // --- Alert Rule Types ---

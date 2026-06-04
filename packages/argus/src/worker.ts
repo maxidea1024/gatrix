@@ -3,6 +3,8 @@ import { TransactionWorker } from './workers/transaction-worker';
 import { SessionWorker } from './workers/session-worker';
 import { FeedbackWorker } from './workers/feedback-worker';
 import { MetricWorker } from './workers/metric-worker';
+import { UptimeWorker } from './workers/uptime-worker';
+import { CronSupervisorWorker } from './workers/cron-supervisor-worker';
 import { testClickHouseConnection } from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import { createLogger } from './utils/logger';
@@ -32,15 +34,19 @@ async function start() {
     const sessionWorker = new SessionWorker();
     const feedbackWorker = new FeedbackWorker();
     const metricWorker = new MetricWorker();
+    const uptimeWorker = new UptimeWorker();
+    const cronSupervisorWorker = new CronSupervisorWorker();
 
     await errorWorker.start();
     await transactionWorker.start();
     await sessionWorker.start();
     await feedbackWorker.start();
     await metricWorker.start();
+    await uptimeWorker.start();
+    await cronSupervisorWorker.start();
 
     logger.info('All workers started successfully', {
-      workers: ['error', 'transaction', 'session', 'feedback', 'metric'],
+      workers: ['error', 'transaction', 'session', 'feedback', 'metric', 'uptime', 'cron'],
     });
 
     // Graceful shutdown
@@ -54,6 +60,8 @@ async function start() {
           sessionWorker.close(),
           feedbackWorker.close(),
           metricWorker.close(),
+          uptimeWorker.close(),
+          cronSupervisorWorker.close(),
         ]);
 
         logger.info('All workers closed');
