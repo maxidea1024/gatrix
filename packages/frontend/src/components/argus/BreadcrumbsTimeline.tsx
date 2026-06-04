@@ -1,4 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import BreadcrumbExpandedDetail from './BreadcrumbExpandedDetail';
 import {
   Box,
   Typography,
@@ -67,6 +69,8 @@ interface BreadcrumbsTimelineProps {
     value?: string;
     timestamp?: string;
   };
+  /** If true, all rows render expanded data by default (used in Drawer mode) */
+  fullyExpanded?: boolean;
 }
 
 // ==================== Constants ====================
@@ -255,6 +259,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
   summaryMode = false,
   summaryCount = 5,
   errorEvent,
+  fullyExpanded = false,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -403,7 +408,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
     const cfg = getCategoryConfig(crumb.category, crumb.type);
     const levelColor = crumb.level ? LEVEL_COLORS[crumb.level] : undefined;
     const hasData = crumb.data && Object.keys(crumb.data).filter(k => k !== '_virtual').length > 0;
-    const isExpanded = expandedIdx === idx;
+    const isExpanded = fullyExpanded || expandedIdx === idx;
     const isError = crumb.level === 'error' || crumb.level === 'fatal';
     const isVirtual = crumb.data?._virtual;
     const isHttp = isHttpBreadcrumb(crumb);
@@ -426,10 +431,10 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
             : isError ? alpha('#f44336', 0.03) : 'transparent',
           transition: 'background 0.1s',
           '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
-          cursor: hasData ? 'pointer' : 'default',
+          cursor: 'pointer',
 
         }}
-        onClick={() => hasData && setExpandedIdx(isExpanded ? null : idx)}
+        onClick={() => !fullyExpanded && setExpandedIdx(isExpanded ? null : idx)}
       >
         {/* Timeline line */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 20, alignSelf: 'stretch' }}>
@@ -484,7 +489,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
                 sx={{ height: 16, fontSize: '0.58rem', fontWeight: 700, backgroundColor: alpha('#f44336', 0.1), color: '#f44336', border: 'none' }}
               />
             )}
-            {hasData && (
+            {!fullyExpanded && (
               <ExpandMoreIcon sx={{
                 fontSize: 14, color: 'text.disabled',
                 transform: isExpanded ? 'rotate(180deg)' : 'none',
@@ -525,27 +530,9 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
             </Box>
           )}
 
-          {/* Expanded data */}
+          {/* Expanded data — uses BreadcrumbExpandedDetail */}
           <Collapse in={isExpanded}>
-            {hasData && (
-              <Box sx={{
-                mt: 0.5, p: 1, borderRadius: '4px',
-                backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
-                fontSize: '0.7rem',
-                maxHeight: 200, overflow: 'auto',
-              }}>
-                {Object.entries(crumb.data!).filter(([k]) => k !== '_virtual').map(([key, val]) => (
-                  <Box key={key} sx={{ display: 'flex', gap: 1, py: 0.2 }}>
-                    <Typography component="span" sx={{ color: 'text.secondary', fontSize: '0.7rem', minWidth: 80, fontWeight: 600 }}>
-                      {key}:
-                    </Typography>
-                    <Typography component="span" sx={{ color: 'text.primary', fontSize: '0.7rem', wordBreak: 'break-all' }}>
-                      {typeof val === 'object' ? JSON.stringify(val) : String(val)}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
+            <BreadcrumbExpandedDetail crumb={crumb} isDark={isDark} fullyExpanded={fullyExpanded} />
           </Collapse>
         </Box>
 
@@ -688,7 +675,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
     </Box>
   );
 
-  // ---- Timeline list ----
+  // ---- Timeline list (simple, for summary mode) ----
   const renderTimeline = (items: Breadcrumb[]) => (
     <Box sx={{
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
@@ -698,6 +685,45 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
       {items.map((crumb, idx) => renderItem(crumb, idx, items.length))}
     </Box>
   );
+
+  // ---- Virtualized Timeline (for Drawer with many items) ----
+  const VirtualizedTimeline: React.FC<{ items: Breadcrumb[] }> = ({ items }) => {
+    const parentRef = useRef<HTMLDivElement>(null);
+    const virtualizer = useVirtualizer({
+      count: items.length,
+      getScrollElement: () => parentRef.current,
+      estimateSize: () => 52,
+      overscan: 10,
+    });
+
+    return (
+      <Box
+        ref={parentRef}
+        sx={{
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          borderRadius: '8px',
+          overflow: 'auto',
+          maxHeight: 'calc(100vh - 200px)',
+        }}
+      >
+        <Box sx={{ height: virtualizer.getTotalSize(), width: '100%', position: 'relative' }}>
+          {virtualizer.getVirtualItems().map(virtualRow => (
+            <Box
+              key={virtualRow.key}
+              ref={virtualizer.measureElement}
+              data-index={virtualRow.index}
+              sx={{
+                position: 'absolute', top: 0, left: 0, width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              {renderItem(items[virtualRow.index], virtualRow.index, items.length)}
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    );
+  };
 
   // ---- SUMMARY MODE ----
   if (summaryMode) {
@@ -763,7 +789,11 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
             {/* Drawer body */}
             <Box sx={{ flex: 1, overflow: 'auto', px: 2.5, py: 2 }}>
               {renderToolbar(true)}
-              {renderTimeline(filtered)}
+              {filtered.length > 50 ? (
+                <VirtualizedTimeline items={filtered} />
+              ) : (
+                renderTimeline(filtered)
+              )}
             </Box>
           </Box>
         </Drawer>

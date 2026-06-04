@@ -3778,11 +3778,12 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.11.3"
     "@mui/x-date-pickers": "npm:^8.11.3"
     "@mui/x-date-pickers-pro": "npm:^8.11.3"
-    "@tanstack/react-virtual": "npm:^3.13.12"
+    "@tanstack/react-virtual": "npm:^3.14.2"
     "@testing-library/jest-dom": "npm:^6.1.5"
     "@testing-library/react": "npm:^14.1.2"
     "@testing-library/user-event": "npm:^14.5.1"
     "@types/d3-force": "npm:^3.0.10"
+    "@types/prismjs": "npm:^1.26.6"
     "@types/react": "npm:^18.2.43"
     "@types/react-beautiful-dnd": "npm:^13.1.8"
     "@types/react-dom": "npm:^18.2.17"
@@ -3823,6 +3824,7 @@ __metadata:
     monaco-editor: "npm:^0.55.1"
     mui-color-input: "npm:^7.0.0"
     notistack: "npm:^3.0.2"
+    prismjs: "npm:^1.30.0"
     quill: "npm:^2.0.3"
     react: "npm:18.2.0"
     react-beautiful-dnd: "npm:^13.1.1"
@@ -8789,22 +8791,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:^3.13.12":
-  version: 3.13.21
-  resolution: "@tanstack/react-virtual@npm:3.13.21"
+"@tanstack/react-virtual@npm:^3.14.2":
+  version: 3.14.2
+  resolution: "@tanstack/react-virtual@npm:3.14.2"
   dependencies:
-    "@tanstack/virtual-core": "npm:3.13.21"
+    "@tanstack/virtual-core": "npm:3.17.0"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/4af1da35de730cba482c94529e51b52f7a33aa1855270c572d67c80965931090301299b55ca2803a2c58d5082ba36be4ae252d972ce4cb225088ef391da405f3
+  checksum: 10c0/6d42161f17fc037663270d68d14340e8d2561bd1b8ea17c295477adf99fa6d5ba4e4cde2ee050047c673217f7f71db92749159d25885530de1c78ca18ef6536d
   languageName: node
   linkType: hard
 
-"@tanstack/virtual-core@npm:3.13.21":
-  version: 3.13.21
-  resolution: "@tanstack/virtual-core@npm:3.13.21"
-  checksum: 10c0/e420e3d3d7d494deab873fd1d4114a5a5aa65ca475f0a8149c84bdd52572c695a142449c6de033fbb369eac68e2d4b0c25c090c97f9cceaad3b51a7f22f3e2a7
+"@tanstack/virtual-core@npm:3.17.0":
+  version: 3.17.0
+  resolution: "@tanstack/virtual-core@npm:3.17.0"
+  checksum: 10c0/313c5762343ad93ec0569b528c111a43f9615acc572293a71efc6dcf94ff9d791c97f1ada32b7dfbda79ed7d472834b14315ebe54d74b0221224732e501def6f
   languageName: node
   linkType: hard
 
@@ -9614,7 +9616,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prismjs@npm:^1.0.0":
+"@types/prismjs@npm:^1.0.0, @types/prismjs@npm:^1.26.6":
   version: 1.26.6
   resolution: "@types/prismjs@npm:1.26.6"
   checksum: 10c0/152a27500cb32b114edfb77f9d0dccd03bebc84828d1e92abacaf212b22d3ccdde041ce421dd58b6ec8461bbec7cd76ed5ee773cae4be7ca36a6dd4ddcf0f9e7
