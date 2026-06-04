@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-sql';
 import BreadcrumbExpandedDetail from './BreadcrumbExpandedDetail';
 import {
   Box,
@@ -501,6 +503,27 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           {/* Message — specialized rendering */}
           {isHttp ? (
             <HttpBreadcrumbContent crumb={crumb} isError={isError} />
+          ) : isSql && crumb.message ? (
+            <Box
+              component="code"
+              sx={{
+                fontSize: '0.76rem',
+                wordBreak: 'break-word',
+                backgroundColor: isDark ? 'rgba(76,175,80,0.06)' : 'rgba(76,175,80,0.04)',
+                px: 0.5, py: 0.1, borderRadius: '3px',
+                border: `1px solid ${alpha('#4caf50', 0.15)}`,
+                display: 'inline',
+                '& .token.keyword': { color: isDark ? '#569cd6' : '#0000ff', fontWeight: 700 },
+                '& .token.string': { color: isDark ? '#ce9178' : '#a31515' },
+                '& .token.number': { color: isDark ? '#b5cea8' : '#098658' },
+                '& .token.operator': { color: isDark ? '#d4d4d4' : '#333' },
+                '& .token.punctuation': { color: isDark ? '#808080' : '#999' },
+                '& .token.function': { color: isDark ? '#dcdcaa' : '#795e26' },
+              }}
+              dangerouslySetInnerHTML={{
+                __html: (() => { try { return Prism.highlight(crumb.message, Prism.languages.sql, 'sql'); } catch { return crumb.message; } })(),
+              }}
+            />
           ) : (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography sx={{
@@ -508,11 +531,6 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
                 color: isError || isVirtual ? '#f44336' : 'text.primary',
                 fontWeight: isError || isVirtual ? 600 : 400,
                 wordBreak: 'break-word',
-
-                ...(isSql ? {
-                  backgroundColor: isDark ? 'rgba(76,175,80,0.06)' : 'rgba(76,175,80,0.04)',
-                  px: 0.5, py: 0.1, borderRadius: '3px', border: `1px solid ${alpha('#4caf50', 0.15)}`,
-                } : {}),
               }}>
                 {crumb.message || '(no message)'}
               </Typography>
