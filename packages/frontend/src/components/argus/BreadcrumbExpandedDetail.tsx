@@ -5,9 +5,11 @@ import {
 import {
   ContentCopy as CopyIcon,
   OpenInNew as ExternalLinkIcon,
+  Storage as DatabaseIcon,
 } from '@mui/icons-material';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-sql';
+import { CopyButton } from '@/components/common/CopyButton';
 import type { Breadcrumb } from './BreadcrumbsTimeline';
 
 /* ─── Helpers ─── */
@@ -282,11 +284,7 @@ const BreadcrumbExpandedDetail: React.FC<BreadcrumbExpandedDetailProps> = ({
   const isNav = isNavigationCategory(crumb);
   const isSql = isSqlMessage(crumb.message);
 
-  const handleCopyCrumb = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const text = JSON.stringify(crumb, null, 2);
-    navigator.clipboard.writeText(text).catch(() => {});
-  };
+
 
   return (
     <Box sx={{
@@ -296,15 +294,13 @@ const BreadcrumbExpandedDetail: React.FC<BreadcrumbExpandedDetailProps> = ({
       position: 'relative',
     }}>
       {/* Copy button */}
-      <Tooltip title="Copy breadcrumb">
-        <IconButton
-          size="small"
-          onClick={handleCopyCrumb}
-          sx={{ position: 'absolute', top: 4, right: 4, p: 0.3, opacity: 0.5, '&:hover': { opacity: 1 } }}
-        >
-          <CopyIcon sx={{ fontSize: 12 }} />
-        </IconButton>
-      </Tooltip>
+      <Box sx={{ position: 'absolute', top: 4, right: 4, opacity: 0.5, '&:hover': { opacity: 1 } }} onClick={(e) => e.stopPropagation()}>
+        <CopyButton 
+          text={JSON.stringify(crumb, null, 2)}
+          size={12}
+          sx={{ p: 0.3 }}
+        />
+      </Box>
 
       {/* Category-specific rendering */}
       {isHttp && hasData ? (

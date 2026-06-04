@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Box, Typography, Tooltip, IconButton, useTheme } from '@mui/material';
+import { Box, Typography, IconButton, useTheme } from '@mui/material';
+import SafeTooltip from '@/components/common/SafeTooltip';
 import {
   ContentCopy as CopyIcon,
   Check as CheckIcon,
@@ -53,7 +54,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   }, [text, onCopied]);
 
   return (
-    <Tooltip title={copied ? copiedTooltip : tooltip} placement={tooltipPlacement}>
+    <SafeTooltip title={copied ? copiedTooltip : tooltip} placement={tooltipPlacement}>
       <IconButton
         onClick={handleCopy}
         size="small"
@@ -69,7 +70,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
           : <CopyIcon sx={{ fontSize: size }} />
         }
       </IconButton>
-    </Tooltip>
+    </SafeTooltip>
   );
 };
 
@@ -142,14 +143,14 @@ export const CopyableField: React.FC<CopyableFieldProps> = ({
         }}>
           {value}
         </Typography>
-        <Tooltip title={copied ? '✓ 복사됨' : '클릭하여 복사'} placement="top">
+        <SafeTooltip title={copied ? '✓ 복사됨' : '클릭하여 복사'} placement="top">
           <Box sx={{
             color: copied ? '#2ea44f' : 'text.secondary',
             display: 'flex', alignItems: 'center', transition: 'color 0.15s',
           }}>
             {copied ? <CheckIcon sx={{ fontSize: 16 }} /> : <CopyIcon sx={{ fontSize: 16 }} />}
           </Box>
-        </Tooltip>
+        </SafeTooltip>
       </Box>
     </Box>
   );
