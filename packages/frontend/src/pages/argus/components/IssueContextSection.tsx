@@ -42,38 +42,38 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
   const [showTrace, setShowTrace] = useState(false);
 
   // Parse tags safely
-  const parsedTags = (() => {
+  const parsedTags = React.useMemo(() => {
     try {
       return typeof event.tags === 'string' ? JSON.parse(event.tags) : (event.tags || {});
     } catch { return {}; }
-  })();
+  }, [event.tags]);
 
   // Parse extra data safely
-  const extraData = (() => {
+  const extraData = React.useMemo(() => {
     if (!event.extra) return null;
     try {
       const d = typeof event.extra === 'string' ? JSON.parse(event.extra) : event.extra;
       return d && Object.keys(d).length > 0 ? d : null;
     } catch { return null; }
-  })();
+  }, [event.extra]);
 
   // Parse contexts safely
-  const ctxData = (() => {
+  const ctxData = React.useMemo(() => {
     if (!event.contexts) return null;
     try {
       const d = typeof event.contexts === 'string' ? JSON.parse(event.contexts) : event.contexts;
       return d && Object.keys(d).length > 0 ? d : null;
     } catch { return null; }
-  })();
+  }, [event.contexts]);
 
   // Parse breadcrumbs
-  const breadcrumbsArr = (() => {
+  const breadcrumbsArr = React.useMemo(() => {
     if (!event.breadcrumbs) return [];
     try {
       const arr = typeof event.breadcrumbs === 'string' ? JSON.parse(event.breadcrumbs) : event.breadcrumbs;
       return Array.isArray(arr) ? arr : [];
     } catch { return []; }
-  })();
+  }, [event.breadcrumbs]);
 
   return (
     <>

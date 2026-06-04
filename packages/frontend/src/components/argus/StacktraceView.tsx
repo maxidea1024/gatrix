@@ -21,7 +21,7 @@ interface StacktraceViewProps {
   isDark: boolean;
 }
 
-const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'full', order = 'recent', isDark }) => {
+const StacktraceView: React.FC<StacktraceViewProps> = React.memo(({ stacktrace, mode = 'full', order = 'recent', isDark }) => {
   const { t } = useTranslation();
   const [toggledFrames, setToggledFrames] = useState<Set<number>>(new Set());
 
@@ -45,6 +45,9 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
     });
   };
 
+  // Only expand the first 3 in-app frames by default to prevent UI freezing
+  let inAppCount = 0;
+
   if (displayFrames.length === 0 && mode === 'relevant') {
     return (
       <Box sx={{ p: 4, textAlign: 'center', color: 'text.secondary' }}>
@@ -60,7 +63,14 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
       {displayFrames.map((frame: any, idx: number) => {
         const isInApp = !!frame.in_app;
         const hasContext = !!frame.context_line || (frame.pre_context && frame.pre_context.length > 0);
-        const isExpanded = hasContext && (isInApp ? !toggledFrames.has(idx) : toggledFrames.has(idx));
+        
+        let defaultExpanded = false;
+        if (hasContext && isInApp) {
+          inAppCount++;
+          if (inAppCount <= 3) defaultExpanded = true;
+        }
+        
+        const isExpanded = hasContext && (defaultExpanded ? !toggledFrames.has(idx) : toggledFrames.has(idx));
         
         let codeSnippet = '';
         let startLine = 1;
@@ -152,7 +162,7 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
                       margin: 0,
                       padding: '8px 0',
                       fontSize: '0.8rem',
-                      backgroundColor: 'transparent',
+                      background: 'transparent',
                     }}
                   >
                     {codeSnippet}
@@ -165,6 +175,6 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
       })}
     </Box>
   );
-};
+});
 
 export default StacktraceView;

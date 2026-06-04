@@ -1457,10 +1457,9 @@ const METRICS_TEMPLATES = [
 
 
 function generateLogsForEvent(
-  issueId: number, timestamp: Date, scenario: ErrorScenario,
+  issueId: number, traceId: string, timestamp: Date, scenario: ErrorScenario,
   user: { id: string; ip: string }, server: string, env: string, release: string
 ): any[] {
-  const traceId = uuid();
   const baseTime = new Date(timestamp.getTime() - randomInt(5000, 30000));
   const service = randomPick(scenario.services);
   const pod = k8sPodName(service);
@@ -1535,10 +1534,16 @@ async function main() {
 
   // ──────── 1.5. FETCH DSN KEYS ────────
   console.log('\n🔑 Fetching DSN keys from MySQL...');
-  const [dsnKeyRows] = await pool.query(
-    'SELECT id, is_active FROM g_argus_dsn_keys WHERE project_id = ?',
-    [PROJECT_ID]
-  ) as any[];
+  let dsnKeyRows: any[] = [];
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, is_active FROM g_argus_dsn_keys WHERE project_id = ?',
+      [PROJECT_ID]
+    );
+    dsnKeyRows = rows as any[];
+  } catch (e) {
+    console.log('   ⚠ Error fetching DSN keys (table missing?).');
+  }
   const activeDsnKeys: number[] = (dsnKeyRows as any[]).filter((k: any) => k.is_active).map((k: any) => k.id);
   if (activeDsnKeys.length === 0) {
     console.log('   ⚠ No active DSN keys found. Events will use dsn_key_id=0.');
@@ -1731,9 +1736,12 @@ async function main() {
       if (timestamp > dsnTs.max) dsnTs.max = timestamp;
     }
 
+    const traceId = uuid();
+
     allEvents.push({
       event_id: eventId,
       project_id: PROJECT_ID,
+      _traceId: traceId,
       issue_id: 0,
       dsn_key_id: dsnKeyId,
       timestamp: timestamp.toISOString(),
@@ -1825,7 +1833,7 @@ async function main() {
       http_referer: 'https://game.unchartedwaters.io',
       tags: dynamicTags(scenario, randomPick(scenario.servers), env),
       extra: dynamicExtra(scenario),
-      contexts: JSON.stringify(scenario.contexts),
+      contexts: JSON.stringify({ ...scenario.contexts, trace: { trace_id: traceId } }),
       breadcrumbs: JSON.stringify(breadcrumbs),
       is_handled: scenario.level === 'warning' ? 1 : 0,
       is_symbolicated: 0,
@@ -1892,7 +1900,7 @@ async function main() {
     if (!tracker) continue;
     const scenario = tracker.scenario;
     const logs = generateLogsForEvent(
-      tracker.id, new Date(ev.timestamp), scenario,
+      tracker.id, ev._traceId, new Date(ev.timestamp), scenario,
       ev._user || { id: 'unknown', ip: '0.0.0.0' },
       ev._server || randomPick(scenario.servers),
       ev._env || randomPick(scenario.environments),
@@ -1932,7 +1940,7 @@ async function main() {
     const timestamp = randomDateWeighted(DAYS_BACK);
     const duration = randomInt(tmpl.durMin, tmpl.durMax);
     const start = new Date(timestamp.getTime() - duration);
-    const traceId = uuid();
+    const traceId = allEvents[i] ? allEvents[i]._traceId : uuid();
     const spanId = uuid().substring(0, 16);
     const isError = Math.random() < tmpl.errRate;
     const env = randomPick(['production', 'production', 'production', 'staging']);
@@ -2171,11 +2179,15 @@ async function main() {
     console.log(`\n🔑 Updating DSN key first_seen/last_seen for ${dsnKeyTimestamps.size} keys...`);
     for (const [keyId, ts] of dsnKeyTimestamps) {
       if (keyId === 0) continue;
-      await pool.query(
-        `UPDATE g_argus_dsn_keys SET first_seen = ?, last_seen = ? WHERE id = ?`,
-        [formatDate(ts.min), formatDate(ts.max), keyId]
-      );
-      console.log(`   ✓ DSN key ${keyId}: first=${formatDate(ts.min)}, last=${formatDate(ts.max)}`);
+      try {
+        await pool.query(
+          `UPDATE g_argus_dsn_keys SET first_seen = ?, last_seen = ? WHERE id = ?`,
+          [formatDate(ts.min), formatDate(ts.max), keyId]
+        );
+        console.log(`   ✓ DSN key ${keyId}: first=${formatDate(ts.min)}, last=${formatDate(ts.max)}`);
+      } catch (e) {
+        console.log(`   ⚠ Failed to update DSN key ${keyId} (table missing?)`);
+      }
     }
   }
 

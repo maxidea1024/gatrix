@@ -199,6 +199,130 @@ const TRACKER_PROVIDERS: (TrackerProviderDef & { gradient: string; accentColor: 
       { key: 'team_id', labelKey: 'argus.settings.linearTeamId', labelFallback: 'Team ID', placeholder: 'team-uuid' },
     ],
   },
+  {
+    id: 'clickup', name: 'ClickUp', color: '#7B68EE',
+    gradient: 'linear-gradient(160deg, #4B0082 0%, #7B68EE 40%, #9370DB 100%)',
+    accentColor: '#9370DB',
+    descKey: 'argus.settings.clickupDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'ClickUp' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://api.clickup.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'API Token', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'list_id', labelKey: 'argus.settings.clickupListId', labelFallback: 'List ID', placeholder: '12345678' },
+    ],
+  },
+  {
+    id: 'asana', name: 'Asana', color: '#F06A6A',
+    gradient: 'linear-gradient(160deg, #B22222 0%, #F06A6A 40%, #FA8072 100%)',
+    accentColor: '#FA8072',
+    descKey: 'argus.settings.asanaDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Asana' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://app.asana.com/api/1.0' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Personal Access Token', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'project_gid', labelKey: 'argus.settings.asanaProjectGid', labelFallback: 'Project GID', placeholder: '123456789012345' },
+    ],
+  },
+  {
+    id: 'notion', name: 'Notion', color: '#000000',
+    gradient: 'linear-gradient(160deg, #000000 0%, #333333 40%, #666666 100%)',
+    accentColor: '#888888',
+    descKey: 'argus.settings.notionDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Notion' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://api.notion.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Integration Secret', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'database_id', labelKey: 'argus.settings.notionDbId', labelFallback: 'Database ID', placeholder: 'abcd1234abcd1234' },
+      { key: 'title_property', labelKey: 'argus.settings.notionTitleProp', labelFallback: 'Title Property Name', placeholder: 'Name' },
+    ],
+  },
+  {
+    id: 'shortcut', name: 'Shortcut', color: '#3A9FA0',
+    gradient: 'linear-gradient(160deg, #006064 0%, #3A9FA0 40%, #4DD0E1 100%)',
+    accentColor: '#4DD0E1',
+    descKey: 'argus.settings.shortcutDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Shortcut' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://api.app.shortcut.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'API Token', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'project_id', labelKey: 'argus.settings.shortcutProjectId', labelFallback: 'Project ID', placeholder: '123' },
+    ],
+  },
+  {
+    id: 'azure_devops', name: 'Azure DevOps', color: '#0078D7',
+    gradient: 'linear-gradient(160deg, #004578 0%, #0078D7 40%, #00BFFF 100%)',
+    accentColor: '#00BFFF',
+    descKey: 'argus.settings.azureDevOpsDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Azure DevOps' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://dev.azure.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Personal Access Token', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'organization', labelKey: 'argus.settings.azureOrg', labelFallback: 'Organization', placeholder: 'my-org' },
+      { key: 'project', labelKey: 'argus.settings.azureProject', labelFallback: 'Project', placeholder: 'my-project' },
+    ],
+  },
+  {
+    id: 'redmine', name: 'Redmine', color: '#A30000',
+    gradient: 'linear-gradient(160deg, #660000 0%, #A30000 40%, #E60000 100%)',
+    accentColor: '#E60000',
+    descKey: 'argus.settings.redmineDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Redmine' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://redmine.example.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'API Key', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'project_id', labelKey: 'argus.settings.redmineProjectId', labelFallback: 'Project ID', placeholder: '123' },
+      { key: 'tracker_id', labelKey: 'argus.settings.redmineTrackerId', labelFallback: 'Tracker ID (1 for Bug)', placeholder: '1' },
+    ],
+  },
+  {
+    id: 'youtrack', name: 'YouTrack', color: '#000000',
+    gradient: 'linear-gradient(160deg, #000000 0%, #333333 40%, #666666 100%)',
+    accentColor: '#888888',
+    descKey: 'argus.settings.youtrackDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'YouTrack' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://youtrack.example.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Permanent Token', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'project_id', labelKey: 'argus.settings.youtrackProjectId', labelFallback: 'Project Short Name', placeholder: 'PROJ' },
+    ],
+  },
+  {
+    id: 'trello', name: 'Trello', color: '#0079BF',
+    gradient: 'linear-gradient(160deg, #026AA7 0%, #0079BF 40%, #00AECC 100%)',
+    accentColor: '#00AECC',
+    descKey: 'argus.settings.trelloDesc',
+    icon: <BugIcon />,
+    baseFields: [
+      { key: 'name', labelKey: 'argus.settings.trackerName', labelFallback: 'Display Name', placeholder: 'Trello' },
+      { key: 'api_url', labelKey: 'argus.settings.trackerApiUrl', labelFallback: 'API URL', placeholder: 'https://api.trello.com' },
+      { key: 'api_token', labelKey: 'argus.settings.trackerApiToken', labelFallback: 'Token', placeholder: '', type: 'password' },
+    ],
+    configFields: [
+      { key: 'api_key', labelKey: 'argus.settings.trelloApiKey', labelFallback: 'API Key', placeholder: 'abcd1234abcd1234' },
+      { key: 'list_id', labelKey: 'argus.settings.trelloListId', labelFallback: 'List ID', placeholder: 'abcd1234abcd1234' },
+    ],
+  },
 ];
 
 // ─── Notification Providers ─────────────────────────────────────────

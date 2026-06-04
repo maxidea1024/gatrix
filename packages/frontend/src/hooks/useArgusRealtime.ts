@@ -38,8 +38,8 @@ export function useArgusRealtime(
   useEffect(() => {
     if (!projectId || !enabled) return;
 
-    // Connect
-    argusRealtimeService.connect(projectId);
+    // Connect (Temporarily disabled to prevent 404 loops since backend SSE stream is not implemented)
+    // argusRealtimeService.connect(projectId);
 
     const handleConnected = () => setIsConnected(true);
     const handleIssueCreated = (event: ArgusRealtimeEvent) => {
@@ -68,7 +68,7 @@ export function useArgusRealtime(
       argusRealtimeService.off('issue:updated', handleIssueUpdated);
       argusRealtimeService.off('issue:resolved', handleIssueResolved);
       argusRealtimeService.off('event:created', handleEventCreated);
-      argusRealtimeService.disconnect();
+      // argusRealtimeService.disconnect();
       setIsConnected(false);
     };
   }, [projectId, enabled]);

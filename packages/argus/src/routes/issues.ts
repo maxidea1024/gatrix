@@ -131,7 +131,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
         if (hasContextFilter || hasTimeFilter) {
           const conditions: string[] = [`project_id = {projectId:String}`];
-          const qp: Record<string, string> = { projectId: String(projectId) };
+          const qp: Record<string, any> = { projectId: String(projectId) };
 
           if (environment) {
             conditions.push(`environment = {env:String}`);
@@ -148,10 +148,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
           // Time range filter on ClickHouse events
           if (start && end) {
-            conditions.push(`timestamp >= {start:String}`);
-            conditions.push(`timestamp <= {end:String}`);
-            qp.start = start;
-            qp.end = end;
+            conditions.push(`timestamp >= toDateTime({startTs:UInt32})`);
+            conditions.push(`timestamp <= toDateTime({endTs:UInt32})`);
+            qp.startTs = Math.floor(new Date(start).getTime() / 1000);
+            qp.endTs = Math.floor(new Date(end).getTime() / 1000);
           } else if (period) {
             const periodMap: Record<string, string> = {
               '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
@@ -708,6 +708,8 @@ export default async function issuesRoutes(app: FastifyInstance) {
         status?: string;
         assigned_to?: string | null;
         priority?: string;
+        external_url?: string | null;
+        external_key?: string | null;
       };
 
       try {
@@ -730,6 +732,14 @@ export default async function issuesRoutes(app: FastifyInstance) {
         if (body.priority) {
           updates.push('priority = ?');
           params.push(body.priority);
+        }
+        if (body.external_url !== undefined) {
+          updates.push('external_url = ?');
+          params.push(body.external_url);
+        }
+        if (body.external_key !== undefined) {
+          updates.push('external_key = ?');
+          params.push(body.external_key);
         }
 
         if (updates.length === 0) {

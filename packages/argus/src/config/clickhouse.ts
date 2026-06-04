@@ -11,7 +11,7 @@ let clickhouseClient: ClickHouseClient | null = null;
 export function getClickHouseClient(): ClickHouseClient {
   if (!clickhouseClient) {
     clickhouseClient = createClient({
-      url: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
+      url: `http://${config.clickhouse.host === 'localhost' ? '127.0.0.1' : config.clickhouse.host}:${config.clickhouse.port}`,
       database: config.clickhouse.database,
       username: config.clickhouse.username,
       password: config.clickhouse.password,
@@ -48,7 +48,7 @@ export async function testClickHouseConnection(): Promise<boolean> {
 export async function initClickHouseDatabase(): Promise<void> {
   try {
     const adminClient = createClient({
-      url: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
+      url: `http://${config.clickhouse.host === 'localhost' ? '127.0.0.1' : config.clickhouse.host}:${config.clickhouse.port}`,
       username: config.clickhouse.username,
       password: config.clickhouse.password,
       compression: {

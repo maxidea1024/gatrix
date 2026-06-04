@@ -34,6 +34,8 @@ class ArgusRealtimeService {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private projectId: string | null = null;
   private _isConnected = false;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
 
   get isConnected(): boolean {
     return this._isConnected;
@@ -54,6 +56,7 @@ class ArgusRealtimeService {
 
       this.eventSource.onopen = () => {
         this._isConnected = true;
+        this.reconnectAttempts = 0; // Reset on successful connection
         this.emit('connected', {
           type: 'connected',
           data: { projectId },
@@ -125,13 +128,22 @@ class ArgusRealtimeService {
    */
   private scheduleReconnect(): void {
     if (this.reconnectTimer) return;
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.warn('[Argus Realtime] Max reconnect attempts reached. Giving up.');
+      return;
+    }
+    
+    // Exponential backoff
+    const delay = Math.min(5000 * Math.pow(2, this.reconnectAttempts), 60000);
+    this.reconnectAttempts++;
+    
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       if (this.projectId) {
-        console.log('[Argus Realtime] Attempting reconnection...');
+        console.log(`[Argus Realtime] Attempting reconnection (attempt ${this.reconnectAttempts})...`);
         this.connect(this.projectId);
       }
-    }, 5000);
+    }, delay);
   }
 
   // ==================== Event Subscription ====================

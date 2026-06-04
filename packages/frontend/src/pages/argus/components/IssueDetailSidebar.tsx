@@ -21,6 +21,8 @@ export interface IssueDetailSidebarProps {
   projectId: string;
   issueId: string;
   isDark: boolean;
+  updateIssueOptimistic?: (updater: (prev: ArgusIssueDetail) => ArgusIssueDetail) => void;
+  revalidateIssue?: () => void;
 }
 
 const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
@@ -29,6 +31,8 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
   projectId,
   issueId,
   isDark,
+  updateIssueOptimistic,
+  revalidateIssue,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -87,7 +91,14 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
       {/* Issue Tracking */}
       {projectId && issueId && (
         <Box sx={{ mb: 2 }}>
-          <IssueTrackerWidget projectId={projectId} issueId={issueId} isDark={isDark} />
+          <IssueTrackerWidget 
+            projectId={projectId} 
+            issueId={issueId} 
+            issue={issue}
+            isDark={isDark} 
+            updateIssueOptimistic={updateIssueOptimistic}
+            revalidateIssue={revalidateIssue}
+          />
         </Box>
       )}
 

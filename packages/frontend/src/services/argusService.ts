@@ -777,6 +777,15 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  async createExternalIssue(
+    projectId: number | string,
+    trackerId: number,
+    data: { title: string; description?: string; labels?: string[] }
+  ): Promise<{ url: string; key: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}/create-issue`, data);
+    return response.data?.data || response.data;
+  }
+
   async updateIssueTracker(
     projectId: number | string,
     trackerId: number,
@@ -997,6 +1006,31 @@ class ArgusService {
   ): Promise<void> {
     await argusApi.patch(`${ARGUS_BASE}/${projectId}/issues/${issueId}`, {
       assigned_to: assignee,
+    });
+  }
+
+  async createExternalIssue(
+    projectId: number | string,
+    issueId: number | string,
+    provider: string,
+    data: Record<string, any>
+  ): Promise<{ url: string; key: string }> {
+    const response = await argusApi.post(`${ARGUS_BASE}/${projectId}/issues/${issueId}/external-issue`, {
+      provider,
+      ...data,
+    });
+    return response.data?.data || response.data;
+  }
+
+  async updateIssueExternalLink(
+    projectId: number | string,
+    issueId: number | string,
+    externalUrl: string | null,
+    externalKey: string | null
+  ): Promise<void> {
+    await argusApi.patch(`${ARGUS_BASE}/${projectId}/issues/${issueId}`, {
+      external_url: externalUrl,
+      external_key: externalKey,
     });
   }
 

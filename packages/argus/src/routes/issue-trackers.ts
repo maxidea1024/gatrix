@@ -12,7 +12,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       CREATE TABLE IF NOT EXISTS g_argus_issue_trackers (
         id INT AUTO_INCREMENT PRIMARY KEY,
         project_id VARCHAR(64) NOT NULL,
-        provider ENUM('jira', 'github', 'linear') NOT NULL,
+        provider ENUM('jira', 'github', 'linear', 'clickup', 'asana', 'notion', 'shortcut', 'azure_devops', 'redmine', 'youtrack', 'trello') NOT NULL,
         name VARCHAR(255) NOT NULL,
         api_url VARCHAR(512) NOT NULL,
         api_token VARCHAR(512) NOT NULL,
@@ -23,6 +23,17 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         INDEX idx_project (project_id)
       )
     `);
+    
+    // Attempt to alter the table to update the ENUM if it was created with fewer providers.
+    // This is safe to run multiple times, though it might throw a warning.
+    try {
+      await mysqlPool.query(`
+        ALTER TABLE g_argus_issue_trackers 
+        MODIFY COLUMN provider ENUM('jira', 'github', 'linear', 'clickup', 'asana', 'notion', 'shortcut', 'azure_devops', 'redmine', 'youtrack', 'trello') NOT NULL
+      `);
+    } catch (e) {
+      logger.warn('Failed to alter provider ENUM', { error: (e as Error).message });
+    }
   };
 
   // List issue trackers for a project
@@ -55,7 +66,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const body = request.body as {
-        provider: 'jira' | 'github' | 'linear';
+        provider: 'jira' | 'github' | 'linear' | 'clickup' | 'asana' | 'notion' | 'shortcut' | 'azure_devops' | 'redmine' | 'youtrack' | 'trello';
         name: string;
         api_url: string;
         api_token: string;

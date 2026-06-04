@@ -343,6 +343,8 @@ const ArgusIssueDetailPage: React.FC = () => {
                     projectId={projectId || ''}
                     issueId={issueId || ''}
                     isDark={isDark}
+                    updateIssueOptimistic={updateIssueOptimistic}
+                    revalidateIssue={revalidateIssue}
                   />
                 </Box>
               </>
