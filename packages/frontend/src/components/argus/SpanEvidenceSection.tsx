@@ -114,7 +114,7 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
                   <Chip
                     label={span.op}
                     size="small"
-                    sx={{ height: 16, fontSize: '0.55rem', fontWeight: 700, fontFamily: 'monospace' }}
+                    sx={{ height: 16, fontSize: '0.55rem', fontWeight: 700}}
                   />
                   {problemCfg && (
                     <Chip
@@ -138,8 +138,7 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
                   )}
                   <Box sx={{ flex: 1 }} />
                   <Typography sx={{
-                    fontSize: '0.75rem', fontWeight: 700, fontFamily: 'monospace',
-                    color: span.duration_ms > 1000 ? '#f44336' : span.duration_ms > 200 ? '#ff9800' : 'text.primary',
+                    fontSize: '0.75rem', fontWeight: 700, color: span.duration_ms > 1000 ? '#f44336' : span.duration_ms > 200 ? '#ff9800' : 'text.primary',
                   }}>
                     {formatDuration(span.duration_ms)}
                   </Typography>
@@ -147,8 +146,7 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
 
                 {/* Description */}
                 <Typography sx={{
-                  fontSize: '0.7rem', fontFamily: 'monospace',
-                  color: 'text.secondary', wordBreak: 'break-all',
+                  fontSize: '0.7rem', color: 'text.secondary', wordBreak: 'break-all',
                   mb: 0.5,
                 }}>
                   {span.description}

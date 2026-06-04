@@ -269,7 +269,7 @@ const SavedSearchesSidebar: React.FC<SavedSearchesSidebarProps> = ({
             onChange={(e) => setEditQuery(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
             placeholder="is:unresolved level:error"
-            InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
+            InputProps={{ sx: { fontSize: '0.85rem' } }}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>

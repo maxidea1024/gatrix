@@ -291,7 +291,6 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({
                   padding: '12px',
                   margin: '8px 0',
                   overflow: 'auto',
-                  fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
                   fontSize: '13px',
                   lineHeight: 1.45,
                   color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e',
@@ -314,7 +313,6 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({
                   border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e1e4e8'}`,
                   borderRadius: '3px',
                   padding: '2px 4px',
-                  fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
                   fontSize: '13px',
                   color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e',
                   userSelect: 'text', // 인라인 코드 텍스트 선택 허용

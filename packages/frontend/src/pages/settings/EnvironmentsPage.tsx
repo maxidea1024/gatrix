@@ -777,7 +777,6 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
                               cursor: 'pointer',
                               '&:hover': {
                                 color: 'primary.main',
@@ -1486,7 +1485,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                   }
                   style={{ width: 50, height: 40, cursor: 'pointer' }}
                 />
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                <Typography variant="body2" >
                   {editEnv.color || '#2e7d32'}
                 </Typography>
               </Box>

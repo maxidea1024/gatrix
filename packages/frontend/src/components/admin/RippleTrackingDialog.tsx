@@ -242,7 +242,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ fontFamily: 'monospace' }}
+            
           >
             {requestId} / {pattern}
           </Typography>
@@ -273,7 +273,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                 sx={{
                   height: 20,
                   fontSize: '0.65rem',
-                  fontFamily: 'monospace',
                   fontWeight: 500,
                 }}
               />
@@ -406,7 +405,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
                               fontSize: '0.78rem',
                               fontWeight: 500,
                               color:
@@ -433,7 +431,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                               color="info.main"
                               sx={{
                                 fontSize: '0.78rem',
-                                fontFamily: 'monospace',
                                 fontWeight: 600,
                               }}
                             >
@@ -451,7 +448,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                               color="text.secondary"
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {event.hostname}
@@ -476,7 +472,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                               color="text.disabled"
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {event.serverId}

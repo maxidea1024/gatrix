@@ -110,13 +110,13 @@ const LogDetail: React.FC<{
           '&:hover .detail-actions': { opacity: 1 },
         }}>
           <Typography sx={{
-            fontSize: '0.72rem', color: 'text.disabled', minWidth: 140, fontFamily: 'monospace', flexShrink: 0, pt: 0.2
+            fontSize: '0.72rem', color: 'text.disabled', minWidth: 140, flexShrink: 0, pt: 0.2
           }}>
             {key}
           </Typography>
           <Box sx={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', minWidth: 0 }}>
             <Typography sx={{
-              fontSize: '0.72rem', fontFamily: 'monospace', wordBreak: 'break-all', pt: 0.2,
+              fontSize: '0.72rem', wordBreak: 'break-all', pt: 0.2,
               color: key === 'severity' ? (SEVERITY_COLORS[String(val)?.toLowerCase()] || 'text.primary') : 'text.primary',
               fontWeight: key === 'severity' ? 700 : 400,
             }}>
@@ -591,13 +591,12 @@ const ArgusLogsPage: React.FC = () => {
     switch (col) {
       case 'timestamp': {
         const formatted = formatWith(log.timestamp, 'MMM D, h:mm:ss A') + '.' + String(new Date(log.timestamp + 'Z').getMilliseconds()).padStart(3, '0');
-        return <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatted}</Typography>;
+        return <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatted}</Typography>;
       }
       case 'severity':
         return (
           <Typography sx={{
-            fontSize: '0.72rem', fontWeight: 700, fontFamily: 'monospace',
-            color: SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
+            fontSize: '0.72rem', fontWeight: 700, color: SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
           }}>
             {log.level?.toUpperCase()}
           </Typography>
@@ -605,11 +604,11 @@ const ArgusLogsPage: React.FC = () => {
       case 'message':
         return <Typography sx={{ fontSize: '0.73rem', ...(wrapLines ? { whiteSpace: 'pre-wrap', wordBreak: 'break-all' } : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }) }}>{log.message}</Typography>;
       case 'service':
-        return <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'text.secondary' }}>{log.service || '—'}</Typography>;
+        return <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>{log.service || '—'}</Typography>;
       case 'environment':
-        return <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'text.secondary' }}>{log.environment || '—'}</Typography>;
+        return <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>{log.environment || '—'}</Typography>;
       case 'logger_name':
-        return <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'text.secondary' }}>{log.logger_name || '—'}</Typography>;
+        return <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>{log.logger_name || '—'}</Typography>;
       case 'trace_id':
         return (
           <Typography
@@ -620,7 +619,7 @@ const ArgusLogsPage: React.FC = () => {
               }
             }}
             sx={{
-              fontSize: '0.72rem', fontFamily: 'monospace', color: '#7c4dff',
+              fontSize: '0.72rem', color: '#7c4dff',
               cursor: log.trace_id ? 'pointer' : 'default',
               '&:hover': log.trace_id ? { textDecoration: 'underline' } : {},
             }}
@@ -629,7 +628,7 @@ const ArgusLogsPage: React.FC = () => {
           </Typography>
         );
       case 'release':
-        return <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'text.secondary' }}>{log.release || '—'}</Typography>;
+        return <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>{log.release || '—'}</Typography>;
       default:
         return <Typography sx={{ fontSize: '0.72rem' }}>—</Typography>;
     }
@@ -870,16 +869,16 @@ const ArgusLogsPage: React.FC = () => {
                                   transition: 'width 0.3s ease',
                                 }} />
                                 <Typography sx={{
-                                  zIndex: 1, fontFamily: 'monospace', fontSize: '0.78rem',
+                                  zIndex: 1, fontSize: '0.78rem',
                                   color: theme.palette.primary.main, fontWeight: 600,
                                 }}>
                                   {v.value || '(empty)'}
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, zIndex: 1 }}>
-                                  <Typography sx={{ fontSize: '0.65rem', fontFamily: 'monospace', fontWeight: 700, color: theme.palette.primary.main }}>
+                                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: theme.palette.primary.main }}>
                                     {pctOfTotal.toFixed(0)}%
                                   </Typography>
-                                  <Typography sx={{ fontSize: '0.65rem', fontFamily: 'monospace', color: 'text.disabled' }}>
+                                  <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
                                     {v.count.toLocaleString()}
                                   </Typography>
                                 </Box>
@@ -943,8 +942,7 @@ const ArgusLogsPage: React.FC = () => {
                             searchContainerRef.current?.querySelector('input')?.focus();
                           }}
                           sx={{
-                            px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', fontFamily: 'monospace',
-                            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                            px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
                           }}
                         >
                           <span style={{ color: theme.palette.primary.main }}>has</span>:
@@ -959,8 +957,7 @@ const ArgusLogsPage: React.FC = () => {
                             searchContainerRef.current?.querySelector('input')?.focus();
                           }}
                           sx={{
-                            px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', fontFamily: 'monospace',
-                            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                            px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
                           }}
                         >
                           <span style={{ color: theme.palette.primary.main }}>{field}</span>:
@@ -1005,8 +1002,7 @@ const ArgusLogsPage: React.FC = () => {
               size="small"
               label={`${logs.length.toLocaleString()} / ${totalLogCount.toLocaleString()}`}
               sx={{
-                height: 22, fontSize: '0.68rem', fontWeight: 700, fontFamily: 'monospace',
-                backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                height: 22, fontSize: '0.68rem', fontWeight: 700, backgroundColor: alpha(theme.palette.primary.main, 0.08),
                 color: 'text.secondary', border: 'none',
               }}
             />
@@ -1081,8 +1077,7 @@ const ArgusLogsPage: React.FC = () => {
               autoFocus
               sx={{
                 width: 90, height: 26, border: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-                borderRadius: '6px', px: 1, fontSize: '0.72rem', fontFamily: 'monospace',
-                backgroundColor: 'transparent', color: 'text.primary', outline: 'none',
+                borderRadius: '6px', px: 1, fontSize: '0.72rem', backgroundColor: 'transparent', color: 'text.primary', outline: 'none',
                 '&:focus': { borderColor: theme.palette.primary.main },
               }}
             />
@@ -1286,13 +1281,13 @@ const ArgusLogsPage: React.FC = () => {
                             <TableRow key={idx} hover sx={{ cursor: 'pointer', '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.008)' } }}
                               onClick={() => addSearchTag(aggGroupBy, row.group_value)}
                             >
-                              <TableCell sx={{ fontSize: '0.78rem', fontFamily: 'monospace', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
+                              <TableCell sx={{ fontSize: '0.78rem', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: colors[idx % colors.length], flexShrink: 0 }} />
                                   {row.group_value || '(empty)'}
                                 </Box>
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.78rem', fontFamily: 'monospace', fontWeight: 600, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
+                              <TableCell align="right" sx={{ fontSize: '0.78rem', fontWeight: 600, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
                                 {Number(row.count).toLocaleString()}
                               </TableCell>
                               <TableCell sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
@@ -1300,7 +1295,7 @@ const ArgusLogsPage: React.FC = () => {
                                   <Box sx={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', overflow: 'hidden' }}>
                                     <Box sx={{ width: `${pct}%`, height: '100%', borderRadius: 3, backgroundColor: colors[idx % colors.length], transition: 'width 0.3s' }} />
                                   </Box>
-                                  <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', color: 'text.disabled', minWidth: 35, textAlign: 'right' }}>
+                                  <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', minWidth: 35, textAlign: 'right' }}>
                                     {pct.toFixed(1)}%
                                   </Typography>
                                 </Box>
@@ -1342,7 +1337,7 @@ const ArgusLogsPage: React.FC = () => {
             <FormControlLabel key={col.key}
               control={<Checkbox size="small" checked={tempColumns.includes(col.key)} onChange={() => toggleColumn(col.key)}
                 sx={{ '&.Mui-checked': { color: theme.palette.primary.main } }} />}
-              label={<Typography sx={{ fontSize: '0.82rem', fontFamily: 'monospace' }}>{col.label}</Typography>}
+              label={<Typography sx={{ fontSize: '0.82rem'}}>{col.label}</Typography>}
               sx={{ display: 'flex', mb: 0.3 }}
             />
           ))}

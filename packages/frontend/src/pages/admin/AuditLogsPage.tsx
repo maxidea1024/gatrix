@@ -595,7 +595,7 @@ const AuditLogsPage: React.FC = () => {
         );
       case 'ipAddress':
         return (
-          <Typography variant="body2" fontFamily="monospace">
+          <Typography variant="body2">
             {log.ipAddress || '-'}
           </Typography>
         );
@@ -901,7 +901,7 @@ const AuditLogsPage: React.FC = () => {
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
@@ -947,7 +947,6 @@ const AuditLogsPage: React.FC = () => {
                                             variant="body2"
                                             color="text.secondary"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.8rem',
                                             }}
                                           >
@@ -1022,7 +1021,6 @@ const AuditLogsPage: React.FC = () => {
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: 'monospace',
                                                     color: 'text.secondary',
                                                   }}
                                                 >
@@ -1052,7 +1050,7 @@ const AuditLogsPage: React.FC = () => {
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       {log.ipAddress || '-'}
                                     </Typography>
@@ -1079,7 +1077,6 @@ const AuditLogsPage: React.FC = () => {
                                           sx={{
                                             mt: 0.5,
                                             wordBreak: 'break-all',
-                                            fontFamily: 'monospace',
                                             fontSize: '0.75rem',
                                             color: 'text.secondary',
                                           }}
@@ -1233,8 +1230,6 @@ const AuditLogsPage: React.FC = () => {
                                                           <TableCell
                                                             sx={{
                                                               fontWeight: 500,
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                             }}
@@ -1243,8 +1238,6 @@ const AuditLogsPage: React.FC = () => {
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1270,8 +1263,6 @@ const AuditLogsPage: React.FC = () => {
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1349,7 +1340,6 @@ const AuditLogsPage: React.FC = () => {
                                                 style={{
                                                   margin: 0,
                                                   fontSize: '0.75rem',
-                                                  fontFamily: 'monospace',
                                                   color:
                                                     theme.palette.text.primary,
                                                 }}
@@ -1410,7 +1400,6 @@ const AuditLogsPage: React.FC = () => {
                                                 style={{
                                                   margin: 0,
                                                   fontSize: '0.75rem',
-                                                  fontFamily: 'monospace',
                                                   color:
                                                     theme.palette.text.primary,
                                                 }}

@@ -87,7 +87,6 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       borderColor: 'grey.700',
       cursor: 'pointer',
       userSelect: 'none' as const,
-      fontFamily: 'D2Coding, monospace',
       fontSize: '0.725rem', // Slightly smaller
       '&:hover': {
         color: 'grey.300',
@@ -104,7 +103,6 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       py: 0, // Reduced from 0.25
       whiteSpace: 'pre-wrap' as const,
       wordBreak: 'break-all' as const,
-      fontFamily: 'D2Coding, monospace',
       fontSize: '0.725rem', // Slightly smaller
     }),
     []
@@ -574,7 +572,6 @@ export const LogViewer: React.FC<LogViewerProps> = ({
           overflow: 'hidden',
           bgcolor: 'grey.900',
           color: 'grey.100',
-          fontFamily: 'monospace',
           fontSize: '0.75rem',
           position: 'relative',
         }}

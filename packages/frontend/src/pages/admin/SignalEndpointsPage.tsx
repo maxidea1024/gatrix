@@ -200,7 +200,6 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               <Typography
                 variant="body2"
                 sx={{
-                  fontFamily: 'monospace',
                   flex: 1,
                   wordBreak: 'break-all',
                   color: name.trim() ? 'text.primary' : 'text.disabled',
@@ -754,7 +753,6 @@ const SignalEndpointsPage: React.FC = () => {
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  fontFamily: 'monospace',
                                   flex: 1,
                                   wordBreak: 'break-all',
                                   color: 'text.primary',

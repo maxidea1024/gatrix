@@ -160,7 +160,6 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
             InputProps={{
               readOnly: true,
               sx: {
-                fontFamily: 'monospace',
                 fontSize: '0.875rem',
                 bgcolor: 'grey.50',
                 borderRadius: 1,

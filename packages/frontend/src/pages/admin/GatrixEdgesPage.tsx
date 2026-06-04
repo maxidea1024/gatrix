@@ -515,7 +515,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
               <TableCell sx={{ pl: 0, width: '40%', color: 'text.secondary' }}>
                 {t('gatrixEdges.instanceId')}
               </TableCell>
-              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              <TableCell sx={{ fontSize: '0.8rem' }}>
                 {instance.instanceId}
               </TableCell>
             </TableRow>
@@ -558,7 +558,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.externalAddress')}
               </TableCell>
-              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              <TableCell sx={{ fontSize: '0.8rem' }}>
                 {externalAddress}
               </TableCell>
             </TableRow>
@@ -566,7 +566,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.internalAddress')}
               </TableCell>
-              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              <TableCell sx={{ fontSize: '0.8rem' }}>
                 {internalAddress}
               </TableCell>
             </TableRow>
@@ -606,7 +606,6 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   size="small"
                   variant="outlined"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: '0.75rem',
                   }}
                 />
@@ -734,7 +733,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             <Typography
               variant="caption"
               color="text.secondary"
-              sx={{ fontFamily: 'monospace' }}
+              
             >
               ID: {instance.instanceId}
             </Typography>
@@ -1288,7 +1287,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             <Chip
               label={`${cacheInvalidateTarget.hostname} (${cacheInvalidateTarget.instanceId})`}
               size="small"
-              sx={{ mb: 2, fontFamily: 'monospace', fontSize: '0.75rem' }}
+              sx={{ mb: 2, fontSize: '0.75rem' }}
             />
           )}
           <Alert severity="warning" sx={{ mt: 1, borderRadius: 2 }}>

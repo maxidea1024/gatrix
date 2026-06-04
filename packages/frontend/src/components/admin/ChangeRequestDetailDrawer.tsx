@@ -1042,7 +1042,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ fontWeight: 600, fontFamily: 'monospace' }}
+                        sx={{ fontWeight: 600}}
                       >
                         {new Date(cr.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -1161,7 +1161,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           <Typography
                             variant="caption"
                             color="text.secondary"
-                            sx={{ fontWeight: 600, fontFamily: 'monospace' }}
+                            sx={{ fontWeight: 600}}
                           >
                             {new Date(event.timestamp).toLocaleTimeString([], {
                               hour: '2-digit',
@@ -2164,7 +2164,6 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                             <Typography
                                               variant="caption"
                                               sx={{
-                                                fontFamily: 'monospace',
                                                 fontWeight: 600,
                                               }}
                                             >
@@ -2313,7 +2312,6 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 <Typography
                                   variant="body2"
                                   sx={{
-                                    fontFamily: 'monospace',
                                     fontWeight: 600,
                                     flex: 1,
                                   }}

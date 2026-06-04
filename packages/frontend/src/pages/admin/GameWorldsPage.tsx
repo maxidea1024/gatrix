@@ -1656,7 +1656,7 @@ const GameWorldsPage: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'monospace', maxWidth: 250 }}
+              sx={{ maxWidth: 250 }}
             >
               {world.worldServerAddress || '-'}
             </Typography>

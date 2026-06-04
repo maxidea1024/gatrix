@@ -225,7 +225,7 @@ const KeyValuePage: React.FC = () => {
                 borderColor: 'divider',
               }}
             />
-            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+            <Typography variant="body2" >
               {item.varValue}
             </Typography>
           </Box>
@@ -236,7 +236,6 @@ const KeyValuePage: React.FC = () => {
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
               maxWidth: 300,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -248,7 +247,7 @@ const KeyValuePage: React.FC = () => {
         );
       case 'string':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" >
             "{item.varValue}"
           </Typography>
         );
@@ -324,7 +323,6 @@ const KeyValuePage: React.FC = () => {
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
                               cursor: 'pointer',
                               '&:hover': {
                                 textDecoration: 'underline',

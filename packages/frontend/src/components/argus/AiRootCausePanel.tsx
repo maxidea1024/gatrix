@@ -306,7 +306,7 @@ const AiRootCausePanel: React.FC<AiRootCausePanelProps> = ({
                           p: 1.5, borderRadius: 1,
                           backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.03)',
                         }}>
-                          <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'primary.main', display: 'block', mb: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: 'primary.main', display: 'block', mb: 0.5 }}>
                             {cp.file}:{cp.line}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">

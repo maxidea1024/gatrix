@@ -342,7 +342,7 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Chip label={`${Number(root.duration).toLocaleString()}ms`} size="small" sx={{
-              fontWeight: 700, fontFamily: 'monospace', fontSize: '0.78rem',
+              fontWeight: 700, fontSize: '0.78rem',
               backgroundColor: alpha(theme.palette.primary.main, 0.1),
               color: theme.palette.primary.main, border: 'none',
             }} />
@@ -358,8 +358,7 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
             />
             {root.http_status_code > 0 && (
               <Chip label={`HTTP ${root.http_status_code}`} size="small" variant="outlined" sx={{
-                fontSize: '0.72rem', fontFamily: 'monospace',
-                borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+                fontSize: '0.72rem', borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
               }} />
             )}
           </Box>
@@ -447,8 +446,7 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
                   zIndex: 11,
                 }}>
                   <Typography variant="caption" sx={{
-                    fontSize: '0.6rem', fontWeight: 600, fontFamily: 'monospace',
-                    color: theme.palette.text.primary,
+                    fontSize: '0.6rem', fontWeight: 600, color: theme.palette.text.primary,
                   }}>
                     {fmtDur(hoverTime)}
                   </Typography>
@@ -713,7 +711,7 @@ const WaterfallRow: React.FC<{
             )}
             {/* Label */}
             <Typography variant="caption" noWrap sx={{
-              fontFamily: 'monospace', fontSize: '0.73rem', ml: 0.5,
+              fontSize: '0.73rem', ml: 0.5,
               fontWeight: isRoot ? 700 : 400,
               color: isErr ? '#f44336' : (isDark ? '#ccc' : '#333'),
               flex: 1, minWidth: 0,

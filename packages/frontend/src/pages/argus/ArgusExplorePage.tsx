@@ -109,8 +109,6 @@ const QueryCard: React.FC<{
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(query.name);
 
-
-
   const periodLabel = query.query_config?.period || '24h';
 
   return (
@@ -174,7 +172,7 @@ const QueryCard: React.FC<{
               </Typography>
             )}
             <Typography sx={{
-              fontSize: '0.7rem', fontFamily: 'monospace', color: 'text.disabled',
+              fontSize: '0.7rem', color: 'text.disabled',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               maxWidth: '100%',
             }}>

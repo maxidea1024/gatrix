@@ -578,7 +578,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                             >
                               <Typography
                                 variant="body2"
-                                sx={{ fontFamily: 'monospace' }}
+                                
                               >
                                 {ip.ipAddress}
                               </Typography>

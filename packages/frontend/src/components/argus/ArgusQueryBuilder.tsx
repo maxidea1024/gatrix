@@ -233,7 +233,7 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, on
                 value={rule.value}
                 onChange={e => setTagRules(prev => prev.map(r => r.id === rule.id ? { ...r, value: e.target.value } : r))}
                 placeholder="value..."
-                InputProps={{ sx: { height: 32, fontSize: '0.75rem', fontFamily: 'monospace' } }}
+                InputProps={{ sx: { height: 32, fontSize: '0.75rem'} }}
                 sx={{ flex: 1 }}
               />
 
@@ -270,7 +270,7 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, on
                 value={rule.value}
                 onChange={e => setTextRules(prev => prev.map(r => r.id === rule.id ? { ...r, value: e.target.value } : r))}
                 placeholder="Search text..."
-                InputProps={{ sx: { height: 32, fontSize: '0.75rem', fontFamily: 'monospace' } }}
+                InputProps={{ sx: { height: 32, fontSize: '0.75rem'} }}
                 sx={{ flex: 1 }}
               />
 

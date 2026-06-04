@@ -2639,7 +2639,6 @@ const PlayerConnectionsPage: React.FC = () => {
                         error={kickConfirmText.length > 0 && !isConfirmed}
                         sx={{
                           '& .MuiInputBase-input': {
-                            fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: 2,
                           },
@@ -2944,7 +2943,6 @@ const PlayerConnectionsPage: React.FC = () => {
                             <TableCell
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {u.accountId}
@@ -2952,7 +2950,6 @@ const PlayerConnectionsPage: React.FC = () => {
                             <TableCell
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {u.lastUserId || '-'}
@@ -2963,7 +2960,6 @@ const PlayerConnectionsPage: React.FC = () => {
                             <TableCell
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {u.characterId || '-'}

@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { mysqlPool } from '../config/mysql';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
+import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('argus-dashboards');
 
@@ -316,11 +317,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       try {
         const { fields = ['count()'], conditions, groupBy, orderBy, limit = 20, period = '24h', dataset = 'errors' } = query;
 
-        const periodMap: Record<string, string> = {
-          '1h': '1 HOUR', '6h': '6 HOUR', '12h': '12 HOUR', '24h': '24 HOUR',
-          '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
-        };
-        const interval = periodMap[period] || '24 HOUR';
+        const bucket = getBucketingConfig(period);
 
         // Determine table based on dataset
         const datasetTableMap: Record<string, string> = {
@@ -347,7 +344,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           return f;
         });
 
-        let sql = `SELECT ${selectParts.join(', ')} FROM ${tableName} WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}`;
+        let sql = `SELECT ${selectParts.join(', ')} FROM ${tableName} WHERE project_id = {projectId:String} AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
         if (conditions) {
           sql += ` AND ${conditions}`;
@@ -356,7 +353,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         if (groupBy && groupBy.length > 0) {
           const safeCols = groupBy.filter(c => c !== 'timestamp');
           if (groupBy.includes('timestamp')) {
-            safeCols.unshift('toStartOfHour(timestamp) AS hour');
+            safeCols.unshift(`${bucket.selectExpr} AS hour`);
           }
           if (safeCols.length > 0) sql += ` GROUP BY ${safeCols.map(c => c.startsWith('toStart') ? 'hour' : c).join(', ')}`;
         }
@@ -367,9 +364,27 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           sql += ` ORDER BY ${col} ${desc ? 'DESC' : 'ASC'}`;
         }
 
+        // Apply fill expr if timestamp is in group by
+        if (groupBy && groupBy.includes('timestamp') && !orderBy) {
+            sql += ` ORDER BY hour ${bucket.fillExpr}`;
+        } else if (groupBy && groupBy.includes('timestamp') && orderBy) {
+            // Can't easily use WITH FILL with arbitrary order by without breaking syntax (ORDER BY col DESC, hour WITH FILL).
+            // It should work as long as hour is grouped, we just append it if not already ordered by hour.
+            if (orderBy.replace(/^-/, '') === 'hour') {
+                sql += ` ${bucket.fillExpr}`;
+            }
+        }
+
         sql += ` LIMIT ${Math.min(limit, 1000)}`;
 
-        const result = await clickhouse.query({ query: sql, query_params: { projectId: String(projectId) } });
+        const result = await clickhouse.query({ 
+          query: sql, 
+          query_params: { 
+            projectId: String(projectId),
+            fillStart: bucket.queryParams.fillStart,
+            fillEnd: bucket.queryParams.fillEnd
+          } 
+        });
         const json = await result.json();
 
         return reply.send({ data: json.data || [] });

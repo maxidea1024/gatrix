@@ -1590,7 +1590,6 @@ const ClientVersionsPage: React.FC = () => {
                 <Typography
                   variant="body2"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: '0.75rem',
                     whiteSpace: 'nowrap',
                   }}
@@ -1608,7 +1607,6 @@ const ClientVersionsPage: React.FC = () => {
                 <Typography
                   variant="body2"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: '0.75rem',
                     whiteSpace: 'nowrap',
                   }}

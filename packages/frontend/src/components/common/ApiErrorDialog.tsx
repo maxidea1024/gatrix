@@ -160,7 +160,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                       <Typography
                         component="pre"
                         variant="caption"
-                        sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}
+                        sx={{ whiteSpace: 'pre-wrap' }}
                       >
                         {formatValue(conflictData.currentLive)}
                       </Typography>
@@ -194,7 +194,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                       <Typography
                         component="pre"
                         variant="caption"
-                        sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}
+                        sx={{ whiteSpace: 'pre-wrap' }}
                       >
                         {formatValue(conflictData.originalDraftBase)}
                       </Typography>
@@ -227,7 +227,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
+                  sx={{ wordBreak: 'break-all' }}
                 >
                   {message}
                 </Typography>

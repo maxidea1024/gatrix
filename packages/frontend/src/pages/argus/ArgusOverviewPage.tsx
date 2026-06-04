@@ -554,7 +554,7 @@ const ArgusOverviewPage: React.FC = () => {
                 return (
                   <Box key={`${r.release}-${idx}`}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
-                      <Typography variant="caption" noWrap sx={{ fontFamily: 'monospace', fontSize: '0.72rem', maxWidth: '60%' }}>
+                      <Typography variant="caption" noWrap sx={{ fontSize: '0.72rem', maxWidth: '60%' }}>
                         {r.release}
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 1 }}>

@@ -120,7 +120,7 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: field.mono ? 'monospace' : undefined,
+
                               wordBreak: 'break-all',
                             }}
                           >

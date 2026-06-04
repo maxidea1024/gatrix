@@ -98,13 +98,13 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ packages }) => {
                 }}
               >
                 <Typography sx={{
-                  fontSize: '0.7rem', fontFamily: 'monospace', flex: 1,
+                  fontSize: '0.7rem', flex: 1,
                   color: pkg.inApp ? 'text.primary' : 'text.secondary',
                   fontWeight: pkg.inApp ? 600 : 400,
                 }}>
                   {pkg.name}
                 </Typography>
-                <Typography sx={{ fontSize: '0.65rem', fontFamily: 'monospace', color: 'text.disabled' }}>
+                <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
                   {pkg.version}
                 </Typography>
                 {pkg.inApp && (

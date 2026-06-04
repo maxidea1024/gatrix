@@ -2398,7 +2398,6 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
               input: {
                 readOnly: true,
                 sx: {
-                  fontFamily: 'monospace',
                   fontSize: '0.85rem',
                   wordBreak: 'break-all',
                 },
@@ -3278,7 +3277,6 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 p: 1,
                 bgcolor: 'action.hover',
                 borderRadius: 0,
-                fontFamily: 'monospace',
                 fontWeight: 600,
               }}
             >
@@ -3583,7 +3581,6 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   onClick={(e) => (e.target as HTMLInputElement).select()}
                   style={{
                     flex: 1,
-                    fontFamily: 'monospace',
                     fontSize: '0.875rem',
                     letterSpacing: '0.5px',
                     background: 'transparent',

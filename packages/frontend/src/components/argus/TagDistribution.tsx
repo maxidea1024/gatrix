@@ -130,7 +130,6 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}>
                           <Typography variant="caption" sx={{
                             fontSize: '0.75rem',
-                            fontFamily: 'monospace',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -140,8 +139,7 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
                             {val.value || '(empty)'}
                           </Typography>
                           <Typography variant="caption" sx={{
-                            fontSize: '0.75rem', color: 'text.secondary', fontFamily: 'monospace',
-                            flexShrink: 0, ml: 1, textAlign: 'right',
+                            fontSize: '0.75rem', color: 'text.secondary', flexShrink: 0, ml: 1, textAlign: 'right',
                           }}>
                             {count.toLocaleString()} ({pct.toFixed(0)}%)
                           </Typography>

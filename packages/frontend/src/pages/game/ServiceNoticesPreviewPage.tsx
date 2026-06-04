@@ -763,8 +763,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     fontFamily: 'Georgia, Times New Roman, serif',
                   },
                   '& .ql-font-monospace': {
-                    fontFamily: 'Monaco, Courier New, monospace',
-                  },
+                    },
                   // Quill editor font sizes
                   '& .ql-size-small': {
                     fontSize: '0.75em',
@@ -795,7 +794,6 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     backgroundColor: 'rgba(0, 0, 0, 0.05)',
                     padding: '0.2em 0.4em',
                     borderRadius: 0,
-                    fontFamily: 'Monaco, Courier New, monospace',
                     fontSize: '0.9em',
                   },
                   '& pre': {

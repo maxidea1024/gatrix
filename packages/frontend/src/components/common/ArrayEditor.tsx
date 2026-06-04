@@ -197,7 +197,6 @@ const SortableItem: React.FC<SortableItemProps> = ({
               InputProps={{
                 readOnly: true,
                 sx: {
-                  fontFamily: 'monospace',
                   fontSize: '0.875rem',
                   cursor: 'pointer',
                 },

@@ -216,7 +216,6 @@ const SortableLinkItem: React.FC<SortableLinkItemProps> = ({
                 opacity: 0.6,
                 display: 'block',
                 mt: 0.25,
-                fontFamily: 'monospace',
                 fontSize: '0.65rem',
               }}
             >

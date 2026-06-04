@@ -239,7 +239,6 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                       readOnly: true,
                       sx: {
                         fontSize: '0.8rem',
-                        fontFamily: 'monospace',
                         color: 'text.primary',
                         cursor: 'pointer',
                       },

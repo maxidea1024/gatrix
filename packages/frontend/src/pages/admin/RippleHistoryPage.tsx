@@ -177,7 +177,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
               fontSize: '0.7rem',
               color: 'text.secondary',
             }}
@@ -208,7 +207,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
             size="small"
             color="primary"
             sx={{
-              fontFamily: 'monospace',
               fontWeight: 600,
               fontSize: '0.72rem',
               height: 22,
@@ -222,7 +220,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
               fontSize: '0.78rem',
               color: 'text.primary',
             }}
@@ -280,7 +277,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                       sx={{
                         height: 20,
                         fontSize: '0.68rem',
-                        fontFamily: 'monospace',
                       }}
                     />
                   );
@@ -310,7 +306,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                 sx={{
                   height: 20,
                   fontSize: '0.68rem',
-                  fontFamily: 'monospace',
                 }}
               />
             ))}
@@ -358,7 +353,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
               fontSize: '0.8rem',
               fontWeight: group.maxDelayMs > 3000 ? 700 : 400,
               color: group.maxDelayMs > 3000 ? 'warning.main' : 'text.primary',
@@ -375,7 +369,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
               fontSize: '0.8rem',
               fontWeight: group.maxDurationMs > 5000 ? 700 : 400,
               color:
@@ -534,7 +527,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: 'monospace',
                                 fontSize: '0.75rem',
                                 fontWeight: 600,
                               }}
@@ -546,7 +538,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: 'monospace',
                                 fontSize: '0.72rem',
                                 color: 'text.secondary',
                               }}
@@ -565,7 +556,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                                       evt.status === 'warning'
                                         ? 'warning.main'
                                         : 'error.main',
-                                    fontFamily: 'monospace',
                                     maxWidth: 400,
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -592,7 +582,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: 'monospace',
                                 fontSize: '0.75rem',
                                 color: 'text.secondary',
                               }}
@@ -604,7 +593,6 @@ const GroupRow: React.FC<{ group: RequestGroup; index: number }> = ({
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: 'monospace',
                                 fontSize: '0.75rem',
                                 fontWeight:
                                   (evt.durationMs || 0) > 5000 ? 700 : 400,

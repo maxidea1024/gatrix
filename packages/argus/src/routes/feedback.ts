@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
 import { mysqlPool } from '../config/mysql';
+import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('feedback-api');
@@ -24,20 +25,19 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         filterBrowser?: string; filterOs?: string;
       };
 
+      const bucket = getBucketingConfig(period, start, end);
       const limitNum = parseInt(limit, 10);
       const offset = (parseInt(page, 10) - 1) * limitNum;
-      const qp: Record<string, any> = { projectId: String(projectId), limit: limitNum, offset };
+      const qp: Record<string, any> = { 
+        projectId: String(projectId), 
+        limit: limitNum, 
+        offset,
+        fillStart: bucket.queryParams.fillStart,
+        fillEnd: bucket.queryParams.fillEnd
+      };
 
       // Date filter
-      let dateClause: string;
-      if (start && end) {
-        dateClause = `timestamp >= {startDate:String} AND timestamp <= {endDate:String}`;
-        qp.startDate = start;
-        qp.endDate = end;
-      } else {
-        const interval = periodToInterval(period);
-        dateClause = `timestamp >= now() - INTERVAL ${interval}`;
-      }
+      const dateClause = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       // Search filter
       const searchClause = search
@@ -115,11 +115,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           // Trend (daily count)
           clickhouse.query({
             query: `SELECT
-              toStartOfDay(timestamp) AS day,
+              ${bucket.selectExpr} AS day,
               count() AS count
             FROM argus.user_feedback
             WHERE ${whereBase}
-            GROUP BY day ORDER BY day`,
+            GROUP BY day ORDER BY day ${bucket.fillExpr}`,
             query_params: qp,
           }),
 
@@ -650,33 +650,39 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { period = '30d' } = request.query as { period?: string };
 
-      const interval = periodToInterval(period);
+      const bucket = getBucketingConfig(period);
+      const qp: Record<string, any> = { 
+        projectId: String(projectId),
+        fillStart: bucket.queryParams.fillStart,
+        fillEnd: bucket.queryParams.fillEnd
+      };
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
         const [envResult, browserResult, osResult, assignedResult] = await Promise.all([
           clickhouse.query({
             query: `SELECT DISTINCT environment FROM argus.user_feedback
-              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              WHERE project_id = {projectId:String} AND ${timeCond}
               AND environment != '' ORDER BY environment`,
-            query_params: { projectId: String(projectId) },
+            query_params: qp,
           }),
           clickhouse.query({
             query: `SELECT DISTINCT browser FROM argus.user_feedback
-              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              WHERE project_id = {projectId:String} AND ${timeCond}
               AND browser != '' ORDER BY browser`,
-            query_params: { projectId: String(projectId) },
+            query_params: qp,
           }),
           clickhouse.query({
             query: `SELECT DISTINCT os FROM argus.user_feedback
-              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              WHERE project_id = {projectId:String} AND ${timeCond}
               AND os != '' ORDER BY os`,
-            query_params: { projectId: String(projectId) },
+            query_params: qp,
           }),
           clickhouse.query({
             query: `SELECT DISTINCT assigned_to FROM argus.user_feedback
-              WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
+              WHERE project_id = {projectId:String} AND ${timeCond}
               AND assigned_to != '' ORDER BY assigned_to`,
-            query_params: { projectId: String(projectId) },
+            query_params: qp,
           }),
         ]);
 
@@ -825,19 +831,6 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       }
     }
   );
-}
-
-function periodToInterval(period: string): string {
-  const map: Record<string, string> = {
-    '1h': '1 HOUR',
-    '6h': '6 HOUR',
-    '24h': '24 HOUR',
-    '7d': '7 DAY',
-    '14d': '14 DAY',
-    '30d': '30 DAY',
-    '90d': '90 DAY',
-  };
-  return map[period] || '7 DAY';
 }
 
 let activityTableChecked = false;

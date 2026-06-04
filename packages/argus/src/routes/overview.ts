@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
+import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('overview-api');
@@ -22,7 +23,8 @@ export default async function overviewRoutes(app: FastifyInstance) {
       const interval = periodMap[period] || '24 HOUR';
 
       try {
-        const qp = { projectId: String(projectId) };
+        const bucket = getBucketingConfig(period);
+        const qp = { projectId: String(projectId), ...bucket.queryParams };
 
         // ---- Run all queries in parallel ----
         const [
@@ -44,9 +46,9 @@ export default async function overviewRoutes(app: FastifyInstance) {
         ] = await Promise.all([
           // --- Existing queries ---
           clickhouse.query({
-            query: `SELECT toStartOfHour(timestamp) AS hour, count() AS count, uniq(user_id) AS users
+            query: `SELECT ${bucket.selectExpr} AS hour, count() AS count, uniq(user_id) AS users
                     FROM argus.errors WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
-                    GROUP BY hour ORDER BY hour`,
+                    GROUP BY hour ORDER BY hour ${bucket.fillExpr}`,
             query_params: qp,
           }),
           clickhouse.query({
@@ -62,9 +64,9 @@ export default async function overviewRoutes(app: FastifyInstance) {
             query_params: qp,
           }),
           clickhouse.query({
-            query: `SELECT toStartOfHour(timestamp) AS hour, count() AS count, avg(duration) AS avg_duration
+            query: `SELECT ${bucket.selectExpr} AS hour, count() AS count, avg(duration) AS avg_duration
                     FROM argus.transactions WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval}
-                    GROUP BY hour ORDER BY hour`,
+                    GROUP BY hour ORDER BY hour ${bucket.fillExpr}`,
             query_params: qp,
           }),
           clickhouse.query({

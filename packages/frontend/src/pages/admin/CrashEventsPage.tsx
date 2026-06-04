@@ -1361,7 +1361,7 @@ const CrashEventsPage: React.FC = () => {
                                             >
                                               <Typography
                                                 variant="body2"
-                                                sx={{ fontFamily: 'monospace' }}
+                                                
                                               >
                                                 {event.id}
                                               </Typography>
@@ -1841,7 +1841,7 @@ const CrashEventsPage: React.FC = () => {
                                             >
                                               <Typography
                                                 variant="body2"
-                                                sx={{ fontFamily: 'monospace' }}
+                                                
                                               >
                                                 {event.crashEventIp || '-'}
                                               </Typography>
@@ -1874,7 +1874,6 @@ const CrashEventsPage: React.FC = () => {
                                               <Typography
                                                 variant="body2"
                                                 sx={{
-                                                  fontFamily: 'monospace',
                                                   fontSize: '0.75rem',
                                                   wordBreak: 'break-all',
                                                 }}
@@ -1913,7 +1912,6 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: 'monospace',
                                                     fontSize: '0.85rem',
                                                     wordBreak: 'break-all',
                                                   }}
@@ -1984,7 +1982,6 @@ const CrashEventsPage: React.FC = () => {
                                       style={{
                                         margin: 0,
                                         fontSize: '0.875rem',
-                                        fontFamily: 'monospace',
                                         lineHeight: 1.6,
                                       }}
                                     >

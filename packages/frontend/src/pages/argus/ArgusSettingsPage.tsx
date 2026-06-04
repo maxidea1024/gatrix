@@ -748,7 +748,7 @@ const ArgusSettingsPage: React.FC = () => {
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Box sx={{ flex: 1, minWidth: 0, p: 1, borderRadius: '6px', backgroundColor: isDark ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.03)' }}>
                               <Typography sx={{
-                                fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.75rem',
+                                fontSize: '0.75rem',
                                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                                 color: isDark ? '#bbb' : '#555', userSelect: 'all',
                               }}>{key.dsn}</Typography>
@@ -830,7 +830,7 @@ const ArgusSettingsPage: React.FC = () => {
                 {/* CLI */}
                 <Paper elevation={0} sx={{ p: 2, mb: 2.5, border: `1px solid ${bdr}`, borderRadius: '8px', backgroundColor: bgSubtle }}>
                   <Typography sx={{ fontWeight: 600, fontSize: '0.75rem', mb: 1, color: 'text.secondary' }}>{t('argus.settings.cliExample')}</Typography>
-                  <Box sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.73rem', color: isDark ? '#aaa' : '#555', whiteSpace: 'pre', lineHeight: 1.6 }}>
+                  <Box sx={{ fontSize: '0.73rem', color: isDark ? '#aaa' : '#555', whiteSpace: 'pre', lineHeight: 1.6 }}>
                     {`curl -X POST '${window.location.origin}/argus/api/${projectId}/sourcemaps' \\\n  -F 'release=1.0.0' \\\n  -F 'files=@dist/main.js.map'`}
                   </Box>
                 </Paper>
@@ -1066,7 +1066,7 @@ const ArgusSettingsPage: React.FC = () => {
                           <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: s.color, flexShrink: 0 }} />
                           <Typography sx={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.type}</Typography>
                         </Box>
-                        <Typography sx={{ fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.72rem', color: s.color, mb: 0.3 }}>{s.example}</Typography>
+                        <Typography sx={{ fontSize: '0.72rem', color: s.color, mb: 0.3 }}>{s.example}</Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem', lineHeight: 1.4 }}>{s.desc}</Typography>
                       </Box>
                     ))}
@@ -1079,7 +1079,6 @@ const ArgusSettingsPage: React.FC = () => {
                     {t('argus.settings.ownershipExampleTitle')}
                   </Typography>
                   <Box sx={{
-                    fontFamily: '"JetBrains Mono", "Fira Code", monospace',
                     fontSize: '0.73rem', lineHeight: 2,
                     color: isDark ? '#bbb' : '#555',
                     p: 1.5, borderRadius: '6px',
@@ -1225,10 +1224,10 @@ const ArgusSettingsPage: React.FC = () => {
                                 px: 1, py: 0.3, borderRadius: '4px', mb: 1,
                                 backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.03)',
                               }}>
-                                <Box component="span" sx={{ color: typeColor, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem', fontWeight: 700 }}>
+                                <Box component="span" sx={{ color: typeColor, fontSize: '0.7rem', fontWeight: 700 }}>
                                   {rule.match_type}:
                                 </Box>
-                                <Typography sx={{ fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.73rem', color: isDark ? '#ccc' : '#444' }}>
+                                <Typography sx={{ fontSize: '0.73rem', color: isDark ? '#ccc' : '#444' }}>
                                   {rule.match_pattern}
                                 </Typography>
                               </Box>

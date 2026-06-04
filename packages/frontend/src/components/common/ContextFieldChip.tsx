@@ -94,7 +94,6 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({
           sx={{
             height: 22,
             fontSize: '0.75rem',
-            fontFamily: 'monospace',
             fontWeight: 500,
             cursor: fieldInfo ? 'pointer' : 'default',
             borderColor: 'divider',
@@ -138,7 +137,7 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({
                 <Typography
                   variant="subtitle2"
                   fontWeight={600}
-                  sx={{ fontFamily: 'monospace' }}
+                  
                 >
                   {fieldInfo.fieldName}
                 </Typography>

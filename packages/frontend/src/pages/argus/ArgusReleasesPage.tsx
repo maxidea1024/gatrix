@@ -253,7 +253,7 @@ const ArgusReleasesPage: React.FC = () => {
                   {/* Version */}
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                      <Typography variant="subtitle2" fontWeight={800} sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                      <Typography variant="subtitle2" fontWeight={800} sx={{ fontSize: '0.9rem' }}>
                         {r.release}
                       </Typography>
                       {isHotfix && (
@@ -314,7 +314,7 @@ const ArgusReleasesPage: React.FC = () => {
 
                   {/* Total Errors */}
                   <Box>
-                    <Typography variant="body1" fontWeight={700} sx={{ fontFamily: 'monospace' }}>
+                    <Typography variant="body1" fontWeight={700} >
                       {formatCompactNumber(errorCount)}
                     </Typography>
                   </Box>

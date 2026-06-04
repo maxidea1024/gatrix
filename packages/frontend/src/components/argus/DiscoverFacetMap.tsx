@@ -68,10 +68,10 @@ const DiscoverFacetMap: React.FC<DiscoverFacetMapProps> = ({ facets, onSelectFac
               },
             }}
           >
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: 'text.secondary', fontFamily: 'monospace' }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: 'text.secondary'}}>
               {tag}
             </Typography>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: theme.palette.primary.main, fontFamily: 'monospace' }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: theme.palette.primary.main}}>
               {topValue}
             </Typography>
             {values.length > 1 && (
@@ -126,17 +126,17 @@ const DiscoverFacetMap: React.FC<DiscoverFacetMapProps> = ({ facets, onSelectFac
                 }} />
                 {/* Value */}
                 <Typography sx={{
-                  zIndex: 1, flex: 1, fontSize: '0.74rem', fontFamily: 'monospace', fontWeight: 500,
+                  zIndex: 1, flex: 1, fontSize: '0.74rem', fontWeight: 500,
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
                   {v.value || '(empty)'}
                 </Typography>
                 {/* Right side: pct + count + actions */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, zIndex: 1, flexShrink: 0, ml: 1 }}>
-                  <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 700, color: theme.palette.primary.main, minWidth: 28, textAlign: 'right' }}>
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: theme.palette.primary.main, minWidth: 28, textAlign: 'right' }}>
                     {pctOfTotal.toFixed(0)}%
                   </Typography>
-                  <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', color: 'text.disabled', minWidth: 32, textAlign: 'right' }}>
+                  <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', minWidth: 32, textAlign: 'right' }}>
                     {v.count.toLocaleString()}
                   </Typography>
                   <Box className="facet-actions" sx={{ display: 'flex', gap: 0.25, opacity: 0, transition: 'opacity 0.15s' }}>

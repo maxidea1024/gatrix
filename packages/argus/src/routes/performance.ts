@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
 import { mysqlPool } from '../config/mysql';
+import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('performance-api');
@@ -18,11 +19,12 @@ export default async function performanceRoutes(app: FastifyInstance) {
         start?: string;
         end?: string;
       };
+      const bucket = getBucketingConfig(period, start, end);
+      const qp: Record<string, any> = { projectId: String(projectId), limit: parseInt(limit, 10), ...bucket.queryParams };
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       const orderBy = sort === 'p95' ? 'p95 DESC' : sort === 'avg' ? 'avg_duration DESC' : sort === 'error_rate' ? 'error_rate DESC' : 'count DESC';
-      const timeFilter = start && end
-        ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= now() - INTERVAL ${periodToInterval(period)}`;
+      const timeFilter = timeCond;
 
       try {
         const result = await clickhouse.query({
@@ -44,7 +46,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
             ORDER BY ${orderBy}
             LIMIT {limit:UInt32}
           `,
-          query_params: { projectId: String(projectId), limit: parseInt(limit, 10), ...(start && end ? { start, end } : {}) },
+          query_params: qp,
         });
         const data = await result.json();
         return reply.send({ data: data.data || [] });
@@ -64,14 +66,17 @@ export default async function performanceRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, txnName } = request.params as { projectId: string; txnName: string };
       const { period = '24h' } = request.query as { period?: string };
-      const interval = periodToInterval(period);
+      
+      const bucket = getBucketingConfig(period);
+      const qp = { projectId: String(projectId), txnName, ...bucket.queryParams };
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
         // Hourly trend
         const trendResult = await clickhouse.query({
           query: `
             SELECT
-              toStartOfHour(timestamp) AS hour,
+              ${bucket.selectExpr} AS hour,
               count() AS count,
               avg(duration) AS avg_duration,
               quantile(0.95)(duration) AS p95,
@@ -79,11 +84,11 @@ export default async function performanceRoutes(app: FastifyInstance) {
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND transaction = {txnName:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND ${timeCond}
             GROUP BY hour
-            ORDER BY hour
+            ORDER BY hour ${bucket.fillExpr}
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const trend = await trendResult.json();
 
@@ -104,11 +109,11 @@ export default async function performanceRoutes(app: FastifyInstance) {
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND transaction = {txnName:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND ${timeCond}
             GROUP BY bucket
             ORDER BY min(duration)
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const histogram = await histResult.json();
 
@@ -127,15 +132,15 @@ export default async function performanceRoutes(app: FastifyInstance) {
               FROM argus.transactions
               WHERE project_id = {projectId:String}
                 AND transaction = {txnName:String}
-                AND timestamp >= now() - INTERVAL ${interval}
+                AND ${timeCond}
             ) t ON s.transaction_id = t.event_id
             WHERE s.project_id = {projectId:String}
-              AND s.timestamp >= now() - INTERVAL ${interval}
+              AND s.timestamp >= toDateTime({fillStart:UInt32}) AND s.timestamp <= toDateTime({fillEnd:UInt32})
             GROUP BY s.description, s.op
             ORDER BY avg_duration DESC
             LIMIT 20
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const spans = await spansResult.json();
 
@@ -154,11 +159,11 @@ export default async function performanceRoutes(app: FastifyInstance) {
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND transaction = {txnName:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND ${timeCond}
             ORDER BY timestamp DESC
             LIMIT 20
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const recentTraces = await recentTracesResult.json();
 
@@ -174,9 +179,9 @@ export default async function performanceRoutes(app: FastifyInstance) {
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND transaction = {txnName:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND ${timeCond}
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const summaryData = await summaryResult.json();
 
@@ -184,15 +189,15 @@ export default async function performanceRoutes(app: FastifyInstance) {
         const suspectTagsResult = await clickhouse.query({
           query: `
             SELECT 'browser' AS tag_key, tags['browser'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
-            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= now() - INTERVAL ${interval} AND tags['browser'] != '' GROUP BY tags['browser'] HAVING count > 0
+            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND ${timeCond} AND tags['browser'] != '' GROUP BY tags['browser'] HAVING count > 0
             UNION ALL
             SELECT 'os' AS tag_key, tags['os'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
-            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= now() - INTERVAL ${interval} AND tags['os'] != '' GROUP BY tags['os'] HAVING count > 0
+            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND ${timeCond} AND tags['os'] != '' GROUP BY tags['os'] HAVING count > 0
             UNION ALL
             SELECT 'environment' AS tag_key, environment AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
-            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= now() - INTERVAL ${interval} AND environment != '' GROUP BY environment HAVING count > 0
+            FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND ${timeCond} AND environment != '' GROUP BY environment HAVING count > 0
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const suspectTagsData = await suspectTagsResult.json();
 
@@ -206,13 +211,13 @@ export default async function performanceRoutes(app: FastifyInstance) {
             FROM argus.errors
             WHERE project_id = {projectId:String}
               AND transaction = {txnName:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND ${timeCond}
               AND toString(issue_id) != ''
             GROUP BY issue_id
             ORDER BY event_count DESC
             LIMIT 5
           `,
-          query_params: { projectId: String(projectId), txnName },
+          query_params: qp,
         });
         const errorsData = await errorsResult.json();
         let relatedIssues = (errorsData.data || []) as any[];
@@ -345,15 +350,4 @@ export default async function performanceRoutes(app: FastifyInstance) {
       }
     }
   );
-}
-
-function periodToInterval(period: string): string {
-  const map: Record<string, string> = {
-    '1h': '1 HOUR',
-    '6h': '6 HOUR',
-    '24h': '24 HOUR',
-    '7d': '7 DAY',
-    '30d': '30 DAY',
-  };
-  return map[period] || '24 HOUR';
 }

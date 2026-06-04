@@ -2411,7 +2411,6 @@ const FeatureFlagsPage: React.FC = () => {
                                   >
                                     <Box
                                       sx={{
-                                        fontFamily: 'monospace',
                                         fontSize: '0.75rem',
                                         color: 'success.main',
                                         fontWeight: 600,
@@ -2434,7 +2433,6 @@ const FeatureFlagsPage: React.FC = () => {
                                   >
                                     <Box
                                       sx={{
-                                        fontFamily: 'monospace',
                                         fontSize: '0.75rem',
                                         color: 'text.secondary',
                                         bgcolor: (theme: any) =>
@@ -4302,7 +4300,7 @@ const FeatureFlagsPage: React.FC = () => {
             value={importData}
             onChange={(e) => setImportData(e.target.value)}
             placeholder={t('featureFlags.importPlaceholder')}
-            sx={{ fontFamily: 'monospace' }}
+            
           />
         </DialogContent>
         <DialogActions>

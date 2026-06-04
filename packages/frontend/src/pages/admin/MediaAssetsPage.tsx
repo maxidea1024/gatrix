@@ -646,7 +646,7 @@ const MediaAssetsPage: React.FC = () => {
                         value: (
                           <Typography
                             variant="body2"
-                            sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                            sx={{ fontSize: '0.8rem' }}
                           >
                             {detailAsset.id}
                           </Typography>
@@ -676,7 +676,6 @@ const MediaAssetsPage: React.FC = () => {
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
                               fontSize: '0.75rem',
                               wordBreak: 'break-all',
                               opacity: 0.8,
@@ -704,7 +703,6 @@ const MediaAssetsPage: React.FC = () => {
                               variant="body2"
                               color="primary"
                               sx={{
-                                fontFamily: 'monospace',
                                 fontSize: '0.75rem',
                                 wordBreak: 'break-all',
                                 flex: 1,

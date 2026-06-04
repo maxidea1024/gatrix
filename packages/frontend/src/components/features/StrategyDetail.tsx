@@ -451,7 +451,6 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
                             fontSize: '0.75rem',
                             bgcolor: 'action.selected',
                             fontWeight: 500,
-                            fontFamily: 'monospace',
                           }}
                         />
                       ))}
@@ -491,7 +490,6 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
                             fontSize: '0.75rem',
                             bgcolor: 'action.selected',
                             fontWeight: 500,
-                            fontFamily: 'monospace',
                           }}
                         />
                       ))}

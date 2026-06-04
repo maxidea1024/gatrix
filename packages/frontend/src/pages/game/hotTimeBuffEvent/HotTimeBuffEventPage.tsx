@@ -961,7 +961,7 @@ const HotTimeBuffEventPage: React.FC = () => {
                   );
                 case 'cmsId':
                   return (
-                    <Typography variant="body2" fontFamily="monospace">
+                    <Typography variant="body2">
                       {row.cmsId}
                     </Typography>
                   );
@@ -1236,7 +1236,6 @@ const HotTimeBuffEventPage: React.FC = () => {
                                     </TableCell>
                                     <TableCell
                                       sx={{
-                                        fontFamily: 'monospace',
                                         fontSize: '0.7rem',
                                       }}
                                     >
@@ -1990,7 +1989,7 @@ const HotTimeBuffEventPage: React.FC = () => {
                         }}
                       >
                         <TableCell
-                          sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}
+                          sx={{ fontSize: '0.7rem' }}
                         >
                           {row.cmsId}
                         </TableCell>

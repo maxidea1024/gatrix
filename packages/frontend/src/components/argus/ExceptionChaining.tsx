@@ -148,13 +148,13 @@ const ExceptionChaining: React.FC<ExceptionChainingProps> = ({
                 {t('argus.exceptionChain.causedBy')}
               </Typography>
             )}
-            <Typography component="span" sx={{ fontSize: '0.78rem', fontWeight: 700, color: idx === 0 ? 'error.main' : 'warning.main', fontFamily: 'monospace' }}>
+            <Typography component="span" sx={{ fontSize: '0.78rem', fontWeight: 700, color: idx === 0 ? 'error.main' : 'warning.main'}}>
               {entry.type}
             </Typography>
           </Box>
           <Collapse in={expandedIds.has(idx)}>
             <Box sx={{ px: 1.5, py: 1, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
-              <Typography sx={{ fontSize: '0.78rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: 'text.primary' }}>
+              <Typography sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: 'text.primary' }}>
                 {entry.value}
               </Typography>
             </Box>

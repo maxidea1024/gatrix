@@ -121,8 +121,7 @@ const CopyableUrl: React.FC<{
         }}
       >
         <Typography sx={{
-          flex: 1, fontSize: '0.82rem', fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-          color: isDark ? '#c9d1d9' : '#24292f', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          flex: 1, fontSize: '0.82rem', color: isDark ? '#c9d1d9' : '#24292f', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {value}
         </Typography>
@@ -153,8 +152,7 @@ const PermissionItem: React.FC<{
         <Box key={item} sx={{
           px: 1.2, py: 0.4, borderRadius: '6px', fontSize: '0.78rem', fontWeight: 500,
           backgroundColor: alpha(color, isDark ? 0.15 : 0.08), color: isDark ? alpha(color, 0.9) : color,
-          fontFamily: '"JetBrains Mono", monospace',
-        }}>
+          }}>
           {item}
         </Box>
       ))}
@@ -196,7 +194,6 @@ const WizardInput: React.FC<{
         sx={{
           '& .MuiOutlinedInput-root': {
             borderRadius: '8px', fontSize: '0.85rem',
-            fontFamily: multiline ? '"JetBrains Mono", monospace' : 'inherit',
             backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
           },
         }}

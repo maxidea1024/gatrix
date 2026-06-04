@@ -555,7 +555,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ fontWeight: 600, fontFamily: 'monospace' }}
+                      sx={{ fontWeight: 600}}
                     >
                       {new Date(cr.createdAt).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -671,7 +671,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontWeight: 600, fontFamily: 'monospace' }}
+                          sx={{ fontWeight: 600}}
                         >
                           {new Date(event.timestamp).toLocaleTimeString([], {
                             hour: '2-digit',
@@ -1332,7 +1332,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                 >
                   <Typography
                     variant="body2"
-                    sx={{ fontFamily: 'monospace', fontWeight: 600 }}
+                    sx={{ fontWeight: 600 }}
                   >
                     {item.table}/{item.targetId}
                   </Typography>
@@ -1360,7 +1360,6 @@ const ChangeRequestDetailPage: React.FC = () => {
                     width: '100%',
                     borderCollapse: 'collapse',
                     fontSize: 13,
-                    fontFamily: 'monospace',
                   }}
                 >
                   <Box component="thead">

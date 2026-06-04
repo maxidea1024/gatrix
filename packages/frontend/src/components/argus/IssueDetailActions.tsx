@@ -86,7 +86,6 @@ const IssueDetailActions: React.FC<IssueDetailActionsProps> = ({
                 height: 22,
                 fontSize: '0.7rem',
                 fontWeight: 700,
-                fontFamily: 'monospace',
                 cursor: 'pointer',
                 backgroundColor: alpha(theme.palette.primary.main, 0.08),
                 color: theme.palette.primary.main,

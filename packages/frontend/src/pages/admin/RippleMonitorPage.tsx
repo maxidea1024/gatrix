@@ -536,7 +536,6 @@ const RippleMonitorPage: React.FC = () => {
                                     : 'default'
                                 }
                                 sx={{
-                                  fontFamily: 'monospace',
                                   fontWeight: 500,
                                 }}
                               />
@@ -578,7 +577,6 @@ const RippleMonitorPage: React.FC = () => {
                                         variant="outlined"
                                         sx={{
                                           fontSize: '0.7rem',
-                                          fontFamily: 'monospace',
                                           height: 20,
                                         }}
                                       />
@@ -608,7 +606,6 @@ const RippleMonitorPage: React.FC = () => {
                                   <Typography
                                     variant="body2"
                                     sx={{
-                                      fontFamily: 'monospace',
                                       fontSize: '0.75rem',
                                     }}
                                   >
@@ -648,7 +645,7 @@ const RippleMonitorPage: React.FC = () => {
                             <TableCell align="right">
                               <Typography
                                 variant="body2"
-                                sx={{ fontFamily: 'monospace' }}
+                                
                               >
                                 {handler.timeoutMs != null
                                   ? `${handler.timeoutMs}ms`
@@ -658,7 +655,7 @@ const RippleMonitorPage: React.FC = () => {
                             <TableCell align="right">
                               <Typography
                                 variant="body2"
-                                sx={{ fontFamily: 'monospace' }}
+                                
                               >
                                 {handler.debounceMs != null
                                   ? `${handler.debounceMs}ms`
@@ -997,8 +994,6 @@ const RippleMonitorPage: React.FC = () => {
                                                                 <Typography
                                                                   variant="caption"
                                                                   sx={{
-                                                                    fontFamily:
-                                                                      'monospace',
                                                                     fontWeight: 700,
                                                                     fontSize:
                                                                       '0.72rem',
@@ -1145,8 +1140,6 @@ const RippleMonitorPage: React.FC = () => {
                                                                 <Typography
                                                                   variant="body2"
                                                                   sx={{
-                                                                    fontFamily:
-                                                                      'monospace',
                                                                     fontSize:
                                                                       '0.75rem',
                                                                     fontWeight: 600,
@@ -1162,8 +1155,6 @@ const RippleMonitorPage: React.FC = () => {
                                                                 <Typography
                                                                   variant="body2"
                                                                   sx={{
-                                                                    fontFamily:
-                                                                      'monospace',
                                                                     fontSize:
                                                                       '0.72rem',
                                                                     color:
@@ -1191,8 +1182,6 @@ const RippleMonitorPage: React.FC = () => {
                                                                           '0.7rem',
                                                                         color:
                                                                           'error.main',
-                                                                        fontFamily:
-                                                                          'monospace',
                                                                         maxWidth: 200,
                                                                         overflow:
                                                                           'hidden',
@@ -1230,8 +1219,6 @@ const RippleMonitorPage: React.FC = () => {
                                                                 <Typography
                                                                   variant="body2"
                                                                   sx={{
-                                                                    fontFamily:
-                                                                      'monospace',
                                                                     fontSize:
                                                                       '0.75rem',
                                                                     color:
@@ -1251,8 +1238,6 @@ const RippleMonitorPage: React.FC = () => {
                                                                 <Typography
                                                                   variant="body2"
                                                                   sx={{
-                                                                    fontFamily:
-                                                                      'monospace',
                                                                     fontSize:
                                                                       '0.75rem',
                                                                     fontWeight:

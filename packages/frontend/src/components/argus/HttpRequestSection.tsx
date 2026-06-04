@@ -76,14 +76,13 @@ const CollapsibleKV: React.FC<{
             {Object.entries(data).map(([key, value]) => (
               <TableRow key={key} sx={{ '&:last-child td': { borderBottom: 0 } }}>
                 <TableCell sx={{ py: 0.25, px: 1, width: '30%', verticalAlign: 'top' }}>
-                  <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', color: 'text.secondary', fontWeight: 600 }}>
+                  <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
                     {key}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ py: 0.25, px: 1 }}>
                   <Typography sx={{
-                    fontSize: '0.68rem', fontFamily: 'monospace',
-                    wordBreak: 'break-all', whiteSpace: 'pre-wrap',
+                    fontSize: '0.68rem', wordBreak: 'break-all', whiteSpace: 'pre-wrap',
                   }}>
                     {value}
                   </Typography>
@@ -156,8 +155,7 @@ const HttpRequestSection: React.FC<HttpRequestSectionProps> = ({ request }) => {
             }}
           />
           <Typography sx={{
-            fontSize: '0.75rem', fontFamily: 'monospace',
-            color: 'text.primary', wordBreak: 'break-all', flex: 1,
+            fontSize: '0.75rem', color: 'text.primary', wordBreak: 'break-all', flex: 1,
           }}>
             {request.url}
           </Typography>
@@ -183,8 +181,7 @@ const HttpRequestSection: React.FC<HttpRequestSectionProps> = ({ request }) => {
             <Box sx={{
               p: 1.5, borderRadius: '6px',
               backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-              fontSize: '0.7rem', fontFamily: 'monospace',
-              whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+              fontSize: '0.7rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
               maxHeight: 200, overflow: 'auto',
             }}>
               {typeof request.data === 'object'

@@ -1961,7 +1961,6 @@ const RealtimeEventsPage: React.FC = () => {
                             overflow: 'hidden',
                             '& pre': {
                               fontSize: '0.75rem !important',
-                              fontFamily: 'monospace',
                             },
                             '& .diff-gutter': {
                               minWidth: '30px',

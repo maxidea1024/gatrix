@@ -102,7 +102,6 @@ const TimezoneSelector: React.FC = () => {
           variant="outlined"
           onClick={handleClick}
           sx={{
-            fontFamily: 'monospace',
             fontSize: '0.75rem',
             color: theme.palette.text.primary,
             borderColor: 'transparent',
@@ -174,7 +173,7 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   {t('common.currentLocalTime')}
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                <Typography variant="body2" >
                   {formatDateTimeDetailed(new Date())}
                 </Typography>
               </Box>
@@ -183,7 +182,7 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   {t('common.serverTime')}
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                <Typography variant="body2" >
                   {formatDateTimeDetailed(serverTime)}
                   {serverTimeData && (
                     <Typography
@@ -203,7 +202,7 @@ const TimezoneSelector: React.FC = () => {
                   <Typography variant="caption" color="text.secondary">
                     {t('common.serverUptime')}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  <Typography variant="body2" >
                     {formatUptime(currentUptime)}
                   </Typography>
                 </Box>
@@ -254,7 +253,7 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
                   {formatTimezone(timezone)}
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                <Typography variant="body2" >
                   {dayjs().tz(timezone).format('YYYY-MM-DD HH:mm:ss')}
                 </Typography>
               </Box>

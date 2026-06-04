@@ -317,17 +317,17 @@ const ArgusCronsPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'text.secondary' }}>
+                      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
                         {monitor.schedule_value}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
+                      <Typography sx={{ fontSize: '0.75rem'}}>
                         {formatRelativeTime(monitor.last_checkin_at, t)}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
+                      <Typography sx={{ fontSize: '0.75rem'}}>
                         {formatRelativeTime(monitor.next_checkin_at, t)}
                       </Typography>
                     </TableCell>

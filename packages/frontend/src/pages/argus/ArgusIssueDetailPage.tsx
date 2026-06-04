@@ -388,7 +388,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                       primary={t('argus.detail.resolveInCurrentRelease')}
                       secondary={latestEvent.release}
                       primaryTypographyProps={{ fontSize: '0.75rem', fontWeight: 500 }}
-                      secondaryTypographyProps={{ fontSize: '0.65rem', fontFamily: 'monospace' }}
+                      secondaryTypographyProps={{ fontSize: '0.65rem'}}
                     />
                   </MenuItem>
                 )}
@@ -508,7 +508,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                     size="small"
                     sx={{
                       cursor: 'default', height: 22, fontSize: '0.68rem',
-                      fontFamily: 'monospace',
                       backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                       border: 'none',
                     }}
@@ -523,7 +522,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                     size="small"
                     sx={{
                       cursor: 'default', height: 22, fontSize: '0.68rem',
-                      fontFamily: 'monospace',
                       backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                       border: 'none',
                     }}
@@ -572,7 +570,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                 size="small"
                 sx={{
                   height: 20, fontSize: '0.65rem', fontWeight: 600,
-                  fontFamily: 'monospace',
                   backgroundColor: alpha(theme.palette.info.main, 0.08),
                   color: theme.palette.info.main,
                   border: 'none',
@@ -663,7 +660,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                   {t('argus.issues.stackTraceTitle', 'Stack Trace')}
                 </Typography>
                 {latestEvent.exception_value && (
-                  <Typography variant="body1" sx={{ fontFamily: 'monospace', color: isDark ? '#ddd' : '#333', mb: 2 }}>
+                  <Typography variant="body1" sx={{ color: isDark ? '#ddd' : '#333', mb: 2 }}>
                     {latestEvent.exception_value}
                   </Typography>
                 )}
@@ -906,7 +903,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                     </Box>
                     <Box component="pre" sx={{
                       margin: 0,
-                      fontFamily: 'monospace',
                       fontSize: '0.8rem',
                       lineHeight: 1.5,
                       backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.02)',
@@ -960,7 +956,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                             value: String(v),
                           }))} isDark={isDark} />
                         ) : (
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{String(ctxVal)}</Typography>
+                          <Typography variant="body2" sx={{ fontSize: '0.78rem' }}>{String(ctxVal)}</Typography>
                         )}
                       </Box>
                     ))}

@@ -544,7 +544,6 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                   <Tooltip title={sg.metricName} enterDelay={300}>
                     <Typography
                       variant="body2"
-                      fontFamily={sg.displayName ? 'inherit' : 'monospace'}
                       fontSize="0.8rem"
                       fontWeight={sg.displayName ? 600 : 400}
                       sx={{
@@ -562,7 +561,6 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        fontFamily="monospace"
                         fontSize="0.7rem"
                         sx={{
                           overflow: 'hidden',
@@ -609,7 +607,6 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                 <TableCell align="center">
                   <Typography
                     variant="body2"
-                    fontFamily="monospace"
                     fontWeight={600}
                   >
                     {sg.operator} {sg.threshold}
@@ -738,7 +735,6 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                         <Box>
                           <Typography
                             variant="body2"
-                            fontFamily="monospace"
                             fontSize="0.8rem"
                           >
                             {option}

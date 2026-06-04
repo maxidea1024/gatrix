@@ -137,7 +137,6 @@ export const CopyableField: React.FC<CopyableFieldProps> = ({
       >
         <Typography sx={{
           flex: 1, fontSize: '0.82rem',
-          fontFamily: monoFont ? '"JetBrains Mono", "Fira Code", monospace' : 'inherit',
           color: isDark ? '#c9d1d9' : '#24292f',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>

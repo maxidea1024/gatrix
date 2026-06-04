@@ -120,8 +120,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, minWidth: 0 }}>
         {typeof value === 'string' ? (
           <Typography variant="caption" sx={{
-            fontSize: '0.75rem', fontFamily: 'monospace',
-            wordBreak: 'break-all', textAlign: 'right',
+            fontSize: '0.75rem', wordBreak: 'break-all', textAlign: 'right',
             color: theme.palette.text.primary,
           }}>
             {value}
@@ -170,7 +169,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="caption" sx={{
-              fontFamily: 'monospace', fontSize: '0.72rem',
+              fontSize: '0.72rem',
               color: theme.palette.text.secondary,
               maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
@@ -222,8 +221,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
                       : alpha(theme.palette.text.secondary, 0.3),
                   }} />
                   <Typography variant="caption" sx={{
-                    flex: 1, fontSize: '0.72rem', fontFamily: 'monospace',
-                    color: theme.palette.text.primary,
+                    flex: 1, fontSize: '0.72rem', color: theme.palette.text.primary,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {d.value || '(empty)'}
@@ -275,7 +273,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
           }}
         />
         <Typography variant="body2" sx={{
-          fontFamily: 'monospace', fontSize: '0.78rem',
+          fontSize: '0.78rem',
           flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           color: theme.palette.text.primary,
         }}>
@@ -356,7 +354,7 @@ const SpanDetailPanel: React.FC<SpanDetailPanelProps> = ({
                 mt: 0.5, p: 1.5, borderRadius: 1,
                 backgroundColor: theme.palette.action.hover,
                 border: `1px solid ${theme.palette.divider}`,
-                fontFamily: 'monospace', fontSize: '0.72rem',
+                fontSize: '0.72rem',
                 whiteSpace: 'pre-wrap', wordBreak: 'break-all',
                 maxHeight: 120, overflow: 'auto',
                 color: theme.palette.text.primary,

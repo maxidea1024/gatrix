@@ -672,7 +672,7 @@ const UnknownFlagsPage: React.FC = () => {
                                     />
                                     <Typography
                                       fontWeight={500}
-                                      sx={{ fontFamily: 'monospace' }}
+                                      
                                     >
                                       {flag.flagName}
                                     </Typography>

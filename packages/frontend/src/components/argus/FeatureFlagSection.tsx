@@ -196,7 +196,7 @@ const FeatureFlagSection: React.FC<FeatureFlagSectionProps> = ({ flags, projectS
                         component={RouterLink}
                         to={`/feature-flags/${flag.flagName}`}
                         underline="hover"
-                        sx={{ fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: flag.suspect ? 700 : 400 }}
+                        sx={{ fontSize: '0.75rem', fontWeight: flag.suspect ? 700 : 400 }}
                       >
                         {flag.displayName || flag.flagName}
                       </Link>
@@ -230,7 +230,7 @@ const FeatureFlagSection: React.FC<FeatureFlagSectionProps> = ({ flags, projectS
                         label={formatValue(flag.evaluatedValue, flag.valueType)}
                         size="small"
                         sx={{
-                          height: 18, fontSize: '0.62rem', fontFamily: 'monospace', fontWeight: 600,
+                          height: 18, fontSize: '0.62rem', fontWeight: 600,
                           maxWidth: 120,
                           backgroundColor: alpha(theme.palette.primary.main, 0.06),
                           color: theme.palette.primary.main,

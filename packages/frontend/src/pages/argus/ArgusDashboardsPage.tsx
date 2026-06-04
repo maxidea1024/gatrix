@@ -160,7 +160,7 @@ const WidgetCard: React.FC<{
               <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="caption" sx={{
                   minWidth: 80, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap', fontSize: '0.68rem', fontFamily: 'monospace', color: 'text.secondary',
+                  whiteSpace: 'nowrap', fontSize: '0.68rem', color: 'text.secondary',
                 }}>
                   {String(row[labelKey])}
                 </Typography>
@@ -176,7 +176,7 @@ const WidgetCard: React.FC<{
                     transition: 'width 0.3s ease',
                   }} />
                 </Box>
-                <Typography variant="caption" sx={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 600, minWidth: 40, textAlign: 'right' }}>
+                <Typography variant="caption" sx={{ fontSize: '0.68rem', fontWeight: 600, minWidth: 40, textAlign: 'right' }}>
                   {Number(row[numKey]).toLocaleString()}
                 </Typography>
               </Box>
@@ -235,7 +235,7 @@ const WidgetCard: React.FC<{
         const headers = Object.keys(data[0]);
         return (
           <Box sx={{ overflow: 'auto', height: '100%', fontSize: '0.72rem' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'monospace' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse'}}>
               <thead>
                 <tr>
                   {headers.map(h => (
@@ -767,7 +767,7 @@ const ArgusDashboardsPage: React.FC = () => {
                 ...editingWidget,
                 query: { ...editingWidget.query, fields: e.target.value.split(',').map(s => s.trim()).filter(Boolean) },
               })}
-              sx={{ mb: 2, '& .MuiOutlinedInput-root': { fontFamily: 'monospace', fontSize: '0.82rem' } }}
+              sx={{ mb: 2, '& .MuiOutlinedInput-root': { fontSize: '0.82rem' } }}
             />
 
             <TextField fullWidth size="small"
@@ -777,7 +777,7 @@ const ArgusDashboardsPage: React.FC = () => {
                 ...editingWidget,
                 query: { ...editingWidget.query, groupBy: e.target.value.split(',').map(s => s.trim()).filter(Boolean) },
               })}
-              sx={{ mb: 2, '& .MuiOutlinedInput-root': { fontFamily: 'monospace', fontSize: '0.82rem' } }}
+              sx={{ mb: 2, '& .MuiOutlinedInput-root': { fontSize: '0.82rem' } }}
             />
 
             <Box sx={{ display: 'flex', gap: 2 }}>

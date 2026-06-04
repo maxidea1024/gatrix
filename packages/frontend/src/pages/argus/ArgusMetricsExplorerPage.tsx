@@ -537,7 +537,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                 placeholder={t('argus.metrics.equationPlaceholder', 'e.g. a / b * 100')}
                 value={eq.equation}
                 onChange={(e) => updateEquation(eq.id, { equation: e.target.value })}
-                sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, fontFamily: 'monospace', backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }}
+                sx={{ '& .MuiInputBase-root': { fontSize: '0.8rem', fontWeight: 600, width: 300, backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff' } }}
               />
 
               <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', ml: 1 }}>
@@ -634,13 +634,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
               {chartLabels.slice(0, 100).map((label, idx) => (
                 <TableRow key={idx} hover>
                   <TableCell sx={{ py: 0.6 }}>
-                    <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary' }}>
+                    <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary' }}>
                       {label}
                     </Typography>
                   </TableCell>
                   {chartDatasets.map(ds => (
                     <TableCell key={ds.id} sx={{ py: 0.6 }}>
-                      <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                      <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
                         {Number(ds.data[idx]).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                       </Typography>
                     </TableCell>

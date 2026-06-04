@@ -176,7 +176,6 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
       borderRight: '1px solid',
       borderColor: 'grey.700',
       userSelect: 'none' as const,
-      fontFamily: 'D2Coding, monospace',
       color: 'grey.500',
       bgcolor: 'grey.800',
     }),
@@ -190,7 +189,6 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
       py: 0.25,
       whiteSpace: 'pre-wrap' as const,
       wordBreak: 'break-all' as const,
-      fontFamily: 'D2Coding, monospace',
     }),
     []
   );
@@ -267,7 +265,6 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
           overflow: 'hidden',
           bgcolor: 'grey.900',
           color: 'grey.100',
-          fontFamily: 'D2Coding, monospace',
           fontSize: '0.75rem',
           position: 'relative',
         }}

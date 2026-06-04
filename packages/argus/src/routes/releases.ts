@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
 import { mysqlPool } from '../config/mysql';
+import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('releases-api');
@@ -12,8 +13,11 @@ export default async function releasesRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const { period = '30d' } = request.query as { period?: string };
-      const interval = periodToInterval(period);
-      const qp = { projectId: String(projectId) };
+      
+      const bucket = getBucketingConfig(period);
+      const qp = { projectId: String(projectId), ...bucket.queryParams };
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+      const startedTimeCond = `started >= toDateTime({fillStart:UInt32}) AND started <= toDateTime({fillEnd:UInt32})`;
 
       try {
         const [errorResult, sessionResult, txnResult, trendResult, newIssuesResult] = await Promise.all([
@@ -29,7 +33,7 @@ export default async function releasesRoutes(app: FastifyInstance) {
               countIf(level = 'fatal') AS fatal_count,
               countIf(is_handled = 0) AS unhandled_count
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND release != ''
+            WHERE project_id = {projectId:String} AND ${timeCond} AND release != ''
             GROUP BY release ORDER BY last_seen DESC`,
             query_params: qp,
           }),
@@ -45,7 +49,7 @@ export default async function releasesRoutes(app: FastifyInstance) {
               uniqIf(distinct_id, status = 'crashed') AS crashed_users,
               if(session_users > 0, (1 - crashed_users / session_users) * 100, 100) AS crash_free_users
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval} AND release != ''
+            WHERE project_id = {projectId:String} AND ${startedTimeCond} AND release != ''
             GROUP BY release`,
             query_params: qp,
           }),
@@ -59,7 +63,7 @@ export default async function releasesRoutes(app: FastifyInstance) {
               quantile(0.95)(duration) AS p95,
               countIf(transaction_status != 'ok') / count() * 100 AS error_rate
             FROM argus.transactions
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND release != ''
+            WHERE project_id = {projectId:String} AND ${timeCond} AND release != ''
             GROUP BY release`,
             query_params: qp,
           }),
@@ -68,10 +72,10 @@ export default async function releasesRoutes(app: FastifyInstance) {
           clickhouse.query({
             query: `SELECT
               release,
-              toStartOfDay(timestamp) AS day,
+              ${bucket.selectExpr} AS day,
               count() AS count
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL ${interval} AND release != ''
+            WHERE project_id = {projectId:String} AND ${timeCond} AND release != ''
             GROUP BY release, day ORDER BY release, day`,
             query_params: qp,
           }),
@@ -144,13 +148,4 @@ export default async function releasesRoutes(app: FastifyInstance) {
       }
     }
   );
-}
-
-function periodToInterval(period: string): string {
-  const map: Record<string, string> = {
-    '7d': '7 DAY',
-    '30d': '30 DAY',
-    '90d': '90 DAY',
-  };
-  return map[period] || '30 DAY';
 }

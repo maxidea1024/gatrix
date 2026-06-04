@@ -505,7 +505,7 @@ const ArgusPerformancePage: React.FC = () => {
                         <Box key={idx} sx={{ mb: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.3 }}>
                             <Box sx={{ color: opColor, display: 'flex' }}>{getOpIcon(span.op)}</Box>
-                            <Typography variant="caption" noWrap sx={{ flex: 1, fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                            <Typography variant="caption" noWrap sx={{ flex: 1, fontSize: '0.75rem' }}>
                               {span.description || span.op}
                             </Typography>
                             <Typography variant="caption" fontWeight={700} sx={{ color: opColor, flexShrink: 0 }}>
@@ -551,7 +551,7 @@ const ArgusPerformancePage: React.FC = () => {
                         >
                           <Box sx={{ width: 3, height: 28, borderRadius: 1, backgroundColor: isErr ? '#f44336' : '#4caf50', flexShrink: 0 }} />
                           <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.72rem', color: isDark ? '#888' : '#666' }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.72rem', color: isDark ? '#888' : '#666' }}>
                               {tr.trace_id.slice(0, 16)}...
                             </Typography>
                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>

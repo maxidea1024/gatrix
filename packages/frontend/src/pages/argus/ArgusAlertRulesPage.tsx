@@ -285,7 +285,7 @@ const ActionCard: React.FC<{
             <TextField size="small" fullWidth
               placeholder={action.type === 'webhook' ? "https://hooks.slack.com/services/..." : "admin@example.com"}
               value={action.target_url || ''} onChange={(e) => onChange({ ...action, target_url: e.target.value })}
-              sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.82rem', fontFamily: 'monospace' } }}
+              sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.82rem'} }}
             />
           )
         )}
@@ -748,7 +748,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
                           <React.Fragment key={i}>
                             <Chip icon={cfg?.icon} label={cfg?.label || c.type} size="small"
                               sx={{ height: 22, fontSize: '0.68rem', backgroundColor: alpha(cfg?.color || '#9e9e9e', 0.08), color: cfg?.color, border: 'none' }} />
-                            {c.value && <Chip label={`≥ ${c.value}`} size="small" sx={{ height: 18, fontSize: '0.62rem', fontFamily: 'monospace' }} />}
+                            {c.value && <Chip label={`≥ ${c.value}`} size="small" sx={{ height: 18, fontSize: '0.62rem'}} />}
                           </React.Fragment>
                         );
                       })}
@@ -770,7 +770,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
                         const tags = typeof rule.tags === 'string' ? JSON.parse(rule.tags || '{}') : (rule.tags || {});
                         return Object.entries(tags).map(([k, v]) => (
                           <Chip key={k} icon={<TagIcon sx={{ fontSize: '10px !important' }} />} label={`${k}:${v}`} size="small"
-                            sx={{ height: 18, fontSize: '0.58rem', fontFamily: 'monospace', backgroundColor: alpha('#00bcd4', 0.08), color: '#00bcd4', border: 'none', '& .MuiChip-icon': { color: '#00bcd4' } }} />
+                            sx={{ height: 18, fontSize: '0.58rem', backgroundColor: alpha('#00bcd4', 0.08), color: '#00bcd4', border: 'none', '& .MuiChip-icon': { color: '#00bcd4' } }} />
                         ));
                       })()}
                     </Box>
@@ -812,7 +812,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
                   {/* Last triggered */}
                   {rule.last_triggered_at && (
                     <Tooltip title={t('argus.alerts.lastTriggered')}>
-                      <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', whiteSpace: 'nowrap', fontFamily: 'monospace' }}>
+                      <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', whiteSpace: 'nowrap'}}>
                         {new Date(rule.last_triggered_at).toLocaleString()}
                       </Typography>
                     </Tooltip>
@@ -922,7 +922,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
                           }} />
                       </Tooltip>
                     )}
-                    <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', fontFamily: 'monospace' }}>
+                    <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled'}}>
                       {new Date(h.triggered_at).toLocaleString()}
                     </Typography>
                   </Box>
@@ -1084,8 +1084,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
                         setFormTags(next);
                       }}
                       sx={{
-                        height: 22, fontSize: '0.68rem', fontFamily: 'monospace',
-                        backgroundColor: alpha('#00bcd4', 0.08), color: '#00bcd4', border: 'none',
+                        height: 22, fontSize: '0.68rem', backgroundColor: alpha('#00bcd4', 0.08), color: '#00bcd4', border: 'none',
                         '& .MuiChip-deleteIcon': { fontSize: 14, color: alpha('#00bcd4', 0.5), '&:hover': { color: '#00bcd4' } },
                       }}
                     />

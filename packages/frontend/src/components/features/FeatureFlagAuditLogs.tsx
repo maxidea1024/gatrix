@@ -508,7 +508,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
         );
       case 'ipAddress':
         return (
-          <Typography variant="body2" fontFamily="monospace">
+          <Typography variant="body2">
             {log.ipAddress || '-'}
           </Typography>
         );
@@ -735,7 +735,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
@@ -781,7 +781,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                             variant="body2"
                                             color="text.secondary"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.8rem',
                                             }}
                                           >
@@ -846,7 +845,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: 'monospace',
                                                     color: 'text.secondary',
                                                   }}
                                                 >
@@ -877,7 +875,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       {log.ipAddress || '-'}
                                     </Typography>
@@ -905,7 +903,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                           sx={{
                                             mt: 0.5,
                                             wordBreak: 'break-all',
-                                            fontFamily: 'monospace',
                                             fontSize: '0.75rem',
                                             color: 'text.secondary',
                                           }}
@@ -1059,8 +1056,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                           <TableCell
                                                             sx={{
                                                               fontWeight: 500,
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                             }}
@@ -1069,8 +1064,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1096,8 +1089,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1175,7 +1166,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                 style={{
                                                   margin: 0,
                                                   fontSize: '0.75rem',
-                                                  fontFamily: 'monospace',
                                                   color:
                                                     theme.palette.text.primary,
                                                 }}

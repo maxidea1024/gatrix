@@ -148,19 +148,19 @@ const SortableColumnRow: React.FC<{
         }}
         sx={{
           flex: 1, minWidth: 140,
-          '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem', fontFamily: 'monospace' },
+          '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem'},
         }}
         MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
       >
         <MenuItem disabled sx={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'text.secondary' }}>Functions</MenuItem>
         {aggregates.map(agg => (
-          <MenuItem key={`agg-${agg}`} value={agg} sx={{ fontSize: '0.82rem', fontFamily: 'monospace', pl: 3 }}>
+          <MenuItem key={`agg-${agg}`} value={agg} sx={{ fontSize: '0.82rem', pl: 3 }}>
             {agg}
           </MenuItem>
         ))}
         <MenuItem disabled sx={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'text.secondary', mt: 1 }}>Columns</MenuItem>
         {columns.map(col => (
-          <MenuItem key={`col-${col}`} value={col} sx={{ fontSize: '0.82rem', fontFamily: 'monospace', pl: 3 }}>
+          <MenuItem key={`col-${col}`} value={col} sx={{ fontSize: '0.82rem', pl: 3 }}>
             {col}
           </MenuItem>
         ))}
@@ -176,12 +176,12 @@ const SortableColumnRow: React.FC<{
           }}
           sx={{
             flex: 1, minWidth: 140,
-            '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem', fontFamily: 'monospace' },
+            '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem'},
           }}
           MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
         >
           {columns.map(col => (
-            <MenuItem key={`param-${col}`} value={col} sx={{ fontSize: '0.82rem', fontFamily: 'monospace' }}>
+            <MenuItem key={`param-${col}`} value={col} sx={{ fontSize: '0.82rem'}}>
               {col}
             </MenuItem>
           ))}
@@ -199,7 +199,7 @@ const SortableColumnRow: React.FC<{
         onChange={(e) => onChangeAlias(entry.id, e.target.value)}
         sx={{
           width: 160, flexShrink: 0,
-          '& .MuiOutlinedInput-root': { fontSize: '0.8rem', fontFamily: 'monospace' },
+          '& .MuiOutlinedInput-root': { fontSize: '0.8rem'},
           '& .MuiOutlinedInput-input': { py: 0.75 },
         }}
       />

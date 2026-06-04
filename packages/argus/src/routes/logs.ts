@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
-import { getDynamicBucketFn } from '../utils/timeBucket';
+import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('logs-api');
 
@@ -32,23 +32,16 @@ export default async function logsRoutes(app: FastifyInstance) {
         end,
       } = request.query as Record<string, string>;
 
-      const periodMap: Record<string, string> = {
-        '1h': '1 HOUR', '6h': '6 HOUR', '12h': '12 HOUR', '24h': '24 HOUR',
-        '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY',
-      };
-      const interval = periodMap[period] || '24 HOUR';
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const conditions: string[] = ['project_id = {projectId:String}'];
-        const params: Record<string, string> = { projectId: String(projectId) };
-
-        if (period === 'custom' && start && end) {
-          conditions.push(`timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`);
-          params.start = start.replace('T', ' ').replace('Z', '');
-          params.end = end.replace('T', ' ').replace('Z', '');
-        } else {
-          conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
-        }
+        const conditions: string[] = ['project_id = {projectId:String}', timeCond];
+        const params: Record<string, string> = { 
+          projectId: String(projectId), 
+          fillStart: String(bucket.queryParams.fillStart), 
+          fillEnd: String(bucket.queryParams.fillEnd) 
+        };
 
         if (cursor) {
           const op = order === 'DESC' ? '<' : '>';
@@ -103,31 +96,14 @@ export default async function logsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h', level, start, end, search } = request.query as Record<string, string>;
 
-      const periodMap: Record<string, string> = {
-        '1h': '1 HOUR', '6h': '6 HOUR', '12h': '12 HOUR', '24h': '24 HOUR',
-        '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY',
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+      const conditions: string[] = ['project_id = {projectId:String}', timeCond];
+      const params: Record<string, string> = { 
+        projectId: String(projectId),
+        fillStart: String(bucket.queryParams.fillStart),
+        fillEnd: String(bucket.queryParams.fillEnd)
       };
-      
-      let bucketFn = 'toStartOfHour';
-      const conditions: string[] = ['project_id = {projectId:String}'];
-      const params: Record<string, string> = { projectId: String(projectId) };
-
-      if (period === 'custom' && start && end) {
-        conditions.push(`timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`);
-        params.start = start.replace('T', ' ').replace('Z', '');
-        params.end = end.replace('T', ' ').replace('Z', '');
-        
-        const s = new Date(start).getTime();
-        const e = new Date(end).getTime();
-        const diffHours = (e - s) / 3600000;
-        if (diffHours <= 12) bucketFn = 'toStartOfFiveMinutes';
-        else if (diffHours <= 72) bucketFn = 'toStartOfHour';
-        else bucketFn = 'toStartOfDay';
-      } else {
-        const interval = periodMap[period] || '24 HOUR';
-        conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
-      }
-      bucketFn = getDynamicBucketFn(period, start, end);
 
       try {
 
@@ -146,7 +122,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         const sql = `
-          SELECT ${bucketFn}(timestamp) AS bucket, level, count() AS count
+          SELECT ${bucket.selectExpr} AS bucket, level, count() AS count
           FROM argus.logs
           WHERE ${conditions.join(' AND ')}
           GROUP BY bucket, level
@@ -170,18 +146,13 @@ export default async function logsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h', start, end } = request.query as Record<string, string>;
 
-      const periodMap: Record<string, string> = {
-        '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR', '7d': '7 DAY', '30d': '30 DAY',
+      const bucket = getBucketingConfig(period, start, end);
+      const qp: Record<string, any> = { 
+        projectId: String(projectId),
+        fillStart: bucket.queryParams.fillStart,
+        fillEnd: bucket.queryParams.fillEnd
       };
-      const interval = periodMap[period] || '24 HOUR';
-      const qp: Record<string, string> = { projectId: String(projectId) };
-
-      let timeFilter = `timestamp >= now() - INTERVAL ${interval}`;
-      if (period === 'custom' && start && end) {
-        timeFilter = `timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`;
-        qp.start = start.replace('T', ' ').replace('Z', '');
-        qp.end = end.replace('T', ' ').replace('Z', '');
-      }
+      const timeFilter = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
         const [levelsRes, servicesRes, envsRes, loggersRes] = await Promise.all([
@@ -237,26 +208,20 @@ export default async function logsRoutes(app: FastifyInstance) {
         environment,
       } = request.query as Record<string, string>;
 
-      const periodMap: Record<string, string> = {
-        '1h': '1 HOUR', '6h': '6 HOUR', '12h': '12 HOUR', '24h': '24 HOUR',
-        '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY',
-      };
-      const interval = periodMap[period] || '24 HOUR';
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       // Only allow safe column names
       const ALLOWED_GROUP = new Set(['level', 'service', 'environment', 'logger_name', 'release']);
       const safeGroup = ALLOWED_GROUP.has(groupBy) ? groupBy : 'level';
 
       try {
-        const conditions: string[] = ['project_id = {projectId:String}'];
-        const params: Record<string, string> = { projectId: String(projectId) };
-        if (period === 'custom' && start && end) {
-          conditions.push(`timestamp >= {start:DateTime64(3, 'UTC')} AND timestamp <= {end:DateTime64(3, 'UTC')}`);
-          params.start = start.replace('T', ' ').replace('Z', '');
-          params.end = end.replace('T', ' ').replace('Z', '');
-        } else {
-          conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
-        }
+        const conditions: string[] = ['project_id = {projectId:String}', timeCond];
+        const params: Record<string, string> = { 
+          projectId: String(projectId),
+          fillStart: String(bucket.queryParams.fillStart),
+          fillEnd: String(bucket.queryParams.fillEnd)
+        };
 
         if (service) { conditions.push('service = {service:String}'); params.service = service; }
         if (environment) { conditions.push('environment = {environment:String}'); params.environment = environment; }
@@ -283,7 +248,6 @@ export default async function logsRoutes(app: FastifyInstance) {
         const topValues = await topResult.json() as any[];
 
         // 2) Time series per group value (top 5)
-        const bucketFn = getDynamicBucketFn(period, start, end);
         const top5 = topValues.slice(0, 5).map((r: any) => r.group_value);
 
         let timeSeries: any[] = [];
@@ -292,7 +256,7 @@ export default async function logsRoutes(app: FastifyInstance) {
           top5.forEach((v: string, i: number) => { params[`g${i}`] = v; });
 
           const tsSql = `
-            SELECT ${bucketFn}(timestamp) AS bucket, ${safeGroup} AS group_value, count() AS count
+            SELECT ${bucket.selectExpr} AS bucket, ${safeGroup} AS group_value, count() AS count
             FROM argus.logs
             WHERE ${conditions.join(' AND ')} AND ${safeGroup} IN (${inList})
             GROUP BY bucket, group_value

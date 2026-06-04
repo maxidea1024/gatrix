@@ -315,7 +315,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                     </TableCell>
                     <TableCell
                       sx={{
-                        fontFamily: '"D2Coding", monospace',
                         fontWeight: 600,
                         fontSize: '0.75rem',
                         color: 'text.primary',
@@ -350,7 +349,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                     </TableCell>
                     <TableCell
                       sx={{
-                        fontFamily: '"D2Coding", monospace',
                         fontSize: '0.75rem',
                       }}
                     >
@@ -369,7 +367,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                     </TableCell>
                     <TableCell
                       sx={{
-                        fontFamily: '"D2Coding", monospace',
                         fontSize: '0.75rem',
                       }}
                     >
@@ -447,7 +444,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontFamily: '"D2Coding", monospace',
                           fontSize: '0.75rem',
                         }}
                       >
@@ -649,7 +645,6 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                 color: 'white',
                 lineHeight: 1,
                 textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                fontFamily: 'monospace',
               }}
             >
               {service.status === 'ready'

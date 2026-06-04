@@ -235,7 +235,7 @@ const ArgusUptimePage: React.FC = () => {
                         {monitor.name}
                       </Typography>
                     </Box>
-                    <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', fontFamily: 'monospace', mt: 0.25 }}>
+                    <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', mt: 0.25 }}>
                       {monitor.method} {monitor.url}
                     </Typography>
                   </Box>

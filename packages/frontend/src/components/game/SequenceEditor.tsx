@@ -296,7 +296,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <Typography variant="caption" color="text.secondary">
             {t('banners.listViewTime')}
           </Typography>
-          <Typography variant="body2" fontFamily="monospace">
+          <Typography variant="body2">
             {(startTime / 1000).toFixed(2)}s - {(endTime / 1000).toFixed(2)}s
           </Typography>
         </Box>

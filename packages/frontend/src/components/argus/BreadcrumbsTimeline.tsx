@@ -215,8 +215,7 @@ const HttpBreadcrumbContent: React.FC<{ crumb: Breadcrumb; isError: boolean }> =
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
       {(method || msgMatch?.[1]) && (
         <Typography component="span" sx={{
-          fontSize: '0.7rem', fontWeight: 700, fontFamily: 'monospace',
-          color: isError ? '#f44336' : '#00bcd4',
+          fontSize: '0.7rem', fontWeight: 700, color: isError ? '#f44336' : '#00bcd4',
         }}>
           {method || msgMatch?.[1]}
         </Typography>
@@ -224,7 +223,6 @@ const HttpBreadcrumbContent: React.FC<{ crumb: Breadcrumb; isError: boolean }> =
       <Typography component="span" sx={{
         fontSize: '0.76rem', color: isError ? '#f44336' : 'text.primary',
         fontWeight: isError ? 600 : 400, wordBreak: 'break-word',
-        fontFamily: 'monospace',
       }}>
         {url || msgMatch?.[2] || msg}
       </Typography>
@@ -233,8 +231,7 @@ const HttpBreadcrumbContent: React.FC<{ crumb: Breadcrumb; isError: boolean }> =
           label={statusCode || msgMatch?.[3]}
           size="small"
           sx={{
-            height: 16, fontSize: '0.6rem', fontWeight: 700, fontFamily: 'monospace',
-            backgroundColor: alpha(
+            height: 16, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha(
               Number(statusCode || msgMatch?.[3]) >= 400 ? '#f44336' : '#4caf50',
               0.1
             ),
@@ -243,7 +240,7 @@ const HttpBreadcrumbContent: React.FC<{ crumb: Breadcrumb; isError: boolean }> =
         />
       )}
       {msgMatch?.[4] && (
-        <Typography component="span" sx={{ fontSize: '0.65rem', color: 'text.disabled', fontFamily: 'monospace' }}>
+        <Typography component="span" sx={{ fontSize: '0.65rem', color: 'text.disabled'}}>
           {msgMatch[4]}
         </Typography>
       )}
@@ -506,7 +503,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
                 color: isError || isVirtual ? '#f44336' : 'text.primary',
                 fontWeight: isError || isVirtual ? 600 : 400,
                 wordBreak: 'break-word',
-                fontFamily: isSql || crumb.category === 'console' ? 'monospace' : 'inherit',
+
                 ...(isSql ? {
                   backgroundColor: isDark ? 'rgba(76,175,80,0.06)' : 'rgba(76,175,80,0.04)',
                   px: 0.5, py: 0.1, borderRadius: '3px', border: `1px solid ${alpha('#4caf50', 0.15)}`,
@@ -534,15 +531,15 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
               <Box sx={{
                 mt: 0.5, p: 1, borderRadius: '4px',
                 backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
-                fontFamily: 'monospace', fontSize: '0.7rem',
+                fontSize: '0.7rem',
                 maxHeight: 200, overflow: 'auto',
               }}>
                 {Object.entries(crumb.data!).filter(([k]) => k !== '_virtual').map(([key, val]) => (
                   <Box key={key} sx={{ display: 'flex', gap: 1, py: 0.2 }}>
-                    <Typography component="span" sx={{ color: 'text.secondary', fontSize: '0.7rem', fontFamily: 'monospace', minWidth: 80, fontWeight: 600 }}>
+                    <Typography component="span" sx={{ color: 'text.secondary', fontSize: '0.7rem', minWidth: 80, fontWeight: 600 }}>
                       {key}:
                     </Typography>
-                    <Typography component="span" sx={{ color: 'text.primary', fontSize: '0.7rem', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    <Typography component="span" sx={{ color: 'text.primary', fontSize: '0.7rem', wordBreak: 'break-all' }}>
                       {typeof val === 'object' ? JSON.stringify(val) : String(val)}
                     </Typography>
                   </Box>
@@ -556,7 +553,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
         <Tooltip title={crumb.timestamp ? new Date(crumb.timestamp).toLocaleString() : ''}>
           <Typography sx={{
             fontSize: '0.65rem', color: timeDisplay === 'relative' ? alpha(theme.palette.text.primary, 0.5) : 'text.disabled',
-            fontFamily: 'monospace', whiteSpace: 'nowrap', py: 0.7,
+            whiteSpace: 'nowrap', py: 0.7,
             fontWeight: timeDisplay === 'relative' ? 500 : 400,
           }}>
             {timeStr}

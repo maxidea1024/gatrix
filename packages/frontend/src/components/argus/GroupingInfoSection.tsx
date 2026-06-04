@@ -90,7 +90,7 @@ const GroupingInfoSection: React.FC<GroupingInfoSectionProps> = ({ groupingInfo 
               <Box sx={{
                 flex: 1, p: 0.75, borderRadius: '4px',
                 backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                fontFamily: 'monospace', fontSize: '0.7rem',
+                fontSize: '0.7rem',
                 wordBreak: 'break-all',
               }}>
                 {groupingInfo.fingerprint.join(', ')}
@@ -109,7 +109,7 @@ const GroupingInfoSection: React.FC<GroupingInfoSectionProps> = ({ groupingInfo 
               <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase' }}>
                 {t('argus.grouping.strategy')}
               </Typography>
-              <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace' }}>
+              <Typography sx={{ fontSize: '0.72rem'}}>
                 {groupingInfo.strategy}
               </Typography>
             </Box>
@@ -117,7 +117,7 @@ const GroupingInfoSection: React.FC<GroupingInfoSectionProps> = ({ groupingInfo 
               <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase' }}>
                 {t('argus.grouping.type')}
               </Typography>
-              <Typography sx={{ fontSize: '0.72rem', fontFamily: 'monospace' }}>
+              <Typography sx={{ fontSize: '0.72rem'}}>
                 {groupingInfo.type}
               </Typography>
             </Box>
@@ -144,10 +144,10 @@ const GroupingInfoSection: React.FC<GroupingInfoSectionProps> = ({ groupingInfo 
                   ) : (
                     <NonContributingIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
                   )}
-                  <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', color: frame.contributing ? 'text.primary' : 'text.disabled' }}>
+                  <Typography sx={{ fontSize: '0.68rem', color: frame.contributing ? 'text.primary' : 'text.disabled' }}>
                     {frame.module || frame.filename}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: frame.contributing ? 700 : 400 }}>
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: frame.contributing ? 700 : 400 }}>
                     {frame.function}
                   </Typography>
                 </Box>

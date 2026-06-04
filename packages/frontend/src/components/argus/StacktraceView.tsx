@@ -85,13 +85,13 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
               }}
             >
               <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: isDark ? '#ccc' : '#444' }}>
+                <Typography variant="body2" sx={{ fontSize: '0.8rem', color: isDark ? '#ccc' : '#444' }}>
                   {frame.filename || frame.abs_path || '<anonymous>'}
                 </Typography>
                 <Typography variant="body2" sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
                   in
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: isDark ? '#bb86fc' : '#6200ea', fontWeight: 600 }}>
+                <Typography variant="body2" sx={{ fontSize: '0.8rem', color: isDark ? '#bb86fc' : '#6200ea', fontWeight: 600 }}>
                   {frame.function || '<anonymous>'}
                 </Typography>
                 {(frame.lineno) && (
@@ -99,7 +99,7 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
                     <Typography variant="body2" sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
                       at
                     </Typography>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: isDark ? '#aaa' : '#666' }}>
+                    <Typography variant="body2" sx={{ fontSize: '0.8rem', color: isDark ? '#aaa' : '#666' }}>
                       {frame.lineno}{frame.colno ? `:${frame.colno}` : ''}
                     </Typography>
                   </>
@@ -153,7 +153,6 @@ const StacktraceView: React.FC<StacktraceViewProps> = ({ stacktrace, mode = 'ful
                       padding: '8px 0',
                       fontSize: '0.8rem',
                       backgroundColor: 'transparent',
-                      fontFamily: 'D2Coding, monospace',
                     }}
                   >
                     {codeSnippet}

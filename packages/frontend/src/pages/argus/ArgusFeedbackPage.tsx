@@ -1389,7 +1389,7 @@ const ArgusFeedbackPage: React.FC = () => {
                     <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.7rem', minWidth: 80 }}>
                       {row.label}
                     </Typography>
-                    <Typography variant="caption" sx={{ fontSize: '0.72rem', fontFamily: 'monospace', wordBreak: 'break-all', flex: 1 }}>
+                    <Typography variant="caption" sx={{ fontSize: '0.72rem', wordBreak: 'break-all', flex: 1 }}>
                       {row.value}
                     </Typography>
                     <CopyButton text={row.value as string} size={14} />
@@ -1409,7 +1409,7 @@ const ArgusFeedbackPage: React.FC = () => {
                         key={k}
                         label={`${k}: ${v}`}
                         size="small"
-                        sx={{ height: 22, fontSize: '0.65rem', fontFamily: 'monospace', backgroundColor: alpha(theme.palette.primary.main, 0.08), border: 'none' }}
+                        sx={{ height: 22, fontSize: '0.65rem', backgroundColor: alpha(theme.palette.primary.main, 0.08), border: 'none' }}
                       />
                     ))}
                   </Box>
@@ -1634,7 +1634,7 @@ const ArgusFeedbackPage: React.FC = () => {
                 size="small"
                 onClick={() => setNewKeywordRegex(!newKeywordRegex)}
                 sx={{
-                  height: 32, fontFamily: 'monospace', fontWeight: 700, cursor: 'pointer',
+                  height: 32, fontWeight: 700, cursor: 'pointer',
                   backgroundColor: newKeywordRegex ? alpha('#ff9800', 0.15) : 'transparent',
                   color: newKeywordRegex ? '#ff9800' : 'text.disabled',
                   border: `1px solid ${newKeywordRegex ? '#ff9800' : 'rgba(128,128,128,0.3)'}`,
@@ -1664,7 +1664,7 @@ const ArgusFeedbackPage: React.FC = () => {
                   borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                   '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
                 }}>
-                  <Typography sx={{ flex: 1, fontSize: '0.82rem', fontFamily: 'monospace' }}>
+                  <Typography sx={{ flex: 1, fontSize: '0.82rem'}}>
                     {kw.keyword}
                   </Typography>
                   {kw.is_regex && (

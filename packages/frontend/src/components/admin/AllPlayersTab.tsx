@@ -825,8 +825,6 @@ export default function AllPlayersTab({
     return Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
   }, [data.users, groupBy, t]);
 
-
-
   // ── Visible columns ──
   const visibleColumns = columns.filter((c) => c.visible);
 
@@ -839,7 +837,6 @@ export default function AllPlayersTab({
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'monospace',
                 cursor: 'pointer',
                 '&:hover': {
                   color: 'primary.main',
@@ -891,7 +888,6 @@ export default function AllPlayersTab({
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
                 '&:hover': {
@@ -919,7 +915,6 @@ export default function AllPlayersTab({
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
                 '&:hover': {
@@ -1010,7 +1005,7 @@ export default function AllPlayersTab({
         return (
           <Typography
             variant="body2"
-            sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+            sx={{ fontSize: '0.75rem' }}
           >
             {user.clientVersion || '-'}
           </Typography>
@@ -1147,7 +1142,6 @@ export default function AllPlayersTab({
                   resize: 'vertical',
                   overflow: 'auto',
                   fontSize: '0.85rem',
-                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
                   fontWeight: 500,
                 },
               }}

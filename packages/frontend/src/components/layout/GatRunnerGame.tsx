@@ -954,7 +954,6 @@ const GatRunnerGame: React.FC<GatRunnerGameProps> = ({ open, onClose }) => {
             bgcolor: '#2d2d2d',
             color: 'rgba(255,255,255,0.5)',
             fontSize: '0.7rem',
-            fontFamily: 'monospace',
           }}
         >
           {t('gatRunner.controlsFooter')}

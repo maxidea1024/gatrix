@@ -3497,7 +3497,7 @@ const CouponSettingsPage: React.FC = () => {
                               >
                                 <Typography
                                   variant="caption"
-                                  sx={{ fontFamily: 'monospace' }}
+                                  
                                 >
                                   {c.code}
                                 </Typography>

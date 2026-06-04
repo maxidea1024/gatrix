@@ -66,7 +66,6 @@ const DigitCell: React.FC<{ value: string; prevValue: string }> = ({
     >
       <Typography
         sx={{
-          fontFamily: '"Inter", "Roboto Mono", monospace',
           fontWeight: 900,
           fontSize: 'clamp(2rem, 5.5vw, 6.5rem)',
           lineHeight: 1,

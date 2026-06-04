@@ -69,8 +69,6 @@ const EventRow: React.FC<EventRowProps> = ({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-
-
   // Event type color based on status
   const getEventColor = (type: string) => {
     switch (type.toUpperCase()) {
@@ -127,19 +125,19 @@ const EventRow: React.FC<EventRowProps> = ({
         );
       case 'hostname':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" >
             {event.hostname || '-'}
           </Typography>
         );
       case 'externalAddress':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" >
             {event.externalAddress || '-'}
           </Typography>
         );
       case 'internalAddress':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" >
             {event.internalAddress || '-'}
           </Typography>
         );
@@ -179,7 +177,7 @@ const EventRow: React.FC<EventRowProps> = ({
         );
       case 'instanceId':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" >
             {event.instanceId}
           </Typography>
         );
@@ -187,7 +185,7 @@ const EventRow: React.FC<EventRowProps> = ({
         return (
           <Typography
             variant="body2"
-            sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+            sx={{ fontSize: '0.75rem' }}
           >
             {event.ports
               ? Object.entries(event.ports)
@@ -308,7 +306,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     >
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'monospace' }}
+                        
                       >
                         {event.instanceId}
                       </Typography>
@@ -367,7 +365,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     >
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'monospace' }}
+                        
                       >
                         {event.hostname || '-'}
                       </Typography>
@@ -410,7 +408,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     >
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'monospace' }}
+                        
                       >
                         {event.externalAddress || '-'}
                       </Typography>
@@ -433,7 +431,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     >
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'monospace' }}
+                        
                       >
                         {event.internalAddress || '-'}
                       </Typography>
@@ -456,7 +454,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     >
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+                        sx={{ fontSize: '0.75rem' }}
                       >
                         {event.ports
                           ? Object.entries(event.ports)
@@ -607,7 +605,6 @@ const EventRow: React.FC<EventRowProps> = ({
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'monospace',
                             fontSize: '0.75rem',
                             whiteSpace: 'pre-wrap',
                           }}
@@ -664,7 +661,6 @@ const EventRow: React.FC<EventRowProps> = ({
                         borderRadius: 1,
                         maxHeight: 200,
                         overflow: 'auto',
-                        fontFamily: 'monospace',
                         fontSize: '0.75rem',
                         whiteSpace: 'pre-wrap',
                       }}

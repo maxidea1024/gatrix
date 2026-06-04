@@ -550,7 +550,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: 'monospace',
                                 cursor: 'pointer',
                                 '&:hover': {
                                   color: 'primary.main',

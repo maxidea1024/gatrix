@@ -397,8 +397,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     setUrlState({ tab: newTab });
   };
 
-
-
   const addSearchTag = (key: string, value: string) => {
     const appendStr = `${key}:"${value}"`;
     const finalStr = (search.trim() ? search.trim() + ' ' : '') + appendStr + ' ';
@@ -443,7 +441,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
               '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.02) },
             }}>
               <TableCell sx={{ py: 0.8 }}>
-                <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>
+                <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>
                   {formatWith(span.timestamp, 'MMM D, HH:mm:ss')}
                 </Typography>
               </TableCell>
@@ -452,8 +450,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   label={span.op || '—'}
                   size="small"
                   sx={{
-                    height: 20, fontSize: '0.68rem', fontWeight: 700, fontFamily: 'monospace',
-                    backgroundColor: alpha(getOpColor(span.op), 0.12),
+                    height: 20, fontSize: '0.68rem', fontWeight: 700, backgroundColor: alpha(getOpColor(span.op), 0.12),
                     color: getOpColor(span.op),
                     borderRadius: '4px',
                   }}
@@ -466,7 +463,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
               </TableCell>
               <TableCell sx={{ py: 0.8 }}>
                 <Typography sx={{
-                  fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600,
+                  fontSize: '0.73rem', fontWeight: 600,
                   color: Number(span.duration) > 1000 ? theme.palette.error.main : 'text.primary',
                 }}>
                   {formatDuration(Number(span.duration))}
@@ -474,8 +471,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
               </TableCell>
               <TableCell sx={{ py: 0.8 }}>
                 <Typography sx={{
-                  fontSize: '0.72rem', fontFamily: 'monospace',
-                  color: span.status === 'ok' ? theme.palette.success.main
+                  fontSize: '0.72rem', color: span.status === 'ok' ? theme.palette.success.main
                     : span.status && span.status !== '' ? theme.palette.error.main
                     : 'text.disabled',
                 }}>
@@ -491,7 +487,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                       }
                     }}
                     sx={{
-                      fontSize: '0.72rem', fontFamily: 'monospace', color: theme.palette.primary.main,
+                      fontSize: '0.72rem', color: theme.palette.primary.main,
                       cursor: 'pointer', '&:hover': { textDecoration: 'underline' },
                     }}
                   >
@@ -653,11 +649,11 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: getOpColor(v.value), flexShrink: 0 }} />
-                      <span style={{ fontFamily: 'monospace', color: theme.palette.primary.main, fontWeight: 600 }}>
+                      <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>
                         {v.value || '(empty)'}
                       </span>
                     </Box>
-                    <Typography sx={{ fontSize: '0.65rem', fontFamily: 'monospace', color: 'text.disabled' }}>
+                    <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
                       {Number(v.count).toLocaleString()}
                     </Typography>
                   </Box>
@@ -675,7 +671,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                           '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
                         }}
                       >
-                        <span style={{ fontFamily: 'monospace' }}>{v.value}</span>
+                        <span style={{ }}>{v.value}</span>
                       </Box>
                     ))}
                   </>
@@ -743,22 +739,22 @@ const ArgusTraceExplorerPage: React.FC = () => {
                         onClick={() => navigate(`/argus/performance?trace=${trace.trace_id}`)}
                       >
                         <TableCell sx={{ py: 0.8 }}>
-                          <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: theme.palette.primary.main, fontWeight: 600 }}>
+                          <Typography sx={{ fontSize: '0.73rem', color: theme.palette.primary.main, fontWeight: 600 }}>
                             {String(trace.trace_id).slice(0, 16)}…
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 0.8 }}>
-                          <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>
+                          <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>
                             {new Date(trace.start_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 0.8 }}>
-                          <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                          <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
                             {Number(trace.span_count).toLocaleString()}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 0.8 }}>
-                          <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                          <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
                             {formatDuration(Number(trace.total_duration))}
                           </Typography>
                         </TableCell>
@@ -766,8 +762,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                             {ops.slice(0, 4).map((op, i) => (
                               <Chip key={i} label={op} size="small" sx={{
-                                height: 18, fontSize: '0.65rem', fontFamily: 'monospace',
-                                backgroundColor: alpha(getOpColor(op), 0.12),
+                                height: 18, fontSize: '0.65rem', backgroundColor: alpha(getOpColor(op), 0.12),
                                 color: getOpColor(op),
                                 borderRadius: '3px',
                               }} />
@@ -781,7 +776,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                         </TableCell>
                         <TableCell sx={{ py: 0.8 }}>
                           <Typography sx={{
-                            fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600,
+                            fontSize: '0.73rem', fontWeight: 600,
                             color: Number(trace.error_count) > 0 ? theme.palette.error.main : 'text.disabled',
                           }}>
                             {Number(trace.error_count)}
@@ -864,24 +859,24 @@ const ArgusTraceExplorerPage: React.FC = () => {
                           {aggGroupBy === 'op' && (
                             <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: getOpColor(row.group_value), flexShrink: 0 }} />
                           )}
-                          <Typography sx={{ fontSize: '0.78rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                          <Typography sx={{ fontSize: '0.78rem', fontWeight: 600 }}>
                             {row.group_value || '(empty)'}
                           </Typography>
                         </Box>
                       </TableCell>
                       <TableCell sx={{ py: 0.8 }}>
-                        <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace' }}>
+                        <Typography sx={{ fontSize: '0.73rem'}}>
                           {Number(row.count).toLocaleString()}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.8 }}>
-                        <Typography sx={{ fontSize: '0.73rem', fontFamily: 'monospace' }}>
+                        <Typography sx={{ fontSize: '0.73rem'}}>
                           {formatDuration(Number(row.avg_duration || 0))}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.8 }}>
                         <Typography sx={{
-                          fontSize: '0.73rem', fontFamily: 'monospace', fontWeight: 600,
+                          fontSize: '0.73rem', fontWeight: 600,
                           color: Number(row.p95_duration) > 1000 ? theme.palette.error.main : 'text.primary',
                         }}>
                           {formatDuration(Number(row.p95_duration || 0))}

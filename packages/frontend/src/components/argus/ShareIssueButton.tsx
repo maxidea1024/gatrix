@@ -124,7 +124,7 @@ const ShareIssueButton: React.FC<ShareIssueButtonProps> = ({
             primary={t('argus.share.copyShortId')}
             secondary={shortId}
             primaryTypographyProps={{ fontSize: '0.78rem' }}
-            secondaryTypographyProps={{ fontSize: '0.65rem', fontFamily: 'monospace' }}
+            secondaryTypographyProps={{ fontSize: '0.65rem'}}
           />
         </MenuItem>
       </Menu>

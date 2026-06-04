@@ -184,7 +184,6 @@ const PlayerHistoryTable: React.FC<{
                   sx={{
                     fontSize: '0.75rem',
                     py: 0.75,
-                    fontFamily: 'monospace',
                     whiteSpace: 'nowrap',
                   }}
                 >

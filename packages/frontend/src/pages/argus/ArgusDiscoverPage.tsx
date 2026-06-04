@@ -190,8 +190,7 @@ const GroupBySelector: React.FC<{
             key={col}
             onClick={() => onToggle(col)}
             sx={{
-              px: 1.5, py: 0.6, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'monospace',
-              fontWeight: groupBy.includes(col) ? 700 : 400,
+              px: 1.5, py: 0.6, cursor: 'pointer', fontSize: '0.78rem', fontWeight: groupBy.includes(col) ? 700 : 400,
               color: groupBy.includes(col) ? theme.palette.primary.main : 'text.primary',
               backgroundColor: groupBy.includes(col) ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
               transition: 'background 0.1s', display: 'flex', alignItems: 'center', gap: 1,
@@ -597,7 +596,7 @@ const ArgusDiscoverPage: React.FC = () => {
                   <TableCell key={key}
                     onClick={() => handleColumnSort(key)}
                     sx={{
-                      fontWeight: 700, fontSize: '0.72rem', fontFamily: 'monospace', cursor: 'pointer',
+                      fontWeight: 700, fontSize: '0.72rem', cursor: 'pointer',
                       backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
                       borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                       whiteSpace: 'nowrap', userSelect: 'none',
@@ -623,8 +622,7 @@ const ArgusDiscoverPage: React.FC = () => {
                 }}>
                   {Object.entries(row).map(([colKey, val], cidx) => (
                     <TableCell key={cidx} sx={{
-                      fontSize: '0.78rem', fontFamily: 'monospace',
-                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      fontSize: '0.78rem', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
                       position: 'relative', whiteSpace: 'nowrap',
                       '&:hover .cell-actions': { opacity: 1 },
                     }}>
@@ -845,14 +843,14 @@ const ArgusDiscoverPage: React.FC = () => {
                             zIndex: 0,
                             transition: 'width 0.3s ease',
                           }} />
-                          <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: theme.palette.primary.main, fontWeight: 600, zIndex: 1, position: 'relative' }}>
+                          <span style={{ fontSize: '0.78rem', color: theme.palette.primary.main, fontWeight: 600, zIndex: 1, position: 'relative' }}>
                             {v.value || '(empty)'}
                           </span>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, zIndex: 1, position: 'relative' }}>
-                            <Typography sx={{ fontSize: '0.6rem', fontFamily: 'monospace', color: 'text.disabled', fontWeight: 600 }}>
+                            <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', fontWeight: 600 }}>
                               {pctOfTotal.toFixed(0)}%
                             </Typography>
-                            <Typography sx={{ fontSize: '0.65rem', fontFamily: 'monospace', color: 'text.disabled' }}>
+                            <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
                               {v.count.toLocaleString()}
                             </Typography>
                           </Box>
@@ -913,8 +911,7 @@ const ArgusDiscoverPage: React.FC = () => {
                         searchContainerRef.current?.querySelector('input')?.focus();
                       }}
                       sx={{
-                        px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', fontFamily: 'monospace',
-                        '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                        px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
                       }}
                     >
                       <span style={{ color: theme.palette.primary.main }}>has</span>:
@@ -929,8 +926,7 @@ const ArgusDiscoverPage: React.FC = () => {
                         searchContainerRef.current?.querySelector('input')?.focus();
                       }}
                       sx={{
-                        px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', fontFamily: 'monospace',
-                        '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                        px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem', '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
                       }}
                     >
                       <span style={{ color: theme.palette.primary.main }}>{field}</span>:
@@ -974,7 +970,7 @@ const ArgusDiscoverPage: React.FC = () => {
                 <Select value={yAxis} onChange={(e) => setUrlState({ yAxis: e.target.value })}
                   disableUnderline
                   sx={{ fontSize: '0.7rem', fontWeight: 700, '& .MuiSelect-select': { py: 0 } }}>
-                  {Y_AXIS_OPTIONS.map(o => <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>{o.label}</MenuItem>)}
+                  {Y_AXIS_OPTIONS.map(o => <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem'}}>{o.label}</MenuItem>)}
                 </Select>
               </FormControl>
             </Box>
@@ -1014,8 +1010,7 @@ const ArgusDiscoverPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 0.5, flex: 1, overflow: 'hidden', flexWrap: 'nowrap' }}>
               {fields.slice(0, 6).map((f, i) => (
                 <Chip key={i} label={f} size="small" sx={{
-                  height: 20, fontSize: '0.62rem', fontFamily: 'monospace',
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                  height: 20, fontSize: '0.62rem', backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
                   border: 'none',
                 }} />
               ))}
@@ -1035,7 +1030,7 @@ const ArgusDiscoverPage: React.FC = () => {
 
           {error && (
             <Box sx={{ p: 2, backgroundColor: alpha('#f44336', 0.04) }}>
-              <Typography variant="body2" sx={{ color: '#f44336', fontSize: '0.82rem', fontFamily: 'monospace' }}>
+              <Typography variant="body2" sx={{ color: '#f44336', fontSize: '0.82rem'}}>
                 {error}
               </Typography>
             </Box>

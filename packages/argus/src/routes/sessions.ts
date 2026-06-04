@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
+import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('sessions-api');
@@ -11,8 +12,10 @@ export default async function sessionsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h' } = request.query as { period?: string };
-      const interval = periodToInterval(period);
-      const qp = { projectId: String(projectId) };
+      
+      const bucket = getBucketingConfig(period, undefined, undefined, 'started');
+      const qp = { projectId: String(projectId), ...bucket.queryParams };
+      const timeCond = `started >= toDateTime({fillStart:UInt32}) AND started <= toDateTime({fillEnd:UInt32})`;
 
       try {
         const [
@@ -37,21 +40,21 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               uniq(distinct_id) AS unique_users,
               avg(duration) AS avg_duration
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval}`,
+            WHERE project_id = {projectId:String} AND ${timeCond}`,
             query_params: qp,
           }),
 
           // Hourly trend
           clickhouse.query({
             query: `SELECT
-              toStartOfHour(started) AS hour,
+              ${bucket.selectExpr} AS hour,
               count() AS total,
               countIf(status = 'crashed') AS crashed,
               countIf(status IN ('ok', 'exited')) AS healthy,
               if(total > 0, (1 - crashed / total) * 100, 100) AS crash_free_rate
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval}
-            GROUP BY hour ORDER BY hour`,
+            WHERE project_id = {projectId:String} AND ${timeCond}
+            GROUP BY hour ORDER BY hour ${bucket.fillExpr}`,
             query_params: qp,
           }),
 
@@ -64,7 +67,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               if(total > 0, (1 - crashed / total) * 100, 100) AS crash_free_rate,
               uniq(distinct_id) AS users
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval} AND release != ''
+            WHERE project_id = {projectId:String} AND ${timeCond} AND release != ''
             GROUP BY release ORDER BY total DESC LIMIT 10`,
             query_params: qp,
           }),
@@ -83,7 +86,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               ) AS bucket,
               count() AS count
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval}
+            WHERE project_id = {projectId:String} AND ${timeCond}
             GROUP BY bucket ORDER BY min(duration)`,
             query_params: qp,
           }),
@@ -91,14 +94,14 @@ export default async function sessionsRoutes(app: FastifyInstance) {
           // NEW: Status timeline (stacked area data)
           clickhouse.query({
             query: `SELECT
-              toStartOfHour(started) AS hour,
+              ${bucket.selectExpr} AS hour,
               countIf(status IN ('ok', 'exited')) AS healthy,
               countIf(status = 'errored') AS errored,
               countIf(status = 'crashed') AS crashed,
               countIf(status = 'abnormal') AS abnormal
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval}
-            GROUP BY hour ORDER BY hour`,
+            WHERE project_id = {projectId:String} AND ${timeCond}
+            GROUP BY hour ORDER BY hour ${bucket.fillExpr}`,
             query_params: qp,
           }),
 
@@ -118,7 +121,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               countIf(status = 'crashed') AS crashed,
               if(total > 0, crashed / total * 100, 0) AS crash_rate
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval}
+            WHERE project_id = {projectId:String} AND ${timeCond}
             GROUP BY browser ORDER BY total DESC LIMIT 8`,
             query_params: qp,
           }),
@@ -139,7 +142,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               countIf(status = 'crashed') AS crashed,
               if(total > 0, crashed / total * 100, 0) AS crash_rate
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND started >= now() - INTERVAL ${interval}
+            WHERE project_id = {projectId:String} AND ${timeCond}
             GROUP BY os ORDER BY total DESC LIMIT 8`,
             query_params: qp,
           }),
@@ -153,8 +156,8 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               uniq(distinct_id) AS unique_users
             FROM argus.sessions
             WHERE project_id = {projectId:String}
-              AND started >= now() - INTERVAL ${interval} - INTERVAL ${interval}
-              AND started < now() - INTERVAL ${interval}`,
+              AND started >= toDateTime({fillStart:UInt32}) - (toDateTime({fillEnd:UInt32}) - toDateTime({fillStart:UInt32}))
+              AND started < toDateTime({fillStart:UInt32})`,
             query_params: qp,
           }),
         ]);
@@ -192,15 +195,4 @@ export default async function sessionsRoutes(app: FastifyInstance) {
       }
     }
   );
-}
-
-function periodToInterval(period: string): string {
-  const map: Record<string, string> = {
-    '1h': '1 HOUR',
-    '6h': '6 HOUR',
-    '24h': '24 HOUR',
-    '7d': '7 DAY',
-    '30d': '30 DAY',
-  };
-  return map[period] || '24 HOUR';
 }

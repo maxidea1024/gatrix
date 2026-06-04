@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import { mysqlPool } from '../config/mysql';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
+import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('projects-api');
 
@@ -360,28 +361,22 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h' } = request.query as { period?: string };
 
-      const periodMap: Record<string, string> = {
-        '1h': '1 HOUR',
-        '24h': '24 HOUR',
-        '7d': '7 DAY',
-        '30d': '30 DAY',
-      };
-      const interval = periodMap[period] || '24 HOUR';
+      const bucket = getBucketingConfig(period);
 
       try {
         const result = await clickhouse.query({
           query: `
             SELECT
-              toStartOfHour(timestamp) AS hour,
+              ${bucket.selectExpr} AS hour,
               count() AS event_count,
               uniq(user_id) AS affected_users
             FROM argus.errors
             WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
             GROUP BY hour
-            ORDER BY hour
+            ORDER BY hour ${bucket.fillExpr}
           `,
-          query_params: { projectId: String(projectId) },
+          query_params: { projectId: String(projectId), fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd },
         });
 
         const stats = await result.json();
@@ -406,44 +401,39 @@ export default async function projectsRoutes(app: FastifyInstance) {
       };
       const { period = '7d' } = request.query as { period?: string };
 
-      const periodMap: Record<string, { interval: string; resolution: string }> = {
-        '24h': { interval: '24 HOUR', resolution: 'toStartOfHour(timestamp)' },
-        '7d':  { interval: '7 DAY',   resolution: 'toStartOfHour(timestamp)' },
-        '30d': { interval: '30 DAY',  resolution: 'toStartOfDay(timestamp)' },
-      };
-      const config = periodMap[period] || periodMap['7d'];
+      const bucket = getBucketingConfig(period);
 
       try {
         // Query errors
         const errorsResult = await clickhouse.query({
           query: `
             SELECT
-              ${config.resolution} AS ts,
+              ${bucket.selectExpr} AS ts,
               count() AS accepted
             FROM argus.errors
             WHERE project_id = {projectId:String}
               AND dsn_key_id = {dsnKeyId:UInt32}
-              AND timestamp >= now() - INTERVAL ${config.interval}
+              AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
             GROUP BY ts
-            ORDER BY ts
+            ORDER BY ts ${bucket.fillExpr}
           `,
-          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId) },
+          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId), fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd },
         });
 
         // Query transactions
         const txnResult = await clickhouse.query({
           query: `
             SELECT
-              ${config.resolution} AS ts,
+              ${bucket.selectExpr} AS ts,
               count() AS accepted
             FROM argus.transactions
             WHERE project_id = {projectId:String}
               AND dsn_key_id = {dsnKeyId:UInt32}
-              AND timestamp >= now() - INTERVAL ${config.interval}
+              AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
             GROUP BY ts
-            ORDER BY ts
+            ORDER BY ts ${bucket.fillExpr}
           `,
-          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId) },
+          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId), fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd },
         });
 
         const errors = (await errorsResult.json()).data as { ts: string; accepted: string }[];

@@ -252,7 +252,6 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
             size="small"
             sx={{
               height: 20, fontSize: '0.68rem',
-              fontFamily: 'monospace',
               backgroundColor: alpha(theme.palette.text.primary, 0.05),
               color: theme.palette.text.secondary,
             }}

@@ -152,7 +152,7 @@ const SuspectCommits: React.FC<SuspectCommitsProps> = ({ projectId, issueId, isD
                     </Typography>
                     <Tooltip title={commit.commit_hash}>
                       <Typography variant="caption" sx={{
-                        fontSize: '0.62rem', fontFamily: 'monospace', color: 'text.disabled',
+                        fontSize: '0.62rem', color: 'text.disabled',
                         cursor: 'default',
                       }}>
                         {commit.commit_hash.slice(0, 7)}

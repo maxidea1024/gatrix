@@ -115,3 +115,25 @@ When implementing text search inputs (e.g., name search), always apply debouncin
 
 Never use `window.alert()` or `window.prompt()`. Use MUI Dialog components instead.
 
+## Font: Never Set fontFamily Inline
+
+**절대로** 컴포넌트에서 인라인으로 `fontFamily`를 지정하지 마세요. 모든 폰트는 `global.css`와 `ThemeContext.tsx`에서 전역으로 관리됩니다.
+
+**금지 패턴:**
+```tsx
+// ❌ 이렇게 하지 마세요
+<Typography sx={{ fontFamily: 'monospace' }}>...</Typography>
+<Box sx={{ fontFamily: '"D2Coding", monospace' }}>...</Box>
+<span style={{ fontFamily: 'Consolas, monospace' }}>...</span>
+```
+
+**올바른 패턴:**
+```tsx
+// ✅ 전역 폰트가 자동 적용됩니다. fontFamily 지정 불필요.
+<Typography>...</Typography>
+<code>monospace가 필요한 텍스트</code>
+```
+
+- 기본 폰트(D2Coding + sans-serif fallback)는 `body`에서 전역 적용
+- 고정폭이 필요한 경우 `<code>`, `<pre>`, `<kbd>`, `<samp>` 태그 사용
+- 외부 라이브러리 스타일 오버라이드 등 **특수한 경우에만** 예외 허용
