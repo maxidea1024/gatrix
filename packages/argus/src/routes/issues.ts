@@ -16,19 +16,49 @@ export default async function issuesRoutes(app: FastifyInstance) {
       const { period = '24h', status, level, start, end } = request.query as Record<string, string>;
 
       try {
-        const periodMap: Record<string, string> = {
-          '1h': '1 HOUR', '24h': '24 HOUR', '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
-        };
-        let interval = periodMap[period] || '24 HOUR';
-        let timeCondition = `timestamp >= now() - INTERVAL ${interval}`;
+        let startDt: Date;
+        let endDt: Date;
 
         if (start && end) {
-          timeCondition = `timestamp >= {start:String} AND timestamp <= {end:String}`;
+          startDt = new Date(start);
+          endDt = new Date(end);
+        } else {
+          const periodMap: Record<string, number> = {
+            '1h': 3600, '6h': 21600, '24h': 86400, '7d': 604800, '14d': 1209600, '30d': 2592000, '90d': 7776000,
+          };
+          const deltaSecs = periodMap[period] || 86400;
+          endDt = new Date();
+          startDt = new Date(endDt.getTime() - deltaSecs * 1000);
         }
 
-        const conditions = [`project_id = {projectId:String}`, timeCondition];
-        const qp: Record<string, string> = { projectId: String(projectId) };
-        if (start && end) { qp.start = start; qp.end = end; }
+        if (isNaN(startDt.getTime()) || isNaN(endDt.getTime())) {
+          return reply.code(400).send({ error: 'Invalid start or end date' });
+        }
+
+        const deltaSeconds = Math.max(1, (endDt.getTime() - startDt.getTime()) / 1000);
+        let interval = '1 DAY';
+        if (deltaSeconds <= 3600) interval = '1 MINUTE';
+        else if (deltaSeconds <= 6 * 3600) interval = '5 MINUTE';
+        else if (deltaSeconds <= 24 * 3600) interval = '30 MINUTE';
+        else if (deltaSeconds <= 7 * 86400) interval = '4 HOUR';
+        else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';
+
+        const qp: Record<string, any> = { 
+          projectId: String(projectId),
+          fillStart: Math.floor(startDt.getTime() / 1000),
+          fillEnd: Math.floor(endDt.getTime() / 1000),
+        };
+
+        const conditions = [
+          `project_id = {projectId:String}`, 
+          `timestamp >= toDateTime({fillStart:UInt32})`,
+          `timestamp <= toDateTime({fillEnd:UInt32})`
+        ];
+
+        if (level) {
+          conditions.push(`level = {level:String}`);
+          qp.level = level;
+        }
 
         // Optional: filter by issue status from MySQL
         if (status && status !== 'all') {
@@ -43,25 +73,20 @@ export default async function issuesRoutes(app: FastifyInstance) {
           conditions.push(`issue_id IN (${issueIds.join(',')})`);
         }
 
-        if (level) {
-          conditions.push(`level = {level:String}`);
-          qp.level = level;
-        }
-
-        // Use appropriate bucketing based on range
-        const bucketFn = period === '1h' ? 'toStartOfFiveMinutes' :
-                         (period === '24h' ? 'toStartOfHour' : 'toStartOfDay');
-
         const result = await clickhouse.query({
           query: `
             SELECT
-              ${bucketFn}(timestamp) AS day,
+              toStartOfInterval(timestamp, INTERVAL ${interval}) AS day,
               count() AS count,
               uniqExact(issue_id) AS issue_count
             FROM argus.errors
             WHERE ${conditions.join(' AND ')}
             GROUP BY day
             ORDER BY day
+            WITH FILL 
+              FROM toStartOfInterval(toDateTime({fillStart:UInt32}), INTERVAL ${interval})
+              TO toDateTime({fillEnd:UInt32})
+              STEP INTERVAL ${interval}
           `,
           query_params: qp,
         });
@@ -558,32 +583,44 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
       const { period = '14d' } = request.query as { period?: string };
 
-      const periodMap: Record<string, string> = {
-        '24h': '24 HOUR',
-        '7d': '7 DAY',
-        '14d': '14 DAY',
-        '30d': '30 DAY',
+      const periodMap: Record<string, number> = {
+        '1h': 3600, '6h': 21600, '24h': 86400, '7d': 604800, '14d': 1209600, '30d': 2592000, '90d': 7776000
       };
-      const interval = periodMap[period] || '14 DAY';
-      const timeGroup = period === '24h' ? 'toStartOfHour(timestamp)' : 'toStartOfDay(timestamp)';
+      const deltaSeconds = periodMap[period] || 1209600;
+      const endDt = new Date();
+      const startDt = new Date(endDt.getTime() - deltaSeconds * 1000);
+
+      let interval = '1 DAY';
+      if (deltaSeconds <= 3600) interval = '1 MINUTE';
+      else if (deltaSeconds <= 6 * 3600) interval = '5 MINUTE';
+      else if (deltaSeconds <= 24 * 3600) interval = '30 MINUTE';
+      else if (deltaSeconds <= 7 * 86400) interval = '4 HOUR';
+      else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';
 
       try {
         const result = await clickhouse.query({
           query: `
             SELECT
-              ${timeGroup} AS timestamp,
+              toStartOfInterval(timestamp, INTERVAL ${interval}) AS timestamp,
               count() AS event_count,
               uniq(user_id) AS user_count
             FROM argus.errors
             WHERE project_id = {projectId:String}
               AND issue_id = {issueId:UInt64}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND timestamp >= toDateTime({fillStart:UInt32})
+              AND timestamp <= toDateTime({fillEnd:UInt32})
             GROUP BY timestamp
             ORDER BY timestamp
+            WITH FILL 
+              FROM toStartOfInterval(toDateTime({fillStart:UInt32}), INTERVAL ${interval})
+              TO toDateTime({fillEnd:UInt32})
+              STEP INTERVAL ${interval}
           `,
           query_params: {
             projectId: String(projectId),
             issueId: parseInt(issueId, 10),
+            fillStart: Math.floor(startDt.getTime() / 1000),
+            fillEnd: Math.floor(endDt.getTime() / 1000),
           },
         });
 
