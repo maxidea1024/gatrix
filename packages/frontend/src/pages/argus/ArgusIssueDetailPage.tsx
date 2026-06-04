@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -40,6 +40,7 @@ import IssueLogsSection from '@/components/argus/IssueLogsSection';
 import IssueActionBar from './components/IssueActionBar';
 import IssueStacktraceSection from './components/IssueStacktraceSection';
 import IssueContextSection from './components/IssueContextSection';
+import SpanEvidenceSection from '@/components/argus/SpanEvidenceSection';
 import IssueDetailSidebar from './components/IssueDetailSidebar';
 
 const MIN_SPLIT_WIDTH = 250;
@@ -99,6 +100,67 @@ const ArgusIssueDetailPage: React.FC = () => {
   }
 
   const { traceDetail, traceLoading: loadingTrace } = useTraceData(projectId, traceId, !sidebarCollapsed);
+
+  // --- Span Evidence ---
+  const spanEvidence = useMemo(() => {
+    if (!traceDetail || !traceDetail.spans) return [];
+    
+    const queryCounts: Record<string, { count: number; totalDuration: number; op: string }> = {};
+    const evidence: any[] = [];
+    
+    traceDetail.spans.forEach(span => {
+      const isDb = span.op?.startsWith('db');
+      const isHttp = span.op?.startsWith('http');
+      const dur = span.duration || 0;
+      
+      if (isDb) {
+        if (!queryCounts[span.description]) {
+          queryCounts[span.description] = { count: 0, totalDuration: 0, op: span.op };
+        }
+        queryCounts[span.description].count++;
+        queryCounts[span.description].totalDuration += dur;
+      }
+      
+      let problem_type;
+      if (isDb && dur > 500) problem_type = 'slow_db_query';
+      else if (isHttp && dur > 1000) problem_type = 'slow_http';
+      else if (dur > 2000) problem_type = 'slow_resource';
+      else if (span.status !== 'ok' && span.status !== 'unknown') problem_type = 'internal_error';
+      
+      if (problem_type) {
+        evidence.push({
+          op: span.op || 'unknown',
+          description: span.description || '',
+          duration_ms: dur,
+          status: span.status || 'ok',
+          problem_type,
+          parent_span_id: span.parent_span_id,
+        });
+      }
+    });
+    
+    Object.entries(queryCounts).forEach(([desc, stat]) => {
+      if (stat.count >= 5 && stat.totalDuration > 100) {
+        const existing = evidence.find(e => e.description === desc);
+        if (existing) {
+          existing.problem_type = 'n_plus_one';
+          existing.repeats = stat.count;
+          existing.duration_ms = stat.totalDuration;
+        } else {
+          evidence.push({
+            op: stat.op || 'db.query',
+            description: desc,
+            duration_ms: stat.totalDuration,
+            status: 'ok',
+            problem_type: 'n_plus_one',
+            repeats: stat.count,
+          });
+        }
+      }
+    });
+    
+    return evidence.sort((a, b) => b.duration_ms - a.duration_ms).slice(0, 5);
+  }, [traceDetail]);
 
   // --- Actions ---
   const actions = useIssueActions({ projectId, issueId, issue, updateIssueOptimistic, revalidateIssue });
@@ -216,6 +278,13 @@ const ArgusIssueDetailPage: React.FC = () => {
 
               {/* Event Highlights */}
               <EventHighlights event={latestEvent} />
+
+              {/* Span Evidence */}
+              {spanEvidence.length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <SpanEvidenceSection spans={spanEvidence} />
+                </Box>
+              )}
 
               {/* Stacktrace */}
               {latestEvent && (
