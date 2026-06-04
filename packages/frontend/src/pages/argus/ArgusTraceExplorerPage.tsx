@@ -138,7 +138,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   // ─── URL-driven state ───
   const URL_PARAMS = useMemo(() => ({
-    period:  { key: 'period',  default: '24h', storageKey: 'argus-traces-period' },
+    period:  { key: 'period',  default: '14d', storageKey: 'argus-traces-period' },
     start:   { key: 'start',   default: '' },
     end:     { key: 'end',     default: '' },
     q:       { key: 'q',       default: '' },

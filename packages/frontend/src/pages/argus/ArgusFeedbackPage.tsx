@@ -90,7 +90,7 @@ import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse, ArgusFeedbackActivity, ArgusIssueTracker, ArgusIssue } from '@/services/argusService';
 import { rbacService } from '@/services/rbacService';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
-import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { formatCompactNumber, formatWithCommas, needsCompactTooltip } from '@/utils/numberFormat';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
@@ -101,6 +101,8 @@ import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
+import { stringToColor, getInitials } from '@/utils/argusHelpers';
+import HighlightText from '@/components/common/HighlightText';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
@@ -114,40 +116,6 @@ const MIN_SPLIT_WIDTH = 280;
 const MAX_SPLIT_WIDTH = 1000;
 
 // ─── Helpers ───
-function stringToColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
-  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ff9800'];
-  return colors[Math.abs(hash) % colors.length];
-}
-
-function getInitials(name: string): string {
-  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-}
-
-function HighlightText({ text, highlight, isDark }: { text: string; highlight: string; isDark: boolean }) {
-  if (!text) return <>{text}</>;
-  if (!highlight.trim()) return <>{text}</>;
-  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
-  return (
-    <>
-      {parts.map((part, i) =>
-        part.toLowerCase() === highlight.toLowerCase() ? (
-          <span key={i} style={{ 
-            backgroundColor: isDark ? 'rgba(255, 235, 59, 0.2)' : 'rgba(255, 235, 59, 0.4)',
-            color: isDark ? '#ffd54f' : '#f57f17',
-            borderRadius: '2px',
-            padding: '0 2px'
-          }}>
-            {part}
-          </span>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      )}
-    </>
-  );
-}
 
 
 
@@ -173,7 +141,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
   // ─── URL State ───
   const URL_PARAMS = useMemo(() => ({
-    period: { key: 'period', default: '7d' },
+    period: { key: 'period', default: '14d', storageKey: 'argus-feedback-period' },
     status: { key: 'status', default: 'unresolved' },
     page:   { key: 'page',   default: '1' },
     sort:   { key: 'sort',   default: 'newest' },
@@ -1122,64 +1090,71 @@ const ArgusFeedbackPage: React.FC = () => {
 
             </Box>
 
-            {/* Detail Actions */}
+
+            {/* Detail Actions — Unified Toolbar */}
             <Box sx={{
-              px: 2, py: 0.8, display: 'flex', alignItems: 'center', gap: 0.75,
+              px: 2, py: 0.8, display: 'flex', alignItems: 'center', gap: 0,
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              flexShrink: 0, flexWrap: 'wrap',
+              flexShrink: 0,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.01)',
             }}>
-              {selectedItem.status !== 'resolved' ? (
-                <Button size="small" startIcon={<ResolveIcon sx={{ fontSize: '15px !important' }} />}
-                  onClick={() => handleUpdateStatus(selectedItem.feedback_id, 'resolved')}
+              {/* Status action group */}
+              <Box sx={{
+                display: 'flex', alignItems: 'center',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                borderRadius: '8px',
+                overflow: 'hidden',
+              }}>
+                {selectedItem.status !== 'resolved' ? (
+                  <Button size="small" startIcon={<ResolveIcon sx={{ fontSize: '14px !important' }} />}
+                    onClick={() => handleUpdateStatus(selectedItem.feedback_id, 'resolved')}
+                    sx={{
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, px: 1.2, minHeight: 30,
+                      borderRadius: 0, color: isDark ? '#66bb6a' : '#2e7d32',
+                      '&:hover': { backgroundColor: alpha('#4caf50', isDark ? 0.15 : 0.08) },
+                    }}>
+                    {t('argus.feedback.resolve')}
+                  </Button>
+                ) : (
+                  <Button size="small" startIcon={<UnresolveIcon sx={{ fontSize: '14px !important' }} />}
+                    onClick={() => handleUpdateStatus(selectedItem.feedback_id, 'unresolved')}
+                    sx={{
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, px: 1.2, minHeight: 30,
+                      borderRadius: 0, color: isDark ? '#ffb74d' : '#e65100',
+                      '&:hover': { backgroundColor: alpha('#ff9800', isDark ? 0.15 : 0.08) },
+                    }}>
+                    {t('argus.feedback.unresolve')}
+                  </Button>
+                )}
+                {!selectedItem.is_spam && (
+                  <>
+                    <Divider orientation="vertical" flexItem sx={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+                    <Button size="small" startIcon={<SpamIcon sx={{ fontSize: '14px !important' }} />}
+                      onClick={() => handleMarkSpam(selectedItem.feedback_id)}
+                      sx={{
+                        textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, px: 1.2, minHeight: 30,
+                        borderRadius: 0, color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+                        '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+                      }}>
+                      {t('argus.feedback.markSpam')}
+                    </Button>
+                  </>
+                )}
+                <Divider orientation="vertical" flexItem sx={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+                <Button size="small" startIcon={<AssignIcon sx={{ fontSize: '14px !important' }} />}
+                  onClick={(e) => setAssigneeAnchor({ el: e.currentTarget, feedbackId: selectedItem.feedback_id })}
                   sx={{
-                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, borderRadius: '6px', px: 1.5, minHeight: 28,
-                    backgroundColor: alpha('#4caf50', isDark ? 0.15 : 0.1),
-                    color: isDark ? '#66bb6a' : '#2e7d32',
-                    border: `1px solid ${alpha('#4caf50', isDark ? 0.3 : 0.25)}`,
-                    '&:hover': { backgroundColor: alpha('#4caf50', isDark ? 0.25 : 0.18) },
+                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, px: 1.2, minHeight: 30,
+                    borderRadius: 0, color: isDark ? '#b388ff' : '#5e35b1',
+                    '&:hover': { backgroundColor: alpha('#7c4dff', isDark ? 0.12 : 0.06) },
                   }}>
-                  {t('argus.feedback.resolve')}
+                  {selectedItem.assigned_to || t('argus.feedback.assign')}
                 </Button>
-              ) : (
-                <Button size="small" startIcon={<UnresolveIcon sx={{ fontSize: '15px !important' }} />}
-                  onClick={() => handleUpdateStatus(selectedItem.feedback_id, 'unresolved')}
-                  sx={{
-                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, borderRadius: '6px', px: 1.5, minHeight: 28,
-                    backgroundColor: alpha('#ff9800', isDark ? 0.15 : 0.1),
-                    color: isDark ? '#ffb74d' : '#e65100',
-                    border: `1px solid ${alpha('#ff9800', isDark ? 0.3 : 0.25)}`,
-                    '&:hover': { backgroundColor: alpha('#ff9800', isDark ? 0.25 : 0.18) },
-                  }}>
-                  {t('argus.feedback.unresolve')}
-                </Button>
-              )}
-              {!selectedItem.is_spam && (
-                <Button size="small" startIcon={<SpamIcon sx={{ fontSize: '15px !important' }} />}
-                  onClick={() => handleMarkSpam(selectedItem.feedback_id)}
-                  sx={{
-                    textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-                    color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)'}`,
-                    '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' },
-                  }}>
-                  {t('argus.feedback.markSpam')}
-                </Button>
-              )}
-              <Button size="small" startIcon={<AssignIcon sx={{ fontSize: '15px !important' }} />}
-                onClick={(e) => setAssigneeAnchor({ el: e.currentTarget, feedbackId: selectedItem.feedback_id })}
-                sx={{
-                  textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
-                  backgroundColor: alpha('#7c4dff', isDark ? 0.12 : 0.08),
-                  color: isDark ? '#b388ff' : '#5e35b1',
-                  border: `1px solid ${alpha('#7c4dff', isDark ? 0.25 : 0.2)}`,
-                  '&:hover': { backgroundColor: alpha('#7c4dff', isDark ? 0.2 : 0.14) },
-                }}>
-                {selectedItem.assigned_to || t('argus.feedback.assign')}
-              </Button>
+              </Box>
 
               <Box sx={{ flex: 1 }} />
 
+              {/* Issue linking group */}
               {selectedItem.issue_id ? (() => {
                 const issueColor = selectedItem.issue_status === 'resolved' ? '#4caf50'
                   : selectedItem.issue_status === 'ignored' ? '#9e9e9e' : '#ff9800';
@@ -1189,21 +1164,29 @@ const ArgusFeedbackPage: React.FC = () => {
                     ? (isDark ? '#bdbdbd' : '#616161')
                     : (isDark ? '#ffb74d' : '#e65100');
                 return (
-                  <Button size="small" startIcon={<BugReportIcon sx={{ fontSize: '15px !important' }} />}
-                    onClick={() => navigate(`/argus/issues/${projectId}/${selectedItem.issue_id}`, { state: { from: 'feedback' } })}
-                    sx={{
-                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, borderRadius: '6px', px: 1.5, minHeight: 28,
-                      backgroundColor: alpha(issueColor, isDark ? 0.15 : 0.1),
-                      color: issueTextColor,
-                      border: `1px solid ${alpha(issueColor, isDark ? 0.3 : 0.25)}`,
-                      '&:hover': { backgroundColor: alpha(issueColor, isDark ? 0.25 : 0.18) },
-                    }}>
-                    #{selectedItem.issue_id} {selectedItem.issue_status || ''}
-                  </Button>
+                  <Box sx={{
+                    display: 'flex', alignItems: 'center',
+                    border: `1px solid ${alpha(issueColor, isDark ? 0.3 : 0.25)}`,
+                    borderRadius: '8px', overflow: 'hidden',
+                  }}>
+                    <Button size="small" startIcon={<BugReportIcon sx={{ fontSize: '14px !important' }} />}
+                      onClick={() => navigate(`/argus/issues/${projectId}/${selectedItem.issue_id}`, { state: { from: 'feedback' } })}
+                      sx={{
+                        textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, px: 1.2, minHeight: 30,
+                        borderRadius: 0, color: issueTextColor,
+                        '&:hover': { backgroundColor: alpha(issueColor, isDark ? 0.15 : 0.08) },
+                      }}>
+                      #{selectedItem.issue_id} {selectedItem.issue_status || ''}
+                    </Button>
+                  </Box>
                 );
               })() : (
-                <>
-                  <Button size="small" startIcon={<LinkIcon sx={{ fontSize: '15px !important' }} />}
+                <Box sx={{
+                  display: 'flex', alignItems: 'center',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                  borderRadius: '8px', overflow: 'hidden',
+                }}>
+                  <Button size="small" startIcon={<LinkIcon sx={{ fontSize: '14px !important' }} />}
                     onClick={() => {
                       setLinkIssueSearch('');
                       setLinkIssueResults([]);
@@ -1211,15 +1194,14 @@ const ArgusFeedbackPage: React.FC = () => {
                       searchIssuesForLink('');
                     }}
                     sx={{
-                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
-                      backgroundColor: alpha('#2196f3', isDark ? 0.12 : 0.08),
-                      color: isDark ? '#64b5f6' : '#1565c0',
-                      border: `1px solid ${alpha('#2196f3', isDark ? 0.25 : 0.2)}`,
-                      '&:hover': { backgroundColor: alpha('#2196f3', isDark ? 0.2 : 0.14) },
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, px: 1.2, minHeight: 30,
+                      borderRadius: 0, color: isDark ? '#64b5f6' : '#1565c0',
+                      '&:hover': { backgroundColor: alpha('#2196f3', isDark ? 0.12 : 0.06) },
                     }}>
                     {t('argus.feedback.linkExistingIssue')}
                   </Button>
-                  <Button size="small" startIcon={<AddIcon sx={{ fontSize: '15px !important' }} />}
+                  <Divider orientation="vertical" flexItem sx={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+                  <Button size="small" startIcon={<AddIcon sx={{ fontSize: '14px !important' }} />}
                     onClick={async () => {
                       setCreateIssueFeedbackId(selectedItem.feedback_id);
                       setCreateIssueTitle(`[Feedback] ${selectedItem.message.slice(0, 80)}`);
@@ -1228,15 +1210,13 @@ const ArgusFeedbackPage: React.FC = () => {
                       setCreateIssueOpen(true);
                     }}
                     sx={{
-                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, borderRadius: '6px', px: 1.5, minHeight: 28,
-                      backgroundColor: alpha('#3f51b5', isDark ? 0.12 : 0.08),
-                      color: isDark ? '#7986cb' : '#283593',
-                      border: `1px solid ${alpha('#3f51b5', isDark ? 0.25 : 0.2)}`,
-                      '&:hover': { backgroundColor: alpha('#3f51b5', isDark ? 0.2 : 0.14) },
+                      textTransform: 'none', fontSize: '0.72rem', fontWeight: 500, px: 1.2, minHeight: 30,
+                      borderRadius: 0, color: isDark ? '#7986cb' : '#283593',
+                      '&:hover': { backgroundColor: alpha('#3f51b5', isDark ? 0.12 : 0.06) },
                     }}>
                     {t('argus.feedback.createIssue')}
                   </Button>
-                </>
+                </Box>
               )}
             </Box>
 

@@ -34,10 +34,10 @@ import { CopyButton } from '@/components/common/CopyButton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePageState } from '@/hooks/usePageState';
 import RewardDisplay from '@/components/game/RewardDisplay';
-import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, {
-  DateRangePreset,
-} from '@/components/common/DateRangePicker';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '@/components/common/DateRangeSelector';
 import DynamicFilterBar, {
   ActiveFilter,
   FilterDefinition,
@@ -128,11 +128,7 @@ const SurveyLogsPage: React.FC = () => {
     defaultState: {
       page: 1,
       limit: 50,
-      filters: {
-        dateRangePreset: 'last7d',
-        startDate: dayjs().subtract(7, 'day').startOf('day').toISOString(),
-        endDate: dayjs().endOf('day').toISOString(),
-      },
+      filters: {},
     },
     storageKey: 'surveyLogsState',
   });
@@ -145,18 +141,8 @@ const SurveyLogsPage: React.FC = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // Date Range State
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.startDate
-      ? dayjs(pageState.filters.startDate)
-      : dayjs().subtract(7, 'day').startOf('day')
-  );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.endDate
-      ? dayjs(pageState.filters.endDate)
-      : dayjs().endOf('day')
-  );
-  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>(
-    pageState.filters?.dateRangePreset || 'last7d'
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
 
   // active filters
@@ -363,19 +349,13 @@ const SurveyLogsPage: React.FC = () => {
     updateFilters({ ...pageState.filters, [filterKey]: value });
   };
 
-  const handleDateRangeChange = (
-    from: Dayjs | null,
-    to: Dayjs | null,
-    preset: DateRangePreset
-  ) => {
-    setDateFrom(from);
-    setDateTo(to);
-    setDateRangePreset(preset);
+  const handleDateRangeChange = (newDateRange: DateRangeValue) => {
+    setDateRange(newDateRange);
+    const { start, end } = dateRangeToDatePair(newDateRange);
     updateFilters({
       ...pageState.filters,
-      startDate: from ? from.toISOString() : undefined,
-      endDate: to ? to.toISOString() : undefined,
-      dateRangePreset: preset,
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
     });
   };
 
@@ -590,19 +570,10 @@ const SurveyLogsPage: React.FC = () => {
                     flexShrink: 0,
                   }}
                 >
-                  <DateRangePicker
-                    dateFrom={dateFrom}
-                    dateTo={dateTo}
-                    preset={dateRangePreset}
+                  <DateRangeSelector
+                    value={dateRange}
                     onChange={handleDateRangeChange}
-                    availablePresets={[
-                      'today',
-                      'yesterday',
-                      'last7d',
-                      'last30d',
-                      'custom',
-                    ]}
-                    size="small"
+                    compact
                   />
                   <Tooltip title={t('common.columnSettings')}>
                     <IconButton

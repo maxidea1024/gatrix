@@ -63,7 +63,7 @@ import argusService, {
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
-import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -105,7 +105,7 @@ const ArgusPerformancePage: React.FC = () => {
     view:   { key: 'view',   default: 'list',  pushHistory: true },
     txn:    { key: 'txn',    default: '',       pushHistory: true },
     trace:  { key: 'trace',  default: '',       pushHistory: true },
-    period: { key: 'period', default: '24h',    storageKey: 'argus-perf-period' },
+    period: { key: 'period', default: '14d',    storageKey: 'argus-perf-period' },
     sort:   { key: 'sort',   default: 'count' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);

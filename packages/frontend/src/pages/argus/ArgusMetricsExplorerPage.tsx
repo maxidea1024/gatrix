@@ -137,7 +137,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
 
   // ─── URL-driven state ───
   const URL_PARAMS = useMemo(() => ({
-    period:  { key: 'period',  default: '24h', storageKey: 'argus-metrics-period' },
+    period:  { key: 'period',  default: '14d', storageKey: 'argus-metrics-period' },
     start:   { key: 'start',   default: '' },
     end:     { key: 'end',     default: '' },
     queryId: { key: 'queryId', default: '' },

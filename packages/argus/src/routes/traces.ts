@@ -1,22 +1,11 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
-import { getDynamicBucketFn } from '../utils/timeBucket';
+import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('traces-api');
 
-function periodToInterval(period: string): string {
-  const map: Record<string, string> = {
-    '1h': '1 HOUR',
-    '6h': '6 HOUR',
-    '24h': '24 HOUR',
-    '7d': '7 DAY',
-    '14d': '14 DAY',
-    '30d': '30 DAY',
-    '90d': '90 DAY',
-  };
-  return map[period] || '24 HOUR';
-}
+
 
 export default async function tracesRoutes(app: FastifyInstance) {
   // ────────────────────────────────────────────────
@@ -34,9 +23,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
         limit?: string; orderBy?: string; start?: string; end?: string;
       };
 
+      const bucket = getBucketingConfig(period, start, end);
       const timeFilter = start && end
         ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= now() - INTERVAL ${periodToInterval(period)}`;
+        : `timestamp >= toDateTime({fillStart:UInt32})`;
 
       const conditions: string[] = [
         `project_id = {projectId:String}`,
@@ -80,6 +70,7 @@ export default async function tracesRoutes(app: FastifyInstance) {
             ...(op ? { op } : {}),
             ...(status ? { status } : {}),
             ...(start && end ? { start, end } : {}),
+            ...bucket.queryParams,
           },
         });
         const data = await result.json();
@@ -108,9 +99,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
         start?: string; end?: string;
       };
 
+      const bucket = getBucketingConfig(period, start, end);
       const timeFilter = start && end
         ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= now() - INTERVAL ${periodToInterval(period)}`;
+        : `timestamp >= toDateTime({fillStart:UInt32})`;
 
       const conditions: string[] = [
         `project_id = {projectId:String}`,
@@ -142,6 +134,7 @@ export default async function tracesRoutes(app: FastifyInstance) {
             limit: parseInt(limit, 10),
             ...(search ? { search: `%${search}%` } : {}),
             ...(start && end ? { start, end } : {}),
+            ...bucket.queryParams,
           },
         });
         const data = await result.json();
@@ -172,9 +165,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
       const safeGroupBy = ['op', 'status', 'domain', 'action'].includes(groupBy)
         ? groupBy : 'op';
 
+      const bucket = getBucketingConfig(period, start, end);
       const timeFilter = start && end
         ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= now() - INTERVAL ${periodToInterval(period)}`;
+        : `timestamp >= toDateTime({fillStart:UInt32})`;
 
       try {
         // Top values
@@ -195,27 +189,27 @@ export default async function tracesRoutes(app: FastifyInstance) {
           query_params: {
             projectId: String(projectId),
             ...(start && end ? { start, end } : {}),
+            ...bucket.queryParams,
           },
         });
         const topData = await topResult.json();
 
-        // Time series
-        const bucketFn = getDynamicBucketFn(period, start, end);
         const tsResult = await clickhouse.query({
           query: `
             SELECT
-              ${bucketFn}(timestamp) AS bucket,
+              ${bucket.selectExpr} AS hour,
               ${safeGroupBy} AS group_value,
               count() AS count
             FROM argus.spans
             WHERE project_id = {projectId:String}
               AND ${timeFilter}
-            GROUP BY bucket, ${safeGroupBy}
-            ORDER BY bucket, count DESC
+            GROUP BY hour, ${safeGroupBy}
+            ORDER BY hour, count DESC
           `,
           query_params: {
             projectId: String(projectId),
             ...(start && end ? { start, end } : {}),
+            ...bucket.queryParams,
           },
         });
         const tsData = await tsResult.json();
@@ -245,7 +239,7 @@ export default async function tracesRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h' } = request.query as { period?: string };
-      const interval = periodToInterval(period);
+      const bucket = getBucketingConfig(period);
 
       try {
         // Get distinct op values
@@ -254,12 +248,12 @@ export default async function tracesRoutes(app: FastifyInstance) {
             SELECT op AS value, count() AS count
             FROM argus.spans
             WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND timestamp >= toDateTime({fillStart:UInt32})
             GROUP BY op
             ORDER BY count DESC
             LIMIT 30
           `,
-          query_params: { projectId: String(projectId) },
+          query_params: { projectId: String(projectId), ...bucket.queryParams },
         });
         const opsData = await opsResult.json();
 
@@ -269,13 +263,13 @@ export default async function tracesRoutes(app: FastifyInstance) {
             SELECT status AS value, count() AS count
             FROM argus.spans
             WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND timestamp >= toDateTime({fillStart:UInt32})
               AND status != ''
             GROUP BY status
             ORDER BY count DESC
             LIMIT 20
           `,
-          query_params: { projectId: String(projectId) },
+          query_params: { projectId: String(projectId), ...bucket.queryParams },
         });
         const statusData = await statusResult.json();
 
@@ -285,13 +279,13 @@ export default async function tracesRoutes(app: FastifyInstance) {
             SELECT domain AS value, count() AS count
             FROM argus.spans
             WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL ${interval}
+              AND timestamp >= toDateTime({fillStart:UInt32})
               AND domain != ''
             GROUP BY domain
             ORDER BY count DESC
             LIMIT 20
           `,
-          query_params: { projectId: String(projectId) },
+          query_params: { projectId: String(projectId), ...bucket.queryParams },
         });
         const domainData = await domainResult.json();
 
@@ -325,9 +319,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
         period?: string; search?: string; start?: string; end?: string;
       };
 
+      const bucket = getBucketingConfig(period, start, end);
       const timeFilter = start && end
         ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= now() - INTERVAL ${periodToInterval(period)}`;
+        : `timestamp >= toDateTime({fillStart:UInt32})`;
 
       const conditions: string[] = [
         `project_id = {projectId:String}`,
@@ -336,22 +331,22 @@ export default async function tracesRoutes(app: FastifyInstance) {
       if (search) conditions.push(`description ILIKE {search:String}`);
 
       try {
-        const bucketFn = getDynamicBucketFn(period, start, end);
         const result = await clickhouse.query({
           query: `
             SELECT
-              ${bucketFn}(timestamp) AS bucket,
+              ${bucket.selectExpr} AS hour,
               op,
               count() AS count
             FROM argus.spans
             WHERE ${conditions.join(' AND ')}
-            GROUP BY bucket, op
-            ORDER BY bucket
+            GROUP BY hour, op
+            ORDER BY hour
           `,
           query_params: {
             projectId: String(projectId),
             ...(search ? { search: `%${search}%` } : {}),
             ...(start && end ? { start, end } : {}),
+            ...bucket.queryParams,
           },
         });
         const data = await result.json();

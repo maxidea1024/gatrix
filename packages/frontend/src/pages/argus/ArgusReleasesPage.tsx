@@ -32,7 +32,7 @@ import { formatCompactNumber } from '@/utils/numberFormat';
 import argusService, { ArgusRelease } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
-import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -51,7 +51,7 @@ const ArgusReleasesPage: React.FC = () => {
   const projectId = currentProject?.id || '1';
 
   const URL_PARAMS = useMemo(() => ({
-    period: { key: 'period', default: '30d', storageKey: 'argus-releases-period' },
+    period: { key: 'period', default: '90d', storageKey: 'argus-releases-period' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 

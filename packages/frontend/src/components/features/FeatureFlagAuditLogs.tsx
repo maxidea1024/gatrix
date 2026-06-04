@@ -52,10 +52,7 @@ import {
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useI18n } from '../../contexts/I18nContext';
-import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, {
-  DateRangePreset,
-} from '../../components/common/DateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -181,12 +178,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    dayjs().subtract(7, 'day')
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(dayjs());
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>('last7d');
   const [userFilter, setUserFilter] = useState('');
   const debouncedUserFilter = useDebounce(userFilter, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -259,12 +253,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
         ['resource_id' as keyof AuditLogFilters]: flagId,
       };
 
-      if (dateFrom) {
-        filters.start_date = dateFrom.toISOString();
-      }
-      if (dateTo) {
-        filters.end_date = dateTo.toISOString();
-      }
+      const { start, end } = dateRangeToDatePair(dateRange);
+      filters.start_date = start.toISOString();
+      filters.end_date = end.toISOString();
       if (debouncedUserFilter) {
         filters.user = debouncedUserFilter.trim();
       }
@@ -308,9 +299,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
   }, [
     page,
     limit,
-    flagName,
-    dateFrom,
-    dateTo,
+    flagId,
+    dateRange,
     debouncedUserFilter,
     activeFilters,
     enqueueSnackbar,
@@ -529,24 +519,13 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
           mb: 3,
         }}
       >
-        <DateRangePicker
-          dateFrom={dateFrom}
-          dateTo={dateTo}
-          onChange={(from, to, preset) => {
-            setDateFrom(from);
-            setDateTo(to);
-            setDateRangePreset(preset);
+        <DateRangeSelector
+          value={dateRange}
+          onChange={(newDateRange) => {
+            setDateRange(newDateRange);
             setPage(1);
           }}
-          preset={dateRangePreset}
-          availablePresets={[
-            'today',
-            'yesterday',
-            'last7d',
-            'last30d',
-            'custom',
-          ]}
-          size="small"
+          compact
         />
 
         <SearchTextField

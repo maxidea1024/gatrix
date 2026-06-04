@@ -278,7 +278,7 @@ const ArgusDiscoverPage: React.FC = () => {
 
   // ─── URL-driven state ───
   const URL_PARAMS = useMemo(() => ({
-    period:   { key: 'period',   default: '24h',                    storageKey: 'argus-discover-period' },
+    period:   { key: 'period',   default: '14d',                    storageKey: 'argus-discover-period' },
     fields:   { key: 'fields',   default: 'count(),level,platform', type: 'array' as const },
     groupBy:  { key: 'groupBy',  default: 'level',                  type: 'array' as const },
     q:        { key: 'q',        default: '' },

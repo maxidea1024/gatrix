@@ -546,48 +546,7 @@ const ArgusIssueDetailPage: React.FC = () => {
             </Box>
           </Box>
 
-          {/* First/Last Seen + Release Info */}
-          <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
-                {t('argus.issues.firstSeen')}:
-              </Typography>
-              <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>
-                {issue.first_seen ? new Date(issue.first_seen).toLocaleString() : '—'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
-                {t('argus.issues.lastSeen')}:
-              </Typography>
-              <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>
-                {issue.last_seen ? new Date(issue.last_seen).toLocaleString() : '—'}
-              </Typography>
-            </Box>
-            {latestEvent?.release && (
-              <Chip
-                label={`${t('argus.detail.release')}: ${latestEvent.release}`}
-                size="small"
-                sx={{
-                  height: 20, fontSize: '0.65rem', fontWeight: 600,
-                  backgroundColor: alpha(theme.palette.info.main, 0.08),
-                  color: theme.palette.info.main,
-                  border: 'none',
-                }}
-              />
-            )}
-            {latestEvent?.environment && (
-              <Chip
-                label={latestEvent.environment}
-                size="small"
-                sx={{
-                  height: 20, fontSize: '0.65rem', fontWeight: 600,
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                  border: 'none',
-                }}
-              />
-            )}
-          </Box>
+
 
           <Box sx={{
             display: 'flex',
@@ -1016,6 +975,50 @@ const ArgusIssueDetailPage: React.FC = () => {
                   py: 2,
                 }}>
 
+
+              {/* First/Last Seen + Release */}
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+                      {t('argus.issues.firstSeen')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'text.primary' }}>
+                      {issue.first_seen ? new Date(issue.first_seen).toLocaleString() : '—'}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+                      {t('argus.issues.lastSeen')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'text.primary' }}>
+                      {issue.last_seen ? new Date(issue.last_seen).toLocaleString() : '—'}
+                    </Typography>
+                  </Box>
+                  {latestEvent?.release && (
+                    <Box>
+                      <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+                        {t('argus.detail.release')}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, color: theme.palette.info.main }}>
+                        {latestEvent.release}
+                      </Typography>
+                    </Box>
+                  )}
+                  {latestEvent?.environment && (
+                    <Box>
+                      <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+                        {t('argus.issues.environment')}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600 }}>
+                        {latestEvent.environment}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+
+              <Divider sx={{ mb: 2 }} />
 
               {/* Suspect Commits — renders null if no data */}
               {projectId && issueId && (

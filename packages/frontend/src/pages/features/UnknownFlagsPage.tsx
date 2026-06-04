@@ -64,6 +64,7 @@ import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import SearchTextField from '@/components/common/SearchTextField';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '@/components/common/DateRangeSelector';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -78,6 +79,9 @@ const UnknownFlagsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
+  );
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -299,10 +303,13 @@ const UnknownFlagsPage: React.FC = () => {
         statusFilter?.includes('resolved') ||
         statusFilter?.length === 2 ||
         !statusFilter;
+      const { start, end } = dateRangeToDatePair(dateRange);
       const result = await unknownFlagService.getUnknownFlags(
         {
           includeResolved,
           environmentId: currentEnvironmentId || undefined,
+          startDate: start.toISOString(),
+          endDate: end.toISOString(),
         },
         projectApiPath
       );
@@ -312,7 +319,7 @@ const UnknownFlagsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, currentEnvironmentId, enqueueSnackbar, t]);
+  }, [statusFilter, currentEnvironmentId, dateRange, enqueueSnackbar, t]);
 
   useEffect(() => {
     loadFlags();
@@ -617,6 +624,11 @@ const UnknownFlagsPage: React.FC = () => {
               }
             />
           </Box>
+          <DateRangeSelector
+            value={dateRange}
+            onChange={setDateRange}
+            compact
+          />
         </Box>
       </Box>
 

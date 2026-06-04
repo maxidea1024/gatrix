@@ -254,7 +254,6 @@ const ArgusCronsPage: React.FC = () => {
           </Box>
         ) : filtered.length === 0 ? (
           <EmptyPlaceholder 
-            icon={<ScheduleIcon sx={{ fontSize: 40 }} />} 
             message={t('argus.crons.noMonitors', 'No cron monitors found')} 
           />
         ) : (

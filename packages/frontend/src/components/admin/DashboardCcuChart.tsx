@@ -4,12 +4,11 @@ import {
   Card,
   CardContent,
   Typography,
-  ToggleButton,
-  ToggleButtonGroup,
   IconButton,
   Tooltip,
   useTheme,
 } from '@mui/material';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../common/DateRangeSelector';
 import {
   OpenInNew as OpenInNewIcon,
   Refresh as RefreshIcon,
@@ -42,12 +41,7 @@ ChartJS.register(
   Filler
 );
 
-const TIME_RANGES = [
-  { value: '1h', label: '1H', hours: 1 },
-  { value: '6h', label: '6H', hours: 6 },
-  { value: '24h', label: '24H', hours: 24 },
-  { value: '7d', label: '7D', hours: 168 },
-];
+
 
 const WORLD_COLORS = [
   { border: '#2196f3', bg: 'rgba(33,150,243,0.1)' },
@@ -70,24 +64,23 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
-  const [timeRange, setTimeRangeRaw] = useState(
-    () => localStorage.getItem('ccu-time-range') || '24h'
+  const [dateRange, setDateRangeRaw] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: localStorage.getItem('ccu-time-range') || '24h' })
   );
-  const setTimeRange = useCallback((v: string) => {
-    setTimeRangeRaw(v);
-    localStorage.setItem('ccu-time-range', v);
+  const setDateRange = useCallback((v: DateRangeValue) => {
+    setDateRangeRaw(v);
+    if (v.type === 'preset' && v.preset) {
+      localStorage.setItem('ccu-time-range', v.preset);
+    }
   }, []);
   const [showLegend] = useState(
     () => localStorage.getItem('ccu-show-legend') !== 'false'
   );
 
   const getDateRange = useCallback(() => {
-    const opt = TIME_RANGES.find((r) => r.value === timeRange);
-    const hours = opt?.hours || 24;
-    const to = new Date();
-    const from = new Date(to.getTime() - hours * 3600000);
-    return { from, to };
-  }, [timeRange]);
+    const { start, end } = dateRangeToDatePair(dateRange);
+    return { from: start, to: end };
+  }, [dateRange]);
 
   const loadHistory = useCallback(async () => {
     setLoading(true);
@@ -226,28 +219,11 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
             {t('dashboard.ccuChartTitle')}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <ToggleButtonGroup
-              value={timeRange}
-              exclusive
-              onChange={(_, v) => v && setTimeRange(v)}
-              size="small"
-            >
-              {TIME_RANGES.map((r) => (
-                <ToggleButton
-                  key={r.value}
-                  value={r.value}
-                  sx={{
-                    px: 1,
-                    py: 0.25,
-                    textTransform: 'none',
-                    fontSize: '0.7rem',
-                    minWidth: 32,
-                  }}
-                >
-                  {r.label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+            <DateRangeSelector
+              value={dateRange}
+              onChange={setDateRange}
+              compact
+            />
             <Tooltip title={t('common.refresh')}>
               <IconButton size="small" onClick={loadHistory}>
                 <RefreshIcon fontSize="small" />

@@ -79,7 +79,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import dayjs, { Dayjs } from 'dayjs';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
 
@@ -97,9 +96,7 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import DateRangePicker, {
-  DateRangePreset,
-} from '../../components/common/DateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
 import { usePageState } from '../../hooks/usePageState';
 import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
@@ -210,17 +207,10 @@ const CrashEventsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  // Date range state - restore from pageState.filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.dateFrom
-      ? dayjs(pageState.filters.dateFrom)
-      : dayjs().subtract(7, 'day')
+  // Date range state
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.dateTo ? dayjs(pageState.filters.dateTo) : dayjs()
-  );
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>('last7d');
 
   // Search state - restore from pageState.filters
   const [searchTerm, setSearchTerm] = useState<string>(
@@ -601,12 +591,9 @@ const CrashEventsPage: React.FC = () => {
     }
 
     // Add date range
-    if (dateFrom) {
-      params.dateFrom = dateFrom.toISOString();
-    }
-    if (dateTo) {
-      params.dateTo = dateTo.toISOString();
-    }
+    const { start, end } = dateRangeToDatePair(dateRange);
+    params.dateFrom = start.toISOString();
+    params.dateTo = end.toISOString();
 
     // Add active filters
     activeFilters.forEach((filter) => {
@@ -635,8 +622,7 @@ const CrashEventsPage: React.FC = () => {
     pageState.sortBy,
     pageState.sortOrder,
     debouncedSearchTerm,
-    dateFrom,
-    dateTo,
+    dateRange,
     activeFilters,
   ]);
 
@@ -837,7 +823,7 @@ const CrashEventsPage: React.FC = () => {
       // Create TSV (Tab-Separated Values) format for easy paste into spreadsheet
       const fields = [
         ['ID', event.id],
-        ['Created At', dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')],
+        ['Created At', formatDateTimeDetailed(event.createdAt)],
         ['Platform', getPlatformName(event.platform)],
         ['Environment', (event as any).environmentName || event.environmentId],
         ['Project', (event as any).projectName || '-'],
@@ -1132,23 +1118,10 @@ const CrashEventsPage: React.FC = () => {
           }}
         >
           {/* Date Range Picker */}
-          <DateRangePicker
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            onChange={(from, to, preset) => {
-              setDateFrom(from);
-              setDateTo(to);
-              setDateRangePreset(preset);
-            }}
-            preset={dateRangePreset}
-            availablePresets={[
-              'today',
-              'yesterday',
-              'last7d',
-              'last30d',
-              'custom',
-            ]}
-            size="small"
+          <DateRangeSelector
+            value={dateRange}
+            onChange={setDateRange}
+            compact
           />
 
           {/* Search */}
@@ -1383,9 +1356,7 @@ const CrashEventsPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Typography variant="body2">
-                                              {dayjs(event.createdAt).format(
-                                                'YYYY-MM-DD HH:mm:ss'
-                                              )}
+                                              {formatDateTimeDetailed(event.createdAt)}
                                             </Typography>
                                           </TableCell>
                                         </TableRow>

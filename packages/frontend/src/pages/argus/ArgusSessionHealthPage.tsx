@@ -43,7 +43,7 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusSessionHealth, ArgusIssue } from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
-import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
@@ -72,7 +72,7 @@ const ArgusSessionHealthPage: React.FC = () => {
   const navigate = useNavigate();
 
   const URL_PARAMS = useMemo(() => ({
-    period: { key: 'period', default: '24h', storageKey: 'argus-session-period' },
+    period: { key: 'period', default: '14d', storageKey: 'argus-session-period' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 

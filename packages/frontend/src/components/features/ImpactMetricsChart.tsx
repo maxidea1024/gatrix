@@ -39,6 +39,7 @@ import {
   ToggleButtonGroup,
   Divider,
 } from '@mui/material';
+import DateRangeSelector, { DateRangeValue, presetToHours, dateRangeToDatePair } from '../common/DateRangeSelector';
 import {
   Add as AddIcon,
   Refresh as RefreshIcon,
@@ -132,7 +133,6 @@ interface TimeSeriesResponse {
   series: TimeSeriesSeries[];
 }
 
-type RangeOption = 'hour' | 'sixhour' | 'day' | 'week' | 'month';
 type AggregationMode = 'rps' | 'count' | 'avg' | 'sum' | 'p50' | 'p95' | 'p99';
 type ChartType = 'line' | 'area' | 'bar';
 
@@ -151,7 +151,7 @@ const DEFAULT_H = 3;
 const MIN_W = 3;
 const MIN_H = 2;
 
-// Colors for multiple series – Grafana-inspired curated palette
+// Colors for multiple series ??Grafana-inspired curated palette
 const SERIES_COLORS = [
   { border: '#5794F2', bg: 'rgba(87, 148, 242, 0.45)' },
   { border: '#73BF69', bg: 'rgba(115, 191, 105, 0.45)' },
@@ -173,7 +173,7 @@ interface ChartPanelProps {
   onExpand?: () => void;
   isExpanded?: boolean;
   onChartTypeChange?: (chartType: ChartType) => void;
-  globalRange: RangeOption;
+  dateRange: DateRangeValue;
   refreshKey: number;
   globalLabelFilter?: string;
 }
@@ -186,7 +186,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   onExpand,
   isExpanded = false,
   onChartTypeChange,
-  globalRange,
+  dateRange,
   refreshKey,
   globalLabelFilter,
 }) => {
@@ -198,7 +198,8 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [seriesData, setSeriesData] = useState<TimeSeriesResponse | null>(null);
-  const range = globalRange;
+  const rangePreset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : '24h';
+  const rangeHours = presetToHours(rangePreset) || 24;
   const [localChartType, setLocalChartType] = useState<ChartType>(
     config.chartType
   );
@@ -215,7 +216,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     try {
       const params: any = {
         series: config.metricName,
-        range,
+        range: rangePreset,
         aggregationMode: config.aggregationMode || 'count',
       };
 
@@ -261,7 +262,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     config.aggregationMode,
     config.labelSelectors,
     config.groupBy,
-    range,
+    rangePreset,
     globalLabelFilter,
   ]);
 
@@ -290,7 +291,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     });
     const sorted = Array.from(allTimestamps).sort((a, b) => a - b);
 
-    // Downsample for bar charts – too many bars causes canvas anti-aliasing artifacts
+    // Downsample for bar charts ??too many bars causes canvas anti-aliasing artifacts
     const MAX_BAR_POINTS = 80;
     const shouldDownsample =
       localChartType === 'bar' && sorted.length > MAX_BAR_POINTS;
@@ -312,7 +313,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           : 'en-US';
     const formatLabel = (ts: number) => {
       const d = new Date(ts * 1000);
-      if (range === 'hour' || range === 'day') {
+      if (rangeHours <= 24) {
         return d.toLocaleTimeString(locale, {
           hour: '2-digit',
           minute: '2-digit',
@@ -352,7 +353,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         }
       }
 
-      // Compute data values – average buckets when downsampling
+      // Compute data values ??average buckets when downsampling
       const data = shouldDownsample
         ? displayTimestamps.map((_, bucketIdx) => {
             const start = bucketIdx * bucketSize;
@@ -400,7 +401,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     });
 
     return { labels, datasets };
-  }, [seriesData, range, config, localChartType, isExpanded]);
+  }, [seriesData, rangePreset, rangeHours, config, localChartType, isExpanded]);
 
   const chartOptions = useMemo(
     () => ({
@@ -1463,23 +1464,19 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   // URL params + localStorage persistence for dashboard controls
   const [searchParams, setSearchParams] = useSearchParams();
   const STORAGE_KEY = 'impactMetrics';
-  const validRanges: RangeOption[] = [
-    'hour',
-    'sixhour',
-    'day',
-    'week',
-    'month',
-  ];
+  const validPresets = ['1h', '6h', '24h', '7d', '30d'];
   const validIntervals = [0, 5, 10, 30, 60, 300];
 
-  const resolveInitialRange = (): RangeOption => {
+  const resolveInitialDateRange = (): DateRangeValue => {
     const fromUrl = searchParams.get('range');
-    if (fromUrl && validRanges.includes(fromUrl as RangeOption))
-      return fromUrl as RangeOption;
+    if (fromUrl && validPresets.includes(fromUrl)) {
+      return { type: 'preset', preset: fromUrl };
+    }
     const fromStorage = localStorage.getItem(`${STORAGE_KEY}.range`);
-    if (fromStorage && validRanges.includes(fromStorage as RangeOption))
-      return fromStorage as RangeOption;
-    return 'hour';
+    if (fromStorage && validPresets.includes(fromStorage)) {
+      return { type: 'preset', preset: fromStorage };
+    }
+    return { type: 'preset', preset: '1h' };
   };
 
   const resolveInitialRefresh = (): number => {
@@ -1497,8 +1494,8 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   };
 
   // Global dashboard controls (Grafana-style)
-  const [globalRange, setGlobalRangeState] =
-    useState<RangeOption>(resolveInitialRange);
+  const [dateRangeValue, setDateRangeValueState] =
+    useState<DateRangeValue>(resolveInitialDateRange);
   const [refreshInterval, setRefreshIntervalState] = useState<number>(
     resolveInitialRefresh
   );
@@ -1506,14 +1503,15 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Sync to URL params + localStorage on change
-  const setGlobalRange = useCallback(
-    (range: RangeOption) => {
-      setGlobalRangeState(range);
-      localStorage.setItem(`${STORAGE_KEY}.range`, range);
+  const setDateRangeValue = useCallback(
+    (value: DateRangeValue) => {
+      setDateRangeValueState(value);
+      const presetStr = value.type === 'preset' ? (value.preset || '24h') : 'custom';
+      localStorage.setItem(`${STORAGE_KEY}.range`, presetStr);
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
-          next.set('range', range);
+          next.set('range', presetStr);
           return next;
         },
         { replace: true }
@@ -1886,33 +1884,11 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             sx={{ width: '1px', height: 24, bgcolor: theme.palette.divider }}
           />
           {/* Time Range Picker */}
-          <ToggleButtonGroup
-            size="small"
-            value={globalRange}
-            exclusive
-            onChange={(_, v) => v && setGlobalRange(v)}
-            sx={{
-              '& .MuiToggleButton-root': {
-                py: 0.3,
-                px: 1,
-                fontSize: '0.75rem',
-                height: 30,
-                textTransform: 'none',
-                border: `1px solid ${theme.palette.divider}`,
-                '&.Mui-selected': {
-                  bgcolor: theme.palette.primary.main,
-                  color: '#fff',
-                  '&:hover': { bgcolor: theme.palette.primary.dark },
-                },
-              },
-            }}
-          >
-            <ToggleButton value="hour">1h</ToggleButton>
-            <ToggleButton value="sixhour">6h</ToggleButton>
-            <ToggleButton value="day">24h</ToggleButton>
-            <ToggleButton value="week">7d</ToggleButton>
-            <ToggleButton value="month">30d</ToggleButton>
-          </ToggleButtonGroup>
+          <DateRangeSelector
+            value={dateRangeValue}
+            onChange={setDateRangeValue}
+            compact
+          />
 
           {/* Divider */}
           <Box
@@ -2085,7 +2061,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
                 onChartTypeChange={(chartType) =>
                   handleChartTypeChange(config.id, chartType)
                 }
-                globalRange={globalRange}
+                dateRange={dateRangeValue}
                 refreshKey={refreshKey}
                 globalLabelFilter={debouncedLabelFilter}
               />
@@ -2132,7 +2108,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
                 onChartTypeChange={(chartType) =>
                   handleChartTypeChange(expandedConfig.id, chartType)
                 }
-                globalRange={globalRange}
+                dateRange={dateRangeValue}
                 refreshKey={refreshKey}
                 globalLabelFilter={debouncedLabelFilter}
               />

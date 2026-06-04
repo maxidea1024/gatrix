@@ -1,7 +1,21 @@
 /**
- * Argus shared utility functions.
- * Extracted from ArgusIssueDetailPage to be reusable across Argus components.
+ * Argus shared utility functions and constants.
+ * Centralised from ArgusIssuesPage / ArgusIssueDetailPage to be reusable
+ * across all Argus components.
  */
+
+import React from 'react';
+import {
+  ErrorOutline as ErrorIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon,
+  KeyboardDoubleArrowUp as CriticalPriorityIcon,
+  KeyboardArrowUp as HighPriorityIcon,
+  Remove as MediumPriorityIcon,
+  KeyboardArrowDown as LowPriorityIcon,
+} from '@mui/icons-material';
+
+// ─── Utility Functions ───────────────────────────────────────────────
 
 /** Generate a stable color from a string (for avatars). */
 export function stringToColor(str: string): string {
@@ -46,11 +60,39 @@ export function formatRelative(dateStr: string, t: (key: string, opts?: any) => 
   }
 }
 
-/** Level colors for issue severity. */
+// ─── Level Config ────────────────────────────────────────────────────
+
+/** Simple color-only map (kept for backward compat). */
 export const LEVEL_COLORS: Record<string, string> = {
   fatal: '#f44336',
   error: '#ff5722',
   warning: '#ff9800',
   info: '#2196f3',
   debug: '#9e9e9e',
+};
+
+/** Rich level config with icon and background color for issue rows. */
+export const LEVEL_CONFIG: Record<string, { color: string; icon: React.ReactElement; bg: string }> = {
+  fatal: { color: '#f44336', icon: React.createElement(ErrorIcon, { sx: { fontSize: 16 } }), bg: 'rgba(244,67,54,0.08)' },
+  error: { color: '#ff5722', icon: React.createElement(ErrorIcon, { sx: { fontSize: 16 } }), bg: 'rgba(255,87,34,0.08)' },
+  warning: { color: '#ff9800', icon: React.createElement(WarningIcon, { sx: { fontSize: 16 } }), bg: 'rgba(255,152,0,0.08)' },
+  info: { color: '#2196f3', icon: React.createElement(InfoIcon, { sx: { fontSize: 16 } }), bg: 'rgba(33,150,243,0.08)' },
+  debug: { color: '#9e9e9e', icon: React.createElement(InfoIcon, { sx: { fontSize: 16 } }), bg: 'rgba(158,158,158,0.08)' },
+};
+
+// ─── Priority Config ─────────────────────────────────────────────────
+
+export const PRIORITY_CONFIG: Record<string, { color: string; label: string; icon: React.ReactElement }> = {
+  critical: { color: '#f44336', label: 'Critical', icon: React.createElement(CriticalPriorityIcon, { sx: { fontSize: 14 } }) },
+  high: { color: '#ff5722', label: 'High', icon: React.createElement(HighPriorityIcon, { sx: { fontSize: 14 } }) },
+  medium: { color: '#ff9800', label: 'Medium', icon: React.createElement(MediumPriorityIcon, { sx: { fontSize: 14 } }) },
+  low: { color: '#2196f3', label: 'Low', icon: React.createElement(LowPriorityIcon, { sx: { fontSize: 14 } }) },
+};
+
+// ─── Issue Status Config ─────────────────────────────────────────────
+
+export const ISSUE_STATUS_CONFIG: Record<string, { color: string; label: string }> = {
+  unresolved: { color: '#f44336', label: 'Unresolved' },
+  resolved: { color: '#4caf50', label: 'Resolved' },
+  ignored: { color: '#9e9e9e', label: 'Ignored' },
 };

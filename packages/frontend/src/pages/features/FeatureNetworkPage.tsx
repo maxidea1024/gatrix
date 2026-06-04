@@ -35,6 +35,7 @@ import {
   Chip,
   keyframes,
 } from '@mui/material';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair, presetToHours } from '@/components/common/DateRangeSelector';
 import {
   Refresh as RefreshIcon,
   Hub as HubIcon,
@@ -157,15 +158,7 @@ interface GlobalEnvironment {
   orgName: string;
 }
 
-// Time range options
-const TIME_RANGE_OPTIONS = [
-  { value: '1h', label: 'network.timeRange.1h', hours: 1 },
-  { value: '6h', label: 'network.timeRange.6h', hours: 6 },
-  { value: '24h', label: 'network.timeRange.24h', hours: 24 },
-  { value: '48h', label: 'network.timeRange.48h', hours: 48 },
-  { value: '7d', label: 'network.timeRange.7d', hours: 24 * 7 },
-  { value: '30d', label: 'network.timeRange.30d', hours: 24 * 30 },
-];
+
 
 // Global API base path (not project-scoped)
 const GLOBAL_API_PATH = '/admin/network';
@@ -303,8 +296,8 @@ const FeatureNetworkPage: React.FC = () => {
     const appsParam = searchParams.get('apps');
     return appsParam ? appsParam.split(',') : [];
   });
-  const [timeRange, setTimeRange] = useState(
-    () => searchParams.get('range') || '24h'
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: searchParams.get('range') || '7d' })
   );
   const [showTable, setShowTable] = useState(true);
   const [showEvalTable, setShowEvalTable] = useState(true);
@@ -342,12 +335,9 @@ const FeatureNetworkPage: React.FC = () => {
 
   // Get time range dates
   const getTimeRange = useCallback(() => {
-    const option = TIME_RANGE_OPTIONS.find((o) => o.value === timeRange);
-    const hours = option?.hours || 24;
-    const endDate = new Date();
-    const startDate = new Date(endDate.getTime() - hours * 60 * 60 * 1000);
-    return { startDate, endDate };
-  }, [timeRange]);
+    const { start, end } = dateRangeToDatePair(dateRange);
+    return { startDate: start, endDate: end };
+  }, [dateRange]);
 
   // Update URL params when filters change
   useEffect(() => {
@@ -361,8 +351,9 @@ const FeatureNetworkPage: React.FC = () => {
     if (selectedApps.length > 0 && selectedApps.length < applications.length) {
       params.set('apps', selectedApps.join(','));
     }
-    if (timeRange !== '24h') {
-      params.set('range', timeRange);
+    const preset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : 'custom';
+    if (preset !== '24h') {
+      params.set('range', preset);
     }
     if (activeTab !== 0) {
       params.set('tab', String(activeTab));
@@ -374,7 +365,7 @@ const FeatureNetworkPage: React.FC = () => {
   }, [
     selectedEnvironments,
     selectedApps,
-    timeRange,
+    dateRange,
     activeTab,
     chartGroupBy,
     filteredEnvs.length,
@@ -556,7 +547,7 @@ const FeatureNetworkPage: React.FC = () => {
   // Fetch applications when environments or time range changes
   useEffect(() => {
     fetchApplications();
-  }, [fetchApplications, selectedEnvironments.length, timeRange]);
+  }, [fetchApplications, selectedEnvironments.length, dateRange]);
 
   // Fetch data when filters change
   useEffect(() => {
@@ -580,14 +571,9 @@ const FeatureNetworkPage: React.FC = () => {
   };
 
   // Handle time range change
-  const handleTimeRangeChange = (
-    _: React.MouseEvent<HTMLElement>,
-    newRange: string | null
-  ) => {
-    if (newRange) {
-      setTimeRange(newRange);
-    }
-  };
+  const handleDateRangeChange = useCallback((value: DateRangeValue) => {
+    setDateRange(value);
+  }, []);
 
   // Chart data - fill missing hours and downsample if needed
   const downsampledChartData = useMemo<ChartDataPoint[]>(() => {
@@ -963,14 +949,14 @@ const FeatureNetworkPage: React.FC = () => {
         value: evaluations
           ? Math.round(
               evaluations.totalEvaluations /
-                (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours ||
+                (presetToHours(dateRange.type === 'preset' ? (dateRange.preset || '24h') : '24h') ||
                   24)
             ).toLocaleString()
           : '0',
         color: '#9c27b0',
       },
     ],
-    [evaluations, summary, t, timeRange, selectedEnvironments]
+    [evaluations, summary, t, dateRange, selectedEnvironments]
   );
 
   return (
@@ -1041,18 +1027,11 @@ const FeatureNetworkPage: React.FC = () => {
 
         {/* Time Range */}
         <Box sx={{ ml: 'auto' }}>
-          <ToggleButtonGroup
-            value={timeRange}
-            exclusive
-            onChange={handleTimeRangeChange}
-            size="small"
-          >
-            {TIME_RANGE_OPTIONS.map((option) => (
-              <ToggleButton key={option.value} value={option.value}>
-                {t(option.label)}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <DateRangeSelector
+            value={dateRange}
+            onChange={handleDateRangeChange}
+            compact
+          />
         </Box>
       </Box>
 

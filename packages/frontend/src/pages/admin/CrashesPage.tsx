@@ -48,10 +48,7 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
-import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, {
-  DateRangePreset,
-} from '../../components/common/DateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
 
 // Types and Services
 import { CrashState, getPlatformName } from '@/types/crash';
@@ -119,17 +116,10 @@ const CrashesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  // Date range state - restore from pageState.filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.dateFrom
-      ? dayjs(pageState.filters.dateFrom)
-      : dayjs().subtract(7, 'day')
+  // Date range state
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.dateTo ? dayjs(pageState.filters.dateTo) : dayjs()
-  );
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>('last7d');
 
   // Search state - restore from pageState.filters
   const [searchTerm, setSearchTerm] = useState<string>(
@@ -334,12 +324,9 @@ const CrashesPage: React.FC = () => {
     }
 
     // Add date range
-    if (dateFrom) {
-      params.dateFrom = dateFrom.toISOString();
-    }
-    if (dateTo) {
-      params.dateTo = dateTo.toISOString();
-    }
+    const { start, end } = dateRangeToDatePair(dateRange);
+    params.dateFrom = start.toISOString();
+    params.dateTo = end.toISOString();
 
     // Add active filters
     activeFilters.forEach((filter) => {
@@ -364,8 +351,7 @@ const CrashesPage: React.FC = () => {
     pageState.sortBy,
     pageState.sortOrder,
     debouncedSearchTerm,
-    dateFrom,
-    dateTo,
+    dateRange,
     activeFilters,
   ]);
 
@@ -701,23 +687,10 @@ const CrashesPage: React.FC = () => {
           }}
         >
           {/* Date Range Picker */}
-          <DateRangePicker
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            onChange={(from, to, preset) => {
-              setDateFrom(from);
-              setDateTo(to);
-              setDateRangePreset(preset);
-            }}
-            preset={dateRangePreset}
-            availablePresets={[
-              'today',
-              'yesterday',
-              'last7d',
-              'last30d',
-              'custom',
-            ]}
-            size="small"
+          <DateRangeSelector
+            value={dateRange}
+            onChange={setDateRange}
+            compact
           />
 
           {/* Search */}

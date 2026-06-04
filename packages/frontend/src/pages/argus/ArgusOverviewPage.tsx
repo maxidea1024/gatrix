@@ -47,7 +47,7 @@ import argusService, { ArgusOverviewData } from '@/services/argusService';
 import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
-import { argusDateRangeToApiParams } from '@/components/argus/ArgusDateRangePicker';
+import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -70,7 +70,7 @@ const ArgusOverviewPage: React.FC = () => {
   const isDark = theme.palette.mode === 'dark';
 
   const URL_PARAMS = useMemo(() => ({
-    period: { key: 'period', default: '24h', storageKey: 'argus-overview-period' },
+    period: { key: 'period', default: '14d', storageKey: 'argus-overview-period' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 

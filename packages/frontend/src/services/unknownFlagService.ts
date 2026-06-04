@@ -29,6 +29,8 @@ export const unknownFlagService = {
     options?: {
       includeResolved?: boolean;
       environmentId?: string;
+      startDate?: string;
+      endDate?: string;
     },
     projectApiPath: string | null = null
   ): Promise<{ flags: UnknownFlag[]; total: number }> {
@@ -38,6 +40,12 @@ export const unknownFlagService = {
     }
     if (options?.environmentId) {
       params.append('environmentId', options.environmentId);
+    }
+    if (options?.startDate) {
+      params.append('startDate', options.startDate);
+    }
+    if (options?.endDate) {
+      params.append('endDate', options.endDate);
     }
     const queryString = params.toString();
     const base = basePath(projectApiPath);

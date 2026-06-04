@@ -31,6 +31,9 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import SimplePagination from '@/components/common/SimplePagination';
+import { LEVEL_COLORS } from '@/utils/argusHelpers';
+import { formatCompactNumber } from '@/utils/numberFormat';
+import IssueListItem from '@/components/argus/IssueListItem';
 
 const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
 
@@ -41,19 +44,7 @@ function formatDate(dateStr: string): string {
   } catch { return dateStr; }
 }
 
-function formatCompactNumber(n: number): string {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return String(n);
-}
 
-const LEVEL_COLORS: Record<string, string> = {
-  fatal: '#f44336',
-  error: '#ff5722',
-  warning: '#ff9800',
-  info: '#2196f3',
-  debug: '#9e9e9e',
-};
 
 const ArgusReleaseDetailPage: React.FC = () => {
   const theme = useTheme();
@@ -292,69 +283,20 @@ const ArgusReleaseDetailPage: React.FC = () => {
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                   borderRadius: 2, overflow: 'hidden',
                 }}>
-                  {issues.map((issue, idx) => {
-                    const levelColor = LEVEL_COLORS[issue.level] || LEVEL_COLORS.info;
-                    return (
-                      <Box
-                        key={issue.id}
-                        onClick={() => navigate(`/argus/issues/${projectId}/${issue.id}`)}
-                        sx={{
-                          display: 'flex', alignItems: 'center', px: 2, py: 1.5, gap: 2,
-                          cursor: 'pointer',
-                          borderBottom: idx < issues.length - 1
-                            ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`
-                            : 'none',
-                          '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
-                        }}
-                      >
-                        <Box sx={{
-                          width: 4, height: 32, borderRadius: 1,
-                          backgroundColor: levelColor, flexShrink: 0,
-                        }} />
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="body2" fontWeight={600} noWrap sx={{ fontSize: '0.82rem' }}>
-                            {issue.title}
-                          </Typography>
-                          <Typography variant="caption" noWrap sx={{ color: 'text.disabled', fontSize: '0.7rem' }}>
-                            {issue.culprit || issue.fingerprint?.slice(0, 16)}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-                          {/* Sparkline */}
-                          {issue.stats_24h && issue.stats_24h.length > 0 && (() => {
-                            const data = issue.stats_24h!;
-                            const max = Math.max(...data, 1);
-                            const w = 40, h = 16;
-                            const points = data.map((v, i) =>
-                              `${(i / (data.length - 1)) * w},${h - (v / max) * h}`
-                            ).join(' ');
-                            return (
-                              <svg width={w} height={h} style={{ flexShrink: 0, opacity: 0.7 }}>
-                                <polyline
-                                  points={points}
-                                  fill="none"
-                                  stroke={levelColor}
-                                  strokeWidth={1.2}
-                                  strokeLinejoin="round"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                            );
-                          })()}
-                          <Tooltip title={t('argus.issues.events', 'Events')}>
-                            <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem', minWidth: 35, textAlign: 'right' }}>
-                              {formatCompactNumber(issue.event_count || 0)}
-                            </Typography>
-                          </Tooltip>
-                          <Tooltip title={t('argus.issues.users', 'Users')}>
-                            <Typography variant="body2" sx={{ fontSize: '0.75rem', color: 'text.secondary', minWidth: 30, textAlign: 'right' }}>
-                              {formatCompactNumber(issue.user_count || 0)}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      </Box>
-                    );
-                  })}
+                  {issues.map((issue, idx) => (
+                    <IssueListItem
+                      key={issue.id}
+                      issue={issue}
+                      onClick={() => navigate(`/argus/issues/${projectId}/${issue.id}`)}
+                      showCheckbox={false}
+                      showAssignee={false}
+                      showSparkline
+                      showLastSeen
+                      isFirst={idx === 0}
+                      isLast={idx === issues.length - 1}
+                      showDivider={idx < issues.length - 1}
+                    />
+                  ))}
                 </Paper>
               )}
 

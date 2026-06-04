@@ -194,7 +194,6 @@ const ArgusUptimePage: React.FC = () => {
         </Box>
       ) : filtered.length === 0 ? (
         <EmptyPlaceholder 
-          icon={<UrlIcon sx={{ fontSize: 40 }} />} 
           message={t('argus.uptime.noMonitors', 'No uptime monitors found')} 
         />
       ) : (

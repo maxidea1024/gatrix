@@ -3,7 +3,7 @@ import { clickhouse } from '../config/clickhouse';
 import { mysqlPool } from '../config/mysql';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
-import { getDynamicBucketFn } from '../utils/timeBucket';
+import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('argus-discover');
 
@@ -378,17 +378,21 @@ export default async function discoverRoutes(app: FastifyInstance) {
       const { period, start, end, search } = request.query as any;
 
       try {
-        const bucketFn = getDynamicBucketFn(period, start, end);
+        const bucket = getBucketingConfig(period, start, end);
+        const timeFilter = start && end
+          ? `timestamp >= '${start}' AND timestamp <= '${end}'`
+          : `timestamp >= toDateTime(${bucket.queryParams.fillStart})`;
+
         let query = `
           SELECT
-            ${bucketFn}(timestamp) AS bucket,
+            ${bucket.selectExpr} AS hour,
             level,
             count() as count
           FROM argus.errors
           WHERE project_id = {projectId:String}
         `;
         
-        query += ` AND ${buildTimeFilter(period, start, end)}`;
+        query += ` AND ${timeFilter}`;
 
         const queryParams: Record<string, string> = { projectId };
 
@@ -403,8 +407,8 @@ export default async function discoverRoutes(app: FastifyInstance) {
         }
 
         query += `
-          GROUP BY bucket, level
-          ORDER BY bucket ASC
+          GROUP BY hour, level
+          ORDER BY hour ASC
         `;
 
         const result = await clickhouse.query({

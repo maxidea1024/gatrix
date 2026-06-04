@@ -50,6 +50,47 @@ import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 
 > **Note:** `EmptyPlaceholder` (`@/components/common/EmptyPlaceholder`) exists but is for table-row-level empty states. For page-level empty states, always prefer `EmptyPagePlaceholder`.
 
+## Date Range Selection: Always Use DateRangeSelector
+
+When implementing date/time range selection, **ALWAYS** use the `DateRangeSelector` component. Do NOT create ad-hoc `ToggleButton`, `Select`, or `ButtonGroup` alternatives.
+
+**Location:** `@/components/common/DateRangeSelector`
+
+**Usage:**
+```tsx
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+  PRESETS_LOG,           // 1h–90d (logs, audit, crashes)
+  PRESETS_FLAG_METRICS,  // 24h–365d (feature flag metrics)
+} from '@/components/common/DateRangeSelector';
+
+// State
+const [dateRange, setDateRange] = useState<DateRangeValue>({ type: 'preset', preset: '24h' });
+
+// Component
+<DateRangeSelector
+  value={dateRange}
+  onChange={setDateRange}
+  presets={PRESETS_LOG}   // or PRESETS_FLAG_METRICS, or custom
+  compact                 // optional: narrow trigger button
+/>
+
+// Converting to API params
+const { start, end } = dateRangeToDatePair(dateRange);
+params.dateFrom = start.toISOString();
+params.dateTo = end.toISOString();
+```
+
+**Key types:**
+- `DateRangeValue`: `{ type: 'preset' | 'custom', preset?: string, start?: Date, end?: Date }`
+- `dateRangeToDatePair(value)`: Converts any `DateRangeValue` to `{ start: Date, end: Date }`
+- `dateRangeToApiParams(value)`: Returns `{ period, start?, end? }` for API query params
+
+**Timezone:** All date calculations respect the user's configured timezone via `getStoredTimezone()` from `@/utils/dateFormat`.
+
+**DO NOT** use the legacy `DateRangePicker` — it has been deleted.
+
 ## Search Input: Always Use SearchTextField
 
 When implementing a search input field, **ALWAYS** use the `SearchTextField` component. Do NOT create custom search fields with `TextField` + `InputAdornment` + `SearchIcon`.

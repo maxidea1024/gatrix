@@ -13,13 +13,13 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
-import ArgusDateRangePicker, { ArgusDateRangeValue, argusDateRangeToApiParams } from './ArgusDateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import argusService from '@/services/argusService';
 
 // ==================== Types ====================
 
 export interface ArgusFilterState {
-  dateRange: ArgusDateRangeValue;
+  dateRange: DateRangeValue;
   environments: string[];
   browsers: string[];
   os: string[];
@@ -44,7 +44,7 @@ interface ArgusFilterBarProps {
 // ==================== Default State ====================
 
 export const defaultArgusFilterState = (savedPreset?: string): ArgusFilterState => ({
-  dateRange: { type: 'preset', preset: savedPreset || '24h' },
+  dateRange: { type: 'preset', preset: savedPreset || '14d' },
   environments: [],
   browsers: [],
   os: [],
@@ -83,7 +83,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
 
   useEffect(() => { fetchOptions(); }, [fetchOptions]);
 
-  const handleDateRangeChange = (dateRange: ArgusDateRangeValue) => {
+  const handleDateRangeChange = (dateRange: DateRangeValue) => {
     onChange({ ...value, dateRange });
   };
 
@@ -176,7 +176,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
       <Box sx={{ flex: 1 }} />
 
       {/* Date Range Picker — always rightmost */}
-      <ArgusDateRangePicker
+      <DateRangeSelector
         value={value.dateRange}
         onChange={handleDateRangeChange}
       />
@@ -224,7 +224,7 @@ export function argusFilterStateToApiParams(state: ArgusFilterState): {
   browser?: string;
   os?: string;
 } {
-  const dateParams = argusDateRangeToApiParams(state.dateRange);
+  const dateParams = dateRangeToApiParams(state.dateRange);
   return {
     ...dateParams,
     environment: state.environments.length === 1 ? state.environments[0] : undefined,
