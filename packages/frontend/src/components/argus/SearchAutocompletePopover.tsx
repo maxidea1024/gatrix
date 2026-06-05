@@ -137,9 +137,13 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
     }
 
     // AND/OR syntax — only when there's a completed condition before,
-    // and the previous completed token is NOT already AND/OR
+    // and the previous completed token is NOT already AND/OR,
+    // and lastToken is not already a complete AND/OR (user already typed it fully)
+    const lastTokenUpper = lastToken.toUpperCase();
+    const isLastTokenOperator = lastTokenUpper === 'AND' || lastTokenUpper === 'OR';
     const hasCompletedCondition = completedTokens.length > 0
-      && prevCompleted !== 'AND' && prevCompleted !== 'OR';
+      && prevCompleted !== 'AND' && prevCompleted !== 'OR'
+      && !isLastTokenOperator;
     if (hasCompletedCondition) {
       const syntax = ['AND', 'OR'];
       const filteredSyntax = lastToken
@@ -166,12 +170,6 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
         sublabel: t('argus.discover.hasDesc', 'Find events with this tag'),
         action: () => onSelectField('has'),
       });
-    }
-
-    // DEBUG: remove after fixing AND issue
-    const syntaxCount = result.filter(r => r.type === 'syntax').length;
-    if (syntaxCount > 0 || prevCompleted === 'AND' || prevCompleted === 'OR') {
-      console.warn('[AC-DEBUG] query:', JSON.stringify(query), '\n  allTokens:', allTokens, '\n  prevCompleted:', prevCompleted, '\n  hasCompletedCondition:', hasCompletedCondition, '\n  syntaxItems:', syntaxCount, '\n  totalItems:', result.length);
     }
 
     return result;
