@@ -234,7 +234,7 @@ export const ArgusSearchInput: React.FC<{
         onClick={() => inputRef.current?.focus()}
         sx={{
           display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, flexWrap: 'nowrap',
-          px: 1, py: 0.3, borderRadius: '6px', minWidth: 0, minHeight: 26, height: 30, overflow: 'hidden',
+          px: 1, py: 0.3, borderRadius: '6px', minWidth: 0, minHeight: 26, overflowX: 'auto', overflowY: 'hidden',
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
           transition: 'border-color 0.2s', cursor: 'text',
           backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
@@ -287,7 +287,7 @@ export const ArgusSearchInput: React.FC<{
           }}
         />
         {localSearch && (
-          <IconButton size="small" onClick={() => { setLocalSearch(''); onSubmit(''); setSearchFocused(false); }} sx={{ p: 0.2, mr: 0.5 }}>
+          <IconButton size="small" onClick={() => { setLocalSearch(''); onSubmit(''); setSearchFocused(false); }} sx={{ p: 0.2, mr: 0.5, flexShrink: 0 }}>
             <CloseIcon sx={{ fontSize: 14 }} />
           </IconButton>
         )}
