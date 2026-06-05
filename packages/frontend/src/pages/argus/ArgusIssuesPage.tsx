@@ -37,6 +37,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
+import { ArgusSearchInput } from '@/components/argus/ArgusSearchInput';
 import SavedSearchesSidebar, { SavedSearch } from '@/components/argus/SavedSearchesSidebar';
 import { useArgusRealtime } from '@/hooks/useArgusRealtime';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
@@ -422,6 +423,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
 
+  const mappedFacets = useMemo(() => ({
+    status: statusOptions.filter(o => o.value).map(o => ({ value: o.value, count: 0 })),
+    level: levelOptions.filter(o => o.value).map(o => ({ value: o.value, count: 0 })),
+    sort: sortOptions.map(o => ({ value: o.value, count: 0 })),
+    assigned: members.map(m => ({ value: m.name || m.email || '', count: 0 })).filter(m => m.value),
+  }), [members]);
+
   // ─── Render ────────────────────────────────────────────────────
 
   return (
@@ -466,40 +474,20 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         extraControls={
           <>
             <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
-            <TextField
-              size="small"
-              placeholder={t('argus.issues.searchPlaceholder')}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setStoreSearch(searchInput);
+            <Box sx={{ flex: 1, minWidth: 260, maxWidth: 600 }}>
+              <ArgusSearchInput
+                initialValue={storeSearch}
+                onDebouncedChange={(val) => setSearchInput(val)}
+                onSubmit={(val) => {
+                  setStoreSearch(val);
+                  setSearchInput(val);
                   setCurrentPage(1);
-                }
-              }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
-                endAdornment: searchInput ? (
-                  <InputAdornment position="end">
-                    <IconButton size="small" onClick={() => {
-                      setSearchInput('');
-                      setStoreSearch('');
-                      setCurrentPage(1);
-                    }} sx={{ p: 0.2 }}>
-                      <CloseIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  </InputAdornment>
-                ) : null,
-              }}
-              sx={{
-                minWidth: 160,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '6px', fontSize: '0.75rem', height: 26,
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                },
-                '& .MuiOutlinedInput-input': { py: 0.3 },
-              }}
-            />
+                }}
+                isDark={isDark}
+                theme={theme}
+                mappedFacets={mappedFacets}
+              />
+            </Box>
             <Tooltip title={t('argus.builder.title', 'Visual Query Builder')}>
               <IconButton
                 size="small"
@@ -519,6 +507,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             <ArgusQueryBuilder
               fields={QUERY_BUILDER_FIELDS}
               query={searchInput}
+              facets={mappedFacets}
               onApply={handleQueryBuilderApply}
               anchorEl={queryBuilderAnchor}
               onClose={() => setQueryBuilderAnchor(null)}
