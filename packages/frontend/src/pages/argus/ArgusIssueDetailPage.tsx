@@ -44,7 +44,7 @@ import SpanEvidenceSection from '@/components/argus/SpanEvidenceSection';
 import IssueDetailSidebar from './components/IssueDetailSidebar';
 
 const MIN_SPLIT_WIDTH = 250;
-const MAX_SPLIT_WIDTH = 600;
+const MAX_SPLIT_WIDTH = 800;
 
 const ArgusIssueDetailPage: React.FC = () => {
   const theme = useTheme();
