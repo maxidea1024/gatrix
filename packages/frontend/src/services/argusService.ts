@@ -1022,7 +1022,7 @@ class ArgusService {
     });
   }
 
-  async createExternalIssue(
+  async createIssueExternalLink(
     projectId: number | string,
     issueId: number | string,
     provider: string,
