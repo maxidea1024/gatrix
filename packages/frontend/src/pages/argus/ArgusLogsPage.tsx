@@ -1010,12 +1010,18 @@ const ArgusLogsPage: React.FC = () => {
             <Box
               onMouseDown={handleFacetSplitterMouseDown}
               sx={{
-                position: 'absolute', right: -4, top: 0, bottom: 0,
-                width: 8, cursor: 'col-resize',
-                backgroundColor: isFacetDragging ? alpha(theme.palette.primary.main, 0.2) : 'transparent',
-                transition: 'background-color 0.2s',
+                position: 'absolute', right: 0, top: 0, bottom: 0,
+                width: '1px', cursor: 'col-resize',
+                bgcolor: isFacetDragging ? 'primary.main' : 'divider',
                 zIndex: 10,
-                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.1) },
+                transition: 'background-color 0.15s, transform 0.15s',
+                transformOrigin: 'center',
+                ...(isFacetDragging && { bgcolor: 'primary.main', transform: 'scaleX(4)' }),
+                '&::after': {
+                  content: '""', position: 'absolute',
+                  top: 0, bottom: 0, left: '-5px', right: '-5px', cursor: 'col-resize',
+                },
+                '&:hover, &:active': { bgcolor: 'primary.main', transform: 'scaleX(4)' },
               }}
             />
           )}
