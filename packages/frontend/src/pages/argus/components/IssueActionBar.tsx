@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Chip,
   Divider,
   useTheme,
-  alpha,
   Tooltip,
   Menu,
   MenuItem,
@@ -16,14 +14,17 @@ import {
   ErrorOutline as ErrorIcon,
   CheckCircle as CheckCircleIcon,
   DoNotDisturb as IgnoreIcon,
-  ExpandMore as ExpandMoreIcon,
   Person as PersonIcon,
+  Archive as ArchiveIcon,
+  NewReleases as NextReleaseIcon,
+  Verified as CurrentReleaseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusIssueDetail, ArgusErrorEvent } from '@/services/argusService';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { LEVEL_COLORS, PRIORITY_CONFIG } from '@/utils/argusHelpers';
 import { CopyButton } from '@/components/common/CopyButton';
+import { ActionChip, ActionChipSplit } from '@/components/common/ActionChip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PresenceIndicator from '@/components/argus/PresenceIndicator';
 import IssueDetailActions from '@/components/argus/IssueDetailActions';
@@ -155,7 +156,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
         }}
       >
         {/* Status Badge */}
-        <Chip
+        <ActionChip
           label={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
@@ -173,51 +174,17 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               )}
             </Box>
           }
-          size="small"
-          sx={{
-            height: 28, borderRadius: '6px',
-            border: `1px solid ${alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.3)}`,
-            backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12),
-            color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',
-            '& .MuiChip-label': { px: 1.2 },
-          }}
+          variant="tinted"
+          tintColor={issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336'}
         />
 
         {/* Status Change — split button */}
-        <Box sx={{
-          display: 'flex', alignItems: 'center', height: 28,
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}`,
-          borderRadius: '6px', overflow: 'hidden',
-        }}>
-          <Chip
-            icon={issue.status === 'resolved' ? <ErrorIcon sx={{ fontSize: '14px !important' }} /> : <CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
-            label={issue.status === 'resolved' ? t('argus.issues.reopen') : t('argus.issues.resolve')}
-            size="small"
-            onClick={() => handleStatusRequest(issue.status === 'resolved' ? 'unresolved' : 'resolved')}
-            sx={{
-              height: '100%', borderRadius: 0, border: 'none',
-              backgroundColor: 'transparent',
-              color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
-              '& .MuiChip-icon': { color: 'inherit', ml: 0.8 },
-              '& .MuiChip-label': { px: 0.8 },
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-            }}
-          />
-          <Divider orientation="vertical" flexItem />
-          <Chip
-            icon={<ExpandMoreIcon sx={{ fontSize: '16px !important' }} />}
-            size="small"
-            onClick={(e) => setStatusMenuAnchor(e.currentTarget)}
-            sx={{
-              height: '100%', borderRadius: 0, border: 'none', minWidth: 28,
-              backgroundColor: 'transparent',
-              color: 'text.secondary',
-              '& .MuiChip-icon': { color: 'inherit', ml: 0.5, mr: -0.5 },
-              '& .MuiChip-label': { display: 'none' },
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-            }}
-          />
-        </Box>
+        <ActionChipSplit
+          icon={issue.status === 'resolved' ? <ErrorIcon sx={{ fontSize: '14px !important' }} /> : <CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
+          label={issue.status === 'resolved' ? t('argus.issues.reopen') : t('argus.issues.resolve')}
+          onClick={() => handleStatusRequest(issue.status === 'resolved' ? 'unresolved' : 'resolved')}
+          onDropdownClick={(e) => setStatusMenuAnchor(e.currentTarget)}
+        />
 
           <Menu
             anchorEl={statusMenuAnchor}
@@ -234,7 +201,8 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               </MenuItem>
             )}
             {issue.status !== 'resolved' && latestEvent?.release && (
-              <MenuItem onClick={() => handleStatusRequest('resolved')} sx={{ fontSize: '0.8rem', py: 1, pl: 4 }}>
+              <MenuItem onClick={() => handleStatusRequest('resolved')} sx={{ fontSize: '0.8rem', py: 1 }}>
+                <ListItemIcon><CurrentReleaseIcon fontSize="small" sx={{ color: '#4caf50' }} /></ListItemIcon>
                 <ListItemText
                   primary={t('argus.detail.resolveInCurrentRelease')}
                   secondary={latestEvent.release}
@@ -244,7 +212,8 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               </MenuItem>
             )}
             {issue.status !== 'resolved' && (
-              <MenuItem onClick={() => handleStatusRequest('resolved')} sx={{ fontSize: '0.8rem', py: 1, pl: 4 }}>
+              <MenuItem onClick={() => handleStatusRequest('resolved')} sx={{ fontSize: '0.8rem', py: 1 }}>
+                <ListItemIcon><NextReleaseIcon fontSize="small" sx={{ color: '#2196f3' }} /></ListItemIcon>
                 <ListItemText
                   primary={t('argus.detail.resolveInNextRelease')}
                   primaryTypographyProps={{ fontSize: '0.75rem', fontWeight: 500 }}
@@ -254,13 +223,13 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
             <Divider sx={{ my: 0.5 }} />
             {issue.status !== 'ignored' && (
               <MenuItem onClick={() => handleStatusRequest('ignored')} sx={{ fontSize: '0.8rem', py: 1 }}>
-                <ListItemIcon><IgnoreIcon fontSize="small" color="action" /></ListItemIcon>
+                <ListItemIcon><IgnoreIcon fontSize="small" sx={{ color: '#ff9800' }} /></ListItemIcon>
                 <ListItemText primary={t('argus.issues.ignore')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
               </MenuItem>
             )}
             {issue.status !== 'archived' && (
               <MenuItem onClick={() => handleStatusRequest('archived')} sx={{ fontSize: '0.8rem', py: 1 }}>
-                <ListItemIcon><IgnoreIcon fontSize="small" sx={{ color: 'text.disabled' }} /></ListItemIcon>
+                <ListItemIcon><ArchiveIcon fontSize="small" sx={{ color: '#9e9e9e' }} /></ListItemIcon>
                 <ListItemText primary={t('argus.detail.archive')} primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 500 }} />
               </MenuItem>
             )}
@@ -274,36 +243,16 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           </Menu>
 
         {/* Priority & Assignee */}
-        <Chip
+        <ActionChip
           icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800' }} />}
           label={PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
-          size="small"
-          variant="outlined"
           onClick={(e) => setPriorityAnchor(e.currentTarget)}
-          sx={{
-            height: 28, borderRadius: '6px',
-            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
-            color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
-            '& .MuiChip-icon': { ml: 0.8 },
-            '& .MuiChip-label': { px: 0.8 },
-            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-          }}
         />
 
-        <Chip
+        <ActionChip
           icon={<PersonIcon sx={{ fontSize: '14px !important', color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />}
           label={issue.assigned_to ? issue.assigned_to : t('argus.issues.unassigned', 'Unassigned')}
-          size="small"
-          variant="outlined"
           onClick={onAssigneeClick}
-          sx={{
-            height: 28, borderRadius: '6px',
-            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
-            color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
-            '& .MuiChip-icon': { ml: 0.8 },
-            '& .MuiChip-label': { px: 0.8 },
-            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-          }}
         />
 
         <Menu
@@ -323,18 +272,12 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
         <Divider orientation="vertical" flexItem sx={{ mx: 0.3 }} />
 
         {/* AI Analysis */}
-        <Chip
+        <ActionChip
           label={t('argus.issues.aiAnalysis', 'AI 분석')}
-          size="small"
-          variant="outlined"
+          variant="tinted"
+          tintColor={theme.palette.primary.main}
           onClick={onAiAnalysis}
-          sx={{
-            height: 28, borderRadius: '6px',
-            borderColor: alpha(theme.palette.primary.main, 0.4),
-            color: 'primary.main', fontWeight: 700, fontSize: '0.75rem',
-            '& .MuiChip-label': { px: 1.2 },
-            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
-          }}
+          sx={{ fontWeight: 700 }}
         />
 
         {/* Right side items */}
