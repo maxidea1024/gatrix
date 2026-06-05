@@ -556,6 +556,18 @@ const ArgusLogsPage: React.FC = () => {
     { key: 'logger', label: t('argus.logs.facet.logger', 'Logger'), values: mappedFacets.logger },
   ].filter(g => g.values.length > 0), [mappedFacets, t]);
 
+  // ─── Search + Filter Merge Helper ───
+  /** Merge search-bar text + active chip filters into a single QueryParser-compatible search string */
+  const buildSearchWithFilters = useCallback((): string | undefined => {
+    const parts: string[] = [];
+    if (searchDebounce.trim()) parts.push(searchDebounce.trim());
+    for (const f of activeFilters) {
+      if (!f.enabled) continue;
+      const prefix = f.exclude ? '!' : '';
+      parts.push(`${prefix}${f.key}:"${f.value}"`);
+    }
+    return parts.length > 0 ? parts.join(' ') : undefined;
+  }, [searchDebounce, activeFilters]);
 
   // ─── Fetch ───
   const fetchLogs = useCallback(async (append = false, cursor?: string) => {
@@ -573,20 +585,10 @@ const ArgusLogsPage: React.FC = () => {
       if (searchDebounce.trim()) params.search = searchDebounce.trim();
       if (cursor) params.cursor = cursor;
 
-      // Inject active chip filters into API params (only enabled ones)
-      for (const f of activeFilters) {
-        if (!f.enabled) continue;
-        if (f.exclude) {
-          // Exclude filters: prepend "!" to signal negation
-          params[`exclude_${f.key}`] = params[`exclude_${f.key}`]
-            ? `${params[`exclude_${f.key}`]},${f.value}` : f.value;
-        } else {
-          // Include filters: comma-separated for same key
-          const paramKey = f.key === 'severity' ? 'level' : f.key;
-          params[paramKey] = params[paramKey]
-            ? `${params[paramKey]},${f.value}` : f.value;
-        }
-      }
+      // Inject active chip filters into the search query string
+      // This ensures they go through QueryParser and don't conflict with search-bar conditions
+      const mergedSearch = buildSearchWithFilters();
+      if (mergedSearch) params.search = mergedSearch;
 
       const result = await argusService.browseLogs(projectId, params);
       const newLogs = result.data || [];
@@ -617,11 +619,11 @@ const ArgusLogsPage: React.FC = () => {
         period: apiParams.period || '14d',
         start: apiParams.start,
         end: apiParams.end,
-        search: searchDebounce.trim()
+        search: buildSearchWithFilters(),
       });
       setVolume(data);
     } catch (err) { console.error('Failed to fetch volume', err); }
-  }, [projectId, filters, searchDebounce]);
+  }, [projectId, filters, buildSearchWithFilters]);
 
   const fetchAll = useCallback(() => {
     fetchLogs(); fetchFacets(); fetchVolume();
@@ -636,11 +638,12 @@ const ArgusLogsPage: React.FC = () => {
         start: apiParams.start,
         end: apiParams.end,
         groupBy: groupByVal || aggGroupBy,
+        search: buildSearchWithFilters(),
       });
       setAggData(data);
     } catch (err) { console.error('Failed to fetch aggregates', err); }
     finally { setAggLoading(false); }
-  }, [projectId, filters, currentPeriod, aggGroupBy]);
+  }, [projectId, filters, currentPeriod, aggGroupBy, buildSearchWithFilters]);
 
   useEffect(() => {
     fetchAll();
@@ -662,12 +665,12 @@ const ArgusLogsPage: React.FC = () => {
       const apiParams = argusFilterStateToApiParams(filters);
       const data = await argusService.getLogPatterns(projectId, {
         period: apiParams.period, start: apiParams.start, end: apiParams.end,
-        search: searchDebounce || undefined,
+        search: buildSearchWithFilters(),
       });
       setPatterns(data);
     } catch (e) { console.error('Failed to fetch patterns', e); }
     setPatternsLoading(false);
-  }, [projectId, filters, searchDebounce]);
+  }, [projectId, filters, buildSearchWithFilters]);
 
   // Auto-fetch patterns when switching to patterns tab
   useEffect(() => {

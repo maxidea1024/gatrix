@@ -15,6 +15,7 @@ const LOGS_ALLOWED_COLUMNS = new Set([
 // The UI displays "severity" but the DB column is "level".
 const LOGS_COLUMN_ALIASES: Record<string, string> = {
   severity: 'level',
+  logger: 'logger_name',
 };
 
 export default async function logsRoutes(app: FastifyInstance) {
