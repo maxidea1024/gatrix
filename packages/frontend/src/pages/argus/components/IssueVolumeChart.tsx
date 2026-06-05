@@ -6,6 +6,8 @@ import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import argusService from '@/services/argusService';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { ArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import { BarChart as BarChartIcon } from '@mui/icons-material';
 
 interface IssueVolumeChartProps {
   projectId: string | number;
@@ -112,6 +114,12 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
       <Box sx={{ height: 120 }}>
         {volumeLoading ? (
           <ArgusChartSkeleton type="bar" height={120} color={theme.palette.error.main} />
+        ) : chartData.length === 0 || chartData.every(d => d.count === 0) ? (
+          <EmptyPlaceholder
+            icon={<BarChartIcon sx={{ fontSize: 36 }} />}
+            message={t('argus.issues.noVolumeData', 'No event data')}
+            sx={{ height: '100%', py: 0, minHeight: 'unset' }}
+          />
         ) : (
           <InteractiveTimeSeriesChart 
             data={chartData} 
