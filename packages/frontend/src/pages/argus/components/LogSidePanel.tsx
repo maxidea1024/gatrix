@@ -65,7 +65,7 @@ const AttrRow: React.FC<{
 
   return (
     <Box sx={{
-      display: 'flex', gap: 2, py: 0.6, px: 1.5,
+      display: 'flex', gap: 2, py: 0.6, px: 2,
       borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
       alignItems: 'flex-start',
       '&:hover .attr-actions': { opacity: 1 },
@@ -309,7 +309,7 @@ const EventTab: React.FC<{
 
       {/* Core attributes section */}
       <Box sx={{ pt: 0.5 }}>
-        <Typography sx={{ px: 1.5, pt: 1, pb: 0.5, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.disabled' }}>
+        <Typography sx={{ px: 2, pt: 1, pb: 0.5, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.disabled' }}>
           {t('argus.logs.panel.coreAttributes', 'Core Attributes')}
         </Typography>
         {coreAttrs.map(([key, val, color, bold]) => (
@@ -320,7 +320,7 @@ const EventTab: React.FC<{
       {/* Custom attributes — structured tree view */}
       {attrTree.length > 0 && (
         <Box sx={{ pt: 0.5 }}>
-          <Typography sx={{ px: 1.5, pt: 1, pb: 0.5, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.disabled' }}>
+          <Typography sx={{ px: 2, pt: 1, pb: 0.5, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.disabled' }}>
             {t('argus.logs.panel.customAttributes', 'Custom Attributes')}
           </Typography>
           <AttrTreeRenderer nodes={attrTree} depth={0} isDark={isDark} onFilter={onFilter} />
@@ -431,7 +431,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
       {/* ── Header ── */}
       <Box sx={{
         display: 'flex', alignItems: 'center', gap: 1,
-        px: 1.5, py: 1,
+        px: 2, py: 1,
         borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
         backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.02)',
         flexShrink: 0,
@@ -494,7 +494,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
 
       {/* ── Service / Tags bar ── */}
       <Box sx={{
-        display: 'flex', gap: 0.5, flexWrap: 'wrap', px: 1.5, py: 0.8,
+        display: 'flex', gap: 0.5, flexWrap: 'wrap', px: 2, py: 0.8,
         borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
         backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.01)',
         flexShrink: 0,
