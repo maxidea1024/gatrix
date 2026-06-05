@@ -7,6 +7,53 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('releases-api');
 
 export default async function releasesRoutes(app: FastifyInstance) {
+  // Release health time-series (for a specific release)
+  app.get(
+    '/releases/:projectId/health',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { release, period = '30d' } = request.query as { release: string; period?: string };
+
+      if (!release) {
+        return reply.code(400).send({ error: 'release query param is required' });
+      }
+
+      const bucket = getBucketingConfig(period, undefined, undefined, 'started');
+      const qp = { projectId: String(projectId), release, ...bucket.queryParams };
+      const startedTimeCond = `started >= toDateTime({fillStart:UInt32}) AND started <= toDateTime({fillEnd:UInt32})`;
+
+      try {
+        const result = await clickhouse.query({
+          query: `SELECT
+            ${bucket.selectExpr} AS timestamp,
+            count() AS total_sessions,
+            countIf(status = 'crashed') AS crashed_sessions,
+            countIf(status = 'errored') AS errored_sessions,
+            countIf(status = 'abnormal') AS abnormal_sessions,
+            countIf(status IN ('ok', 'exited')) AS healthy_sessions,
+            if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100) AS crash_free_rate,
+            uniq(distinct_id) AS total_users,
+            uniqIf(distinct_id, status = 'crashed') AS crashed_users,
+            if(uniq(distinct_id) > 0, (1 - uniqIf(distinct_id, status = 'crashed') / uniq(distinct_id)) * 100, 100) AS crash_free_users
+          FROM argus.sessions
+          WHERE project_id = {projectId:String} AND release = {release:String} AND ${startedTimeCond}
+          GROUP BY timestamp ORDER BY timestamp ${bucket.fillExpr}`,
+          query_params: qp,
+        });
+
+        const data = await result.json();
+        return reply.send({ data: data.data || [] });
+      } catch (error) {
+        logger.error('Failed to get release health', {
+          projectId,
+          release,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get release health' });
+      }
+    }
+  );
+
   // List releases with enriched stats
   app.get(
     '/releases/:projectId',

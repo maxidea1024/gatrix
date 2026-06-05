@@ -142,16 +142,17 @@ const ReleaseHealthChart: React.FC<{
 
 // --- Session Status Donut Chart ---
 const SESSION_STATUSES = [
-  { key: 'healthy', label: 'Healthy', color: '#4caf50' },
-  { key: 'errored', label: 'Errored', color: '#ff9800' },
-  { key: 'crashed', label: 'Crashed', color: '#f44336' },
-  { key: 'abnormal', label: 'Abnormal', color: '#9c27b0' },
+  { key: 'healthy', labelKey: 'argus.sessions.healthy', fallback: 'Healthy', color: '#4caf50' },
+  { key: 'errored', labelKey: 'argus.sessions.errored', fallback: 'Errored', color: '#ff9800' },
+  { key: 'crashed', labelKey: 'argus.sessions.crashed', fallback: 'Crashed', color: '#f44336' },
+  { key: 'abnormal', labelKey: 'argus.sessions.abnormal', fallback: 'Abnormal', color: '#9c27b0' },
 ] as const;
 
 const SessionStatusChart: React.FC<{
   releaseData: any;
   isDark: boolean;
 }> = ({ releaseData, isDark }) => {
+  const { t } = useTranslation();
   const totalSessions = Number(releaseData.total_sessions) || 1;
   const crashFreeRate = Number(releaseData.crash_free_rate) / 100;
   const crashed = Number(releaseData.fatal_count || 0) + Number(releaseData.unhandled_count || 0);
@@ -160,10 +161,10 @@ const SessionStatusChart: React.FC<{
   const abnormal = Math.max(0, totalSessions - healthy - Math.max(0, errored) - crashed);
 
   const segments = [
-    { ...SESSION_STATUSES[0], value: healthy },
-    { ...SESSION_STATUSES[1], value: Math.max(0, errored) },
-    { ...SESSION_STATUSES[2], value: crashed },
-    { ...SESSION_STATUSES[3], value: abnormal },
+    { ...SESSION_STATUSES[0], label: t(SESSION_STATUSES[0].labelKey, SESSION_STATUSES[0].fallback), value: healthy },
+    { ...SESSION_STATUSES[1], label: t(SESSION_STATUSES[1].labelKey, SESSION_STATUSES[1].fallback), value: Math.max(0, errored) },
+    { ...SESSION_STATUSES[2], label: t(SESSION_STATUSES[2].labelKey, SESSION_STATUSES[2].fallback), value: crashed },
+    { ...SESSION_STATUSES[3], label: t(SESSION_STATUSES[3].labelKey, SESSION_STATUSES[3].fallback), value: abnormal },
   ].filter(s => s.value > 0);
 
   const total = segments.reduce((s, seg) => s + seg.value, 0) || 1;
@@ -180,7 +181,7 @@ const SessionStatusChart: React.FC<{
     }}>
       <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <DonutIcon sx={{ fontSize: 16, color: '#7c4dff' }} />
-        Session Status
+        {t('argus.releaseDetail.sessionStatus', 'Session Status')}
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
         <svg width={120} height={120} viewBox="0 0 120 120">
@@ -207,7 +208,7 @@ const SessionStatusChart: React.FC<{
             {formatCompactNumber(totalSessions)}
           </text>
           <text x={cx} y={cy + 12} textAnchor="middle" fill={isDark ? '#888' : '#999'} fontSize={9}>
-            sessions
+            {t('argus.sessions.sessions', 'sessions')}
           </text>
         </svg>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8, flex: 1 }}>
@@ -231,6 +232,7 @@ const SessionStatusChart: React.FC<{
 
 // --- Commit Author Breakdown ---
 const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+  const { t } = useTranslation();
   // Placeholder — backend doesn't expose commit data yet
   // Will be populated when API is available
   const authors: { name: string; email: string; commits: number }[] = [];
@@ -242,13 +244,13 @@ const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({ isDark }) => {
     }}>
       <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <PersonIcon sx={{ fontSize: 16, color: '#2196f3' }} />
-        Commit Authors
+        {t('argus.releaseDetail.commitAuthors', 'Commit Authors')}
       </Typography>
       {authors.length === 0 ? (
         <Box sx={{ py: 2, textAlign: 'center' }}>
           <PersonIcon sx={{ fontSize: 28, color: 'text.disabled', mb: 0.5 }} />
-          <Typography variant="caption" color="text.disabled" display="block">No commit data</Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>Associate commits to see author breakdown</Typography>
+          <Typography variant="caption" color="text.disabled" display="block">{t('argus.releaseDetail.noCommitData', 'No commit data')}</Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>{t('argus.releaseDetail.noCommitDataHint', 'Associate commits to see author breakdown')}</Typography>
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -279,6 +281,7 @@ const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({ isDark }) => {
 
 // --- Deploy History ---
 const DeployHistory: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+  const { t } = useTranslation();
   // Placeholder — backend doesn't expose deploy data yet
   const deploys: { environment: string; deployed_at: string }[] = [];
 
@@ -295,13 +298,13 @@ const DeployHistory: React.FC<{ isDark: boolean }> = ({ isDark }) => {
     }}>
       <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <DeployIcon sx={{ fontSize: 16, color: '#00bcd4' }} />
-        Deploys
+        {t('argus.releaseDetail.deploys', 'Deploys')}
       </Typography>
       {deploys.length === 0 ? (
         <Box sx={{ py: 2, textAlign: 'center' }}>
           <DeployIcon sx={{ fontSize: 28, color: 'text.disabled', mb: 0.5 }} />
-          <Typography variant="caption" color="text.disabled" display="block">No deploy data</Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>Set up deploy notifications to track</Typography>
+          <Typography variant="caption" color="text.disabled" display="block">{t('argus.releaseDetail.noDeployData', 'No deploy data')}</Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>{t('argus.releaseDetail.noDeployDataHint', 'Set up deploy notifications to track')}</Typography>
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -338,11 +341,12 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const [releaseData, setReleaseData] = useState<any>(null);
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
   const [issuesLoading, setIssuesLoading] = useState(true);
-  const [issueTab, setIssueTab] = useState<IssueTabType>('all');
   const [healthData, setHealthData] = useState<{ timestamp: string; crash_free_rate: number }[]>([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const rawTab = searchParams.get('tab');
+  const issueTab: IssueTabType = ISSUE_TABS.some(t => t.key === rawTab) ? (rawTab as IssueTabType) : 'all';
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
     const saved = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
     const parsed = parseInt(saved || '', 10);
@@ -425,13 +429,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
   useEffect(() => { fetchReleaseData(); fetchHealthData(); }, [fetchReleaseData, fetchHealthData]);
   useEffect(() => { fetchIssues(); }, [fetchIssues]);
 
-  // Reset page when tab changes
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    params.set('page', '1');
-    setSearchParams(params);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [issueTab]);
+
 
   const r = releaseData;
   const crashFree = r ? Number(r.crash_free_rate) : 100;
@@ -595,7 +593,12 @@ const ArgusReleaseDetailPage: React.FC = () => {
             {/* Issue Tabs */}
             <Tabs
               value={issueTab}
-              onChange={(_, v) => setIssueTab(v)}
+              onChange={(_, v) => {
+                const params = new URLSearchParams(searchParams);
+                params.set('tab', v);
+                params.set('page', '1');
+                setSearchParams(params, { replace: true });
+              }}
               sx={{
                 mb: 2, minHeight: 36,
                 '& .MuiTab-root': {
