@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
   Paper,
   Chip,
+  Tab,
+  Tabs,
   useTheme,
   alpha,
   Skeleton,
-  IconButton,
   Divider,
   Tooltip,
 } from '@mui/material';
 import {
-  ArrowBack as ArrowBackIcon,
   NewReleases as ReleaseIcon,
   BugReport as BugReportIcon,
   People as PeopleIcon,
@@ -22,7 +22,6 @@ import {
   CheckCircle as CheckIcon,
   Schedule as ScheduleIcon,
   ErrorOutline as ErrorIcon,
-  TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -31,7 +30,6 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import SimplePagination from '@/components/common/SimplePagination';
-import { LEVEL_COLORS } from '@/utils/argusHelpers';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import IssueListItem from '@/components/argus/IssueListItem';
 
@@ -44,6 +42,102 @@ function formatDate(dateStr: string): string {
   } catch { return dateStr; }
 }
 
+// --- Issue Tabs ---
+type IssueTabType = 'all' | 'new' | 'unhandled' | 'regressed' | 'resolved';
+
+const ISSUE_TABS: { key: IssueTabType; labelKey: string; fallback: string }[] = [
+  { key: 'all', labelKey: 'argus.releaseDetail.allIssues', fallback: 'All' },
+  { key: 'new', labelKey: 'argus.releaseDetail.newIssues', fallback: 'New' },
+  { key: 'unhandled', labelKey: 'argus.releaseDetail.unhandledIssues', fallback: 'Unhandled' },
+  { key: 'regressed', labelKey: 'argus.releaseDetail.regressedIssues', fallback: 'Regressed' },
+  { key: 'resolved', labelKey: 'argus.releaseDetail.resolvedIssues', fallback: 'Resolved' },
+];
+
+// --- Mini Health Chart ---
+const ReleaseHealthChart: React.FC<{
+  data: { timestamp: string; crash_free_rate: number }[];
+  isDark: boolean;
+}> = ({ data, isDark }) => {
+  if (!data || data.length < 2) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 180 }}>
+        <Typography variant="body2" color="text.disabled">No health data available</Typography>
+      </Box>
+    );
+  }
+
+  const maxVal = 100;
+  const minVal = Math.min(...data.map(d => d.crash_free_rate), 90);
+  const range = maxVal - minVal || 1;
+  const chartWidth = 800;
+  const chartHeight = 160;
+  const padding = { top: 10, right: 40, bottom: 30, left: 50 };
+  const innerW = chartWidth - padding.left - padding.right;
+  const innerH = chartHeight - padding.top - padding.bottom;
+
+  const points = data.map((d, i) => ({
+    x: padding.left + (i / (data.length - 1)) * innerW,
+    y: padding.top + (1 - (d.crash_free_rate - minVal) / range) * innerH,
+    value: d.crash_free_rate,
+    ts: d.timestamp,
+  }));
+
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${padding.top + innerH} L ${points[0].x} ${padding.top + innerH} Z`;
+
+  const lineColor = '#4caf50';
+  const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
+  const xLabels = data.length > 6
+    ? [0, Math.floor(data.length / 3), Math.floor(2 * data.length / 3), data.length - 1]
+    : data.map((_, i) => i);
+
+  return (
+    <Paper elevation={0} sx={{
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+      borderRadius: 2, p: 2, mb: 3,
+    }}>
+      <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <CheckIcon sx={{ fontSize: 16, color: lineColor }} />
+        Crash Free Rate
+      </Typography>
+      <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} width="100%" style={{ maxHeight: 180 }}>
+        {/* Y-axis grid + labels */}
+        {yTicks.map(tick => {
+          const y = padding.top + (1 - (tick - minVal) / range) * innerH;
+          return (
+            <g key={tick}>
+              <line x1={padding.left} y1={y} x2={chartWidth - padding.right} y2={y}
+                stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} strokeDasharray="3,3" />
+              <text x={padding.left - 8} y={y + 4} textAnchor="end"
+                fill={isDark ? '#888' : '#999'} fontSize={11}>{tick.toFixed(1)}%</text>
+            </g>
+          );
+        })}
+        {/* X-axis labels */}
+        {xLabels.map(idx => {
+          const p = points[idx as number];
+          if (!p) return null;
+          const label = new Date(data[idx as number].timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          return (
+            <text key={idx} x={p.x} y={chartHeight - 5} textAnchor="middle"
+              fill={isDark ? '#888' : '#999'} fontSize={10}>{label}</text>
+          );
+        })}
+        {/* Area fill */}
+        <path d={areaPath} fill={alpha(lineColor, 0.08)} />
+        {/* Line */}
+        <path d={linePath} fill="none" stroke={lineColor} strokeWidth={2} strokeLinejoin="round" />
+        {/* Dots */}
+        {points.map((p, i) => (
+          <Tooltip key={i} title={`${p.value.toFixed(2)}% — ${new Date(p.ts).toLocaleString()}`}>
+            <circle cx={p.x} cy={p.y} r={3} fill={lineColor} stroke="#fff" strokeWidth={1.5}
+              style={{ cursor: 'pointer' }} />
+          </Tooltip>
+        ))}
+      </svg>
+    </Paper>
+  );
+};
 
 
 const ArgusReleaseDetailPage: React.FC = () => {
@@ -57,7 +151,9 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const [releaseData, setReleaseData] = useState<any>(null);
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
   const [issuesLoading, setIssuesLoading] = useState(true);
-  
+  const [issueTab, setIssueTab] = useState<IssueTabType>('all');
+  const [healthData, setHealthData] = useState<{ timestamp: string; crash_free_rate: number }[]>([]);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get('page') || '1', 10);
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
@@ -77,7 +173,6 @@ const ArgusReleaseDetailPage: React.FC = () => {
     if (!projectId || !decodedRelease) return;
     setLoading(true);
     try {
-      // Fetch releases and find matching one
       const releases = await argusService.getReleases(projectId, '90d');
       const found = releases?.find((r: any) => r.release === decodedRelease);
       setReleaseData(found || null);
@@ -88,17 +183,47 @@ const ArgusReleaseDetailPage: React.FC = () => {
     }
   }, [projectId, decodedRelease]);
 
+  const fetchHealthData = useCallback(async () => {
+    if (!projectId || !decodedRelease) return;
+    try {
+      const data = await argusService.getReleaseHealth(projectId, decodedRelease, '30d');
+      setHealthData(data || []);
+    } catch {
+      // API might not exist yet, silently fail
+      setHealthData([]);
+    }
+  }, [projectId, decodedRelease]);
+
   const fetchIssues = useCallback(async () => {
     if (!projectId) return;
     setIssuesLoading(true);
     try {
-      // TODO: Add release filter to issues API when backend supports it
-      const result = await argusService.listIssues(projectId, {
-        status: 'unresolved',
+      const params: Record<string, any> = {
+        release: decodedRelease,
         sort: 'last_seen',
         limit: rowsPerPage,
         offset: (page - 1) * rowsPerPage,
-      });
+      };
+
+      // Map tab to API params
+      switch (issueTab) {
+        case 'new':
+          params.substatus = 'new';
+          break;
+        case 'unhandled':
+          params.is_unhandled = true;
+          break;
+        case 'regressed':
+          params.substatus = 'regressed';
+          break;
+        case 'resolved':
+          params.status = 'resolved';
+          break;
+        default:
+          params.status = 'unresolved';
+      }
+
+      const result = await argusService.listIssues(projectId, params);
       setIssues(result.data);
       setTotalIssues(result.total || 0);
     } catch (error) {
@@ -108,12 +233,18 @@ const ArgusReleaseDetailPage: React.FC = () => {
     } finally {
       setIssuesLoading(false);
     }
-  }, [projectId, page, rowsPerPage]);
+  }, [projectId, decodedRelease, page, rowsPerPage, issueTab]);
 
+  useEffect(() => { fetchReleaseData(); fetchHealthData(); }, [fetchReleaseData, fetchHealthData]);
+  useEffect(() => { fetchIssues(); }, [fetchIssues]);
+
+  // Reset page when tab changes
   useEffect(() => {
-    fetchReleaseData();
-    fetchIssues();
-  }, [fetchReleaseData, fetchIssues]);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', '1');
+    setSearchParams(params);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issueTab]);
 
   const r = releaseData;
   const crashFree = r ? Number(r.crash_free_rate) : 100;
@@ -206,11 +337,12 @@ const ArgusReleaseDetailPage: React.FC = () => {
               </Typography>
             </Box>
 
+            {/* Release Health Chart */}
+            <ReleaseHealthChart data={healthData} isDark={isDark} />
+
             <Divider sx={{ mb: 3 }} />
 
-
-
-            {/* Issues in this release */}
+            {/* Issues Section */}
             <Box sx={{
               mb: 2, display: 'flex', alignItems: 'center', gap: 1,
               px: 2, py: 0.8,
@@ -222,7 +354,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
               <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1rem' }}>
                 {t('argus.releaseDetail.issuesTitle', 'Issues in this Release')}
               </Typography>
-              <Chip label={issues.length} size="small" sx={{
+              <Chip label={totalIssues} size="small" sx={{
                 height: 20, fontSize: '0.7rem', fontWeight: 700,
                 backgroundColor: alpha('#f44336', 0.1), color: '#f44336',
               }} />
@@ -243,7 +375,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
                     {(() => {
                       const data = r.error_trend as number[];
                       const max = Math.max(...data, 1);
-                      return data.map((count, i) => {
+                      return data.map((count: number, i: number) => {
                         const pct = (count / max) * 100;
                         return (
                           <Box
@@ -265,6 +397,24 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 </Box>
               )}
             </Box>
+
+            {/* Issue Tabs */}
+            <Tabs
+              value={issueTab}
+              onChange={(_, v) => setIssueTab(v)}
+              sx={{
+                mb: 2, minHeight: 36,
+                '& .MuiTab-root': {
+                  minHeight: 36, py: 0.5, fontSize: '0.78rem', fontWeight: 600,
+                  textTransform: 'none',
+                },
+                '& .MuiTabs-indicator': { height: 2.5, borderRadius: 1 },
+              }}
+            >
+              {ISSUE_TABS.map(tab => (
+                <Tab key={tab.key} label={t(tab.labelKey, tab.fallback)} value={tab.key} />
+              ))}
+            </Tabs>
 
             <PageContentLoader loading={issuesLoading}>
               {issues.length === 0 ? (

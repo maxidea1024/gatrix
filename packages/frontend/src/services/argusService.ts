@@ -240,6 +240,8 @@ export interface ArgusIssueListParams {
   end?: string;
   substatus?: string;
   assigned_to?: string;
+  release?: string;
+  is_unhandled?: boolean;
 }
 
 export interface ArgusProjectStats {
@@ -872,6 +874,17 @@ class ArgusService {
   ): Promise<ArgusRelease[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/releases/${projectId}`, {
       params: { period, start, end },
+    });
+    return response.data?.data || response.data || [];
+  }
+
+  async getReleaseHealth(
+    projectId: number | string,
+    release: string,
+    period?: string
+  ): Promise<{ timestamp: string; crash_free_rate: number; crash_free_users: number; total_sessions: number; crashed_sessions: number; errored_sessions: number; healthy_sessions: number; abnormal_sessions: number }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/releases/${projectId}/health`, {
+      params: { release, period },
     });
     return response.data?.data || response.data || [];
   }
