@@ -10,6 +10,7 @@ import { testMySQLConnection } from './config/mysql';
 import { createLogger } from './utils/logger';
 import { alertRuleStore } from './utils/alert-rule-store';
 import { dsnStore } from './utils/dsn-store';
+import { initShortIdCounters } from './processing/issue-grouper';
 
 const logger = createLogger('worker');
 
@@ -34,6 +35,7 @@ async function start() {
     logger.info('Initializing in-memory stores...');
     await alertRuleStore.init();
     await dsnStore.init();
+    await initShortIdCounters();
 
     // Start all workers
     const errorWorker = new ErrorWorker();
