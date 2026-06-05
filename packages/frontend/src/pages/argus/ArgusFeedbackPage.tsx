@@ -10,7 +10,6 @@ import {
   Avatar,
   TextField,
   InputAdornment,
-  Skeleton,
   Button,
   Tooltip,
   Checkbox,
@@ -86,14 +85,14 @@ import {
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
+
 import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse, ArgusFeedbackActivity, ArgusIssueTracker, ArgusIssue } from '@/services/argusService';
 import { rbacService } from '@/services/rbacService';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { formatCompactNumber, formatWithCommas, needsCompactTooltip } from '@/utils/numberFormat';
-import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import SimplePagination from '@/components/common/SimplePagination';
 import PageHeader from '@/components/common/PageHeader';
@@ -798,13 +797,11 @@ const ArgusFeedbackPage: React.FC = () => {
                 {React.cloneElement(card.icon, { sx: { fontSize: 16 } })}
               </Box>
               <Box>
-                {loading ? <Skeleton width={40} height={20} /> : (
-                  <Tooltip title={typeof card.value === 'number' && needsCompactTooltip(card.value) ? formatWithCommas(card.value) : ''} arrow placement="top">
-                    <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.1, fontSize: '0.95rem' }}>
-                      {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value ?? '-'}
-                    </Typography>
-                  </Tooltip>
-                )}
+                <Tooltip title={typeof card.value === 'number' && needsCompactTooltip(card.value) ? formatWithCommas(card.value) : ''} arrow placement="top">
+                  <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.1, fontSize: '0.95rem' }}>
+                    {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value ?? '-'}
+                  </Typography>
+                </Tooltip>
                 <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, fontSize: '0.58rem' }}>
                   {card.label}
                 </Typography>
@@ -834,7 +831,7 @@ const ArgusFeedbackPage: React.FC = () => {
             onMouseUp={handleChartMouseUp}
             onMouseLeave={() => { if (isDragging) handleChartMouseUp(); }}
           >
-            {loading ? <ArgusChartSkeleton type="bar" height={80} color="#7c4dff" /> : <Bar ref={chartRef} data={trendChartData} options={chartOpts as any} />}
+            <Bar ref={chartRef} data={trendChartData} options={chartOpts as any} />
           </Box>
           {isDragging && (
             <Typography variant="caption" sx={{ position: 'absolute', bottom: 4, right: 8, fontSize: '0.58rem', color: 'text.disabled' }}>
@@ -897,7 +894,7 @@ const ArgusFeedbackPage: React.FC = () => {
           width: splitWidth, minWidth: MIN_SPLIT_WIDTH, flexShrink: 0,
           display: 'flex', flexDirection: 'column', transition: isSplitDragging ? 'none' : 'width 0.2s', overflow: 'hidden',
         }}>
-          <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <PageContentLoader loading={loading} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             {items.length === 0 ? (
               <Box sx={{ py: 8, textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <FeedbackIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
