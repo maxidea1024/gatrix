@@ -341,12 +341,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   const { chartLabels, chartDatasets, buckets } = useMemo(() => {
     const allBuckets = new Set<string>();
     Object.values(queryResults).forEach(res => {
-      res.timeSeries.forEach((ts: any) => allBuckets.add(ts.bucket));
+      res.timeSeries.forEach((ts: any) => allBuckets.add(String(ts.bucket)));
     });
     const sortedBuckets = Array.from(allBuckets).sort();
     
     const formattedLabels = sortedBuckets.map(b => {
-      const date = new Date(b);
+      // Handle both ISO strings and stringified numeric timestamps
+      const date = new Date(/^\d+$/.test(b) ? Number(b) : b);
       return date.toLocaleString(i18n.language || 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
     });
 
@@ -358,7 +359,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       const res = queryResults[q.id];
       if (!res) return;
       const bucketMap = new Map();
-      res.timeSeries.forEach((ts: any) => bucketMap.set(ts.bucket, Number(ts.value)));
+      res.timeSeries.forEach((ts: any) => bucketMap.set(String(ts.bucket), Number(ts.value)));
       const data = sortedBuckets.map(b => bucketMap.get(b) ?? 0);
       datasets.push({
         id: q.id,

@@ -6,6 +6,7 @@ import {
   Timeline as TimelineIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { ArgusLogEntry } from '@/services/argusService';
 import { CopyButton } from '@/components/common/CopyButton';
 
@@ -22,6 +23,7 @@ export interface LogDetailProps {
 
 const LogDetail: React.FC<LogDetailProps> = ({ log, isDark, onFilter }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const attrs: [string, any][] = [];
   if (log.level) attrs.push(['severity', log.level]);
   if (log.timestamp) attrs.push(['timestamp_precise', log.timestamp]);
@@ -77,9 +79,7 @@ const LogDetail: React.FC<LogDetailProps> = ({ log, isDark, onFilter }) => {
                 <Tooltip title={t('argus.logs.viewInTraceExplorer', 'View in Trace Explorer')}>
                   <IconButton
                     size="small"
-                    component="a"
-                    href={`/argus/explore/traces?q=trace_id:"${val}"`}
-                    onClick={(e: React.MouseEvent) => { e.preventDefault(); window.location.href = `/argus/explore/traces?q=trace_id:"${val}"`; }}
+                    onClick={() => navigate(`/argus/performance?trace=${val}`, { state: { allowBack: true } })}
                     sx={{ p: 0.2, color: 'primary.main' }}
                   >
                     <TimelineIcon sx={{ fontSize: 13 }} />

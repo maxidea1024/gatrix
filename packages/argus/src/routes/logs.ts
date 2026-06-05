@@ -11,6 +11,12 @@ const LOGS_ALLOWED_COLUMNS = new Set([
   'logger_name', 'message', 'body', 'service', 'environment', 'release'
 ]);
 
+// User-friendly aliases → actual DB column names.
+// The UI displays "severity" but the DB column is "level".
+const LOGS_COLUMN_ALIASES: Record<string, string> = {
+  severity: 'level',
+};
+
 export default async function logsRoutes(app: FastifyInstance) {
 
   // ─── Browse Logs (independent explorer — no trace_id required) ───
@@ -58,7 +64,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         if (logger_name) { conditions.push('logger_name = {loggerName:String}'); params.loggerName = logger_name; }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set());
+          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -113,7 +119,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set());
+          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -227,7 +233,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         if (environment) { conditions.push('environment = {environment:String}'); params.environment = environment; }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set());
+          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -300,7 +306,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         if (level) { conditions.push('level = {level:String}'); params.level = level; }
         
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set());
+          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);

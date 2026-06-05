@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { Box, useTheme, alpha } from '@mui/material';
 import { Line, Bar, Chart } from 'react-chartjs-2';
 import {
@@ -59,6 +59,11 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
+  const onZoomRef = useRef(onZoom);
+  useEffect(() => {
+    onZoomRef.current = onZoom;
+  }, [onZoom]);
 
   const finalLabels = useMemo(() => {
     if (labels) return labels;
@@ -166,10 +171,14 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
   const plugins = useMemo(() => {
     const list = [getCrosshairPlugin(isDark)];
     if (onZoom) {
-      list.push(getDragSelectPlugin(isDark, onZoom));
+      list.push(getDragSelectPlugin(isDark, (start, end) => {
+        if (onZoomRef.current) {
+          onZoomRef.current(start, end);
+        }
+      }));
     }
     return list;
-  }, [isDark, onZoom]);
+  }, [isDark, !!onZoom]);
 
   if (finalLabels.length === 0) return null;
 

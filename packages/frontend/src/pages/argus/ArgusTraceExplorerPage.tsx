@@ -483,7 +483,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   <Typography
                     onClick={() => {
                       if (span.trace_id) {
-                        navigate(`/argus/performance?trace=${span.trace_id}`);
+                        navigate(`/argus/performance?trace=${span.trace_id}`, { state: { allowBack: true } });
                       }
                     }}
                     sx={{
@@ -736,7 +736,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                         cursor: 'pointer',
                         '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.02) },
                       }}
-                        onClick={() => navigate(`/argus/performance?trace=${trace.trace_id}`)}
+                        onClick={() => navigate(`/argus/performance?trace=${trace.trace_id}`, { state: { allowBack: true } })}
                       >
                         <TableCell sx={{ py: 0.8 }}>
                           <Typography sx={{ fontSize: '0.73rem', color: theme.palette.primary.main, fontWeight: 600 }}>

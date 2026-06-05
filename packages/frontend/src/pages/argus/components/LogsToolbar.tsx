@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-  Box, Typography, Chip, IconButton, Tooltip,
+  Box, Typography, Chip, IconButton,
   Button, Divider, useTheme, alpha,
 } from '@mui/material';
+import SafeTooltip from '@/components/common/SafeTooltip';
 import {
   FileDownload as ExportIcon,
   TableChart as EditTableIcon,
@@ -10,6 +11,9 @@ import {
   Fullscreen as FullscreenIcon,
   WrapText as WrapTextIcon,
   AccessTime as GotoTimeIcon,
+  DensitySmall as CompactIcon,
+  DensityMedium as DefaultDensityIcon,
+  DensityLarge as ExpandedIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
@@ -38,6 +42,9 @@ export interface LogsToolbarProps {
   onGotoTimeChange: (val: string) => void;
   onGotoTimeSubmit: () => void;
   onGotoTimeCancel: () => void;
+  // Display density
+  displayDensity?: 'compact' | 'default' | 'expanded';
+  onDensityChange?: (density: 'compact' | 'default' | 'expanded') => void;
 }
 
 const LogsToolbar: React.FC<LogsToolbarProps> = ({
@@ -60,6 +67,8 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
   onGotoTimeChange,
   onGotoTimeSubmit,
   onGotoTimeCancel,
+  displayDensity = 'default',
+  onDensityChange,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -113,11 +122,11 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
           {t('argus.logs.editTable', 'Edit Table')}
         </Button>
 
-        <Tooltip title={t('argus.logs.export', 'Export')}>
+        <SafeTooltip title={t('argus.logs.export', 'Export')}>
           <IconButton size="small" onClick={onExport}>
             <ExportIcon sx={{ fontSize: 18 }} />
           </IconButton>
-        </Tooltip>
+        </SafeTooltip>
 
         {/* Time Jump */}
         {showGotoTime ? (
@@ -139,26 +148,50 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
             }}
           />
         ) : (
-          <Tooltip title={t('argus.logs.jumpToTime', 'Jump to time')}>
+          <SafeTooltip title={t('argus.logs.jumpToTime', 'Jump to time')}>
             <IconButton size="small" onClick={onShowGotoTime} sx={{ p: 0.4 }}>
               <GotoTimeIcon sx={{ fontSize: 18 }} />
             </IconButton>
-          </Tooltip>
+          </SafeTooltip>
         )}
 
         {/* Wrap Lines */}
-        <Tooltip title={wrapLines ? t('argus.logs.unwrapLines', 'Unwrap lines') : t('argus.logs.wrapLines', 'Wrap lines')}>
+        <SafeTooltip title={wrapLines ? t('argus.logs.unwrapLines', 'Unwrap lines') : t('argus.logs.wrapLines', 'Wrap lines')}>
           <IconButton size="small" onClick={onWrapLinesToggle} color={wrapLines ? 'primary' : 'default'} sx={{ p: 0.4 }}>
             <WrapTextIcon sx={{ fontSize: 18 }} />
           </IconButton>
-        </Tooltip>
+        </SafeTooltip>
+
+        {/* Display Density */}
+        {onDensityChange && (
+          <Box sx={{ display: 'flex', alignItems: 'center', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, borderRadius: '6px', overflow: 'hidden' }}>
+            <SafeTooltip title={t('argus.logs.density.compact', 'Compact')}>
+              <IconButton size="small" onClick={() => onDensityChange('compact')}
+                sx={{ p: 0.3, borderRadius: 0, backgroundColor: displayDensity === 'compact' ? alpha(theme.palette.primary.main, 0.12) : 'transparent' }}>
+                <CompactIcon sx={{ fontSize: 16, color: displayDensity === 'compact' ? theme.palette.primary.main : 'text.disabled' }} />
+              </IconButton>
+            </SafeTooltip>
+            <SafeTooltip title={t('argus.logs.density.default', 'Default')}>
+              <IconButton size="small" onClick={() => onDensityChange('default')}
+                sx={{ p: 0.3, borderRadius: 0, backgroundColor: displayDensity === 'default' ? alpha(theme.palette.primary.main, 0.12) : 'transparent' }}>
+                <DefaultDensityIcon sx={{ fontSize: 16, color: displayDensity === 'default' ? theme.palette.primary.main : 'text.disabled' }} />
+              </IconButton>
+            </SafeTooltip>
+            <SafeTooltip title={t('argus.logs.density.expanded', 'Expanded')}>
+              <IconButton size="small" onClick={() => onDensityChange('expanded')}
+                sx={{ p: 0.3, borderRadius: 0, backgroundColor: displayDensity === 'expanded' ? alpha(theme.palette.primary.main, 0.12) : 'transparent' }}>
+                <ExpandedIcon sx={{ fontSize: 16, color: displayDensity === 'expanded' ? theme.palette.primary.main : 'text.disabled' }} />
+              </IconButton>
+            </SafeTooltip>
+          </Box>
+        )}
 
         {/* Fullscreen */}
-        <Tooltip title={logsFullscreen ? t('argus.logs.exitFullscreen', 'Exit fullscreen') : t('argus.logs.fullscreen', 'Fullscreen')}>
+        <SafeTooltip placement="bottom-end" title={logsFullscreen ? t('argus.logs.exitFullscreen', 'Exit fullscreen') : t('argus.logs.fullscreen', 'Fullscreen')}>
           <IconButton size="small" onClick={onFullscreenToggle} sx={{ p: 0.4 }}>
             {logsFullscreen ? <FullscreenExitIcon sx={{ fontSize: 18 }} /> : <FullscreenIcon sx={{ fontSize: 18 }} />}
           </IconButton>
-        </Tooltip>
+        </SafeTooltip>
       </Box>
     </Box>
   );

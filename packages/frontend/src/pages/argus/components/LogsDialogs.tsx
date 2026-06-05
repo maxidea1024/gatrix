@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Paper, Button, IconButton,
   Dialog, DialogTitle, DialogContent, DialogActions,
@@ -78,16 +78,24 @@ export const EditTableDialog: React.FC<EditTableDialogProps> = ({
 
 export interface SaveQueryDialogProps {
   open: boolean;
-  saveName: string;
+  initialName: string;
   onClose: () => void;
-  onNameChange: (name: string) => void;
-  onSave: () => void;
+  onSave: (name: string) => void;
 }
 
 export const SaveQueryDialog: React.FC<SaveQueryDialogProps> = ({
-  open, saveName, onClose, onNameChange, onSave,
+  open, initialName = '', onClose, onSave,
 }) => {
   const { t } = useTranslation();
+  const [localName, setLocalName] = useState(initialName ?? '');
+
+  useEffect(() => {
+    if (open) {
+      setLocalName(initialName ?? '');
+    }
+  }, [open, initialName]);
+
+  const safeName = localName ?? '';
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth
@@ -100,9 +108,9 @@ export const SaveQueryDialog: React.FC<SaveQueryDialogProps> = ({
         <TextField
           fullWidth size="small" autoFocus
           label={t('argus.discover.queryName', 'Query Name')}
-          value={saveName}
-          onChange={(e) => onNameChange(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') onSave(); }}
+          value={safeName}
+          onChange={(e) => setLocalName(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && safeName.trim()) onSave(safeName); }}
           sx={{ mt: 1 }}
         />
       </DialogContent>
@@ -110,7 +118,7 @@ export const SaveQueryDialog: React.FC<SaveQueryDialogProps> = ({
         <Button onClick={onClose} sx={{ textTransform: 'none' }}>
           {t('common.cancel', 'Cancel')}
         </Button>
-        <Button variant="contained" onClick={onSave} disabled={!saveName.trim()}
+        <Button variant="contained" onClick={() => onSave(safeName)} disabled={!safeName.trim()}
           sx={{ textTransform: 'none', fontWeight: 700 }}>
           {t('common.save', 'Save')}
         </Button>

@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import {
-  Box, Typography, Button, IconButton, Tooltip,
+  Box, Typography, Button, IconButton, Chip,
   useTheme, alpha, CircularProgress, Collapse,
 } from '@mui/material';
+import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
@@ -27,6 +28,7 @@ import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatWith } from '@/utils/dateFormat';
+import { useResizableSplit } from '@/hooks/useResizableSplit';
 
 // Page-specific components
 import LogDetail from './components/LogDetail';
@@ -35,6 +37,8 @@ import LogsToolbar from './components/LogsToolbar';
 import LogsTablePanel from './components/LogsTablePanel';
 import LogsAggregatePanel from './components/LogsAggregatePanel';
 import { EditTableDialog, SaveQueryDialog, SavedQueriesDrawer } from './components/LogsDialogs';
+import LogsFacetSidebar, { FacetGroup } from './components/LogsFacetSidebar';
+import LogSidePanel from './components/LogSidePanel';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip, Legend);
 
@@ -54,7 +58,217 @@ const SEVERITY_COLORS: Record<string, string> = {
 
 const DEFAULT_COLUMNS = ['timestamp', 'severity', 'message'];
 
+/** Log row display density modes */
+export type DisplayDensity = 'compact' | 'default' | 'expanded';
+const DENSITY_PY: Record<DisplayDensity, number> = { compact: 0.15, default: 0.5, expanded: 1 };
+
+/* ─── Isolated Search Input Component ─── */
+
+const ArgusLogsSearchInput: React.FC<{
+  initialValue: string;
+  onDebouncedChange: (val: string) => void;
+  onSubmit: (val: string) => void;
+  isDark: boolean;
+  theme: any;
+  mappedFacets: any;
+}> = ({ initialValue, onDebouncedChange, onSubmit, isDark, theme, mappedFacets }) => {
+  const { t } = useTranslation();
+  const [localSearch, setLocalSearch] = useState(initialValue);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const [builderAnchorEl, setBuilderAnchorEl] = useState<HTMLElement | null>(null);
+
+  // Recent searches (persisted in localStorage)
+  const RECENT_KEY = 'argus_recent_log_searches';
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+    } catch { return []; }
+  });
+
+  const saveRecentSearch = (q: string) => {
+    if (!q.trim()) return;
+    setRecentSearches(prev => {
+      const next = [q.trim(), ...prev.filter(p => p !== q.trim())].slice(0, 10);
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem(RECENT_KEY);
+  };
+
+  useEffect(() => {
+    setLocalSearch(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onDebouncedChange(localSearch);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [localSearch, onDebouncedChange]);
+
+  const addSearchTag = (key: string, value: string, op: string = 'is') => {
+    const opStr = op === '!=' ? '!=' : ':';
+    const appendStr = `${key}${opStr}"${value}"`;
+
+    let newSearch = localSearch;
+    const colonMatch = localSearch.match(/([\w.-]+):([^\s]*)$/);
+    if (colonMatch && colonMatch[1] === key) {
+      newSearch = localSearch.substring(0, localSearch.length - colonMatch[0].length);
+    } else {
+      const bareMatch = localSearch.match(/([\w.-]+)$/);
+      if (bareMatch && bareMatch[1] === key) {
+        newSearch = localSearch.substring(0, localSearch.length - bareMatch[0].length);
+      }
+    }
+
+    const finalStr = (newSearch.trim() ? newSearch.trim() + ' ' : '') + appendStr + ' ';
+    setLocalSearch(finalStr);
+    onSubmit(finalStr.trim());
+    setSearchFocused(false);
+  };
+
+  const handleSearchKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      saveRecentSearch(localSearch.trim());
+      onSubmit(localSearch.trim());
+      setSearchFocused(false);
+    }
+  };
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <Box
+        ref={searchContainerRef}
+        sx={{
+          display: 'flex', alignItems: 'center', gap: 0.5, flex: 1,
+          px: 1, py: 0.2, borderRadius: '6px', minWidth: 500, minHeight: 30,
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+          transition: 'border-color 0.2s',
+          backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
+          '&:focus-within': { borderColor: theme.palette.primary.main, boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` },
+        }}
+      >
+        <SearchIcon sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }} />
+        <Box component="input"
+          value={localSearch}
+          spellCheck={false}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
+          onKeyDown={handleSearchKey as any}
+          onFocus={() => setSearchFocused(true)}
+          placeholder={t('argus.discover.searchPlaceholder', 'Search for events, users, tags (e.g. level:error OR browser:Chrome)')}
+          style={{
+            flex: 1, border: 'none', outline: 'none', backgroundColor: 'transparent',
+            color: 'inherit', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 500, minWidth: 120, padding: '6px 8px'
+          }}
+        />
+        {localSearch && (
+          <IconButton size="small" onClick={() => { setLocalSearch(''); onSubmit(''); }} sx={{ p: 0.2, mr: 0.5 }}>
+            <CloseIcon sx={{ fontSize: 14 }} />
+          </IconButton>
+        )}
+      </Box>
+
+      <SafeTooltip title={t('argus.builder.open', 'Open Query Builder')}>
+        <IconButton
+          size="small"
+          onClick={(e) => setBuilderAnchorEl(e.currentTarget)}
+          sx={{
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+            borderRadius: '6px', height: 30, width: 30,
+            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)'
+          }}
+        >
+          <FilterIcon sx={{ fontSize: 15 }} />
+        </IconButton>
+      </SafeTooltip>
+
+      <ArgusQueryBuilder
+        fields={['severity', 'service', 'environment', 'logger_name', 'trace_id', 'release']}
+        query={localSearch}
+        onApply={(q) => { setLocalSearch(q); onSubmit(q); }}
+        anchorEl={builderAnchorEl}
+        onClose={() => setBuilderAnchorEl(null)}
+      />
+
+      {/* Search Autocomplete Popover */}
+      <SearchAutocompletePopover
+        open={searchFocused}
+        anchorEl={searchContainerRef.current}
+        query={localSearch}
+        fields={['severity', 'service', 'environment', 'logger', 'trace_id', 'message']}
+        facets={mappedFacets}
+        isDark={isDark}
+        onSelectTag={(field, value) => {
+          addSearchTag(field, value);
+        }}
+        onSelectField={(field) => {
+          const tokens = localSearch.split(/\s+/);
+          const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + field + ':';
+          setLocalSearch(newCond);
+          searchContainerRef.current?.querySelector('input')?.focus();
+        }}
+        onSelectSyntax={(syntax) => {
+          const tokens = localSearch.split(/\s+/);
+          const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + syntax + ' ';
+          setLocalSearch(newCond);
+          searchContainerRef.current?.querySelector('input')?.focus();
+        }}
+        onClose={() => setSearchFocused(false)}
+        recentSearches={recentSearches}
+        onClearRecentSearches={clearRecentSearches}
+        onSelectRecentSearch={(q) => {
+          setLocalSearch(q);
+          onSubmit(q);
+          setSearchFocused(false);
+        }}
+      />
+    </Box>
+  );
+};
+
 /* ─── Main Component ─── */
+
+/**
+ * Extract free-text search terms from a query string (ignoring key:value pairs)
+ * and wrap matching substrings in the text with a highlighted <mark> element.
+ *
+ * - key:"value" and key:value patterns are skipped (they are field filters, not text searches)
+ * - AND/OR operators are skipped
+ * - Remaining tokens are treated as free-text search terms to highlight
+ */
+function highlightSearchTerms(text: string, query: string): React.ReactNode {
+  if (!query || !text) return text;
+
+  // Tokenize query: extract tokens that are NOT key:value pairs and NOT logical operators
+  const tokens = query.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+  const freeTextTerms = tokens
+    .filter(t => !/^[\w.-]+[:!=]/.test(t))  // skip key:value, key!=value
+    .filter(t => !['AND', 'OR', 'NOT'].includes(t.toUpperCase()))
+    .map(t => t.replace(/^"|"$/g, '').trim())  // strip quotes
+    .filter(t => t.length > 0);
+
+  if (freeTextTerms.length === 0) return text;
+
+  // Build regex from terms, escaping special chars
+  const escaped = freeTextTerms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+
+  const parts = text.split(regex);
+  if (parts.length === 1) return text;
+
+  // When splitting by a capturing group regex, matched segments appear
+  // at odd indices (1, 3, 5, ...) in the resulting array.
+  return parts.map((part, i) =>
+    i % 2 === 1
+      ? <mark key={i} style={{ backgroundColor: 'rgba(255,213,79,0.4)', borderRadius: 2, padding: '0 1px' }}>{part}</mark>
+      : part
+  );
+}
 
 const ArgusLogsPage: React.FC = () => {
   const theme = useTheme();
@@ -82,20 +296,29 @@ const ArgusLogsPage: React.FC = () => {
 
   // Derive filters from URL period
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
-    if (urlState.period === 'custom' && urlState.start && urlState.end) {
-      const base = defaultArgusFilterState('custom');
-      base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
-      return base;
+    if (urlState.period === 'custom') {
+      if (urlState.start && urlState.end) {
+        const base = defaultArgusFilterState('custom');
+        base.dateRange = { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) };
+        return base;
+      }
+      return defaultArgusFilterState('14d');
     }
     return defaultArgusFilterState(urlState.period);
   });
 
   useEffect(() => {
     setFilters(prev => {
-      if (urlState.period === 'custom' && urlState.start && urlState.end) {
+      if (urlState.period === 'custom') {
+        if (urlState.start && urlState.end) {
+          return {
+            ...prev,
+            dateRange: { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) }
+          };
+        }
         return {
           ...prev,
-          dateRange: { type: 'custom', start: new Date(urlState.start), end: new Date(urlState.end) }
+          dateRange: { type: 'preset', preset: '14d' }
         };
       }
       return {
@@ -104,6 +327,12 @@ const ArgusLogsPage: React.FC = () => {
       };
     });
   }, [urlState.period, urlState.start, urlState.end]);
+
+  useEffect(() => {
+    if (urlState.period === 'custom' && (!urlState.start || !urlState.end)) {
+      setUrlState({ period: '14d' });
+    }
+  }, [urlState.period, urlState.start, urlState.end, setUrlState]);
 
   // Search state
   const [search, setSearch] = useState<string>(urlState.q || '');
@@ -134,6 +363,56 @@ const ArgusLogsPage: React.FC = () => {
   const [gotoTime, setGotoTime] = useState('');
   const logContainerRef = useRef<HTMLDivElement>(null);
 
+  // Facet sidebar state
+  const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useState(false);
+
+  // Side panel state (selected log index in the current logs array)
+  const [selectedLogIndex, setSelectedLogIndex] = useState<number | null>(null);
+  const selectedLog = selectedLogIndex !== null ? logs[selectedLogIndex] || null : null;
+
+  // Resizable side panel splitter
+  const { splitWidth: panelWidth, isDragging: isPanelDragging, handleMouseDown: handlePanelSplitterMouseDown } = useResizableSplit({
+    storageKey: 'argus_log_panel_width',
+    defaultWidth: 420,
+    minWidth: 320,
+    maxWidth: 700,
+    invertDelta: true,
+  });
+
+  // Display density
+  const [displayDensity, setDisplayDensity] = useState<DisplayDensity>('default');
+
+  // ─── Active Filters (chip tags from facet sidebar / detail panel) ───
+  type ActiveFilter = { key: string; value: string; exclude: boolean; enabled: boolean };
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+
+  /** Toggle a facet chip filter. If already exists, toggle enabled; otherwise add as enabled. */
+  const toggleActiveFilter = useCallback((key: string, value: string, exclude: boolean = false) => {
+    setActiveFilters(prev => {
+      const idx = prev.findIndex(f => f.key === key && f.value === value && f.exclude === exclude);
+      if (idx >= 0) {
+        // Already exists — toggle enabled/disabled
+        return prev.map((f, i) => i === idx ? { ...f, enabled: !f.enabled } : f);
+      }
+      return [...prev, { key, value, exclude, enabled: true }];
+    });
+  }, []);
+
+  const removeActiveFilter = useCallback((idx: number) => {
+    setActiveFilters(prev => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const clearAllActiveFilters = useCallback(() => {
+    setActiveFilters([]);
+  }, []);
+
+  // Re-fetch when activeFilters change
+  useEffect(() => {
+    fetchLogs();
+    fetchVolume();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilters]);
+
   // Aggregates state
   const [aggData, setAggData] = useState<{
     groupBy: string;
@@ -141,10 +420,6 @@ const ArgusLogsPage: React.FC = () => {
     timeSeries: { bucket: string; group_value: string; count: number }[];
   } | null>(null);
   const [aggLoading, setAggLoading] = useState(false);
-
-  // Search Autocomplete State
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
 
   // Query Builder State
   const [builderAnchorEl, setBuilderAnchorEl] = useState<HTMLElement | null>(null);
@@ -184,11 +459,14 @@ const ArgusLogsPage: React.FC = () => {
     logger: facets.loggers?.map(l => ({ value: l.logger_name, count: Number(l.count) })) || [],
   }), [facets]);
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => setSearchDebounce(search), 400);
-    return () => clearTimeout(timer);
-  }, [search]);
+  // Build facet groups for the sidebar component
+  const facetGroups: FacetGroup[] = useMemo(() => [
+    { key: 'severity', label: t('argus.logs.facet.severity', 'Severity'), values: mappedFacets.severity },
+    { key: 'service', label: t('argus.logs.facet.service', 'Service'), values: mappedFacets.service },
+    { key: 'environment', label: t('argus.logs.facet.environment', 'Environment'), values: mappedFacets.environment },
+    { key: 'logger', label: t('argus.logs.facet.logger', 'Logger'), values: mappedFacets.logger },
+  ].filter(g => g.values.length > 0), [mappedFacets, t]);
+
 
   // ─── Fetch ───
   const fetchLogs = useCallback(async (append = false, cursor?: string) => {
@@ -206,17 +484,34 @@ const ArgusLogsPage: React.FC = () => {
       if (searchDebounce.trim()) params.search = searchDebounce.trim();
       if (cursor) params.cursor = cursor;
 
+      // Inject active chip filters into API params (only enabled ones)
+      for (const f of activeFilters) {
+        if (!f.enabled) continue;
+        if (f.exclude) {
+          // Exclude filters: prepend "!" to signal negation
+          params[`exclude_${f.key}`] = params[`exclude_${f.key}`]
+            ? `${params[`exclude_${f.key}`]},${f.value}` : f.value;
+        } else {
+          // Include filters: comma-separated for same key
+          const paramKey = f.key === 'severity' ? 'level' : f.key;
+          params[paramKey] = params[paramKey]
+            ? `${params[paramKey]},${f.value}` : f.value;
+        }
+      }
+
       const result = await argusService.browseLogs(projectId, params);
       const newLogs = result.data || [];
       if (append) {
         setLogs(prev => [...prev, ...newLogs]);
       } else {
         setLogs(newLogs);
+        setSelectedLogIndex(null);  // Reset selection when log list is replaced
       }
       setHasMore(result.meta?.hasMore || false);
     } catch (err) { console.error('Failed to fetch logs', err); }
     finally { setLoading(false); }
-  }, [projectId, filters, searchDebounce]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, filters, searchDebounce, activeFilters]);
 
   const fetchFacets = useCallback(async () => {
     try {
@@ -274,26 +569,38 @@ const ArgusLogsPage: React.FC = () => {
   }, [autoRefresh, fetchLogs, fetchVolume]);
 
   // ─── Handlers ───
-  const addSearchTag = (key: string, value: string, op: string = 'is') => {
+  const handleDebouncedSearchChange = useCallback((val: string) => {
+    setSearchDebounce(val);
+  }, []);
+
+  const handleSearchSubmit = useCallback((val: string) => {
+    setSearch(val);
+    setUrlState({ q: val });
+    setTimeout(() => fetchLogs(), 10);
+  }, [setUrlState, fetchLogs]);
+
+  const addSearchTag = useCallback((key: string, value: string, op: string = 'is') => {
     const opStr = op === '!=' ? '!=' : ':';
     const appendStr = `${key}${opStr}"${value}"`;
 
-    let newSearch = search;
-    const colonMatch = search.match(/([\w.-]+):([^\s]*)$/);
-    if (colonMatch && colonMatch[1] === key) {
-      newSearch = search.substring(0, search.length - colonMatch[0].length);
-    } else {
-      const bareMatch = search.match(/([\w.-]+)$/);
-      if (bareMatch && bareMatch[1] === key) {
-        newSearch = search.substring(0, search.length - bareMatch[0].length);
+    setSearch(prevSearch => {
+      let newSearch = prevSearch;
+      const colonMatch = prevSearch.match(/([\w.-]+):([^\s]*)$/);
+      if (colonMatch && colonMatch[1] === key) {
+        newSearch = prevSearch.substring(0, prevSearch.length - colonMatch[0].length);
+      } else {
+        const bareMatch = prevSearch.match(/([\w.-]+)$/);
+        if (bareMatch && bareMatch[1] === key) {
+          newSearch = prevSearch.substring(0, prevSearch.length - bareMatch[0].length);
+        }
       }
-    }
 
-    const finalStr = (newSearch.trim() ? newSearch.trim() + ' ' : '') + appendStr + ' ';
-    setSearch(finalStr);
-    setUrlState({ q: finalStr.trim() });
-    setSearchFocused(false);
-  };
+      const finalStr = (newSearch.trim() ? newSearch.trim() + ' ' : '') + appendStr + ' ';
+      setUrlState({ q: finalStr.trim() });
+      setTimeout(() => fetchLogs(), 10);
+      return finalStr;
+    });
+  }, [setUrlState, fetchLogs]);
 
   const toggleRow = useCallback((logId: string) => {
     setExpandedRows(prev => {
@@ -303,13 +610,22 @@ const ArgusLogsPage: React.FC = () => {
     });
   }, []);
 
-  const handleSearchKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setUrlState({ q: search.trim() });
-      setSearchFocused(false);
-      setTimeout(() => fetchLogs(), 10);
-    }
-  };
+  // Side panel handlers
+  const handleSelectLog = useCallback((index: number) => {
+    setSelectedLogIndex(index);
+  }, []);
+
+  const handleCloseSidePanel = useCallback(() => {
+    setSelectedLogIndex(null);
+  }, []);
+
+  const handlePrevLog = useCallback(() => {
+    setSelectedLogIndex(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
+  }, []);
+
+  const handleNextLog = useCallback(() => {
+    setSelectedLogIndex(prev => (prev !== null && prev < logs.length - 1) ? prev + 1 : prev);
+  }, [logs.length]);
 
   const handleLoadMore = useCallback(() => {
     if (logs.length > 0) fetchLogs(true, logs[logs.length - 1].timestamp);
@@ -341,8 +657,8 @@ const ArgusLogsPage: React.FC = () => {
   };
 
   const handleDetailFilter = useCallback((key: string, val: string, exclude: boolean) => {
-    addSearchTag(key, val, exclude ? '!=' : 'is');
-  }, [addSearchTag]);
+    toggleActiveFilter(key, val, exclude);
+  }, [toggleActiveFilter]);
 
   const handleGotoTimeSubmit = () => {
     if (gotoTime) {
@@ -372,18 +688,18 @@ const ArgusLogsPage: React.FC = () => {
   };
 
   // ─── Saved Query Handlers ───
-  const handleSaveQuery = async () => {
-    if (!saveName.trim()) return;
+  const handleSaveQuery = async (finalName: string) => {
+    if (!finalName.trim()) return;
     try {
       const res = await argusService.createSavedQuery(projectId, {
-        name: saveName.trim(),
+        name: finalName.trim(),
         query_config: { search: search.trim(), columns, period: currentPeriod, groupBy: aggGroupBy },
         display_type: 'table',
         query_type: 'logs',
       });
       const updated = await argusService.listSavedQueries(projectId, 'logs');
       setSavedQueries(updated);
-      setQueryName(saveName.trim());
+      setQueryName(finalName.trim());
       if (res.id) setCurrentQueryId(res.id);
       setSaveDialogOpen(false);
       setSaveName('');
@@ -437,8 +753,10 @@ const ArgusLogsPage: React.FC = () => {
             {log.level?.toUpperCase()}
           </Typography>
         );
-      case 'message':
-        return <Typography sx={{ fontSize: '0.73rem', ...(wrapLines ? { whiteSpace: 'pre-wrap', wordBreak: 'break-all' } : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }) }}>{log.message}</Typography>;
+      case 'message': {
+        const highlighted = highlightSearchTerms(log.message || '', searchDebounce);
+        return <Typography component="div" sx={{ fontSize: '0.73rem', ...(wrapLines ? { whiteSpace: 'pre-wrap', wordBreak: 'break-all' } : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }) }}>{highlighted}</Typography>;
+      }
       case 'service':
         return <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>{log.service || '—'}</Typography>;
       case 'environment':
@@ -451,7 +769,7 @@ const ArgusLogsPage: React.FC = () => {
             onClick={(e) => {
               if (log.trace_id) {
                 e.stopPropagation();
-                navigate(`/argus/explore/traces?q=trace_id:"${log.trace_id}"`);
+                navigate(`/argus/performance?trace=${log.trace_id}`, { state: { allowBack: true } });
               }
             }}
             sx={{
@@ -468,7 +786,7 @@ const ArgusLogsPage: React.FC = () => {
       default:
         return <Typography sx={{ fontSize: '0.72rem' }}>—</Typography>;
     }
-  }, [wrapLines, navigate]);
+  }, [wrapLines, navigate, searchDebounce]);
 
   // ─── Logs table content ───
   const logsTableContent = useMemo(() => (
@@ -488,24 +806,27 @@ const ArgusLogsPage: React.FC = () => {
           </Box>
         ) : (
           <>
-            {logs.map(log => {
+            {logs.map((log, idx) => {
               const levelColor = SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e';
-              const isExpanded = expandedRows.has(log.log_id);
+              const isSelected = selectedLogIndex === idx;
 
               return (
                 <Box key={log.log_id}>
                   <Box
                     data-log-row
                     sx={{
-                      display: 'flex', alignItems: 'center', px: 1.5, py: 0.5,
+                      display: 'flex', alignItems: 'center', px: 1.5, py: DENSITY_PY[displayDensity],
                       cursor: 'pointer', transition: 'background-color 0.1s',
-                      borderBottom: isExpanded ? 'none' : `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      backgroundColor: isSelected
+                        ? (isDark ? 'rgba(33,150,243,0.08)' : 'rgba(33,150,243,0.06)')
+                        : 'transparent',
                       '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.008)' },
+                      ...(isSelected && { borderLeft: `2px solid ${theme.palette.primary.main}` }),
                     }}
-                    onClick={() => toggleRow(log.log_id)}
+                    onClick={() => handleSelectLog(idx)}
                   >
                     <Box sx={{ width: 44, display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-                      {isExpanded ? <ExpandIcon sx={{ fontSize: 16, color: 'text.disabled' }} /> : <CollapseIcon sx={{ fontSize: 16, color: 'text.disabled' }} />}
                       <DotIcon sx={{ fontSize: 8, color: levelColor }} />
                     </Box>
 
@@ -519,10 +840,6 @@ const ArgusLogsPage: React.FC = () => {
                       </Box>
                     ))}
                   </Box>
-
-                  <Collapse in={isExpanded}>
-                    <LogDetail log={log} isDark={isDark} onFilter={handleDetailFilter} />
-                  </Collapse>
                 </Box>
               );
             })}
@@ -540,11 +857,12 @@ const ArgusLogsPage: React.FC = () => {
         )}
       </Box>
     </PageContentLoader>
-  ), [loading, logs, columns, expandedRows, isDark, theme, t, wrapLines, hasMore, logsFullscreen, handleLoadMore, toggleRow, renderCell, handleDetailFilter]);
+  ), [loading, logs, columns, expandedRows, isDark, theme, t, wrapLines, hasMore, logsFullscreen, handleLoadMore, toggleRow, renderCell, handleDetailFilter, selectedLogIndex, handleSelectLog, displayDensity]);
 
   /* ═══ RENDER ═══ */
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+      {/* ── Top: Header (full width) ── */}
       <PageHeader
         icon={<LogIcon />}
         title={
@@ -556,12 +874,12 @@ const ArgusLogsPage: React.FC = () => {
         subtitle={t('argus.logs.subtitle', 'Structured log explorer with trace-connected debugging')}
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Tooltip title={t('argus.logs.savedQueries', 'Saved Queries')}>
+            <SafeTooltip title={t('argus.logs.savedQueries', 'Saved Queries')}>
               <IconButton size="small" onClick={() => setSavedPanelOpen(true)}
                 sx={{ color: savedQueries.length > 0 ? theme.palette.primary.main : 'text.secondary' }}>
                 {savedQueries.length > 0 ? <BookmarkIcon sx={{ fontSize: 20 }} /> : <BookmarkBorderIcon sx={{ fontSize: 20 }} />}
               </IconButton>
-            </Tooltip>
+            </SafeTooltip>
             <Button
               size="small" variant="outlined" startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
               onClick={() => { setSaveName(queryName === defaultQueryName ? '' : queryName); setSaveDialogOpen(true); }}
@@ -577,6 +895,7 @@ const ArgusLogsPage: React.FC = () => {
         }
       />
 
+      {/* ── Top: Filter Bar (full width) ── */}
       <ArgusFilterBar
         projectId={projectId}
         value={filters}
@@ -585,150 +904,184 @@ const ArgusLogsPage: React.FC = () => {
         loading={loading}
         hideFilters={['browser', 'os']}
         extraControls={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Box
-              ref={searchContainerRef}
-              sx={{
-                display: 'flex', alignItems: 'center', gap: 0.5, flex: 1,
-                px: 1, py: 0.2, borderRadius: '6px', minWidth: 500, minHeight: 30,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                transition: 'border-color 0.2s',
-                backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-                '&:focus-within': { borderColor: theme.palette.primary.main, boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` },
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }} />
-              <Box component="input"
-                value={search}
-                spellCheck={false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-                onKeyDown={handleSearchKey as any}
-                onFocus={() => setSearchFocused(true)}
-                placeholder={t('argus.discover.searchPlaceholder', 'Search for events, users, tags (e.g. level:error OR browser:Chrome)')}
-                style={{
-                  flex: 1, border: 'none', outline: 'none', backgroundColor: 'transparent',
-                  color: 'inherit', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 500, minWidth: 120, padding: '6px 8px'
-                }}
-              />
-              {search && (
-                <IconButton size="small" onClick={() => { setSearch(''); setUrlState({ q: '' }); }} sx={{ p: 0.2, mr: 0.5 }}>
-                  <CloseIcon sx={{ fontSize: 14 }} />
-                </IconButton>
-              )}
-            </Box>
-
-            <Tooltip title={t('argus.builder.open', 'Open Query Builder')}>
-              <IconButton
-                size="small"
-                onClick={(e) => setBuilderAnchorEl(e.currentTarget)}
-                sx={{
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                  borderRadius: '6px', height: 30, width: 30,
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)'
-                }}
-              >
-                <FilterIcon sx={{ fontSize: 15 }} />
-              </IconButton>
-            </Tooltip>
-
-            <ArgusQueryBuilder
-              fields={['severity', 'service', 'environment', 'logger_name', 'trace_id', 'release']}
-              query={search}
-              onApply={(q) => { setSearch(q); setUrlState({ q }); }}
-              anchorEl={builderAnchorEl}
-              onClose={() => setBuilderAnchorEl(null)}
-            />
-
-            {/* Search Autocomplete Popover */}
-            <SearchAutocompletePopover
-              open={searchFocused}
-              anchorEl={searchContainerRef.current}
-              query={search}
-              fields={['severity', 'service', 'environment', 'logger', 'trace_id', 'message']}
-              facets={mappedFacets}
-              isDark={isDark}
-              onSelectTag={(field, value) => {
-                addSearchTag(field, value);
-                setSearch('');
-                setSearchFocused(false);
-              }}
-              onSelectField={(field) => {
-                const tokens = search.split(/\s+/);
-                const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + field + ':';
-                setSearch(newCond);
-                searchContainerRef.current?.querySelector('input')?.focus();
-              }}
-              onSelectSyntax={(syntax) => {
-                const tokens = search.split(/\s+/);
-                const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + syntax + ' ';
-                setSearch(newCond);
-                searchContainerRef.current?.querySelector('input')?.focus();
-              }}
-              onClose={() => setSearchFocused(false)}
-            />
-          </Box>
+          <ArgusLogsSearchInput
+            initialValue={search}
+            onDebouncedChange={handleDebouncedSearchChange}
+            onSubmit={handleSearchSubmit}
+            isDark={isDark}
+            theme={theme}
+            mappedFacets={mappedFacets}
+          />
         }
       />
 
-      {/* Facet Map */}
-      <DiscoverFacetMap
-        facets={mappedFacets}
-        onSelectFacet={(key, val, ex) => addSearchTag(key, val, ex ? '!=' : 'is')}
-        loading={loading}
-      />
-
-      {/* Volume Chart */}
-      <LogVolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleZoom} />
-
-      {/* Toolbar */}
-      <LogsToolbar
-        activeTab={activeTab}
-        onTabChange={(key) => { setUrlState({ tab: key }); if (key === '1' && !aggData) fetchAggregates(); }}
-        autoRefresh={autoRefresh}
-        onAutoRefreshToggle={() => setAutoRefresh(!autoRefresh)}
-        totalLogCount={totalLogCount}
-        displayCount={logs.length}
-        isDark={isDark}
-        onOpenEditTable={openEditTable}
-        onExport={handleExport}
-        wrapLines={wrapLines}
-        onWrapLinesToggle={() => setWrapLines(w => !w)}
-        logsFullscreen={logsFullscreen}
-        onFullscreenToggle={() => setLogsFullscreen(f => !f)}
-        showGotoTime={showGotoTime}
-        gotoTime={gotoTime}
-        onShowGotoTime={() => setShowGotoTime(true)}
-        onGotoTimeChange={setGotoTime}
-        onGotoTimeSubmit={handleGotoTimeSubmit}
-        onGotoTimeCancel={() => { setShowGotoTime(false); setGotoTime(''); }}
-      />
-
-      {/* Logs Tab */}
-      {activeTab === 0 && (
-        <LogsTablePanel
-          columns={columns}
-          logsFullscreen={logsFullscreen}
-          wrapLines={wrapLines}
-          logCount={logs.length}
-          isDark={isDark}
-          onExitFullscreen={() => setLogsFullscreen(false)}
-          onWrapLinesToggle={() => setWrapLines(w => !w)}
-        >
-          {logsTableContent}
-        </LogsTablePanel>
+      {/* ── Active Filter Chips ── */}
+      {activeFilters.length > 0 && (
+        <Box sx={{
+          display: 'flex', flexWrap: 'wrap', gap: 0.5, px: 2, py: 0.75,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          backgroundColor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
+          alignItems: 'center', flexShrink: 0,
+        }}>
+          {activeFilters.map((f, idx) => (
+            <Chip
+              key={`${f.key}-${f.value}-${f.exclude}-${idx}`}
+              label={`${f.key}${f.exclude ? ' ≠ ' : ': '}${f.value}`}
+              size="small"
+              onClick={() => {
+                // Toggle enabled/disabled on click
+                setActiveFilters(prev =>
+                  prev.map((item, i) => i === idx ? { ...item, enabled: !item.enabled } : item)
+                );
+              }}
+              onDelete={() => removeActiveFilter(idx)}
+              sx={{
+                height: 24, fontSize: '0.73rem', fontWeight: 600,
+                cursor: 'pointer',
+                backgroundColor: !f.enabled
+                  ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)')
+                  : f.exclude
+                    ? alpha(theme.palette.error.main, 0.12)
+                    : alpha(theme.palette.primary.main, 0.10),
+                color: !f.enabled
+                  ? 'text.disabled'
+                  : f.exclude ? theme.palette.error.main : theme.palette.primary.main,
+                borderRadius: '6px',
+                opacity: f.enabled ? 1 : 0.55,
+                textDecoration: f.enabled ? 'none' : 'line-through',
+                transition: 'all 0.15s ease',
+                '& .MuiChip-label': {
+                  textDecoration: f.enabled ? 'none' : 'line-through',
+                },
+                '& .MuiChip-deleteIcon': {
+                  fontSize: 14,
+                  color: !f.enabled
+                    ? 'text.disabled'
+                    : f.exclude ? theme.palette.error.main : theme.palette.primary.main,
+                  opacity: 0.6,
+                  '&:hover': { opacity: 1 },
+                },
+              }}
+            />
+          ))}
+          <Typography
+            component="span"
+            onClick={clearAllActiveFilters}
+            sx={{
+              fontSize: '0.7rem', color: 'text.disabled', cursor: 'pointer',
+              ml: 0.5, '&:hover': { color: 'text.secondary', textDecoration: 'underline' },
+            }}
+          >
+            {t('argus.logs.clearAll', 'Clear all')}
+          </Typography>
+        </Box>
       )}
 
-      {/* Aggregates Tab */}
-      {activeTab === 1 && (
-        <LogsAggregatePanel
-          aggData={aggData}
-          aggGroupBy={aggGroupBy}
-          aggLoading={aggLoading}
-          isDark={isDark}
-          onGroupByChange={(val) => { setUrlState({ groupBy: val }); fetchAggregates(val); }}
-          onAddFilter={(key, val) => addSearchTag(key, val)}
+      {/* ── Body: Sidebar + Content split ── */}
+      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left: Facets Sidebar */}
+        <LogsFacetSidebar
+          facets={facetGroups}
+          onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
+          collapsed={facetSidebarCollapsed}
+          onToggleCollapse={() => setFacetSidebarCollapsed(c => !c)}
+          loading={loading}
         />
-      )}
+
+        {/* Right: Main log content — separated from sidebar with a subtle border gap */}
+        <Box sx={{
+          flex: 1, overflow: 'auto', minWidth: 0,
+          pl: facetSidebarCollapsed ? 0.5 : 1.5,
+        }}>
+          {/* Volume Chart */}
+          <LogVolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleZoom} />
+
+          {/* Toolbar */}
+          <LogsToolbar
+            activeTab={activeTab}
+            onTabChange={(key) => { setUrlState({ tab: key }); if (key === '1' && !aggData) fetchAggregates(); }}
+            autoRefresh={autoRefresh}
+            onAutoRefreshToggle={() => setAutoRefresh(!autoRefresh)}
+            totalLogCount={totalLogCount}
+            displayCount={logs.length}
+            isDark={isDark}
+            onOpenEditTable={openEditTable}
+            onExport={handleExport}
+            wrapLines={wrapLines}
+            onWrapLinesToggle={() => setWrapLines(w => !w)}
+            logsFullscreen={logsFullscreen}
+            onFullscreenToggle={() => setLogsFullscreen(f => !f)}
+            showGotoTime={showGotoTime}
+            gotoTime={gotoTime}
+            onShowGotoTime={() => setShowGotoTime(true)}
+            onGotoTimeChange={setGotoTime}
+            onGotoTimeSubmit={handleGotoTimeSubmit}
+            onGotoTimeCancel={() => { setShowGotoTime(false); setGotoTime(''); }}
+            displayDensity={displayDensity}
+            onDensityChange={setDisplayDensity}
+          />
+
+          {/* Logs Tab */}
+          {activeTab === 0 && (
+            <LogsTablePanel
+              columns={columns}
+              logsFullscreen={logsFullscreen}
+              wrapLines={wrapLines}
+              logCount={logs.length}
+              isDark={isDark}
+              onExitFullscreen={() => setLogsFullscreen(false)}
+              onWrapLinesToggle={() => setWrapLines(w => !w)}
+            >
+              {logsTableContent}
+            </LogsTablePanel>
+          )}
+
+          {/* Aggregates Tab */}
+          {activeTab === 1 && (
+            <LogsAggregatePanel
+              aggData={aggData}
+              aggGroupBy={aggGroupBy}
+              aggLoading={aggLoading}
+              isDark={isDark}
+              onGroupByChange={(val) => { setUrlState({ groupBy: val }); fetchAggregates(val); }}
+              onAddFilter={(key, val) => toggleActiveFilter(key, val)}
+            />
+          )}
+        </Box>
+
+        {/* ── Splitter Handle + Right Side Panel ── */}
+        {selectedLogIndex !== null && (
+          <>
+            <Box
+              onMouseDown={handlePanelSplitterMouseDown}
+              sx={{
+                width: '1px', flexShrink: 0, cursor: 'col-resize',
+                bgcolor: isPanelDragging ? 'primary.main' : 'divider',
+                position: 'relative', zIndex: 10,
+                transition: 'background-color 0.15s, transform 0.15s',
+                transformOrigin: 'center',
+                ...(isPanelDragging && { bgcolor: 'primary.main', transform: 'scaleX(4)' }),
+                '&::after': {
+                  content: '""', position: 'absolute',
+                  top: 0, bottom: 0, left: '-5px', right: '-5px', cursor: 'col-resize',
+                },
+                '&:hover, &:active': { bgcolor: 'primary.main', transform: 'scaleX(4)' },
+              }}
+            />
+            <LogSidePanel
+              log={selectedLog}
+              open={selectedLogIndex !== null}
+              onClose={handleCloseSidePanel}
+              onPrev={handlePrevLog}
+              onNext={handleNextLog}
+              onFilter={handleDetailFilter}
+              hasPrev={selectedLogIndex !== null && selectedLogIndex > 0}
+              hasNext={selectedLogIndex !== null && selectedLogIndex < logs.length - 1}
+              width={panelWidth}
+            />
+          </>
+        )}
+      </Box>
 
       {/* Dialogs */}
       <EditTableDialog
@@ -742,9 +1095,8 @@ const ArgusLogsPage: React.FC = () => {
 
       <SaveQueryDialog
         open={saveDialogOpen}
-        saveName={saveName}
+        initialName={saveName}
         onClose={() => setSaveDialogOpen(false)}
-        onNameChange={setSaveName}
         onSave={handleSaveQuery}
       />
 

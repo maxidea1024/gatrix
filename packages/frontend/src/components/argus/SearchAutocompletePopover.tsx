@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Popover, useTheme, alpha } from '@mui/material';
+import { Box, Typography, Popover, Divider, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 export interface SearchAutocompleteFacet {
@@ -28,6 +28,12 @@ export interface SearchAutocompletePopoverProps {
   onSelectSyntax: (syntax: string) => void;
   /** Called to close the popover */
   onClose: () => void;
+  /** Recent search queries (stored externally, e.g. localStorage) */
+  recentSearches?: string[];
+  /** Called when user clicks 'Clear all' recent searches */
+  onClearRecentSearches?: () => void;
+  /** Called when user selects a recent search */
+  onSelectRecentSearch?: (query: string) => void;
 }
 
 /**
@@ -49,6 +55,9 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
   onSelectField,
   onSelectSyntax,
   onClose,
+  recentSearches = [],
+  onClearRecentSearches,
+  onSelectRecentSearch,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -77,18 +86,62 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
     >
       <Box sx={{ p: 1 }}>
         {(() => {
-          // Stage 2: User typed "field:" — show values from facets
           const colonMatch = query.match(/([\w.-]+):([^\s]*)$/);
 
+          // ── has: special case — suggest field names ──
+          if (colonMatch && colonMatch[1] === 'has') {
+            const partial = colonMatch[2].toLowerCase();
+            const matchedFields = partial
+              ? fields.filter(f => f.toLowerCase().includes(partial))
+              : fields;
+
+            if (matchedFields.length === 0) {
+              return (
+                <Typography sx={{ px: 1, py: 1, fontSize: '0.75rem', color: 'text.disabled', fontStyle: 'italic' }}>
+                  {partial
+                    ? t('argus.discover.pressEnterToUse', { val: `has:${partial}` })
+                    : t('argus.discover.typeFieldName', 'Type a field name')}
+                </Typography>
+              );
+            }
+
+            return (
+              <>
+                <Typography variant="caption" sx={{ px: 1, color: 'text.disabled', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                  {t('argus.discover.availableFields', 'Available Fields')}
+                </Typography>
+                {matchedFields.map(field => (
+                  <Box
+                    key={field}
+                    onClick={() => onSelectTag('has', field)}
+                    sx={{
+                      px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.78rem',
+                      '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                    }}
+                  >
+                    <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{field}</span>
+                  </Box>
+                ))}
+              </>
+            );
+          }
+
+          // ── Stage 2: field:value — show facet values ──
           if (colonMatch) {
             const fieldKey = colonMatch[1];
             const partialValue = colonMatch[2].toLowerCase();
+
+            // Check if this field actually has facets
             const values = (facets[fieldKey] || []) as SearchAutocompleteFacet[];
             const filtered = partialValue
               ? values.filter(v => v.value?.toLowerCase().includes(partialValue))
               : values;
 
             if (filtered.length === 0) {
+              // If the field isn't recognized at all, don't show a confusing empty state
+              if (values.length === 0 && !fields.includes(fieldKey)) {
+                return null;
+              }
               return (
                 <Typography sx={{ px: 1, py: 1, fontSize: '0.75rem', color: 'text.disabled', fontStyle: 'italic' }}>
                   {partialValue
@@ -118,7 +171,6 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
                         '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
                       }}
                     >
-                      {/* Background bar */}
                       <Box sx={{
                         position: 'absolute', left: 8, top: 2, bottom: 2,
                         width: `${pctOfTotal}%`, minWidth: pctOfTotal > 0 ? 4 : 0,
@@ -147,9 +199,9 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
             );
           }
 
-          // Stage 1: Show field keys + syntax
+          // ── Stage 1: field/syntax suggestions ──
           const tokens = query.split(/\s+/);
-          const lastToken = tokens[tokens.length - 1].toLowerCase();
+          const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
           const syntax = ['AND', 'OR'];
 
           const filteredFields = lastToken
@@ -158,9 +210,53 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
           const filteredSyntax = lastToken
             ? syntax.filter(s => s.toLowerCase().includes(lastToken))
             : syntax;
+          const showHas = !lastToken || 'has'.includes(lastToken);
+
+          // Plain text search: nothing matches — hide popover entirely
+          if (lastToken && filteredFields.length === 0 && filteredSyntax.length === 0 && !showHas) {
+            return null;
+          }
 
           return (
             <>
+              {/* Recent searches — shown when query is empty or minimal */}
+              {recentSearches.length > 0 && !lastToken && (
+                <>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1, mb: 0.5, mt: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 600 }}>
+                      {t('argus.logs.recentSearches', 'Recent searches')}
+                    </Typography>
+                    {onClearRecentSearches && (
+                      <Typography
+                        variant="caption"
+                        onClick={onClearRecentSearches}
+                        sx={{
+                          color: theme.palette.primary.main, cursor: 'pointer', fontWeight: 600,
+                          '&:hover': { textDecoration: 'underline' },
+                        }}
+                      >
+                        {t('argus.logs.clearAll', 'Clear all')}
+                      </Typography>
+                    )}
+                  </Box>
+                  {recentSearches.slice(0, 5).map((q, idx) => (
+                    <Box
+                      key={idx}
+                      onClick={() => onSelectRecentSearch?.(q)}
+                      sx={{
+                        px: 1.5, py: 0.5, cursor: 'pointer', borderRadius: '4px', fontSize: '0.75rem',
+                        fontFamily: 'monospace', color: 'text.secondary',
+                        '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {q}
+                    </Box>
+                  ))}
+                  <Divider sx={{ my: 0.5 }} />
+                </>
+              )}
+
               {filteredSyntax.length > 0 && (
                 <>
                   <Typography variant="caption" sx={{ px: 1, color: 'text.disabled', fontWeight: 600, display: 'block', mb: 0.5, mt: 0.5 }}>
@@ -188,8 +284,7 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
               <Typography variant="caption" sx={{ px: 1, color: 'text.disabled', fontWeight: 600, display: 'block', mb: 0.5 }}>
                 {t('argus.discover.suggestions', 'Suggested Fields')}
               </Typography>
-              {/* has: helper */}
-              {(!lastToken || 'has:'.includes(lastToken)) && (
+              {showHas && (
                 <Box
                   onClick={() => onSelectField('has')}
                   sx={{
@@ -215,11 +310,6 @@ const SearchAutocompletePopover: React.FC<SearchAutocompletePopoverProps> = ({
                   <span style={{ color: theme.palette.primary.main }}>{field}</span>:
                 </Box>
               ))}
-              {filteredFields.length === 0 && (!lastToken || !'has:'.includes(lastToken)) && (
-                <Typography sx={{ px: 1, py: 1, fontSize: '0.75rem', color: 'text.disabled', fontStyle: 'italic' }}>
-                  {t('argus.discover.noValues', 'No matching values')}
-                </Typography>
-              )}
             </>
           );
         })()}

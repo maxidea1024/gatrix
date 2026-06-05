@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import {
   Box,
@@ -94,6 +94,7 @@ const ArgusPerformancePage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
@@ -213,6 +214,11 @@ const ArgusPerformancePage: React.FC = () => {
   };
 
   const handleBack = () => {
+    // If navigated from another page (e.g., logs), use browser back
+    if (location.state?.allowBack) {
+      navigate(-1);
+      return;
+    }
     if (viewMode === 'trace') {
       setUrlState({ view: selectedTxn ? 'detail' : 'list', trace: '' });
       setTraceData(null);
@@ -303,7 +309,7 @@ const ArgusPerformancePage: React.FC = () => {
     const paths: { label: string; to?: string }[] = [
       { label: t('argus.performance.title'), to: viewMode !== 'list' ? `/argus/performance` : undefined }
     ];
-    if (viewMode === 'detail' || viewMode === 'trace') {
+    if (viewMode === 'detail' || (viewMode === 'trace' && (selectedTxn || urlState.txn))) {
       paths.push({ 
         label: (selectedTxn || urlState.txn) as string, 
         to: viewMode === 'trace' ? `/argus/performance?txn=${encodeURIComponent(selectedTxn || urlState.txn)}` : undefined 
@@ -324,6 +330,7 @@ const ArgusPerformancePage: React.FC = () => {
           <ArgusBreadcrumbs size="title" paths={breadcrumbPaths} />
         }
         subtitle={viewMode === 'list' ? t('argus.performance.subtitle') : undefined}
+        onBack={viewMode !== 'list' ? handleBack : undefined}
       />
 
       {/* Filter Bar + Sort */}

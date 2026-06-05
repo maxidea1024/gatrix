@@ -346,7 +346,8 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
   const timelineMinWidth = zoomLevel > 1 ? `${zoomLevel * 100}%` : undefined;
 
   return (
-    <Box ref={waterfallContainerRef} tabIndex={0} sx={{ outline: 'none' }}>
+    <>
+      <Box ref={waterfallContainerRef} tabIndex={0} sx={{ outline: 'none' }}>
       {/* Root transaction header */}
       {root && (
         <Paper elevation={0} sx={{
@@ -580,6 +581,8 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
         ↑↓ {t('argus.performance.navigate', 'navigate')} · Enter {t('argus.performance.select', 'select')} · Esc {t('argus.performance.close', 'close')} · / {t('argus.performance.search', 'search')} · {t('argus.performance.dblClickZoom', 'double-click to zoom')}
       </Typography>
 
+      </Box>
+
       {/* Hover tooltip rendered as fixed overlay to prevent layout/scrollbar interference */}
       {hoverTime !== null && hoverClientX !== null && hoverClientY !== null && document.body && createPortal(
         <Box sx={{
@@ -603,7 +606,7 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
         </Box>,
         document.body
       )}
-    </Box>
+    </>
   );
 };
 

@@ -38,42 +38,36 @@ export const getDragSelectPlugin = (
   return {
     id: 'dragSelect',
 
+    beforeEvent(chart: any) {
+      if (dragging) {
+        // Prevent Chart.js from processing mouse events (like showing tooltip) during drag
+        if (chart.tooltip) {
+          chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+        }
+        return false;
+      }
+    },
+
     afterInit(chart: any) {
       const canvas = chart.canvas as HTMLCanvasElement;
       canvas.style.cursor = 'crosshair';
 
-      const onMouseDown = (e: MouseEvent) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const xScale = chart.scales.x;
-        if (!xScale) return;
-        // Only start drag inside chart area
-        if (x >= xScale.left && x <= xScale.right) {
-          dragging = true;
-          startX = x;
-          currentX = x;
-          // Disable tooltip during drag
-          if (chart.options.plugins?.tooltip) {
-            chart.options.plugins.tooltip.enabled = false;
-          }
-        }
-      };
-
-      const onMouseMove = (e: MouseEvent) => {
+      const onPointerMove = (e: PointerEvent) => {
         if (!dragging) return;
         const rect = canvas.getBoundingClientRect();
         currentX = Math.max(chart.scales.x.left, Math.min(e.clientX - rect.left, chart.scales.x.right));
         chart.draw();
       };
 
-      const onMouseUp = () => {
+      const onPointerUp = (e: PointerEvent) => {
         if (!dragging) return;
         dragging = false;
-        // Re-enable tooltip
-        if (chart.options.plugins?.tooltip) {
-          chart.options.plugins.tooltip.enabled = true;
-        }
         chart.draw();
+
+        canvas.releasePointerCapture(e.pointerId);
+        canvas.removeEventListener('pointermove', onPointerMove);
+        canvas.removeEventListener('pointerup', onPointerUp);
+        canvas.removeEventListener('pointercancel', onPointerUp);
 
         const xScale = chart.scales.x;
         if (!xScale) return;
@@ -81,10 +75,8 @@ export const getDragSelectPlugin = (
         const x1 = Math.min(startX, currentX);
         const x2 = Math.max(startX, currentX);
 
-        // Require minimum 10px drag to avoid accidental clicks
         if (x2 - x1 < 10) return;
 
-        // Find label indices at both edges
         const startIdx = xScale.getValueForPixel(x1);
         const endIdx = xScale.getValueForPixel(x2);
 
@@ -97,33 +89,43 @@ export const getDragSelectPlugin = (
         }
       };
 
-      const onMouseLeave = () => {
-        if (dragging) {
-          dragging = false;
-          if (chart.options.plugins?.tooltip) {
-            chart.options.plugins.tooltip.enabled = true;
+      const onPointerDown = (e: PointerEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const xScale = chart.scales.x;
+        if (!xScale) return;
+        // Only start drag inside chart area
+        if (x >= xScale.left && x <= xScale.right) {
+          dragging = true;
+          startX = x;
+          currentX = x;
+          // Hide tooltip immediately when drag starts
+          if (chart.tooltip) {
+            chart.tooltip.setActiveElements([], { x: 0, y: 0 });
           }
           chart.draw();
+
+          canvas.setPointerCapture(e.pointerId);
+          canvas.addEventListener('pointermove', onPointerMove);
+          canvas.addEventListener('pointerup', onPointerUp);
+          canvas.addEventListener('pointercancel', onPointerUp);
         }
       };
 
-      canvas.addEventListener('mousedown', onMouseDown);
-      canvas.addEventListener('mousemove', onMouseMove);
-      canvas.addEventListener('mouseup', onMouseUp);
-      canvas.addEventListener('mouseleave', onMouseLeave);
+      canvas.addEventListener('pointerdown', onPointerDown);
 
       // Store handlers for cleanup
-      (chart as any).__dragHandlers = { onMouseDown, onMouseMove, onMouseUp, onMouseLeave };
+      (chart as any).__dragHandlers = { onPointerDown, onPointerMove, onPointerUp };
     },
 
     beforeDestroy(chart: any) {
       const handlers = (chart as any).__dragHandlers;
       if (handlers) {
         const canvas = chart.canvas as HTMLCanvasElement;
-        canvas.removeEventListener('mousedown', handlers.onMouseDown);
-        canvas.removeEventListener('mousemove', handlers.onMouseMove);
-        canvas.removeEventListener('mouseup', handlers.onMouseUp);
-        canvas.removeEventListener('mouseleave', handlers.onMouseLeave);
+        canvas.removeEventListener('pointerdown', handlers.onPointerDown);
+        canvas.removeEventListener('pointermove', handlers.onPointerMove);
+        canvas.removeEventListener('pointerup', handlers.onPointerUp);
+        canvas.removeEventListener('pointercancel', handlers.onPointerUp);
       }
     },
 
