@@ -11,6 +11,8 @@ import { createLogger } from './utils/logger';
 import { alertRuleStore } from './utils/alert-rule-store';
 import { dsnStore } from './utils/dsn-store';
 import { initShortIdCounters } from './processing/issue-grouper';
+import { configSubscriber } from './utils/config-subscriber';
+import { batchFlusher } from './utils/batch-flusher';
 
 const logger = createLogger('worker');
 
@@ -35,7 +37,11 @@ async function start() {
     logger.info('Initializing in-memory stores...');
     await alertRuleStore.init();
     await dsnStore.init();
+    await configSubscriber.init();
     await initShortIdCounters();
+
+    // Start batch flusher (Redis → MySQL periodic writes)
+    batchFlusher.start();
 
     // Start all workers
     const errorWorker = new ErrorWorker();
@@ -73,9 +79,11 @@ async function start() {
           cronSupervisorWorker.close(),
         ]);
 
-        // Close stores after workers
+        // Close stores and flusher after workers
+        await batchFlusher.close();
         await alertRuleStore.close();
         await dsnStore.close();
+        await configSubscriber.close();
 
         logger.info('All workers closed');
         process.exit(0);

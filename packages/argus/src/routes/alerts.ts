@@ -1,8 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { mysqlPool } from '../config/mysql';
+import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
+import { ConfigBroadcaster } from '../utils/config-broadcaster';
+import { CONFIG_TYPES } from '../config/redis-keys';
 
 const logger = createLogger('alerts-api');
+const broadcaster = new ConfigBroadcaster(redis);
 
 export default async function alertsRoutes(app: FastifyInstance) {
   // List alert rules for a project
@@ -83,6 +87,10 @@ export default async function alertsRoutes(app: FastifyInstance) {
           ]
         );
         const insertId = (result as any).insertId;
+
+        // Notify workers to reload alert rules for this project
+        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId: parseInt(projectId, 10) });
+
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to create alert rule', {
@@ -142,6 +150,10 @@ export default async function alertsRoutes(app: FastifyInstance) {
           `UPDATE g_argus_alert_rules SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           params
         );
+
+        // Notify workers to reload alert rules for this project
+        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId: parseInt(projectId, 10) });
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update alert rule', {
@@ -164,6 +176,10 @@ export default async function alertsRoutes(app: FastifyInstance) {
           'DELETE FROM g_argus_alert_rules WHERE id = ? AND project_id = ?',
           [ruleId, projectId]
         );
+
+        // Notify workers to reload alert rules for this project
+        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId: parseInt(projectId, 10) });
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete alert rule', {

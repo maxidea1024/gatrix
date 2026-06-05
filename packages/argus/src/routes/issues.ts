@@ -1,9 +1,13 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { mysqlPool } from '../config/mysql';
 import { clickhouse } from '../config/clickhouse';
+import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
+import { ConfigBroadcaster } from '../utils/config-broadcaster';
+import { CONFIG_TYPES } from '../config/redis-keys';
 
 const logger = createLogger('issues-api');
+const broadcaster = new ConfigBroadcaster(redis);
 
 
 
@@ -807,6 +811,14 @@ export default async function issuesRoutes(app: FastifyInstance) {
           logger.warn('Failed to record activity', { error: actErr instanceof Error ? actErr.message : String(actErr) });
         }
 
+        // Notify workers to invalidate issue cache if status changed
+        if (body.status) {
+          await broadcaster.publish({
+            type: CONFIG_TYPES.ISSUE_STATUS,
+            issueId: parseInt(issueId, 10),
+          });
+        }
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update issue', {
@@ -869,6 +881,16 @@ export default async function issuesRoutes(app: FastifyInstance) {
           count: body.issue_ids.length,
           status: body.status,
         });
+
+        // Notify workers to invalidate issue cache for each updated issue
+        if (body.status) {
+          for (const id of body.issue_ids) {
+            await broadcaster.publish({
+              type: CONFIG_TYPES.ISSUE_STATUS,
+              issueId: id,
+            });
+          }
+        }
 
         return reply.send({
           success: true,
