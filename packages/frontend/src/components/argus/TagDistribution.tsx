@@ -17,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueTagGroup } from '@/services/argusService';
 import { getBrowserIcon, getOsIcon } from '@/utils/brandIcons';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 interface TagDistributionProps {
   projectId: string;
@@ -48,9 +49,7 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
   const { t } = useTranslation();
   const [tags, setTags] = useState<ArgusIssueTagGroup[]>([]);
   const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState(() => {
-    try { return localStorage.getItem('argus:issue:tags-expanded') !== 'false'; } catch { return true; }
-  });
+  const [expanded, setExpanded] = useLocalStorage('argus_tags_expanded', true);
 
   const fetchTags = useCallback(async () => {
     setLoading(true);
@@ -74,11 +73,7 @@ const TagDistribution: React.FC<TagDistributionProps> = ({ projectId, issueId, i
     <Box id="argus-tag-distribution" sx={{ mb: 2 }}>
       {/* Header */}
       <Box
-        onClick={() => {
-          const next = !expanded;
-          setExpanded(next);
-          try { localStorage.setItem('argus:issue:tags-expanded', String(next)); } catch {}
-        }}
+        onClick={() => setExpanded(!expanded)}
         sx={{
           display: 'flex', alignItems: 'center', gap: 1,
           py: 0.5, cursor: 'pointer',

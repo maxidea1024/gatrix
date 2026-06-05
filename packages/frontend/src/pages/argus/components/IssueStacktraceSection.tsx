@@ -15,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ArgusErrorEvent } from '@/services/argusService';
 import { copyToClipboard } from '@/utils/clipboard';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import ExceptionChaining from '@/components/argus/ExceptionChaining';
 import StacktraceView from '@/components/argus/StacktraceView';
 
@@ -25,8 +26,8 @@ export interface IssueStacktraceSectionProps {
 
 const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, isDark }) => {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<'relevant' | 'full'>('relevant');
-  const [order, setOrder] = useState<'recent' | 'oldest'>('recent');
+  const [mode, setMode] = useLocalStorage<'relevant' | 'full'>('argus_stacktrace_mode', 'relevant');
+  const [order, setOrder] = useLocalStorage<'recent' | 'oldest'>('argus_stacktrace_order', 'recent');
   const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
 
   const handleCopyRaw = () => {

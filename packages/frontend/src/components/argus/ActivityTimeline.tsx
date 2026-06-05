@@ -7,6 +7,7 @@ import {
   useTheme,
   alpha,
   CircularProgress,
+  Collapse,
   Link,
 } from '@mui/material';
 import {
@@ -17,10 +18,13 @@ import {
   Comment as CommentIcon,
   Merge as MergeIcon,
   PriorityHigh as PriorityIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueActivity } from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 // ==================== Props ====================
 
@@ -91,6 +95,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
   const [showAll, setShowAll] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [sectionExpanded, setSectionExpanded] = useLocalStorage('argus_activity_expanded', true);
 
   const fetchActivities = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -241,21 +246,36 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
   return (
     <Box>
       {/* Header */}
-      <Typography variant="caption" fontWeight={700} sx={{
-        fontSize: '0.7rem',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        color: 'text.secondary',
-        display: 'flex', alignItems: 'center', gap: 0.5,
-        mb: 1,
-      }}>
-        {t('argus.activity.title')}
-        {activities.length > 0 && (
-          <Typography component="span" sx={{ color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}>
-            ({activities.length})
-          </Typography>
-        )}
-      </Typography>
+      <Box
+        onClick={() => setSectionExpanded(!sectionExpanded)}
+        sx={{
+          display: 'flex', alignItems: 'center', gap: 0.5,
+          mb: 1, cursor: 'pointer',
+          '&:hover': { opacity: 0.8 },
+        }}
+      >
+        <Typography variant="caption" fontWeight={700} sx={{
+          fontSize: '0.7rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          color: 'text.secondary',
+          display: 'flex', alignItems: 'center', gap: 0.5,
+          flex: 1,
+        }}>
+          {t('argus.activity.title')}
+          {activities.length > 0 && (
+            <Typography component="span" sx={{ color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}>
+              ({activities.length})
+            </Typography>
+          )}
+        </Typography>
+        {sectionExpanded
+          ? <ExpandLessIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+          : <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+        }
+      </Box>
+
+      <Collapse in={sectionExpanded}>
 
       {/* Comment input */}
       <Box sx={{
@@ -341,6 +361,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
           })()}
         </Box>
       )}
+      </Collapse>
     </Box>
   );
 };
