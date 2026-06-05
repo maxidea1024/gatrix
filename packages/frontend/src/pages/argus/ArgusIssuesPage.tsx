@@ -458,28 +458,54 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
 
-  // ─── Facet data from loaded issues ───
-  const countBy = useCallback((field: keyof ArgusIssue) => {
-    const counts = new Map<string, number>();
-    issues.forEach(issue => {
-      const val = issue[field];
-      if (val != null && val !== '') {
-        const key = String(val);
-        counts.set(key, (counts.get(key) || 0) + 1);
-      }
-    });
-    return Array.from(counts.entries())
-      .map(([value, count]) => ({ value, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [issues]);
+  // ─── Facet data (separate fetch without activeFilters) ───
+  const [facetData, setFacetData] = useState<{ level: {value: string; count: number}[]; status: {value: string; count: number}[]; platform: {value: string; count: number}[]; assigned_to: {value: string; count: number}[]; priority: {value: string; count: number}[] }>({ level: [], status: [], platform: [], assigned_to: [], priority: [] });
 
-  const mappedFacets = useMemo(() => ({
-    level: countBy('level'),
-    status: countBy('status'),
-    platform: countBy('platform'),
-    assigned_to: countBy('assigned_to'),
-    priority: countBy('priority'),
-  }), [countBy]);
+  const fetchFacets = useCallback(async () => {
+    try {
+      const dateParams = argusDateRangeToApiParams(filters.dateRange);
+      const params: ArgusIssueListParams = {
+        status: status || undefined,
+        level: level || undefined,
+        sort,
+        limit: 1000,
+        offset: 0,
+        query: searchDebounce || undefined,
+        ...dateParams,
+        substatus: substatus || undefined,
+        assigned_to: assignedTo || undefined,
+      };
+      const result = await argusService.listIssues(projectId, params);
+      const allIssues = result.data;
+
+      const countByField = (field: keyof ArgusIssue) => {
+        const counts = new Map<string, number>();
+        allIssues.forEach(issue => {
+          const val = issue[field];
+          if (val != null && val !== '') {
+            const key = String(val);
+            counts.set(key, (counts.get(key) || 0) + 1);
+          }
+        });
+        return Array.from(counts.entries())
+          .map(([value, count]) => ({ value, count }))
+          .sort((a, b) => b.count - a.count);
+      };
+
+      setFacetData({
+        level: countByField('level'),
+        status: countByField('status'),
+        platform: countByField('platform'),
+        assigned_to: countByField('assigned_to'),
+        priority: countByField('priority'),
+      });
+    } catch { /* ignore */ }
+  }, [projectId, filters, status, level, sort, searchDebounce, substatus, assignedTo]);
+
+  // Fetch facets on base filter changes (NOT on activeFilters change)
+  useEffect(() => { fetchFacets(); }, [fetchFacets]);
+
+  const mappedFacets = facetData;
 
   const facetGroups: FacetGroup[] = useMemo(() => [
     { key: 'level', label: t('argus.issues.level', 'Level'), values: mappedFacets.level },
@@ -489,11 +515,53 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { key: 'priority', label: t('argus.issues.priority', 'Priority'), values: mappedFacets.priority },
   ].filter(g => g.values.length > 0), [mappedFacets, t]);
 
-  // Re-fetch when activeFilters change
+  // Re-fetch displayed issues when activeFilters change
   useEffect(() => {
     fetchIssues();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFilters]);
+
+  // ─── Custom Facets (user-defined attribute keys) ───
+  const CUSTOM_FACETS_KEY = 'argus_issue_custom_facets';
+  const [customFacetKeys, setCustomFacetKeys] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(CUSTOM_FACETS_KEY) || '[]'); }
+    catch { return []; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(CUSTOM_FACETS_KEY, JSON.stringify(customFacetKeys));
+  }, [customFacetKeys]);
+
+  const customFacetData: FacetGroup[] = useMemo(() => {
+    if (customFacetKeys.length === 0) return [];
+    // For issues, custom facets try to count by arbitrary issue field
+    return customFacetKeys.map(key => {
+      const counts = new Map<string, number>();
+      issues.forEach(issue => {
+        const val = (issue as any)[key];
+        if (val != null && val !== '') {
+          const k = String(val);
+          counts.set(k, (counts.get(k) || 0) + 1);
+        }
+      });
+      return {
+        key: `attr.${key}`,
+        label: key,
+        values: Array.from(counts.entries())
+          .map(([value, count]) => ({ value, count }))
+          .sort((a, b) => b.count - a.count),
+      } as FacetGroup;
+    });
+  }, [customFacetKeys, issues]);
+
+  const handleAddCustomFacet = useCallback((key: string) => {
+    setCustomFacetKeys(prev => prev.includes(key) ? prev : [...prev, key]);
+  }, []);
+
+  const handleRemoveCustomFacet = useCallback((facetKey: string) => {
+    const realKey = facetKey.startsWith('attr.') ? facetKey.slice(5) : facetKey;
+    setCustomFacetKeys(prev => prev.filter(k => k !== realKey));
+  }, []);
 
   // ─── Render ────────────────────────────────────────────────────
 
@@ -658,7 +726,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               ml: 0.5, '&:hover': { color: 'text.secondary', textDecoration: 'underline' },
             }}
           >
-            {t('argus.issues.clearAll', 'Clear all')}
+            {t('argus.logs.clearAll', 'Clear all')}
           </Typography>
         </Box>
       )}
@@ -674,6 +742,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             collapsed={facetCollapsed}
             onToggleCollapse={() => setFacetCollapsed(c => !c)}
             loading={loading}
+            customFacets={customFacetData}
+            onAddCustomFacet={handleAddCustomFacet}
+            onRemoveCustomFacet={handleRemoveCustomFacet}
           />
           {!facetCollapsed && (
             <Box

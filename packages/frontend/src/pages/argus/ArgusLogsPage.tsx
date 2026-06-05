@@ -24,6 +24,7 @@ import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterS
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
 import SearchAutocompletePopover, { SearchAutocompletePopoverHandle } from '@/components/argus/SearchAutocompletePopover';
+import { ArgusSearchInput } from '@/components/argus/ArgusSearchInput';
 import argusService, { ArgusLogEntry, ArgusSavedQuery } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
