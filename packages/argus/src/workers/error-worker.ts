@@ -10,6 +10,7 @@ import { evaluateErrorAlerts } from '../utils/alert-evaluator';
 import { ArgusErrorEvent } from '../types/events';
 import { QUEUES } from '../config/redis-keys';
 import { pipelineConfig } from '../config/pipeline-config';
+import { recordEventForIssue } from '../utils/event-counter';
 
 const logger = createLogger('error-worker');
 
@@ -116,7 +117,15 @@ export class ErrorWorker {
         fingerprint
       );
 
-      // 4. Evaluate alert rules (fire-and-forget — never block event processing)
+      // 4. Record event in Redis counters (for alert frequency evaluation)
+      recordEventForIssue(
+        rawEvent.project_id,
+        groupResult.issue_id,
+        rawEvent.event_id,
+        (rawEvent as any).user?.id || (rawEvent as any).user_id
+      ).catch(() => {}); // fire-and-forget
+
+      // 5. Evaluate alert rules (fire-and-forget — never block event processing)
       evaluateErrorAlerts(
         {
           event_id: rawEvent.event_id,

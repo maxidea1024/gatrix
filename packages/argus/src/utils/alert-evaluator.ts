@@ -1,8 +1,12 @@
 import { mysqlPool } from '../config/mysql';
-import { clickhouse } from '../config/clickhouse';
 import { createLogger } from './logger';
 import { IssueGroupResult } from '../processing/issue-grouper';
 import { alertRuleStore } from './alert-rule-store';
+import {
+  getEventCountInWindow as redisEventCount,
+  getUniqueUserCount as redisUserCount,
+  getProjectEventCount as redisProjectCount,
+} from './event-counter';
 
 const logger = createLogger('alert-evaluator');
 
@@ -161,7 +165,7 @@ export async function evaluateErrorAlerts(
           } else if (cond.type === 'event_frequency') {
             const threshold = cond.value || 10;
             const interval = cond.interval || 3600;
-            const count = await getEventCountInWindow(event.project_id, event.issue_id, interval);
+            const count = await redisEventCount(event.project_id, event.issue_id, interval);
             if (count >= threshold) {
               condMatched = true;
               condReason = `Event frequency threshold: ${count} events in ${formatInterval(interval)}`;
@@ -169,7 +173,7 @@ export async function evaluateErrorAlerts(
           } else if (cond.type === 'user_count') {
             const threshold = cond.value || 10;
             const interval = cond.interval || 3600;
-            const count = await getUniqueUserCountInWindow(event.project_id, event.issue_id, interval);
+            const count = await redisUserCount(event.project_id, event.issue_id);
             if (count >= threshold) {
               condMatched = true;
               condReason = `User count threshold: ${count} users in ${formatInterval(interval)}`;
@@ -202,7 +206,7 @@ export async function evaluateErrorAlerts(
           } else if (cond.type === 'project_error_rate') {
             const threshold = cond.value || 100;
             const interval = cond.interval || 3600;
-            const count = await getProjectEventCountInWindow(event.project_id, interval);
+            const count = await redisProjectCount(event.project_id);
             if (count >= threshold) {
               condMatched = true;
               condReason = `Project error rate threshold: ${count} events in ${formatInterval(interval)}`;
@@ -259,62 +263,7 @@ export async function evaluateErrorAlerts(
   }
 }
 
-async function getEventCountInWindow(
-  projectId: string, issueId: number, intervalSeconds: number
-): Promise<number> {
-  try {
-    const result = await clickhouse.query({
-      query: `SELECT count() as cnt FROM argus.errors
-              WHERE project_id = {projectId:String}
-                AND issue_id = {issueId:UInt64}
-                AND timestamp >= now() - INTERVAL {interval:UInt32} SECOND`,
-      query_params: { projectId, issueId, interval: intervalSeconds },
-    });
-    const data = (await result.json()) as any;
-    return Number(data?.[0]?.cnt || 0);
-  } catch (e) {
-    logger.warn('Failed to query event count', { error: (e as Error).message });
-    return 0;
-  }
-}
 
-async function getProjectEventCountInWindow(
-  projectId: string, intervalSeconds: number
-): Promise<number> {
-  try {
-    const result = await clickhouse.query({
-      query: `SELECT count() as cnt FROM argus.errors
-              WHERE project_id = {projectId:String}
-                AND timestamp >= now() - INTERVAL {interval:UInt32} SECOND`,
-      query_params: { projectId, interval: intervalSeconds },
-    });
-    const data = (await result.json()) as any;
-    return Number(data?.[0]?.cnt || 0);
-  } catch (e) {
-    logger.warn('Failed to query project event count', { error: (e as Error).message });
-    return 0;
-  }
-}
-
-async function getUniqueUserCountInWindow(
-  projectId: string, issueId: number, intervalSeconds: number
-): Promise<number> {
-  try {
-    const result = await clickhouse.query({
-      query: `SELECT uniq(user_id) as cnt FROM argus.errors
-              WHERE project_id = {projectId:String}
-                AND issue_id = {issueId:UInt64}
-                AND timestamp >= now() - INTERVAL {interval:UInt32} SECOND
-                AND user_id != ''`,
-      query_params: { projectId, issueId, interval: intervalSeconds },
-    });
-    const data = (await result.json()) as any;
-    return Number(data?.[0]?.cnt || 0);
-  } catch (e) {
-    logger.warn('Failed to query user count', { error: (e as Error).message });
-    return 0;
-  }
-}
 
 function shouldFireForError(rule: AlertRule, event: ErrorEventData): boolean {
   // Check environment filter
