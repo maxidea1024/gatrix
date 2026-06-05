@@ -4,19 +4,13 @@ import {
   Typography,
   Paper,
   Chip,
-  TextField,
-  InputAdornment,
   useTheme,
   alpha,
-  Tooltip,
-  IconButton,
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import {
-  Search as SearchIcon,
   BugReport as BugReportIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +30,7 @@ import SimplePagination from '@/components/common/SimplePagination';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
-import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
+
 import { ArgusSearchInput } from '@/components/argus/ArgusSearchInput';
 import SavedSearchesSidebar, { SavedSearch } from '@/components/argus/SavedSearchesSidebar';
 import { useArgusRealtime } from '@/hooks/useArgusRealtime';
@@ -167,7 +161,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [merging, setMerging] = useState(false);
-  const [queryBuilderAnchor, setQueryBuilderAnchor] = useState<HTMLElement | null>(null);
+
   const [members, setMembers] = useState<any[]>([]);
   const [assigneeAnchor, setAssigneeAnchor] = useState<{ el: HTMLElement; issue: ArgusIssue } | null>(null);
 
@@ -386,11 +380,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     setAssignedTo(viewAssignedTo);
   };
 
-  const handleQueryBuilderApply = (query: string) => {
-    setSearchInput(query);
-    setStoreSearch(query);
-    setCurrentPage(1);
-  };
+
 
   const handleDateRangeSelect = (start: Date, end: Date) => {
     setFilters(prev => ({
@@ -474,7 +464,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         extraControls={
           <>
             <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
-            <Box sx={{ flex: 1, minWidth: 260, maxWidth: 600 }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <ArgusSearchInput
                 initialValue={storeSearch}
                 onDebouncedChange={(val) => setSearchInput(val)}
@@ -486,32 +476,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                 isDark={isDark}
                 theme={theme}
                 mappedFacets={mappedFacets}
+                fields={QUERY_BUILDER_FIELDS}
               />
             </Box>
-            <Tooltip title={t('argus.builder.title', 'Visual Query Builder')}>
-              <IconButton
-                size="small"
-                onClick={(e) => setQueryBuilderAnchor(e.currentTarget)}
-                sx={{
-                  width: 26, height: 26,
-                  border: '1px solid',
-                  borderColor: queryBuilderAnchor ? 'primary.main' : 'divider',
-                  borderRadius: '6px',
-                  backgroundColor: queryBuilderAnchor ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
-                  '&:hover': { borderColor: 'primary.main', backgroundColor: alpha(theme.palette.primary.main, 0.04) },
-                }}
-              >
-                <SearchIcon sx={{ fontSize: 14, color: queryBuilderAnchor ? 'primary.main' : 'text.disabled' }} />
-              </IconButton>
-            </Tooltip>
-            <ArgusQueryBuilder
-              fields={QUERY_BUILDER_FIELDS}
-              query={searchInput}
-              facets={mappedFacets}
-              onApply={handleQueryBuilderApply}
-              anchorEl={queryBuilderAnchor}
-              onClose={() => setQueryBuilderAnchor(null)}
-            />
             <FilterChipSelect
               label={t('argus.issues.status')}
               value={status}

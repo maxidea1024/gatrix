@@ -18,7 +18,13 @@ export const ArgusSearchInput: React.FC<{
   theme: any;
   mappedFacets: any;
   activeFilters?: any[];
-}> = ({ initialValue, onDebouncedChange, onSubmit, isDark, theme, mappedFacets, activeFilters }) => {
+  fields?: string[];
+}> = ({ initialValue, onDebouncedChange, onSubmit, isDark, theme, mappedFacets, activeFilters, fields: fieldsProp }) => {
+  // Derive fields from prop or facet keys
+  const fields = useMemo(() => {
+    if (fieldsProp && fieldsProp.length > 0) return fieldsProp;
+    return Object.keys(mappedFacets || {});
+  }, [fieldsProp, mappedFacets]);
   const { t } = useTranslation();
   const [localSearch, setLocalSearch] = useState(initialValue);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -228,7 +234,7 @@ export const ArgusSearchInput: React.FC<{
         onClick={() => inputRef.current?.focus()}
         sx={{
           display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, flexWrap: 'wrap',
-          px: 1, py: 0.3, borderRadius: '6px', minWidth: 500, minHeight: 30,
+          px: 1, py: 0.3, borderRadius: '6px', minWidth: 0, minHeight: 30,
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
           transition: 'border-color 0.2s', cursor: 'text',
           backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
@@ -302,7 +308,7 @@ export const ArgusSearchInput: React.FC<{
       </SafeTooltip>
 
       <ArgusQueryBuilder
-        fields={['severity', 'service', 'environment', 'logger_name', 'trace_id', 'release']}
+        fields={fields}
         query={localSearch}
         facets={mappedFacets}
         activeFilters={activeFilters}
@@ -317,7 +323,7 @@ export const ArgusSearchInput: React.FC<{
         open={searchFocused}
         anchorEl={searchContainerRef.current}
         query={normalizedQuery}
-        fields={['severity', 'service', 'environment', 'logger', 'trace_id', 'message']}
+        fields={fields}
         facets={mappedFacets}
         isDark={isDark}
         onSelectTag={(field, value) => {
@@ -342,42 +348,4 @@ export const ArgusSearchInput: React.FC<{
   );
 };
 
-/* ─── Main Component ─── */
-
-/**
- * Extract free-text search terms from a query string (ignoring key:value pairs)
- * and wrap matching substrings in the text with a highlighted <mark> element.
- *
- * - key:"value" and key:value patterns are skipped (they are field filters, not text searches)
- * - AND/OR operators are skipped
- * - Remaining tokens are treated as free-text search terms to highlight
- */
-function highlightSearchTerms(text: string, query: string): React.ReactNode {
-  if (!query || !text) return text;
-
-  // Tokenize query: extract tokens that are NOT key:value pairs and NOT logical operators
-  const tokens = query.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-  const freeTextTerms = tokens
-    .filter(t => !/^[\w.-]+[:!=]/.test(t))  // skip key:value, key!=value
-    .filter(t => !['AND', 'OR', 'NOT'].includes(t.toUpperCase()))
-    .map(t => t.replace(/^"|"$/g, '').trim())  // strip quotes
-    .filter(t => t.length > 0);
-
-  if (freeTextTerms.length === 0) return text;
-
-  // Build regex from terms, escaping special chars
-  const escaped = freeTextTerms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
-
-  const parts = text.split(regex);
-  if (parts.length === 1) return text;
-
-  // When splitting by a capturing group regex, matched segments appear
-  // at odd indices (1, 3, 5, ...) in the resulting array.
-  return parts.map((part, i) =>
-    i % 2 === 1
-      ? <mark key={i} style={{ backgroundColor: 'rgba(255,213,79,0.4)', borderRadius: 2, padding: '0 1px' }}>{part}</mark>
-      : part
-  );
-}
 
