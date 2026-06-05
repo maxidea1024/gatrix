@@ -4,7 +4,6 @@ import {
   Typography,
   Chip,
   Divider,
-  Button,
   useTheme,
   alpha,
   Tooltip,
@@ -12,7 +11,6 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  ButtonGroup,
 } from '@mui/material';
 import {
   ErrorOutline as ErrorIcon,
@@ -152,60 +150,69 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
       {/* Action Bar */}
       <Box
         sx={{
-          py: 1.5, mb: 2, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap',
+          py: 1, mb: 2, display: 'flex', gap: 0.8, alignItems: 'center', flexWrap: 'wrap',
           borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
         }}
       >
         {/* Status Badge */}
-        <Box sx={{
-          px: 1.5, py: 0.8, display: 'flex', alignItems: 'center', gap: 1,
-          backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12),
-          color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',
-          borderRadius: 1.5,
-        }}>
-          <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {t(`argus.issues.${issue.status}`, issue.status)}
-          </Typography>
-          {issue.substatus === 'regressed' && (
-            <Chip label={t('argus.issues.regressed', 'Regressed')} size="small" sx={{
-              fontWeight: 700, fontSize: '0.65rem', height: 18,
-              backgroundColor: alpha('#ff9800', 0.15), color: '#ff9800', border: 'none',
-            }} />
-          )}
-          {issue.is_regression && (
-            <Chip label={t('argus.issues.regression')} size="small" sx={{
-              fontWeight: 700, fontSize: '0.65rem', height: 18,
-              backgroundColor: alpha('#ff9800', 0.12), color: '#ff9800', border: 'none',
-            }} />
-          )}
+        <Chip
+          label={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                {t(`argus.issues.${issue.status}`, issue.status)}
+              </Typography>
+              {issue.substatus === 'regressed' && (
+                <Typography component="span" sx={{ fontSize: '0.62rem', fontWeight: 600, color: '#ff9800' }}>
+                  {t('argus.issues.regressed', 'Regressed')}
+                </Typography>
+              )}
+              {issue.is_regression && (
+                <Typography component="span" sx={{ fontSize: '0.62rem', fontWeight: 600, color: '#ff9800' }}>
+                  {t('argus.issues.regression')}
+                </Typography>
+              )}
+            </Box>
+          }
+          size="small"
+          sx={{
+            height: 28, borderRadius: '6px', border: 'none',
+            backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12),
+            color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',
+            '& .MuiChip-label': { px: 1.2 },
+          }}
+        />
+
+        {/* Status Change */}
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <Chip
+            icon={issue.status === 'resolved' ? <ErrorIcon sx={{ fontSize: '14px !important' }} /> : <CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
+            label={issue.status === 'resolved' ? t('argus.issues.reopen') : t('argus.issues.resolve')}
+            size="small"
+            onClick={() => handleStatusRequest(issue.status === 'resolved' ? 'unresolved' : 'resolved')}
+            sx={{
+              height: 28, borderRadius: '6px', border: 'none',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
+              '& .MuiChip-icon': { color: 'inherit', ml: 0.8 },
+              '& .MuiChip-label': { px: 0.8 },
+              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+            }}
+          />
+          <Chip
+            icon={<ExpandMoreIcon sx={{ fontSize: '16px !important' }} />}
+            size="small"
+            onClick={(e) => setStatusMenuAnchor(e.currentTarget)}
+            sx={{
+              height: 28, borderRadius: '6px', border: 'none', minWidth: 28,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              color: 'text.secondary',
+              '& .MuiChip-icon': { color: 'inherit', ml: 0.5, mr: -0.5 },
+              '& .MuiChip-label': { display: 'none' },
+              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+            }}
+          />
         </Box>
 
-        {/* Status Change ButtonGroup */}
-        <Box>
-          <ButtonGroup size="small" variant="outlined" disableElevation sx={{
-            height: 28,
-            '& .MuiButton-root': {
-              fontSize: '0.78rem', textTransform: 'none', px: 2,
-              color: 'text.primary',
-              borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-            }
-          }}>
-            <Button
-              onClick={() => handleStatusRequest(issue.status === 'resolved' ? 'unresolved' : 'resolved')}
-              startIcon={issue.status === 'resolved' ? <ErrorIcon /> : <CheckCircleIcon />}
-              sx={{ borderTopLeftRadius: 6, borderBottomLeftRadius: 6 }}
-            >
-              {issue.status === 'resolved' ? t('argus.issues.reopen') : t('argus.issues.resolve')}
-            </Button>
-            <Button
-              size="small"
-              onClick={(e) => setStatusMenuAnchor(e.currentTarget)}
-              sx={{ px: 0.5, borderTopRightRadius: 6, borderBottomRightRadius: 6, minWidth: 0 }}
-            >
-              <ExpandMoreIcon fontSize="small" />
-            </Button>
-          </ButtonGroup>
           <Menu
             anchorEl={statusMenuAnchor}
             open={Boolean(statusMenuAnchor)}
@@ -259,29 +266,37 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               </MenuItem>
             )}
           </Menu>
-        </Box>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
         {/* Priority & Assignee */}
-        <ButtonGroup size="small" variant="outlined" sx={{
-          height: 28,
-          '& .MuiButton-root': {
-            fontSize: '0.75rem', textTransform: 'none', px: 1.5,
-            color: 'text.primary',
-            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-          }
-        }}>
-          <Button onClick={(e) => setPriorityAnchor(e.currentTarget)}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800', mr: 1 }} />
-            {PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
-          </Button>
-          <Button onClick={onAssigneeClick}>
-            <PersonIcon sx={{ fontSize: 14, mr: 0.5, color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />
-            {issue.assigned_to ? issue.assigned_to : t('argus.issues.unassigned', 'Unassigned')}
-          </Button>
-        </ButtonGroup>
+        <Chip
+          icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800' }} />}
+          label={PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
+          size="small"
+          onClick={(e) => setPriorityAnchor(e.currentTarget)}
+          sx={{
+            height: 28, borderRadius: '6px', border: 'none',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+            color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
+            '& .MuiChip-icon': { ml: 0.8 },
+            '& .MuiChip-label': { px: 0.8 },
+            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+          }}
+        />
+
+        <Chip
+          icon={<PersonIcon sx={{ fontSize: '14px !important', color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />}
+          label={issue.assigned_to ? issue.assigned_to : t('argus.issues.unassigned', 'Unassigned')}
+          size="small"
+          onClick={onAssigneeClick}
+          sx={{
+            height: 28, borderRadius: '6px', border: 'none',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+            color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
+            '& .MuiChip-icon': { ml: 0.8 },
+            '& .MuiChip-label': { px: 0.8 },
+            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+          }}
+        />
 
         <Menu
           anchorEl={priorityAnchor}
@@ -297,20 +312,21 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           ))}
         </Menu>
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.3 }} />
 
         {/* AI Analysis */}
-        <Button variant="outlined" size="small" onClick={onAiAnalysis}
+        <Chip
+          label={t('argus.issues.aiAnalysis', 'AI 분석')}
+          size="small"
+          onClick={onAiAnalysis}
           sx={{
-            height: 28, fontSize: '0.75rem',
-            borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-            color: 'primary.main', fontWeight: 600,
-            textTransform: 'none', px: 2,
-            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08), borderColor: 'primary.main' }
+            height: 28, borderRadius: '6px', border: 'none',
+            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            color: 'primary.main', fontWeight: 700, fontSize: '0.75rem',
+            '& .MuiChip-label': { px: 1.2 },
+            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.18) },
           }}
-        >
-          {t('argus.issues.aiAnalysis', 'AI 분석')}
-        </Button>
+        />
 
         {/* Right side items */}
         <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
