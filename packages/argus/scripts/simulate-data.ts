@@ -2093,6 +2093,18 @@ async function main() {
     const env = randomPick(['production', 'production', 'staging']);
     const release = randomPick([...SERVER_RELEASES, ...CLIENT_RELEASES]);
 
+    // ~30% of feedback has screenshot attachments
+    const hasAttachments = Math.random() < 0.3;
+    const attachments: string[] = [];
+    if (hasAttachments) {
+      const numAttachments = randomInt(1, 3);
+      for (let a = 0; a < numAttachments; a++) {
+        const w = randomPick([800, 1024, 1280, 1920]);
+        const h = randomPick([600, 768, 720, 1080]);
+        attachments.push(`https://picsum.photos/seed/${uuid().substring(0, 8)}/${w}/${h}`);
+      }
+    }
+
     feedbackBatch.push({
       feedback_id: uuid(),
       project_id: PROJECT_ID,
@@ -2107,6 +2119,7 @@ async function main() {
       release,
       source: randomPick(['widget', 'dialog', 'api']),
       tags: {},
+      attachments,
     });
   }
 
