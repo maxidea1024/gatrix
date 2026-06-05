@@ -210,6 +210,8 @@ function generateSqlPreview(rules: Rule[], activeFilters?: ActiveFilter[]): stri
 }
 
 const HighlightedQuery: React.FC<{ sql: string; isDark: boolean }> = ({ sql, isDark }) => {
+  const { t } = useTranslation();
+
   if (!sql) {
     return (
       <Box sx={{
@@ -218,7 +220,7 @@ const HighlightedQuery: React.FC<{ sql: string; isDark: boolean }> = ({ sql, isD
         borderRadius: 1, border: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
         color: 'text.disabled', fontStyle: 'italic',
       }}>
-        No valid conditions to generate a query.
+        {t('argus.builder.noConditions', 'No valid conditions to generate a query.')}
       </Box>
     );
   }
