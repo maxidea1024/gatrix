@@ -182,6 +182,28 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     maxWidth: 400,
   });
 
+  // ─── Active Filters (chip tags from facet sidebar) ─────────────
+  type ActiveFilter = { key: string; value: string; exclude: boolean; enabled: boolean };
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+
+  const toggleActiveFilter = useCallback((key: string, value: string, exclude: boolean = false) => {
+    setActiveFilters(prev => {
+      const idx = prev.findIndex(f => f.key === key && f.value === value && f.exclude === exclude);
+      if (idx >= 0) {
+        return prev.map((f, i) => i === idx ? { ...f, enabled: !f.enabled } : f);
+      }
+      return [...prev, { key, value, exclude, enabled: true }];
+    });
+  }, []);
+
+  const removeActiveFilter = useCallback((idx: number) => {
+    setActiveFilters(prev => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const clearAllActiveFilters = useCallback(() => {
+    setActiveFilters([]);
+  }, []);
+
   // ─── Real-time SSE ──────────────────────────────────────────────
   const { newIssueCount, resetNewIssueCount } = useArgusRealtime(
     String(projectId),
@@ -267,6 +289,17 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   }, [searchInput, storeSearch, setStoreSearch]);
 
   // ─── Fetch issues ──────────────────────────────────────────────
+  /** Merge search text + active chip filters into a single query string */
+  const buildSearchWithFilters = useCallback((): string | undefined => {
+    const parts: string[] = [];
+    if (searchDebounce.trim()) parts.push(searchDebounce.trim());
+    for (const f of activeFilters) {
+      if (!f.enabled) continue;
+      parts.push(`${f.exclude ? '!' : ''}${f.key}:${f.value}`);
+    }
+    return parts.length > 0 ? parts.join(' ') : undefined;
+  }, [searchDebounce, activeFilters]);
+
   const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
@@ -277,7 +310,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         sort,
         limit: rowsPerPage,
         offset: (currentPage - 1) * rowsPerPage,
-        query: searchDebounce || undefined,
+        query: buildSearchWithFilters(),
         environment: filters.environments.length === 1 ? filters.environments[0] : undefined,
         browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
         os: filters.os.length === 1 ? filters.os[0] : undefined,
@@ -295,7 +328,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     } finally {
       setLoading(false);
     }
-  }, [projectId, status, level, sort, currentPage, rowsPerPage, searchDebounce, filters, substatus, assignedTo]);
+  }, [projectId, status, level, sort, currentPage, rowsPerPage, buildSearchWithFilters, filters, substatus, assignedTo]);
 
   // Persist page size
   useEffect(() => {
@@ -456,15 +489,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { key: 'priority', label: t('argus.issues.priority', 'Priority'), values: mappedFacets.priority },
   ].filter(g => g.values.length > 0), [mappedFacets, t]);
 
-  /** Handle facet click → append to search query as chip */
-  const handleFacetFilter = useCallback((key: string, value: string, exclude?: boolean) => {
-    const prefix = exclude ? '!' : '';
-    const chip = `${prefix}${key}:${value}`;
-    const newQuery = storeSearch ? `${storeSearch} AND ${chip}` : chip;
-    setStoreSearch(newQuery);
-    setSearchInput(newQuery);
-    setCurrentPage(1);
-  }, [storeSearch, setStoreSearch, setCurrentPage]);
+  // Re-fetch when activeFilters change
+  useEffect(() => {
+    fetchIssues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilters]);
 
   // ─── Render ────────────────────────────────────────────────────
 
@@ -573,6 +602,67 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         onDateRangeSelect={handleDateRangeSelect}
       />
 
+      {/* ── Active Filter Chips ── */}
+      {activeFilters.length > 0 && (
+        <Box sx={{
+          display: 'flex', flexWrap: 'wrap', gap: 0.5, px: 2, py: 0.75,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          backgroundColor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
+          alignItems: 'center', flexShrink: 0,
+        }}>
+          {activeFilters.map((f, idx) => (
+            <Chip
+              key={`${f.key}-${f.value}-${f.exclude}-${idx}`}
+              label={`${f.key}${f.exclude ? ' ≠ ' : ': '}${f.value}`}
+              size="small"
+              onClick={() => {
+                setActiveFilters(prev =>
+                  prev.map((item, i) => i === idx ? { ...item, enabled: !item.enabled } : item)
+                );
+              }}
+              onDelete={() => removeActiveFilter(idx)}
+              sx={{
+                height: 24, fontSize: '0.73rem', fontWeight: 600,
+                cursor: 'pointer',
+                backgroundColor: !f.enabled
+                  ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)')
+                  : f.exclude
+                    ? alpha(theme.palette.error.main, 0.12)
+                    : alpha(theme.palette.primary.main, 0.10),
+                color: !f.enabled
+                  ? 'text.disabled'
+                  : f.exclude ? theme.palette.error.main : theme.palette.primary.main,
+                borderRadius: '6px',
+                opacity: f.enabled ? 1 : 0.55,
+                textDecoration: f.enabled ? 'none' : 'line-through',
+                transition: 'all 0.15s ease',
+                '& .MuiChip-label': {
+                  textDecoration: f.enabled ? 'none' : 'line-through',
+                },
+                '& .MuiChip-deleteIcon': {
+                  fontSize: 14,
+                  color: !f.enabled
+                    ? 'text.disabled'
+                    : f.exclude ? theme.palette.error.main : theme.palette.primary.main,
+                  opacity: 0.6,
+                  '&:hover': { opacity: 1 },
+                },
+              }}
+            />
+          ))}
+          <Typography
+            component="span"
+            onClick={clearAllActiveFilters}
+            sx={{
+              fontSize: '0.7rem', color: 'text.disabled', cursor: 'pointer',
+              ml: 0.5, '&:hover': { color: 'text.secondary', textDecoration: 'underline' },
+            }}
+          >
+            {t('argus.issues.clearAll', 'Clear all')}
+          </Typography>
+        </Box>
+      )}
+
       {/* Issues content area with sidebar */}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left: Facet Sidebar */}
@@ -580,7 +670,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
-            onFilter={(key, val, exclude) => handleFacetFilter(key, val, exclude)}
+            onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
             collapsed={facetCollapsed}
             onToggleCollapse={() => setFacetCollapsed(c => !c)}
             loading={loading}
