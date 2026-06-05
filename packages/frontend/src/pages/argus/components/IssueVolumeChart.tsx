@@ -12,6 +12,7 @@ interface IssueVolumeChartProps {
   filters: ArgusFilterState;
   status: string;
   level: string;
+  query?: string;
   /** Called when user drag-selects a date range on the chart */
   onDateRangeSelect?: (start: Date, end: Date) => void;
 }
@@ -25,6 +26,7 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
   filters,
   status,
   level,
+  query,
   onDateRangeSelect,
 }) => {
   const theme = useTheme();
@@ -43,6 +45,7 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
         ...dateParams,
         status: status || undefined,
         level: level || undefined,
+        query: query || undefined,
       });
       setVolumeData(data);
     } catch (e) {
@@ -51,7 +54,7 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
     } finally {
       setVolumeLoading(false);
     }
-  }, [projectId, filters, status, level]);
+  }, [projectId, filters, status, level, query]);
 
   useEffect(() => { fetchVolume(); }, [fetchVolume]);
 

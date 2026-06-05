@@ -761,6 +761,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             filters={filters}
             status={status}
             level={level}
+            query={buildSearchWithFilters()}
             onDateRangeSelect={handleDateRangeSelect}
           />
 
