@@ -426,7 +426,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
         display: open ? 'flex' : 'none',
         flexDirection: 'column',
-        pl: 0.5,
+        pl: 1.5,
       }}
     >
       {/* ── Header ── */}
