@@ -443,7 +443,7 @@ const ArgusLogsPage: React.FC = () => {
         setLogs(prev => [...prev, ...newLogs]);
       } else {
         setLogs(newLogs);
-        setSelectedLogIndex(null);  // Reset selection when log list is replaced
+        setUrlState({ log: '' });  // Reset selection when log list is replaced
       }
       setHasMore(result.meta?.hasMore || false);
     } catch (err) { console.error('Failed to fetch logs', err); }
