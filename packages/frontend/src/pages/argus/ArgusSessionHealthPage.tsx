@@ -41,7 +41,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusSessionHealth, ArgusIssue } from '@/services/argusService';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import IssueListItem from '@/components/argus/IssueListItem';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
@@ -516,76 +516,18 @@ const ArgusSessionHealthPage: React.FC = () => {
               <Typography variant="body2" color="text.secondary">{loading ? t('common.loading') : t('argus.sessions.noData')}</Typography>
             </Box>
           ) : (
-            topIssues.map((issue, idx) => {
-              const levelColor = issue.level === 'fatal' ? '#f44336' : issue.level === 'error' ? '#ff5722' : '#ff9800';
-              return (
-                <Box
-                  key={issue.id}
-                  onClick={() => navigate(`/argus/issues/${projectId}/${issue.id}`)}
-                  sx={{
-                    display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.2,
-                    borderBottom: idx < topIssues.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` : 'none',
-                    cursor: 'pointer', transition: 'all 0.15s',
-                    position: 'relative',
-                    '&:hover': {
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      transform: 'translateX(4px)',
-                      '&::before': { content: '""', position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, backgroundColor: levelColor, borderTopRightRadius: 3, borderBottomRightRadius: 3 }
-                    },
-                  }}
-                >
-                  <Chip
-                    label={issue.level}
-                    size="small"
-                    sx={{
-                      height: 18, fontSize: '0.58rem', fontWeight: 700, minWidth: 40,
-                      backgroundColor: alpha(levelColor, 0.1), color: levelColor, border: 'none',
-                    }}
-                  />
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={600} noWrap sx={{ mb: 0.1 }}>
-                      {issue.title}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: isDark ? '#666' : '#aaa', display: 'block', fontSize: '0.68rem' }} noWrap>
-                      {issue.culprit || issue.fingerprint?.slice(0, 16)}
-                    </Typography>
-                  </Box>
-                  {/* 24h Sparkline */}
-                  {issue.stats_24h && issue.stats_24h.length > 0 && (() => {
-                    const sparkData = issue.stats_24h!;
-                    const max = Math.max(...sparkData, 1);
-                    const w = 40, h = 16;
-                    const points = sparkData.map((v, i) =>
-                      `${(i / (sparkData.length - 1)) * w},${h - (v / max) * h}`
-                    ).join(' ');
-                    return (
-                      <svg width={w} height={h} style={{ flexShrink: 0 }}>
-                        <polyline points={points} fill="none" stroke={levelColor} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" opacity={0.7} />
-                      </svg>
-                    );
-                  })()}
-                  <Box sx={{ textAlign: 'center', minWidth: 44 }}>
-                    <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1.2, fontSize: '0.82rem' }}>
-                      {Number(issue.event_count || 0).toLocaleString()}
-                    </Typography>
-                    <Typography variant="caption" sx={{ fontSize: '0.58rem', color: isDark ? '#666' : '#aaa' }}>
-                      {t('argus.issues.events')}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'center', minWidth: 36 }}>
-                    <Typography variant="body2" fontWeight={600} sx={{ lineHeight: 1.2, fontSize: '0.82rem' }}>
-                      {Number(issue.user_count || 0).toLocaleString()}
-                    </Typography>
-                    <Typography variant="caption" sx={{ fontSize: '0.58rem', color: isDark ? '#666' : '#aaa' }}>
-                      {t('argus.issues.users')}
-                    </Typography>
-                  </Box>
-                  <Typography variant="caption" sx={{ fontSize: '0.68rem', color: isDark ? '#555' : '#bbb', minWidth: 30, textAlign: 'right' }}>
-                    {issue.last_seen ? formatRelativeTime(issue.last_seen) : '-'}
-                  </Typography>
-                </Box>
-              );
-            })
+            topIssues.map((issue, idx) => (
+              <IssueListItem
+                key={issue.id}
+                issue={issue}
+                onClick={() => navigate(`/argus/issues/${projectId}/${issue.id}`)}
+                showSparkline
+                showLastSeen
+                showDivider={idx < topIssues.length - 1}
+                isFirst={idx === 0}
+                isLast={idx === topIssues.length - 1}
+              />
+            ))
           )}
         </Paper>
 

@@ -245,3 +245,47 @@ Never use `window.alert()` or `window.prompt()`. Use MUI Dialog components inste
 - 기본 폰트(D2Coding + sans-serif fallback)는 `body`에서 전역 적용
 - 고정폭이 필요한 경우 `<code>`, `<pre>`, `<kbd>`, `<samp>` 태그 사용
 - 외부 라이브러리 스타일 오버라이드 등 **특수한 경우에만** 예외 허용
+
+## Shared Components: No Inline Rendering
+
+동일한 데이터 아이템(이슈, 피드백, 릴리즈 등)을 여러 페이지에서 렌더링할 때, **절대로** 인라인으로 직접 렌더링하지 마세요. 반드시 공용 컴포넌트를 사용하거나, 없으면 만들어서 사용하세요.
+
+**이유:** 인라인 렌더링은 code bloating, 스타일 불일치, 유지보수 비용 증가를 초래합니다.
+
+**기존 공용 아이템 컴포넌트:**
+
+| 컴포넌트 | 위치 | 용도 |
+|---------|------|------|
+| `IssueListItem` | `@/components/argus/IssueListItem` | 이슈 목록 아이템 (full/compact 모드) |
+| `FeedbackListItem` | `@/pages/argus/components/FeedbackListItem` | 피드백 목록 아이템 |
+| `EmptyPlaceholder` | `@/components/common/EmptyPlaceholder` | 섹션 빈 상태 |
+| `EmptyPagePlaceholder` | `@/components/common/EmptyPagePlaceholder` | 페이지 빈 상태 |
+
+**❌ 하지 마세요:**
+```tsx
+// ❌ 이슈를 페이지마다 인라인으로 렌더링
+topIssues.map(issue => (
+  <Box onClick={...} sx={{ display: 'flex', ... }}>
+    <Chip label={issue.level} />
+    <Typography>{issue.title}</Typography>
+    {/* ... 50줄 이상의 중복 렌더링 코드 */}
+  </Box>
+))
+```
+
+**✅ 공용 컴포넌트를 사용하세요:**
+```tsx
+// ✅ IssueListItem 사용
+topIssues.map(issue => (
+  <IssueListItem
+    key={issue.id}
+    issue={issue}
+    onClick={() => navigate(`/argus/issues/${projectId}/${issue.id}`)}
+    showSparkline
+    showLastSeen
+    compact  // 위젯/사이드바에서는 compact 모드 사용
+  />
+))
+```
+
+> **원칙:** 새로운 페이지에서 기존 데이터 타입의 리스트 아이템을 렌더링해야 할 때, 먼저 기존 공용 컴포넌트가 있는지 확인하고, 필요한 옵션(compact, showCheckbox 등)이 없으면 기존 컴포넌트에 prop을 추가하세요.
