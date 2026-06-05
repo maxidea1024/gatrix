@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 export interface UseResizableSplitOptions {
   /** localStorage key to persist width */
@@ -28,7 +28,10 @@ export interface UseResizableSplitReturn {
 
 /**
  * Reusable hook for resizable split panels.
- * Persists the width to localStorage and handles mouse drag events.
+ *
+ * Performance: During drag, width is updated via requestAnimationFrame to
+ * limit React re-renders to at most once per paint frame. localStorage is
+ * only written on mouseup (not on every pixel move).
  */
 export function useResizableSplit({
   storageKey,
@@ -43,34 +46,54 @@ export function useResizableSplit({
   });
   const [isDragging, setIsDragging] = useState(false);
 
+  // Ref to track pending rAF so we can cancel stale frames
+  const rafRef = useRef<number | null>(null);
+  // Ref to track the latest width during drag (for mouseup persist)
+  const latestWidthRef = useRef(splitWidth);
+  latestWidthRef.current = splitWidth;
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
     const startX = e.clientX;
-    const startWidth = splitWidth;
+    const startWidth = latestWidthRef.current;
 
     const onMouseMove = (ev: MouseEvent) => {
       const rawDelta = ev.clientX - startX;
       const delta = invertDelta ? -rawDelta : rawDelta;
       const newWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
-      setSplitWidth(newWidth);
+
+      // Throttle state updates to one per animation frame
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      rafRef.current = requestAnimationFrame(() => {
+        setSplitWidth(newWidth);
+        rafRef.current = null;
+      });
     };
+
     const onMouseUp = () => {
+      // Cancel any pending rAF
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       setIsDragging(false);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+
+      // Persist to localStorage only once on drag end
+      localStorage.setItem(storageKey, String(latestWidthRef.current));
     };
+
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
-  }, [splitWidth, minWidth, maxWidth, invertDelta]);
-
-  useEffect(() => {
-    localStorage.setItem(storageKey, String(splitWidth));
-  }, [storageKey, splitWidth]);
+  }, [storageKey, minWidth, maxWidth, invertDelta]);
 
   return { splitWidth, isDragging, handleMouseDown };
 }
