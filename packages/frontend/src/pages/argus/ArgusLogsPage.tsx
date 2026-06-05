@@ -149,13 +149,16 @@ const ArgusLogsSearchInput: React.FC<{
         if (key === 'has') {
           chipList.push({ type: 'has', raw: tok, key: 'has', value: val });
         } else {
-          // Only treat as completed chip if value is quoted (i.e. fully completed)
+          // Completed if: quoted value OR unquoted value that is followed by space (not at end of input)
           const rawVal = clean.slice(ci + 1);
           const isQuoted = (rawVal.startsWith('"') && rawVal.endsWith('"')) || (rawVal.startsWith("'") && rawVal.endsWith("'"));
-          if (isQuoted) {
+          const matchEnd = match.index + match[0].length;
+          const hasTrailingSpace = matchEnd < text.length && text[matchEnd] === ' ';
+          const isComplete = isQuoted || (rawVal.length > 0 && hasTrailingSpace);
+          if (isComplete) {
             chipList.push({ type: isNeg ? 'negated' : 'filter', raw: tok, key, value: val });
           } else {
-            // Not completed yet (e.g. severity:err) — leave as remainder
+            // Not completed yet (e.g. severity: with no value) — leave as remainder
             break;
           }
         }
