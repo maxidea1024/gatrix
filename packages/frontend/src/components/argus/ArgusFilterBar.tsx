@@ -173,7 +173,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
       {extraControls}
 
       {/* Spacer */}
-      <Box sx={{ flex: 1 }} />
+      <Box sx={{ flex: 1, minWidth: 0 }} />
 
       {/* Date Range Picker — always rightmost */}
       <DateRangeSelector
