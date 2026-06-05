@@ -372,4 +372,4 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
   );
 };
 
-export default IssueActionBar;
+export default React.memo(IssueActionBar);

@@ -235,4 +235,4 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
   );
 };
 
-export default IssueContextSection;
+export default React.memo(IssueContextSection);

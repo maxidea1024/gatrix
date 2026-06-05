@@ -151,4 +151,4 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
   );
 };
 
-export default IssueDetailSidebar;
+export default React.memo(IssueDetailSidebar);

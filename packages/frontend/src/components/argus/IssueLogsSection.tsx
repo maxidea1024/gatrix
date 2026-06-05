@@ -460,4 +460,4 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({ projectId, issueId,
   );
 };
 
-export default IssueLogsSection;
+export default React.memo(IssueLogsSection);

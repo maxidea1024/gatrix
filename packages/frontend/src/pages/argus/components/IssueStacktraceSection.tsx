@@ -151,4 +151,4 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
   );
 };
 
-export default IssueStacktraceSection;
+export default React.memo(IssueStacktraceSection);

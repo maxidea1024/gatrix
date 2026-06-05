@@ -179,4 +179,4 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
   );
 };
 
-export default SpanEvidenceSection;
+export default React.memo(SpanEvidenceSection);

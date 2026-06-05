@@ -300,4 +300,4 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({ project
   );
 };
 
-export default EventDistributionChart;
+export default React.memo(EventDistributionChart);

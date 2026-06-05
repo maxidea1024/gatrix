@@ -149,4 +149,4 @@ const EventHighlights: React.FC<EventHighlightsProps> = ({ event }) => {
   );
 };
 
-export default EventHighlights;
+export default React.memo(EventHighlights);

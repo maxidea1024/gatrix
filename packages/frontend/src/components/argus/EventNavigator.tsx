@@ -296,4 +296,4 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
   );
 };
 
-export default EventNavigator;
+export default React.memo(EventNavigator);
