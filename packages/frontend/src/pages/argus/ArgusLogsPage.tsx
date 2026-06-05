@@ -210,7 +210,7 @@ const ArgusLogsPage: React.FC = () => {
   const [isRightPanelOpen, setIsRightPanelOpen] = useLocalStorage('argus_right_panel_open', false);
 
   // Resizable side panel splitter
-  const { splitWidth: panelWidth, isDragging: isPanelDragging, handleMouseDown: handlePanelSplitterMouseDown } = useResizableSplit({
+  const { splitWidth: panelWidth, isDragging: isPanelDragging, handleMouseDown: handlePanelSplitterMouseDown, panelRef: logPanelRef } = useResizableSplit({
     storageKey: 'argus_log_panel_width',
     defaultWidth: 420,
     minWidth: 320,
@@ -219,7 +219,7 @@ const ArgusLogsPage: React.FC = () => {
   });
 
   // Resizable facet sidebar splitter
-  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown } = useResizableSplit({
+  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown, panelRef: facetPanelRef } = useResizableSplit({
     storageKey: 'argus_facet_panel_width',
     defaultWidth: 240,
     minWidth: 150,
@@ -995,8 +995,8 @@ const ArgusLogsPage: React.FC = () => {
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left: Facets Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
+          <Box ref={facetPanelRef as React.RefObject<HTMLDivElement>} sx={{ width: facetWidth }}>
           <FacetSidebar
-            width={facetWidth}
             facets={facetGroups}
             onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
             collapsed={facetSidebarCollapsed}
@@ -1006,6 +1006,7 @@ const ArgusLogsPage: React.FC = () => {
             onAddCustomFacet={handleAddCustomFacet}
             onRemoveCustomFacet={handleRemoveCustomFacet}
           />
+          </Box>
           {!facetSidebarCollapsed && (
             <Box
               onMouseDown={handleFacetSplitterMouseDown}
@@ -1276,6 +1277,7 @@ const ArgusLogsPage: React.FC = () => {
                 '&:hover, &:active': { bgcolor: 'primary.main', transform: 'scaleX(4)' },
               }}
             />
+            <Box ref={logPanelRef as React.RefObject<HTMLDivElement>} sx={{ width: panelWidth, flexShrink: 0 }}>
             <LogSidePanel
               log={selectedLog}
               open={isRightPanelOpen}
@@ -1285,8 +1287,8 @@ const ArgusLogsPage: React.FC = () => {
               onFilter={handleDetailFilter}
               hasPrev={selectedLogIndex !== null && selectedLogIndex > 0}
               hasNext={selectedLogIndex !== null && selectedLogIndex < logs.length - 1}
-              width={panelWidth}
             />
+            </Box>
           </>
         )}
       </Box>

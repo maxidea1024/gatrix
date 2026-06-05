@@ -226,7 +226,7 @@ const FacetSidebar: React.FC<FacetSidebarProps> = ({
 
   return (
     <Box sx={{
-      width, flexShrink: 0, overflowY: 'auto', overflowX: 'hidden',
+      width: width ?? '100%', flexShrink: 0, overflowY: 'auto', overflowX: 'hidden',
       borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
       '&::-webkit-scrollbar': { width: 4 },
       '&::-webkit-scrollbar-thumb': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: 2 },

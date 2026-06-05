@@ -73,7 +73,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; status: string }>({ open: false, status: '' });
 
   // --- Resizable Splitter ---
-  const { splitWidth, isDragging: isSplitDragging, handleMouseDown: handleSplitterMouseDown } = useResizableSplit({
+  const { splitWidth, isDragging: isSplitDragging, handleMouseDown: handleSplitterMouseDown, panelRef: sidebarPanelRef } = useResizableSplit({
     storageKey: 'argus_issue_split_width',
     defaultWidth: 320,
     minWidth: MIN_SPLIT_WIDTH,
@@ -332,7 +332,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                 />
 
                 {/* Sidebar Panel */}
-                <Box sx={{
+                <Box ref={sidebarPanelRef as React.RefObject<HTMLDivElement>} sx={{
                   width: { xs: '100%', md: splitWidth },
                   minWidth: { md: MIN_SPLIT_WIDTH },
                   flexShrink: 0, pl: { md: 3 }, py: 2,

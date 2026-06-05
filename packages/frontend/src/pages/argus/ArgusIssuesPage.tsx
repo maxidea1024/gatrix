@@ -181,7 +181,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   // ─── Facet sidebar state ────────────────────────────────────────
   const [facetCollapsed, setFacetCollapsed] = useLocalStorage('argus_issue_facet_collapsed', false);
-  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown } = useResizableSplit({
+  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown, panelRef: facetPanelRef } = useResizableSplit({
     storageKey: 'argus_issue_facet_width',
     defaultWidth: 220,
     minWidth: 150,
@@ -752,8 +752,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', borderTop: activeFilters.length === 0 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
         {/* Left: Facet Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
+          <Box ref={facetPanelRef as React.RefObject<HTMLDivElement>} sx={{ width: facetWidth }}>
           <FacetSidebar
-            width={facetWidth}
             facets={facetGroups}
             onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
             collapsed={facetCollapsed}
@@ -763,6 +763,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             onAddCustomFacet={handleAddCustomFacet}
             onRemoveCustomFacet={handleRemoveCustomFacet}
           />
+          </Box>
           {!facetCollapsed && (
             <Box
               onMouseDown={handleFacetSplitterMouseDown}
