@@ -753,7 +753,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         </Box>
 
         {/* Right: Main content */}
-        <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75 }}>
+        <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75, pt: 1 }}>
           {/* Volume Chart */}
           <IssueVolumeChart
             projectId={projectId}
