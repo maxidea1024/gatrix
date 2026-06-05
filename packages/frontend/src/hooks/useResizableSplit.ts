@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 export interface UseResizableSplitOptions {
   /** localStorage key to persist width */
@@ -24,20 +24,14 @@ export interface UseResizableSplitReturn {
   isDragging: boolean;
   /** Attach this to the splitter handle's onMouseDown */
   handleMouseDown: (e: React.MouseEvent) => void;
-  /**
-   * Ref to attach to the element whose width should be resized.
-   * During drag, width is set via DOM style (no React re-render).
-   */
-  panelRef: React.RefObject<HTMLElement>;
 }
 
 /**
  * Reusable hook for resizable split panels.
  *
- * Performance: During drag, the width is applied directly via DOM style on the
- * panelRef element. This completely avoids React re-renders while dragging.
- * React state (splitWidth) is only updated once on mouseup.
- * localStorage is also only written on mouseup.
+ * Performance: During drag, state updates are throttled to at most once every
+ * 50ms (~20fps) to avoid excessive React re-renders of heavy parent trees.
+ * localStorage is only written on mouseup (not on every pixel move).
  */
 export function useResizableSplit({
   storageKey,
@@ -52,10 +46,11 @@ export function useResizableSplit({
   });
   const [isDragging, setIsDragging] = useState(false);
 
-  const panelRef = useRef<HTMLElement>(null);
-  // Track latest width for mouseup persist
+  // Ref to track the latest width during drag (for mouseup persist)
   const latestWidthRef = useRef(splitWidth);
   latestWidthRef.current = splitWidth;
+  // Time-based throttle: last state update timestamp
+  const lastUpdateRef = useRef(0);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -68,23 +63,28 @@ export function useResizableSplit({
       const delta = invertDelta ? -rawDelta : rawDelta;
       const newWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
 
-      // Update DOM directly — no React re-render
-      latestWidthRef.current = newWidth;
-      if (panelRef.current) {
-        panelRef.current.style.width = `${newWidth}px`;
-      }
+      // Time-based throttle: max ~20 state updates/sec during drag
+      const now = performance.now();
+      if (now - lastUpdateRef.current < 50) return;
+      lastUpdateRef.current = now;
+
+      setSplitWidth(newWidth);
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (ev: MouseEvent) => {
       setIsDragging(false);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
 
-      // Single React state update + localStorage persist
-      const finalWidth = latestWidthRef.current;
+      // Final precise width from the last mouse position
+      const rawDelta = ev.clientX - startX;
+      const delta = invertDelta ? -rawDelta : rawDelta;
+      const finalWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
       setSplitWidth(finalWidth);
+
+      // Persist to localStorage only once on drag end
       localStorage.setItem(storageKey, String(finalWidth));
     };
 
@@ -94,5 +94,5 @@ export function useResizableSplit({
     document.addEventListener('mouseup', onMouseUp);
   }, [storageKey, minWidth, maxWidth, invertDelta]);
 
-  return { splitWidth, isDragging, handleMouseDown, panelRef };
+  return { splitWidth, isDragging, handleMouseDown };
 }
