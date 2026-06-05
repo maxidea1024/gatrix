@@ -754,7 +754,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         </Box>
 
         {/* Right: Main content */}
-        <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75, pt: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75, pt: 1, display: 'flex', flexDirection: 'column' }}>
           {/* Volume Chart */}
           <IssueVolumeChart
             projectId={projectId}
@@ -785,11 +785,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             }}
           />
 
-          <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />}>
+          <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {issues.length === 0 ? (
               <EmptyPlaceholder
                 icon={<BugReportIcon sx={{ fontSize: 48 }} />}
                 message={t('argus.issues.noIssues')}
+                sx={{ flex: 1 }}
               />
             ) : (
               <>
