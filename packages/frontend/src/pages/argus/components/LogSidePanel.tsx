@@ -426,6 +426,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
         display: open ? 'flex' : 'none',
         flexDirection: 'column',
+        pl: 0.5,
       }}
     >
       {/* ── Header ── */}
@@ -537,7 +538,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
             {/* Header with navigate button */}
             <Box sx={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              px: 1.5, py: 1, flexShrink: 0,
+              px: 2, py: 1, flexShrink: 0,
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
