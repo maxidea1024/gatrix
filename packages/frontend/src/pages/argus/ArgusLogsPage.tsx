@@ -817,13 +817,7 @@ const ArgusLogsPage: React.FC = () => {
       <Box ref={logContainerRef} sx={{
         ...(logsFullscreen ? { flex: 1, overflowY: 'auto' } : { maxHeight: 'none' }),
       }}>
-        {logs.length === 0 && !loading ? (
-          <EmptyPlaceholder
-            icon={<SearchIcon sx={{ fontSize: 48 }} />}
-            message={t('argus.logs.noLogs', 'No logs found yet')}
-            description={t('argus.logs.noLogsDesc', 'Try adjusting your filters or time range.')}
-          />
-        ) : (
+        {logs.length > 0 && (
           <>
             {logs.map((log, idx) => {
               const levelColor = SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e';
@@ -1069,8 +1063,15 @@ const ArgusLogsPage: React.FC = () => {
 
           {/* Scrollable tab content */}
           <Box sx={{ flex: 1, overflow: 'auto' }}>
-          {/* Logs Tab */}
-          {activeTab === 0 && (
+          {activeTab === 0 && logs.length === 0 && !loading && (
+            <EmptyPlaceholder
+              icon={<SearchIcon sx={{ fontSize: 48 }} />}
+              message={t('argus.logs.noLogs', 'No logs found yet')}
+              description={t('argus.logs.noLogsDesc', 'Try adjusting your filters or time range.')}
+              sx={{ flex: 1 }}
+            />
+          )}
+          {activeTab === 0 && (logs.length > 0 || loading) && (
             <LogsTablePanel
               columns={columns}
               logsFullscreen={logsFullscreen}
