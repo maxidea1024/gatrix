@@ -12,7 +12,6 @@ import {
   InputAdornment,
   Button,
   Tooltip,
-  Checkbox,
   Menu,
   MenuItem,
   ListItemIcon,
@@ -29,7 +28,6 @@ import {
   Select,
   FormControl,
   InputLabel,
-  ButtonGroup,
 } from '@mui/material';
 import {
   Feedback as FeedbackIcon,
@@ -82,7 +80,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import { Bar, getElementAtEvent } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
@@ -91,7 +89,7 @@ import { rbacService } from '@/services/rbacService';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { formatRelativeTime } from '@/utils/dateFormat';
-import { formatCompactNumber, formatWithCommas, needsCompactTooltip } from '@/utils/numberFormat';
+import { formatCompactNumber, formatWithCommas } from '@/utils/numberFormat';
 
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -102,6 +100,9 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { stringToColor, getInitials } from '@/utils/argusHelpers';
 import HighlightText from '@/components/common/HighlightText';
+import FeedbackListItem from './components/FeedbackListItem';
+import FeedbackActivityTimeline from './components/FeedbackActivityTimeline';
+import FeedbackStatsBar from './components/FeedbackStatsBar';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
@@ -211,8 +212,6 @@ const ArgusFeedbackPage: React.FC = () => {
 
   // ─── Activity Timeline ───
   const [activities, setActivities] = useState<ArgusFeedbackActivity[]>([]);
-  const [commentText, setCommentText] = useState('');
-  const [commentLoading, setCommentLoading] = useState(false);
 
   // ─── Resizable Splitter ───
 
@@ -778,68 +777,22 @@ const ArgusFeedbackPage: React.FC = () => {
       </Box>
 
       {/* Collapsible Stats */}
-      <Collapse in={!statsCollapsed} sx={{ flexShrink: 0 }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 1.5, mb: 1.5 }}>
-          {statCards.map((card, idx) => (
-            <Paper key={idx} elevation={0} sx={{
-              p: 1.5,
-              background: isDark
-                ? `linear-gradient(135deg, ${alpha(card.color, 0.12)}, ${alpha(card.color, 0.03)})`
-                : `linear-gradient(135deg, ${alpha(card.color, 0.06)}, ${alpha(card.color, 0.01)})`,
-              border: `1px solid ${alpha(card.color, 0.2)}`,
-              borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1,
-            }}>
-              <Box sx={{
-                width: 32, height: 32, borderRadius: 1.5,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: alpha(card.color, isDark ? 0.2 : 0.1), color: card.color,
-              }}>
-                {React.cloneElement(card.icon, { sx: { fontSize: 16 } })}
-              </Box>
-              <Box>
-                <Tooltip title={typeof card.value === 'number' && needsCompactTooltip(card.value) ? formatWithCommas(card.value) : ''} arrow placement="top">
-                  <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.1, fontSize: '0.95rem' }}>
-                    {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value ?? '-'}
-                  </Typography>
-                </Tooltip>
-                <Typography variant="caption" sx={{ color: isDark ? '#888' : '#777', fontWeight: 500, fontSize: '0.58rem' }}>
-                  {card.label}
-                </Typography>
-              </Box>
-            </Paper>
-          ))}
-        </Box>
-        {/* Volume Chart – full width, drag to select time range */}
-        <Paper elevation={0} sx={{ p: 1.5, mb: 1.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, position: 'relative' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-            <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
-              {t('argus.feedback.volumeChart')}
-            </Typography>
-            {dragStart !== null && dragEnd !== null && (
-              <Chip
-                label={t('argus.feedback.clearSelection')}
-                size="small"
-                onDelete={handleChartReset}
-                sx={{ height: 18, fontSize: '0.6rem', '& .MuiChip-deleteIcon': { fontSize: 12 } }}
-              />
-            )}
-          </Box>
-          <Box
-            sx={{ height: 80, cursor: 'crosshair', userSelect: 'none' }}
-            onMouseDown={handleChartMouseDown}
-            onMouseMove={handleChartMouseMove}
-            onMouseUp={handleChartMouseUp}
-            onMouseLeave={() => { if (isDragging) handleChartMouseUp(); }}
-          >
-            <Bar ref={chartRef} data={trendChartData} options={chartOpts as any} />
-          </Box>
-          {isDragging && (
-            <Typography variant="caption" sx={{ position: 'absolute', bottom: 4, right: 8, fontSize: '0.58rem', color: 'text.disabled' }}>
-              {t('argus.feedback.dragToSelect')}
-            </Typography>
-          )}
-        </Paper>
-      </Collapse>
+      <FeedbackStatsBar
+        isDark={isDark}
+        statsCollapsed={statsCollapsed}
+        loading={loading}
+        statCards={statCards}
+        chartRef={chartRef}
+        trendChartData={trendChartData}
+        chartOpts={chartOpts}
+        isDragging={isDragging}
+        dragStart={dragStart}
+        dragEnd={dragEnd}
+        onChartMouseDown={handleChartMouseDown}
+        onChartMouseMove={handleChartMouseMove}
+        onChartMouseUp={handleChartMouseUp}
+        onChartReset={handleChartReset}
+      />
 
       {/* Status Tabs */}
       <Tabs
@@ -902,102 +855,24 @@ const ArgusFeedbackPage: React.FC = () => {
               </Box>
             ) : (
               <Box sx={{ flex: 1, overflow: 'auto' }}>
-                {items.map((item) => {
-                  const displayName = item.name || item.email?.split('@')[0] || t('argus.feedback.anonymous');
-                  const isSelected = selectedIds.has(item.feedback_id);
-                  const isActive = selectedFbId === item.feedback_id;
-                  return (
-                    <Box
-                      key={item.feedback_id}
-                      onClick={() => {
-                        setUrlState({ fb: item.feedback_id });
-                        // Mark as read
-                        if (!item.is_read) {
-                          argusService.markFeedbackRead(projectId, [item.feedback_id]).catch(() => {});
-                          item.is_read = 1;
-                        }
-                      }}
-                      sx={{
-                        display: 'flex', alignItems: 'flex-start', gap: 1,
-                        px: 1.5, py: 1.2, cursor: 'pointer',
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                        backgroundColor: isActive
-                          ? alpha('#7c4dff', isDark ? 0.12 : 0.06)
-                          : isSelected
-                            ? alpha('#7c4dff', 0.03)
-                            : 'transparent',
-                        borderLeft: isActive ? `3px solid #7c4dff` : '3px solid transparent',
-                        transition: 'all 0.1s',
-                        '&:hover': { backgroundColor: isActive ? alpha('#7c4dff', isDark ? 0.15 : 0.08) : isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' },
-                      }}
-                    >
-                      <Checkbox
-                        size="small"
-                        checked={isSelected}
-                        onChange={(e) => {
-                          setSelectedIds(prev => {
-                            const next = new Set(prev);
-                            next.has(item.feedback_id) ? next.delete(item.feedback_id) : next.add(item.feedback_id);
-                            return next;
-                          });
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                        sx={{ p: 0.2, mt: 0.2 }}
-                      />
-                      <Box sx={{
-                        width: 6, height: 6, borderRadius: '50%', mt: 0.8, flexShrink: 0,
-                        backgroundColor: statusColor(item.status),
-                      }} />
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.2 }}>
-                          <Typography variant="body2" fontWeight={item.is_read ? 600 : 800} noWrap sx={{ fontSize: '0.8rem', flex: 1 }}>
-                            <HighlightText text={displayName} highlight={searchDebounce} isDark={isDark} />
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontSize: '0.62rem', flexShrink: 0 }}>
-                            {formatRelativeTime(item.submitted_at)}
-                          </Typography>
-                        </Box>
-                        <Typography variant="caption" noWrap sx={{
-                          color: isDark ? '#999' : '#666', fontSize: '0.72rem', display: 'block',
-                          lineHeight: 1.4, maxHeight: '2.8em', overflow: 'hidden',
-                        }}>
-                          <HighlightText text={item.message} highlight={searchDebounce} isDark={isDark} />
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.4, flexWrap: 'wrap' }}>
-                          {item.issue_id && (() => {
-                            const issueColor = item.issue_status === 'resolved' ? '#4caf50'
-                              : item.issue_status === 'ignored' ? '#9e9e9e' : '#ff9800';
-                            return (
-                              <Chip icon={<BugReportIcon sx={{ fontSize: '10px !important' }} />}
-                                label={`#${item.issue_id} ${item.issue_status || ''}`}
-                                size="small" sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha(issueColor, 0.08), color: issueColor, border: 'none', '& .MuiChip-icon': { color: issueColor } }} />
-                            );
-                          })()}
-                          {item.attachments?.length > 0 && (
-                            <Chip icon={<ImageIcon sx={{ fontSize: '10px !important' }} />} label={item.attachments.length}
-                              size="small" sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha('#2196f3', 0.08), color: '#2196f3', border: 'none', '& .MuiChip-icon': { color: '#2196f3' } }} />
-                          )}
-                          {item.assigned_to && (
-                            <Chip label={item.assigned_to} size="small"
-                              sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha('#4caf50', 0.08), color: '#4caf50', border: 'none' }} />
-                          )}
-                          {item.sentiment && item.sentiment !== '' && (
-                            <Chip label={item.sentiment} size="small"
-                              sx={{
-                                height: 16, fontSize: '0.55rem', border: 'none',
-                                backgroundColor: alpha(item.sentiment === 'positive' ? '#4caf50' : item.sentiment === 'negative' ? '#f44336' : '#9e9e9e', 0.08),
-                                color: item.sentiment === 'positive' ? '#4caf50' : item.sentiment === 'negative' ? '#f44336' : '#9e9e9e',
-                              }} />
-                          )}
-                          {item.category && item.category !== '' && item.category !== 'other' && (
-                            <Chip label={item.category.replace('_', ' ')} size="small"
-                              sx={{ height: 16, fontSize: '0.55rem', backgroundColor: alpha('#7c4dff', 0.08), color: '#7c4dff', border: 'none' }} />
-                          )}
-                        </Box>
-                      </Box>
-                    </Box>
-                  );
-                })}
+                {items.map((item) => (
+                  <FeedbackListItem
+                    key={item.feedback_id}
+                    item={item}
+                    isActive={selectedFbId === item.feedback_id}
+                    isSelected={selectedIds.has(item.feedback_id)}
+                    isDark={isDark}
+                    searchHighlight={searchDebounce}
+                    onSelect={() => {
+                      setUrlState({ fb: item.feedback_id });
+                      if (!item.is_read) {
+                        argusService.markFeedbackRead(projectId, [item.feedback_id]).catch(() => {});
+                        item.is_read = 1;
+                      }
+                    }}
+                    onToggleCheck={() => toggleSelect(item.feedback_id)}
+                  />
+                ))}
               </Box>
             )}
 
@@ -1394,180 +1269,13 @@ const ArgusFeedbackPage: React.FC = () => {
               )}
 
               {/* Activity Timeline */}
-              <Typography variant="caption" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1, fontSize: '0.72rem', color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {t('argus.feedback.activity')}
-                {activities.length > 0 && (
-                  <Typography component="span" sx={{ color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}>
-                    ({activities.length})
-                  </Typography>
-                )}
-              </Typography>
-
-              {/* Comment Input */}
-              <Box sx={{ display: 'flex', gap: 1, mb: 1.5, alignItems: 'flex-start' }}>
-                <TextField
-                  size="small"
-                  fullWidth
-                  multiline
-                  maxRows={3}
-                  placeholder={t('argus.feedback.addComment')}
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  onKeyDown={async (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && commentText.trim() && !commentLoading) {
-                      e.preventDefault();
-                      const target = e.target as HTMLTextAreaElement;
-                      setCommentLoading(true);
-                      const text = commentText.trim();
-                      // Get user name from localStorage
-                      let userName: string | undefined;
-                      try { const u = JSON.parse(localStorage.getItem('user') || '{}'); userName = u.name || undefined; } catch { /* ignore */ }
-                      setCommentText('');
-                      try {
-                        await argusService.addFeedbackComment(projectId, selectedItem.feedback_id, text, userName);
-                        const updated = await argusService.getFeedbackActivity(projectId, selectedItem.feedback_id);
-                        setActivities(updated);
-                      } catch {
-                        enqueueSnackbar(t('common.error'), { variant: 'error' });
-                        setCommentText(text);
-                      }
-                      finally {
-                        setCommentLoading(false);
-                        // Restore focus after submit
-                        requestAnimationFrame(() => target.focus());
-                      }
-                    }
-                  }}
-                  disabled={commentLoading}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      fontSize: '0.78rem', borderRadius: '8px',
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)',
-                      '& fieldset': { borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' },
-                      '&:hover fieldset': { borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)' },
-                    },
-                    '& .MuiOutlinedInput-input': { py: 0.8 },
-                  }}
-                />
-              </Box>
-
-              {/* Activity Items — Sentry style */}
-              {activities.length > 0 && (
-                <Box sx={{ mb: 2 }}>
-                  {activities.map((act, idx) => {
-                    const actData = typeof act.data === 'string' ? JSON.parse(act.data) : act.data;
-                    const isComment = act.action === 'comment';
-                    const isLast = idx === activities.length - 1;
-                    const displayName = act.user_name || t('argus.activity.system');
-
-                    // Build localized label + color for system actions
-                    let label = '';
-                    let iconColor = 'text.secondary';
-                    switch (act.action) {
-                      case 'status_change':
-                        label = t('argus.activity.statusChanged', { to: actData?.to || '?' });
-                        iconColor = statusColor(actData?.to || '');
-                        break;
-                      case 'assign':
-                        label = actData?.assigned_to
-                          ? t('argus.activity.assigned', { to: actData.assigned_to })
-                          : t('argus.activity.unassigned');
-                        iconColor = '#2196f3';
-                        break;
-                      case 'comment':
-                        label = actData?.text || '';
-                        iconColor = '#ff9800';
-                        break;
-                      case 'mark_spam':
-                        label = t('argus.feedback.markedAsSpam');
-                        iconColor = '#9e9e9e';
-                        break;
-                      case 'unmark_spam':
-                        label = t('argus.feedback.unmarkedFromSpam');
-                        iconColor = '#4caf50';
-                        break;
-                    }
-
-                    return (
-                      <Box key={act.id} sx={{ display: 'flex', gap: 1.5, position: 'relative' }}>
-                        {/* Timeline column: avatar/icon + vertical line */}
-                        <Box sx={{
-                          display: 'flex', flexDirection: 'column', alignItems: 'center',
-                          position: 'relative', minWidth: 28, pt: 0.2,
-                        }}>
-                          {!isLast && (
-                            <Box sx={{
-                              position: 'absolute',
-                              top: isComment ? 28 : 24,
-                              bottom: 0, left: '50%', transform: 'translateX(-50%)',
-                              width: '2px',
-                              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                            }} />
-                          )}
-                          {isComment ? (
-                            <Avatar sx={{
-                              width: 26, height: 26, fontSize: '0.6rem', fontWeight: 700,
-                              backgroundColor: stringToColor(displayName),
-                              color: '#fff', zIndex: 1,
-                            }}>
-                              {getInitials(displayName)}
-                            </Avatar>
-                          ) : (
-                            <Box sx={{
-                              width: 22, height: 22, borderRadius: '50%',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              backgroundColor: alpha(iconColor, isDark ? 0.15 : 0.08),
-                              color: iconColor, zIndex: 1,
-                            }}>
-                              {act.action === 'status_change' && <ResolveIcon sx={{ fontSize: 14 }} />}
-                              {act.action === 'assign' && <AssignIcon sx={{ fontSize: 14 }} />}
-                              {act.action === 'mark_spam' && <SpamIcon sx={{ fontSize: 14 }} />}
-                              {act.action === 'unmark_spam' && <ResolveIcon sx={{ fontSize: 14 }} />}
-                            </Box>
-                          )}
-                        </Box>
-
-                        {/* Content */}
-                        <Box sx={{ flex: 1, minWidth: 0, pb: isLast ? 0 : 1.5 }}>
-                          {isComment ? (
-                            <>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.4 }}>
-                                <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.primary' }}>
-                                  {displayName}
-                                </Typography>
-                                <Typography sx={{ fontSize: '0.62rem', color: 'text.disabled' }}>
-                                  {formatRelativeTime(act.created_at)}
-                                </Typography>
-                              </Box>
-                              <Box sx={{
-                                px: 1.5, py: 1, borderRadius: '8px',
-                                backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.025)',
-                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                              }}>
-                                <Typography sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.5 }}>
-                                  {label}
-                                </Typography>
-                              </Box>
-                            </>
-                          ) : (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 22, flexWrap: 'wrap' }}>
-                              <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
-                                {displayName}
-                              </Typography>
-                              <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
-                                {label}
-                              </Typography>
-                              <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', ml: 'auto', whiteSpace: 'nowrap' }}>
-                                {formatRelativeTime(act.created_at)}
-                              </Typography>
-                            </Box>
-                          )}
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                </Box>
-              )}
+              <FeedbackActivityTimeline
+                projectId={projectId}
+                feedbackId={selectedItem.feedback_id}
+                activities={activities}
+                isDark={isDark}
+                onActivitiesChange={setActivities}
+              />
                 </Box>
               </Box>
             ) : (
