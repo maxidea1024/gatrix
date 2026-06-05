@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Chip,
-  Button,
   CircularProgress,
   useTheme,
 } from '@mui/material';
@@ -21,6 +20,7 @@ import ContextGrid from '@/components/argus/ContextGrid';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import BreadcrumbsTimeline from '@/components/argus/BreadcrumbsTimeline';
 import JsonViewer from '@/components/common/JsonViewer';
+import { ActionChip } from '@/components/common/ActionChip';
 
 export interface IssueContextSectionProps {
   event: ArgusErrorEvent;
@@ -152,9 +152,11 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
               {t('argus.issues.transactionTrace', 'Transaction Trace')}
             </Typography>
             {!showTrace && (
-              <Button variant="outlined" size="small" onClick={() => setShowTrace(true)} disabled={loadingTrace}>
-                {t('argus.issues.viewTrace', 'Trace 보기')}
-              </Button>
+              <ActionChip
+                label={t('argus.issues.viewTrace', 'Trace 보기')}
+                onClick={() => setShowTrace(true)}
+                disabled={loadingTrace}
+              />
             )}
           </Box>
           {showTrace && (

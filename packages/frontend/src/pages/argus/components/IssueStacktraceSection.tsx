@@ -3,19 +3,21 @@ import {
   Box,
   Typography,
   Paper,
-  Button,
-  useTheme,
   Menu,
   MenuItem,
   ListItemText,
+  ListItemIcon,
 } from '@mui/material';
 import {
-  ExpandMore as ExpandMoreIcon,
+  SwapVert as SwapVertIcon,
+  MoreHoriz as MoreHorizIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusErrorEvent } from '@/services/argusService';
 import { copyToClipboard } from '@/utils/clipboard';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { ActionChip } from '@/components/common/ActionChip';
 import ExceptionChaining from '@/components/argus/ExceptionChaining';
 import StacktraceView from '@/components/argus/StacktraceView';
 
@@ -29,6 +31,7 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
   const [mode, setMode] = useLocalStorage<'relevant' | 'full'>('argus_stacktrace_mode', 'relevant');
   const [order, setOrder] = useLocalStorage<'recent' | 'oldest'>('argus_stacktrace_order', 'recent');
   const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
+  const [orderMenuAnchor, setOrderMenuAnchor] = useState<null | HTMLElement>(null);
 
   const handleCopyRaw = () => {
     if (event.stacktrace_raw) {
@@ -67,63 +70,53 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
         {/* Controls Row */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0 }}>
           {/* Mode Toggle */}
-          <Box sx={{
-            display: 'inline-flex',
-            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-            borderRadius: 2, overflow: 'hidden', p: 0.4, gap: 0.5,
-          }}>
-            {(['relevant', 'full'] as const).map((m) => (
-              <Button
-                key={m}
-                size="small"
-                onClick={() => setMode(m)}
-                sx={{
-                  fontSize: '0.75rem', py: 0.4, px: 2, borderRadius: 1.5, textTransform: 'none',
-                  color: mode === m ? 'text.primary' : 'text.secondary',
-                  backgroundColor: mode === m ? (isDark ? 'rgba(255,255,255,0.1)' : '#fff') : 'transparent',
-                  boxShadow: mode === m ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
-                  fontWeight: mode === m ? 600 : 500,
-                  '&:hover': {
-                    backgroundColor: mode === m
-                      ? (isDark ? 'rgba(255,255,255,0.15)' : '#fff')
-                      : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'),
-                  },
-                }}
-              >
-                {m === 'relevant' ? t('argus.issues.mostRelevant', 'Most Relevant') : t('argus.issues.fullStackTrace', 'Full Stack Trace')}
-              </Button>
-            ))}
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <ActionChip
+              label={t('argus.issues.mostRelevant', 'Most Relevant')}
+              variant={mode === 'relevant' ? 'filled' : 'outlined'}
+              onClick={() => setMode('relevant')}
+              sx={{ fontWeight: mode === 'relevant' ? 700 : 500 }}
+            />
+            <ActionChip
+              label={t('argus.issues.fullStackTrace', 'Full Stack Trace')}
+              variant={mode === 'full' ? 'filled' : 'outlined'}
+              onClick={() => setMode('full')}
+              sx={{ fontWeight: mode === 'full' ? 700 : 500 }}
+            />
           </Box>
 
           {/* Order & More */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setOrder(prev => prev === 'recent' ? 'oldest' : 'recent')}
-              endIcon={<ExpandMoreIcon sx={{ fontSize: 16, transform: order === 'oldest' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />}
-              sx={{
-                textTransform: 'none', color: 'text.primary',
-                borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
-                fontSize: '0.75rem', height: 32, borderRadius: 1.5,
-              }}
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <ActionChip
+              icon={<SwapVertIcon sx={{ fontSize: '14px !important' }} />}
+              label={order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
+              onClick={(e) => setOrderMenuAnchor(e.currentTarget)}
+            />
+            <Menu
+              anchorEl={orderMenuAnchor}
+              open={Boolean(orderMenuAnchor)}
+              onClose={() => setOrderMenuAnchor(null)}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             >
-              <Typography component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: 'inherit', fontWeight: 600 }}>
-                <span style={{ fontSize: '10px' }}>⇅</span> {order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
-              </Typography>
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
+              <MenuItem onClick={() => { setOrder('recent'); setOrderMenuAnchor(null); }} selected={order === 'recent'}>
+                <ListItemIcon>{order === 'recent' && <CheckIcon fontSize="small" />}</ListItemIcon>
+                <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>
+                  {t('argus.issues.mostRecent')}
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={() => { setOrder('oldest'); setOrderMenuAnchor(null); }} selected={order === 'oldest'}>
+                <ListItemIcon>{order === 'oldest' && <CheckIcon fontSize="small" />}</ListItemIcon>
+                <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>
+                  {t('argus.issues.oldestFirst')}
+                </ListItemText>
+              </MenuItem>
+            </Menu>
+            <ActionChip
+              label={<MoreHorizIcon sx={{ fontSize: 16 }} />}
               onClick={(e) => setMoreMenuAnchor(e.currentTarget)}
-              sx={{
-                minWidth: 0, px: 1,
-                borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
-                color: 'text.primary', height: 32, borderRadius: 1.5,
-              }}
-            >
-              <Typography component="span" sx={{ fontSize: '12px', lineHeight: 1 }}>•••</Typography>
-            </Button>
+              sx={{ minWidth: 28, '& .MuiChip-label': { px: 0.5, display: 'flex' } }}
+            />
             <Menu
               anchorEl={moreMenuAnchor}
               open={Boolean(moreMenuAnchor)}
