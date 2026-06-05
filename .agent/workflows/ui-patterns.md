@@ -340,3 +340,201 @@ const sortOptions = [
 ```
 
 > **원칙:** 모든 정렬/필터 드롭다운은 `FilterChipSelect`를 사용하여 일관된 `라벨: 값 ∨` 스타일을 유지하세요.
+
+## List State Restoration: Use Zustand Store
+
+목록 페이지(이슈 목록, 릴리스 목록 등)에서 상세 페이지로 이동한 뒤 **브레드크럼으로 복귀**할 때, 이전 검색/필터/페이징 상태가 유지되어야 합니다. 이를 위해 **Zustand 전역 스토어**를 사용합니다.
+
+**기존 스토어:**
+
+| 스토어 | 위치 | 대상 페이지 |
+|--------|------|------------|
+| `useArgusIssueStore` | `@/hooks/useArgusIssueStore` | ArgusIssuesPage |
+| `useArgusReleaseStore` | `@/hooks/useArgusReleaseStore` | ArgusReleasesPage |
+
+**아키텍처:**
+- URL SearchParams 대신 **Zustand가 Single Source of Truth** (SSOT)
+- 마운트 시 3단계 초기화:
+  1. `location.state.fromSidebar` → `resetStore()` (사이드바 클릭 = 초기 상태)
+  2. URL에 딥링크 파라미터 있음 → `resetStore()` + `hydrateFromParams()` (다른 페이지에서 이동)
+  3. 둘 다 아님 → Zustand 기존 상태 자동 복원 (브레드크럼 복귀)
+
+**새 목록 페이지에 적용할 때:**
+```tsx
+// 1. 스토어 생성 (hooks/useXxxStore.ts)
+import { create } from 'zustand';
+
+const DEFAULTS = { currentPage: 1, search: '', sort: 'date' } as const;
+
+export const useXxxStore = create((set) => ({
+  ...DEFAULTS,
+  setCurrentPage: (currentPage) => set({ currentPage }),
+  setSearch: (search) => set({ search }),
+  hydrateFromParams: (params) => set((state) => ({ ...state, ...params })),
+  resetStore: () => set({ ...DEFAULTS }),
+}));
+
+// 2. 페이지 컴포넌트에서 마운트 초기화
+const hasInitialized = useRef(false);
+
+useEffect(() => {
+  if (hasInitialized.current) return;
+  hasInitialized.current = true;
+
+  if ((location.state as any)?.fromSidebar) {
+    resetStore();
+    navigate(location.pathname, { replace: true, state: {} });
+    return;
+  }
+
+  const hasDeepLinkParams = DEEP_LINK_KEYS.some((k) => searchParams.has(k));
+  if (hasDeepLinkParams) {
+    resetStore();
+    // ... hydration logic
+    hydrateFromParams(hydration);
+    navigate(location.pathname, { replace: true });
+  }
+}, []);
+```
+
+**핵심 규칙:**
+- `setSearchParams`를 사용하지 않음 — 모든 상태 변경은 Zustand 액션으로
+- 딥링크 하이드레이션 전 반드시 `resetStore()` 호출 (이전 상태 오염 방지)
+- `navigate(pathname, { replace: true })` 로 URL 파라미터 strip
+
+## Cross-Page Back Navigation: Use enableAutoBack
+
+상세 페이지(이슈 상세, 릴리스 상세 등)에서 **이전 페이지로 돌아가기**가 필요할 때, `PageHeader`의 `enableAutoBack` prop을 사용합니다.
+
+**위치:** `@/components/common/PageHeader`
+
+**동작:**
+- 앱 내 네비게이션으로 진입한 경우: ← 뒤로가기 버튼 표시 (`history.back()`)
+- 사이드바에서 직접 진입한 경우: 버튼 숨김 (돌아갈 곳이 없으므로)
+- 외부 링크/직접 URL 접속: 버튼 숨김
+
+**사용법:**
+```tsx
+<PageHeader
+  enableAutoBack
+  title={...}
+  subtitle={...}
+/>
+```
+
+**설계 원칙:**
+- **브레드크럼** = 정적 위치 표시 (현재 페이지가 어디인지: `Issues > 이슈제목`)
+- **← 버튼** = 동적 뒤로가기 (실제 이전 페이지: 세션건강, 오버뷰 등)
+- 두 가지를 **조합**하여 사용 (브레드크럼 + enableAutoBack)
+
+**❌ 하지 마세요:**
+```tsx
+// ❌ enableAutoBack={false} 로 명시적 비활성화
+<PageHeader enableAutoBack={false} ... />
+
+// ❌ 동적 브레드크럼으로 이전 페이지를 표시하려는 시도
+<ArgusBreadcrumbs paths={[
+  { label: '세션건강', to: '/argus/sessions' },  // referrer에 따라 동적으로 변경
+  { label: issue.title }
+]} />
+```
+
+**✅ 올바른 패턴:**
+```tsx
+// ✅ 정적 브레드크럼 + enableAutoBack 조합
+<PageHeader
+  enableAutoBack
+  title={
+    <ArgusBreadcrumbs paths={[
+      { label: 'Issues', to: '/argus/issues' },
+      { label: issue.title }
+    ]} size="title" />
+  }
+/>
+```
+
+## Timeline Lazy Loading: Use limit & offset with common.showMore
+
+타임라인(활동 히스토리, 유저 피드백 댓글 등)을 렌더링할 때, 전체 항목을 한 번에 보여주거나 프론트엔드에서 일괄 로드하여 슬라이싱하는 대신, 백엔드에서 필요한 만큼만 가져오고 더 보기 클릭 시 추가 데이터를 점진적으로 호출해 누적하는 **Lazy Loading (더 보기)** 패턴을 사용합니다.
+
+**설계:**
+- API 서비스와 백엔드 라우터가 `limit`와 `offset` 파라미터를 지원해야 합니다.
+- 프론트엔드에서는 `activities` 배열 상태와 `hasMore` (추가 데이터 존재 여부) 상태를 유지합니다.
+- 리소스 ID가 바뀔 때 최초 `limit = 5, offset = 0`으로 데이터 및 `hasMore` 여부를 리셋합니다.
+- 더 보기 클릭 시 현재 로드된 개수(`activities.length`)를 `offset`으로 전달하여 다음 5개를 비동기로 가져와 기존 배열 뒤에 병합(`[...prev, ...newData]`)합니다.
+- 공용 번역 키 `common.showMore` (ko: `+{{count}}개 더 보기`, en: `Show {{count}} more`)를 활용해 다음 가져올 크기(예: 5)를 표기합니다.
+
+**✅ 올바른 구현 패턴:**
+```tsx
+const [activities, setActivities] = useState<ArgusActivity[]>([]);
+const [loading, setLoading] = useState(false);
+const [loadingMore, setLoadingMore] = useState(false);
+const [hasMore, setHasMore] = useState(true);
+
+const fetchActivities = useCallback(async (silent = false, customLimit = 5) => {
+  if (!silent) setLoading(true);
+  try {
+    const data = await argusService.getActivity(projectId, resourceId, customLimit, 0);
+    setActivities(data);
+    setHasMore(data.length === customLimit);
+  } catch {
+    setActivities([]);
+  } finally {
+    if (!silent) setLoading(false);
+  }
+}, [projectId, resourceId]);
+
+useEffect(() => {
+  fetchActivities(false, 5);
+}, [resourceId, fetchActivities]);
+
+const fetchMoreActivities = async () => {
+  if (loadingMore) return;
+  setLoadingMore(true);
+  try {
+    const offset = activities.length;
+    const data = await argusService.getActivity(projectId, resourceId, 5, offset);
+    if (data.length > 0) {
+      setActivities(prev => [...prev, ...data]);
+      if (data.length < 5) setHasMore(false);
+    } else {
+      setHasMore(false);
+    }
+  } catch {
+    // error handling
+  } finally {
+    setLoadingMore(false);
+  }
+};
+
+return (
+  <Box>
+    {activities.map((item, idx) => (
+      <TimelineItem key={item.id} isLast={idx === activities.length - 1} ... />
+    ))}
+    
+    {hasMore && (
+      <Box sx={{ pt: 1, textAlign: 'center' }}>
+        <Link
+          component="button"
+          variant="caption"
+          onClick={fetchMoreActivities}
+          disabled={loadingMore}
+          sx={{
+            fontSize: '0.7rem', cursor: 'pointer',
+            color: 'primary.main',
+            textDecoration: 'none',
+            fontWeight: 600,
+            opacity: loadingMore ? 0.5 : 1,
+            display: 'inline-flex', alignItems: 'center', gap: 0.5,
+            '&:hover': { textDecoration: 'underline' },
+          }}
+        >
+          {loadingMore && <CircularProgress size={10} color="inherit" />}
+          {t('common.showMore', { count: 5 })}
+        </Link>
+      </Box>
+    )}
+  </Box>
+);
+```

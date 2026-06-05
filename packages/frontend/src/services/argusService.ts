@@ -668,9 +668,13 @@ class ArgusService {
 
   async getFeedbackActivity(
     projectId: number | string,
-    feedbackId: string
+    feedbackId: string,
+    limit?: number,
+    offset?: number
   ): Promise<ArgusFeedbackActivity[]> {
-    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/activity`);
+    const response = await argusApi.get(`${ARGUS_BASE}/feedback/${projectId}/${feedbackId}/activity`, {
+      params: { limit, offset }
+    });
     return response.data?.data || response.data || [];
   }
 
@@ -1071,9 +1075,13 @@ class ArgusService {
 
   async getIssueActivity(
     projectId: number | string,
-    issueId: number | string
+    issueId: number | string,
+    limit?: number,
+    offset?: number
   ): Promise<ArgusIssueActivity[]> {
-    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}/activity`);
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/${issueId}/activity`, {
+      params: { limit, offset }
+    });
     return response.data?.data || [];
   }
 

@@ -12,6 +12,7 @@ import {
   Divider, useTheme, InputAdornment, alpha, Tooltip, Select, MenuItem,
   FormControl, InputLabel, CircularProgress, Dialog, DialogTitle,
   DialogContent, DialogActions, Avatar, Collapse, Switch, FormControlLabel,
+  Menu,
 } from '@mui/material';
 import {
   Settings as SettingsIcon, Add as AddIcon,
@@ -24,7 +25,7 @@ import {
   Notifications as NotificationsIcon, Email as EmailIcon,
   Webhook as WebhookIcon, Chat as ChatIcon, Edit as EditIcon,
   Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon,
-  ExpandMore as ExpandMoreIcon,
+  ExpandMore as ExpandMoreIcon, MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -512,6 +513,7 @@ const ArgusSettingsPage: React.FC = () => {
   const [addIntDialog, setAddIntDialog] = useState<string | null>(null);
   const [addTrkDialog, setAddTrkDialog] = useState<string | null>(null);
   const [addNotifDialog, setAddNotifDialog] = useState<string | null>(null);
+  const [editingNotifChannel, setEditingNotifChannel] = useState<any | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [dynamicFields, setDynamicFields] = useState<ProviderFieldDef[]>([]);
 
@@ -680,7 +682,6 @@ const ArgusSettingsPage: React.FC = () => {
       });
       setIntegrations(await argusService.listIntegrations(projectId));
       setAddIntDialog(null); setFormData({});
-      enqueueSnackbar(t('argus.settings.integrationAdded'), { variant: 'success' });
     } catch { enqueueSnackbar(t('argus.settings.integrationFailed'), { variant: 'error' }); }
   };
 
@@ -698,7 +699,6 @@ const ArgusSettingsPage: React.FC = () => {
       });
       setTrackers(await argusService.listIssueTrackers(projectId));
       setAddTrkDialog(null); setFormData({});
-      enqueueSnackbar(t('argus.settings.trackerAdded'), { variant: 'success' });
     } catch { enqueueSnackbar(t('argus.settings.trackerAddFailed'), { variant: 'error' }); }
   };
 
@@ -1028,7 +1028,7 @@ const ArgusSettingsPage: React.FC = () => {
                 </SettingsCard>
                 {intLoaded && integrations.length > 0 && (
                   <SettingsCard title={t('argus.settings.configuredIntegrations')} desc={t('argus.settings.configuredIntegrationsDesc')} isDark={isDark}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 2 }}>
                       {integrations.map(intg => {
                         const prov = REPO_PROVIDERS.find(p => p.id === intg.provider);
                         return (
@@ -1061,14 +1061,15 @@ const ArgusSettingsPage: React.FC = () => {
                 </SettingsCard>
                 {notifLoaded && notifChannels.length > 0 && (
                   <SettingsCard title={t('argus.settings.configuredChannels')} desc={t('argus.settings.configuredChannelsDesc')} isDark={isDark}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 2 }}>
                       {notifChannels.map((ch: any) => {
                         const prov = NOTIFICATION_PROVIDERS.find(p => p.id === ch.provider);
                         return (
                           <ConnectedItem key={ch.id} isDark={isDark} color={prov?.color || '#666'} icon={prov?.icon || <NotificationsIcon sx={{ fontSize: 18 }} />}
                             title={ch.name} chipLabel={prov?.name || ch.provider}
-                            subtitle={ch.webhook_url || ch.recipients || ''}
+                            subtitle={ch.webhook_url || ch.config?.webhook_url || ch.recipients || ch.config?.recipients || ''}
                             active={ch.enabled} t={t}
+                            onEdit={() => setEditingNotifChannel(ch)}
                             onToggle={async () => {
                               try {
                                 await (argusService as any).updateNotificationChannel?.(projectId, ch.id, { enabled: !ch.enabled });
@@ -1114,7 +1115,7 @@ const ArgusSettingsPage: React.FC = () => {
                 </SettingsCard>
                 {trkLoaded && trackers.length > 0 && (
                   <SettingsCard title={t('argus.settings.configuredTrackers')} desc={t('argus.settings.configuredTrackersDesc')} isDark={isDark}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 2 }}>
                       {trackers.map(trk => {
                         const prov = TRACKER_PROVIDERS.find(p => p.id === trk.provider);
                         return (
@@ -1558,7 +1559,6 @@ const ArgusSettingsPage: React.FC = () => {
               });
               setTrackers(await argusService.listIssueTrackers(projectId));
               setAddTrkDialog(null);
-              enqueueSnackbar(t('argus.settings.trackerAdded'), { variant: 'success' });
             }}
           />
         );
@@ -1585,6 +1585,12 @@ const ArgusSettingsPage: React.FC = () => {
             provider={wizardCfg}
             fields={wizardFields}
             wizardTitleKey="argus.settings.providerWizard.addNotification"
+            onTestConnection={async (data) => {
+              return await (argusService as any).testNotificationChannelPreSave?.(projectId, {
+                provider: addNotifDialog!,
+                config: data,
+              });
+            }}
             onSubmit={async (data) => {
               await (argusService as any).createNotificationChannel?.(projectId, {
                 provider: addNotifDialog, name: data.name?.trim() || '',
@@ -1596,7 +1602,51 @@ const ArgusSettingsPage: React.FC = () => {
               const updated = await (argusService as any).listNotificationChannels?.(projectId);
               if (updated) setNotifChannels(updated);
               setAddNotifDialog(null);
-              enqueueSnackbar(t('argus.settings.channelAdded'), { variant: 'success' });
+            }}
+          />
+        );
+      })()}
+
+      {/* ═══ EDIT NOTIFICATION WIZARD ═══ */}
+      {(() => {
+        if (!editingNotifChannel) return null;
+        const np = NOTIFICATION_PROVIDERS.find(p => p.id === editingNotifChannel.provider);
+        if (!np) return null;
+        const wizardCfg: WizardProviderConfig = {
+          id: np.id, name: np.name, color: np.color,
+          gradient: np.gradient, accentColor: np.accentColor,
+          icon: np.icon, descKey: np.descKey,
+          guideUrl: np.guideUrl, guideButtonKey: np.guideButtonKey,
+          guideDescKey: np.guideDescKey,
+        };
+        const wizardFields: WizardFieldDef[] = np.fields.map(f => ({
+          ...f, required: f.key === 'name',
+        }));
+        return (
+          <ProviderWizardModal
+            open={!!editingNotifChannel}
+            onClose={() => { setEditingNotifChannel(null); }}
+            provider={wizardCfg}
+            fields={wizardFields}
+            wizardTitleKey="argus.settings.providerWizard.editNotification"
+            initialData={{
+              name: editingNotifChannel.name || '',
+              ...(editingNotifChannel.config || {}),
+            }}
+            onTestConnection={async (data) => {
+              return await (argusService as any).testNotificationChannelPreSave?.(projectId, {
+                provider: editingNotifChannel.provider,
+                config: data,
+              });
+            }}
+            onSubmit={async (data) => {
+              await (argusService as any).updateNotificationChannel?.(projectId, editingNotifChannel.id, {
+                name: data.name?.trim() || '',
+                config: data,
+              });
+              const updated = await (argusService as any).listNotificationChannels?.(projectId);
+              if (updated) setNotifChannels(updated);
+              setEditingNotifChannel(null);
             }}
           />
         );
@@ -1608,7 +1658,6 @@ const ArgusSettingsPage: React.FC = () => {
         onClose={() => setWizardOpen(false)}
         onSuccess={() => {
           setWizardOpen(false);
-          enqueueSnackbar(t('common.saved', 'Saved successfully'), { variant: 'success' });
           setAddIntDialog(wizardProvider);
           setFormData({ default_branch: 'main' });
         }}
@@ -1711,34 +1760,168 @@ const ConnectedItem: React.FC<{
   isDark: boolean; color: string; icon: React.ReactNode;
   title: string; subtitle: string; chipLabel?: string;
   active: boolean; t: any;
+  onEdit?: () => void;
   onToggle?: () => void; onTest?: () => void; onDelete: () => void;
-}> = ({ isDark, color, icon, title, subtitle, chipLabel, active, t, onToggle, onTest, onDelete }) => {
+}> = ({ isDark, color, icon, title, subtitle, chipLabel, active, t, onEdit, onToggle, onTest, onDelete }) => {
   const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openMenu = Boolean(anchorEl);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Paper elevation={0} sx={{
-      p: 2, display: 'flex', alignItems: 'center', gap: 2,
-      border: `1px solid ${bdr}`, borderRadius: '10px',
+      p: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5,
+      border: `1px solid ${bdr}`, borderRadius: '12px',
+      transition: 'all 0.15s ease-in-out',
+      position: 'relative',
+      '&:hover': {
+        borderColor: alpha(color, 0.5),
+        boxShadow: `0 4px 16px ${alpha(color, 0.1)}`,
+        transform: 'translateY(-1px)',
+      },
     }}>
-      <Avatar sx={{ width: 32, height: 32, backgroundColor: alpha(color, isDark ? 0.2 : 0.08), color }}>
-        {icon}
-      </Avatar>
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }} noWrap>{title}</Typography>
-          {chipLabel && <Chip label={chipLabel} size="small" sx={{ height: 20, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha(color, 0.1), color, border: 'none' }} />}
+      {/* Header: Avatar, Chip, and More Menu */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+          <Avatar sx={{
+            width: 36, height: 36,
+            backgroundColor: alpha(color, isDark ? 0.2 : 0.08),
+            color: color,
+            border: `1px solid ${alpha(color, 0.15)}`,
+          }}>
+            {icon}
+          </Avatar>
+          {chipLabel && (
+            <Chip 
+              label={chipLabel} 
+              size="small" 
+              sx={{ 
+                height: 18, 
+                fontSize: '0.58rem', 
+                fontWeight: 700, 
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                backgroundColor: alpha(color, 0.1), 
+                color: color, 
+                border: 'none' 
+              }} 
+            />
+          )}
         </Box>
-        <Typography variant="caption" color="text.secondary" noWrap>{subtitle}</Typography>
+
+        <IconButton
+          size="small"
+          onClick={handleMenuClick}
+          sx={{
+            color: 'text.secondary',
+            '&:hover': {
+              backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+              color: 'text.primary',
+            }
+          }}
+        >
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
       </Box>
-      {onTest && (
-        <Tooltip title={t('argus.settings.testConnection')}><IconButton size="small" onClick={onTest}
-          sx={{ '&:hover': { color: '#4caf50' } }}><TestConnectionIcon fontSize="small" /></IconButton></Tooltip>
-      )}
-      {onToggle && (
-        <Chip label={active ? t('common.active') : t('common.inactive')} size="small" onClick={onToggle}
-          sx={{ height: 22, fontWeight: 600, fontSize: '0.7rem', cursor: 'pointer', backgroundColor: alpha(active ? '#4caf50' : '#9e9e9e', 0.12), color: active ? '#4caf50' : '#9e9e9e', border: 'none' }} />
-      )}
-      {!onToggle && <StatusBadge active={active} t={t} />}
-      <IconButton size="small" color="error" onClick={onDelete}><DeleteIcon fontSize="small" /></IconButton>
+
+      {/* Body: Title and Subtitle */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', mb: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={title}>
+          {title}
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.73rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={subtitle}>
+          {subtitle}
+        </Typography>
+      </Box>
+
+      {/* Footer: Toggle/Status */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${bdr}`, pt: 1.5, mt: 'auto' }}>
+        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
+          {t('argus.common.status', 'Status')}
+        </Typography>
+        {onToggle ? (
+          <Tooltip title={active ? t('argus.settings.deactivateKey', 'Deactivate') : t('common.active', 'Activate')}>
+            <Chip
+              label={active ? t('common.active') : t('common.inactive')}
+              size="small"
+              onClick={onToggle}
+              sx={{
+                height: 22,
+                fontWeight: 600,
+                fontSize: '0.7rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                backgroundColor: alpha(active ? '#4caf50' : '#9e9e9e', 0.12),
+                color: active ? '#4caf50' : '#9e9e9e',
+                border: 'none',
+                '&:hover': {
+                  backgroundColor: alpha(active ? '#4caf50' : '#9e9e9e', 0.2),
+                }
+              }}
+            />
+          </Tooltip>
+        ) : (
+          <StatusBadge active={active} t={t} />
+        )}
+      </Box>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        PaperProps={{
+          sx: {
+            borderRadius: '10px',
+            minWidth: 130,
+            mt: 0.5,
+            boxShadow: isDark
+              ? '0 5px 15px rgba(0, 0, 0, 0.5)'
+              : '0 5px 15px rgba(0, 0, 0, 0.08)',
+            border: `1px solid ${bdr}`,
+          }
+        }}
+      >
+        {onEdit && (
+          <MenuItem
+            onClick={() => { handleMenuClose(); onEdit(); }}
+            sx={{ gap: 1, fontSize: '0.8rem', fontWeight: 500, py: 1 }}
+          >
+            <EditIcon fontSize="small" sx={{ fontSize: 16, color: 'text.secondary' }} />
+            {t('common.edit', '편집')}
+          </MenuItem>
+        )}
+        {onTest && (
+          <MenuItem
+            onClick={() => { handleMenuClose(); onTest(); }}
+            sx={{ gap: 1, fontSize: '0.8rem', fontWeight: 500, py: 1 }}
+          >
+            <TestConnectionIcon fontSize="small" sx={{ fontSize: 16, color: '#4caf50' }} />
+            {t('argus.settings.testConnection', '연결 테스트')}
+          </MenuItem>
+        )}
+        <Divider sx={{ my: '4px !important', borderColor: bdr }} />
+        <MenuItem
+          onClick={() => { handleMenuClose(); onDelete(); }}
+          sx={{
+            gap: 1, fontSize: '0.8rem', fontWeight: 500, py: 1,
+            color: 'error.main',
+            '&:hover': {
+              backgroundColor: isDark ? 'rgba(244, 67, 54, 0.12)' : 'rgba(211, 47, 47, 0.08)',
+            }
+          }}
+        >
+          <DeleteIcon fontSize="small" sx={{ fontSize: 16, color: 'inherit' }} />
+          {t('common.delete', '삭제')}
+        </MenuItem>
+      </Menu>
     </Paper>
   );
 };

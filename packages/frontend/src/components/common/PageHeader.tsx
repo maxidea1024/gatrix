@@ -101,27 +101,23 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 size="small" 
                 onClick={onBack ? onBack : () => navigate(-1)}
                 sx={{
-                  mr: 0.5,
-                  width: 30,
-                  height: 30,
-                  color: 'primary.main',
-                  backgroundColor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(144, 202, 249, 0.08)'
-                      : 'rgba(25, 118, 210, 0.08)',
-                  border: (theme) =>
-                    `1px solid ${theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.2)' : 'rgba(25, 118, 210, 0.2)'}`,
-                  borderRadius: '50%',
+                  mr: 0.25,
+                  width: 26,
+                  height: 26,
+                  color: 'text.secondary',
+                  borderRadius: 1.5,
                   '&:hover': {
+                    color: 'text.primary',
                     backgroundColor: (theme) =>
                       theme.palette.mode === 'dark'
-                        ? 'rgba(144, 202, 249, 0.16)'
-                        : 'rgba(25, 118, 210, 0.14)',
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : 'rgba(0, 0, 0, 0.06)',
+                    transform: 'translateX(-1px)',
                   },
                   transition: 'all 0.15s ease',
                 }}
               >
-                <ArrowBackIcon sx={{ fontSize: 16 }} />
+                <ArrowBackIcon sx={{ fontSize: 18, strokeWidth: 1, stroke: 'currentColor' }} />
               </IconButton>
             </Tooltip>
           )}

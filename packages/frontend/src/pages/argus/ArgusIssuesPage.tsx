@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -18,7 +18,7 @@ import {
   BugReport as BugReportIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, {
   ArgusIssue,
@@ -45,6 +45,7 @@ import IssueVolumeChart from './components/IssueVolumeChart';
 import IssueBulkActions from './components/IssueBulkActions';
 import IssueAssigneeMenu from './components/IssueAssigneeMenu';
 import NewIssuesBanner from './components/NewIssuesBanner';
+import { useArgusIssueStore } from '@/hooks/useArgusIssueStore';
 
 const PAGE_SIZE_STORAGE_KEY = 'argusIssues.pageSize';
 const DEFAULT_PAGE_SIZE = 25;
@@ -55,6 +56,9 @@ const QUERY_BUILDER_FIELDS = [
   'environment', 'release', 'assigned', 'times_seen', 'user_count',
 ];
 
+/** URL param keys that, when present, signal a deep-link / cross-page intent. */
+const DEEP_LINK_KEYS = ['page', 'search', 'status', 'level', 'sort', 'view', 'substatus', 'assigned_to'];
+
 interface ArgusIssuesPageProps {
   projectId?: string | number;
 }
@@ -63,32 +67,105 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuth();
   const isDark = theme.palette.mode === 'dark';
 
+  // ─── Zustand Store ──────────────────────────────────────────────
+  const currentPage = useArgusIssueStore((s) => s.currentPage);
+  const storeSearch = useArgusIssueStore((s) => s.search);
+  const status = useArgusIssueStore((s) => s.status);
+  const level = useArgusIssueStore((s) => s.level);
+  const sort = useArgusIssueStore((s) => s.sort);
+  const activeViewId = useArgusIssueStore((s) => s.activeViewId);
+  const substatus = useArgusIssueStore((s) => s.substatus);
+  const assignedTo = useArgusIssueStore((s) => s.assignedTo);
+
+  const setCurrentPage = useArgusIssueStore((s) => s.setCurrentPage);
+  const setStoreSearch = useArgusIssueStore((s) => s.setSearch);
+  const setStatus = useArgusIssueStore((s) => s.setStatus);
+  const setLevel = useArgusIssueStore((s) => s.setLevel);
+  const setSort = useArgusIssueStore((s) => s.setSort);
+  const setActiveViewId = useArgusIssueStore((s) => s.setActiveViewId);
+  const setSubstatus = useArgusIssueStore((s) => s.setSubstatus);
+  const setAssignedTo = useArgusIssueStore((s) => s.setAssignedTo);
+  const hydrateFromParams = useArgusIssueStore((s) => s.hydrateFromParams);
+  const resetStore = useArgusIssueStore((s) => s.resetStore);
+
+  // ─── Mount Initialization ──────────────────────────────────────
+  // Runs once: handles GNB reset and deep-link hydration.
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    // 1. GNB/Sidebar reset: MainLayout's openOrNavigate passes { fromSidebar: true }
+    //    When user clicks the sidebar menu (not breadcrumb), reset to clean state.
+    if ((location.state as any)?.fromSidebar) {
+      resetStore();
+      // Clear location state to prevent re-reset on re-render
+      navigate(location.pathname, { replace: true, state: {} });
+      return;
+    }
+
+    // 2. Deep-link hydration: if URL contains filter params, apply them to store
+    const hasDeepLinkParams = DEEP_LINK_KEYS.some((k) => searchParams.has(k));
+    if (hasDeepLinkParams) {
+      // Reset to defaults first, then apply URL params on top.
+      // This prevents stale Zustand state from leaking into deep-link navigation
+      // (e.g. Overview → Issues with level=error should NOT retain page=50 from previous session).
+      resetStore();
+      const hydration: Record<string, unknown> = {};
+      const urlPage = searchParams.get('page');
+      const urlSearch = searchParams.get('search');
+      const urlStatus = searchParams.get('status');
+      const urlLevel = searchParams.get('level');
+      const urlSort = searchParams.get('sort');
+      const urlView = searchParams.get('view');
+      const urlSubstatus = searchParams.get('substatus');
+      const urlAssignedTo = searchParams.get('assigned_to');
+
+      if (urlPage) hydration.currentPage = parseInt(urlPage, 10);
+      if (urlSearch) hydration.search = urlSearch;
+      if (urlStatus) hydration.status = urlStatus;
+      if (urlLevel) hydration.level = urlLevel;
+      if (urlSort) hydration.sort = urlSort;
+      if (urlView) hydration.activeViewId = urlView;
+      if (urlSubstatus) hydration.substatus = urlSubstatus;
+      if (urlAssignedTo) hydration.assignedTo = urlAssignedTo;
+
+      hydrateFromParams(hydration);
+      // Strip deep-link params from URL (Zustand is now the source of truth)
+      navigate(location.pathname, { replace: true });
+    }
+    // 3. Normal breadcrumb return: no URL params, no GNB flag
+    //    → Zustand retains previous state automatically.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Project / Page-size ────────────────────────────────────────
   const { currentProject } = useOrgProject();
   const projectId = propProjectId || searchParams.get('projectId') || currentProject?.id || '1';
-  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const saved = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '', 10);
     if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
     return DEFAULT_PAGE_SIZE;
   });
 
-  // ─── State ──────────────────────────────────────────────────────
+  // ─── Local-only UI State ────────────────────────────────────────
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [searchDebounce, setSearchDebounce] = useState(search);
-  const [status, setStatus] = useState(searchParams.get('status') || 'unresolved');
-  const [level, setLevel] = useState(searchParams.get('level') || '');
-  const [sort, setSort] = useState(searchParams.get('sort') || 'last_seen');
+
+  // Local input mirror — follows Zustand for initial value, debounced into store
+  const [searchInput, setSearchInput] = useState(storeSearch);
+  const [searchDebounce, setSearchDebounce] = useState(storeSearch);
+
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [merging, setMerging] = useState(false);
-  const [activeViewId, setActiveViewId] = useState(searchParams.get('view') || 'unresolved');
   const [queryBuilderAnchor, setQueryBuilderAnchor] = useState<HTMLElement | null>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [assigneeAnchor, setAssigneeAnchor] = useState<{ el: HTMLElement; issue: ArgusIssue } | null>(null);
@@ -164,19 +241,29 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     fetchMembers();
   }, [projectId]);
 
-  // ─── Debounce search ───────────────────────────────────────────
+  // ─── Sync local search input when store changes externally ─────
+  // (e.g. via hydration, reset, or saved-searches sidebar)
   useEffect(() => {
-    const timer = setTimeout(() => setSearchDebounce(search), 400);
+    setSearchInput(storeSearch);
+  }, [storeSearch]);
+
+  // ─── Debounce search input → store ─────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchDebounce(searchInput);
+      // Commit debounced value to Zustand if different from current store value
+      if (searchInput !== storeSearch) {
+        setStoreSearch(searchInput);
+      }
+    }, 400);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [searchInput, storeSearch, setStoreSearch]);
 
   // ─── Fetch issues ──────────────────────────────────────────────
   const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
       const dateParams = argusDateRangeToApiParams(filters.dateRange);
-      const substatus = searchParams.get('substatus') || undefined;
-      const assignedTo = searchParams.get('assigned_to') || undefined;
       const params: ArgusIssueListParams = {
         status: status || undefined,
         level: level || undefined,
@@ -188,8 +275,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
         os: filters.os.length === 1 ? filters.os[0] : undefined,
         ...dateParams,
-        substatus,
-        assigned_to: assignedTo,
+        substatus: substatus || undefined,
+        assigned_to: assignedTo || undefined,
       };
       const result = await argusService.listIssues(projectId, params);
       setIssues(result.data);
@@ -201,7 +288,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     } finally {
       setLoading(false);
     }
-  }, [projectId, status, level, sort, currentPage, rowsPerPage, searchDebounce, filters]);
+  }, [projectId, status, level, sort, currentPage, rowsPerPage, searchDebounce, filters, substatus, assignedTo]);
 
   // Persist page size
   useEffect(() => {
@@ -220,9 +307,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   };
 
   const handlePageChange = (_: unknown, page: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('page', String(page));
-    setSearchParams(params);
+    setCurrentPage(page);
   };
 
   const handleIssueClick = (issue: ArgusIssue) => {
@@ -286,33 +371,24 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   const handleViewChange = (view: IssueView) => {
     setActiveViewId(view.id);
-    const params = new URLSearchParams(searchParams);
-    params.set('view', view.id);
-    Object.entries(view.urlParams).forEach(([k, v]) => {
-      if (v === '__me__') {
-        params.set(k, user?.name || '');
-      } else {
-        params.set(k, v);
-      }
-    });
-    ['status', 'substatus', 'assigned_to'].forEach(k => {
-      if (!view.urlParams[k]) params.delete(k);
-    });
-    params.set('page', '1');
-    setSearchParams(params);
-    setStatus(view.urlParams.status || '');
+    setCurrentPage(1);
+
+    // Apply view-specific params to store
+    const viewStatus = view.urlParams.status || '';
+    const viewSubstatus = view.urlParams.substatus || '';
+    const viewAssignedTo = view.urlParams.assigned_to
+      ? (view.urlParams.assigned_to === '__me__' ? (user?.name || '') : view.urlParams.assigned_to)
+      : '';
+
+    setStatus(viewStatus);
+    setSubstatus(viewSubstatus);
+    setAssignedTo(viewAssignedTo);
   };
 
   const handleQueryBuilderApply = (query: string) => {
-    setSearch(query);
-    const params = new URLSearchParams(searchParams);
-    if (query) {
-      params.set('search', query);
-    } else {
-      params.delete('search');
-    }
-    params.set('page', '1');
-    setSearchParams(params);
+    setSearchInput(query);
+    setStoreSearch(query);
+    setCurrentPage(1);
   };
 
   const handleDateRangeSelect = (start: Date, end: Date) => {
@@ -320,11 +396,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       ...prev,
       dateRange: { type: 'custom', start, end },
     }));
-    const params = new URLSearchParams(searchParams);
-    params.set('start', start.toISOString());
-    params.set('end', end.toISOString());
-    params.set('page', '1');
-    setSearchParams(params);
+    setCurrentPage(1);
   };
 
   // ─── Filter options ────────────────────────────────────────────
@@ -397,26 +469,22 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             <TextField
               size="small"
               placeholder={t('argus.issues.searchPlaceholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  const params = new URLSearchParams(searchParams);
-                  params.set('search', search);
-                  params.set('page', '1');
-                  setSearchParams(params);
+                  setStoreSearch(searchInput);
+                  setCurrentPage(1);
                 }
               }}
               InputProps={{
                 startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
-                endAdornment: search ? (
+                endAdornment: searchInput ? (
                   <InputAdornment position="end">
                     <IconButton size="small" onClick={() => {
-                      setSearch('');
-                      const params = new URLSearchParams(searchParams);
-                      params.delete('search');
-                      params.set('page', '1');
-                      setSearchParams(params);
+                      setSearchInput('');
+                      setStoreSearch('');
+                      setCurrentPage(1);
                     }} sx={{ p: 0.2 }}>
                       <CloseIcon sx={{ fontSize: 14 }} />
                     </IconButton>
@@ -450,7 +518,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             </Tooltip>
             <ArgusQueryBuilder
               fields={QUERY_BUILDER_FIELDS}
-              query={search}
+              query={searchInput}
               onApply={handleQueryBuilderApply}
               anchorEl={queryBuilderAnchor}
               onClose={() => setQueryBuilderAnchor(null)}
@@ -464,9 +532,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               onClose={() => setStatusAnchor(null)}
               onSelect={(v) => {
                 setStatus(v);
-                const params = new URLSearchParams(searchParams);
-                params.set('status', v); params.set('page', '1');
-                setSearchParams(params);
+                setCurrentPage(1);
               }}
             />
             <FilterChipSelect
@@ -478,9 +544,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               onClose={() => setLevelAnchor(null)}
               onSelect={(v) => {
                 setLevel(v);
-                const params = new URLSearchParams(searchParams);
-                params.set('level', v); params.set('page', '1');
-                setSearchParams(params);
+                setCurrentPage(1);
               }}
             />
             <FilterChipSelect
@@ -492,9 +556,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               onClose={() => setSortAnchor(null)}
               onSelect={(v) => {
                 setSort(v);
-                const params = new URLSearchParams(searchParams);
-                params.set('sort', v);
-                setSearchParams(params);
               }}
             />
           </>
@@ -513,17 +574,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       {/* Issues content area with sidebar */}
       <Box sx={{ display: 'flex' }}>
         <SavedSearchesSidebar
-          currentQuery={search}
+          currentQuery={searchInput}
           currentSort={sort}
           onApply={(saved: SavedSearch) => {
-            setSearch(saved.query);
+            setSearchInput(saved.query);
+            setStoreSearch(saved.query);
             setSort(saved.sort);
-            const params = new URLSearchParams(searchParams);
-            if (saved.query) params.set('search', saved.query);
-            else params.delete('search');
-            params.set('sort', saved.sort);
-            params.set('page', '1');
-            setSearchParams(params);
+            setCurrentPage(1);
           }}
         />
 
@@ -600,9 +657,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                   onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
                   onRowsPerPageChange={(e) => {
                     setRowsPerPage(Number(e.target.value));
-                    const params = new URLSearchParams(searchParams);
-                    params.set('page', '1');
-                    setSearchParams(params);
+                    setCurrentPage(1);
                   }}
                   size="small"
                 />

@@ -381,7 +381,16 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
               sx={{ borderRadius: '8px', fontSize: '0.82rem' }}
               icon={testResult.ok ? <CheckIcon sx={{ fontSize: 18 }} /> : undefined}
             >
-              {testResult.message}
+              {testResult.ok 
+                ? t('argus.settings.providerWizard.testSuccess', 'Test message sent successfully') 
+                : (() => {
+                    const msg = testResult.message;
+                    if (msg === 'Invalid Slack Webhook URL format') return t('argus.settings.providerWizard.invalidSlackUrl', msg);
+                    if (msg === 'Invalid Discord Webhook URL format') return t('argus.settings.providerWizard.invalidDiscordUrl', msg);
+                    if (msg === 'Invalid MSTeams Webhook URL format') return t('argus.settings.providerWizard.invalidMSTeamsUrl', msg);
+                    if (msg === 'Webhook URL is required') return t('argus.settings.providerWizard.webhookUrlRequired', msg);
+                    return t(msg, msg);
+                  })()}
             </Alert>
           )}
         </Box>

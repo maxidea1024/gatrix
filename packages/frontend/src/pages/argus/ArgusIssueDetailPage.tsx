@@ -200,7 +200,7 @@ const ArgusIssueDetailPage: React.FC = () => {
           </Button>
         </Box>
       ) : (
-        <Box>
+        <Box sx={{ mt: -0.5 }}>
           {/* Action Bar (Header + Controls) */}
           <IssueActionBar
             issue={issue}

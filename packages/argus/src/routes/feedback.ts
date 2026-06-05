@@ -746,11 +746,15 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
       try {
         await ensureActivityTable();
+        const { limit, offset } = request.query as Record<string, string>;
+        const limitVal = limit ? parseInt(limit, 10) : 50;
+        const offsetVal = offset ? parseInt(offset, 10) : 0;
+
         const [rows] = await mysqlPool.query(
           `SELECT * FROM g_argus_feedback_activity
            WHERE project_id = ? AND feedback_id = ?
-           ORDER BY created_at DESC LIMIT 50`,
-          [projectId, feedbackId]
+           ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+          [projectId, feedbackId, limitVal, offsetVal]
         );
         return reply.send({ data: rows });
       } catch (error) {

@@ -12,8 +12,6 @@ import {
 } from '@mui/material';
 import {
   CheckCircle as ResolvedIcon,
-  Block as IgnoreIcon,
-  ErrorOutline as ReopenedIcon,
   PersonAdd as AssignIcon,
   Comment as CommentIcon,
   Merge as MergeIcon,
@@ -92,16 +90,18 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
   const theme = useTheme();
   const [activities, setActivities] = useState<ArgusIssueActivity[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showAll, setShowAll] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [sectionExpanded, setSectionExpanded] = useLocalStorage('argus_activity_expanded', true);
 
-  const fetchActivities = useCallback(async (silent = false) => {
+  const fetchActivities = useCallback(async (silent = false, customLimit = 5) => {
     if (!silent) setLoading(true);
     try {
-      const data = await argusService.getIssueActivity(projectId, issueId);
+      const data = await argusService.getIssueActivity(projectId, issueId, customLimit, 0);
       setActivities(data);
+      setHasMore(data.length === customLimit);
     } catch (error) {
       console.error('Failed to fetch activities:', error);
     } finally {
@@ -110,8 +110,29 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
   }, [projectId, issueId]);
 
   useEffect(() => {
-    fetchActivities();
-  }, [fetchActivities]);
+    fetchActivities(false, 5);
+  }, [issueId, fetchActivities]);
+
+  const fetchMoreActivities = async () => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const offset = activities.length;
+      const data = await argusService.getIssueActivity(projectId, issueId, 5, offset);
+      if (data.length > 0) {
+        setActivities(prev => [...prev, ...data]);
+        if (data.length < 5) {
+          setHasMore(false);
+        }
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Failed to fetch more activities:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleAddComment = async () => {
     if (!commentText.trim() || submitting) return;
@@ -133,8 +154,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
 
     try {
       await argusService.addIssueComment(projectId, issueId, text);
-      // Silent refresh to sync with server (get real IDs)
-      fetchActivities(true);
     } catch (error) {
       console.error('Failed to add comment:', error);
       // Rollback optimistic update
@@ -331,28 +350,32 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
       ) : (
         <Box>
           {(() => {
-            const maxItems = embedded && !showAll ? 5 : activities.length;
-            const visibleActivities = activities.slice(0, maxItems);
-            const hasMore = embedded && activities.length > 5 && !showAll;
+            const visibleActivities = activities;
+            const showLoadMore = hasMore;
             return (
               <>
                 {visibleActivities.map((activity, idx) =>
                   renderActivityItem(activity, idx, visibleActivities.length)
                 )}
-                {hasMore && (
+                {showLoadMore && (
                   <Box sx={{ pt: 1, textAlign: 'center' }}>
                     <Link
                       component="button"
                       variant="caption"
-                      onClick={() => setShowAll(true)}
+                      onClick={fetchMoreActivities}
+                      disabled={loadingMore}
                       sx={{
                         fontSize: '0.7rem', cursor: 'pointer',
                         color: theme.palette.primary.main,
                         textDecoration: 'none',
+                        fontWeight: 600,
+                        opacity: loadingMore ? 0.5 : 1,
+                        display: 'inline-flex', alignItems: 'center', gap: 0.5,
                         '&:hover': { textDecoration: 'underline' },
                       }}
                     >
-                      {t('argus.activity.showAll', { count: activities.length - 5 })}
+                      {loadingMore && <CircularProgress size={10} color="inherit" />}
+                      {t('common.showMore', { count: 5 })}
                     </Link>
                   </Box>
                 )}

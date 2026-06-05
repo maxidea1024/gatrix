@@ -154,6 +154,10 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
               result = { ok: false, message: 'Webhook URL is required' };
               break;
             }
+            if (!webhookUrl.startsWith('https://hooks.slack.com/services/')) {
+              result = { ok: false, message: 'Invalid Slack Webhook URL format' };
+              break;
+            }
             try {
               const res = await fetch(webhookUrl, {
                 method: 'POST',
@@ -172,6 +176,10 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
             const webhookUrl = config?.webhook_url;
             if (!webhookUrl) {
               result = { ok: false, message: 'Webhook URL is required' };
+              break;
+            }
+            if (!webhookUrl.startsWith('https://discord.com/api/webhooks/') && !webhookUrl.startsWith('https://discordapp.com/api/webhooks/')) {
+              result = { ok: false, message: 'Invalid Discord Webhook URL format' };
               break;
             }
             try {
@@ -194,6 +202,10 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
               result = { ok: false, message: 'Webhook URL is required' };
               break;
             }
+            if (!webhookUrl.startsWith('https://outlook.office.com/webhook/')) {
+              result = { ok: false, message: 'Invalid MSTeams Webhook URL format' };
+              break;
+            }
             try {
               const res = await fetch(webhookUrl, {
                 method: 'POST',
@@ -212,6 +224,10 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
             const webhookUrl = config?.webhook_url;
             if (!webhookUrl) {
               result = { ok: false, message: 'Webhook URL is required' };
+              break;
+            }
+            if (!webhookUrl.startsWith('http://') && !webhookUrl.startsWith('https://')) {
+              result = { ok: false, message: 'Invalid Webhook URL format' };
               break;
             }
             try {

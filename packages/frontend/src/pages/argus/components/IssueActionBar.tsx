@@ -120,7 +120,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           </Box>
         }
         subtitle={issue.culprit}
-        enableAutoBack={false}
+        enableAutoBack
         onBack={onBack}
         actions={
           <Box sx={{ display: 'flex', gap: 3, pt: 0.5, pr: 1, alignItems: 'center' }}>

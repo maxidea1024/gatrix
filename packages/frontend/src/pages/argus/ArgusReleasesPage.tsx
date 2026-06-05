@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -30,6 +30,7 @@ import FilterChipSelect from '@/components/common/FilterChipSelect';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useArgusReleaseStore } from '@/hooks/useArgusReleaseStore';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SimplePagination from '@/components/common/SimplePagination';
 import { formatCompactNumber } from '@/utils/numberFormat';
@@ -43,13 +44,14 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 
 const PAGE_SIZE_STORAGE_KEY = 'argus:releases:pageSize';
+const DEEP_LINK_KEYS = ['page', 'search', 'sort'];
 
 const ArgusReleasesPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
@@ -59,13 +61,57 @@ const ArgusReleasesPage: React.FC = () => {
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
+  // ─── Zustand Store ──────────────────────────────────────────────
+  const currentPage = useArgusReleaseStore((s) => s.currentPage);
+  const searchTerm = useArgusReleaseStore((s) => s.searchTerm);
+  const sortBy = useArgusReleaseStore((s) => s.sortBy);
+
+  const setCurrentPage = useArgusReleaseStore((s) => s.setCurrentPage);
+  const setSearchTerm = useArgusReleaseStore((s) => s.setSearchTerm);
+  const setSortBy = useArgusReleaseStore((s) => s.setSortBy);
+  const hydrateFromParams = useArgusReleaseStore((s) => s.hydrateFromParams);
+  const resetStore = useArgusReleaseStore((s) => s.resetStore);
+
+  // ─── Mount Initialization ──────────────────────────────────────
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    // 1. GNB/Sidebar reset: MainLayout passes { fromSidebar: true }
+    if ((location.state as any)?.fromSidebar) {
+      resetStore();
+      navigate(location.pathname, { replace: true, state: {} });
+      return;
+    }
+
+    // 2. Deep-link hydration
+    const hasDeepLinkParams = DEEP_LINK_KEYS.some((k) => searchParams.has(k));
+    if (hasDeepLinkParams) {
+      resetStore();
+      const hydration: Record<string, unknown> = {};
+      const urlPage = searchParams.get('page');
+      const urlSearch = searchParams.get('search');
+      const urlSort = searchParams.get('sort');
+
+      if (urlPage) hydration.currentPage = parseInt(urlPage, 10);
+      if (urlSearch) hydration.searchTerm = urlSearch;
+      if (urlSort) hydration.sortBy = urlSort;
+
+      hydrateFromParams(hydration);
+      navigate(location.pathname, { replace: true });
+    }
+    // 3. Breadcrumb return: Zustand retains previous state automatically.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Local-only UI State ────────────────────────────────────────
   const [releases, setReleases] = useState<ArgusRelease[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<ArgusFilterState>(
     () => defaultArgusFilterState(urlState.period)
   );
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'crash_free' | 'sessions' | 'errors'>('date');
   const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
 
   const sortOptions = useMemo(() => [
@@ -82,7 +128,6 @@ const ArgusReleasesPage: React.FC = () => {
     }));
   }, [urlState.period]);
 
-  const currentPage = Number(searchParams.get('page') || 1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
     const stored = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
     const saved = Number(stored);
@@ -94,9 +139,7 @@ const ArgusReleasesPage: React.FC = () => {
   }, [rowsPerPage]);
 
   const handlePageChange = (_: unknown, page: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('page', String(page));
-    setSearchParams(params);
+    setCurrentPage(page);
   };
 
   const fetchData = useCallback(async () => {
@@ -454,9 +497,7 @@ const ArgusReleasesPage: React.FC = () => {
               onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
               onRowsPerPageChange={(e) => {
                 setRowsPerPage(Number(e.target.value));
-                const params = new URLSearchParams(searchParams);
-                params.set('page', '1');
-                setSearchParams(params);
+                setCurrentPage(1);
               }}
               size="small"
             />

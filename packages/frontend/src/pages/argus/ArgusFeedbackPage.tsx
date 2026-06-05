@@ -82,7 +82,7 @@ import { Bar } from 'react-chartjs-2';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
-import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse, ArgusFeedbackActivity, ArgusIssueTracker, ArgusIssue } from '@/services/argusService';
+import argusService, { ArgusFeedbackItem, ArgusFeedbackResponse, ArgusIssueTracker, ArgusIssue } from '@/services/argusService';
 import { rbacService } from '@/services/rbacService';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
@@ -210,8 +210,6 @@ const ArgusFeedbackPage: React.FC = () => {
   const [newKeywordRegex, setNewKeywordRegex] = useState(false);
   const [spamScanLoading, setSpamScanLoading] = useState(false);
 
-  // ─── Activity Timeline ───
-  const [activities, setActivities] = useState<ArgusFeedbackActivity[]>([]);
 
   // ─── Resizable Splitter ───
 
@@ -303,13 +301,6 @@ const ArgusFeedbackPage: React.FC = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // ─── Fetch Activity for selected feedback ───
-  useEffect(() => {
-    if (!urlState.fb || !projectId) { setActivities([]); return; }
-    argusService.getFeedbackActivity(projectId, urlState.fb)
-      .then(setActivities)
-      .catch(() => setActivities([]));
-  }, [projectId, urlState.fb]);
 
   // ─── Handlers ───
   const handleFilterChange = (newFilters: ArgusFilterState) => {
@@ -1242,9 +1233,7 @@ const ArgusFeedbackPage: React.FC = () => {
               <FeedbackActivityTimeline
                 projectId={projectId}
                 feedbackId={selectedItem.feedback_id}
-                activities={activities}
                 isDark={isDark}
-                onActivitiesChange={setActivities}
               />
                 </Box>
               </Box>
