@@ -337,21 +337,28 @@ const JsonTab: React.FC<{ log: ArgusLogEntry; isDark: boolean }> = ({ log, isDar
 
   return (
     <Box sx={{ p: 2, overflow: 'auto' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-        <CopyButton text={jsonStr} size={14} />
-      </Box>
-      <Box
-        component="pre"
-        sx={{
-          fontSize: '0.7rem', lineHeight: 1.6,
-          fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-          backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: '8px', p: 2, m: 0,
-          overflow: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-        }}
-      >
-        {jsonStr}
+      <Box sx={{ position: 'relative' }}>
+        <Box
+          sx={{
+            position: 'sticky', top: 0, display: 'flex', justifyContent: 'flex-end',
+            pt: 1, pr: 1, zIndex: 1,
+          }}
+        >
+          <CopyButton text={jsonStr} size={14} />
+        </Box>
+        <Box
+          component="pre"
+          sx={{
+            fontSize: '0.7rem', lineHeight: 1.6,
+            fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+            backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            borderRadius: '8px', p: 2, pt: 0, m: 0, mt: -3,
+            overflow: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+          }}
+        >
+          {jsonStr}
+        </Box>
       </Box>
     </Box>
   );
