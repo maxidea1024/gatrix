@@ -113,16 +113,89 @@ const ArgusLogsSearchInput: React.FC<{
     return () => clearTimeout(timer);
   }, [localSearch, onDebouncedChange]);
 
-  /* ─── Cursor-position-based word helpers (inspired by Sentry's replaceFocusedWord) ─── */
+  /* ─── Chip-based search input ─── */
   const inputRef = useRef<HTMLInputElement>(null);
 
-  /** Get the word at the cursor position in the input */
-  const getWordAtCursor = (): { word: string; start: number; end: number } => {
-    const el = inputRef.current || searchContainerRef.current?.querySelector('input');
-    const cursor = el?.selectionStart ?? localSearch.length;
+  /** Tokenize query into completed chips + editable remainder */
+  interface SearchChip {
+    type: 'filter' | 'negated' | 'has' | 'operator' | 'text';
+    raw: string;
+    key?: string;
+    value?: string;
+  }
+
+  const { chips, remainder, chipsText } = useMemo(() => {
+    const chipList: SearchChip[] = [];
+    // Match completed key:"value", key:'value', key:value, AND, OR
+    const re = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|\S+))|(\bAND\b|\bOR\b)/g;
+    let lastIdx = 0;
+    let match: RegExpExecArray | null;
     const text = localSearch;
 
-    // Find word boundaries around cursor
+    while ((match = re.exec(text)) !== null) {
+      // Free text between tokens
+      const gap = text.slice(lastIdx, match.index).trim();
+      if (gap) chipList.push({ type: 'text', raw: gap });
+
+      if (match[1]) {
+        const tok = match[1];
+        const isNeg = tok.startsWith('!') || tok.startsWith('-');
+        const clean = isNeg ? tok.slice(1) : tok;
+        const ci = clean.indexOf(':');
+        const key = clean.slice(0, ci);
+        let val = clean.slice(ci + 1);
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) val = val.slice(1, -1);
+
+        if (key === 'has') {
+          chipList.push({ type: 'has', raw: tok, key: 'has', value: val });
+        } else {
+          // Only treat as completed chip if value is quoted (i.e. fully completed)
+          const rawVal = clean.slice(ci + 1);
+          const isQuoted = (rawVal.startsWith('"') && rawVal.endsWith('"')) || (rawVal.startsWith("'") && rawVal.endsWith("'"));
+          if (isQuoted) {
+            chipList.push({ type: isNeg ? 'negated' : 'filter', raw: tok, key, value: val });
+          } else {
+            // Not completed yet (e.g. severity:err) — leave as remainder
+            break;
+          }
+        }
+      } else if (match[2]) {
+        chipList.push({ type: 'operator', raw: match[2] });
+      }
+      lastIdx = match.index + match[0].length;
+    }
+
+    const rem = text.slice(lastIdx).trimStart();
+    const ct = chipList.map(c => c.raw).join(' ');
+    return { chips: chipList, remainder: rem, chipsText: ct };
+  }, [localSearch]);
+
+  /** Remove a chip by index */
+  const removeChip = (idx: number) => {
+    const newChips = chips.filter((_, i) => i !== idx);
+    const newChipsText = newChips.map(c => c.raw).join(' ');
+    const newQuery = (newChipsText ? newChipsText + ' ' : '') + remainder;
+    const final = newQuery.trim();
+    setLocalSearch(final);
+    onSubmit(final);
+  };
+
+  /** Update localSearch by replacing the remainder portion */
+  const updateRemainder = (newRemainder: string) => {
+    const newQuery = (chipsText ? chipsText + ' ' : '') + newRemainder;
+    setLocalSearch(newQuery);
+    setSearchFocused(true);
+  };
+
+  /** Get cursor-adjusted word position in full localSearch */
+  const getWordAtCursor = (): { word: string; start: number; end: number } => {
+    const el = inputRef.current;
+    const inputCursor = el?.selectionStart ?? remainder.length;
+    // Offset: chips text + separator space
+    const offset = chipsText ? chipsText.length + 1 : 0;
+    const cursor = offset + inputCursor;
+    const text = localSearch;
+
     let start = cursor;
     while (start > 0 && text[start - 1] !== ' ') start--;
     let end = cursor;
@@ -131,7 +204,6 @@ const ArgusLogsSearchInput: React.FC<{
     return { word: text.slice(start, end), start, end };
   };
 
-  /** Replace the word at cursor position with replacement text */
   const replaceWordAtCursor = (replacement: string, moveCursorToEnd = true): string => {
     const { start, end } = getWordAtCursor();
     const before = localSearch.slice(0, start);
@@ -140,11 +212,13 @@ const ArgusLogsSearchInput: React.FC<{
 
     setLocalSearch(result);
     if (moveCursorToEnd) {
-      // Set cursor after the replacement
-      const newPos = (before + replacement).length + 1;
       requestAnimationFrame(() => {
-        const el = inputRef.current || searchContainerRef.current?.querySelector('input');
-        if (el) { el.selectionStart = el.selectionEnd = Math.min(newPos, result.length); el.focus(); }
+        if (inputRef.current) {
+          inputRef.current.focus();
+          // Cursor at end of input
+          const newLen = result.length;
+          inputRef.current.selectionStart = inputRef.current.selectionEnd = newLen;
+        }
       });
     }
     return result;
@@ -159,6 +233,14 @@ const ArgusLogsSearchInput: React.FC<{
   };
 
   const handleSearchKey = (e: React.KeyboardEvent) => {
+    // Backspace on empty remainder → delete last chip
+    if (e.key === 'Backspace' && remainder === '' && chips.length > 0) {
+      e.preventDefault();
+      const newChips = chips.slice(0, -1);
+      const newChipsText = newChips.map(c => c.raw).join(' ');
+      setLocalSearch(newChipsText ? newChipsText + ' ' : '');
+      return;
+    }
     // Forward to autocomplete for arrow/enter/tab navigation
     if (autocompleteRef.current?.handleKeyDown(e)) return;
     if (e.key === 'Enter') {
@@ -168,31 +250,74 @@ const ArgusLogsSearchInput: React.FC<{
     }
   };
 
+  /* ─── Chip color helpers ─── */
+  const chipColor = (chip: SearchChip) => {
+    switch (chip.type) {
+      case 'filter': return { bg: alpha(theme.palette.primary.main, 0.12), border: alpha(theme.palette.primary.main, 0.3), color: isDark ? theme.palette.primary.light : theme.palette.primary.dark };
+      case 'negated': return { bg: alpha(theme.palette.error.main, 0.12), border: alpha(theme.palette.error.main, 0.3), color: isDark ? theme.palette.error.light : theme.palette.error.dark };
+      case 'has': return { bg: alpha(theme.palette.success.main, 0.12), border: alpha(theme.palette.success.main, 0.3), color: isDark ? theme.palette.success.light : theme.palette.success.dark };
+      case 'operator': return { bg: alpha(theme.palette.warning.main, 0.10), border: 'transparent', color: theme.palette.warning.main };
+      default: return { bg: alpha(theme.palette.text.primary, 0.08), border: alpha(theme.palette.text.primary, 0.15), color: theme.palette.text.primary };
+    }
+  };
+
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <Box
         ref={searchContainerRef}
+        onClick={() => inputRef.current?.focus()}
         sx={{
-          display: 'flex', alignItems: 'center', gap: 0.5, flex: 1,
-          px: 1, py: 0.2, borderRadius: '6px', minWidth: 500, minHeight: 30,
+          display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, flexWrap: 'wrap',
+          px: 1, py: 0.3, borderRadius: '6px', minWidth: 500, minHeight: 30,
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-          transition: 'border-color 0.2s',
+          transition: 'border-color 0.2s', cursor: 'text',
           backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
           '&:focus-within': { borderColor: theme.palette.primary.main, boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` },
         }}
       >
         <SearchIcon sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }} />
+
+        {/* Rendered chips */}
+        {chips.map((chip, i) => {
+          const cc = chipColor(chip);
+          if (chip.type === 'operator') {
+            return (
+              <Typography key={i} sx={{
+                fontSize: '0.7rem', fontWeight: 700, px: 0.5,
+                color: cc.color, userSelect: 'none',
+              }}>
+                {chip.raw}
+              </Typography>
+            );
+          }
+          return (
+            <Chip
+              key={i}
+              size="small"
+              label={chip.type === 'has' ? `has:${chip.value}` : `${chip.key}:${chip.value}`}
+              onDelete={() => removeChip(i)}
+              sx={{
+                height: 22, fontSize: '0.75rem', fontWeight: 600,
+                backgroundColor: cc.bg, color: cc.color,
+                border: `1px solid ${cc.border}`,
+                '& .MuiChip-deleteIcon': { fontSize: 14, color: cc.color, opacity: 0.6, '&:hover': { opacity: 1 } },
+              }}
+            />
+          );
+        })}
+
+        {/* Editable input for remainder */}
         <Box component="input"
           ref={inputRef}
-          value={localSearch}
+          value={remainder}
           spellCheck={false}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setLocalSearch(e.target.value); setSearchFocused(true); }}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateRemainder(e.target.value)}
           onKeyDown={handleSearchKey as any}
           onFocus={() => setSearchFocused(true)}
-          placeholder={t('argus.discover.searchPlaceholder', 'Search for events, users, tags (e.g. level:error OR browser:Chrome)')}
+          placeholder={chips.length === 0 ? t('argus.discover.searchPlaceholder', 'Search for events, users, tags (e.g. level:error OR browser:Chrome)') : ''}
           style={{
             flex: 1, border: 'none', outline: 'none', backgroundColor: 'transparent',
-            color: 'inherit', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 500, minWidth: 120, padding: '6px 8px'
+            color: 'inherit', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 500, minWidth: 120, padding: '6px 4px'
           }}
         />
         {localSearch && (
