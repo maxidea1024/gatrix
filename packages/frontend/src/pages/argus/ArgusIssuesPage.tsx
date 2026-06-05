@@ -754,16 +754,21 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         </Box>
 
         {/* Right: Main content */}
-        <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75, pt: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Volume Chart */}
-          <IssueVolumeChart
-            projectId={projectId}
-            filters={filters}
-            status={status}
-            level={level}
-            query={buildSearchWithFilters()}
-            onDateRangeSelect={handleDateRangeSelect}
-          />
+        <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden', pl: facetCollapsed ? 0.25 : 0.75, pt: 1, display: 'flex', flexDirection: 'column' }}>
+          {/* Volume Chart - fixed at top */}
+          <Box sx={{ flexShrink: 0 }}>
+            <IssueVolumeChart
+              projectId={projectId}
+              filters={filters}
+              status={status}
+              level={level}
+              query={buildSearchWithFilters()}
+              onDateRangeSelect={handleDateRangeSelect}
+            />
+          </Box>
+
+          {/* Scrollable issue list area */}
+          <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
 
           {/* Bulk Actions */}
           <IssueBulkActions
@@ -848,6 +853,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             )}
           </PageContentLoader>
 
+          </Box>{/* end scrollable area */}
         </Box>{/* end right content area */}
       </Box>{/* end flex sidebar container */}
 
