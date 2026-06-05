@@ -3,11 +3,8 @@ import {
   Box,
   Typography,
   TextField,
-  IconButton,
   Avatar,
   useTheme,
-  alpha,
-  CircularProgress,
   Link,
 } from '@mui/material';
 import {
@@ -16,7 +13,6 @@ import {
   ErrorOutline as ReopenedIcon,
   PersonAdd as AssignIcon,
   Comment as CommentIcon,
-  Send as SendIcon,
   Merge as MergeIcon,
   PriorityHigh as PriorityIcon,
 } from '@mui/icons-material';
@@ -214,7 +210,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
                 px: 1.5, py: 0.8,
                 borderRadius: '6px',
                 backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.018)',
-                borderLeft: `2px solid ${alpha(config.color, 0.5)}`,
               }}>
                 <Typography sx={{ fontSize: '0.76rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.5, color: 'text.primary' }}>
                   {getActivityDescription(activity, t)}
@@ -298,24 +293,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
             '& .MuiOutlinedInput-input': { py: 0.8, px: 1.2 },
           }}
         />
-        <IconButton
-          size="small"
-          onClick={handleAddComment}
-          disabled={!commentText.trim() || submitting}
-          sx={{
-            mb: 0.4, mr: 0.4,
-            width: 28, height: 28,
-            borderRadius: '8px',
-            color: commentText.trim() ? '#fff' : 'text.disabled',
-            backgroundColor: commentText.trim() ? theme.palette.primary.main : 'transparent',
-            '&:hover': {
-              backgroundColor: commentText.trim() ? theme.palette.primary.dark : alpha(theme.palette.primary.main, 0.08),
-            },
-            transition: 'all 0.2s',
-          }}
-        >
-          {submitting ? <CircularProgress size={14} sx={{ color: 'inherit' }} /> : <SendIcon sx={{ fontSize: 14 }} />}
-        </IconButton>
       </Box>
 
       {/* Activity list */}

@@ -4,10 +4,10 @@ import {
   Typography,
   Divider,
   useTheme,
-  alpha,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ArgusIssueDetail, ArgusErrorEvent } from '@/services/argusService';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import SuspectCommits from '@/components/argus/SuspectCommits';
 import IssueTrackerWidget from '@/components/argus/IssueTrackerWidget';
 import SimilarMergedIssues from '@/components/argus/SimilarMergedIssues';
@@ -35,45 +35,45 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
   revalidateIssue,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <>
       {/* First/Last Seen + Release */}
       <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-          <Box>
-            <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
               {t('argus.issues.firstSeen')}
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'text.primary' }}>
-              {issue.first_seen ? new Date(issue.first_seen).toLocaleString() : '—'}
+            <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.primary' }}>
+              {issue.first_seen ? formatRelativeTime(issue.first_seen, undefined, i18n.language) : '—'}
             </Typography>
           </Box>
-          <Box>
-            <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
               {t('argus.issues.lastSeen')}
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'text.primary' }}>
-              {issue.last_seen ? new Date(issue.last_seen).toLocaleString() : '—'}
+            <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.primary' }}>
+              {issue.last_seen ? formatRelativeTime(issue.last_seen, undefined, i18n.language) : '—'}
             </Typography>
           </Box>
           {latestEvent?.release && (
-            <Box>
-              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
                 {t('argus.detail.release')}
               </Typography>
-              <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600, color: theme.palette.info.main }}>
+              <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.info.main }}>
                 {latestEvent.release}
               </Typography>
             </Box>
           )}
           {latestEvent?.environment && (
-            <Box>
-              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', display: 'block', mb: 0.2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
                 {t('argus.issues.environment')}
               </Typography>
-              <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
                 {latestEvent.environment}
               </Typography>
             </Box>
