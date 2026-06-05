@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
@@ -1125,7 +1124,7 @@ const ArgusLogsPage: React.FC = () => {
 
   // ─── Logs table content ───
   const logsTableContent = useMemo(() => (
-    <PageContentLoader loading={loading && logs.length === 0} skeleton={<TableSkeleton rows={12} cols={columns.length || 4} />}>
+    <PageContentLoader loading={loading && logs.length === 0}>
       <Box ref={logContainerRef} sx={{
         ...(logsFullscreen ? { flex: 1, overflowY: 'auto' } : { maxHeight: 'none' }),
       }}>
