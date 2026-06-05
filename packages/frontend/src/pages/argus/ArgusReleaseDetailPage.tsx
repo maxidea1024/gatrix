@@ -11,6 +11,8 @@ import {
   Skeleton,
   Divider,
   Tooltip,
+  Avatar,
+  LinearProgress,
 } from '@mui/material';
 import {
   NewReleases as ReleaseIcon,
@@ -22,6 +24,10 @@ import {
   CheckCircle as CheckIcon,
   Schedule as ScheduleIcon,
   ErrorOutline as ErrorIcon,
+  DonutLarge as DonutIcon,
+  Person as PersonIcon,
+  RocketLaunch as DeployIcon,
+  FiberManualRecord as DotIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -31,16 +37,11 @@ import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import SimplePagination from '@/components/common/SimplePagination';
 import { formatCompactNumber } from '@/utils/numberFormat';
+import { formatRelativeTime, formatDateTime } from '@/utils/dateFormat';
 import IssueListItem from '@/components/argus/IssueListItem';
 
 const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
 
-function formatDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  } catch { return dateStr; }
-}
 
 // --- Issue Tabs ---
 type IssueTabType = 'all' | 'new' | 'unhandled' | 'regressed' | 'resolved';
@@ -135,6 +136,192 @@ const ReleaseHealthChart: React.FC<{
           </Tooltip>
         ))}
       </svg>
+    </Paper>
+  );
+};
+
+// --- Session Status Donut Chart ---
+const SESSION_STATUSES = [
+  { key: 'healthy', label: 'Healthy', color: '#4caf50' },
+  { key: 'errored', label: 'Errored', color: '#ff9800' },
+  { key: 'crashed', label: 'Crashed', color: '#f44336' },
+  { key: 'abnormal', label: 'Abnormal', color: '#9c27b0' },
+] as const;
+
+const SessionStatusChart: React.FC<{
+  releaseData: any;
+  isDark: boolean;
+}> = ({ releaseData, isDark }) => {
+  const totalSessions = Number(releaseData.total_sessions) || 1;
+  const crashFreeRate = Number(releaseData.crash_free_rate) / 100;
+  const crashed = Number(releaseData.fatal_count || 0) + Number(releaseData.unhandled_count || 0);
+  const errored = Number(releaseData.error_count || 0) - crashed;
+  const healthy = Math.max(0, Math.round(totalSessions * crashFreeRate) - Math.max(0, errored));
+  const abnormal = Math.max(0, totalSessions - healthy - Math.max(0, errored) - crashed);
+
+  const segments = [
+    { ...SESSION_STATUSES[0], value: healthy },
+    { ...SESSION_STATUSES[1], value: Math.max(0, errored) },
+    { ...SESSION_STATUSES[2], value: crashed },
+    { ...SESSION_STATUSES[3], value: abnormal },
+  ].filter(s => s.value > 0);
+
+  const total = segments.reduce((s, seg) => s + seg.value, 0) || 1;
+
+  // SVG donut
+  const cx = 60, cy = 60, r = 45, strokeW = 14;
+  const circumference = 2 * Math.PI * r;
+  let cumulative = 0;
+
+  return (
+    <Paper elevation={0} sx={{
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+      borderRadius: 2, p: 2,
+    }}>
+      <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <DonutIcon sx={{ fontSize: 16, color: '#7c4dff' }} />
+        Session Status
+      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <svg width={120} height={120} viewBox="0 0 120 120">
+          {segments.map((seg, i) => {
+            const pct = seg.value / total;
+            const dashLen = pct * circumference;
+            const dashOffset = -cumulative * circumference;
+            cumulative += pct;
+            return (
+              <circle
+                key={seg.key}
+                cx={cx} cy={cy} r={r}
+                fill="none"
+                stroke={seg.color}
+                strokeWidth={strokeW}
+                strokeDasharray={`${dashLen} ${circumference - dashLen}`}
+                strokeDashoffset={dashOffset}
+                transform={`rotate(-90 ${cx} ${cy})`}
+                strokeLinecap="butt"
+              />
+            );
+          })}
+          <text x={cx} y={cy - 4} textAnchor="middle" fill={isDark ? '#fff' : '#333'} fontSize={14} fontWeight={800}>
+            {formatCompactNumber(totalSessions)}
+          </text>
+          <text x={cx} y={cy + 12} textAnchor="middle" fill={isDark ? '#888' : '#999'} fontSize={9}>
+            sessions
+          </text>
+        </svg>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8, flex: 1 }}>
+          {segments.map(seg => (
+            <Box key={seg.key} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: seg.color, flexShrink: 0 }} />
+              <Typography variant="caption" sx={{ fontSize: '0.72rem', flex: 1 }}>{seg.label}</Typography>
+              <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.72rem' }}>
+                {formatCompactNumber(seg.value)}
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled', minWidth: 36, textAlign: 'right' }}>
+                {((seg.value / total) * 100).toFixed(1)}%
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Paper>
+  );
+};
+
+// --- Commit Author Breakdown ---
+const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+  // Placeholder — backend doesn't expose commit data yet
+  // Will be populated when API is available
+  const authors: { name: string; email: string; commits: number }[] = [];
+
+  return (
+    <Paper elevation={0} sx={{
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+      borderRadius: 2, p: 2,
+    }}>
+      <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <PersonIcon sx={{ fontSize: 16, color: '#2196f3' }} />
+        Commit Authors
+      </Typography>
+      {authors.length === 0 ? (
+        <Box sx={{ py: 2, textAlign: 'center' }}>
+          <PersonIcon sx={{ fontSize: 28, color: 'text.disabled', mb: 0.5 }} />
+          <Typography variant="caption" color="text.disabled" display="block">No commit data</Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>Associate commits to see author breakdown</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {authors.map(a => {
+            const maxCommits = Math.max(...authors.map(x => x.commits), 1);
+            return (
+              <Box key={a.email} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Avatar sx={{ width: 22, height: 22, fontSize: '0.65rem', bgcolor: alpha('#2196f3', 0.2), color: '#2196f3' }}>
+                  {a.name.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.72rem' }}>{a.name}</Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={(a.commits / maxCommits) * 100}
+                    sx={{ height: 4, borderRadius: 2, mt: 0.3, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
+                  />
+                </Box>
+                <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.7rem' }}>{a.commits}</Typography>
+              </Box>
+            );
+          })}
+        </Box>
+      )}
+    </Paper>
+  );
+};
+
+// --- Deploy History ---
+const DeployHistory: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+  // Placeholder — backend doesn't expose deploy data yet
+  const deploys: { environment: string; deployed_at: string }[] = [];
+
+  const envColors: Record<string, string> = {
+    production: '#f44336',
+    staging: '#ff9800',
+    development: '#4caf50',
+  };
+
+  return (
+    <Paper elevation={0} sx={{
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+      borderRadius: 2, p: 2,
+    }}>
+      <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <DeployIcon sx={{ fontSize: 16, color: '#00bcd4' }} />
+        Deploys
+      </Typography>
+      {deploys.length === 0 ? (
+        <Box sx={{ py: 2, textAlign: 'center' }}>
+          <DeployIcon sx={{ fontSize: 28, color: 'text.disabled', mb: 0.5 }} />
+          <Typography variant="caption" color="text.disabled" display="block">No deploy data</Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>Set up deploy notifications to track</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {deploys.map((d, i) => {
+            const color = envColors[d.environment] || '#7c4dff';
+            return (
+              <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <DotIcon sx={{ fontSize: 10, color }} />
+                <Chip label={d.environment} size="small" sx={{
+                  height: 18, fontSize: '0.6rem', fontWeight: 700,
+                  backgroundColor: alpha(color, 0.1), color,
+                }} />
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', ml: 'auto' }}>
+                  {formatRelativeTime(d.deployed_at)}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
+      )}
     </Paper>
   );
 };
@@ -333,12 +520,19 @@ const ArgusReleaseDetailPage: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
               <ScheduleIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                {t('argus.releaseDetail.timeRange', 'Period')}: {formatDate(r.first_seen)} → {formatDate(r.last_seen)}
+                {t('argus.releaseDetail.timeRange', 'Period')}: {formatDateTime(r.first_seen)} → {formatDateTime(r.last_seen)}
               </Typography>
             </Box>
 
             {/* Release Health Chart */}
             <ReleaseHealthChart data={healthData} isDark={isDark} />
+
+            {/* Session Status + Authors + Deploys */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+              <SessionStatusChart releaseData={r} isDark={isDark} />
+              <CommitAuthorBreakdown isDark={isDark} />
+              <DeployHistory isDark={isDark} />
+            </Box>
 
             <Divider sx={{ mb: 3 }} />
 

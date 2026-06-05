@@ -13,9 +13,10 @@ import {
   Divider,
   TextField,
   InputAdornment,
+  Menu,
   MenuItem,
-  Select,
-  FormControl,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -29,7 +30,11 @@ import {
   Schedule as ScheduleIcon,
   ArrowBack as ArrowBackIcon,
   Search as SearchIcon,
+  ExpandMore as ExpandMoreIcon,
+  Check as CheckMarkIcon,
 } from '@mui/icons-material';
+import { ActionChip } from '@/components/common/ActionChip';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -68,6 +73,14 @@ const ArgusReleasesPage: React.FC = () => {
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'crash_free' | 'sessions' | 'errors'>('date');
+  const [sortMenuAnchor, setSortMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const SORT_OPTIONS = useMemo(() => [
+    { key: 'date' as const, label: t('argus.releases.sortDate', '최신순') },
+    { key: 'crash_free' as const, label: t('argus.releases.sortCrashFree', '크래시 프리 낮은순') },
+    { key: 'sessions' as const, label: t('argus.releases.sortSessions', '세션 많은순') },
+    { key: 'errors' as const, label: t('argus.releases.sortErrors', '에러 많은순') },
+  ], [t]);
 
   useEffect(() => {
     setFilters(prev => ({
@@ -270,18 +283,40 @@ const ArgusReleasesPage: React.FC = () => {
                   '& .MuiOutlinedInput-root': { borderRadius: 2, fontSize: '0.8rem' },
                 }}
               />
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <Select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  sx={{ borderRadius: 2, fontSize: '0.8rem' }}
-                >
-                  <MenuItem value="date">{t('argus.releases.sortDate', 'Date (newest)')}</MenuItem>
-                  <MenuItem value="crash_free">{t('argus.releases.sortCrashFree', 'Crash Free (lowest)')}</MenuItem>
-                  <MenuItem value="sessions">{t('argus.releases.sortSessions', 'Sessions (most)')}</MenuItem>
-                  <MenuItem value="errors">{t('argus.releases.sortErrors', 'Errors (most)')}</MenuItem>
-                </Select>
-              </FormControl>
+              <ActionChip
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography component="span" sx={{ fontSize: '0.72rem', color: 'text.disabled', fontWeight: 500 }}>
+                      {t('argus.releases.sortLabel', '정렬')}
+                    </Typography>
+                    <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
+                      {SORT_OPTIONS.find(o => o.key === sortBy)?.label}
+                    </Typography>
+                    <ExpandMoreIcon sx={{ fontSize: 14, color: 'text.secondary', ml: -0.2 }} />
+                  </Box>
+                }
+                onClick={(e) => setSortMenuAnchor(e.currentTarget)}
+              />
+              <Menu
+                anchorEl={sortMenuAnchor}
+                open={Boolean(sortMenuAnchor)}
+                onClose={() => setSortMenuAnchor(null)}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <MenuItem
+                    key={opt.key}
+                    onClick={() => { setSortBy(opt.key); setSortMenuAnchor(null); }}
+                    selected={sortBy === opt.key}
+                  >
+                    <ListItemIcon>{sortBy === opt.key && <CheckMarkIcon fontSize="small" />}</ListItemIcon>
+                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>
+                      {opt.label}
+                    </ListItemText>
+                  </MenuItem>
+                ))}
+              </Menu>
               {searchTerm && (
                 <Typography variant="caption" color="text.secondary">
                   {filteredTotal} / {total} {t('argus.releases.releasesLabel', 'releases')}
@@ -360,7 +395,7 @@ const ArgusReleasesPage: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <ScheduleIcon sx={{ fontSize: 13, color: isDark ? '#555' : '#bbb' }} />
                       <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
-                        {formatDate(r.first_seen)}
+                        {formatRelativeTime(r.first_seen)}
                       </Typography>
                     </Box>
                   </Box>
@@ -465,14 +500,5 @@ const ArgusReleasesPage: React.FC = () => {
     </Box>
   );
 };
-
-// --- Sub-components ---
-
-function formatDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr);
-    return `${d.getMonth() + 1}/${d.getDate()}`;
-  } catch { return dateStr; }
-}
 
 export default ArgusReleasesPage;
