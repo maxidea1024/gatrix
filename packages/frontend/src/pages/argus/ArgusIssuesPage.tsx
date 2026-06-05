@@ -724,7 +724,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       )}
 
       {/* ── Body: Sidebar + Content split ── */}
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` }}>
+      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', borderTop: activeFilters.length === 0 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
         {/* Left: Facet Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
           <FacetSidebar
