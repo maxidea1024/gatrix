@@ -186,7 +186,7 @@ const ArgusLogsPage: React.FC = () => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [hasMore, setHasMore] = useState(false);
 
-  const [columns, setColumns] = useState<string[]>(DEFAULT_COLUMNS);
+  const [columns, setColumns] = useLocalStorage<string[]>('argus_log_columns', DEFAULT_COLUMNS);
   const [editTableOpen, setEditTableOpen] = useState(false);
   const [tempColumns, setTempColumns] = useState<string[]>([]);
 
