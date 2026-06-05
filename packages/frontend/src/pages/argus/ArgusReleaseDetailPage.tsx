@@ -8,7 +8,6 @@ import {
   Tabs,
   useTheme,
   alpha,
-  Skeleton,
   Divider,
   Tooltip,
   Avatar,

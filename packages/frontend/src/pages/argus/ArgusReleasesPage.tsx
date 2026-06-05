@@ -7,7 +7,6 @@ import {
   IconButton,
   useTheme,
   alpha,
-  Skeleton,
   LinearProgress,
   Tooltip,
   Divider,
@@ -239,11 +238,9 @@ const ArgusReleasesPage: React.FC = () => {
                   {card.label}
                 </Typography>
               </Box>
-              {loading ? <Skeleton width={50} height={24} sx={{ mx: 'auto' }} /> : (
-                <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', color: 'text.primary' }}>
-                  {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value}
-                </Typography>
-              )}
+              <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1, fontSize: '1.2rem', color: 'text.primary' }}>
+                {typeof card.value === 'number' ? formatCompactNumber(card.value) : card.value}
+              </Typography>
             </Box>
             {idx < arr.length - 1 && (
               <Divider orientation="vertical" flexItem sx={{ mx: 1, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
