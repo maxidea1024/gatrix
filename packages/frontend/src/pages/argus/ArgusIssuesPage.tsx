@@ -661,15 +661,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         }
       />
 
-      {/* Volume Chart */}
-      <IssueVolumeChart
-        projectId={projectId}
-        filters={filters}
-        status={status}
-        level={level}
-        onDateRangeSelect={handleDateRangeSelect}
-      />
-
       {/* ── Active Filter Chips ── */}
       {activeFilters.length > 0 && (
         <Box sx={{
@@ -731,8 +722,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         </Box>
       )}
 
-      {/* Issues content area with sidebar */}
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      {/* ── Body: Sidebar + Content split ── */}
+      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` }}>
         {/* Left: Facet Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
           <FacetSidebar
@@ -761,8 +752,17 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           )}
         </Box>
 
-        {/* Right: Issues content */}
+        {/* Right: Main content */}
         <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75 }}>
+          {/* Volume Chart */}
+          <IssueVolumeChart
+            projectId={projectId}
+            filters={filters}
+            status={status}
+            level={level}
+            onDateRangeSelect={handleDateRangeSelect}
+          />
+
           {/* Bulk Actions */}
           <IssueBulkActions
             selectedIds={selectedIds}
@@ -843,7 +843,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             )}
           </PageContentLoader>
 
-        </Box>{/* end flex content area */}
+        </Box>{/* end right content area */}
       </Box>{/* end flex sidebar container */}
 
       {/* Assignee Menu */}
