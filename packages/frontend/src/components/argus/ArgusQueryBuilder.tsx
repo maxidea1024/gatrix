@@ -111,31 +111,35 @@ function parseQueryToRules(q: string, defaultField: string): { rules: Rule[]; is
 /* ─── Serializer ─── */
 
 function rulesToQuery(rules: Rule[]): string {
+  // Filter out incomplete rules (empty values)
+  const validRules = rules.filter(rule => {
+    if (rule.type === 'tag') return rule.field && rule.value;
+    if (rule.type === 'has') return !!rule.field;
+    if (rule.type === 'text') return !!rule.value;
+    return false;
+  });
+
   const parts: string[] = [];
 
-  rules.forEach((rule, idx) => {
+  validRules.forEach((rule, idx) => {
     if (idx > 0) {
       parts.push(rule.connector);
     }
 
     switch (rule.type) {
       case 'tag': {
-        if (!rule.field || !rule.value) break;
         const isNeg = rule.op === '!=';
         let valStr = rule.value;
         if (['>', '<', '>=', '<='].includes(rule.op)) valStr = rule.op + valStr;
-        if (valStr.includes(' ')) valStr = `"${valStr}"`;
-        else valStr = `"${valStr}"`;
+        valStr = `"${valStr}"`;
         parts.push(`${isNeg ? '!' : ''}${rule.field}:${valStr}`);
         break;
       }
       case 'has': {
-        if (!rule.field) break;
         parts.push(`has:"${rule.field}"`);
         break;
       }
       case 'text': {
-        if (!rule.value) break;
         let v = rule.value;
         if (v.includes(' ')) v = `"${v}"`;
         parts.push(`${!rule.contains ? '!' : ''}${v}`);
@@ -287,7 +291,12 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
                       onInputChange={(_e, val) => updateRule(rule.id, { value: val })}
                       onChange={(_e, val) => updateRule(rule.id, { value: val || '' })}
                       renderInput={(params) => (
-                        <TextField {...params} placeholder="value..." InputProps={{ ...params.InputProps, sx: inputSx }} />
+                        <TextField
+                          {...params}
+                          placeholder="value..."
+                          error={!rule.value}
+                          InputProps={{ ...params.InputProps, sx: inputSx }}
+                        />
                       )}
                       renderOption={(props, option) => {
                         const fv = (facets[rule.field] || []).find(v => v.value === option);
@@ -386,7 +395,12 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
         </Box>
 
         {/* Actions */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1, pt: 1.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 1, pt: 1.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+          {rules.some(r => (r.type === 'tag' && !r.value) || (r.type === 'text' && !r.value)) && (
+            <Typography sx={{ fontSize: '0.7rem', color: 'warning.main', mr: 'auto' }}>
+              {t('argus.builder.emptyWarning', 'Empty value rules will be ignored')}
+            </Typography>
+          )}
           <Button size="small" onClick={onClose} sx={{ textTransform: 'none', fontWeight: 600 }}>
             {t('common.cancel', 'Cancel')}
           </Button>
