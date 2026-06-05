@@ -14,6 +14,7 @@ import {
   Terminal as LogIcon,
   FilterList as FilterIcon,
   Save as SaveIcon, Bookmark as BookmarkIcon, BookmarkBorder as BookmarkBorderIcon,
+  PlayArrow as PlayArrowIcon, Stop as StopIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
@@ -288,6 +289,7 @@ const ArgusLogsPage: React.FC = () => {
     tab:     { key: 'tab',     default: '0' },
     groupBy: { key: 'groupBy', default: 'level' },
     queryId: { key: 'queryId', default: '' },
+    filters: { key: 'filters', default: '' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
@@ -348,9 +350,7 @@ const ArgusLogsPage: React.FC = () => {
   const [facets, setFacets] = useState<LogFacets>({ levels: [], services: [], environments: [], loggers: [] });
   const [volume, setVolume] = useState<VolumePoint[]>([]);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [autoRefresh, setAutoRefresh] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const autoRefreshRef = useRef<NodeJS.Timeout | null>(null);
 
   const [columns, setColumns] = useState<string[]>(DEFAULT_COLUMNS);
   const [editTableOpen, setEditTableOpen] = useState(false);
@@ -384,7 +384,42 @@ const ArgusLogsPage: React.FC = () => {
 
   // ─── Active Filters (chip tags from facet sidebar / detail panel) ───
   type ActiveFilter = { key: string; value: string; exclude: boolean; enabled: boolean };
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+
+  /** Deserialize filters from URL param. Format: key:value (include+enabled), !key:value (exclude), ~key:value (disabled), ~!key:value (disabled+exclude) */
+  const parseFiltersFromUrl = useCallback((raw: string): ActiveFilter[] => {
+    if (!raw) return [];
+    return raw.split(',').map(part => {
+      let enabled = true;
+      let exclude = false;
+      let s = part.trim();
+      if (s.startsWith('~')) { enabled = false; s = s.slice(1); }
+      if (s.startsWith('!')) { exclude = true; s = s.slice(1); }
+      const colonIdx = s.indexOf(':');
+      if (colonIdx < 0) return null;
+      return { key: s.slice(0, colonIdx), value: s.slice(colonIdx + 1), exclude, enabled };
+    }).filter(Boolean) as ActiveFilter[];
+  }, []);
+
+  const serializeFiltersToUrl = useCallback((filters: ActiveFilter[]): string => {
+    if (filters.length === 0) return '';
+    return filters.map(f => {
+      const prefix = (!f.enabled ? '~' : '') + (f.exclude ? '!' : '');
+      return `${prefix}${f.key}:${f.value}`;
+    }).join(',');
+  }, []);
+
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(
+    () => parseFiltersFromUrl(urlState.filters)
+  );
+
+  // Sync activeFilters → URL
+  useEffect(() => {
+    const serialized = serializeFiltersToUrl(activeFilters);
+    if (serialized !== (urlState.filters || '')) {
+      setUrlState({ filters: serialized });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilters]);
 
   /** Toggle a facet chip filter. If already exists, toggle enabled; otherwise add as enabled. */
   const toggleActiveFilter = useCallback((key: string, value: string, exclude: boolean = false) => {
@@ -559,14 +594,90 @@ const ArgusLogsPage: React.FC = () => {
     argusService.listSavedQueries(projectId, 'logs').then(setSavedQueries).catch(() => setSavedQueries([]));
   }, [fetchAll]);
 
+  // ─── Patterns state ───
+  type PatternEntry = {
+    pattern: string; count: number; level: string; service: string;
+    first_seen: string; last_seen: string; sample_message: string;
+  };
+  const [patterns, setPatterns] = useState<PatternEntry[]>([]);
+  const [patternsLoading, setPatternsLoading] = useState(false);
+
+  const fetchPatterns = useCallback(async () => {
+    setPatternsLoading(true);
+    try {
+      const apiParams = argusFilterStateToApiParams(filters);
+      const data = await argusService.getLogPatterns(projectId, {
+        period: apiParams.period, start: apiParams.start, end: apiParams.end,
+        search: searchDebounce || undefined,
+      });
+      setPatterns(data);
+    } catch (e) { console.error('Failed to fetch patterns', e); }
+    setPatternsLoading(false);
+  }, [projectId, filters, searchDebounce]);
+
+  // Auto-fetch patterns when switching to patterns tab
   useEffect(() => {
-    if (autoRefresh) {
-      autoRefreshRef.current = setInterval(() => { fetchLogs(); fetchVolume(); }, 5000);
-    } else {
-      if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
+    if (activeTab === 2) fetchPatterns();
+  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Live Tail state ───
+  const [liveTailLogs, setLiveTailLogs] = useState<ArgusLogEntry[]>([]);
+  const [liveTailActive, setLiveTailActive] = useState(false);
+  const [liveTailPaused, setLiveTailPaused] = useState(false);
+  const [liveTailCount, setLiveTailCount] = useState(0);
+  const liveTailRef = useRef<EventSource | null>(null);
+  const liveTailBufferRef = useRef<ArgusLogEntry[]>([]);
+
+  // Start/stop live tail
+  useEffect(() => {
+    if (activeTab !== 3) {
+      // Close connection when leaving Live Tail tab
+      if (liveTailRef.current) {
+        liveTailRef.current.close();
+        liveTailRef.current = null;
+      }
+      setLiveTailActive(false);
+      return;
     }
-    return () => { if (autoRefreshRef.current) clearInterval(autoRefreshRef.current); };
-  }, [autoRefresh, fetchLogs, fetchVolume]);
+  }, [activeTab]);
+
+  const startLiveTail = useCallback(() => {
+    if (liveTailRef.current) liveTailRef.current.close();
+    setLiveTailLogs([]);
+    setLiveTailCount(0);
+    setLiveTailPaused(false);
+    setLiveTailActive(true);
+
+    const es = argusService.createLiveTailConnection(
+      projectId,
+      { search: searchDebounce || undefined },
+      (newLogs) => {
+        setLiveTailCount(prev => prev + newLogs.length);
+        if (!liveTailPaused) {
+          setLiveTailLogs(prev => [...prev, ...newLogs].slice(-500));
+        } else {
+          liveTailBufferRef.current.push(...newLogs);
+        }
+      },
+      () => { /* SSE error — will auto-reconnect */ }
+    );
+    liveTailRef.current = es;
+  }, [projectId, searchDebounce, liveTailPaused]);
+
+  const stopLiveTail = useCallback(() => {
+    if (liveTailRef.current) {
+      liveTailRef.current.close();
+      liveTailRef.current = null;
+    }
+    setLiveTailActive(false);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (liveTailRef.current) liveTailRef.current.close();
+    };
+  }, []);
 
   // ─── Handlers ───
   const handleDebouncedSearchChange = useCallback((val: string) => {
@@ -991,7 +1102,7 @@ const ArgusLogsPage: React.FC = () => {
         {/* Right: Main log content — separated from sidebar with a subtle border gap */}
         <Box sx={{
           flex: 1, overflow: 'auto', minWidth: 0,
-          pl: facetSidebarCollapsed ? 0.5 : 1.5,
+          pl: facetSidebarCollapsed ? 0.25 : 0.75,
         }}>
           {/* Volume Chart */}
           <LogVolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleZoom} />
@@ -999,9 +1110,11 @@ const ArgusLogsPage: React.FC = () => {
           {/* Toolbar */}
           <LogsToolbar
             activeTab={activeTab}
-            onTabChange={(key) => { setUrlState({ tab: key }); if (key === '1' && !aggData) fetchAggregates(); }}
-            autoRefresh={autoRefresh}
-            onAutoRefreshToggle={() => setAutoRefresh(!autoRefresh)}
+            onTabChange={(key) => {
+              setUrlState({ tab: key });
+              if (key === '1' && !aggData) fetchAggregates();
+              if (key === '2') fetchPatterns();
+            }}
             totalLogCount={totalLogCount}
             displayCount={logs.length}
             isDark={isDark}
@@ -1046,6 +1159,160 @@ const ArgusLogsPage: React.FC = () => {
               onGroupByChange={(val) => { setUrlState({ groupBy: val }); fetchAggregates(val); }}
               onAddFilter={(key, val) => toggleActiveFilter(key, val)}
             />
+          )}
+
+          {/* Patterns Tab */}
+          {activeTab === 2 && (
+            <Box sx={{ px: 1, py: 1 }}>
+              {patternsLoading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}>
+                  <CircularProgress size={24} sx={{ mr: 1 }} />
+                  <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>
+                    {t('argus.logs.patterns.loading', 'Analyzing patterns...')}
+                  </Typography>
+                </Box>
+              ) : patterns.length === 0 ? (
+                <Box sx={{ py: 8, textAlign: 'center' }}>
+                  <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, mb: 0.5 }}>
+                    {t('argus.logs.patterns.noPatterns', 'No patterns found')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                    {t('argus.logs.patterns.noPatternsDesc', 'Try adjusting your search or time range.')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ overflow: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.73rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}` }}>
+                        <th style={{ textAlign: 'right', padding: '6px 10px', fontWeight: 700, width: 70 }}>{t('argus.logs.patterns.count', 'Count')}</th>
+                        <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700 }}>{t('argus.logs.patterns.pattern', 'Pattern')}</th>
+                        <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700, width: 80 }}>{t('argus.logs.patterns.service', 'Service')}</th>
+                        <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700, width: 140 }}>{t('argus.logs.patterns.lastSeen', 'Last Seen')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {patterns.map((p, idx) => (
+                        <tr key={idx} style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
+                          <td style={{ textAlign: 'right', padding: '6px 10px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: theme.palette.primary.main }}>
+                            {Number(p.count).toLocaleString()}
+                          </td>
+                          <td style={{ padding: '6px 10px', fontFamily: 'monospace', fontSize: '0.70rem', wordBreak: 'break-all', opacity: 0.85 }}>
+                            {p.pattern}
+                            <br />
+                            <span style={{ fontSize: '0.65rem', color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)' }}>
+                              {p.sample_message?.slice(0, 120)}
+                            </span>
+                          </td>
+                          <td style={{ padding: '6px 10px' }}>
+                            <Chip label={p.service || '-'} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.62rem' }} />
+                          </td>
+                          <td style={{ padding: '6px 10px', fontSize: '0.68rem', color: 'text.secondary' }}>
+                            {p.last_seen ? new Date(p.last_seen).toLocaleString() : '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </Box>
+              )}
+            </Box>
+          )}
+
+          {/* Live Tail Tab */}
+          {activeTab === 3 && (
+            <Box sx={{ px: 1, py: 1, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 300 }}>
+              {/* Controls */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                {!liveTailActive ? (
+                  <Button variant="contained" size="small" color="success" onClick={startLiveTail}
+                    startIcon={<PlayArrowIcon sx={{ fontSize: 16 }} />}
+                    sx={{ textTransform: 'none', fontSize: '0.73rem', fontWeight: 600, borderRadius: '6px' }}>
+                    {t('argus.logs.liveTail.start', 'Start Streaming')}
+                  </Button>
+                ) : (
+                  <Button variant="contained" size="small" color="error" onClick={stopLiveTail}
+                    startIcon={<StopIcon sx={{ fontSize: 16 }} />}
+                    sx={{ textTransform: 'none', fontSize: '0.73rem', fontWeight: 600, borderRadius: '6px' }}>
+                    {t('argus.logs.liveTail.stop', 'Stop Streaming')}
+                  </Button>
+                )}
+                {liveTailActive && (
+                  <Button variant="outlined" size="small"
+                    onClick={() => {
+                      if (liveTailPaused) {
+                        // Resume: flush buffer
+                        setLiveTailLogs(prev => [...prev, ...liveTailBufferRef.current].slice(-500));
+                        liveTailBufferRef.current = [];
+                      }
+                      setLiveTailPaused(p => !p);
+                    }}
+                    sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}>
+                    {liveTailPaused
+                      ? t('argus.logs.liveTail.resume', 'Resume')
+                      : t('argus.logs.liveTail.pause', 'Pause')}
+                  </Button>
+                )}
+                {liveTailLogs.length > 0 && (
+                  <Button variant="text" size="small" onClick={() => { setLiveTailLogs([]); setLiveTailCount(0); }}
+                    sx={{ textTransform: 'none', fontSize: '0.72rem', color: 'text.secondary' }}>
+                    {t('argus.logs.liveTail.clear', 'Clear Logs')}
+                  </Button>
+                )}
+                <Box sx={{ flex: 1 }} />
+                {liveTailActive && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{
+                      width: 8, height: 8, borderRadius: '50%',
+                      backgroundColor: liveTailPaused ? '#ff9800' : '#4caf50',
+                      animation: liveTailPaused ? 'none' : 'pulse 1.5s infinite',
+                      '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.4 } },
+                    }} />
+                    <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
+                      {liveTailPaused
+                        ? t('argus.logs.liveTail.paused', 'Paused')
+                        : t('argus.logs.liveTail.streaming', 'Streaming...')}
+                    </Typography>
+                    <Chip size="small" label={t('argus.logs.liveTail.received', '{{count}} received', { count: liveTailCount })}
+                      sx={{ height: 20, fontSize: '0.65rem', ml: 0.5 }} />
+                  </Box>
+                )}
+              </Box>
+
+              {/* Log stream */}
+              <Box sx={{ flex: 1, overflow: 'auto', fontFamily: 'monospace', fontSize: '0.70rem' }}>
+                {liveTailLogs.length === 0 ? (
+                  <Box sx={{ py: 8, textAlign: 'center' }}>
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, mb: 0.5 }}>
+                      {t('argus.logs.liveTail.noLogs', 'No logs received yet')}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                      {t('argus.logs.liveTail.noLogsDesc', 'Start streaming to see new logs appear here.')}
+                    </Typography>
+                  </Box>
+                ) : (
+                  liveTailLogs.map((log, idx) => (
+                    <Box key={`${log.log_id}-${idx}`} sx={{
+                      display: 'flex', gap: 1, py: 0.3, px: 0.5,
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' },
+                    }}>
+                      <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled', flexShrink: 0, width: 75, fontFamily: 'monospace' }}>
+                        {new Date(log.timestamp).toLocaleTimeString()}
+                      </Typography>
+                      <Chip label={log.level} size="small" sx={{
+                        height: 16, fontSize: '0.58rem', fontWeight: 700, flexShrink: 0,
+                        backgroundColor: alpha(SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e', 0.15),
+                        color: SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
+                      }} />
+                      <Typography sx={{ fontSize: '0.70rem', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {log.message || log.body}
+                      </Typography>
+                    </Box>
+                  ))
+                )}
+              </Box>
+            </Box>
           )}
         </Box>
 

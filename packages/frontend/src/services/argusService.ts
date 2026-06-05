@@ -1265,6 +1265,51 @@ class ArgusService {
     return response.data?.data || { groupBy: 'level', topValues: [], timeSeries: [] };
   }
 
+  async getLogPatterns(
+    projectId: number | string,
+    params: { period?: string; start?: string; end?: string; level?: string; service?: string; environment?: string; search?: string; limit?: number }
+  ): Promise<{
+    pattern: string;
+    count: number;
+    level: string;
+    service: string;
+    first_seen: string;
+    last_seen: string;
+    sample_message: string;
+  }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/patterns`, { params });
+    return response.data?.data || [];
+  }
+
+  createLiveTailConnection(
+    projectId: number | string,
+    params: { level?: string; service?: string; environment?: string; search?: string },
+    onData: (logs: ArgusLogEntry[]) => void,
+    onError?: (error: Event) => void,
+  ): EventSource {
+    const searchParams = new URLSearchParams();
+    if (params.level) searchParams.set('level', params.level);
+    if (params.service) searchParams.set('service', params.service);
+    if (params.environment) searchParams.set('environment', params.environment);
+    if (params.search) searchParams.set('search', params.search);
+
+    const url = `/api${ARGUS_BASE}/${projectId}/logs/live-tail?${searchParams.toString()}`;
+    const eventSource = new EventSource(url);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const logs = JSON.parse(event.data) as ArgusLogEntry[];
+        onData(logs);
+      } catch { /* ignore parse errors */ }
+    };
+
+    if (onError) {
+      eventSource.onerror = onError;
+    }
+
+    return eventSource;
+  }
+
   // --- Source Maps ---
 
   async listSourcemapReleases(projectId: number | string): Promise<ArgusSourcemapRelease[]> {

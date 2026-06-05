@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Box, Typography, Chip, IconButton,
-  Button, Divider, useTheme, alpha,
+  Button, useTheme, alpha,
 } from '@mui/material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import {
@@ -17,13 +17,10 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
-import FeatureSwitch from '@/components/common/FeatureSwitch';
 
 export interface LogsToolbarProps {
   activeTab: number;
   onTabChange: (key: string) => void;
-  autoRefresh: boolean;
-  onAutoRefreshToggle: () => void;
   totalLogCount: number;
   displayCount: number;
   isDark: boolean;
@@ -50,8 +47,6 @@ export interface LogsToolbarProps {
 const LogsToolbar: React.FC<LogsToolbarProps> = ({
   activeTab,
   onTabChange,
-  autoRefresh,
-  onAutoRefreshToggle,
   totalLogCount,
   displayCount,
   isDark,
@@ -79,6 +74,8 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
         items={[
           { key: '0', label: t('argus.logs.logsTab', 'Logs') },
           { key: '1', label: t('argus.logs.aggregatesTab', 'Aggregates') },
+          { key: '2', label: t('argus.logs.patternsTab', 'Patterns') },
+          { key: '3', label: t('argus.logs.liveTailTab', 'Live Tail') },
         ]}
         value={String(activeTab)}
         onChange={onTabChange}
@@ -97,20 +94,7 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
           />
         )}
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', fontWeight: 600, whiteSpace: 'nowrap' }}>
-            {t('argus.logs.autoRefresh', 'Auto-refresh')}
-          </Typography>
-          <FeatureSwitch
-            checked={autoRefresh}
-            onChange={onAutoRefreshToggle}
-            size="small"
-            label={autoRefresh ? 'ON' : 'OFF'}
-            color="#43a047"
-          />
-        </Box>
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.3, borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)' }} />
 
         <Button variant="outlined" size="small" startIcon={<EditTableIcon sx={{ fontSize: 15 }} />}
           onClick={onOpenEditTable}

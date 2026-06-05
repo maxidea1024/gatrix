@@ -375,4 +375,160 @@ export default async function logsRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  // ─── Log Patterns (cluster similar log messages) ───
+  app.get(
+    '/:projectId/logs/patterns',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const {
+        period = '24h', start, end, level, service, environment, search, limit = '50',
+      } = request.query as Record<string, string>;
+
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+
+      try {
+        const conditions: string[] = ['project_id = {projectId:String}', timeCond];
+        const params: Record<string, string> = {
+          projectId: String(projectId),
+          fillStart: String(bucket.queryParams.fillStart),
+          fillEnd: String(bucket.queryParams.fillEnd),
+        };
+
+        if (level) {
+          const levels = level.split(',');
+          conditions.push(`level IN (${levels.map((_, i) => `{plvl_${i}:String}`).join(', ')})`);
+          levels.forEach((l, i) => { params[`plvl_${i}`] = l.trim(); });
+        }
+        if (service) { conditions.push('service = {pservice:String}'); params.pservice = service; }
+        if (environment) { conditions.push('environment = {penvironment:String}'); params.penvironment = environment; }
+
+        if (search && typeof search === 'string' && search.trim()) {
+          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+          const ast = parser.parse(search);
+          if (ast) {
+            const { where } = parser.generateSQL(ast, params);
+            if (where) conditions.push(`(${where})`);
+          }
+        }
+
+        // Use ClickHouse to extract patterns by normalizing messages:
+        // Replace numbers, UUIDs, hex strings, IPs, quoted strings with placeholders
+        const patternExpr = `replaceRegexpAll(
+          replaceRegexpAll(
+            replaceRegexpAll(
+              replaceRegexpAll(
+                replaceRegexpAll(message,
+                  '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', '<UUID>'),
+                '[0-9a-f]{24,}', '<HEX>'),
+              '\\\\b\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\b', '<IP>'),
+            '\\\\b\\\\d+\\\\b', '<N>'),
+          '"[^"]*"', '<STR>')`;
+
+        const sql = `
+          SELECT
+            ${patternExpr} AS pattern,
+            count() AS count,
+            any(level) AS level,
+            any(service) AS service,
+            min(timestamp) AS first_seen,
+            max(timestamp) AS last_seen,
+            any(message) AS sample_message
+          FROM argus.logs
+          WHERE ${conditions.join(' AND ')}
+          GROUP BY pattern
+          ORDER BY count DESC
+          LIMIT {patternLimit:UInt32}
+        `;
+        params.patternLimit = String(Math.min(parseInt(limit, 10), 200));
+
+        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
+        const rows = await result.json();
+        return reply.send({ data: rows });
+      } catch (error) {
+        logger.error('Failed to get log patterns', { projectId, error: String(error) });
+        return reply.code(500).send({ error: 'Failed to get log patterns' });
+      }
+    }
+  );
+
+  // ─── Live Tail (SSE — stream new logs in real-time) ───
+  app.get(
+    '/:projectId/logs/live-tail',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { level, service, environment, search } = request.query as Record<string, string>;
+
+      reply.raw.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      });
+
+      let lastTimestamp = new Date().toISOString();
+      let closed = false;
+
+      request.raw.on('close', () => { closed = true; });
+
+      const poll = async () => {
+        if (closed) return;
+
+        try {
+          const conditions: string[] = [
+            'project_id = {projectId:String}',
+            'timestamp > {lastTs:DateTime64(3)}',
+          ];
+          const params: Record<string, string> = {
+            projectId: String(projectId),
+            lastTs: lastTimestamp,
+          };
+
+          if (level) {
+            const levels = level.split(',');
+            conditions.push(`level IN (${levels.map((_, i) => `{llvl_${i}:String}`).join(', ')})`);
+            levels.forEach((l, i) => { params[`llvl_${i}`] = l.trim(); });
+          }
+          if (service) { conditions.push('service = {lservice:String}'); params.lservice = service; }
+          if (environment) { conditions.push('environment = {lenvironment:String}'); params.lenvironment = environment; }
+
+          if (search && typeof search === 'string' && search.trim()) {
+            const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+            const ast = parser.parse(search);
+            if (ast) {
+              const { where } = parser.generateSQL(ast, params);
+              if (where) conditions.push(`(${where})`);
+            }
+          }
+
+          const sql = `
+            SELECT log_id, trace_id, span_id, timestamp, level, logger_name, message, body, service, environment, release, attributes
+            FROM argus.logs
+            WHERE ${conditions.join(' AND ')}
+            ORDER BY timestamp ASC
+            LIMIT 50
+          `;
+
+          const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
+          const rows = await result.json() as any[];
+
+          if (rows.length > 0) {
+            lastTimestamp = rows[rows.length - 1].timestamp;
+            reply.raw.write(`data: ${JSON.stringify(rows)}\n\n`);
+          } else {
+            reply.raw.write(': heartbeat\n\n');
+          }
+        } catch (err) {
+          logger.error('Live tail poll error', { error: String(err) });
+        }
+
+        if (!closed) {
+          setTimeout(poll, 2000);
+        }
+      };
+
+      poll();
+    }
+  );
 }
