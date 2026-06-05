@@ -64,8 +64,11 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
     // Stage 1: field/syntax suggestions
     // Key insight: if query ends with whitespace, cursor is at a NEW token position
     const isNewTokenPos = query.length === 0 || /\s$/.test(query);
-    const allTokens = query.split(/\s+/).filter(t => t.length > 0);
-    const lastToken = isNewTokenPos ? '' : (allTokens[allTokens.length - 1] || '').toLowerCase();
+    const tokenRe2 = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|"[^"]*$|'[^']*$|\S+))|(\bAND\b|\bOR\b)|(\S+)/g;
+    const allTokens2: string[] = [];
+    let m2: RegExpExecArray | null;
+    while ((m2 = tokenRe2.exec(query)) !== null) allTokens2.push(m2[0]);
+    const lastToken = isNewTokenPos ? '' : (allTokens2[allTokens2.length - 1] || '').toLowerCase();
     // Empty or new-token position → always show fields
     if (!lastToken) return true;
     // Typing a partial token → only show if it matches something
@@ -111,9 +114,14 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
 
     // Stage 1: field/syntax suggestions
     const result: AutocompleteItem[] = [];
-    // Consistent token parsing: trailing space = new token position
+    // Proper tokenizer: keeps key:"value" together, matches AND/OR, bare words
     const isNewTokenPos = query.length === 0 || /\s$/.test(query);
-    const allTokens = query.split(/\s+/).filter(t => t.length > 0);
+    const tokenRe = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|"[^"]*$|'[^']*$|\S+))|(\bAND\b|\bOR\b)|(\S+)/g;
+    const allTokens: string[] = [];
+    let tokenMatch: RegExpExecArray | null;
+    while ((tokenMatch = tokenRe.exec(query)) !== null) {
+      allTokens.push(tokenMatch[0]);
+    }
     const lastToken = isNewTokenPos ? '' : (allTokens[allTokens.length - 1] || '').toLowerCase();
     const completedTokens = isNewTokenPos ? allTokens : allTokens.slice(0, -1);
     const prevCompleted = (completedTokens[completedTokens.length - 1] || '').toUpperCase();
