@@ -47,7 +47,7 @@ const LogsTablePanel: React.FC<LogsTablePanelProps> = ({
 
   return (
     <Paper elevation={0} sx={{
-      borderRadius: 2, overflow: 'hidden',
+      borderRadius: 2,
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
       ...(logsFullscreen ? {
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
