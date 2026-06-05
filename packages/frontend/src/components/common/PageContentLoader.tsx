@@ -54,9 +54,13 @@ const PageContentLoader: React.FC<PageContentLoaderProps> = ({
   skeleton,
 }) => {
   if (loading) {
-    // If a skeleton is provided, show it immediately (no delay)
+    // If a skeleton is provided, show it after a short delay to avoid flash
     if (skeleton) {
-      return <>{skeleton}</>;
+      return (
+        <DeferredComponent shouldRender={loading} delay={300}>
+          {skeleton}
+        </DeferredComponent>
+      );
     }
 
     return (
