@@ -11,6 +11,7 @@ import {
 import {
   MoreHoriz as MoreHorizIcon,
   Check as CheckIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusErrorEvent } from '@/services/argusService';
@@ -88,14 +89,14 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <ActionChip
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Typography component="span" sx={{ fontSize: '0.72rem', color: 'text.disabled', fontWeight: 500 }}>
                     {t('argus.issues.sort', '정렬')}
                   </Typography>
-                  <Box sx={{ width: '1px', alignSelf: 'stretch', my: -0.5, backgroundColor: 'divider' }} />
                   <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
                     {order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
                   </Typography>
+                  <ExpandMoreIcon sx={{ fontSize: 14, color: 'text.secondary', ml: -0.2 }} />
                 </Box>
               }
               onClick={(e) => setOrderMenuAnchor(e.currentTarget)}
