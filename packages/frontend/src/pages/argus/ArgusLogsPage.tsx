@@ -454,6 +454,7 @@ const ArgusLogsPage: React.FC = () => {
     groupBy: { key: 'groupBy', default: 'level' },
     queryId: { key: 'queryId', default: '' },
     filters: { key: 'filters', default: '' },
+    log:     { key: 'log',     default: '' },
   }), []);
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
@@ -530,8 +531,12 @@ const ArgusLogsPage: React.FC = () => {
   // Facet sidebar state
   const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useLocalStorage('argus_facet_sidebar_collapsed', false);
 
-  // Side panel state (selected log index in the current logs array)
-  const [selectedLogIndex, setSelectedLogIndex] = useState<number | null>(null);
+  // Side panel state (selected log via URL)
+  const selectedLogIndex = useMemo(() => {
+    if (!urlState.log) return null;
+    const idx = logs.findIndex(l => l.log_id === urlState.log);
+    return idx >= 0 ? idx : null;
+  }, [logs, urlState.log]);
   const selectedLog = selectedLogIndex !== null ? logs[selectedLogIndex] || null : null;
   const [isRightPanelOpen, setIsRightPanelOpen] = useLocalStorage('argus_right_panel_open', false);
 
@@ -953,21 +958,28 @@ const ArgusLogsPage: React.FC = () => {
 
   // Side panel handlers
   const handleSelectLog = useCallback((index: number) => {
-    setSelectedLogIndex(index);
-    setIsRightPanelOpen(true);
-  }, [setIsRightPanelOpen]);
+    const log = logs[index];
+    if (log) {
+      setUrlState({ log: log.log_id });
+      setIsRightPanelOpen(true);
+    }
+  }, [logs, setUrlState, setIsRightPanelOpen]);
 
   const handleCloseSidePanel = useCallback(() => {
     setIsRightPanelOpen(false);
   }, [setIsRightPanelOpen]);
 
   const handlePrevLog = useCallback(() => {
-    setSelectedLogIndex(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
-  }, []);
+    if (selectedLogIndex !== null && selectedLogIndex > 0) {
+      setUrlState({ log: logs[selectedLogIndex - 1].log_id });
+    }
+  }, [selectedLogIndex, logs, setUrlState]);
 
   const handleNextLog = useCallback(() => {
-    setSelectedLogIndex(prev => (prev !== null && prev < logs.length - 1) ? prev + 1 : prev);
-  }, [logs.length]);
+    if (selectedLogIndex !== null && selectedLogIndex < logs.length - 1) {
+      setUrlState({ log: logs[selectedLogIndex + 1].log_id });
+    }
+  }, [selectedLogIndex, logs, setUrlState]);
 
   const handleLoadMore = useCallback(() => {
     if (logs.length > 0) fetchLogs(true, logs[logs.length - 1].timestamp);
