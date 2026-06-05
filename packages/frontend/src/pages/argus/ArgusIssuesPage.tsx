@@ -464,7 +464,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         extraControls={
           <>
             <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
-            <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ width: 360, minWidth: 200, flexShrink: 1 }}>
               <ArgusSearchInput
                 initialValue={storeSearch}
                 onDebouncedChange={(val) => setSearchInput(val)}
