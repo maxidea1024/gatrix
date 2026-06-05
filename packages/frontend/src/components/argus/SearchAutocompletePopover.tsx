@@ -155,15 +155,17 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
     }
 
     // Field suggestions (excluding 'has' — it's shown separately below)
-    const filteredFields = lastToken
-      ? fields.filter(f => f.toLowerCase().includes(lastToken))
+    // When lastToken is AND/OR, show all fields (user needs to pick a new condition)
+    const effectiveLastToken = isLastTokenOperator ? '' : lastToken;
+    const filteredFields = effectiveLastToken
+      ? fields.filter(f => f.toLowerCase().includes(effectiveLastToken))
       : fields;
     filteredFields.forEach(f => {
       result.push({ key: `field-${f}`, type: 'field', label: f, action: () => onSelectField(f) });
     });
 
     // has: — shown as a separate special item at the end
-    const showHas = !lastToken || 'has'.includes(lastToken);
+    const showHas = !effectiveLastToken || 'has'.includes(effectiveLastToken);
     if (showHas) {
       result.push({
         key: 'field-has', type: 'has-field', label: 'has',

@@ -187,7 +187,7 @@ const ArgusLogsSearchInput: React.FC<{
 
   /** Update localSearch by replacing the remainder portion */
   const updateRemainder = (newRemainder: string) => {
-    const newQuery = (chipsText ? chipsText + ' ' : '') + newRemainder;
+    const newQuery = ((chipsText ? chipsText + ' ' : '') + newRemainder).replace(/ {2,}/g, ' ');
     setLocalSearch(newQuery);
     setSearchFocused(true);
   };
@@ -213,7 +213,8 @@ const ArgusLogsSearchInput: React.FC<{
     const { start, end } = getWordAtCursor();
     const before = localSearch.slice(0, start);
     const after = localSearch.slice(end);
-    const result = (before + replacement + (after.startsWith(' ') ? after : ' ' + after.trimStart())).trim();
+    const joined = before + replacement + (after.startsWith(' ') ? after : ' ' + after.trimStart());
+    const result = joined.replace(/^ +/, '').replace(/ {2,}/g, ' ');
 
     setLocalSearch(result);
     if (moveCursorToEnd) {
