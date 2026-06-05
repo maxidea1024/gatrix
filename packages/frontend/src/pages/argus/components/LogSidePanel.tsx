@@ -431,10 +431,15 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
-          pl: 1.5,
+          position: 'relative',
         }}
       >
-        <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+        <SafeTooltip title={t('argus.logs.panel.close', 'Close (Esc)')}>
+          <IconButton size="small" onClick={onClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </SafeTooltip>
+        <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 4 }}>
           {t('argus.logs.panel.selectLog', 'Select a log item to view details')}
         </Typography>
       </Box>
