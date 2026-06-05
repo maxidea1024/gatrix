@@ -9,7 +9,6 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import {
-  SwapVert as SwapVertIcon,
   MoreHoriz as MoreHorizIcon,
   Check as CheckIcon,
 } from '@mui/icons-material';
@@ -88,8 +87,17 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
           {/* Order & More */}
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <ActionChip
-              icon={<SwapVertIcon sx={{ fontSize: '14px !important' }} />}
-              label={order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                  <Typography component="span" sx={{ fontSize: '0.72rem', color: 'text.disabled', fontWeight: 500 }}>
+                    {t('argus.issues.sort', '정렬')}
+                  </Typography>
+                  <Box sx={{ width: '1px', height: 14, backgroundColor: 'divider' }} />
+                  <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
+                    {order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
+                  </Typography>
+                </Box>
+              }
               onClick={(e) => setOrderMenuAnchor(e.currentTarget)}
             />
             <Menu
