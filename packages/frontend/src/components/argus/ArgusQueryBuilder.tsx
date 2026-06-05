@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Button, IconButton, Popover, Chip,
-  MenuItem, Select, TextField, alpha, useTheme
+  MenuItem, Select, TextField, Autocomplete, alpha, useTheme
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -21,9 +21,15 @@ interface TextRule extends BaseRule { type: 'text'; contains: boolean; value: st
 interface HasRule extends BaseRule { type: 'has'; field: string }
 type Rule = TagRule | TextRule | HasRule;
 
+interface FacetValue {
+  value: string;
+  count: number;
+}
+
 interface ArgusQueryBuilderProps {
   fields: string[];
   query: string;
+  facets?: Record<string, FacetValue[]>;
   onApply: (query: string) => void;
   anchorEl: HTMLElement | null;
   onClose: () => void;
@@ -143,7 +149,7 @@ function rulesToQuery(rules: Rule[]): string {
 
 /* ─── Component ─── */
 
-const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, onApply, anchorEl, onClose }) => {
+const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, facets = {}, onApply, anchorEl, onClose }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -273,10 +279,26 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, on
                         </MenuItem>
                       ))}
                     </Select>
-                    <TextField
-                      size="small" value={rule.value} placeholder="value..."
-                      onChange={e => updateRule(rule.id, { value: e.target.value })}
-                      InputProps={{ sx: inputSx }}
+                    <Autocomplete
+                      freeSolo
+                      size="small"
+                      options={(facets[rule.field] || []).map(v => v.value)}
+                      value={rule.value || ''}
+                      onInputChange={(_e, val) => updateRule(rule.id, { value: val })}
+                      onChange={(_e, val) => updateRule(rule.id, { value: val || '' })}
+                      renderInput={(params) => (
+                        <TextField {...params} placeholder="value..." InputProps={{ ...params.InputProps, sx: inputSx }} />
+                      )}
+                      renderOption={(props, option) => {
+                        const fv = (facets[rule.field] || []).find(v => v.value === option);
+                        return (
+                          <Box component="li" {...props} sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', px: 1.5, py: 0.5 }}>
+                            <span>{option}</span>
+                            {fv && <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', ml: 1 }}>{fv.count.toLocaleString()}</Typography>}
+                          </Box>
+                        );
+                      }}
+                      slotProps={{ paper: { sx: { fontSize: '0.75rem', maxHeight: 200 } } }}
                       sx={{ flex: 1 }}
                     />
                   </>

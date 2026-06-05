@@ -349,6 +349,7 @@ const ArgusLogsSearchInput: React.FC<{
       <ArgusQueryBuilder
         fields={['severity', 'service', 'environment', 'logger_name', 'trace_id', 'release']}
         query={localSearch}
+        facets={mappedFacets}
         onApply={(q) => { setLocalSearch(q); onSubmit(q); }}
         anchorEl={builderAnchorEl}
         onClose={() => setBuilderAnchorEl(null)}
