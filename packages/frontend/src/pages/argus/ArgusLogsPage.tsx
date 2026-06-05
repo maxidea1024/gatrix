@@ -1030,15 +1030,19 @@ const ArgusLogsPage: React.FC = () => {
           )}
         </Box>
 
-        {/* Right: Main log content — separated from sidebar with a subtle border gap */}
+        {/* Right: Main log content */}
         <Box sx={{
-          flex: 1, overflow: 'auto', minWidth: 0,
+          flex: 1, overflow: 'hidden', minWidth: 0,
           pl: facetSidebarCollapsed ? 0.25 : 0.75,
+          display: 'flex', flexDirection: 'column',
         }}>
-          {/* Volume Chart */}
-          <LogVolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleZoom} />
+          {/* Volume Chart - fixed at top */}
+          <Box sx={{ flexShrink: 0 }}>
+            <LogVolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleZoom} />
+          </Box>
 
-          {/* Toolbar */}
+          {/* Toolbar - fixed */}
+          <Box sx={{ flexShrink: 0 }}>
           <LogsToolbar
             activeTab={activeTab}
             onTabChange={(key) => {
@@ -1064,7 +1068,10 @@ const ArgusLogsPage: React.FC = () => {
             displayDensity={displayDensity}
             onDensityChange={setDisplayDensity}
           />
+          </Box>{/* end toolbar wrapper */}
 
+          {/* Scrollable tab content */}
+          <Box sx={{ flex: 1, overflow: 'auto' }}>
           {/* Logs Tab */}
           {activeTab === 0 && (
             <LogsTablePanel
@@ -1245,6 +1252,7 @@ const ArgusLogsPage: React.FC = () => {
               </Box>
             </Box>
           )}
+          </Box>{/* end scrollable tab content */}
         </Box>
 
         {/* ── Splitter Handle + Right Side Panel ── */}
