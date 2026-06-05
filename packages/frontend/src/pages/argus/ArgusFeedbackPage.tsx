@@ -1419,6 +1419,7 @@ const ArgusFeedbackPage: React.FC = () => {
                   onKeyDown={async (e) => {
                     if (e.key === 'Enter' && !e.shiftKey && commentText.trim() && !commentLoading) {
                       e.preventDefault();
+                      const target = e.target as HTMLTextAreaElement;
                       setCommentLoading(true);
                       const text = commentText.trim();
                       // Get user name from localStorage
@@ -1433,7 +1434,11 @@ const ArgusFeedbackPage: React.FC = () => {
                         enqueueSnackbar(t('common.error'), { variant: 'error' });
                         setCommentText(text);
                       }
-                      finally { setCommentLoading(false); }
+                      finally {
+                        setCommentLoading(false);
+                        // Restore focus after submit
+                        requestAnimationFrame(() => target.focus());
+                      }
                     }
                   }}
                   disabled={commentLoading}
