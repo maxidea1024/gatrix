@@ -396,7 +396,7 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
 
   return (
     <Popover
-      open={shouldShowPopover}
+      open={shouldShowPopover && items.length > 0}
       anchorEl={anchorEl}
       onClose={onClose}
       disableAutoFocus

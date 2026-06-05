@@ -212,17 +212,19 @@ const ArgusLogsSearchInput: React.FC<{
           addSearchTag(field, value);
         }}
         onSelectField={(field) => {
-          // Strip orphan field: tokens (incomplete key: with no value)
           const tokens = localSearch.split(/\s+/).filter(t => t.length > 0);
-          const cleaned = tokens.filter(t => !/^[\w.-]+:$/.test(t));
+          // If mid-typing (no trailing space), drop the partial token being typed
+          const base = /\s$/.test(localSearch) || localSearch === '' ? tokens : tokens.slice(0, -1);
+          // Also strip any orphan field: tokens (incomplete key: with no value)
+          const cleaned = base.filter(t => !/^[\w.-]+:$/.test(t));
           const prefix = cleaned.length > 0 ? cleaned.join(' ') + ' ' : '';
           setLocalSearch(prefix + field + ':');
           searchContainerRef.current?.querySelector('input')?.focus();
         }}
         onSelectSyntax={(syntax) => {
-          // Strip orphan field: tokens before appending syntax
           const tokens = localSearch.split(/\s+/).filter(t => t.length > 0);
-          const cleaned = tokens.filter(t => !/^[\w.-]+:$/.test(t));
+          const base = /\s$/.test(localSearch) || localSearch === '' ? tokens : tokens.slice(0, -1);
+          const cleaned = base.filter(t => !/^[\w.-]+:$/.test(t));
           const prefix = cleaned.length > 0 ? cleaned.join(' ') + ' ' : '';
           setLocalSearch(prefix + syntax + ' ');
           searchContainerRef.current?.querySelector('input')?.focus();
