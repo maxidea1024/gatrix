@@ -100,19 +100,14 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
 
   return (
     <Paper elevation={0} sx={{ p: 1.5, mb: 1.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, position: 'relative' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-        <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
-          {t('argus.issues.volumeChart')}
-        </Typography>
-      </Box>
-      <Box sx={{ height: 80 }}>
+      <Box sx={{ height: 120 }}>
         {volumeLoading ? (
-          <ArgusChartSkeleton type="bar" height={80} color={theme.palette.error.main} />
+          <ArgusChartSkeleton type="bar" height={120} color={theme.palette.error.main} />
         ) : (
           <InteractiveTimeSeriesChart 
             data={chartData} 
             type="bar" 
-            height={80} 
+            height={120} 
             onZoom={onDateRangeSelect ? handleZoom : undefined} 
             datasets={[{
               label: t('argus.issues.events'),
