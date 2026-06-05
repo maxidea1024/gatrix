@@ -448,6 +448,60 @@ const ArgusLogsPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFilters]);
 
+  // ─── Custom Facets (user-defined attribute keys) ───
+  const CUSTOM_FACETS_KEY = 'argus_custom_facets';
+  const [customFacetKeys, setCustomFacetKeys] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(CUSTOM_FACETS_KEY) || '[]'); }
+    catch { return []; }
+  });
+  const [customFacetData, setCustomFacetData] = useState<FacetGroup[]>([]);
+
+  // Persist custom facet keys
+  useEffect(() => {
+    localStorage.setItem(CUSTOM_FACETS_KEY, JSON.stringify(customFacetKeys));
+  }, [customFacetKeys]);
+
+  // Fetch custom facet values from backend
+  const fetchCustomFacets = useCallback(async () => {
+    if (customFacetKeys.length === 0) { setCustomFacetData([]); return; }
+    const apiParams = argusFilterStateToApiParams(filters);
+    const results = await Promise.all(
+      customFacetKeys.map(async (key) => {
+        try {
+          const data = await argusService.getAttributeFacet(projectId, key, {
+            period: apiParams.period, start: apiParams.start, end: apiParams.end,
+          });
+          return {
+            key: `attr.${key}`,
+            label: key,
+            values: data.map(d => ({ value: d.attr_value, count: Number(d.count) })),
+          } as FacetGroup;
+        } catch {
+          return { key: `attr.${key}`, label: key, values: [] } as FacetGroup;
+        }
+      })
+    );
+    setCustomFacetData(results);
+  }, [customFacetKeys, projectId, filters]);
+
+  useEffect(() => {
+    fetchCustomFacets();
+  }, [fetchCustomFacets]);
+
+  const handleAddCustomFacet = useCallback((key: string) => {
+    setCustomFacetKeys(prev => {
+      if (prev.includes(key)) return prev;
+      return [...prev, key];
+    });
+  }, []);
+
+  const handleRemoveCustomFacet = useCallback((facetKey: string) => {
+    // facetKey is "attr.xxx", extract the real key
+    const realKey = facetKey.startsWith('attr.') ? facetKey.slice(5) : facetKey;
+    setCustomFacetKeys(prev => prev.filter(k => k !== realKey));
+    setCustomFacetData(prev => prev.filter(f => f.key !== facetKey));
+  }, []);
+
   // Aggregates state
   const [aggData, setAggData] = useState<{
     groupBy: string;
@@ -1097,6 +1151,9 @@ const ArgusLogsPage: React.FC = () => {
           collapsed={facetSidebarCollapsed}
           onToggleCollapse={() => setFacetSidebarCollapsed(c => !c)}
           loading={loading}
+          customFacets={customFacetData}
+          onAddCustomFacet={handleAddCustomFacet}
+          onRemoveCustomFacet={handleRemoveCustomFacet}
         />
 
         {/* Right: Main log content — separated from sidebar with a subtle border gap */}

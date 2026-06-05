@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   Box, Typography, IconButton, InputBase, Checkbox,
-  useTheme, alpha, Collapse,
+  useTheme, alpha, Collapse, Chip,
 } from '@mui/material';
 import {
   FilterList as FilterIcon, Block as ExcludeIcon,
@@ -9,6 +9,8 @@ import {
   Search as SearchIcon,
   ChevronLeft as CollapseIcon,
   ChevronRight as ExpandIcon,
+  Add as AddIcon,
+  Close as RemoveIcon,
 } from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +29,9 @@ interface LogsFacetSidebarProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   loading?: boolean;
+  customFacets?: FacetGroup[];
+  onAddCustomFacet?: (key: string) => void;
+  onRemoveCustomFacet?: (key: string) => void;
 }
 
 /* ─── Single Facet Section ─── */
@@ -195,10 +200,12 @@ const FacetSection: React.FC<{
 
 const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
   facets, onFilter, collapsed, onToggleCollapse, loading,
+  customFacets, onAddCustomFacet, onRemoveCustomFacet,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
+  const [newFacetKey, setNewFacetKey] = useState('');
 
   if (collapsed) {
     return (
@@ -252,6 +259,63 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
         <Typography sx={{ px: 2, py: 3, fontSize: '0.72rem', color: 'text.disabled', textAlign: 'center' }}>
           {t('argus.logs.facet.noFacets', 'No facets available')}
         </Typography>
+      )}
+
+      {/* Custom Facets */}
+      {customFacets && customFacets.length > 0 && (
+        <Box sx={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`, mt: 0.5 }}>
+          <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.disabled', px: 1.5, py: 0.6 }}>
+            {t('argus.logs.customFacets.title', 'Custom Facets')}
+          </Typography>
+          {customFacets.map(facet => (
+            <Box key={facet.key} sx={{ position: 'relative' }}>
+              <FacetSection facet={facet} onFilter={onFilter} isDark={isDark} />
+              {onRemoveCustomFacet && (
+                <IconButton
+                  size="small"
+                  onClick={() => onRemoveCustomFacet(facet.key)}
+                  sx={{ position: 'absolute', top: 4, right: 4, p: 0.2, opacity: 0.4, '&:hover': { opacity: 1 } }}
+                >
+                  <RemoveIcon sx={{ fontSize: 12 }} />
+                </IconButton>
+              )}
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      {/* Add Custom Facet */}
+      {onAddCustomFacet && (
+        <Box sx={{ px: 1, py: 0.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <InputBase
+              value={newFacetKey}
+              onChange={(e) => setNewFacetKey(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newFacetKey.trim()) {
+                  onAddCustomFacet(newFacetKey.trim());
+                  setNewFacetKey('');
+                }
+              }}
+              placeholder={t('argus.logs.customFacets.placeholder', 'e.g. user_id, request_path')}
+              sx={{
+                flex: 1, fontSize: '0.65rem', height: 24, px: 0.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
+                borderRadius: '4px',
+              }}
+            />
+            <SafeTooltip title={t('argus.logs.customFacets.add', 'Add Facet')}>
+              <IconButton size="small" onClick={() => {
+                if (newFacetKey.trim()) {
+                  onAddCustomFacet(newFacetKey.trim());
+                  setNewFacetKey('');
+                }
+              }} sx={{ p: 0.3 }}>
+                <AddIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            </SafeTooltip>
+          </Box>
+        </Box>
       )}
     </Box>
   );

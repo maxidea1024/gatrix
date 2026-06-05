@@ -453,6 +453,51 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
+  // ─── Custom Attribute Facet (distinct values for a given attribute key) ───
+  app.get(
+    '/:projectId/logs/attribute-facet',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { key, period = '24h', start, end } = request.query as Record<string, string>;
+
+      if (!key) {
+        return reply.code(400).send({ error: 'key parameter is required' });
+      }
+
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+
+      try {
+        const params: Record<string, string> = {
+          projectId: String(projectId),
+          fillStart: String(bucket.queryParams.fillStart),
+          fillEnd: String(bucket.queryParams.fillEnd),
+          attrKey: key,
+        };
+
+        const sql = `
+          SELECT
+            JSONExtractString(attributes, {attrKey:String}) AS attr_value,
+            count() AS count
+          FROM argus.logs
+          WHERE project_id = {projectId:String}
+            AND ${timeCond}
+            AND JSONHas(attributes, {attrKey:String})
+            AND attr_value != ''
+          GROUP BY attr_value
+          ORDER BY count DESC
+          LIMIT 30
+        `;
+
+        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
+        const rows = await result.json();
+        return reply.send({ data: rows });
+      } catch (error) {
+        logger.error('Failed to get attribute facet', { projectId, key, error: String(error) });
+        return reply.code(500).send({ error: 'Failed to get attribute facet' });
+      }
+    }
+  );
   // ─── Live Tail (SSE — stream new logs in real-time) ───
   app.get(
     '/:projectId/logs/live-tail',

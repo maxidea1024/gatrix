@@ -1281,6 +1281,17 @@ class ArgusService {
     return response.data?.data || [];
   }
 
+  async getAttributeFacet(
+    projectId: number | string,
+    key: string,
+    params?: { period?: string; start?: string; end?: string }
+  ): Promise<{ attr_value: string; count: number }[]> {
+    const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/logs/attribute-facet`, {
+      params: { key, ...params },
+    });
+    return response.data?.data || [];
+  }
+
   createLiveTailConnection(
     projectId: number | string,
     params: { level?: string; service?: string; environment?: string; search?: string },
