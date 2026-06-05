@@ -25,6 +25,7 @@ import { formatWith } from '@/utils/dateFormat';
 import argusService, { ArgusTraceDetail } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 /* ─── Constants ─── */
 
@@ -373,7 +374,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isDark = theme.palette.mode === 'dark';
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useLocalStorage('argus_right_panel_tab', 0);
 
   // Trace data fetching
   const { currentProject } = useOrgProject();
@@ -382,9 +383,8 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
   const [traceLoading, setTraceLoading] = useState(false);
   const [traceFetchedFor, setTraceFetchedFor] = useState<string | null>(null);
 
-  // Reset tab and trace when log changes
+  // Reset trace when log changes
   useEffect(() => {
-    setTab(0);
     setTraceData(null);
     setTraceFetchedFor(null);
   }, [log?.log_id]);
@@ -419,7 +419,27 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
     }
   }, [tab, log?.trace_id, projectId, traceFetchedFor]);
 
-  if (!log) return null;
+  if (!log) {
+    return (
+      <Box
+        sx={{
+          width, flexShrink: 0,
+          height: '100%',
+          backgroundColor: theme.palette.background.default,
+          borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+          display: open ? 'flex' : 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          pl: 1.5,
+        }}
+      >
+        <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+          {t('argus.logs.panel.selectLog', 'Select a log item to view details')}
+        </Typography>
+      </Box>
+    );
+  }
 
   const levelColor = SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e';
   const formattedTime = formatWith(log.timestamp, 'YYYY-MM-DD HH:mm:ss.SSS');

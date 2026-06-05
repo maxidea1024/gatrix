@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
@@ -528,11 +529,12 @@ const ArgusLogsPage: React.FC = () => {
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   // Facet sidebar state
-  const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useState(false);
+  const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useLocalStorage('argus_facet_sidebar_collapsed', false);
 
   // Side panel state (selected log index in the current logs array)
   const [selectedLogIndex, setSelectedLogIndex] = useState<number | null>(null);
   const selectedLog = selectedLogIndex !== null ? logs[selectedLogIndex] || null : null;
+  const [isRightPanelOpen, setIsRightPanelOpen] = useLocalStorage('argus_right_panel_open', false);
 
   // Resizable side panel splitter
   const { splitWidth: panelWidth, isDragging: isPanelDragging, handleMouseDown: handlePanelSplitterMouseDown } = useResizableSplit({
@@ -945,11 +947,12 @@ const ArgusLogsPage: React.FC = () => {
   // Side panel handlers
   const handleSelectLog = useCallback((index: number) => {
     setSelectedLogIndex(index);
-  }, []);
+    setIsRightPanelOpen(true);
+  }, [setIsRightPanelOpen]);
 
   const handleCloseSidePanel = useCallback(() => {
-    setSelectedLogIndex(null);
-  }, []);
+    setIsRightPanelOpen(false);
+  }, [setIsRightPanelOpen]);
 
   const handlePrevLog = useCallback(() => {
     setSelectedLogIndex(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
@@ -1542,7 +1545,7 @@ const ArgusLogsPage: React.FC = () => {
         </Box>
 
         {/* ── Splitter Handle + Right Side Panel ── */}
-        {selectedLogIndex !== null && (
+        {isRightPanelOpen && (
           <>
             <Box
               onMouseDown={handlePanelSplitterMouseDown}
@@ -1562,7 +1565,7 @@ const ArgusLogsPage: React.FC = () => {
             />
             <LogSidePanel
               log={selectedLog}
-              open={selectedLogIndex !== null}
+              open={isRightPanelOpen}
               onClose={handleCloseSidePanel}
               onPrev={handlePrevLog}
               onNext={handleNextLog}
