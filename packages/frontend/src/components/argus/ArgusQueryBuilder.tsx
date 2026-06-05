@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, Button, IconButton, Popover,
-  MenuItem, Select, TextField, Tooltip, alpha, useTheme
+  Box, Typography, Button, IconButton, Popover, Chip,
+  MenuItem, Select, TextField, alpha, useTheme
 } from '@mui/material';
 import {
   Add as AddIcon,
   Close as CloseIcon,
-  FilterList as FilterIcon,
   AutoFixHigh as MagicIcon,
   WarningAmber as WarningIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
-interface TagRule {
-  id: string;
-  field: string;
-  op: string;
-  value: string;
-}
+/* ─── Data model ─── */
 
-interface TextRule {
-  id: string;
-  contains: boolean;
-  value: string;
-}
+type RuleType = 'tag' | 'text' | 'has';
+
+interface BaseRule { id: string; connector: 'AND' | 'OR' }
+interface TagRule extends BaseRule { type: 'tag'; field: string; op: string; value: string }
+interface TextRule extends BaseRule { type: 'text'; contains: boolean; value: string }
+interface HasRule extends BaseRule { type: 'has'; field: string }
+type Rule = TagRule | TextRule | HasRule;
 
 interface ArgusQueryBuilderProps {
   fields: string[];
@@ -42,119 +38,161 @@ const TAG_OPS = [
   { value: '<=', label: 'less eq (<=)', key: 'lte' },
 ];
 
-const generateId = () => Math.random().toString(36).substring(7);
+const genId = () => Math.random().toString(36).substring(7);
+
+/* ─── Parser ─── */
+
+function parseQueryToRules(q: string, defaultField: string): { rules: Rule[]; isComplex: boolean } {
+  if (!q.trim()) {
+    return { rules: [{ id: genId(), type: 'tag', connector: 'AND', field: defaultField, op: '=', value: '' }], isComplex: false };
+  }
+
+  // Complex queries with parentheses
+  if (q.includes('(') || q.includes(')')) {
+    return { rules: [{ id: genId(), type: 'tag', connector: 'AND', field: defaultField, op: '=', value: '' }], isComplex: true };
+  }
+
+  // Tokenize: match key:"quoted value", key:value, "quoted text", AND, OR, or bare words
+  const tokens: string[] = q.match(/(?:!?[\w.-]+:(?:"[^"]*"|'[^']*'|[^\s]*))|(?:"[^"]*")|(?:[^\s]+)/g) || [];
+  const rules: Rule[] = [];
+  let nextConnector: 'AND' | 'OR' = 'AND';
+
+  tokens.forEach(token => {
+    const upper = token.toUpperCase();
+    if (upper === 'AND') { nextConnector = 'AND'; return; }
+    if (upper === 'OR') { nextConnector = 'OR'; return; }
+
+    const isNeg = token.startsWith('-') || token.startsWith('!');
+    const clean = isNeg ? token.slice(1) : token;
+    const colonIdx = clean.indexOf(':');
+
+    if (colonIdx > 0) {
+      const field = clean.slice(0, colonIdx);
+      let val = clean.slice(colonIdx + 1);
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+
+      if (field === 'has') {
+        rules.push({ id: genId(), type: 'has', connector: nextConnector, field: val });
+      } else {
+        let op = isNeg ? '!=' : '=';
+        if (val.startsWith('>=')) { op = '>='; val = val.slice(2); }
+        else if (val.startsWith('<=')) { op = '<='; val = val.slice(2); }
+        else if (val.startsWith('>')) { op = '>'; val = val.slice(1); }
+        else if (val.startsWith('<')) { op = '<'; val = val.slice(1); }
+        rules.push({ id: genId(), type: 'tag', connector: nextConnector, field, op, value: val });
+      }
+    } else {
+      let textVal = token;
+      let contains = true;
+      if (textVal.startsWith('-') || textVal.startsWith('!')) { contains = false; textVal = textVal.slice(1); }
+      if ((textVal.startsWith('"') && textVal.endsWith('"')) || (textVal.startsWith("'") && textVal.endsWith("'"))) {
+        textVal = textVal.slice(1, -1);
+      }
+      rules.push({ id: genId(), type: 'text', connector: nextConnector, contains, value: textVal });
+    }
+    nextConnector = 'AND'; // reset
+  });
+
+  if (rules.length === 0) {
+    rules.push({ id: genId(), type: 'tag', connector: 'AND', field: defaultField, op: '=', value: '' });
+  }
+
+  return { rules, isComplex: false };
+}
+
+/* ─── Serializer ─── */
+
+function rulesToQuery(rules: Rule[]): string {
+  const parts: string[] = [];
+
+  rules.forEach((rule, idx) => {
+    if (idx > 0) {
+      parts.push(rule.connector);
+    }
+
+    switch (rule.type) {
+      case 'tag': {
+        if (!rule.field || !rule.value) break;
+        const isNeg = rule.op === '!=';
+        let valStr = rule.value;
+        if (['>', '<', '>=', '<='].includes(rule.op)) valStr = rule.op + valStr;
+        if (valStr.includes(' ')) valStr = `"${valStr}"`;
+        else valStr = `"${valStr}"`;
+        parts.push(`${isNeg ? '!' : ''}${rule.field}:${valStr}`);
+        break;
+      }
+      case 'has': {
+        if (!rule.field) break;
+        parts.push(`has:"${rule.field}"`);
+        break;
+      }
+      case 'text': {
+        if (!rule.value) break;
+        let v = rule.value;
+        if (v.includes(' ')) v = `"${v}"`;
+        parts.push(`${!rule.contains ? '!' : ''}${v}`);
+        break;
+      }
+    }
+  });
+
+  return parts.join(' ');
+}
+
+/* ─── Component ─── */
 
 const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, onApply, anchorEl, onClose }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
-  const [logicalOp, setLogicalOp] = useState<'AND' | 'OR'>('AND');
-  const [tagRules, setTagRules] = useState<TagRule[]>([]);
-  const [textRules, setTextRules] = useState<TextRule[]>([]);
+  const [rules, setRules] = useState<Rule[]>([]);
   const [isComplex, setIsComplex] = useState(false);
 
-  // Parse initial query
   useEffect(() => {
     if (!anchorEl) return;
-    
-    const parseQuery = (q: string) => {
-      if (!q.trim()) {
-        setTagRules([{ id: generateId(), field: 'level', op: '=', value: '' }]);
-        setTextRules([]);
-        setLogicalOp('AND');
-        setIsComplex(false);
-        return;
-      }
+    const result = parseQueryToRules(query, fields[0] || 'level');
+    setRules(result.rules);
+    setIsComplex(result.isComplex);
+  }, [anchorEl, query, fields]);
 
-      // Check complexity
-      if (q.includes(' OR ') || q.includes('(') || q.includes(')')) {
-        setIsComplex(true);
-        setTagRules([{ id: generateId(), field: 'level', op: '=', value: '' }]);
-        setTextRules([]);
-        setLogicalOp('AND');
-        return;
-      }
+  const updateRule = (id: string, patch: Partial<Rule>) => {
+    setRules(prev => prev.map(r => r.id === id ? { ...r, ...patch } as Rule : r));
+  };
 
-      setIsComplex(false);
-      const tokens: string[] = q.match(/("[^"]+"|[^"\s]+)/g) || [];
-      const newTags: TagRule[] = [];
-      const newTexts: TextRule[] = [];
+  const removeRule = (id: string) => {
+    setRules(prev => {
+      const filtered = prev.filter(r => r.id !== id);
+      return filtered.length > 0 ? filtered : [{ id: genId(), type: 'tag', connector: 'AND', field: fields[0] || 'level', op: '=', value: '' } as TagRule];
+    });
+  };
 
-      tokens.forEach(token => {
-        // Strip AND keyword (since we assume AND for simple queries)
-        if (token.toUpperCase() === 'AND') return;
-
-        const isNegated = token.startsWith('-');
-        const cleanToken = isNegated ? token.slice(1) : token;
-        
-        const colonIdx = cleanToken.indexOf(':');
-        if (colonIdx > 0 && cleanToken.slice(0, colonIdx) !== 'has') {
-          const field = cleanToken.slice(0, colonIdx);
-          let val = cleanToken.slice(colonIdx + 1);
-          // remove quotes if any
-          if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-          
-          let op = isNegated ? '!=' : '=';
-          
-          // Check for > < >= <=
-          if (val.startsWith('>=')) { op = '>='; val = val.slice(2); }
-          else if (val.startsWith('<=')) { op = '<='; val = val.slice(2); }
-          else if (val.startsWith('>')) { op = '>'; val = val.slice(1); }
-          else if (val.startsWith('<')) { op = '<'; val = val.slice(1); }
-
-          newTags.push({ id: generateId(), field, op, value: val });
-        } else {
-          // text search or 'has:' which we treat as raw for simplicity unless we want to map it
-          let textVal = token;
-          let contains = true;
-          if (token.startsWith('-')) {
-            contains = false;
-            textVal = token.slice(1);
-          }
-          if (textVal.startsWith('"') && textVal.endsWith('"')) textVal = textVal.slice(1, -1);
-          
-          newTexts.push({ id: generateId(), contains, value: textVal });
-        }
-      });
-
-      if (newTags.length === 0 && newTexts.length === 0) {
-        newTags.push({ id: generateId(), field: 'level', op: '=', value: '' });
-      }
-
-      setTagRules(newTags);
-      setTextRules(newTexts);
-      setLogicalOp('AND');
-    };
-
-    parseQuery(query);
-  }, [anchorEl, query]);
+  const addRule = (type: RuleType) => {
+    const base = { id: genId(), connector: 'AND' as const };
+    switch (type) {
+      case 'tag':
+        setRules(prev => [...prev, { ...base, type: 'tag', field: fields[0] || 'level', op: '=', value: '' }]);
+        break;
+      case 'has':
+        setRules(prev => [...prev, { ...base, type: 'has', field: fields[0] || '' }]);
+        break;
+      case 'text':
+        setRules(prev => [...prev, { ...base, type: 'text', contains: true, value: '' }]);
+        break;
+    }
+  };
 
   const handleApply = () => {
-    const parts: string[] = [];
-    
-    tagRules.forEach(r => {
-      if (!r.field || !r.value) return;
-      const isNeg = r.op === '!=';
-      let valStr = r.value;
-      if (['>', '<', '>=', '<='].includes(r.op)) {
-        valStr = r.op + valStr;
-      }
-      if (valStr.includes(' ')) valStr = `"${valStr}"`;
-      parts.push(`${isNeg ? '-' : ''}${r.field}:${valStr}`);
-    });
-
-    textRules.forEach(r => {
-      if (!r.value) return;
-      let valStr = r.value;
-      if (valStr.includes(' ')) valStr = `"${valStr}"`;
-      parts.push(`${!r.contains ? '-' : ''}${valStr}`);
-    });
-
-    const finalQuery = parts.join(logicalOp === 'AND' ? ' ' : ' OR ');
-    onApply(finalQuery);
+    const q = rulesToQuery(rules);
+    onApply(q);
     onClose();
   };
+
+  const rowSx = { display: 'flex', gap: 0.75, alignItems: 'center' };
+  const selectSx = { height: 30, fontSize: '0.75rem' };
+  const inputSx = { height: 30, fontSize: '0.75rem' };
 
   return (
     <Popover
@@ -163,9 +201,10 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, on
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      slotProps={{ paper: { sx: { width: 550, mt: 1, borderRadius: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' } } }}
+      slotProps={{ paper: { sx: { width: 600, mt: 1, borderRadius: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' } } }}
     >
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+        {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <MagicIcon sx={{ fontSize: 20, color: theme.palette.primary.main }} />
@@ -180,115 +219,152 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, on
           <Box sx={{ p: 1.5, borderRadius: 1, backgroundColor: alpha(theme.palette.warning.main, 0.1), display: 'flex', gap: 1, alignItems: 'flex-start' }}>
             <WarningIcon sx={{ fontSize: 18, color: theme.palette.warning.main, mt: 0.2 }} />
             <Typography sx={{ fontSize: '0.75rem', color: theme.palette.warning.main }}>
-              {t('argus.builder.complexWarning', 'Complex query detected (OR / Parentheses). The visual builder cannot parse it. Using the builder will overwrite your query.')}
+              {t('argus.builder.complexWarning', 'Complex query detected (Parentheses). The visual builder cannot parse it. Using the builder will overwrite your query.')}
             </Typography>
           </Box>
         )}
 
-        {/* Global Operator */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography sx={{ fontSize: '0.75rem', fontWeight: 600 }}>{t('argus.builder.match', 'Match')}</Typography>
-          <Select
-            size="small"
-            value={logicalOp}
-            onChange={e => setLogicalOp(e.target.value as any)}
-            sx={{ height: 28, fontSize: '0.75rem', fontWeight: 700, minWidth: 80 }}
-          >
-            <MenuItem value="AND" sx={{ fontSize: '0.75rem' }}>ALL (AND)</MenuItem>
-            <MenuItem value="OR" sx={{ fontSize: '0.75rem' }}>ANY (OR)</MenuItem>
-          </Select>
-          <Typography sx={{ fontSize: '0.75rem', fontWeight: 600 }}>{t('argus.builder.conditions', 'of the following rules:')}</Typography>
+        {/* Rules */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {rules.map((rule, idx) => (
+            <React.Fragment key={rule.id}>
+              {/* Connector between rules */}
+              {idx > 0 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', py: 0.25, pl: 1 }}>
+                  <Select
+                    size="small"
+                    value={rule.connector}
+                    onChange={e => updateRule(rule.id, { connector: e.target.value as 'AND' | 'OR' })}
+                    sx={{
+                      height: 22, fontSize: '0.65rem', fontWeight: 700,
+                      color: rule.connector === 'OR' ? theme.palette.warning.main : theme.palette.info.main,
+                      '& .MuiSelect-select': { py: 0, px: 1 },
+                    }}
+                    variant="standard"
+                    disableUnderline
+                  >
+                    <MenuItem value="AND" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>AND</MenuItem>
+                    <MenuItem value="OR" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>OR</MenuItem>
+                  </Select>
+                </Box>
+              )}
+
+              {/* Rule row */}
+              <Box sx={rowSx}>
+                {rule.type === 'tag' && (
+                  <>
+                    <Select
+                      size="small" value={rule.field}
+                      onChange={e => updateRule(rule.id, { field: e.target.value })}
+                      sx={{ width: 130, ...selectSx }}
+                      MenuProps={{ PaperProps: { sx: { maxHeight: 250 } } }}
+                    >
+                      {fields.map(f => <MenuItem key={f} value={f} sx={{ fontSize: '0.75rem' }}>{f}</MenuItem>)}
+                      {!fields.includes(rule.field) && rule.field && <MenuItem value={rule.field} sx={{ fontSize: '0.75rem' }}>{rule.field}</MenuItem>}
+                    </Select>
+                    <Select
+                      size="small" value={rule.op}
+                      onChange={e => updateRule(rule.id, { op: e.target.value })}
+                      sx={{ width: 120, ...selectSx }}
+                    >
+                      {TAG_OPS.map(o => (
+                        <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>
+                          {t(`argus.builder.op.${o.key}`, o.label)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <TextField
+                      size="small" value={rule.value} placeholder="value..."
+                      onChange={e => updateRule(rule.id, { value: e.target.value })}
+                      InputProps={{ sx: inputSx }}
+                      sx={{ flex: 1 }}
+                    />
+                  </>
+                )}
+
+                {rule.type === 'has' && (
+                  <>
+                    <Chip
+                      label="has:"
+                      size="small"
+                      sx={{
+                        fontWeight: 700, fontSize: '0.75rem', height: 30,
+                        backgroundColor: alpha(theme.palette.success.main, 0.15),
+                        color: theme.palette.success.main,
+                        border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+                      }}
+                    />
+                    <Select
+                      size="small" value={rule.field}
+                      onChange={e => updateRule(rule.id, { field: e.target.value })}
+                      sx={{ flex: 1, ...selectSx }}
+                      displayEmpty
+                      MenuProps={{ PaperProps: { sx: { maxHeight: 250 } } }}
+                    >
+                      <MenuItem value="" disabled sx={{ fontSize: '0.75rem' }}>
+                        {t('argus.builder.selectField', 'Select field...')}
+                      </MenuItem>
+                      {fields.map(f => <MenuItem key={f} value={f} sx={{ fontSize: '0.75rem' }}>{f}</MenuItem>)}
+                      {rule.field && !fields.includes(rule.field) && <MenuItem value={rule.field} sx={{ fontSize: '0.75rem' }}>{rule.field}</MenuItem>}
+                    </Select>
+                  </>
+                )}
+
+                {rule.type === 'text' && (
+                  <>
+                    <Select
+                      size="small"
+                      value={rule.contains ? 'contains' : 'not_contains'}
+                      onChange={e => updateRule(rule.id, { contains: e.target.value === 'contains' })}
+                      sx={{ width: 150, ...selectSx }}
+                    >
+                      <MenuItem value="contains" sx={{ fontSize: '0.75rem' }}>{t('argus.builder.contains', 'Contains')}</MenuItem>
+                      <MenuItem value="not_contains" sx={{ fontSize: '0.75rem' }}>{t('argus.builder.notContains', 'Not contains')}</MenuItem>
+                    </Select>
+                    <TextField
+                      size="small" value={rule.value} placeholder={t('argus.builder.textPlaceholder', 'Search text...')}
+                      onChange={e => updateRule(rule.id, { value: e.target.value })}
+                      InputProps={{ sx: inputSx }}
+                      sx={{ flex: 1 }}
+                    />
+                  </>
+                )}
+
+                <IconButton size="small" onClick={() => removeRule(rule.id)} sx={{ p: 0.3 }}>
+                  <CloseIcon fontSize="small" sx={{ color: 'text.disabled', fontSize: 16 }} />
+                </IconButton>
+              </Box>
+            </React.Fragment>
+          ))}
         </Box>
 
-        {/* Tag Filters */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {tagRules.map((rule, idx) => (
-            <Box key={rule.id} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Select
-                size="small"
-                value={rule.field}
-                onChange={e => setTagRules(prev => prev.map(r => r.id === rule.id ? { ...r, field: e.target.value } : r))}
-                sx={{ width: 140, height: 32, fontSize: '0.75rem' }}
-                MenuProps={{ PaperProps: { sx: { maxHeight: 250 } } }}
-              >
-                {fields.map(f => <MenuItem key={f} value={f} sx={{ fontSize: '0.75rem' }}>{f}</MenuItem>)}
-                {!fields.includes(rule.field) && rule.field && <MenuItem value={rule.field} sx={{ fontSize: '0.75rem' }}>{rule.field}</MenuItem>}
-              </Select>
-
-              <Select
-                size="small"
-                value={rule.op}
-                onChange={e => setTagRules(prev => prev.map(r => r.id === rule.id ? { ...r, op: e.target.value } : r))}
-                sx={{ width: 140, height: 32, fontSize: '0.75rem' }}
-              >
-                {TAG_OPS.map(o => (
-                  <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.75rem' }}>
-                    {t(`argus.builder.op.${o.key}`, o.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-
-              <TextField
-                size="small"
-                value={rule.value}
-                onChange={e => setTagRules(prev => prev.map(r => r.id === rule.id ? { ...r, value: e.target.value } : r))}
-                placeholder="value..."
-                InputProps={{ sx: { height: 32, fontSize: '0.75rem'} }}
-                sx={{ flex: 1 }}
-              />
-
-              <IconButton size="small" onClick={() => setTagRules(prev => prev.filter(r => r.id !== rule.id))}>
-                <CloseIcon fontSize="small" sx={{ color: 'text.disabled' }} />
-              </IconButton>
-            </Box>
-          ))}
+        {/* Add buttons */}
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 0.5 }}>
           <Button
             startIcon={<AddIcon />} size="small"
-            onClick={() => setTagRules(prev => [...prev, { id: generateId(), field: fields[0] || 'level', op: '=', value: '' }])}
-            sx={{ alignSelf: 'flex-start', textTransform: 'none', fontSize: '0.75rem', px: 1, mt: 0.5 }}
+            onClick={() => addRule('tag')}
+            sx={{ textTransform: 'none', fontSize: '0.7rem', px: 1 }}
           >
-            {t('argus.builder.addTagFilter', 'Add Tag Filter')}
+            {t('argus.builder.addTagFilter', 'Tag Filter')}
+          </Button>
+          <Button
+            startIcon={<AddIcon />} size="small"
+            onClick={() => addRule('has')}
+            sx={{ textTransform: 'none', fontSize: '0.7rem', px: 1 }}
+          >
+            {t('argus.builder.addHasFilter', 'Has Field')}
+          </Button>
+          <Button
+            startIcon={<AddIcon />} size="small"
+            onClick={() => addRule('text')}
+            sx={{ textTransform: 'none', fontSize: '0.7rem', px: 1 }}
+          >
+            {t('argus.builder.addTextFilter', 'Text Search')}
           </Button>
         </Box>
 
-        {/* Text Search Filters */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, pt: 2, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
-          {textRules.map((rule, idx) => (
-            <Box key={rule.id} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Select
-                size="small"
-                value={rule.contains ? 'contains' : 'not_contains'}
-                onChange={e => setTextRules(prev => prev.map(r => r.id === rule.id ? { ...r, contains: e.target.value === 'contains' } : r))}
-                sx={{ width: 140, height: 32, fontSize: '0.75rem' }}
-              >
-                <MenuItem value="contains" sx={{ fontSize: '0.75rem' }}>{t('argus.builder.contains', 'Line contains')}</MenuItem>
-                <MenuItem value="not_contains" sx={{ fontSize: '0.75rem' }}>{t('argus.builder.notContains', 'Does not contain')}</MenuItem>
-              </Select>
-
-              <TextField
-                size="small"
-                value={rule.value}
-                onChange={e => setTextRules(prev => prev.map(r => r.id === rule.id ? { ...r, value: e.target.value } : r))}
-                placeholder="Search text..."
-                InputProps={{ sx: { height: 32, fontSize: '0.75rem'} }}
-                sx={{ flex: 1 }}
-              />
-
-              <IconButton size="small" onClick={() => setTextRules(prev => prev.filter(r => r.id !== rule.id))}>
-                <CloseIcon fontSize="small" sx={{ color: 'text.disabled' }} />
-              </IconButton>
-            </Box>
-          ))}
-          <Button
-            startIcon={<AddIcon />} size="small"
-            onClick={() => setTextRules(prev => [...prev, { id: generateId(), contains: true, value: '' }])}
-            sx={{ alignSelf: 'flex-start', textTransform: 'none', fontSize: '0.75rem', px: 1, mt: 0.5 }}
-          >
-            {t('argus.builder.addTextFilter', 'Add Text Filter')}
-          </Button>
-        </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+        {/* Actions */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1, pt: 1.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
           <Button size="small" onClick={onClose} sx={{ textTransform: 'none', fontWeight: 600 }}>
             {t('common.cancel', 'Cancel')}
           </Button>
