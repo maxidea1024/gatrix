@@ -95,6 +95,7 @@ import useArgusUrlState from '@/hooks/useArgusUrlState';
 import SimplePagination from '@/components/common/SimplePagination';
 import PageHeader from '@/components/common/PageHeader';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
@@ -849,10 +850,10 @@ const ArgusFeedbackPage: React.FC = () => {
         }}>
           <PageContentLoader loading={loading} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             {items.length === 0 ? (
-              <Box sx={{ py: 8, textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <FeedbackIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-                <Typography color="text.secondary">{t('argus.feedback.noFeedback')}</Typography>
-              </Box>
+              <EmptyPlaceholder
+                message={t('argus.feedback.noFeedback')}
+                sx={{ flex: 1, border: 'none' }}
+              />
             ) : (
               <Box sx={{ flex: 1, overflow: 'auto' }}>
                 {items.map((item) => (
@@ -1281,12 +1282,10 @@ const ArgusFeedbackPage: React.FC = () => {
             ) : (
               /* Empty Detail Placeholder */
               items.length > 0 && !loading && (
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'text.disabled', height: '100%', minHeight: 0 }}>
-                  <FeedbackIcon sx={{ fontSize: 56, mb: 1, opacity: 0.3 }} />
-                  <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
-                    {t('argus.feedback.emptySelection', '피드백을 선택하면 상세 내용을 확인할 수 있습니다.')}
-                  </Typography>
-                </Box>
+                <EmptyPlaceholder
+                  message={t('argus.feedback.emptySelection', '피드백을 선택하면 상세 내용을 확인할 수 있습니다.')}
+                  sx={{ flex: 1, border: 'none', height: '100%' }}
+                />
               )
             )}
       </Box>
