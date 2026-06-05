@@ -193,6 +193,9 @@ const ArgusLogsSearchInput: React.FC<{
     setSearchFocused(true);
   };
 
+  // If the remainder is empty but we have chips, the cursor is conceptually resting on the trailing space after the chips.
+  const normalizedQuery = (chipsText && !remainder) ? chipsText + ' ' : localSearch;
+
   /** Get cursor-adjusted word position in full localSearch */
   const getWordAtCursor = (): { word: string; start: number; end: number } => {
     const el = inputRef.current;
@@ -200,7 +203,7 @@ const ArgusLogsSearchInput: React.FC<{
     // Offset: chips text + separator space
     const offset = chipsText ? chipsText.length + 1 : 0;
     const cursor = offset + inputCursor;
-    const text = localSearch;
+    const text = normalizedQuery;
 
     let start = cursor;
     while (start > 0 && text[start - 1] !== ' ') start--;
@@ -212,8 +215,8 @@ const ArgusLogsSearchInput: React.FC<{
 
   const replaceWordAtCursor = (replacement: string, moveCursorToEnd = true): string => {
     const { start, end } = getWordAtCursor();
-    const before = localSearch.slice(0, start);
-    const after = localSearch.slice(end);
+    const before = normalizedQuery.slice(0, start);
+    const after = normalizedQuery.slice(end);
     // Don't add space after ':' — user is about to type a value
     const needsTrailingSpace = !replacement.endsWith(':');
     const joined = needsTrailingSpace
@@ -367,7 +370,7 @@ const ArgusLogsSearchInput: React.FC<{
         ref={autocompleteRef}
         open={searchFocused}
         anchorEl={searchContainerRef.current}
-        query={localSearch}
+        query={normalizedQuery}
         fields={['severity', 'service', 'environment', 'logger', 'trace_id', 'message']}
         facets={mappedFacets}
         isDark={isDark}
