@@ -175,40 +175,46 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           }
           size="small"
           sx={{
-            height: 28, borderRadius: '6px', border: 'none',
+            height: 28, borderRadius: '6px',
+            border: `1px solid ${alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.3)}`,
             backgroundColor: alpha(issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336', 0.12),
             color: issue.status === 'resolved' ? '#4caf50' : issue.status === 'ignored' ? '#9e9e9e' : '#f44336',
             '& .MuiChip-label': { px: 1.2 },
           }}
         />
 
-        {/* Status Change */}
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        {/* Status Change — split button */}
+        <Box sx={{
+          display: 'flex', alignItems: 'center', height: 28,
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}`,
+          borderRadius: '6px', overflow: 'hidden',
+        }}>
           <Chip
             icon={issue.status === 'resolved' ? <ErrorIcon sx={{ fontSize: '14px !important' }} /> : <CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
             label={issue.status === 'resolved' ? t('argus.issues.reopen') : t('argus.issues.resolve')}
             size="small"
             onClick={() => handleStatusRequest(issue.status === 'resolved' ? 'unresolved' : 'resolved')}
             sx={{
-              height: 28, borderRadius: '6px', border: 'none',
-              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              height: '100%', borderRadius: 0, border: 'none',
+              backgroundColor: 'transparent',
               color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
               '& .MuiChip-icon': { color: 'inherit', ml: 0.8 },
               '& .MuiChip-label': { px: 0.8 },
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
             }}
           />
+          <Divider orientation="vertical" flexItem />
           <Chip
             icon={<ExpandMoreIcon sx={{ fontSize: '16px !important' }} />}
             size="small"
             onClick={(e) => setStatusMenuAnchor(e.currentTarget)}
             sx={{
-              height: 28, borderRadius: '6px', border: 'none', minWidth: 28,
-              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              height: '100%', borderRadius: 0, border: 'none', minWidth: 28,
+              backgroundColor: 'transparent',
               color: 'text.secondary',
               '& .MuiChip-icon': { color: 'inherit', ml: 0.5, mr: -0.5 },
               '& .MuiChip-label': { display: 'none' },
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
             }}
           />
         </Box>
@@ -272,14 +278,15 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800' }} />}
           label={PRIORITY_CONFIG[issue.priority || 'medium']?.label || t('argus.issues.priority.medium')}
           size="small"
+          variant="outlined"
           onClick={(e) => setPriorityAnchor(e.currentTarget)}
           sx={{
-            height: 28, borderRadius: '6px', border: 'none',
-            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+            height: 28, borderRadius: '6px',
+            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
             color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
             '& .MuiChip-icon': { ml: 0.8 },
             '& .MuiChip-label': { px: 0.8 },
-            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
           }}
         />
 
@@ -287,14 +294,15 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           icon={<PersonIcon sx={{ fontSize: '14px !important', color: issue.assigned_to ? 'primary.main' : 'text.disabled' }} />}
           label={issue.assigned_to ? issue.assigned_to : t('argus.issues.unassigned', 'Unassigned')}
           size="small"
+          variant="outlined"
           onClick={onAssigneeClick}
           sx={{
-            height: 28, borderRadius: '6px', border: 'none',
-            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+            height: 28, borderRadius: '6px',
+            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
             color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
             '& .MuiChip-icon': { ml: 0.8 },
             '& .MuiChip-label': { px: 0.8 },
-            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+            '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
           }}
         />
 
@@ -318,13 +326,14 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
         <Chip
           label={t('argus.issues.aiAnalysis', 'AI 분석')}
           size="small"
+          variant="outlined"
           onClick={onAiAnalysis}
           sx={{
-            height: 28, borderRadius: '6px', border: 'none',
-            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            height: 28, borderRadius: '6px',
+            borderColor: alpha(theme.palette.primary.main, 0.4),
             color: 'primary.main', fontWeight: 700, fontSize: '0.75rem',
             '& .MuiChip-label': { px: 1.2 },
-            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.18) },
+            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
           }}
         />
 
