@@ -11,6 +11,11 @@ import {
   LinearProgress,
   Tooltip,
   Divider,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -23,6 +28,7 @@ import {
   CheckCircle as CheckIcon,
   Schedule as ScheduleIcon,
   ArrowBack as ArrowBackIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -60,6 +66,8 @@ const ArgusReleasesPage: React.FC = () => {
   const [filters, setFilters] = useState<ArgusFilterState>(
     () => defaultArgusFilterState(urlState.period)
   );
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'crash_free' | 'sessions' | 'errors'>('date');
 
   useEffect(() => {
     setFilters(prev => ({
@@ -123,10 +131,50 @@ const ArgusReleasesPage: React.FC = () => {
     : 100;
 
   const total = releases.length;
+
+  // --- Adoption Stage ---
+  const totalSessionsAll = releases.reduce((s, r) => s + Number(r.total_sessions), 0);
+  const getAdoptionStage = (r: ArgusRelease): 'adopted' | 'low' | 'replaced' => {
+    if (totalSessionsAll === 0) return 'low';
+    const pct = (Number(r.total_sessions) / totalSessionsAll) * 100;
+    return pct >= 10 ? 'adopted' : 'low';
+  };
+
+  // --- Filter & Sort ---
+  const filteredReleases = useMemo(() => {
+    let result = [...releases];
+
+    // Search
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(r => r.release.toLowerCase().includes(term));
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'crash_free':
+        result.sort((a, b) => Number(a.crash_free_rate) - Number(b.crash_free_rate));
+        break;
+      case 'sessions':
+        result.sort((a, b) => Number(b.total_sessions) - Number(a.total_sessions));
+        break;
+      case 'errors':
+        result.sort((a, b) => Number(b.error_count) - Number(a.error_count));
+        break;
+      case 'date':
+      default:
+        // Already sorted by date from backend
+        break;
+    }
+
+    return result;
+  }, [releases, searchTerm, sortBy]);
+
+  const filteredTotal = filteredReleases.length;
   const paginatedReleases = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return releases.slice(start, start + rowsPerPage);
-  }, [releases, currentPage, rowsPerPage]);
+    return filteredReleases.slice(start, start + rowsPerPage);
+  }, [filteredReleases, currentPage, rowsPerPage]);
 
   return (
     <Box>
@@ -203,6 +251,44 @@ const ArgusReleasesPage: React.FC = () => {
           </Paper>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Search & Sort Bar */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+              <TextField
+                size="small"
+                placeholder={t('argus.releases.searchPlaceholder', 'Search releases...')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  flex: 1, maxWidth: 320,
+                  '& .MuiOutlinedInput-root': { borderRadius: 2, fontSize: '0.8rem' },
+                }}
+              />
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <Select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  sx={{ borderRadius: 2, fontSize: '0.8rem' }}
+                >
+                  <MenuItem value="date">{t('argus.releases.sortDate', 'Date (newest)')}</MenuItem>
+                  <MenuItem value="crash_free">{t('argus.releases.sortCrashFree', 'Crash Free (lowest)')}</MenuItem>
+                  <MenuItem value="sessions">{t('argus.releases.sortSessions', 'Sessions (most)')}</MenuItem>
+                  <MenuItem value="errors">{t('argus.releases.sortErrors', 'Errors (most)')}</MenuItem>
+                </Select>
+              </FormControl>
+              {searchTerm && (
+                <Typography variant="caption" color="text.secondary">
+                  {filteredTotal} / {total} {t('argus.releases.releasesLabel', 'releases')}
+                </Typography>
+              )}
+            </Box>
+
             {/* Table Header */}
             <Box sx={{
               display: 'grid', gridTemplateColumns: 'minmax(200px, 2fr) 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr', gap: 2,
@@ -259,6 +345,17 @@ const ArgusReleasesPage: React.FC = () => {
                       {isHotfix && (
                         <Chip label={t('argus.releases.hotfix', 'HOTFIX')} size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha('#ff9800', 0.15), color: '#ff9800', border: 'none' }} />
                       )}
+                      {(() => {
+                        const stage = getAdoptionStage(r);
+                        const stageColor = stage === 'adopted' ? '#4caf50' : '#ff9800';
+                        const stageLabel = stage === 'adopted' ? t('argus.releases.adopted', 'Adopted') : t('argus.releases.lowAdoption', 'Low');
+                        return (
+                          <Chip label={stageLabel} size="small" sx={{
+                            height: 16, fontSize: '0.55rem', fontWeight: 700,
+                            backgroundColor: alpha(stageColor, 0.1), color: stageColor, border: 'none',
+                          }} />
+                        );
+                      })()}
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <ScheduleIcon sx={{ fontSize: 13, color: isDark ? '#555' : '#bbb' }} />
@@ -347,10 +444,10 @@ const ArgusReleasesPage: React.FC = () => {
           </Box>
         )}
 
-        {total > 0 && (
+        {filteredTotal > 0 && (
           <Box sx={{ mt: 3 }}>
             <SimplePagination
-              count={total}
+              count={filteredTotal}
               page={currentPage - 1}
               rowsPerPage={rowsPerPage}
               onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
