@@ -544,6 +544,14 @@ const ArgusLogsPage: React.FC = () => {
     invertDelta: true,
   });
 
+  // Resizable facet sidebar splitter
+  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown } = useResizableSplit({
+    storageKey: 'argus_facet_panel_width',
+    defaultWidth: 240,
+    minWidth: 150,
+    maxWidth: 500,
+  });
+
   // Display density
   const [displayDensity, setDisplayDensity] = useState<DisplayDensity>('default');
 
@@ -1315,16 +1323,32 @@ const ArgusLogsPage: React.FC = () => {
       {/* ── Body: Sidebar + Content split ── */}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left: Facets Sidebar */}
-        <LogsFacetSidebar
-          facets={facetGroups}
-          onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
-          collapsed={facetSidebarCollapsed}
-          onToggleCollapse={() => setFacetSidebarCollapsed(c => !c)}
-          loading={loading}
-          customFacets={customFacetData}
-          onAddCustomFacet={handleAddCustomFacet}
-          onRemoveCustomFacet={handleRemoveCustomFacet}
-        />
+        <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
+          <LogsFacetSidebar
+            width={facetWidth}
+            facets={facetGroups}
+            onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
+            collapsed={facetSidebarCollapsed}
+            onToggleCollapse={() => setFacetSidebarCollapsed(c => !c)}
+            loading={loading}
+            customFacets={customFacetData}
+            onAddCustomFacet={handleAddCustomFacet}
+            onRemoveCustomFacet={handleRemoveCustomFacet}
+          />
+          {!facetSidebarCollapsed && (
+            <Box
+              onMouseDown={handleFacetSplitterMouseDown}
+              sx={{
+                position: 'absolute', right: -4, top: 0, bottom: 0,
+                width: 8, cursor: 'col-resize',
+                backgroundColor: isFacetDragging ? alpha(theme.palette.primary.main, 0.2) : 'transparent',
+                transition: 'background-color 0.2s',
+                zIndex: 10,
+                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.1) },
+              }}
+            />
+          )}
+        </Box>
 
         {/* Right: Main log content — separated from sidebar with a subtle border gap */}
         <Box sx={{

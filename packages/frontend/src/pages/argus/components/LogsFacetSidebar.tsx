@@ -32,6 +32,7 @@ interface LogsFacetSidebarProps {
   customFacets?: FacetGroup[];
   onAddCustomFacet?: (key: string) => void;
   onRemoveCustomFacet?: (key: string) => void;
+  width?: number;
 }
 
 /* ─── Single Facet Section ─── */
@@ -200,7 +201,7 @@ const FacetSection: React.FC<{
 
 const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
   facets, onFilter, collapsed, onToggleCollapse, loading,
-  customFacets, onAddCustomFacet, onRemoveCustomFacet,
+  customFacets, onAddCustomFacet, onRemoveCustomFacet, width = 240,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -225,7 +226,7 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
 
   return (
     <Box sx={{
-      width: 240, flexShrink: 0, overflowY: 'auto', overflowX: 'hidden',
+      width, flexShrink: 0, overflowY: 'auto', overflowX: 'hidden',
       borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
       '&::-webkit-scrollbar': { width: 4 },
       '&::-webkit-scrollbar-thumb': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: 2 },
