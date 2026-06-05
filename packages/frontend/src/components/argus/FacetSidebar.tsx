@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Box, Typography, IconButton, InputBase, Checkbox,
-  useTheme, alpha, Collapse, Chip,
+  Box, Typography, IconButton, InputBase,
+  useTheme, alpha, Collapse,
 } from '@mui/material';
 import {
   FilterList as FilterIcon, Block as ExcludeIcon,
@@ -23,7 +23,7 @@ export interface FacetGroup {
   values: { value: string; count: number }[];
 }
 
-interface LogsFacetSidebarProps {
+export interface FacetSidebarProps {
   facets: FacetGroup[];
   onFilter: (key: string, value: string, exclude?: boolean) => void;
   collapsed: boolean;
@@ -101,7 +101,7 @@ const FacetSection: React.FC<{
               <InputBase
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder={t('argus.logs.facet.filterValues', 'Filter values...')}
+                placeholder={t('argus.facet.filterValues', 'Filter values...')}
                 sx={{ fontSize: '0.68rem', flex: 1, '& input': { p: 0 } }}
               />
             </Box>
@@ -148,13 +148,13 @@ const FacetSection: React.FC<{
                     {v.count.toLocaleString()}
                   </Typography>
                   <Box className="facet-actions" sx={{ display: 'flex', gap: 0.2, opacity: 0, transition: 'opacity 0.15s' }}>
-                    <SafeTooltip title={t('argus.logs.facet.include', 'Include in filter')}>
+                    <SafeTooltip title={t('argus.facet.include', 'Include in filter')}>
                       <IconButton size="small" onClick={(e) => { e.stopPropagation(); onFilter(facet.key, v.value, false); }}
                         sx={{ p: 0.15, color: theme.palette.primary.main }}>
                         <FilterIcon sx={{ fontSize: 11 }} />
                       </IconButton>
                     </SafeTooltip>
-                    <SafeTooltip title={t('argus.logs.facet.exclude', 'Exclude from filter')}>
+                    <SafeTooltip title={t('argus.facet.exclude', 'Exclude from filter')}>
                       <IconButton size="small" onClick={(e) => { e.stopPropagation(); onFilter(facet.key, v.value, true); }}
                         sx={{ p: 0.15, color: theme.palette.error.main }}>
                         <ExcludeIcon sx={{ fontSize: 11 }} />
@@ -176,7 +176,7 @@ const FacetSection: React.FC<{
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
-              {t('argus.logs.facet.viewAll', 'View all {{count}} values', { count: facet.values.length })}
+              {t('argus.facet.viewAll', 'View all {{count}} values', { count: facet.values.length })}
             </Typography>
           )}
           {showAll && facet.values.length > 10 && (
@@ -188,7 +188,7 @@ const FacetSection: React.FC<{
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
-              {t('argus.logs.facet.showLess', 'Show less')}
+              {t('argus.facet.showLess', 'Show less')}
             </Typography>
           )}
         </Box>
@@ -199,7 +199,7 @@ const FacetSection: React.FC<{
 
 /* ─── Main Sidebar ─── */
 
-const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
+const FacetSidebar: React.FC<FacetSidebarProps> = ({
   facets, onFilter, collapsed, onToggleCollapse, loading,
   customFacets, onAddCustomFacet, onRemoveCustomFacet, width = 240,
 }) => {
@@ -215,7 +215,7 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
         borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
         display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 1,
       }}>
-        <SafeTooltip title={t('argus.logs.facet.expandFacets', 'Expand facets')} placement="right">
+        <SafeTooltip title={t('argus.facet.expandFacets', 'Expand facets')} placement="right">
           <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.5 }}>
             <ExpandIcon sx={{ fontSize: 16 }} />
           </IconButton>
@@ -237,9 +237,9 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
         px: 1.5, py: 1, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
       }}>
         <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.secondary' }}>
-          {t('argus.logs.facet.facets', 'Facets')}
+          {t('argus.facet.facets', 'Facets')}
         </Typography>
-        <SafeTooltip title={t('argus.logs.facet.collapseFacets', 'Collapse')} placement="right">
+        <SafeTooltip title={t('argus.facet.collapseFacets', 'Collapse')} placement="right">
           <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.3 }}>
             <CollapseIcon sx={{ fontSize: 14, transform: 'rotate(180deg)' }} />
           </IconButton>
@@ -258,7 +258,7 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
 
       {facets.length === 0 && !loading && (
         <Typography sx={{ px: 2, py: 3, fontSize: '0.72rem', color: 'text.disabled', textAlign: 'center' }}>
-          {t('argus.logs.facet.noFacets', 'No facets available')}
+          {t('argus.facet.noFacets', 'No facets available')}
         </Typography>
       )}
 
@@ -266,7 +266,7 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
       {customFacets && customFacets.length > 0 && (
         <Box sx={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`, mt: 0.5 }}>
           <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.disabled', px: 1.5, py: 0.6 }}>
-            {t('argus.logs.customFacets.title', 'Custom Facets')}
+            {t('argus.facet.customFacets', 'Custom Facets')}
           </Typography>
           {customFacets.map(facet => (
             <Box key={facet.key} sx={{ position: 'relative' }}>
@@ -298,14 +298,14 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
                   setNewFacetKey('');
                 }
               }}
-              placeholder={t('argus.logs.customFacets.placeholder', 'e.g. user_id, request_path')}
+              placeholder={t('argus.facet.customPlaceholder', 'e.g. user_id, request_path')}
               sx={{
                 flex: 1, fontSize: '0.65rem', height: 24, px: 0.5,
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
                 borderRadius: '4px',
               }}
             />
-            <SafeTooltip title={t('argus.logs.customFacets.add', 'Add Facet')}>
+            <SafeTooltip title={t('argus.facet.addFacet', 'Add Facet')}>
               <IconButton size="small" onClick={() => {
                 if (newFacetKey.trim()) {
                   onAddCustomFacet(newFacetKey.trim());
@@ -322,4 +322,4 @@ const LogsFacetSidebar: React.FC<LogsFacetSidebarProps> = ({
   );
 };
 
-export default LogsFacetSidebar;
+export default FacetSidebar;

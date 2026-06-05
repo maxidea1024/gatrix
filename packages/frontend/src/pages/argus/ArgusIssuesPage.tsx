@@ -32,7 +32,9 @@ import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 
 import { ArgusSearchInput } from '@/components/argus/ArgusSearchInput';
-import SavedSearchesSidebar, { SavedSearch } from '@/components/argus/SavedSearchesSidebar';
+import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
+
+import { useResizableSplit } from '@/hooks/useResizableSplit';
 import { useArgusRealtime } from '@/hooks/useArgusRealtime';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
 import IssueListItem from '@/components/argus/IssueListItem';
@@ -170,6 +172,15 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [levelAnchor, setLevelAnchor] = useState<HTMLElement | null>(null);
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
+
+  // ─── Facet sidebar state ────────────────────────────────────────
+  const [facetCollapsed, setFacetCollapsed] = useLocalStorage('argus_issue_facet_collapsed', false);
+  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown } = useResizableSplit({
+    storageKey: 'argus_issue_facet_width',
+    defaultWidth: 220,
+    minWidth: 150,
+    maxWidth: 400,
+  });
 
   // ─── Real-time SSE ──────────────────────────────────────────────
   const { newIssueCount, resetNewIssueCount } = useArgusRealtime(
@@ -414,30 +425,46 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
 
-  const mappedFacets = useMemo(() => {
-    // Count occurrences of each field value from loaded issues
-    const countBy = (field: keyof ArgusIssue) => {
-      const counts = new Map<string, number>();
-      issues.forEach(issue => {
-        const val = issue[field];
-        if (val != null && val !== '') {
-          const key = String(val);
-          counts.set(key, (counts.get(key) || 0) + 1);
-        }
-      });
-      return Array.from(counts.entries())
-        .map(([value, count]) => ({ value, count }))
-        .sort((a, b) => b.count - a.count);
-    };
-
-    return {
-      level: countBy('level'),
-      status: countBy('status'),
-      platform: countBy('platform'),
-      assigned_to: countBy('assigned_to'),
-      priority: countBy('priority'),
-    };
+  // ─── Facet data from loaded issues ───
+  const countBy = useCallback((field: keyof ArgusIssue) => {
+    const counts = new Map<string, number>();
+    issues.forEach(issue => {
+      const val = issue[field];
+      if (val != null && val !== '') {
+        const key = String(val);
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+    });
+    return Array.from(counts.entries())
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => b.count - a.count);
   }, [issues]);
+
+  const mappedFacets = useMemo(() => ({
+    level: countBy('level'),
+    status: countBy('status'),
+    platform: countBy('platform'),
+    assigned_to: countBy('assigned_to'),
+    priority: countBy('priority'),
+  }), [countBy]);
+
+  const facetGroups: FacetGroup[] = useMemo(() => [
+    { key: 'level', label: t('argus.issues.level', 'Level'), values: mappedFacets.level },
+    { key: 'status', label: t('argus.issues.status', 'Status'), values: mappedFacets.status },
+    { key: 'platform', label: t('argus.issues.platform', 'Platform'), values: mappedFacets.platform },
+    { key: 'assigned_to', label: t('argus.issues.assignee', 'Assignee'), values: mappedFacets.assigned_to },
+    { key: 'priority', label: t('argus.issues.priority', 'Priority'), values: mappedFacets.priority },
+  ].filter(g => g.values.length > 0), [mappedFacets, t]);
+
+  /** Handle facet click → append to search query as chip */
+  const handleFacetFilter = useCallback((key: string, value: string, exclude?: boolean) => {
+    const prefix = exclude ? '!' : '';
+    const chip = `${prefix}${key}:${value}`;
+    const newQuery = storeSearch ? `${storeSearch} AND ${chip}` : chip;
+    setStoreSearch(newQuery);
+    setSearchInput(newQuery);
+    setCurrentPage(1);
+  }, [storeSearch, setStoreSearch, setCurrentPage]);
 
   // ─── Render ────────────────────────────────────────────────────
 
@@ -547,19 +574,34 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       />
 
       {/* Issues content area with sidebar */}
-      <Box sx={{ display: 'flex' }}>
-        <SavedSearchesSidebar
-          currentQuery={searchInput}
-          currentSort={sort}
-          onApply={(saved: SavedSearch) => {
-            setSearchInput(saved.query);
-            setStoreSearch(saved.query);
-            setSort(saved.sort);
-            setCurrentPage(1);
-          }}
-        />
+      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left: Facet Sidebar */}
+        <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
+          <FacetSidebar
+            width={facetWidth}
+            facets={facetGroups}
+            onFilter={(key, val, exclude) => handleFacetFilter(key, val, exclude)}
+            collapsed={facetCollapsed}
+            onToggleCollapse={() => setFacetCollapsed(c => !c)}
+            loading={loading}
+          />
+          {!facetCollapsed && (
+            <Box
+              onMouseDown={handleFacetSplitterMouseDown}
+              sx={{
+                position: 'absolute', right: -4, top: 0, bottom: 0,
+                width: 8, cursor: 'col-resize',
+                backgroundColor: isFacetDragging ? alpha(theme.palette.primary.main, 0.2) : 'transparent',
+                transition: 'background-color 0.2s',
+                zIndex: 10,
+                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.1) },
+              }}
+            />
+          )}
+        </Box>
 
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        {/* Right: Issues content */}
+        <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto', pl: facetCollapsed ? 0.25 : 0.75 }}>
           {/* Bulk Actions */}
           <IssueBulkActions
             selectedIds={selectedIds}

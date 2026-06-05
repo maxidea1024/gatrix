@@ -38,7 +38,7 @@ import LogsToolbar from './components/LogsToolbar';
 import LogsTablePanel from './components/LogsTablePanel';
 import LogsAggregatePanel from './components/LogsAggregatePanel';
 import { EditTableDialog, SaveQueryDialog, SavedQueriesDrawer } from './components/LogsDialogs';
-import LogsFacetSidebar, { FacetGroup } from './components/LogsFacetSidebar';
+import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 import LogSidePanel from './components/LogSidePanel';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip, Legend);
@@ -1003,7 +1003,7 @@ const ArgusLogsPage: React.FC = () => {
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left: Facets Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
-          <LogsFacetSidebar
+          <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
             onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
