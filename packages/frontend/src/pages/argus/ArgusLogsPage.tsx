@@ -228,6 +228,34 @@ const ArgusLogsPage: React.FC = () => {
   // Display density
   const [displayDensity, setDisplayDensity] = useState<DisplayDensity>('default');
 
+  // ─── Side panel handlers ───
+  const handleSelectLog = useCallback((idx: number) => {
+    const log = logs[idx];
+    if (log) {
+      setUrlState({ log: log.log_id });
+      setIsRightPanelOpen(true);
+    }
+  }, [logs, setUrlState, setIsRightPanelOpen]);
+
+  const handleCloseSidePanel = useCallback(() => {
+    setUrlState({ log: '' });
+    setIsRightPanelOpen(false);
+  }, [setUrlState, setIsRightPanelOpen]);
+
+  const handlePrevLog = useCallback(() => {
+    if (selectedLogIndex !== null && selectedLogIndex > 0) {
+      const prevLog = logs[selectedLogIndex - 1];
+      if (prevLog) setUrlState({ log: prevLog.log_id });
+    }
+  }, [selectedLogIndex, logs, setUrlState]);
+
+  const handleNextLog = useCallback(() => {
+    if (selectedLogIndex !== null && selectedLogIndex < logs.length - 1) {
+      const nextLog = logs[selectedLogIndex + 1];
+      if (nextLog) setUrlState({ log: nextLog.log_id });
+    }
+  }, [selectedLogIndex, logs, setUrlState]);
+
   // ─── Active Filters (chip tags from facet sidebar / detail panel) ───
   type ActiveFilter = { key: string; value: string; exclude: boolean; enabled: boolean };
 
