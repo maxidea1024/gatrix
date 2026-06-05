@@ -3459,6 +3459,7 @@ __metadata:
     dotenv: "npm:^16.3.1"
     eslint: "npm:^8.54.0"
     fastify: "npm:^4.25.0"
+    groupmq: "npm:^1.1.0"
     ioredis: "npm:^5.3.2"
     jest: "npm:^29.7.0"
     jsonwebtoken: "npm:^9.0.3"
@@ -14945,7 +14946,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:4.9.0":
+"cron-parser@npm:4.9.0, cron-parser@npm:^4.9.0":
   version: 4.9.0
   resolution: "cron-parser@npm:4.9.0"
   dependencies:
@@ -18419,6 +18420,17 @@ __metadata:
   version: 1.4.0
   resolution: "graphemer@npm:1.4.0"
   checksum: 10c0/e951259d8cd2e0d196c72ec711add7115d42eb9a8146c8eeda5b8d3ac91e5dd816b9cd68920726d9fd4490368e7ed86e9c423f40db87e2d8dfafa00fa17c3a31
+  languageName: node
+  linkType: hard
+
+"groupmq@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "groupmq@npm:1.1.0"
+  dependencies:
+    cron-parser: "npm:^4.9.0"
+  peerDependencies:
+    ioredis: ">=5"
+  checksum: 10c0/8f4433d0535c3bac059f7b781bd4ee3c4931b2ac6e5b727916820d76f268d86f4ecb5c3968eb50ad35b130846fb070497f97aced8a1b4b93da1ae7816a3dff99
   languageName: node
   linkType: hard
 
