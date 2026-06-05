@@ -241,9 +241,10 @@ const ArgusLogsSearchInput: React.FC<{
   const addSearchTag = (key: string, value: string, op: string = 'is') => {
     const opStr = op === '!=' ? '!=' : ':';
     const tag = `${key}${opStr}"${value}"`;
-    const result = replaceWordAtCursor(tag, false);
+    const result = replaceWordAtCursor(tag, true);
     onSubmit(result.trim());
-    setSearchFocused(false);
+    // Keep searchFocused true so that autocomplete suggests AND/OR
+    setSearchFocused(true);
   };
 
   const handleSearchKey = (e: React.KeyboardEvent) => {
