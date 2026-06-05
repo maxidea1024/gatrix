@@ -87,7 +87,7 @@ export class FeedbackWorker {
         await this.discoverStreams();
 
         if (this.knownStreams.size === 0) {
-          await this.sleep(BLOCK_MS);
+          await this.sleep(pipelineConfig.worker.blockMs);
           continue;
         }
 

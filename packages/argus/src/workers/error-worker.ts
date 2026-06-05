@@ -20,7 +20,7 @@ export class ErrorWorker {
 
   // ClickHouse batch buffer (flushed periodically or when maxBatchSize is reached)
   private chBuffer: NormalizedError[] = [];
-  private chFlushTimer: NodeJS.Timer | null = null;
+  private chFlushTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.redis = new Redis({

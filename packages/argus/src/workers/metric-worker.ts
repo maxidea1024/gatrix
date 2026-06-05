@@ -4,6 +4,7 @@ import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { ArgusMetricEvent } from '../types/events';
 import { KNOWN_STREAMS, CONSUMER_GROUPS } from '../config/redis-keys';
+import { pipelineConfig } from '../config/pipeline-config';
 
 const logger = createLogger('metric-worker');
 
@@ -69,7 +70,7 @@ export class MetricWorker {
         await this.discoverStreams();
 
         if (this.knownStreams.size === 0) {
-          await this.sleep(BLOCK_MS);
+          await this.sleep(pipelineConfig.worker.blockMs);
           continue;
         }
 

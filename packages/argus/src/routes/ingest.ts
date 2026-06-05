@@ -122,10 +122,10 @@ export default async function ingestRoutes(app: FastifyInstance) {
         // Enqueue GroupMQ events
         const groupmqPromises: Promise<void>[] = [];
         for (const job of groupmqErrors) {
-          groupmqPromises.push(errorQueue.add(job));
+          groupmqPromises.push(errorQueue.add(job).then(() => {}));
         }
         for (const job of groupmqTxns) {
-          groupmqPromises.push(txnQueue.add(job));
+          groupmqPromises.push(txnQueue.add(job).then(() => {}));
         }
 
         // Enqueue Redis Stream events via pipeline

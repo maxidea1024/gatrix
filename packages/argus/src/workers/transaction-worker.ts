@@ -22,7 +22,7 @@ export class TransactionWorker {
   // ClickHouse batch buffers (transactions and spans flushed separately)
   private txnBuffer: NormalizedTransaction[] = [];
   private spanBuffer: NormalizedSpan[] = [];
-  private chFlushTimer: NodeJS.Timer | null = null;
+  private chFlushTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.redis = new Redis({
