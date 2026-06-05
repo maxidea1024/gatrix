@@ -92,8 +92,13 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
     }
 
     // Typing something (no trailing space) → last token is being edited
-    const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
-    return { state: 'typing_field', partial: lastToken };
+    const lastToken = (tokens[tokens.length - 1] || '');
+    const lastUpper = lastToken.toUpperCase();
+    // If last token is exactly AND/OR, treat as after_operator (chip system strips trailing space)
+    if (lastUpper === 'AND' || lastUpper === 'OR') {
+      return { state: 'after_operator' };
+    }
+    return { state: 'typing_field', partial: lastToken.toLowerCase() };
   }, []);
 
   const editingContext = useMemo(() => getEditingContext(query), [query, getEditingContext]);
