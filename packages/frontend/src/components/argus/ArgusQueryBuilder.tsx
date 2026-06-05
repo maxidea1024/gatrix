@@ -151,6 +151,50 @@ function rulesToQuery(rules: Rule[]): string {
   return parts.join(' ');
 }
 
+/* ─── Raw Query Preview ─── */
+
+const HighlightedQuery: React.FC<{ query: string; isDark: boolean }> = ({ query, isDark }) => {
+  const tokens = query.match(/(!?[\w.-]+:)|(\bAND\b|\bOR\b)|("[^"]*"|'[^']*'|\S+)/g) || [];
+  
+  if (!query) {
+    return (
+      <Box sx={{
+        fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.72rem',
+        p: 1.5, backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
+        borderRadius: 1, border: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+        color: 'text.disabled', fontStyle: 'italic',
+      }}>
+        No valid conditions to generate a query.
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{
+      fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.72rem', lineHeight: 1.5,
+      p: 1.5, backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
+      borderRadius: 1, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+      wordBreak: 'break-all', whiteSpace: 'pre-wrap'
+    }}>
+      {tokens.map((tok, i) => {
+        if (tok === 'AND' || tok === 'OR') {
+          return <span key={i} style={{ color: isDark ? '#ffb74d' : '#ed6c02', fontWeight: 700 }}>{tok} </span>;
+        }
+        if (tok.endsWith(':')) {
+          const isNeg = tok.startsWith('!');
+          const color = isDark ? '#64b5f6' : '#1976d2';
+          const negColor = isDark ? '#e57373' : '#d32f2f';
+          return <span key={i} style={{ color: isNeg ? negColor : color, fontWeight: 600 }}>{tok}</span>;
+        }
+        if (tok.startsWith('"') || tok.startsWith("'")) {
+          return <span key={i} style={{ color: isDark ? '#a5d6a7' : '#2e7d32' }}>{tok} </span>;
+        }
+        return <span key={i} style={{ color: isDark ? '#e0e0e0' : '#424242' }}>{tok} </span>;
+      })}
+    </Box>
+  );
+};
+
 /* ─── Component ─── */
 
 const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, facets = {}, onApply, anchorEl, onClose }) => {
@@ -394,8 +438,16 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
           </Button>
         </Box>
 
+        {/* Raw Query Preview */}
+        <Box sx={{ mt: 2, pt: 1.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary', mb: 1 }}>
+            {t('argus.builder.queryPreviewTitle', 'Generated Query Preview')}
+          </Typography>
+          <HighlightedQuery query={rulesToQuery(rules)} isDark={isDark} />
+        </Box>
+
         {/* Actions */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 1, pt: 1.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 1.5 }}>
           {rules.some(r => (r.type === 'tag' && !r.value) || (r.type === 'text' && !r.value)) && (
             <Typography sx={{ fontSize: '0.7rem', color: 'warning.main', mr: 'auto' }}>
               {t('argus.builder.emptyWarning', 'Empty value rules will be ignored')}
