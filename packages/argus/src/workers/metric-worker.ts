@@ -3,13 +3,13 @@ import { config } from '../config';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { ArgusMetricEvent } from '../types/events';
+import { KNOWN_STREAMS, CONSUMER_GROUPS } from '../config/redis-keys';
 
 const logger = createLogger('metric-worker');
 
-const STREAM_KEY_PATTERN = 'argus:metrics:*';
-const CONSUMER_GROUP = 'argus-metric-workers';
+
+const CONSUMER_GROUP = CONSUMER_GROUPS.METRICS;
 const CONSUMER_NAME = `worker-${process.pid}`;
-const BLOCK_MS = 5000;
 const BATCH_SIZE = 500;
 
 interface NormalizedMetric {
@@ -86,7 +86,7 @@ export class MetricWorker {
   }
 
   private async discoverStreams(): Promise<void> {
-    const keys = await this.redis.keys(STREAM_KEY_PATTERN);
+    const keys = await this.redis.smembers(KNOWN_STREAMS.METRICS);
     for (const key of keys) {
       if (!this.knownStreams.has(key)) {
         try {

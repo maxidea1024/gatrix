@@ -3,13 +3,14 @@ import { config } from '../config';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { ArgusSessionEvent } from '../types/events';
+import { KNOWN_STREAMS, CONSUMER_GROUPS } from '../config/redis-keys';
+import { pipelineConfig } from '../config/pipeline-config';
 
 const logger = createLogger('session-worker');
 
-const STREAM_KEY_PATTERN = 'argus:sessions:*';
-const CONSUMER_GROUP = 'argus-session-workers';
+
+const CONSUMER_GROUP = CONSUMER_GROUPS.SESSIONS;
 const CONSUMER_NAME = `worker-${process.pid}`;
-const BLOCK_MS = 5000;
 
 interface NormalizedSession {
   session_id: string;
@@ -69,7 +70,7 @@ export class SessionWorker {
         await this.discoverStreams();
 
         if (this.knownStreams.size === 0) {
-          await this.sleep(BLOCK_MS);
+          await this.sleep(pipelineConfig.worker.blockMs);
           continue;
         }
 
@@ -86,7 +87,7 @@ export class SessionWorker {
   }
 
   private async discoverStreams(): Promise<void> {
-    const keys = await this.redis.keys(STREAM_KEY_PATTERN);
+    const keys = await this.redis.smembers(KNOWN_STREAMS.SESSIONS);
     for (const key of keys) {
       if (!this.knownStreams.has(key)) {
         try {

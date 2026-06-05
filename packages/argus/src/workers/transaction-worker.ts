@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { Queue, Worker } from 'groupmq';
 import { config } from '../config';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
@@ -8,18 +9,20 @@ import {
   NormalizedSpan,
 } from '../processing/transaction-normalizer';
 import { ArgusTransactionEvent } from '../types/events';
+import { QUEUES } from '../config/redis-keys';
+import { pipelineConfig } from '../config/pipeline-config';
 
 const logger = createLogger('txn-worker');
 
-const STREAM_KEY_PATTERN = 'argus:txns:*';
-const CONSUMER_GROUP = 'argus-txn-workers';
-const CONSUMER_NAME = `worker-${process.pid}`;
-const BLOCK_MS = 5000;
-
 export class TransactionWorker {
   private redis: Redis;
-  private running = false;
-  private knownStreams: Set<string> = new Set();
+  private queue: Queue;
+  private worker: Worker | null = null;
+
+  // ClickHouse batch buffers (transactions and spans flushed separately)
+  private txnBuffer: NormalizedTransaction[] = [];
+  private spanBuffer: NormalizedSpan[] = [];
+  private chFlushTimer: NodeJS.Timer | null = null;
 
   constructor() {
     this.redis = new Redis({
@@ -30,183 +33,129 @@ export class TransactionWorker {
       maxRetriesPerRequest: null,
       enableReadyCheck: false,
     });
+
+    this.queue = new Queue({
+      redis: this.redis,
+      namespace: QUEUES.TRANSACTION_PROCESSING,
+    });
   }
 
   async start(): Promise<void> {
-    this.running = true;
-    logger.info('Transaction worker started', {
-      consumerGroup: CONSUMER_GROUP,
-      consumer: CONSUMER_NAME,
-      batchSize: config.worker.transactionBatchSize,
+    const { flushIntervalMs, maxBatchSize } = pipelineConfig.clickhouseBuffer;
+    const { txnConcurrency } = pipelineConfig.groupmq;
+
+    // Start periodic ClickHouse flush timer
+    this.chFlushTimer = setInterval(
+      () => this.flushClickHouse(),
+      flushIntervalMs,
+    );
+
+    // Start GroupMQ worker — per-project FIFO for future-proofing
+    this.worker = new Worker({
+      queue: this.queue,
+      handler: async (job) => {
+        const rawEvent = JSON.parse(job.data) as ArgusTransactionEvent & {
+          project_id: string;
+          dsn_key_id: number;
+        };
+
+        try {
+          const { transaction, spans } = normalizeTransactionEvent(
+            rawEvent,
+            rawEvent.project_id,
+            rawEvent.dsn_key_id || 0,
+          );
+
+          this.txnBuffer.push(transaction);
+          if (spans.length > 0) {
+            this.spanBuffer.push(...spans);
+          }
+
+          // Flush immediately if either buffer reaches max size
+          if (this.txnBuffer.length >= maxBatchSize || this.spanBuffer.length >= maxBatchSize) {
+            await this.flushClickHouse();
+          }
+        } catch (error) {
+          logger.error('Failed to process transaction', {
+            eventId: rawEvent.event_id,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      },
+      concurrency: txnConcurrency,
     });
 
-    this.processLoop().catch((error) => {
-      logger.error('Transaction worker loop crashed', {
-        error: error instanceof Error ? error.message : String(error),
-      });
+    await this.worker.run();
+
+    logger.info('Transaction worker started (GroupMQ)', {
+      namespace: QUEUES.TRANSACTION_PROCESSING,
+      concurrency: txnConcurrency,
+      chFlushIntervalMs: flushIntervalMs,
+      chMaxBatchSize: maxBatchSize,
     });
   }
 
   async close(): Promise<void> {
-    this.running = false;
+    // 1. Stop accepting new jobs
+    if (this.worker) await this.worker.close();
+
+    // 2. Flush remaining buffers
+    if (this.chFlushTimer) clearInterval(this.chFlushTimer);
+    await this.flushClickHouse();
+
+    // 3. Close Redis connection
     await this.redis.quit();
+
     logger.info('Transaction worker stopped');
   }
 
-  private async processLoop(): Promise<void> {
-    while (this.running) {
-      try {
-        await this.discoverStreams();
+  /**
+   * Flush both transaction and span buffers to ClickHouse.
+   * On failure, records are returned to buffers for the next attempt.
+   */
+  private async flushClickHouse(): Promise<void> {
+    const txnBatch = this.txnBuffer.splice(0);
+    const spanBatch = this.spanBuffer.splice(0);
 
-        if (this.knownStreams.size === 0) {
-          await this.sleep(BLOCK_MS);
-          continue;
-        }
+    if (txnBatch.length === 0 && spanBatch.length === 0) return;
 
-        for (const streamKey of this.knownStreams) {
-          await this.processStream(streamKey);
-        }
-      } catch (error) {
-        logger.error('Error in processing loop', {
-          error: error instanceof Error ? error.message : String(error),
-        });
-        await this.sleep(1000);
-      }
-    }
-  }
-
-  private async discoverStreams(): Promise<void> {
-    const keys = await this.redis.keys(STREAM_KEY_PATTERN);
-    for (const key of keys) {
-      if (!this.knownStreams.has(key)) {
-        try {
-          await this.redis.xgroup('CREATE', key, CONSUMER_GROUP, '0', 'MKSTREAM');
-          logger.info('Consumer group created', { stream: key });
-        } catch (error: any) {
-          if (!error.message?.includes('BUSYGROUP')) {
-            throw error;
-          }
-        }
-        this.knownStreams.add(key);
-      }
-    }
-  }
-
-  private async processStream(streamKey: string): Promise<void> {
-    const batchSize = config.worker.transactionBatchSize;
-
-    const results = await this.redis.xreadgroup(
-      'GROUP',
-      CONSUMER_GROUP,
-      CONSUMER_NAME,
-      'COUNT',
-      String(batchSize),
-      'BLOCK',
-      '100',
-      'STREAMS',
-      streamKey,
-      '>'
-    );
-
-    if (!results || results.length === 0) {
-      return;
-    }
-
-    const txnBatch: NormalizedTransaction[] = [];
-    const spanBatch: NormalizedSpan[] = [];
-    const ackIds: string[] = [];
-
-    for (const streamResult of results as [string, [string, string[]][]][]) {
-      const messages = streamResult[1];
-      for (const message of messages) {
-        const messageId = message[0];
-        const fields = message[1];
-        try {
-          const dataIndex = fields.indexOf('data');
-          if (dataIndex === -1 || dataIndex + 1 >= fields.length) {
-            logger.warn('Malformed stream message', { messageId });
-            ackIds.push(messageId);
-            continue;
-          }
-
-          const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusTransactionEvent & {
-            project_id: string;
-            dsn_key_id: number;
-          };
-
-          const { transaction, spans } = normalizeTransactionEvent(
-            rawEvent,
-            rawEvent.project_id,
-            rawEvent.dsn_key_id || 0
-          );
-
-          txnBatch.push(transaction);
-          if (spans.length > 0) {
-            spanBatch.push(...spans);
-          }
-
-          ackIds.push(messageId);
-        } catch (error) {
-          logger.error('Failed to process message', {
-            messageId,
-            error: error instanceof Error ? error.message : String(error),
-          });
-          ackIds.push(messageId);
-        }
-      }
-    }
-
-    // Batch insert transactions
-    if (txnBatch.length > 0) {
-      await this.insertTransactions(txnBatch);
-    }
-
-    // Batch insert spans
-    if (spanBatch.length > 0) {
-      await this.insertSpans(spanBatch);
-    }
-
-    // ACK
-    if (ackIds.length > 0) {
-      await this.redis.xack(streamKey, CONSUMER_GROUP, ...ackIds);
-    }
-  }
-
-  private async insertTransactions(batch: NormalizedTransaction[]): Promise<void> {
     try {
-      await clickhouse.insert({
-        table: 'argus.transactions',
-        values: batch,
-        format: 'JSONEachRow',
-      });
-      logger.info('Transactions inserted', { count: batch.length });
+      const promises: Promise<void>[] = [];
+
+      if (txnBatch.length > 0) {
+        promises.push(
+          clickhouse.insert({
+            table: 'argus.transactions',
+            values: txnBatch,
+            format: 'JSONEachRow',
+          }).then(() => {
+            logger.info('Transactions flushed', { count: txnBatch.length });
+          }),
+        );
+      }
+
+      if (spanBatch.length > 0) {
+        promises.push(
+          clickhouse.insert({
+            table: 'argus.spans',
+            values: spanBatch,
+            format: 'JSONEachRow',
+          }).then(() => {
+            logger.info('Spans flushed', { count: spanBatch.length });
+          }),
+        );
+      }
+
+      await Promise.all(promises);
     } catch (error) {
-      logger.error('ClickHouse transactions insert failed', {
-        count: batch.length,
+      // Put records back for retry
+      this.txnBuffer.unshift(...txnBatch);
+      this.spanBuffer.unshift(...spanBatch);
+      logger.error('ClickHouse flush failed, will retry', {
+        txnCount: txnBatch.length,
+        spanCount: spanBatch.length,
         error: error instanceof Error ? error.message : String(error),
       });
-      throw error;
     }
-  }
-
-  private async insertSpans(batch: NormalizedSpan[]): Promise<void> {
-    try {
-      await clickhouse.insert({
-        table: 'argus.spans',
-        values: batch,
-        format: 'JSONEachRow',
-      });
-      logger.info('Spans inserted', { count: batch.length });
-    } catch (error) {
-      logger.error('ClickHouse spans insert failed', {
-        count: batch.length,
-        error: error instanceof Error ? error.message : String(error),
-      });
-      throw error;
-    }
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

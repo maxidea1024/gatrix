@@ -5,13 +5,14 @@ import { createLogger } from '../utils/logger';
 import { ArgusFeedbackEvent } from '../types/events';
 import { evaluateFeedbackAlerts } from '../utils/alert-evaluator';
 import { classifyFeedback } from '../utils/ai-classifier';
+import { KNOWN_STREAMS, CONSUMER_GROUPS } from '../config/redis-keys';
+import { pipelineConfig } from '../config/pipeline-config';
 
 const logger = createLogger('feedback-worker');
 
-const STREAM_KEY_PATTERN = 'argus:feedback:*';
-const CONSUMER_GROUP = 'argus-feedback-workers';
+
+const CONSUMER_GROUP = CONSUMER_GROUPS.FEEDBACK;
 const CONSUMER_NAME = `worker-${process.pid}`;
-const BLOCK_MS = 5000;
 const BATCH_SIZE = 100;
 
 interface NormalizedFeedback {
@@ -103,7 +104,7 @@ export class FeedbackWorker {
   }
 
   private async discoverStreams(): Promise<void> {
-    const keys = await this.redis.keys(STREAM_KEY_PATTERN);
+    const keys = await this.redis.smembers(KNOWN_STREAMS.FEEDBACK);
     for (const key of keys) {
       if (!this.knownStreams.has(key)) {
         try {
