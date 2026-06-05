@@ -24,7 +24,6 @@ import {
   Tab,
   Divider,
   Collapse,
-  Popover,
   Select,
   FormControl,
   InputLabel,
@@ -49,7 +48,6 @@ import {
   Person as PersonIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  Sort as SortIcon,
   Add as AddIcon,
   Mail as MailIcon,
   Language as UrlIcon,
@@ -104,6 +102,7 @@ import HighlightText from '@/components/common/HighlightText';
 import FeedbackListItem from './components/FeedbackListItem';
 import FeedbackActivityTimeline from './components/FeedbackActivityTimeline';
 import FeedbackStatsBar from './components/FeedbackStatsBar';
+import FilterChipSelect from '@/components/common/FilterChipSelect';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
@@ -732,46 +731,16 @@ const ArgusFeedbackPage: React.FC = () => {
                   '& .MuiOutlinedInput-input': { py: 0.3 },
                 }}
               />
-              <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
-              {/* Sort Button */}
-              <Box
-                onClick={(e) => setSortAnchor(e.currentTarget)}
-                sx={{
-                  display: 'inline-flex', alignItems: 'center', gap: 0.5,
-                  height: 26, px: 1, borderRadius: '6px',
-                  border: '1px solid', borderColor: sortAnchor ? 'primary.main' : 'divider',
-                  cursor: 'pointer', transition: 'all 0.15s', userSelect: 'none',
-                  '&:hover': { borderColor: 'primary.main' },
-                }}
-              >
-                <SortIcon sx={{ fontSize: 13, color: 'text.secondary' }} />
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
-                  {SORT_OPTIONS.find(o => o.value === sortOrder)?.label || 'Sort'}
-                </Typography>
-              </Box>
-              <Popover
-                open={Boolean(sortAnchor)}
+              {/* Sort */}
+              <FilterChipSelect
+                label={t('argus.issues.sort')}
+                value={sortOrder}
+                options={SORT_OPTIONS}
                 anchorEl={sortAnchor}
+                onOpen={(e) => setSortAnchor(e.currentTarget)}
                 onClose={() => setSortAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                slotProps={{ paper: { sx: { mt: 0.5, borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', py: 0.5 } } }}
-              >
-                {SORT_OPTIONS.map(opt => (
-                  <Box
-                    key={opt.value}
-                    onClick={() => { setUrlState({ sort: opt.value, page: '1', fb: '' }); setSortAnchor(null); }}
-                    sx={{
-                      px: 1.5, py: 0.6, cursor: 'pointer', fontSize: '0.78rem',
-                      fontWeight: opt.value === sortOrder ? 700 : 400,
-                      color: opt.value === sortOrder ? 'primary.main' : 'text.primary',
-                      backgroundColor: opt.value === sortOrder ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
-                      '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.04) },
-                    }}
-                  >
-                    {opt.label}
-                  </Box>
-                ))}
-              </Popover>
+                onSelect={(v) => { setUrlState({ sort: v, page: '1', fb: '' }); }}
+              />
             </>
           }
         />

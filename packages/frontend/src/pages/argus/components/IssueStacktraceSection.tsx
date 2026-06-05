@@ -6,17 +6,15 @@ import {
   Menu,
   MenuItem,
   ListItemText,
-  ListItemIcon,
 } from '@mui/material';
 import {
   MoreHoriz as MoreHorizIcon,
-  Check as CheckIcon,
-  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusErrorEvent } from '@/services/argusService';
 import { copyToClipboard } from '@/utils/clipboard';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import FilterChipSelect from '@/components/common/FilterChipSelect';
 import { ActionChip } from '@/components/common/ActionChip';
 import ExceptionChaining from '@/components/argus/ExceptionChaining';
 import StacktraceView from '@/components/argus/StacktraceView';
@@ -31,7 +29,7 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
   const [mode, setMode] = useLocalStorage<'relevant' | 'full'>('argus_stacktrace_mode', 'relevant');
   const [order, setOrder] = useLocalStorage<'recent' | 'oldest'>('argus_stacktrace_order', 'recent');
   const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
-  const [orderMenuAnchor, setOrderMenuAnchor] = useState<null | HTMLElement>(null);
+  const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
 
   const handleCopyRaw = () => {
     if (event.stacktrace_raw) {
@@ -87,40 +85,18 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
 
           {/* Order & More */}
           <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <ActionChip
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Typography component="span" sx={{ fontSize: '0.72rem', color: 'text.disabled', fontWeight: 500 }}>
-                    {t('argus.issues.sort', '정렬')}
-                  </Typography>
-                  <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
-                    {order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
-                  </Typography>
-                  <ExpandMoreIcon sx={{ fontSize: 14, color: 'text.secondary', ml: -0.2 }} />
-                </Box>
-              }
-              onClick={(e) => setOrderMenuAnchor(e.currentTarget)}
+            <FilterChipSelect
+              label={t('argus.issues.sort', '정렬')}
+              value={order}
+              options={[
+                { value: 'recent', label: t('argus.issues.mostRecent') },
+                { value: 'oldest', label: t('argus.issues.oldestFirst') },
+              ]}
+              anchorEl={sortAnchor}
+              onOpen={(e) => setSortAnchor(e.currentTarget)}
+              onClose={() => setSortAnchor(null)}
+              onSelect={(v) => setOrder(v as 'recent' | 'oldest')}
             />
-            <Menu
-              anchorEl={orderMenuAnchor}
-              open={Boolean(orderMenuAnchor)}
-              onClose={() => setOrderMenuAnchor(null)}
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            >
-              <MenuItem onClick={() => { setOrder('recent'); setOrderMenuAnchor(null); }} selected={order === 'recent'}>
-                <ListItemIcon>{order === 'recent' && <CheckIcon fontSize="small" />}</ListItemIcon>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>
-                  {t('argus.issues.mostRecent')}
-                </ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => { setOrder('oldest'); setOrderMenuAnchor(null); }} selected={order === 'oldest'}>
-                <ListItemIcon>{order === 'oldest' && <CheckIcon fontSize="small" />}</ListItemIcon>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>
-                  {t('argus.issues.oldestFirst')}
-                </ListItemText>
-              </MenuItem>
-            </Menu>
             <ActionChip
               label={<MoreHorizIcon sx={{ fontSize: 16 }} />}
               onClick={(e) => setMoreMenuAnchor(e.currentTarget)}

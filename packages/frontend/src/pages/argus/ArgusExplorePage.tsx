@@ -16,7 +16,6 @@ import {
   ExpandMore as ExpandMoreIcon,
   Delete as DeleteIcon,
   MoreHoriz as MoreIcon,
-  Sort as SortIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
   ArrowBack as ArrowBackIcon,
@@ -35,6 +34,7 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { type ArgusSavedQuery, type SavedQueryType } from '@/services/argusService';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import FilterChipSelect from '@/components/common/FilterChipSelect';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 /* ─── Dataset Config ─── */
@@ -315,7 +315,7 @@ const ArgusExplorePage: React.FC = () => {
   const [filterTypes, setFilterTypes] = useState<string[]>([]);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [newMenuAnchor, setNewMenuAnchor] = useState<HTMLElement | null>(null);
-  const [sortMenuAnchor, setSortMenuAnchor] = useState<HTMLElement | null>(null);
+  const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
   const [duplicateTarget, setDuplicateTarget] = useState<ArgusSavedQuery | null>(null);
   const [duplicateName, setDuplicateName] = useState('');
 
@@ -574,33 +574,19 @@ const ArgusExplorePage: React.FC = () => {
           />
 
           {/* Sort */}
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<SortIcon sx={{ fontSize: 14 }} />}
-            onClick={(e) => setSortMenuAnchor(e.currentTarget)}
-            sx={{ textTransform: 'none', fontSize: '0.72rem', height: 28, borderRadius: '6px' }}
-          >
-            {sort === 'newest' ? t('argus.explore.sortNewest') :
-             sort === 'oldest' ? t('argus.explore.sortOldest') :
-             t('argus.explore.sortName')}
-          </Button>
-          <Menu
-            anchorEl={sortMenuAnchor}
-            open={Boolean(sortMenuAnchor)}
-            onClose={() => setSortMenuAnchor(null)}
-            slotProps={{ paper: { sx: { minWidth: 140, borderRadius: '8px' } } }}
-          >
-            <MenuItem onClick={() => { setSort('newest'); setSortMenuAnchor(null); }} selected={sort === 'newest'} sx={{ fontSize: '0.78rem' }}>
-              {t('argus.explore.sortNewest')}
-            </MenuItem>
-            <MenuItem onClick={() => { setSort('oldest'); setSortMenuAnchor(null); }} selected={sort === 'oldest'} sx={{ fontSize: '0.78rem' }}>
-              {t('argus.explore.sortOldest')}
-            </MenuItem>
-            <MenuItem onClick={() => { setSort('name'); setSortMenuAnchor(null); }} selected={sort === 'name'} sx={{ fontSize: '0.78rem' }}>
-              {t('argus.explore.sortName')}
-            </MenuItem>
-          </Menu>
+          <FilterChipSelect
+            label={t('argus.issues.sort')}
+            value={sort}
+            options={[
+              { value: 'newest', label: t('argus.explore.sortNewest') },
+              { value: 'oldest', label: t('argus.explore.sortOldest') },
+              { value: 'name', label: t('argus.explore.sortName') },
+            ]}
+            anchorEl={sortAnchor}
+            onOpen={(e) => setSortAnchor(e.currentTarget)}
+            onClose={() => setSortAnchor(null)}
+            onSelect={(v) => setSort(v as SortOption)}
+          />
 
           {/* + New */}
           <Button

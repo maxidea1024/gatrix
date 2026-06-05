@@ -45,6 +45,7 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageHeader from '@/components/common/PageHeader';
 import { useSnackbar } from 'notistack';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 /* ─── Config ─── */
 
@@ -633,12 +634,14 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
               sx={{ textTransform: 'none', fontSize: '0.78rem', borderRadius: 1.5 }}>
               {t('argus.alerts.history')}
             </Button>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}
-              sx={{
-                textTransform: 'none', fontSize: '0.78rem', fontWeight: 700, borderRadius: 1.5,
-              }}>
-              {t('argus.alerts.createRule')}
-            </Button>
+            {rules.length > 0 && (
+              <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}
+                sx={{
+                  textTransform: 'none', fontSize: '0.78rem', fontWeight: 700, borderRadius: 1.5,
+                }}>
+                {t('argus.alerts.createRule')}
+              </Button>
+            )}
           </Box>
         }
       />
@@ -646,22 +649,12 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({ projectId: pr
       <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={5} />}>
         {/* Rules List */}
         {rules.length === 0 ? (
-          <Paper elevation={0} sx={{
-            py: 8, textAlign: 'center', borderRadius: 2,
-            border: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-          }}>
-            <AlertIcon sx={{ fontSize: 48, color: alpha('#ff9800', 0.2), mb: 1 }} />
-            <Typography color="text.secondary" sx={{ fontSize: '0.88rem', mb: 0.5 }}>
-              {t('argus.alerts.noRules')}
-            </Typography>
-            <Typography color="text.disabled" sx={{ fontSize: '0.78rem', mb: 2 }}>
-              {t('argus.alerts.noRulesDesc')}
-            </Typography>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}
-              sx={{ textTransform: 'none' }}>
-              {t('argus.alerts.createFirstRule')}
-            </Button>
-          </Paper>
+          <EmptyPlaceholder
+            message={t('argus.alerts.noRules')}
+            description={t('argus.alerts.noRulesDesc')}
+            onAddClick={openCreate}
+            addButtonLabel={t('argus.alerts.createFirstRule')}
+          />
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {/* Search Bar */}

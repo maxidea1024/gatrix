@@ -289,3 +289,54 @@ topIssues.map(issue => (
 ```
 
 > **원칙:** 새로운 페이지에서 기존 데이터 타입의 리스트 아이템을 렌더링해야 할 때, 먼저 기존 공용 컴포넌트가 있는지 확인하고, 필요한 옵션(compact, showCheckbox 등)이 없으면 기존 컴포넌트에 prop을 추가하세요.
+
+## Sort/Filter Dropdown: Always Use FilterChipSelect
+
+정렬(Sort) 또는 필터(Status, Level 등) 옵션을 드롭다운 형태로 제공할 때, **반드시** `FilterChipSelect` 컴포넌트를 사용하세요. 인라인으로 `ActionChip` + `Menu`, `Button` + `Menu`, 또는 `Box` + `Popover` 조합을 직접 구현하지 마세요.
+
+**Location:** `@/components/common/FilterChipSelect`
+
+**Usage:**
+```tsx
+import FilterChipSelect from '@/components/common/FilterChipSelect';
+
+const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
+
+const sortOptions = [
+  { value: 'newest', label: t('common.newest') },
+  { value: 'oldest', label: t('common.oldest') },
+];
+
+<FilterChipSelect
+  label={t('argus.issues.sort')}
+  value={sort}
+  options={sortOptions}
+  anchorEl={sortAnchor}
+  onOpen={(e) => setSortAnchor(e.currentTarget)}
+  onClose={() => setSortAnchor(null)}
+  onSelect={(v) => setSort(v)}
+/>
+```
+
+**Props:**
+- `label` (required): 라벨 (예: "정렬", "상태")
+- `value` (required): 현재 선택된 값
+- `options` (required): `{ value: string; label: string; color?: string }[]`
+- `anchorEl` / `onOpen` / `onClose` / `onSelect` (required): Popover 제어
+
+**❌ 하지 마세요:**
+```tsx
+// ❌ ActionChip + Menu 조합
+<ActionChip label={<Box>정렬: {label} <ExpandMoreIcon /></Box>} onClick={...} />
+<Menu><MenuItem>...</MenuItem></Menu>
+
+// ❌ Button + Menu 조합
+<Button variant="outlined" startIcon={<SortIcon />}>{sortLabel}</Button>
+<Menu><MenuItem>...</MenuItem></Menu>
+
+// ❌ 인라인 Box + Popover 조합
+<Box onClick={...}><SortIcon /><Typography>최신순</Typography></Box>
+<Popover>...</Popover>
+```
+
+> **원칙:** 모든 정렬/필터 드롭다운은 `FilterChipSelect`를 사용하여 일관된 `라벨: 값 ∨` 스타일을 유지하세요.

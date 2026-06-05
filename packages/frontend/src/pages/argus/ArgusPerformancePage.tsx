@@ -11,7 +11,6 @@ import {
   alpha,
   Tooltip,
   Skeleton,
-  Popover,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -28,7 +27,6 @@ import {
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
   FitScreen as FitScreenIcon,
-  ExpandMore as ExpandMoreIcon,
   BugReport as BugReportIcon,
   Warning as WarningIcon,
   Lightbulb as LightbulbIcon,
@@ -67,6 +65,7 @@ import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/
 import { formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import FilterChipSelect from '@/components/common/FilterChipSelect';
 
 const PERF_PAGE_SIZE_KEY = 'argusPerf.pageSize';
 const PERF_DEFAULT_PAGE_SIZE = 15;
@@ -144,6 +143,14 @@ const ArgusPerformancePage: React.FC = () => {
   // Trace waterfall state
   const [traceData, setTraceData] = useState<ArgusTraceDetail | null>(null);
   const [traceLoading, setTraceLoading] = useState(false);
+  const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
+
+  const sortOptions = useMemo(() => [
+    { value: 'count', label: t('argus.performance.count') },
+    { value: 'avg', label: t('argus.performance.avgDuration') },
+    { value: 'p95', label: 'P95' },
+    { value: 'error_rate', label: t('argus.performance.errorRate') },
+  ], [t]);
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -326,7 +333,17 @@ const ArgusPerformancePage: React.FC = () => {
         onChange={handleFilterChange}
         onRefresh={viewMode === 'list' ? fetchTransactions : () => selectedTxn && fetchDetail(selectedTxn)}
         loading={loading}
-        extraControls={viewMode === 'list' ? <PerfSortChip sort={sort} onSortChange={handleSortChange} isDark={isDark} /> : undefined}
+        extraControls={viewMode === 'list' ? (
+          <FilterChipSelect
+            label={t('argus.issues.sort')}
+            value={sort}
+            options={sortOptions}
+            anchorEl={sortAnchor}
+            onOpen={(e) => setSortAnchor(e.currentTarget)}
+            onClose={() => setSortAnchor(null)}
+            onSelect={handleSortChange}
+          />
+        ) : undefined}
       />
 
       {/* === TRACE WATERFALL VIEW === */}
@@ -760,69 +777,7 @@ const ArgusPerformancePage: React.FC = () => {
   );
 };
 
-// --- Sort Chip Selector ---
-const SORT_OPTIONS = [
-  { value: 'count', labelKey: 'argus.performance.count' },
-  { value: 'avg', labelKey: 'argus.performance.avgDuration' },
-  { value: 'p95', labelKey: 'P95' },
-  { value: 'error_rate', labelKey: 'argus.performance.errorRate' },
-];
 
-const PerfSortChip: React.FC<{ sort: string; onSortChange: (v: string) => void; isDark: boolean }> = ({ sort, onSortChange, isDark }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const currentOpt = SORT_OPTIONS.find(o => o.value === sort);
-  const displayLabel = currentOpt ? (currentOpt.labelKey.startsWith('argus.') ? t(currentOpt.labelKey) : currentOpt.labelKey) : sort;
-
-  return (
-    <>
-      <Box
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          display: 'inline-flex', alignItems: 'center', gap: 0.5,
-          height: 32, px: 1.5, borderRadius: '6px',
-          border: '1px solid', borderColor: anchorEl ? 'primary.main' : 'divider',
-          bgcolor: anchorEl ? alpha(theme.palette.primary.main, 0.04) : 'transparent',
-          cursor: 'pointer', transition: 'all 0.15s', userSelect: 'none', whiteSpace: 'nowrap',
-          '&:hover': { borderColor: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.04) },
-        }}
-      >
-        <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}>{t('argus.issues.sort', 'Sort')}:</Typography>
-        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'text.primary' }}>{displayLabel}</Typography>
-        <ExpandMoreIcon sx={{ fontSize: 13, color: 'text.disabled', transform: anchorEl ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-      </Box>
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        slotProps={{ paper: { sx: { mt: 0.5, borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', minWidth: 160, py: 0.5 } } }}
-      >
-        {SORT_OPTIONS.map(opt => {
-          const label = opt.labelKey.startsWith('argus.') ? t(opt.labelKey) : opt.labelKey;
-          return (
-            <Box
-              key={opt.value}
-              onClick={() => { onSortChange(opt.value); setAnchorEl(null); }}
-              sx={{
-                px: 1.5, py: 0.7, cursor: 'pointer', fontSize: '0.8rem',
-                fontWeight: opt.value === sort ? 700 : 400,
-                color: opt.value === sort ? 'primary.main' : 'text.primary',
-                backgroundColor: opt.value === sort ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
-                transition: 'background 0.1s',
-                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.04) },
-              }}
-            >
-              {label}
-            </Box>
-          );
-        })}
-      </Popover>
-    </>
-  );
-};
 
 const METHOD_COLORS: Record<string, string> = {
   GET: '#4caf50', POST: '#2196f3', PUT: '#ff9800', PATCH: '#7c4dff',
