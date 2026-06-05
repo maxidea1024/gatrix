@@ -513,15 +513,16 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
 
         {/* Actions */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 1.5 }}>
-          {rules.some(r => (r.type === 'tag' && !r.value) || (r.type === 'text' && !r.value)) && (
-            <Typography sx={{ fontSize: '0.7rem', color: 'warning.main', mr: 'auto' }}>
-              {t('argus.builder.emptyWarning', 'Empty value rules will be ignored')}
-            </Typography>
-          )}
           <Button size="small" onClick={onClose} sx={{ textTransform: 'none', fontWeight: 600 }}>
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button size="small" variant="contained" onClick={handleApply} sx={{ textTransform: 'none', fontWeight: 600 }}>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={handleApply}
+            disabled={rules.some(r => (r.type === 'tag' && !r.value) || (r.type === 'text' && !r.value))}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          >
             {t('common.apply', 'Apply')}
           </Button>
         </Box>
