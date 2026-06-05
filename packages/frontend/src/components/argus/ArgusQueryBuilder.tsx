@@ -26,10 +26,13 @@ interface FacetValue {
   count: number;
 }
 
+export interface ActiveFilter { key: string; value: string; exclude: boolean; enabled: boolean }
+
 interface ArgusQueryBuilderProps {
   fields: string[];
   query: string;
   facets?: Record<string, FacetValue[]>;
+  activeFilters?: ActiveFilter[];
   onApply: (query: string) => void;
   anchorEl: HTMLElement | null;
   onClose: () => void;
@@ -153,10 +156,61 @@ function rulesToQuery(rules: Rule[]): string {
 
 /* ─── Raw Query Preview ─── */
 
-const HighlightedQuery: React.FC<{ query: string; isDark: boolean }> = ({ query, isDark }) => {
-  const tokens = query.match(/(!?[\w.-]+:)|(\bAND\b|\bOR\b)|("[^"]*"|'[^']*'|\S+)/g) || [];
+function escapeSqlString(str: string): string {
+  return `'${str.replace(/'/g, "''")}'`;
+}
+
+function generateSqlPreview(rules: Rule[], activeFilters?: ActiveFilter[]): string {
+  const lines: string[] = [];
   
-  if (!query) {
+  // Filter out incomplete rules
+  const validRules = rules.filter(rule => {
+    if (rule.type === 'tag') return rule.field && rule.value;
+    if (rule.type === 'has') return !!rule.field;
+    if (rule.type === 'text') return !!rule.value;
+    return false;
+  });
+
+  // Query Builder Rules
+  validRules.forEach((rule, idx) => {
+    const prefix = idx === 0 ? 'WHERE ' : `  ${rule.connector.padEnd(3)} `;
+    
+    switch (rule.type) {
+      case 'tag': {
+        // e.g. service = 'game-world'
+        const op = rule.op === '!=' ? '!=' : rule.op === '=' ? '=' : rule.op;
+        lines.push(`${prefix}${rule.field} ${op} ${escapeSqlString(rule.value)}`);
+        break;
+      }
+      case 'has': {
+        lines.push(`${prefix}${rule.field} IS NOT NULL`);
+        break;
+      }
+      case 'text': {
+        const op = rule.contains ? 'ILIKE' : 'NOT ILIKE';
+        lines.push(`${prefix}message ${op} ${escapeSqlString('%' + rule.value + '%')}`);
+        break;
+      }
+    }
+  });
+
+  // Active Facets (always ANDed to the query)
+  const enabledFilters = (activeFilters || []).filter(f => f.enabled);
+  if (enabledFilters.length > 0) {
+    if (lines.length > 0) lines.push('');
+    lines.push('-- Applied Facets');
+    enabledFilters.forEach((f, idx) => {
+      const prefix = (lines.length === 1 && idx === 0) ? 'WHERE ' : '  AND ';
+      const op = f.exclude ? '!=' : '=';
+      lines.push(`${prefix}${f.key} ${op} ${escapeSqlString(f.value)}`);
+    });
+  }
+
+  return lines.join('\n');
+}
+
+const HighlightedQuery: React.FC<{ sql: string; isDark: boolean }> = ({ sql, isDark }) => {
+  if (!sql) {
     return (
       <Box sx={{
         fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.72rem',
@@ -169,35 +223,46 @@ const HighlightedQuery: React.FC<{ query: string; isDark: boolean }> = ({ query,
     );
   }
 
+  // Very basic regex to colorize SQL: keywords, strings, comments
+  const renderLine = (line: string, i: number) => {
+    if (line.startsWith('--')) {
+      return <div key={i} style={{ color: isDark ? '#607d8b' : '#9e9e9e', fontStyle: 'italic' }}>{line}</div>;
+    }
+    // Replace keywords and strings with styled spans
+    // This is safe because we know the generated format exactly
+    const parts = line.split(/('(?:[^']|'')*')|(\bWHERE\b|\bAND\b|\bOR\b|\bIS NOT NULL\b|\bILIKE\b|\bNOT ILIKE\b)/g).filter(Boolean);
+    
+    return (
+      <div key={i}>
+        {parts.map((p, j) => {
+          if (p.startsWith("'") && p.endsWith("'")) {
+            return <span key={j} style={{ color: isDark ? '#a5d6a7' : '#2e7d32' }}>{p}</span>;
+          }
+          if (/^(WHERE|AND|OR|IS NOT NULL|ILIKE|NOT ILIKE)$/.test(p)) {
+            return <span key={j} style={{ color: isDark ? '#ffb74d' : '#ed6c02', fontWeight: 700 }}>{p}</span>;
+          }
+          // fields and operators
+          return <span key={j} style={{ color: isDark ? '#e0e0e0' : '#424242' }}>{p}</span>;
+        })}
+      </div>
+    );
+  };
+
   return (
     <Box sx={{
       fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.72rem', lineHeight: 1.5,
       p: 1.5, backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
       borderRadius: 1, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      wordBreak: 'break-all', whiteSpace: 'pre-wrap'
+      whiteSpace: 'pre', overflowX: 'auto'
     }}>
-      {tokens.map((tok, i) => {
-        if (tok === 'AND' || tok === 'OR') {
-          return <span key={i} style={{ color: isDark ? '#ffb74d' : '#ed6c02', fontWeight: 700 }}>{tok} </span>;
-        }
-        if (tok.endsWith(':')) {
-          const isNeg = tok.startsWith('!');
-          const color = isDark ? '#64b5f6' : '#1976d2';
-          const negColor = isDark ? '#e57373' : '#d32f2f';
-          return <span key={i} style={{ color: isNeg ? negColor : color, fontWeight: 600 }}>{tok}</span>;
-        }
-        if (tok.startsWith('"') || tok.startsWith("'")) {
-          return <span key={i} style={{ color: isDark ? '#a5d6a7' : '#2e7d32' }}>{tok} </span>;
-        }
-        return <span key={i} style={{ color: isDark ? '#e0e0e0' : '#424242' }}>{tok} </span>;
-      })}
+      {sql.split('\n').map((line, i) => renderLine(line, i))}
     </Box>
   );
 };
 
 /* ─── Component ─── */
 
-const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, facets = {}, onApply, anchorEl, onClose }) => {
+const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, facets = {}, activeFilters, onApply, anchorEl, onClose }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -443,7 +508,7 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
           <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary', mb: 1 }}>
             {t('argus.builder.queryPreviewTitle', 'Generated Query Preview')}
           </Typography>
-          <HighlightedQuery query={rulesToQuery(rules)} isDark={isDark} />
+          <HighlightedQuery sql={generateSqlPreview(rules, activeFilters)} isDark={isDark} />
         </Box>
 
         {/* Actions */}

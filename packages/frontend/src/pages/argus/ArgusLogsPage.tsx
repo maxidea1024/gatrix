@@ -72,7 +72,8 @@ const ArgusLogsSearchInput: React.FC<{
   isDark: boolean;
   theme: any;
   mappedFacets: any;
-}> = ({ initialValue, onDebouncedChange, onSubmit, isDark, theme, mappedFacets }) => {
+  activeFilters?: any[];
+}> = ({ initialValue, onDebouncedChange, onSubmit, isDark, theme, mappedFacets, activeFilters }) => {
   const { t } = useTranslation();
   const [localSearch, setLocalSearch] = useState(initialValue);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -355,6 +356,7 @@ const ArgusLogsSearchInput: React.FC<{
         fields={['severity', 'service', 'environment', 'logger_name', 'trace_id', 'release']}
         query={localSearch}
         facets={mappedFacets}
+        activeFilters={activeFilters}
         onApply={(q) => { setLocalSearch(q); onSubmit(q); }}
         anchorEl={builderAnchorEl}
         onClose={() => setBuilderAnchorEl(null)}
@@ -1238,6 +1240,7 @@ const ArgusLogsPage: React.FC = () => {
             isDark={isDark}
             theme={theme}
             mappedFacets={mappedFacets}
+            activeFilters={activeFilters}
           />
         }
       />
