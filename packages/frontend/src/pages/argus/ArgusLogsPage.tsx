@@ -113,24 +113,48 @@ const ArgusLogsSearchInput: React.FC<{
     return () => clearTimeout(timer);
   }, [localSearch, onDebouncedChange]);
 
+  /* ─── Cursor-position-based word helpers (inspired by Sentry's replaceFocusedWord) ─── */
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  /** Get the word at the cursor position in the input */
+  const getWordAtCursor = (): { word: string; start: number; end: number } => {
+    const el = inputRef.current || searchContainerRef.current?.querySelector('input');
+    const cursor = el?.selectionStart ?? localSearch.length;
+    const text = localSearch;
+
+    // Find word boundaries around cursor
+    let start = cursor;
+    while (start > 0 && text[start - 1] !== ' ') start--;
+    let end = cursor;
+    while (end < text.length && text[end] !== ' ') end++;
+
+    return { word: text.slice(start, end), start, end };
+  };
+
+  /** Replace the word at cursor position with replacement text */
+  const replaceWordAtCursor = (replacement: string, moveCursorToEnd = true): string => {
+    const { start, end } = getWordAtCursor();
+    const before = localSearch.slice(0, start);
+    const after = localSearch.slice(end);
+    const result = (before + replacement + (after.startsWith(' ') ? after : ' ' + after.trimStart())).trim();
+
+    setLocalSearch(result);
+    if (moveCursorToEnd) {
+      // Set cursor after the replacement
+      const newPos = (before + replacement).length + 1;
+      requestAnimationFrame(() => {
+        const el = inputRef.current || searchContainerRef.current?.querySelector('input');
+        if (el) { el.selectionStart = el.selectionEnd = Math.min(newPos, result.length); el.focus(); }
+      });
+    }
+    return result;
+  };
+
   const addSearchTag = (key: string, value: string, op: string = 'is') => {
     const opStr = op === '!=' ? '!=' : ':';
-    const appendStr = `${key}${opStr}"${value}"`;
-
-    let newSearch = localSearch;
-    const colonMatch = localSearch.match(/([\w.-]+):([^\s]*)$/);
-    if (colonMatch && colonMatch[1] === key) {
-      newSearch = localSearch.substring(0, localSearch.length - colonMatch[0].length);
-    } else {
-      const bareMatch = localSearch.match(/([\w.-]+)$/);
-      if (bareMatch && bareMatch[1] === key) {
-        newSearch = localSearch.substring(0, localSearch.length - bareMatch[0].length);
-      }
-    }
-
-    const finalStr = (newSearch.trim() ? newSearch.trim() + ' ' : '') + appendStr + ' ';
-    setLocalSearch(finalStr);
-    onSubmit(finalStr.trim());
+    const tag = `${key}${opStr}"${value}"`;
+    const result = replaceWordAtCursor(tag, false);
+    onSubmit(result.trim());
     setSearchFocused(false);
   };
 
@@ -159,6 +183,7 @@ const ArgusLogsSearchInput: React.FC<{
       >
         <SearchIcon sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }} />
         <Box component="input"
+          ref={inputRef}
           value={localSearch}
           spellCheck={false}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setLocalSearch(e.target.value); setSearchFocused(true); }}
@@ -212,22 +237,10 @@ const ArgusLogsSearchInput: React.FC<{
           addSearchTag(field, value);
         }}
         onSelectField={(field) => {
-          const tokens = localSearch.split(/\s+/).filter(t => t.length > 0);
-          // If mid-typing (no trailing space), drop the partial token being typed
-          const base = /\s$/.test(localSearch) || localSearch === '' ? tokens : tokens.slice(0, -1);
-          // Also strip any orphan field: tokens (incomplete key: with no value)
-          const cleaned = base.filter(t => !/^[\w.-]+:$/.test(t));
-          const prefix = cleaned.length > 0 ? cleaned.join(' ') + ' ' : '';
-          setLocalSearch(prefix + field + ':');
-          searchContainerRef.current?.querySelector('input')?.focus();
+          replaceWordAtCursor(field + ':');
         }}
         onSelectSyntax={(syntax) => {
-          const tokens = localSearch.split(/\s+/).filter(t => t.length > 0);
-          const base = /\s$/.test(localSearch) || localSearch === '' ? tokens : tokens.slice(0, -1);
-          const cleaned = base.filter(t => !/^[\w.-]+:$/.test(t));
-          const prefix = cleaned.length > 0 ? cleaned.join(' ') + ' ' : '';
-          setLocalSearch(prefix + syntax + ' ');
-          searchContainerRef.current?.querySelector('input')?.focus();
+          replaceWordAtCursor(syntax);
         }}
         onClose={() => setSearchFocused(false)}
         recentSearches={recentSearches}
