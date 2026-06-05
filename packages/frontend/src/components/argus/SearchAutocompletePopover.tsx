@@ -376,24 +376,28 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
                 '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
               }}
             >
-              {/* Percentage bar */}
-              <Box sx={{
-                position: 'absolute', left: 8, top: 2, bottom: 2,
-                width: `${item.pct || 0}%`, minWidth: (item.pct || 0) > 0 ? 4 : 0,
-                backgroundColor: alpha(theme.palette.primary.main, isDark ? 0.18 : 0.12),
-                borderRadius: '0 3px 3px 0', transition: 'width 0.3s ease',
-              }} />
+              {/* Percentage bar — only when we have real count data */}
+              {(item.count || 0) > 0 && (
+                <Box sx={{
+                  position: 'absolute', left: 8, top: 2, bottom: 2,
+                  width: `${item.pct || 0}%`, minWidth: (item.pct || 0) > 0 ? 4 : 0,
+                  backgroundColor: alpha(theme.palette.primary.main, isDark ? 0.18 : 0.12),
+                  borderRadius: '0 3px 3px 0', transition: 'width 0.3s ease',
+                }} />
+              )}
               <Typography sx={{ zIndex: 1, fontSize: '0.78rem', color: theme.palette.primary.main, fontWeight: 600 }}>
                 {item.label}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, zIndex: 1 }}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: theme.palette.primary.main }}>
-                  {(item.pct || 0).toFixed(0)}%
-                </Typography>
-                <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
-                  {(item.count || 0).toLocaleString()}
-                </Typography>
-              </Box>
+              {(item.count || 0) > 0 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, zIndex: 1 }}>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: theme.palette.primary.main }}>
+                    {(item.pct || 0).toFixed(0)}%
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
+                    {(item.count || 0).toLocaleString()}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           );
           break;
