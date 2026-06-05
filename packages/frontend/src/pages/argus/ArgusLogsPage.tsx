@@ -1062,7 +1062,7 @@ const ArgusLogsPage: React.FC = () => {
           </Box>{/* end toolbar wrapper */}
 
           {/* Scrollable tab content */}
-          <Box sx={{ flex: 1, overflow: 'auto' }}>
+          <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
           {activeTab === 0 && logs.length === 0 && !loading && (
             <EmptyPlaceholder
               icon={<SearchIcon sx={{ fontSize: 48 }} />}
@@ -1108,14 +1108,12 @@ const ArgusLogsPage: React.FC = () => {
                   </Typography>
                 </Box>
               ) : patterns.length === 0 ? (
-                <Box sx={{ py: 8, textAlign: 'center' }}>
-                  <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, mb: 0.5 }}>
-                    {t('argus.logs.patterns.noPatterns', 'No patterns found')}
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                    {t('argus.logs.patterns.noPatternsDesc', 'Try adjusting your search or time range.')}
-                  </Typography>
-                </Box>
+                <EmptyPlaceholder
+                  icon={<SearchIcon sx={{ fontSize: 48 }} />}
+                  message={t('argus.logs.patterns.noPatterns', 'No patterns found')}
+                  description={t('argus.logs.patterns.noPatternsDesc', 'Try adjusting your search or time range.')}
+                  sx={{ flex: 1 }}
+                />
               ) : (
                 <Box sx={{ overflow: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.73rem' }}>
@@ -1218,14 +1216,12 @@ const ArgusLogsPage: React.FC = () => {
               {/* Log stream */}
               <Box sx={{ flex: 1, overflow: 'auto', fontFamily: 'monospace', fontSize: '0.70rem' }}>
                 {liveTailLogs.length === 0 ? (
-                  <Box sx={{ py: 8, textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, mb: 0.5 }}>
-                      {t('argus.logs.liveTail.noLogs', 'No logs received yet')}
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                      {t('argus.logs.liveTail.noLogsDesc', 'Start streaming to see new logs appear here.')}
-                    </Typography>
-                  </Box>
+                  <EmptyPlaceholder
+                    icon={<SearchIcon sx={{ fontSize: 48 }} />}
+                    message={t('argus.logs.liveTail.noLogs', 'No logs received yet')}
+                    description={t('argus.logs.liveTail.noLogsDesc', 'Start streaming to see new logs appear here.')}
+                    sx={{ flex: 1 }}
+                  />
                 ) : (
                   liveTailLogs.map((log, idx) => (
                     <Box key={`${log.log_id}-${idx}`} sx={{
