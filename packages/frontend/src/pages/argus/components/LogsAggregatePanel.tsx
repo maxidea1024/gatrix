@@ -9,6 +9,7 @@ import { ViewColumn as ViewIcon } from '@mui/icons-material';
 import { Bar } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 interface AggData {
   groupBy: string;
@@ -168,15 +169,12 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
             </Box>
           </Box>
         ) : !aggLoading ? (
-          <Box sx={{ py: 8, textAlign: 'center' }}>
-            <ViewIcon sx={{ fontSize: 48, color: alpha(theme.palette.primary.main, 0.15), mb: 1 }} />
-            <Typography sx={{ fontSize: '0.95rem', fontWeight: 600, mb: 0.5 }}>
-              {t('argus.logs.aggregatesTitle', 'Log Aggregates')}
-            </Typography>
-            <Typography color="text.disabled" sx={{ fontSize: '0.8rem' }}>
-              {t('argus.logs.aggregatesDesc', 'Group and count logs by attributes to identify patterns.')}
-            </Typography>
-          </Box>
+          <EmptyPlaceholder
+            icon={<ViewIcon sx={{ fontSize: 48 }} />}
+            message={t('argus.logs.aggregatesTitle', 'Log Aggregates')}
+            description={t('argus.logs.aggregatesDesc', 'Group and count logs by attributes to identify patterns.')}
+            sx={{ flex: 1 }}
+          />
         ) : null}
       </PageContentLoader>
     </Paper>

@@ -1086,7 +1086,15 @@ const ArgusLogsPage: React.FC = () => {
           )}
 
           {/* Aggregates Tab */}
-          {activeTab === 1 && (
+          {activeTab === 1 && !aggLoading && (!aggData || aggData.topValues.length === 0) && (
+            <EmptyPlaceholder
+              icon={<SearchIcon sx={{ fontSize: 48 }} />}
+              message={t('argus.logs.aggregatesTitle', 'Log Aggregates')}
+              description={t('argus.logs.aggregatesDesc', 'Group and count logs by attributes to identify patterns.')}
+              sx={{ flex: 1 }}
+            />
+          )}
+          {activeTab === 1 && (aggLoading || (aggData && aggData.topValues.length > 0)) && (
             <LogsAggregatePanel
               aggData={aggData}
               aggGroupBy={aggGroupBy}
@@ -1099,7 +1107,7 @@ const ArgusLogsPage: React.FC = () => {
 
           {/* Patterns Tab */}
           {activeTab === 2 && (
-            <Box sx={{ px: 1, py: 1 }}>
+            <Box sx={{ px: 1, py: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
               {patternsLoading ? (
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}>
                   <CircularProgress size={24} sx={{ mr: 1 }} />
@@ -1214,7 +1222,7 @@ const ArgusLogsPage: React.FC = () => {
               </Box>
 
               {/* Log stream */}
-              <Box sx={{ flex: 1, overflow: 'auto', fontFamily: 'monospace', fontSize: '0.70rem' }}>
+              <Box sx={{ flex: 1, overflow: 'auto', fontFamily: 'monospace', fontSize: '0.70rem', display: 'flex', flexDirection: 'column' }}>
                 {liveTailLogs.length === 0 ? (
                   <EmptyPlaceholder
                     icon={<SearchIcon sx={{ fontSize: 48 }} />}
