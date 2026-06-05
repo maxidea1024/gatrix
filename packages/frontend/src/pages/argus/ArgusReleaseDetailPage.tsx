@@ -39,6 +39,7 @@ import SimplePagination from '@/components/common/SimplePagination';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { formatRelativeTime, formatDateTime } from '@/utils/dateFormat';
 import IssueListItem from '@/components/argus/IssueListItem';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
 
@@ -59,10 +60,11 @@ const ReleaseHealthChart: React.FC<{
   data: { timestamp: string; crash_free_rate: number }[];
   isDark: boolean;
 }> = ({ data, isDark }) => {
+  const { t } = useTranslation();
   if (!data || data.length < 2) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 180 }}>
-        <Typography variant="body2" color="text.disabled">No health data available</Typography>
+        <Typography variant="body2" color="text.disabled">{t('argus.releaseDetail.noHealthData', 'No health data available')}</Typography>
       </Box>
     );
   }
@@ -99,7 +101,7 @@ const ReleaseHealthChart: React.FC<{
     }}>
       <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <CheckIcon sx={{ fontSize: 16, color: lineColor }} />
-        Crash Free Rate
+        {t('argus.releases.crashFreeRate', 'Crash Free Rate')}
       </Typography>
       <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} width="100%" style={{ maxHeight: 180 }}>
         {/* Y-axis grid + labels */}
@@ -247,11 +249,10 @@ const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({ isDark }) => {
         {t('argus.releaseDetail.commitAuthors', 'Commit Authors')}
       </Typography>
       {authors.length === 0 ? (
-        <Box sx={{ py: 2, textAlign: 'center' }}>
-          <PersonIcon sx={{ fontSize: 28, color: 'text.disabled', mb: 0.5 }} />
-          <Typography variant="caption" color="text.disabled" display="block">{t('argus.releaseDetail.noCommitData', 'No commit data')}</Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>{t('argus.releaseDetail.noCommitDataHint', 'Associate commits to see author breakdown')}</Typography>
-        </Box>
+        <EmptyPlaceholder
+          message={t('argus.releaseDetail.noCommitData', 'No commit data')}
+          description={t('argus.releaseDetail.noCommitDataHint', 'Associate commits to see author breakdown')}
+        />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {authors.map(a => {
@@ -301,11 +302,10 @@ const DeployHistory: React.FC<{ isDark: boolean }> = ({ isDark }) => {
         {t('argus.releaseDetail.deploys', 'Deploys')}
       </Typography>
       {deploys.length === 0 ? (
-        <Box sx={{ py: 2, textAlign: 'center' }}>
-          <DeployIcon sx={{ fontSize: 28, color: 'text.disabled', mb: 0.5 }} />
-          <Typography variant="caption" color="text.disabled" display="block">{t('argus.releaseDetail.noDeployData', 'No deploy data')}</Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>{t('argus.releaseDetail.noDeployDataHint', 'Set up deploy notifications to track')}</Typography>
-        </Box>
+        <EmptyPlaceholder
+          message={t('argus.releaseDetail.noDeployData', 'No deploy data')}
+          description={t('argus.releaseDetail.noDeployDataHint', 'Set up deploy notifications to track')}
+        />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {deploys.map((d, i) => {
@@ -615,16 +615,9 @@ const ArgusReleaseDetailPage: React.FC = () => {
 
             <PageContentLoader loading={issuesLoading}>
               {issues.length === 0 ? (
-                <Paper elevation={0} sx={{
-                  py: 4, textAlign: 'center',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}>
-                  <CheckIcon sx={{ fontSize: 36, color: '#4caf50', mb: 1 }} />
-                  <Typography color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-                    {t('argus.releaseDetail.noIssues', 'No issues found')}
-                  </Typography>
-                </Paper>
+                <EmptyPlaceholder
+                  message={t('argus.releaseDetail.noIssues', 'No issues found')}
+                />
               ) : (
                 <Paper elevation={0} sx={{
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,

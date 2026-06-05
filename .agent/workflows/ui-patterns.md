@@ -48,7 +48,74 @@ import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 
 **DO NOT** manually create empty states with `<Paper>`, `<Box>`, or `<Typography>` - always use `EmptyPagePlaceholder`.
 
-> **Note:** `EmptyPlaceholder` (`@/components/common/EmptyPlaceholder`) exists but is for table-row-level empty states. For page-level empty states, always prefer `EmptyPagePlaceholder`.
+## Section-Level Empty State: Use EmptyPlaceholder
+
+When displaying an empty state for a **section or panel** within a page (e.g., a card, a list inside a tab, a sidebar panel), **ALWAYS** use the `EmptyPlaceholder` component. This is distinct from `EmptyPagePlaceholder` which is for full-page empty states.
+
+**Location:** `@/components/common/EmptyPlaceholder`
+
+**When to use:**
+- 데이터가 없는 카드/패널 (예: "커밋 데이터 없음", "배포 데이터 없음")
+- 검색 결과 0건인 리스트 섹션
+- 탭 내부에서 항목이 없는 경우
+- 테이블에서 행이 없는 경우
+
+**Usage:**
+```tsx
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+
+// Basic usage
+<EmptyPlaceholder
+  message={t('some.noData', 'No data available')}
+/>
+
+// With description
+<EmptyPlaceholder
+  message={t('some.noData', 'No commit data')}
+  description={t('some.noDataHint', 'Associate commits to see author breakdown')}
+/>
+
+// With add button
+<EmptyPlaceholder
+  message={t('some.noItems', 'No items yet')}
+  onAddClick={handleAdd}
+  addButtonLabel={t('some.addItem', 'Add Item')}
+/>
+
+// With custom children
+<EmptyPlaceholder message={t('some.noData')}>
+  <Button onClick={handleAction}>Custom Action</Button>
+</EmptyPlaceholder>
+```
+
+**Props:**
+- `message` (required): Main message text
+- `description` (optional): Sub-text below the message
+- `onAddClick` (optional): Shows an add button
+- `addButtonLabel` (optional): Label for the add button
+- `addButtonVariant` (optional): Button variant (default: 'contained')
+- `children` (optional): Custom content instead of the default add button
+- `minHeight` (optional): Minimum height
+- `sx` (optional): Additional styles
+
+**❌ 하지 마세요:**
+```tsx
+// ❌ 인라인으로 빈 상태를 직접 만들지 마세요
+<Box sx={{ py: 2, textAlign: 'center' }}>
+  <SomeIcon sx={{ fontSize: 28, color: 'text.disabled' }} />
+  <Typography color="text.disabled">데이터가 없습니다</Typography>
+</Box>
+```
+
+**✅ EmptyPlaceholder를 사용하세요:**
+```tsx
+<EmptyPlaceholder
+  message={t('some.noData', '데이터가 없습니다')}
+  description={t('some.noDataHint', '설명 텍스트')}
+/>
+```
+
+> **요약:** 페이지 전체가 비었을 때 → `EmptyPagePlaceholder`, 페이지 내부 섹션/카드가 비었을 때 → `EmptyPlaceholder`
 
 ## Date Range Selection: Always Use DateRangeSelector
 
