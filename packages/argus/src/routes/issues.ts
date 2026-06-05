@@ -13,7 +13,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
     '/:projectId/issues/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', status, level, start, end } = request.query as Record<string, string>;
+      const { period = '24h', status, level, start, end, query, environment, browser, os } = request.query as Record<string, string>;
 
       try {
         let startDt: Date;
@@ -71,6 +71,35 @@ export default async function issuesRoutes(app: FastifyInstance) {
             return reply.send({ data: [] });
           }
           conditions.push(`issue_id IN (${issueIds.join(',')})`);
+        }
+
+        // Context filters (environment, browser, os) on ClickHouse errors
+        if (environment) {
+          conditions.push(`environment = {env:String}`);
+          qp.env = environment;
+        }
+        if (browser) {
+          conditions.push(`browser_name = {browser:String}`);
+          qp.browser = browser;
+        }
+        if (os) {
+          conditions.push(`os_name = {os:String}`);
+          qp.os = os;
+        }
+
+        // Text query filter — search in title/culprit by matching issue_ids from MySQL
+        if (query) {
+          try {
+            const [queryRows] = await mysqlPool.query(
+              'SELECT id FROM g_argus_issues WHERE project_id = ? AND (title LIKE ? OR culprit LIKE ?)',
+              [projectId, `%${query}%`, `%${query}%`]
+            );
+            const queryIssueIds = (queryRows as any[]).map((r: any) => r.id);
+            if (queryIssueIds.length === 0) {
+              return reply.send({ data: [] });
+            }
+            conditions.push(`issue_id IN (${queryIssueIds.join(',')})`);
+          } catch { /* ignore query filter errors */ }
         }
 
         const result = await clickhouse.query({

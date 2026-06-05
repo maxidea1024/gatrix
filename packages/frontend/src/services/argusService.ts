@@ -992,7 +992,7 @@ class ArgusService {
 
   async getIssueVolume(
     projectId: number | string,
-    params?: { period?: string; start?: string; end?: string; status?: string; level?: string }
+    params?: { period?: string; start?: string; end?: string; status?: string; level?: string; query?: string; environment?: string; browser?: string; os?: string }
   ): Promise<{ day: string; count: number; issue_count: number }[]> {
     const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/issues/volume`, { params });
     return response.data?.data || [];

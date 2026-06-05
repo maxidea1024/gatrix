@@ -763,6 +763,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
               status={status}
               level={level}
               query={buildSearchWithFilters()}
+              environment={filters.environments.length === 1 ? filters.environments[0] : undefined}
+              browser={filters.browsers.length === 1 ? filters.browsers[0] : undefined}
+              os={filters.os.length === 1 ? filters.os[0] : undefined}
               onDateRangeSelect={handleDateRangeSelect}
             />
           </Box>
