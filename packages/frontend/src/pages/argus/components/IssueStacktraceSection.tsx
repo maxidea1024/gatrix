@@ -92,7 +92,7 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
                   <Typography component="span" sx={{ fontSize: '0.72rem', color: 'text.disabled', fontWeight: 500 }}>
                     {t('argus.issues.sort', '정렬')}
                   </Typography>
-                  <Box sx={{ width: '1px', height: 14, backgroundColor: 'divider' }} />
+                  <Box sx={{ width: '1px', alignSelf: 'stretch', my: -0.5, backgroundColor: 'divider' }} />
                   <Typography component="span" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
                     {order === 'recent' ? t('argus.issues.mostRecent') : t('argus.issues.oldestFirst')}
                   </Typography>
