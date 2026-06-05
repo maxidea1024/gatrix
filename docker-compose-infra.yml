@@ -127,6 +127,29 @@ services:
       retries: 5
       start_period: 30s
 
+  # MinIO - S3-compatible object storage for Argus (sourcemaps, attachments)
+  minio:
+    image: minio/minio:latest
+    container_name: gatrix-minio-dev
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${ARGUS_STORAGE_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${ARGUS_STORAGE_SECRET_KEY:-minioadmin}
+    ports:
+      - '0.0.0.0:${MINIO_API_PORT:-49100}:9000'
+      - '0.0.0.0:${MINIO_CONSOLE_PORT:-49101}:9001'
+    volumes:
+      - minio-data:/data
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   # Loki - Log aggregation
   loki:
     image: grafana/loki:latest
@@ -248,3 +271,4 @@ volumes:
   gatrix_mysql_dev_data:
   gatrix_etcd_dev_data:
   clickhouse-data:
+  minio-data:

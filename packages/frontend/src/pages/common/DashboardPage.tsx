@@ -2441,7 +2441,6 @@ const DashboardPage: React.FC = () => {
                                             variant="caption"
                                             color="text.disabled"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.65rem',
                                             }}
                                           >

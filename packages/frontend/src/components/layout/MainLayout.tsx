@@ -1367,7 +1367,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       if (!options?.skipRecentUpdate) {
         flushSync(() => addRecentPage(path));
       }
-      navigate(path);
+      navigate(path, { state: { fromSidebar: true } });
     }
   };
 
@@ -1670,7 +1670,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           </Typography>
                           <Typography
                             variant="caption"
-                            sx={{ fontWeight: 500, fontFamily: 'monospace' }}
+                            sx={{ fontWeight: 500}}
                           >
                             {formatDateTimeDetailed(
                               maintenanceStatus.detail.startsAt
@@ -1693,7 +1693,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           </Typography>
                           <Typography
                             variant="caption"
-                            sx={{ fontWeight: 500, fontFamily: 'monospace' }}
+                            sx={{ fontWeight: 500}}
                           >
                             {formatDateTimeDetailed(
                               maintenanceStatus.detail.endsAt

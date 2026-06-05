@@ -36,7 +36,6 @@ import {
   DragIndicator as DragIndicatorIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
-  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -53,10 +52,7 @@ import {
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useI18n } from '../../contexts/I18nContext';
-import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, {
-  DateRangePreset,
-} from '../../components/common/DateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -80,6 +76,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Interfaces & Subcomponents
 interface ColumnConfig {
@@ -181,12 +178,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    dayjs().subtract(7, 'day')
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(dayjs());
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>('last7d');
   const [userFilter, setUserFilter] = useState('');
   const debouncedUserFilter = useDebounce(userFilter, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -259,12 +253,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
         ['resource_id' as keyof AuditLogFilters]: flagId,
       };
 
-      if (dateFrom) {
-        filters.start_date = dateFrom.toISOString();
-      }
-      if (dateTo) {
-        filters.end_date = dateTo.toISOString();
-      }
+      const { start, end } = dateRangeToDatePair(dateRange);
+      filters.start_date = start.toISOString();
+      filters.end_date = end.toISOString();
       if (debouncedUserFilter) {
         filters.user = debouncedUserFilter.trim();
       }
@@ -308,9 +299,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
   }, [
     page,
     limit,
-    flagName,
-    dateFrom,
-    dateTo,
+    flagId,
+    dateRange,
     debouncedUserFilter,
     activeFilters,
     enqueueSnackbar,
@@ -508,7 +498,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
         );
       case 'ipAddress':
         return (
-          <Typography variant="body2" fontFamily="monospace">
+          <Typography variant="body2">
             {log.ipAddress || '-'}
           </Typography>
         );
@@ -529,24 +519,13 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
           mb: 3,
         }}
       >
-        <DateRangePicker
-          dateFrom={dateFrom}
-          dateTo={dateTo}
-          onChange={(from, to, preset) => {
-            setDateFrom(from);
-            setDateTo(to);
-            setDateRangePreset(preset);
+        <DateRangeSelector
+          value={dateRange}
+          onChange={(newDateRange) => {
+            setDateRange(newDateRange);
             setPage(1);
           }}
-          preset={dateRangePreset}
-          availablePresets={[
-            'today',
-            'yesterday',
-            'last7d',
-            'last30d',
-            'custom',
-          ]}
-          size="small"
+          compact
         />
 
         <SearchTextField
@@ -735,7 +714,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
@@ -781,7 +760,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                             variant="body2"
                                             color="text.secondary"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.8rem',
                                             }}
                                           >
@@ -846,7 +824,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: 'monospace',
                                                     color: 'text.secondary',
                                                   }}
                                                 >
@@ -877,7 +854,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       {log.ipAddress || '-'}
                                     </Typography>
@@ -905,7 +882,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                           sx={{
                                             mt: 0.5,
                                             wordBreak: 'break-all',
-                                            fontFamily: 'monospace',
                                             fontSize: '0.75rem',
                                             color: 'text.secondary',
                                           }}
@@ -1059,8 +1035,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                           <TableCell
                                                             sx={{
                                                               fontWeight: 500,
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                             }}
@@ -1069,8 +1043,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1096,8 +1068,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1175,7 +1145,6 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                 style={{
                                                   margin: 0,
                                                   fontSize: '0.75rem',
-                                                  fontFamily: 'monospace',
                                                   color:
                                                     theme.palette.text.primary,
                                                 }}
@@ -1200,19 +1169,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                       justifyContent: 'flex-end',
                                     }}
                                   >
-                                    <Tooltip
-                                      title={t('common.copyToClipboard')}
-                                    >
-                                      <IconButton
-                                        size="small"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleCopyDetails(log);
-                                        }}
-                                      >
-                                        <ContentCopyIcon fontSize="small" />
-                                      </IconButton>
-                                    </Tooltip>
+                                    <CopyButton text={JSON.stringify(log, null, 2)} size={13} />
                                   </Box>
                                 </Box>
                               </Box>

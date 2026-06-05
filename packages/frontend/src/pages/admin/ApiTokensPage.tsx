@@ -118,6 +118,7 @@ import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import { P } from '@/types/permissions';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 interface CreateTokenData {
   tokenName: string;
@@ -1462,28 +1463,7 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             >
               {token.tokenName}
             </Typography>
-            <Tooltip title={t('apiTokens.copyTokenName')}>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  copyToClipboardWithNotification(
-                    token.tokenName,
-                    () =>
-                      enqueueSnackbar(t('common.copiedToClipboard'), {
-                        variant: 'success',
-                      }),
-                    () =>
-                      enqueueSnackbar(t('common.copyFailed'), {
-                        variant: 'error',
-                      })
-                  );
-                }}
-                sx={{ p: 0.5 }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={token.tokenName} size={13} />
           </Box>
         );
       case 'tokenType':
@@ -2418,7 +2398,6 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
               input: {
                 readOnly: true,
                 sx: {
-                  fontFamily: 'monospace',
                   fontSize: '0.85rem',
                   wordBreak: 'break-all',
                 },
@@ -3298,7 +3277,6 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 p: 1,
                 bgcolor: 'action.hover',
                 borderRadius: 0,
-                fontFamily: 'monospace',
                 fontWeight: 600,
               }}
             >
@@ -3603,7 +3581,6 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   onClick={(e) => (e.target as HTMLInputElement).select()}
                   style={{
                     flex: 1,
-                    fontFamily: 'monospace',
                     fontSize: '0.875rem',
                     letterSpacing: '0.5px',
                     background: 'transparent',

@@ -79,7 +79,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import dayjs, { Dayjs } from 'dayjs';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
 
@@ -97,15 +96,14 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import DateRangePicker, {
-  DateRangePreset,
-} from '../../components/common/DateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
 import { usePageState } from '../../hooks/usePageState';
 import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
 import StackTraceViewer from '../../components/StackTraceViewer';
 import SearchTextField from '../../components/common/SearchTextField';
 import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Column definition interface
 interface ColumnConfig {
@@ -209,17 +207,10 @@ const CrashEventsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  // Date range state - restore from pageState.filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.dateFrom
-      ? dayjs(pageState.filters.dateFrom)
-      : dayjs().subtract(7, 'day')
+  // Date range state
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.dateTo ? dayjs(pageState.filters.dateTo) : dayjs()
-  );
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>('last7d');
 
   // Search state - restore from pageState.filters
   const [searchTerm, setSearchTerm] = useState<string>(
@@ -600,12 +591,9 @@ const CrashEventsPage: React.FC = () => {
     }
 
     // Add date range
-    if (dateFrom) {
-      params.dateFrom = dateFrom.toISOString();
-    }
-    if (dateTo) {
-      params.dateTo = dateTo.toISOString();
-    }
+    const { start, end } = dateRangeToDatePair(dateRange);
+    params.dateFrom = start.toISOString();
+    params.dateTo = end.toISOString();
 
     // Add active filters
     activeFilters.forEach((filter) => {
@@ -634,8 +622,7 @@ const CrashEventsPage: React.FC = () => {
     pageState.sortBy,
     pageState.sortOrder,
     debouncedSearchTerm,
-    dateFrom,
-    dateTo,
+    dateRange,
     activeFilters,
   ]);
 
@@ -836,7 +823,7 @@ const CrashEventsPage: React.FC = () => {
       // Create TSV (Tab-Separated Values) format for easy paste into spreadsheet
       const fields = [
         ['ID', event.id],
-        ['Created At', dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')],
+        ['Created At', formatDateTimeDetailed(event.createdAt)],
         ['Platform', getPlatformName(event.platform)],
         ['Environment', (event as any).environmentName || event.environmentId],
         ['Project', (event as any).projectName || '-'],
@@ -1131,23 +1118,10 @@ const CrashEventsPage: React.FC = () => {
           }}
         >
           {/* Date Range Picker */}
-          <DateRangePicker
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            onChange={(from, to, preset) => {
-              setDateFrom(from);
-              setDateTo(to);
-              setDateRangePreset(preset);
-            }}
-            preset={dateRangePreset}
-            availablePresets={[
-              'today',
-              'yesterday',
-              'last7d',
-              'last30d',
-              'custom',
-            ]}
-            size="small"
+          <DateRangeSelector
+            value={dateRange}
+            onChange={setDateRange}
+            compact
           />
 
           {/* Search */}
@@ -1360,36 +1334,11 @@ const CrashEventsPage: React.FC = () => {
                                             >
                                               <Typography
                                                 variant="body2"
-                                                sx={{ fontFamily: 'monospace' }}
+                                                
                                               >
                                                 {event.id}
                                               </Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.id,
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t(
-                                                          'common.copiedToClipboard'
-                                                        ),
-                                                        { variant: 'success' }
-                                                      ),
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t('common.copyFailed'),
-                                                        {
-                                                          variant: 'error',
-                                                        }
-                                                      )
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon
-                                                  sx={{ fontSize: 13 }}
-                                                />
-                                              </IconButton>
+                                              <CopyButton text={event.id} size={13} />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1407,9 +1356,7 @@ const CrashEventsPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Typography variant="body2">
-                                              {dayjs(event.createdAt).format(
-                                                'YYYY-MM-DD HH:mm:ss'
-                                              )}
+                                              {formatDateTimeDetailed(event.createdAt)}
                                             </Typography>
                                           </TableCell>
                                         </TableRow>
@@ -1441,32 +1388,7 @@ const CrashEventsPage: React.FC = () => {
                                                 color="primary"
                                                 variant="outlined"
                                               />
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.platform,
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t(
-                                                          'common.copiedToClipboard'
-                                                        ),
-                                                        { variant: 'success' }
-                                                      ),
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t('common.copyFailed'),
-                                                        {
-                                                          variant: 'error',
-                                                        }
-                                                      )
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon
-                                                  sx={{ fontSize: 13 }}
-                                                />
-                                              </IconButton>
+                                              <CopyButton text={event.platform} size={13} />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1500,32 +1422,7 @@ const CrashEventsPage: React.FC = () => {
                                                 color="secondary"
                                                 variant="outlined"
                                               />
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.environmentId,
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t(
-                                                          'common.copiedToClipboard'
-                                                        ),
-                                                        { variant: 'success' }
-                                                      ),
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t('common.copyFailed'),
-                                                        {
-                                                          variant: 'error',
-                                                        }
-                                                      )
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon
-                                                  sx={{ fontSize: 13 }}
-                                                />
-                                              </IconButton>
+                                              <CopyButton text={event.environmentId} size={13} />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1593,32 +1490,7 @@ const CrashEventsPage: React.FC = () => {
                                                 color="info"
                                                 variant="outlined"
                                               />
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.branch,
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t(
-                                                          'common.copiedToClipboard'
-                                                        ),
-                                                        { variant: 'success' }
-                                                      ),
-                                                    () =>
-                                                      enqueueSnackbar(
-                                                        t('common.copyFailed'),
-                                                        {
-                                                          variant: 'error',
-                                                        }
-                                                      )
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon
-                                                  sx={{ fontSize: 13 }}
-                                                />
-                                              </IconButton>
+                                              <CopyButton text={event.branch} size={13} />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1648,36 +1520,7 @@ const CrashEventsPage: React.FC = () => {
                                                 variant="outlined"
                                               />
                                               {event.appVersion && (
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.appVersion!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.appVersion!} size={13} />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -1708,36 +1551,7 @@ const CrashEventsPage: React.FC = () => {
                                                 variant="outlined"
                                               />
                                               {event.resVersion && (
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.resVersion!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.resVersion!} size={13} />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -1767,36 +1581,7 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.accountId}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      String(event.accountId),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={String(event.accountId)} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1826,36 +1611,7 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.characterId}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      String(event.characterId),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={String(event.characterId)} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1885,36 +1641,7 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.gameUserId}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      String(event.gameUserId),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={String(event.gameUserId)} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1944,36 +1671,7 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.userName}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.userName!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.userName!} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -2003,38 +1701,9 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.gameServerId}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      String(
+                                                <CopyButton text={String(
                                                         event.gameServerId
-                                                      ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                      )} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -2064,36 +1733,7 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.channel}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.channel!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.channel!} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -2123,36 +1763,7 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.subchannel}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.subchannel!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.subchannel!} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -2201,41 +1812,12 @@ const CrashEventsPage: React.FC = () => {
                                             >
                                               <Typography
                                                 variant="body2"
-                                                sx={{ fontFamily: 'monospace' }}
+                                                
                                               >
                                                 {event.crashEventIp || '-'}
                                               </Typography>
                                               {event.crashEventIp && (
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.crashEventIp!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.crashEventIp!} size={13} />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -2263,7 +1845,6 @@ const CrashEventsPage: React.FC = () => {
                                               <Typography
                                                 variant="body2"
                                                 sx={{
-                                                  fontFamily: 'monospace',
                                                   fontSize: '0.75rem',
                                                   wordBreak: 'break-all',
                                                 }}
@@ -2272,36 +1853,7 @@ const CrashEventsPage: React.FC = () => {
                                                   '-'}
                                               </Typography>
                                               {event.crashEventUserAgent && (
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.crashEventUserAgent!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.crashEventUserAgent!} size={13} />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -2331,43 +1883,13 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: 'monospace',
                                                     fontSize: '0.85rem',
                                                     wordBreak: 'break-all',
                                                   }}
                                                 >
                                                   {(event as any).firstLine}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={() => {
-                                                    copyToClipboardWithNotification(
-                                                      (event as any).firstLine!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={(event as any).firstLine!} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -2406,36 +1928,7 @@ const CrashEventsPage: React.FC = () => {
                                                 >
                                                   {event.userMessage}
                                                 </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={async () => {
-                                                    await copyToClipboardWithNotification(
-                                                      event.userMessage!,
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copiedToClipboard'
-                                                          ),
-                                                          {
-                                                            variant: 'success',
-                                                          }
-                                                        ),
-                                                      () =>
-                                                        enqueueSnackbar(
-                                                          t(
-                                                            'common.copyFailed'
-                                                          ),
-                                                          {
-                                                            variant: 'error',
-                                                          }
-                                                        )
-                                                    );
-                                                  }}
-                                                >
-                                                  <CopyIcon
-                                                    sx={{ fontSize: 13 }}
-                                                  />
-                                                </IconButton>
+                                                <CopyButton text={event.userMessage!} size={13} />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -2460,7 +1953,6 @@ const CrashEventsPage: React.FC = () => {
                                       style={{
                                         margin: 0,
                                         fontSize: '0.875rem',
-                                        fontFamily: 'monospace',
                                         lineHeight: 1.6,
                                       }}
                                     >

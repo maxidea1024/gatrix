@@ -176,7 +176,6 @@ const OperatorIcon: React.FC<OperatorIconProps> = ({
               py: 0.6,
               fontSize: '0.75rem',
               fontWeight: 500,
-              fontFamily: "'Consolas','Monaco','Courier New',monospace",
               lineHeight: 1.5,
               opacity: 0.9,
             }}

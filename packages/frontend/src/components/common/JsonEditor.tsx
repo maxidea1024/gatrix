@@ -188,8 +188,6 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
             scrollBeyondLastLine: false,
             wordWrap: 'on',
             fontSize: 14,
-            fontFamily:
-              '"D2Coding", "NanumGothicCoding", "Consolas", "Courier New", monospace',
             lineNumbers: 'on',
             folding: true,
             padding: { top: 8, bottom: 8 },

@@ -63,7 +63,6 @@ import {
   Archive as ArchiveIcon,
   Add as AddIcon,
   Refresh as RefreshIcon,
-  ContentCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   Edit as EditIcon,
   DragIndicator as DragIcon,
@@ -113,7 +112,6 @@ import {
   formatDateTimeDetailed,
   formatRelativeTime,
 } from '../../utils/dateFormat';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
@@ -171,6 +169,7 @@ import PageContentLoader from '../../components/common/PageContentLoader';
 import SegmentedTabs from '../../components/common/SegmentedTabs';
 
 import changeRequestService from '../../services/changeRequestService';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Strategy context menu component for edit/delete actions
 const StrategyContextMenu: React.FC<{
@@ -2230,26 +2229,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 color="warning"
               />
             )}
-            <Tooltip title={t('common.copyToClipboard')}>
-              <IconButton
-                size="small"
-                onClick={() =>
-                  copyToClipboardWithNotification(
-                    flag.flagName,
-                    () =>
-                      enqueueSnackbar(t('common.copySuccess'), {
-                        variant: 'success',
-                      }),
-                    () =>
-                      enqueueSnackbar(t('common.copyFailed'), {
-                        variant: 'error',
-                      })
-                  )
-                }
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={flag.flagName} size={13} />
           </Box>
           {flag.description && (
             <Typography

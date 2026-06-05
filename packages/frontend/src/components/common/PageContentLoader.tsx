@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Box,
-  CircularProgress,
   SxProps,
   Theme,
   keyframes,
@@ -29,12 +28,18 @@ interface PageContentLoaderProps {
   spinnerDelay?: number;
   /** Optional sx passed to the wrapper Box (e.g. flex, height) */
   sx?: SxProps<Theme>;
+  /**
+   * Optional skeleton placeholder shown immediately while loading.
+   * When provided, the skeleton is displayed right away (no delay),
+   * giving users visual structure instead of a blank area.
+   */
+  skeleton?: React.ReactNode;
 }
 
 /**
  * Wraps page content with a smooth loading transition.
  *
- * - While loading: renders nothing (or a delayed spinner for long loads)
+ * - While loading: renders skeleton (if provided) or a delayed spinner for long loads
  * - Once loaded: content slides up and fades in smoothly
  *
  * This eliminates the "flash" where table headers or empty states
@@ -46,8 +51,18 @@ const PageContentLoader: React.FC<PageContentLoaderProps> = ({
   animationDuration = 350,
   spinnerDelay = 1000,
   sx,
+  skeleton,
 }) => {
   if (loading) {
+    // If a skeleton is provided, show it after a short delay to avoid flash
+    if (skeleton) {
+      return (
+        <DeferredComponent shouldRender={loading} delay={300}>
+          {skeleton}
+        </DeferredComponent>
+      );
+    }
+
     return (
       <DeferredComponent shouldRender={loading} delay={spinnerDelay}>
         <Box

@@ -232,7 +232,6 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
-                    fontFamily: 'monospace',
                     cursor:
                       references.length > 0 && references[0].codeUrl
                         ? 'pointer'
@@ -300,7 +299,7 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
                 <React.Fragment key={ref.id}>
                   <TableRow hover>
                     <TableCell
-                      sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                      sx={{ fontSize: '0.8rem' }}
                     >
                       {ref.filePath}
                       {ref.repository && (
@@ -329,7 +328,7 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
                           label={ref.functionName}
                           size="small"
                           variant="outlined"
-                          sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+                          sx={{ fontSize: '0.75rem' }}
                         />
                       ) : (
                         '-'
@@ -444,7 +443,6 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
                               padding: '8px 0',
                               fontSize: '0.85rem',
                               backgroundColor: 'transparent',
-                              fontFamily: 'D2Coding, monospace',
                             }}
                           >
                             {ref.codeSnippet}

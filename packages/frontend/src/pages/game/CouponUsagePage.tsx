@@ -28,16 +28,13 @@ import {
 import {
   History as HistoryIcon,
   ViewColumn as ViewColumnIcon,
-  Download as DownloadIcon,
-  ContentCopy as ContentCopyIcon,
-  MoreVert as MoreVertIcon,
+  Download as DownloadIcon,MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import SimplePagination from '@/components/common/SimplePagination';
 import SearchTextField from '@/components/common/SearchTextField';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import DynamicFilterBar, {
@@ -64,6 +61,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 
+import { CopyButton } from '@/components/common/CopyButton';
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
   const { t } = useTranslation();
@@ -307,18 +305,6 @@ const CouponUsagePage: React.FC = () => {
       setOrder('asc');
     }
   };
-
-  // Copy to clipboard handler
-  const handleCopy = (text: string | undefined) => {
-    if (!text) return;
-    copyToClipboardWithNotification(
-      text,
-      () =>
-        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-    );
-  };
-
   const sortedRecords = useMemo(() => {
     const getVal = (r: UsageRecord) => {
       switch (orderBy) {
@@ -673,18 +659,7 @@ const CouponUsagePage: React.FC = () => {
                                       {r.couponName || '-'}
                                     </Typography>
                                     {r.couponName && (
-                                      <Tooltip title={t('common.copy')}>
-                                        <IconButton
-                                          size="small"
-                                          onClick={() =>
-                                            handleCopy(r.couponName)
-                                          }
-                                        >
-                                          <ContentCopyIcon
-                                            sx={{ fontSize: 13 }}
-                                          />
-                                        </IconButton>
-                                      </Tooltip>
+                                      <CopyButton text={r.couponName} size={13} />
                                     )}
                                   </Box>
                                 </TableCell>
@@ -703,18 +678,7 @@ const CouponUsagePage: React.FC = () => {
                                       {r.couponCode || '-'}
                                     </Typography>
                                     {r.couponCode && (
-                                      <Tooltip title={t('common.copy')}>
-                                        <IconButton
-                                          size="small"
-                                          onClick={() =>
-                                            handleCopy(r.couponCode)
-                                          }
-                                        >
-                                          <ContentCopyIcon
-                                            sx={{ fontSize: 13 }}
-                                          />
-                                        </IconButton>
-                                      </Tooltip>
+                                      <CopyButton text={r.couponCode} size={13} />
                                     )}
                                   </Box>
                                 </TableCell>
@@ -732,16 +696,7 @@ const CouponUsagePage: React.FC = () => {
                                     <Typography variant="body2">
                                       {r.userId}
                                     </Typography>
-                                    <Tooltip title={t('common.copy')}>
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => handleCopy(r.userId)}
-                                      >
-                                        <ContentCopyIcon
-                                          sx={{ fontSize: 13 }}
-                                        />
-                                      </IconButton>
-                                    </Tooltip>
+                                    <CopyButton text={r.userId} size={13} />
                                   </Box>
                                 </TableCell>
                               );
@@ -758,16 +713,7 @@ const CouponUsagePage: React.FC = () => {
                                     <Typography variant="body2">
                                       {r.userName}
                                     </Typography>
-                                    <Tooltip title={t('common.copy')}>
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => handleCopy(r.userName)}
-                                      >
-                                        <ContentCopyIcon
-                                          sx={{ fontSize: 13 }}
-                                        />
-                                      </IconButton>
-                                    </Tooltip>
+                                    <CopyButton text={r.userName} size={13} />
                                   </Box>
                                 </TableCell>
                               );
@@ -785,18 +731,7 @@ const CouponUsagePage: React.FC = () => {
                                       {r.characterId || '-'}
                                     </Typography>
                                     {r.characterId && (
-                                      <Tooltip title={t('common.copy')}>
-                                        <IconButton
-                                          size="small"
-                                          onClick={() =>
-                                            handleCopy(r.characterId)
-                                          }
-                                        >
-                                          <ContentCopyIcon
-                                            sx={{ fontSize: 13 }}
-                                          />
-                                        </IconButton>
-                                      </Tooltip>
+                                      <CopyButton text={r.characterId} size={13} />
                                     )}
                                   </Box>
                                 </TableCell>

@@ -29,8 +29,8 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
   const isChinese = language.startsWith('zh');
   const fontFamily = isChinese
-    ? '"Inter", "Rubik", "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
-    : '"Inter", "Rubik", "Roboto", "Helvetica", "Arial", sans-serif';
+    ? '"D2Coding", "Inter", "Rubik", "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
+    : '"D2Coding", "Pretendard", "Inter", "Noto Sans KR", "Rubik", "Roboto", "Helvetica", "Arial", sans-serif';
 
   // -- Sentry-inspired color palette --
   const colors = {
@@ -45,7 +45,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         main: '#818cf8',
         light: '#a5b4fc',
         dark: '#6366f1',
-        contrastText: '#121212',
+        contrastText: '#ffffff',
       },
     },
     secondary: {
@@ -142,12 +142,18 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
     },
     typography: {
       fontFamily,
+      fontWeightRegular: 500,
       h1: { fontSize: '2.5rem', fontWeight: 600 },
       h2: { fontSize: '2rem', fontWeight: 600 },
       h3: { fontSize: '1.75rem', fontWeight: 600 },
       h4: { fontSize: '1.5rem', fontWeight: 600 },
       h5: { fontSize: '1.25rem', fontWeight: 600 },
       h6: { fontSize: '1rem', fontWeight: 600 },
+      body1: { fontWeight: 500 },
+      body2: { fontWeight: 500 },
+      subtitle1: { fontWeight: 500 },
+      subtitle2: { fontWeight: 500 },
+      caption: { fontWeight: 500 },
     },
     shape: {
       borderRadius: 4,
@@ -230,7 +236,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       },
       MuiButton: {
         defaultProps: {
-          variant: 'contained',
           disableElevation: false,
         },
         styleOverrides: {
@@ -353,7 +358,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              backgroundColor: colors.inputBg,
+              color: txt.primary,
               '& fieldset': {
                 borderColor: colors.border,
               },
@@ -365,6 +370,44 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
                 borderWidth: '2px',
               },
             },
+            '& .MuiOutlinedInput-input': {
+              color: txt.primary,
+            },
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            color: `${txt.primary} !important`,
+            fontWeight: 500,
+          },
+          input: {
+            color: `${txt.primary} !important`,
+            WebkitTextFillColor: `${txt.primary} !important`,
+            fontWeight: 500,
+            '&::placeholder': {
+              color: txt.secondary,
+              WebkitTextFillColor: txt.secondary,
+              opacity: 1,
+              fontWeight: 500,
+            },
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          root: {
+            color: `${txt.primary} !important`,
+            fontWeight: 500,
+          },
+          input: {
+            color: `${txt.primary} !important`,
+            WebkitTextFillColor: `${txt.primary} !important`,
+            fontWeight: 500,
+            '&::placeholder': {
+              fontWeight: 500,
+            },
           },
         },
       },
@@ -372,6 +415,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: txt.secondary,
+            fontWeight: 500,
             '&.Mui-focused': {
               color: p.main,
             },

@@ -164,7 +164,6 @@ const LightDiff: React.FC<{
     <pre
       style={{
         margin: 0,
-        fontFamily: 'monospace',
         fontSize: '0.75rem',
         lineHeight: 1.6,
         whiteSpace: 'pre',
@@ -1583,7 +1582,6 @@ const CmsManagementPage: React.FC = () => {
                               variant="body2"
                               sx={{
                                 fontWeight: 600,
-                                fontFamily: 'monospace',
                                 cursor: 'pointer',
                                 color: 'primary.main',
                                 '&:hover': { textDecoration: 'underline' },
@@ -1616,13 +1614,13 @@ const CmsManagementPage: React.FC = () => {
                               size="small"
                               variant="filled"
                               color="info"
-                              sx={{ fontFamily: 'monospace', fontWeight: 700 }}
+                              sx={{ fontWeight: 700 }}
                             />
                           </TableCell>
                           <TableCell>
                             <Typography
                               variant="caption"
-                              sx={{ fontFamily: 'monospace' }}
+                              
                             >
                               {table.contentHash?.slice(0, 8)}..
                             </Typography>
@@ -1683,7 +1681,6 @@ const CmsManagementPage: React.FC = () => {
                                     }}
                                     sx={{
                                       fontSize: '0.68rem',
-                                      fontFamily: 'monospace',
                                       fontWeight: 700,
                                       height: 22,
                                       cursor: 'pointer',
@@ -1861,7 +1858,6 @@ const CmsManagementPage: React.FC = () => {
               placeholder={t('cms.upload.jsonDataPlaceholder')}
               sx={{
                 '& textarea': {
-                  fontFamily: 'monospace',
                   fontSize: '0.8rem',
                 },
               }}
@@ -2111,7 +2107,6 @@ const CmsManagementPage: React.FC = () => {
                                   <Typography
                                     variant="caption"
                                     sx={{
-                                      fontFamily: 'monospace',
                                       fontWeight: 600,
                                       fontSize: '0.7rem',
                                       color: 'primary.main',
@@ -2129,7 +2124,6 @@ const CmsManagementPage: React.FC = () => {
                                 color="success"
                                 sx={{
                                   fontWeight: 700,
-                                  fontFamily: 'monospace',
                                   fontSize: '0.7rem',
                                   height: 22,
                                   minWidth: 36,
@@ -2472,7 +2466,6 @@ const CmsManagementPage: React.FC = () => {
                                       <Typography
                                         variant="caption"
                                         sx={{
-                                          fontFamily: 'monospace',
                                           fontWeight: 600,
                                           fontSize: '0.7rem',
                                           color: 'primary.main',
@@ -2496,7 +2489,6 @@ const CmsManagementPage: React.FC = () => {
                                     }
                                     sx={{
                                       fontWeight: 700,
-                                      fontFamily: 'monospace',
                                       fontSize: '0.7rem',
                                       height: 22,
                                       minWidth: 36,
@@ -2797,7 +2789,6 @@ const CmsManagementPage: React.FC = () => {
                                       variant="caption"
                                       sx={{
                                         color: 'text.secondary',
-                                        fontFamily: 'monospace',
                                         fontSize: '0.72rem',
                                         ml: 1,
                                       }}
@@ -2927,7 +2918,6 @@ const CmsManagementPage: React.FC = () => {
                                           <Typography
                                             variant="caption"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.72rem',
                                             }}
                                           >
@@ -2939,7 +2929,6 @@ const CmsManagementPage: React.FC = () => {
                                             variant="caption"
                                             color="text.secondary"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.68rem',
                                             }}
                                           >
@@ -3131,7 +3120,6 @@ const CmsManagementPage: React.FC = () => {
                             variant="body2"
                             sx={{
                               fontWeight: 500,
-                              fontFamily: 'monospace',
                               fontSize: '0.8rem',
                             }}
                           >
@@ -3161,7 +3149,6 @@ const CmsManagementPage: React.FC = () => {
                             variant="filled"
                             sx={{
                               fontSize: '0.68rem',
-                              fontFamily: 'monospace',
                               height: 20,
                             }}
                           />
@@ -3338,7 +3325,6 @@ const CmsManagementPage: React.FC = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    fontFamily: 'monospace',
                     fontWeight: 700,
                     lineHeight: 1,
                   }}
@@ -3348,7 +3334,7 @@ const CmsManagementPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontFamily: 'monospace' }}
+                  
                 >
                   {rollbackTableName}
                 </Typography>
@@ -3388,7 +3374,6 @@ const CmsManagementPage: React.FC = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    fontFamily: 'monospace',
                     fontWeight: 700,
                     lineHeight: 1,
                   }}
@@ -3398,7 +3383,7 @@ const CmsManagementPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontFamily: 'monospace' }}
+                  
                 >
                   {rollbackTableName}
                 </Typography>

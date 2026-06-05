@@ -302,6 +302,62 @@ const SharedSpreadsheetPage = React.lazy(
   () => import('./pages/shared/SharedSpreadsheetPage')
 );
 
+// Pages - Argus
+const ArgusIssuesPage = React.lazy(
+  () => import('./pages/argus/ArgusIssuesPage')
+);
+const ArgusIssueDetailPage = React.lazy(
+  () => import('./pages/argus/ArgusIssueDetailPage')
+);
+const ArgusOverviewPage = React.lazy(
+  () => import('./pages/argus/ArgusOverviewPage')
+);
+const ArgusPerformancePage = React.lazy(
+  () => import('./pages/argus/ArgusPerformancePage')
+);
+const ArgusSettingsPage = React.lazy(
+  () => import('./pages/argus/ArgusSettingsPage')
+);
+const ArgusSessionHealthPage = React.lazy(
+  () => import('./pages/argus/ArgusSessionHealthPage')
+);
+const ArgusFeedbackPage = React.lazy(
+  () => import('./pages/argus/ArgusFeedbackPage')
+);
+const ArgusReleasesPage = React.lazy(
+  () => import('./pages/argus/ArgusReleasesPage')
+);
+const ArgusAlertRulesPage = React.lazy(
+  () => import('./pages/argus/ArgusAlertRulesPage')
+);
+const ArgusReleaseDetailPage = React.lazy(
+  () => import('./pages/argus/ArgusReleaseDetailPage')
+);
+const ArgusDiscoverPage = React.lazy(
+  () => import('./pages/argus/ArgusDiscoverPage')
+);
+const ArgusDashboardsPage = React.lazy(
+  () => import('./pages/argus/ArgusDashboardsPage')
+);
+const ArgusLogsPage = React.lazy(
+  () => import('./pages/argus/ArgusLogsPage')
+);
+const ArgusTraceExplorerPage = React.lazy(
+  () => import('./pages/argus/ArgusTraceExplorerPage')
+);
+const ArgusMetricsExplorerPage = React.lazy(
+  () => import('./pages/argus/ArgusMetricsExplorerPage')
+);
+const ArgusExplorePage = React.lazy(
+  () => import('./pages/argus/ArgusExplorePage')
+);
+const ArgusCronsPage = React.lazy(
+  () => import('./pages/argus/ArgusCronsPage')
+);
+const ArgusUptimePage = React.lazy(
+  () => import('./pages/argus/ArgusUptimePage')
+);
+
 // LottieLoader is now imported from @/components/common/LottieLoader
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
@@ -1125,6 +1181,107 @@ const AppContent: React.FC = () => {
                                         />
                                       </Routes>
                                     </EnvironmentAwareLayout>
+                                  </ProtectedRoute>
+                                }
+                              />
+
+                              {/* Argus Routes */}
+                              <Route
+                                path="/argus/*"
+                                element={
+                                  <ProtectedRoute requiredRoles={['admin']}>
+                                    <MainLayout>
+                                      <Routes>
+                                        <Route
+                                          path="overview"
+                                          element={<ArgusOverviewPage />}
+                                        />
+                                        <Route
+                                          path="issues"
+                                          element={<ArgusIssuesPage />}
+                                        />
+                                        <Route
+                                          path="issues/:projectId/:issueId"
+                                          element={<ArgusIssueDetailPage />}
+                                        />
+                                        <Route
+                                          path="performance"
+                                          element={<ArgusPerformancePage />}
+                                        />
+                                        <Route
+                                          path="settings"
+                                          element={<ArgusSettingsPage />}
+                                        />
+                                        <Route
+                                          path="sessions"
+                                          element={<ArgusSessionHealthPage />}
+                                        />
+                                        <Route
+                                          path="feedback"
+                                          element={<ArgusFeedbackPage />}
+                                        />
+                                        <Route
+                                          path="releases"
+                                          element={<ArgusReleasesPage />}
+                                        />
+                                        <Route
+                                          path="releases/:projectId/:release"
+                                          element={<ArgusReleaseDetailPage />}
+                                        />
+                                        <Route
+                                          path="alerts"
+                                          element={<ArgusAlertRulesPage />}
+                                        />
+                                        <Route
+                                          path="discover"
+                                          element={<Navigate to="/argus/explore/discover" replace />}
+                                        />
+                                        <Route
+                                          path="dashboards"
+                                          element={<ArgusDashboardsPage />}
+                                        />
+                                        <Route
+                                          path="logs"
+                                          element={<Navigate to="/argus/explore/logs" replace />}
+                                        />
+                                        <Route
+                                          path="traces"
+                                          element={<Navigate to="/argus/explore/traces" replace />}
+                                        />
+                                        <Route
+                                          path="metrics"
+                                          element={<Navigate to="/argus/explore/metrics" replace />}
+                                        />
+                                        <Route
+                                          path="explore"
+                                          element={<ArgusExplorePage />}
+                                        />
+                                        <Route
+                                          path="crons"
+                                          element={<ArgusCronsPage />}
+                                        />
+                                        <Route
+                                          path="uptime"
+                                          element={<ArgusUptimePage />}
+                                        />
+                                        <Route
+                                          path="explore/traces"
+                                          element={<ArgusTraceExplorerPage />}
+                                        />
+                                        <Route
+                                          path="explore/logs"
+                                          element={<ArgusLogsPage />}
+                                        />
+                                        <Route
+                                          path="explore/metrics"
+                                          element={<ArgusMetricsExplorerPage />}
+                                        />
+                                        <Route
+                                          path="explore/discover"
+                                          element={<ArgusDiscoverPage />}
+                                        />
+                                      </Routes>
+                                    </MainLayout>
                                   </ProtectedRoute>
                                 }
                               />

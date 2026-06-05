@@ -423,6 +423,89 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
+  // Argus (Error Tracking)
+  {
+    id: 'argus',
+    text: 'sidebar.argus',
+    icon: 'BugReport',
+    children: [
+      {
+        text: 'sidebar.argusOverview',
+        icon: 'Dashboard',
+        path: '/argus/overview',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusIssues',
+        icon: 'BugReport',
+        path: '/argus/issues',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusExplore',
+        icon: 'Explore',
+        path: '/argus/explore',
+        requiredPermission: P.CRASH_EVENTS_READ,
+        matchPaths: [
+          '/argus/explore',
+          '/argus/explore/traces',
+          '/argus/explore/logs',
+          '/argus/explore/metrics',
+          '/argus/explore/discover',
+        ],
+      },
+      {
+        text: 'sidebar.argusSessions',
+        icon: 'Devices',
+        path: '/argus/sessions',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusFeedback',
+        icon: 'Feedback',
+        path: '/argus/feedback',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusReleases',
+        icon: 'NewReleases',
+        path: '/argus/releases',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusAlerts',
+        icon: 'NotificationsActive',
+        path: '/argus/alerts',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusCrons',
+        icon: 'Schedule',
+        path: '/argus/crons',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusUptime',
+        icon: 'MonitorHeart',
+        path: '/argus/uptime',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusDashboards',
+        icon: 'Dashboard',
+        path: '/argus/dashboards',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
+        text: 'sidebar.argusSettings',
+        icon: 'Settings',
+        path: '/argus/settings',
+        requiredPermission: P.CRASH_EVENTS_READ,
+        divider: true,
+      },
+    ],
+  },
+
   // Admin Panel
   {
     id: 'admin-panel',

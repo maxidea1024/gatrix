@@ -48,8 +48,7 @@ import type { PlayerHistoryRecord } from '../../services/playerConnectionService
 import PageContentLoader from '../common/PageContentLoader';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import { crosshairPlugin } from '../../utils/chartCrosshairPlugin';
-import DateRangePicker, { DateRangePreset } from '../common/DateRangePicker';
-import dayjs, { Dayjs } from 'dayjs';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../common/DateRangeSelector';
 
 ChartJS.register(
   CategoryScale,
@@ -184,7 +183,6 @@ const PlayerHistoryTable: React.FC<{
                   sx={{
                     fontSize: '0.75rem',
                     py: 0.75,
-                    fontFamily: 'monospace',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -251,30 +249,13 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     setShowLegendRaw(v);
     localStorage.setItem('player-show-legend', String(v));
   }, []);
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(() =>
-    dayjs().subtract(7, 'day').startOf('day')
-  );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(() =>
-    dayjs().endOf('day')
-  );
-  const [datePreset, setDatePreset] = useState<DateRangePreset>('last7d');
-
-  const handleDateChange = useCallback(
-    (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => {
-      setDateFrom(from);
-      setDateTo(to);
-      setDatePreset(preset);
-    },
-    []
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
 
   const getDateRange = useCallback(() => {
-    const to = dateTo ? dateTo.toDate() : new Date();
-    const from = dateFrom
-      ? dateFrom.toDate()
-      : new Date(to.getTime() - 7 * 24 * 3600000);
-    return { from, to };
-  }, [dateFrom, dateTo]);
+    return dateRangeToDatePair(dateRange);
+  }, [dateRange]);
 
   const hasLoadedRef = useRef(false);
   const prevGetDateRangeRef = useRef(getDateRange);
@@ -283,10 +264,10 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     async (showLoading = true) => {
       if (showLoading) setLoading(true);
       try {
-        const { from, to } = getDateRange();
+        const { start, end } = getDateRange();
         const data = await playerConnectionService.getPlayerHistory(
           projectApiPath,
-          { from: from.toISOString(), to: to.toISOString() }
+          { from: start.toISOString(), to: end.toISOString() }
         );
         setRecords(data);
         hasLoadedRef.current = true;
@@ -318,20 +299,20 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     if (records.length === 0) return { labels: [], datasets: [] };
 
     // Generate full time axis from date range
-    // Match backend downsampling: ≤7D=10min, ≤30D=30min, >30D=60min
-    const { from, to } = getDateRange();
-    const rangeHours = (to.getTime() - from.getTime()) / (1000 * 60 * 60);
+    // Match backend downsampling: ??D=10min, ??0D=30min, >30D=60min
+    const { start, end } = getDateRange();
+    const rangeHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
     const intervalMinutes =
       rangeHours > 24 * 30 ? 60 : rangeHours > 24 * 7 ? 30 : 10;
 
     const allLabels: string[] = [];
-    const current = new Date(from);
+    const current = new Date(start);
     current.setMinutes(
       Math.floor(current.getMinutes() / intervalMinutes) * intervalMinutes,
       0,
       0
     );
-    while (current <= to) {
+    while (current <= end) {
       allLabels.push(
         `${String(current.getMonth() + 1).padStart(2, '0')}/${String(current.getDate()).padStart(2, '0')} ${String(current.getHours()).padStart(2, '0')}:${String(current.getMinutes()).padStart(2, '0')}`
       );
@@ -532,21 +513,10 @@ const PlayerGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             </IconButton>
           </Tooltip>
         </Stack>
-        <DateRangePicker
-          dateFrom={dateFrom}
-          dateTo={dateTo}
-          onChange={handleDateChange}
-          preset={datePreset}
-          availablePresets={[
-            'today',
-            'yesterday',
-            'last7d',
-            'last30d',
-            'last3m',
-            'last6m',
-            'custom',
-          ]}
-          size="small"
+        <DateRangeSelector
+          value={dateRange}
+          onChange={setDateRange}
+          compact
         />
       </Box>
 

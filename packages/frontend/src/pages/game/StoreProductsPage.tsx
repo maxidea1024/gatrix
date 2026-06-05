@@ -95,6 +95,7 @@ import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -1375,35 +1376,7 @@ const StoreProductsPage: React.FC = () => {
                                     {product.cmsProductId ?? '-'}
                                   </Box>
                                   {product.cmsProductId && (
-                                    <Tooltip title={t('common.copy')}>
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => {
-                                          copyToClipboardWithNotification(
-                                            String(product.cmsProductId),
-                                            () =>
-                                              enqueueSnackbar(
-                                                t('common.copied'),
-                                                {
-                                                  variant: 'success',
-                                                }
-                                              ),
-                                            () =>
-                                              enqueueSnackbar(
-                                                t('common.copyFailed'),
-                                                {
-                                                  variant: 'error',
-                                                }
-                                              )
-                                          );
-                                        }}
-                                        sx={{ p: 0.25 }}
-                                      >
-                                        <ContentCopyIcon
-                                          sx={{ fontSize: 13 }}
-                                        />
-                                      </IconButton>
-                                    </Tooltip>
+                                    <CopyButton text={String(product.cmsProductId)} size={13} />
                                   )}
                                 </Box>
                               </TableCell>
@@ -1455,33 +1428,7 @@ const StoreProductsPage: React.FC = () => {
                                   >
                                     {product.productId}
                                   </Typography>
-                                  <Tooltip title={t('common.copy')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => {
-                                        copyToClipboardWithNotification(
-                                          product.productId,
-                                          () =>
-                                            enqueueSnackbar(
-                                              t('common.copied'),
-                                              {
-                                                variant: 'success',
-                                              }
-                                            ),
-                                          () =>
-                                            enqueueSnackbar(
-                                              t('common.copyFailed'),
-                                              {
-                                                variant: 'error',
-                                              }
-                                            )
-                                        );
-                                      }}
-                                      sx={{ p: 0.25 }}
-                                    >
-                                      <ContentCopyIcon sx={{ fontSize: 13 }} />
-                                    </IconButton>
-                                  </Tooltip>
+                                  <CopyButton text={product.productId} size={13} />
                                 </Box>
                               </TableCell>
                             );
@@ -1534,33 +1481,7 @@ const StoreProductsPage: React.FC = () => {
                                   >
                                     {displayName}
                                   </Typography>
-                                  <Tooltip title={t('common.copy')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => {
-                                        copyToClipboardWithNotification(
-                                          displayName,
-                                          () =>
-                                            enqueueSnackbar(
-                                              t('common.copied'),
-                                              {
-                                                variant: 'success',
-                                              }
-                                            ),
-                                          () =>
-                                            enqueueSnackbar(
-                                              t('common.copyFailed'),
-                                              {
-                                                variant: 'error',
-                                              }
-                                            )
-                                        );
-                                      }}
-                                      sx={{ p: 0.25 }}
-                                    >
-                                      <ContentCopyIcon sx={{ fontSize: 13 }} />
-                                    </IconButton>
-                                  </Tooltip>
+                                  <CopyButton text={displayName} size={13} />
                                 </Box>
                               </TableCell>
                             );

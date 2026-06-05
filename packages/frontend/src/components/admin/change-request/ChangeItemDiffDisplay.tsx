@@ -395,13 +395,12 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
                   color: 'text.secondary',
                   width: '30%',
                   fontSize: 12,
-                  fontFamily: 'monospace',
                 }}
               >
                 {formatFieldName(item.table, change.field)}
               </TableCell>
               {/* Value change */}
-              <TableCell sx={{ fontSize: 12, fontFamily: 'monospace' }}>
+              <TableCell sx={{ fontSize: 12}}>
                 {CONSTRAINT_FIELDS.includes(change.field) ? (
                   <ConstraintsDiff
                     oldConstraints={change.oldValue}

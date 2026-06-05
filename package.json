@@ -12,7 +12,7 @@
     "packages/evaluator"
   ],
   "scripts": {
-    "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:edge\"",
+    "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:edge\" \"yarn dev:argus:api\" \"yarn dev:argus:worker\"",
     "dev:all": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:others\"",
     "dev:backend": "dotenv -e .env.local -- yarn workspace @gatrix/backend dev",
     "dev:frontend": "dotenv -e .env.local -- yarn workspace @gatrix/frontend dev",
@@ -21,6 +21,8 @@
     "dev:event-lens": "dotenv -e .env.local -- yarn workspace @gatrix/event-lens dev",
     "dev:others": "concurrently -n frontend,edge,chat,event-lens -c green,cyan,magenta,yellow \"yarn dev:frontend\" \"yarn dev:edge\" \"yarn dev:chat-server\" \"yarn dev:event-lens\"",
     "dev:event-lens:worker": "dotenv -e .env.local -- yarn workspace @gatrix/event-lens dev:worker",
+    "dev:argus:api": "dotenv -e .env.local -- yarn workspace @gatrix/argus dev:api",
+    "dev:argus:worker": "dotenv -e .env.local -- yarn workspace @gatrix/argus dev:worker",
     "dev:docs": "cd docs && npm start",
     "infra:up": "docker compose -f docker-compose-infra.yml up -d",
     "infra:down": "docker compose -f docker-compose-infra.yml down",

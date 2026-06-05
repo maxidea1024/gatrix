@@ -141,6 +141,7 @@ import type {
   GroupingOption,
 } from '../../components/server-list/types';
 import { TableVirtuoso, VirtuosoGrid } from 'react-virtuoso';
+import { CopyButton } from '@/components/common/CopyButton';
 
 interface SortableColumnItemProps {
   column: ColumnConfig;
@@ -2516,7 +2517,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                 <Typography
                                   variant="body2"
                                   sx={{
-                                    fontFamily: '"D2Coding", monospace',
                                     fontWeight: 700,
                                   }}
                                 >
@@ -2610,7 +2610,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: '"D2Coding", monospace',
                                 fontSize: '0.75rem',
                               }}
                             >
@@ -2624,7 +2623,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: '"D2Coding", monospace',
                                 fontSize: '0.75rem',
                                 opacity: 0.8,
                               }}
@@ -2639,7 +2637,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                             <Typography
                               variant="body2"
                               sx={{
-                                fontFamily: '"D2Coding", monospace',
                                 fontSize: '0.75rem',
                                 opacity: 0.8,
                               }}
@@ -2673,7 +2670,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                   label={`${name}:${port}`}
                                   size="small"
                                   sx={{
-                                    fontFamily: '"D2Coding", monospace',
                                     fontSize: '0.7rem',
                                     height: '22px',
                                   }}
@@ -2740,8 +2736,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                         sx={{
                                           fontSize: '0.65rem',
                                           color: 'text.secondary',
-                                          fontFamily: '"D2Coding", monospace',
-                                        }}
+                                          }}
                                       >
                                         {k}:{' '}
                                         {typeof v === 'number'
@@ -3399,7 +3394,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   <Typography
                     variant="body2"
                     sx={{
-                      fontFamily: '"D2Coding", monospace',
                       fontWeight: 700,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -3421,7 +3415,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     </Typography>
                     <Typography
                       variant="caption"
-                      sx={{ fontFamily: '"D2Coding", monospace', opacity: 0.7 }}
+                      sx={{ opacity: 0.7 }}
                     >
                       {service.externalAddress}
                     </Typography>
@@ -3443,7 +3437,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         key={n}
                         variant="caption"
                         sx={{
-                          fontFamily: '"D2Coding", monospace',
                           fontSize: '0.6rem',
                           color: 'text.secondary',
                         }}
@@ -3896,7 +3889,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   <Typography
                     variant="body2"
                     sx={{
-                      fontFamily: '"D2Coding", monospace',
                       fontWeight: 600,
                     }}
                   >
@@ -3908,7 +3900,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     variant="body2"
                     color="text.disabled"
                     sx={{
-                      fontFamily: '"D2Coding", monospace',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -3930,7 +3921,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         minWidth: 55,
                       },
                       '& .value': {
-                        fontFamily: '"D2Coding", monospace',
                         fontSize: '0.875rem',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -3967,7 +3957,6 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                           sx={{
                             height: 24,
                             fontSize: '0.8rem',
-                            fontFamily: '"D2Coding", monospace',
                             '& .MuiChip-label': { px: 1 },
                           }}
                         />
@@ -3994,8 +3983,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                           sx={{
                             fontSize: '0.8rem',
                             height: 24,
-                            fontFamily: '"D2Coding", monospace',
-                          }}
+                            }}
                         />
                       ))}
                     </Box>
@@ -4597,31 +4585,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         <Typography variant="body2" fontWeight="medium">
                           {item.service}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (item.service)
-                              copyToClipboardWithNotification(
-                                item.service as string,
-                                () =>
-                                  enqueueSnackbar(
-                                    t('common.copiedToClipboard'),
-                                    {
-                                      variant: 'success',
-                                    }
-                                  ),
-                                () => {}
-                              );
-                          }}
-                          sx={{
-                            opacity: 0.3,
-                            '&:hover': { opacity: 1 },
-                            p: 0.5,
-                            visibility: item.service ? 'visible' : 'hidden',
-                          }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={item.service as string} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -4636,31 +4600,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         <Typography variant="body2" color="text.secondary">
                           {item.group || '-'}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (item.group)
-                              copyToClipboardWithNotification(
-                                item.group as string,
-                                () =>
-                                  enqueueSnackbar(
-                                    t('common.copiedToClipboard'),
-                                    {
-                                      variant: 'success',
-                                    }
-                                  ),
-                                () => {}
-                              );
-                          }}
-                          sx={{
-                            opacity: 0.3,
-                            '&:hover': { opacity: 1 },
-                            p: 0.5,
-                            visibility: item.group ? 'visible' : 'hidden',
-                          }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={item.group as string} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -4675,31 +4615,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         <Typography variant="body2" color="text.secondary">
                           {item.env || '-'}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (item.env)
-                              copyToClipboardWithNotification(
-                                item.env as string,
-                                () =>
-                                  enqueueSnackbar(
-                                    t('common.copiedToClipboard'),
-                                    {
-                                      variant: 'success',
-                                    }
-                                  ),
-                                () => {}
-                              );
-                          }}
-                          sx={{
-                            opacity: 0.3,
-                            '&:hover': { opacity: 1 },
-                            p: 0.5,
-                            visibility: item.env ? 'visible' : 'hidden',
-                          }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={item.env as string} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -4714,37 +4630,12 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'D2Coding, monospace',
                             fontSize: '0.75rem',
                           }}
                         >
                           {item.hostname || '-'}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (item.hostname)
-                              copyToClipboardWithNotification(
-                                item.hostname as string,
-                                () =>
-                                  enqueueSnackbar(
-                                    t('common.copiedToClipboard'),
-                                    {
-                                      variant: 'success',
-                                    }
-                                  ),
-                                () => {}
-                              );
-                          }}
-                          sx={{
-                            opacity: 0.3,
-                            '&:hover': { opacity: 1 },
-                            p: 0.5,
-                            visibility: item.hostname ? 'visible' : 'hidden',
-                          }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={item.hostname as string} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -4759,37 +4650,12 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'D2Coding, monospace',
                             fontSize: '0.75rem',
                           }}
                         >
                           {item.internalIp || '-'}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (item.internalIp)
-                              copyToClipboardWithNotification(
-                                item.internalIp as string,
-                                () =>
-                                  enqueueSnackbar(
-                                    t('common.copiedToClipboard'),
-                                    {
-                                      variant: 'success',
-                                    }
-                                  ),
-                                () => {}
-                              );
-                          }}
-                          sx={{
-                            opacity: 0.3,
-                            '&:hover': { opacity: 1 },
-                            p: 0.5,
-                            visibility: item.internalIp ? 'visible' : 'hidden',
-                          }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={item.internalIp as string} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -4804,37 +4670,12 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'D2Coding, monospace',
                             fontSize: '0.75rem',
                           }}
                         >
                           {item.healthPort || '-'}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (item.healthPort)
-                              copyToClipboardWithNotification(
-                                String(item.healthPort) as string,
-                                () =>
-                                  enqueueSnackbar(
-                                    t('common.copiedToClipboard'),
-                                    {
-                                      variant: 'success',
-                                    }
-                                  ),
-                                () => {}
-                              );
-                          }}
-                          sx={{
-                            opacity: 0.3,
-                            '&:hover': { opacity: 1 },
-                            p: 0.5,
-                            visibility: item.healthPort ? 'visible' : 'hidden',
-                          }}
-                        >
-                          <ContentCopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
+                        <CopyButton text={String(item.healthPort) as string} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>

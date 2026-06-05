@@ -58,7 +58,6 @@ import {
   DataObject as JsonIcon,
   Code as CodeIcon,
   SportsEsports as JoystickIcon,
-  ContentCopy as CopyIcon,
   AccountTree as ExtractIcon,
   WarningAmber as WarningAmberIcon,
   ErrorOutline as ErrorOutlineIcon,
@@ -79,12 +78,12 @@ import api from '../../services/api';
 import ConstraintDisplay from './ConstraintDisplay';
 import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
 import JsonEditor from '../common/JsonEditor';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog';
 import ContextFieldChip, { ContextFieldInfo } from '../common/ContextFieldChip';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { CopyButton } from '@/components/common/CopyButton';
 interface ContextField {
   fieldName: string;
   displayName: string;
@@ -1916,8 +1915,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             mt: 0.5,
                             height: 18,
                             fontSize: '0.65rem',
-                            fontFamily:
-                              'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                             cursor: 'default',
                           }}
                         />
@@ -2417,8 +2414,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   <Typography
                     variant="body2"
                     sx={{
-                      fontFamily:
-                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                       fontSize: '0.8rem',
                       fontWeight: 600,
                       overflow: 'hidden',
@@ -2806,9 +2801,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             variant="caption"
                             sx={{
                               color: 'error.main',
-                              fontFamily:
-                                'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
-                            }}
+                              }}
                           >
                             &quot;&quot;
                           </Typography>
@@ -2936,9 +2929,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 <Typography
                                   variant="caption"
                                   sx={{
-                                    fontFamily:
-                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
-                                  }}
+                                    }}
                                 >
                                   {renderValue(entry.value, entry.type)}
                                 </Typography>
@@ -3100,9 +3091,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   <Typography
                                     variant="caption"
                                     sx={{
-                                      fontFamily:
-                                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
-                                    }}
+                                      }}
                                   >
                                     {!provided ? (
                                       <Typography
@@ -3896,8 +3885,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                   :{' '}
                                                                   <code
                                                                     style={{
-                                                                      fontFamily:
-                                                                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                       backgroundColor:
                                                                         'rgba(0,0,0,0.1)',
                                                                       padding:
@@ -4029,8 +4016,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                       'auto',
                                                                     fontSize:
                                                                       '0.7rem',
-                                                                    fontFamily:
-                                                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                     '& td': {
                                                                       border:
                                                                         '1px solid',
@@ -4163,36 +4148,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     {t('playground.appliedVariant')}
                   </Typography>
                   {selectedEvaluation.result.variant && (
-                    <Tooltip title={t('common.copy')} disableFocusListener>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const value =
-                            selectedEvaluation.result.variant?.value;
-                          const valueToCopy =
-                            typeof value === 'object' &&
-                            value !== null &&
-                            'value' in value
-                              ? String(value.value)
-                              : typeof value === 'object'
-                                ? JSON.stringify(value)
-                                : String(value ?? '');
-                          copyToClipboardWithNotification(
-                            valueToCopy,
-                            () =>
-                              enqueueSnackbar(t('common.copiedToClipboard'), {
-                                variant: 'success',
-                              }),
-                            () =>
-                              enqueueSnackbar(t('common.copyFailed'), {
-                                variant: 'error',
-                              })
-                          );
-                        }}
-                      >
-                        <CopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <CopyButton text={(() => {
+                      const value = selectedEvaluation.result.variant?.value;
+                      return typeof value === 'object' && value !== null && 'value' in value
+                        ? String((value as any).value)
+                        : typeof value === 'object'
+                          ? JSON.stringify(value)
+                          : String(value ?? '');
+                    })()} size={13} />
                   )}
                 </Box>
                 <Box
@@ -4314,8 +4277,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     style={{
                                       margin: 0,
                                       fontSize: '13px',
-                                      fontFamily:
-                                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                       fontWeight: 500,
                                       color: 'var(--mui-palette-text-primary)',
                                       whiteSpace: 'pre-wrap',
@@ -4350,8 +4311,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   border: '1px solid',
                                   borderColor: 'divider',
                                   borderRadius: 1,
-                                  fontFamily:
-                                    'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                   fontWeight: 500,
                                   wordBreak: 'break-all',
                                   ...(innerValue === '' && {
@@ -4404,8 +4363,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     border: '1px solid',
                                     borderColor: 'divider',
                                     borderRadius: 1,
-                                    fontFamily:
-                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                     fontWeight: 500,
                                     fontStyle: 'italic',
                                     color: 'text.disabled',
@@ -4431,8 +4388,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   style={{
                                     margin: 0,
                                     fontSize: '13px',
-                                    fontFamily:
-                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                     fontWeight: 500,
                                     color: 'var(--mui-palette-text-primary)',
                                     whiteSpace: 'pre-wrap',
@@ -4463,8 +4418,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 borderRadius: 1,
-                                fontFamily:
-                                  'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                 fontWeight: 500,
                                 wordBreak: 'break-all',
                                 ...(isEmpty && {
@@ -4592,8 +4545,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily:
-                                'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                               wordBreak: 'break-all',
                             }}
                           >
@@ -4623,38 +4574,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     <Typography variant="subtitle2" color="text.secondary">
                       {t('playground.rawResponse')}
                     </Typography>
-                    <Tooltip
-                      title={t('common.copyToClipboard')}
-                      disableFocusListener
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const jsonStr = JSON.stringify(
-                            {
-                              enabled: selectedEvaluation.result.enabled,
-                              variant: selectedEvaluation.result.variant,
-                              reason: selectedEvaluation.result.reason,
-                            },
-                            null,
-                            2
-                          );
-                          copyToClipboardWithNotification(
-                            jsonStr,
-                            () =>
-                              enqueueSnackbar(t('common.copiedToClipboard'), {
-                                variant: 'success',
-                              }),
-                            () =>
-                              enqueueSnackbar(t('common.copyFailed'), {
-                                variant: 'error',
-                              })
-                          );
-                        }}
-                      >
-                        <CopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <CopyButton text={JSON.stringify(
+                      {
+                        enabled: selectedEvaluation.result.enabled,
+                        variant: selectedEvaluation.result.variant,
+                        reason: selectedEvaluation.result.reason,
+                      },
+                      null,
+                      2
+                    )} size={13} />
                   </Box>
                   <JsonEditor
                     value={JSON.stringify(

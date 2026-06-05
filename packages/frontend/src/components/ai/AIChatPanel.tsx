@@ -109,7 +109,6 @@ const getMessageBubbleSx = (role: 'user' | 'assistant' | 'system') => ({
     bgcolor: 'action.hover',
     px: 0.5,
     borderRadius: 0.5,
-    fontFamily: 'monospace',
     fontSize: '0.8em',
   },
   '& pre': {

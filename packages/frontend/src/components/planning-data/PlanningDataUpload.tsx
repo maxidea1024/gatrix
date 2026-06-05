@@ -511,7 +511,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
             <Typography variant="body2" component="div">
               {t('planningData.upload.conversionNote') ||
                 'Data is filtered based on country code during conversion.'}
-              <Box component="span" sx={{ fontFamily: 'monospace', ml: 1 }}>
+              <Box component="span" sx={{ ml: 1 }}>
                 (binaryCode=cn, countryCode=6)
               </Box>
             </Typography>
@@ -701,7 +701,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                   {SUPPORTED_FILES.map((file) => (
                     <TableRow key={file.name}>
                       <TableCell
-                        sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
+                        sx={{ fontSize: '0.85rem' }}
                       >
                         {file.name}
                       </TableCell>
@@ -863,7 +863,6 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                 width: '100%',
                                 borderCollapse: 'collapse',
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                                 border: '1px dashed',
                                 borderColor: 'divider',
                                 '& th, & td': {
@@ -967,7 +966,6 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                 width: '100%',
                                 borderCollapse: 'collapse',
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                                 border: '1px dashed',
                                 borderColor: 'divider',
                                 '& th, & td': {
@@ -1053,7 +1051,6 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                 width: '100%',
                                 borderCollapse: 'collapse',
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                                 border: '1px dashed',
                                 borderColor: 'divider',
                                 '& th, & td': {

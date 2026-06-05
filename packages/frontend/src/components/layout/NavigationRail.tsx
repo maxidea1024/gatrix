@@ -353,7 +353,6 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
               fontWeight: 600,
               color: 'text.secondary',
               mb: 3,
@@ -386,7 +385,6 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
           <Typography
             variant="caption"
             sx={{
-              fontFamily: 'monospace',
               bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'grey.100',
               display: 'inline-block',
               px: 1.5,

@@ -139,7 +139,6 @@ import {
   parseUTCForPicker,
 } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import SearchTextField from '../../components/common/SearchTextField';
@@ -163,6 +162,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
 import ImportDialog from '../../components/common/ImportDialog';
 import ClientStatusIcon from '../../components/common/ClientStatusIcon';
+import { CopyButton } from '@/components/common/CopyButton';
 
 /** Truncate a string in the middle with "…" if it exceeds maxLen. */
 const truncateMiddle = (
@@ -1543,28 +1543,7 @@ const ClientVersionsPage: React.FC = () => {
                   setFormDialogOpen(true);
                 }}
               />
-              <Tooltip title={t('common.copy')}>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    copyToClipboardWithNotification(
-                      clientVersion.clientVersion,
-                      () =>
-                        enqueueSnackbar(t('common.copiedToClipboard'), {
-                          variant: 'success',
-                        }),
-                      () =>
-                        enqueueSnackbar(t('common.copyFailed'), {
-                          variant: 'error',
-                        })
-                    );
-                  }}
-                  sx={{ p: 0.5 }}
-                >
-                  <CopyIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                </IconButton>
-              </Tooltip>
+              <CopyButton text={clientVersion.clientVersion} size={13} />
             </Box>
           );
         case 'clientStatus':
@@ -1611,7 +1590,6 @@ const ClientVersionsPage: React.FC = () => {
                 <Typography
                   variant="body2"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: '0.75rem',
                     whiteSpace: 'nowrap',
                   }}
@@ -1619,27 +1597,7 @@ const ClientVersionsPage: React.FC = () => {
                   {truncateMiddle(clientVersion.gameServerAddress)}
                 </Typography>
               </Tooltip>
-              <Tooltip title={t('common.copy')}>
-                <IconButton
-                  size="small"
-                  onClick={async () => {
-                    await copyToClipboardWithNotification(
-                      clientVersion.gameServerAddress,
-                      () =>
-                        enqueueSnackbar(t('common.copiedToClipboard'), {
-                          variant: 'success',
-                        }),
-                      () =>
-                        enqueueSnackbar(t('common.copyFailed'), {
-                          variant: 'error',
-                        })
-                    );
-                  }}
-                  sx={{ p: 0.25 }}
-                >
-                  <CopyIcon sx={{ fontSize: 13 }} />
-                </IconButton>
-              </Tooltip>
+              <CopyButton text={clientVersion.gameServerAddress} size={13} />
             </Box>
           );
         case 'patchAddress':
@@ -1649,7 +1607,6 @@ const ClientVersionsPage: React.FC = () => {
                 <Typography
                   variant="body2"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: '0.75rem',
                     whiteSpace: 'nowrap',
                   }}
@@ -1657,27 +1614,7 @@ const ClientVersionsPage: React.FC = () => {
                   {truncateMiddle(clientVersion.patchAddress)}
                 </Typography>
               </Tooltip>
-              <Tooltip title={t('common.copy')}>
-                <IconButton
-                  size="small"
-                  onClick={async () => {
-                    await copyToClipboardWithNotification(
-                      clientVersion.patchAddress,
-                      () =>
-                        enqueueSnackbar(t('common.copiedToClipboard'), {
-                          variant: 'success',
-                        }),
-                      () =>
-                        enqueueSnackbar(t('common.copyFailed'), {
-                          variant: 'error',
-                        })
-                    );
-                  }}
-                  sx={{ p: 0.25 }}
-                >
-                  <CopyIcon sx={{ fontSize: 13 }} />
-                </IconButton>
-              </Tooltip>
+              <CopyButton text={clientVersion.patchAddress} size={13} />
             </Box>
           );
         case 'minPatchVersion':

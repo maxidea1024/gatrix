@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { copyToClipboard } from '@/utils/clipboard';
 import spreadsheetService, {
   type SpreadsheetShare,
   type SharePermission,
@@ -111,11 +112,13 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
 
   const handleCopyLink = useCallback(async () => {
     if (!publicShare?.shareToken) return;
-    await navigator.clipboard.writeText(
+    const ok = await copyToClipboard(
       `${window.location.origin}/shared/spreadsheet/${publicShare.shareToken}`
     );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   }, [publicShare]);
 
   const handleAddUser = useCallback(async () => {
@@ -236,7 +239,6 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                       readOnly: true,
                       sx: {
                         fontSize: '0.8rem',
-                        fontFamily: 'monospace',
                         color: 'text.primary',
                         cursor: 'pointer',
                       },

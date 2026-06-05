@@ -153,6 +153,7 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 
+import { CopyButton } from '@/components/common/CopyButton';
 // Column definition interface
 interface ColumnConfig {
   id: string;
@@ -1628,17 +1629,7 @@ const GameWorldsPage: React.FC = () => {
             >
               {world.worldId}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={() =>
-                  handleCopy(world.worldId, t('gameWorlds.worldId'))
-                }
-                sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={world.worldId} size={13} />
           </Box>
         );
       case 'name':
@@ -1647,15 +1638,7 @@ const GameWorldsPage: React.FC = () => {
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {world.name}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={() => handleCopy(world.name, t('gameWorlds.name'))}
-                sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={world.name} size={13} />
           </Box>
         );
       case 'description':
@@ -1673,25 +1656,12 @@ const GameWorldsPage: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'monospace', maxWidth: 250 }}
+              sx={{ maxWidth: 250 }}
             >
               {world.worldServerAddress || '-'}
             </Typography>
             {world.worldServerAddress && (
-              <Tooltip title={t('common.copy')}>
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    handleCopy(
-                      world.worldServerAddress || '',
-                      t('gameWorlds.worldServerAddress')
-                    )
-                  }
-                  sx={{ p: 0.25, opacity: 0.7, '&:hover': { opacity: 1 } }}
-                >
-                  <CopyIcon sx={{ fontSize: 13 }} />
-                </IconButton>
-              </Tooltip>
+              <CopyButton text={world.worldServerAddress || ''} size={13} />
             )}
           </Box>
         );

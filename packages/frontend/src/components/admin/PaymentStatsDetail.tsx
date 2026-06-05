@@ -90,7 +90,6 @@ const cellSx = {
   px: 2,
   py: 1.2,
   borderBottom: '1px solid rgba(255,255,255,0.1)',
-  fontFamily: '"Inter", "Roboto Mono", monospace',
   fontVariantNumeric: 'tabular-nums' as const,
   fontSize: '0.85rem',
   textShadow: '0 1px 4px rgba(0,0,0,0.6)',
@@ -460,7 +459,6 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 color: '#fff',
                 fontSize: '1.8rem',
                 fontWeight: 800,
-                fontFamily: '"Inter", "Roboto Mono", monospace',
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
                 textShadow: '0 1px 8px rgba(0,0,0,0.6)',
@@ -499,7 +497,6 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 color: '#fff',
                 fontSize: '1.8rem',
                 fontWeight: 800,
-                fontFamily: '"Inter", "Roboto Mono", monospace',
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
               }}
@@ -515,7 +512,6 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                 color: 'rgba(255,255,255,0.5)',
                 fontSize: '0.8rem',
                 mt: 0.5,
-                fontFamily: '"Inter", monospace',
                 fontVariantNumeric: 'tabular-nums',
                 textShadow: '0 1px 4px rgba(0,0,0,0.6)',
               }}
@@ -700,7 +696,6 @@ const PaymentStatsDetail: React.FC<PaymentStatsDetailProps> = ({
                       sx={{
                         color: 'rgba(255,255,255,0.4)',
                         fontSize: '0.8rem',
-                        fontFamily: '"Inter", monospace',
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >

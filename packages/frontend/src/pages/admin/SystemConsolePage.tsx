@@ -323,8 +323,6 @@ const SystemConsolePage: React.FC = () => {
       cursorBlink: true,
       fontSize: 14,
       // Prefer CJK-friendly monospace fonts first
-      fontFamily:
-        'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
       allowProposedApi: true, // Enable IME support
       theme: {
         background: (theme.palette.background?.paper as any) || '#000000',
@@ -1330,9 +1328,7 @@ const SystemConsolePage: React.FC = () => {
           borderRadius: 1,
           p: 1,
           minHeight: 0,
-          fontFamily:
-            'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
-        })}
+          })}
       >
         <div
           ref={containerRef as any}

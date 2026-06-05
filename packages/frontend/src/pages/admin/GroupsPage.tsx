@@ -43,9 +43,7 @@ import {
   Shield as ShieldIcon,
   PersonAdd as PersonAddIcon,
   PersonRemove as PersonRemoveIcon,
-  MoreVert as MoreVertIcon,
-  ContentCopy as CopyIcon,
-} from '@mui/icons-material';
+  MoreVert as MoreVertIcon,} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
@@ -67,6 +65,7 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsViewer';
 import PageHeader from '@/components/common/PageHeader';
 
+import { CopyButton } from '@/components/common/CopyButton';
 // ==================== Tab Panel ====================
 
 interface TabPanelProps {
@@ -549,15 +548,7 @@ const GroupsPage: React.FC = () => {
                         >
                           {group.groupName}
                         </Typography>
-                        <Tooltip title={t('common.copy')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleCopyText(group.groupName)}
-                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
-                          >
-                            <CopyIcon sx={{ fontSize: 13 }} />
-                          </IconButton>
-                        </Tooltip>
+                        <CopyButton text={group.groupName} size={13} />
                       </Box>
                     </TableCell>
                     <TableCell>

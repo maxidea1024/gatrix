@@ -37,7 +37,7 @@ import {
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
   MoreVert as MoreVertIcon,
-  ContentCopy as ContentCopyIcon,
+
 } from '@mui/icons-material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
@@ -69,6 +69,7 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import SearchTextField from '../../components/common/SearchTextField';
 import PageHeader from '@/components/common/PageHeader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 // Default column configuration
 const defaultColumns: ColumnConfig[] = [
@@ -447,23 +448,7 @@ const JobsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             >
               {truncateText(job.name, 30)}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigator.clipboard.writeText(job.name);
-                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                    variant: 'success',
-                  });
-                }}
-                sx={{ p: 0.5 }}
-              >
-                <ContentCopyIcon
-                  sx={{ fontSize: '1rem', color: 'text.secondary' }}
-                />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={job.name} size={14} />
           </Box>
         );
       case 'jobType':

@@ -109,7 +109,6 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
             p: 1.5,
             borderRadius: 1,
             fontSize: '0.75rem',
-            fontFamily: 'monospace',
             overflow: 'auto',
             maxHeight: 300,
             m: 0,
@@ -139,7 +138,6 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
             p: 1.5,
             borderRadius: 1,
             fontSize: '0.75rem',
-            fontFamily: 'monospace',
             overflow: 'auto',
             maxHeight: 300,
             m: 0,
@@ -190,12 +188,11 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
           <TableBody>
             {changes.map((change) => (
               <TableRow key={change.field} hover>
-                <TableCell sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                <TableCell sx={{ fontWeight: 500 }}>
                   {change.field}
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontFamily: 'monospace',
                     bgcolor: 'error.dark',
                     color: 'common.white',
                   }}
@@ -204,7 +201,6 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontFamily: 'monospace',
                     bgcolor: 'success.dark',
                     color: 'common.white',
                   }}

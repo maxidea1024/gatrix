@@ -26,13 +26,13 @@ import {
   Cancel as CancelIcon,
   Warning as WarningIcon,
   HourglassEmpty as HourglassIcon,
-  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import rippleService, { RippleHistoryEvent } from '@/services/rippleService';
+import { CopyButton } from '@/components/common/CopyButton';
 
 const fadeSlideIn = keyframes`
   from {
@@ -242,7 +242,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ fontFamily: 'monospace' }}
+            
           >
             {requestId} / {pattern}
           </Typography>
@@ -273,7 +273,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                 sx={{
                   height: 20,
                   fontSize: '0.65rem',
-                  fontFamily: 'monospace',
                   fontWeight: 500,
                 }}
               />
@@ -406,7 +405,6 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
                               fontSize: '0.78rem',
                               fontWeight: 500,
                               color:
@@ -421,15 +419,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                             {event.handlerKey}
                           </Typography>
                           {event.status !== 'skipped' && (
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.handlerKey)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.handlerKey} size={13} />
                           )}
                         </Box>
                       </TableCell>
@@ -441,21 +431,12 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                               color="info.main"
                               sx={{
                                 fontSize: '0.78rem',
-                                fontFamily: 'monospace',
                                 fontWeight: 600,
                               }}
                             >
                               {event.serviceType}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.serviceType)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.serviceType} size={13} />
                           </Box>
                         ) : null}
                       </TableCell>
@@ -467,20 +448,11 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                               color="text.secondary"
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {event.hostname}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.hostname)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.hostname} size={13} />
                           </Box>
                         ) : event.status !== 'skipped' ? (
                           <Typography
@@ -500,20 +472,11 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
                               color="text.disabled"
                               sx={{
                                 fontSize: '0.75rem',
-                                fontFamily: 'monospace',
                               }}
                             >
                               {event.serverId}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                sx={{ p: 0.25, ml: 0.25 }}
-                                onClick={() => handleCopy(event.serverId)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={event.serverId} size={13} />
                           </Box>
                         ) : event.status !== 'skipped' ? (
                           <Typography

@@ -223,6 +223,14 @@ export default defineConfig({
           });
         },
       },
+      '/argus/api': {
+        target: isDocker
+          ? 'http://argus-api:45300'
+          : `http://localhost:${process.env.ARGUS_API_PORT || '45300'}`,
+        changeOrigin: true,
+        secure: false,
+        agent: httpAgent,
+      },
     },
   },
   build: {

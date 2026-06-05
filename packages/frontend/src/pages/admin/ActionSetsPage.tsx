@@ -914,7 +914,6 @@ const ActionSetsPage: React.FC = () => {
                                         <Typography
                                           variant="body2"
                                           sx={{
-                                            fontFamily: 'monospace',
                                             fontSize: '0.8rem',
                                           }}
                                         >

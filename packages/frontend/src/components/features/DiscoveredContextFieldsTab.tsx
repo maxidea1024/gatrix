@@ -751,7 +751,6 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  fontFamily: 'monospace',
                                   fontWeight: 500,
                                 }}
                               >
@@ -809,7 +808,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                           <TableCell align="right" sx={{ py: 0.75, px: 1.5 }}>
                             <Typography
                               variant="body2"
-                              sx={{ fontFamily: 'monospace' }}
+                              
                             >
                               {formatNumber(field.accessCount)}
                             </Typography>
@@ -984,7 +983,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
               <Typography
                 variant="body2"
                 fontWeight={600}
-                sx={{ fontFamily: 'monospace' }}
+                
               >
                 {editingField ? formatNumber(editingField.accessCount) : ''}
               </Typography>

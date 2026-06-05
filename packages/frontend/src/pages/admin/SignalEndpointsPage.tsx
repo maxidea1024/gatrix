@@ -36,7 +36,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  ContentCopy as CopyIcon,
+
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Sensors as SensorsIcon,
@@ -49,7 +49,7 @@ import signalEndpointService, {
   SignalEndpoint,
   SignalEndpointToken,
 } from '@/services/signalEndpointService';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { CopyButton } from '@/components/common/CopyButton';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageHeader from '@/components/common/PageHeader';
 import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
@@ -200,7 +200,6 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               <Typography
                 variant="body2"
                 sx={{
-                  fontFamily: 'monospace',
                   flex: 1,
                   wordBreak: 'break-all',
                   color: name.trim() ? 'text.primary' : 'text.disabled',
@@ -208,29 +207,9 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               >
                 {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim() || '{name}'}`}
               </Typography>
-              <Tooltip title={t('common.copy')}>
-                <span>
-                  <IconButton
-                    size="small"
-                    disabled={!name.trim()}
-                    onClick={() =>
-                      copyToClipboardWithNotification(
-                        `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
-                        () =>
-                          enqueueSnackbar(t('common.copiedToClipboard'), {
-                            variant: 'success',
-                          }),
-                        () =>
-                          enqueueSnackbar(t('common.copyFailed'), {
-                            variant: 'error',
-                          })
-                      )
-                    }
-                  >
-                    <CopyIcon sx={{ fontSize: 13 }} />
-                  </IconButton>
-                </span>
-              </Tooltip>
+              {name.trim() && (
+                <CopyButton text={`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`} size={13} />
+              )}
             </Box>
             <Typography
               variant="caption"
@@ -359,24 +338,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
               InputProps={{
                 readOnly: true,
                 endAdornment: (
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      copyToClipboardWithNotification(
-                        createdToken,
-                        () =>
-                          enqueueSnackbar(t('common.copiedToClipboard'), {
-                            variant: 'success',
-                          }),
-                        () =>
-                          enqueueSnackbar(t('common.copyFailed'), {
-                            variant: 'error',
-                          })
-                      )
-                    }
-                  >
-                    <CopyIcon sx={{ fontSize: 13 }} />
-                  </IconButton>
+                  <CopyButton text={createdToken} size={13} />
                 ),
               }}
             />
@@ -794,7 +756,6 @@ const SignalEndpointsPage: React.FC = () => {
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  fontFamily: 'monospace',
                                   flex: 1,
                                   wordBreak: 'break-all',
                                   color: 'text.primary',
@@ -803,30 +764,7 @@ const SignalEndpointsPage: React.FC = () => {
                               >
                                 {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`}
                               </Typography>
-                              <Tooltip title={t('common.copy')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    copyToClipboardWithNotification(
-                                      `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`,
-                                      () =>
-                                        enqueueSnackbar(
-                                          t('common.copiedToClipboard'),
-                                          { variant: 'success' }
-                                        ),
-                                      () =>
-                                        enqueueSnackbar(
-                                          t('common.copyFailed'),
-                                          {
-                                            variant: 'error',
-                                          }
-                                        )
-                                    )
-                                  }
-                                >
-                                  <CopyIcon sx={{ fontSize: 13 }} />
-                                </IconButton>
-                              </Tooltip>
+                              <CopyButton text={`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`} size={13} />
                             </Box>
 
                             {/* Tokens Section */}

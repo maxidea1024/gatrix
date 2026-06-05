@@ -21,11 +21,11 @@ import {
   Paper,
 } from '@mui/material';
 import {
-  ContentCopy as ContentCopyIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { CopyButton } from '@/components/common/CopyButton';
 import ResizableDrawer from '../common/ResizableDrawer';
 import SimplePagination from '../common/SimplePagination';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
@@ -127,13 +127,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
     sent: 0,
   });
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    enqueueSnackbar(t('common.copied'), {
-      variant: 'success',
-      autoHideDuration: 1500,
-    });
-  };
+
 
   const loadLogs = useCallback(async () => {
     if (!survey) return;
@@ -481,14 +475,7 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
                             >
                               {log.accountId}
                             </Typography>
-                            <Tooltip title={t('common.copy')}>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleCopy(log.accountId)}
-                              >
-                                <ContentCopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
+                            <CopyButton text={log.accountId} size={13} />
                           </Box>
                         </TableCell>
                         <TableCell>

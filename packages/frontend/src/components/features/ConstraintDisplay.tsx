@@ -158,7 +158,6 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
             py: 0.6,
             fontSize: '0.75rem',
             fontWeight: 500,
-            fontFamily: "'Consolas','Monaco','Courier New',monospace",
             lineHeight: 1.5,
             opacity: 0.9,
           }}
@@ -261,7 +260,6 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
                     sx={{
                       fontSize: '0.6rem',
                       fontWeight: 700,
-                      fontFamily: 'monospace',
                       bgcolor: 'rgba(128,128,128,0.15)',
                       borderRadius: 0.5,
                       px: 0.5,

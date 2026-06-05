@@ -7,8 +7,6 @@ import React, {
 } from 'react';
 import {
   Box,
-  ToggleButton,
-  ToggleButtonGroup,
   Card,
   Chip,
   Stack,
@@ -24,6 +22,7 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
+import DateRangeSelector, { DateRangeValue, presetToHours, dateRangeToDatePair } from '../common/DateRangeSelector';
 import {
   People as PeopleIcon,
   SmartToy as BotIcon,
@@ -63,13 +62,7 @@ ChartJS.register(
   crosshairPlugin
 );
 
-const TIME_RANGES = [
-  { value: '1h', label: '1H', hours: 1 },
-  { value: '6h', label: '6H', hours: 6 },
-  { value: '24h', label: '24H', hours: 24 },
-  { value: '7d', label: '7D', hours: 168 },
-  { value: '14d', label: '14D', hours: 336 },
-];
+
 
 const WORLD_COLORS = [
   { border: '#2196f3', bg: 'rgba(33,150,243,0.1)' },
@@ -248,7 +241,6 @@ const CcuHistoryTable: React.FC<{ records: CcuHistoryRecord[] }> = ({
                   sx={{
                     fontSize: '0.75rem',
                     py: 0.75,
-                    fontFamily: 'monospace',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -301,15 +293,17 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
-  const [timeRange, setTimeRangeRaw] = useState(
-    () =>
-      searchParams.get('range') ||
-      localStorage.getItem('ccu-time-range') ||
-      '24h'
-  );
-  const setTimeRange = useCallback((v: string) => {
-    setTimeRangeRaw(v);
-    localStorage.setItem('ccu-time-range', v);
+  const [dateRange, setDateRangeRaw] = useState<DateRangeValue>(() => {
+    const fromUrl = searchParams.get('range');
+    const fromStorage = localStorage.getItem('ccu-time-range');
+    const preset = fromUrl || fromStorage || '24h';
+    return { type: 'preset', preset };
+  });
+  const setDateRange = useCallback((v: DateRangeValue) => {
+    setDateRangeRaw(v);
+    if (v.type === 'preset' && v.preset) {
+      localStorage.setItem('ccu-time-range', v.preset);
+    }
   }, []);
   const [displayMode, setDisplayModeRaw] = useState<'all' | 'users' | 'bots'>(
     () =>
@@ -329,12 +323,9 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   }, []);
 
   const getDateRange = useCallback(() => {
-    const opt = TIME_RANGES.find((r) => r.value === timeRange);
-    const hours = opt?.hours || 24;
-    const to = new Date();
-    const from = new Date(to.getTime() - hours * 3600000);
-    return { from, to };
-  }, [timeRange]);
+    const { start, end } = dateRangeToDatePair(dateRange);
+    return { from: start, to: end };
+  }, [dateRange]);
 
   // Track whether we've done the initial load (to avoid showing loading skeleton on refreshes)
   const hasLoadedRef = useRef(false);
@@ -363,7 +354,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     [projectApiPath, getDateRange]
   );
 
-  // Initial load or time range change — show loading skeleton
+  // Initial load or time range change ??show loading skeleton
   useEffect(() => {
     // Show loading skeleton only if time range changed or it's the first load
     const rangeChanged = prevGetDateRangeRef.current !== getDateRange;
@@ -371,7 +362,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     loadHistory(!hasLoadedRef.current || rangeChanged);
   }, [loadHistory]);
 
-  // Periodic refresh via refreshKey — update data silently without resetting chart
+  // Periodic refresh via refreshKey ??update data silently without resetting chart
   const prevRefreshKeyRef = useRef(refreshKey);
   useEffect(() => {
     if (prevRefreshKeyRef.current !== refreshKey && hasLoadedRef.current) {
@@ -383,11 +374,12 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   // Persist range to URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
-    if (timeRange !== '24h') params.set('range', timeRange);
+    const preset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : 'custom';
+    if (preset !== '24h') params.set('range', preset);
     else params.delete('range');
     params.set('tab', '1');
     setSearchParams(params, { replace: true });
-  }, [timeRange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dateRange]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build chart data
   const chartData = useMemo(() => {
@@ -579,22 +571,11 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             </IconButton>
           </Tooltip>
         </Stack>
-        <ToggleButtonGroup
-          value={timeRange}
-          exclusive
-          onChange={(_, v) => v && setTimeRange(v)}
-          size="small"
-        >
-          {TIME_RANGES.map((r) => (
-            <ToggleButton
-              key={r.value}
-              value={r.value}
-              sx={{ px: 1.5, py: 0.5, textTransform: 'none' }}
-            >
-              {r.label}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        <DateRangeSelector
+          value={dateRange}
+          onChange={setDateRange}
+          compact
+        />
       </Box>
 
       <PageContentLoader loading={loading}>

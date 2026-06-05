@@ -1,0 +1,118 @@
+import Fastify, { FastifyInstance } from 'fastify';
+import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
+import rateLimit from '@fastify/rate-limit';
+import { config } from './config';
+import { createLogger } from './utils/logger';
+import ingestRoutes from './routes/ingest';
+import issuesRoutes from './routes/issues';
+import projectsRoutes from './routes/projects';
+import overviewRoutes from './routes/overview';
+import performanceRoutes from './routes/performance';
+import sessionsRoutes from './routes/sessions';
+import feedbackRoutes from './routes/feedback';
+import releasesRoutes from './routes/releases';
+import alertsRoutes from './routes/alerts';
+import logsRoutes from './routes/logs';
+import sourcemapsRoutes from './routes/sourcemaps';
+import discoverRoutes from './routes/discover';
+import integrationsRoutes from './routes/integrations';
+import dashboardRoutes from './routes/dashboards';
+import issueTrackersRoutes from './routes/issue-trackers';
+import tracesRoutes from './routes/traces';
+import metricsRoutes from './routes/metrics';
+import globalIntegrationsRoutes from './routes/global-integrations';
+import githubAppRoutes from './routes/github-app';
+import notificationChannelsRoutes from './routes/notification-channels';
+import cronsRoutes from './routes/crons';
+import uptimeRoutes from './routes/uptime';
+
+const logger = createLogger('app');
+
+export async function createApp(): Promise<FastifyInstance> {
+  const app = Fastify({
+    logger: false,
+    trustProxy: true,
+    bodyLimit: 2097152, // 2MB — batch payloads can be larger
+  });
+
+  // Error handler
+  app.setErrorHandler((error, _request, reply) => {
+    logger.error('Unhandled request error', {
+      message: error.message,
+      stack: error.stack,
+      statusCode: error.statusCode,
+    });
+    reply.code(error.statusCode || 500).send({
+      error: error.name || 'InternalServerError',
+      message:
+        config.nodeEnv === 'production'
+          ? 'Internal Server Error'
+          : error.message,
+    });
+  });
+
+  // CORS
+  await app.register(cors, {
+    origin: true,
+    credentials: true,
+  });
+
+  // Security headers
+  await app.register(helmet, {
+    contentSecurityPolicy: false,
+  });
+
+  // Rate limiting
+  await app.register(rateLimit, {
+    max: config.rateLimit.max,
+    timeWindow: config.rateLimit.timeWindow,
+    redis: await import('./config/redis').then((m) => m.redis),
+  });
+
+  // Health check
+  app.get('/health', async () => ({
+    status: 'ok',
+    service: 'argus-api',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  }));
+
+  // Routes
+  await app.register(ingestRoutes, { prefix: '/argus/api' });
+  await app.register(issuesRoutes, { prefix: '/argus/api' });
+  await app.register(projectsRoutes, { prefix: '/argus/api' });
+  await app.register(overviewRoutes, { prefix: '/argus/api' });
+  await app.register(performanceRoutes, { prefix: '/argus/api' });
+  await app.register(sessionsRoutes, { prefix: '/argus/api' });
+  await app.register(feedbackRoutes, { prefix: '/argus/api' });
+  await app.register(releasesRoutes, { prefix: '/argus/api' });
+  await app.register(alertsRoutes, { prefix: '/argus/api' });
+  await app.register(logsRoutes, { prefix: '/argus/api' });
+  await app.register(sourcemapsRoutes, { prefix: '/argus/api' });
+  await app.register(discoverRoutes, { prefix: '/argus/api' });
+  await app.register(integrationsRoutes, { prefix: '/argus/api' });
+  await app.register(dashboardRoutes, { prefix: '/argus/api' });
+  await app.register(issueTrackersRoutes, { prefix: '/argus/api' });
+  await app.register(tracesRoutes, { prefix: '/argus/api' });
+  await app.register(metricsRoutes, { prefix: '/argus/api' });
+  await app.register(globalIntegrationsRoutes, { prefix: '/argus/api' });
+  await app.register(githubAppRoutes, { prefix: '/argus/api' });
+  await app.register(notificationChannelsRoutes, { prefix: '/argus/api' });
+  await app.register(cronsRoutes, { prefix: '/argus/api/projects' });
+  await app.register(uptimeRoutes, { prefix: '/argus/api/projects' });
+
+  // 404 handler
+  app.setNotFoundHandler((request, reply) => {
+    reply.code(404).send({
+      error: 'Not Found',
+      message: `Route ${request.method} ${request.url} not found`,
+    });
+  });
+
+  logger.info('Fastify app created');
+
+  return app;
+}
+
+export default createApp;

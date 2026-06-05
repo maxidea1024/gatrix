@@ -1276,7 +1276,6 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       fill="#fff"
                       fontSize="10"
                       fontWeight="bold"
-                      fontFamily="D2Coding, monospace"
                     >
                       {(service.labels.service || '')
                         .substring(0, 7)
@@ -1289,7 +1288,6 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       textAnchor="middle"
                       fill="rgba(255,255,255,0.9)"
                       fontSize="9"
-                      fontFamily="D2Coding, monospace"
                     >
                       {(service.hostname || '').substring(0, 8)}
                     </text>

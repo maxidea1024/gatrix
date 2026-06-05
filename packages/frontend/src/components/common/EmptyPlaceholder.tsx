@@ -7,13 +7,14 @@ interface EmptyPlaceholderProps {
   message: string;
   /** Optional description text below the message */
   description?: string;
+  /** Optional icon element to display above the message */
+  icon?: React.ReactNode;
   /** If provided, shows an add button */
   onAddClick?: () => void;
   /** Label for the add button */
   addButtonLabel?: string;
   /** Button variant (default: 'contained') */
   addButtonVariant?: 'text' | 'contained' | 'outlined';
-  /** Custom content to render instead of the default add button */
   /** Custom content to render instead of the default add button */
   children?: React.ReactNode;
   /** Minimum height of the placeholder */
@@ -30,6 +31,7 @@ interface EmptyPlaceholderProps {
 const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
   message,
   description,
+  icon,
   onAddClick,
   addButtonLabel,
   addButtonVariant = 'contained',
@@ -51,10 +53,14 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         border: '2px dashed',
         borderColor: 'divider',
         borderRadius: '4px',
-        bgcolor: 'action.hover',
         ...sx,
       }}
     >
+      {icon && (
+        <Box sx={{ mb: 1, color: 'text.disabled', display: 'flex', justifyContent: 'center' }}>
+          {icon}
+        </Box>
+      )}
       <Typography variant="subtitle1" color="text.secondary" fontWeight={500}>
         {message}
       </Typography>

@@ -48,9 +48,7 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
   ViewColumn as ViewColumnIcon,
-  List as ListIcon,
-  ContentCopy as ContentCopyIcon,
-  Code as CodeIcon,
+  List as ListIcon,Code as CodeIcon,
   CardGiftcard as CardGiftcardIcon,
   HourglassEmpty as HourglassEmptyIcon,
   Download as DownloadIcon,
@@ -95,6 +93,7 @@ import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 import { useGameWorld } from '@/contexts/GameWorldContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { CopyButton } from '@/components/common/CopyButton';
 
 import DynamicFilterBar, {
   FilterDefinition,
@@ -1728,20 +1727,7 @@ const CouponSettingsPage: React.FC = () => {
                                     >
                                       {it.name}
                                     </Typography>
-                                    <Tooltip
-                                      title={t(
-                                        'coupons.couponSettings.copyName'
-                                      )}
-                                    >
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => handleCopyName(it.name)}
-                                      >
-                                        <ContentCopyIcon
-                                          sx={{ fontSize: 13 }}
-                                        />
-                                      </IconButton>
-                                    </Tooltip>
+                                    <CopyButton text={it.name} size={13} />
                                   </Box>
                                 </TableCell>
                               );
@@ -1776,22 +1762,7 @@ const CouponSettingsPage: React.FC = () => {
                                         />
                                       </Tooltip>
                                       {it.code && (
-                                        <Tooltip
-                                          title={t(
-                                            'coupons.couponSettings.copyCode'
-                                          )}
-                                        >
-                                          <IconButton
-                                            size="small"
-                                            onClick={() =>
-                                              handleCopyCode(it.code!)
-                                            }
-                                          >
-                                            <ContentCopyIcon
-                                              sx={{ fontSize: 13 }}
-                                            />
-                                          </IconButton>
-                                        </Tooltip>
+                                        <CopyButton text={it.code!} size={13} />
                                       )}
                                     </Box>
                                   ) : (
@@ -3526,20 +3497,11 @@ const CouponSettingsPage: React.FC = () => {
                               >
                                 <Typography
                                   variant="caption"
-                                  sx={{ fontFamily: 'monospace' }}
+                                  
                                 >
                                   {c.code}
                                 </Typography>
-                                <Tooltip
-                                  title={t('coupons.couponSettings.copyCode')}
-                                >
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleCopyCode(c.code)}
-                                  >
-                                    <ContentCopyIcon sx={{ fontSize: 13 }} />
-                                  </IconButton>
-                                </Tooltip>
+                                <CopyButton text={c.code} size={13} />
                               </Box>
                             </TableCell>
                             <TableCell sx={{ py: 1, px: 2 }}>

@@ -445,8 +445,6 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({
                       color: (theme) =>
                         theme.palette.mode === 'dark' ? '#e6e6e6' : '#333333',
                       borderRadius: 1,
-                      fontFamily:
-                        'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
                       fontSize: '0.85rem',
                       whiteSpace: 'pre-wrap',
                       overflowX: 'auto',
@@ -474,7 +472,6 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({
                       p: 2,
                       bgcolor: 'action.hover',
                       borderRadius: 1,
-                      fontFamily: 'monospace',
                       fontSize: '0.85rem',
                       whiteSpace: 'pre-wrap',
                       border: 1,

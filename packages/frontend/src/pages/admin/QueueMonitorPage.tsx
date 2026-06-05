@@ -539,7 +539,6 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                               ? 'primary.main'
                               : 'text.primary',
                           mb: 0.5,
-                          fontFamily: 'monospace',
                           fontSize: '0.85rem',
                         }}
                       >
@@ -738,7 +737,6 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                         <Typography
                                           variant="body2"
                                           sx={{
-                                            fontFamily: 'monospace',
                                             fontWeight: 600,
                                             fontSize: '0.8rem',
                                           }}
@@ -753,7 +751,6 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                           size="small"
                                           label={rj.pattern}
                                           sx={{
-                                            fontFamily: 'monospace',
                                             height: 22,
                                             bgcolor: (theme) =>
                                               alpha(
@@ -919,7 +916,6 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                       <Typography
                                         variant="body2"
                                         sx={{
-                                          fontFamily: 'monospace',
                                           fontSize: '0.75rem',
                                         }}
                                       >
@@ -938,7 +934,6 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                         }
                                         variant="outlined"
                                         sx={{
-                                          fontFamily: 'monospace',
                                           height: 22,
                                           '& .MuiChip-icon': {
                                             fontSize: 14,
@@ -1096,7 +1091,7 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             >
               <Typography
                 variant="body2"
-                sx={{ fontFamily: 'monospace', fontWeight: 700, mb: 0.5 }}
+                sx={{ fontWeight: 700, mb: 0.5 }}
               >
                 {deleteWarningTarget.name}
               </Typography>

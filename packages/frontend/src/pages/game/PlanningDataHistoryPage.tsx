@@ -495,7 +495,6 @@ const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({
                                 }}
                                 sx={{
                                   cursor: 'pointer',
-                                  fontFamily: 'monospace',
                                   borderRadius: 1,
                                   bgcolor: 'background.paper',
                                   '&:hover': { bgcolor: 'action.hover' },
@@ -649,7 +648,6 @@ const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({
                                                         borderCollapse:
                                                           'collapse',
                                                         fontSize: '0.75rem',
-                                                        fontFamily: 'monospace',
                                                         border: '1px solid',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
@@ -799,7 +797,6 @@ const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({
                                                         borderCollapse:
                                                           'collapse',
                                                         fontSize: '0.75rem',
-                                                        fontFamily: 'monospace',
                                                         border: '1px solid',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
@@ -920,7 +917,6 @@ const PlanningDataHistoryPage: React.FC<PlanningDataHistoryPageProps> = ({
                                                         borderCollapse:
                                                           'collapse',
                                                         fontSize: '0.75rem',
-                                                        fontFamily: 'monospace',
                                                         border: '1px solid',
                                                         borderColor: 'divider',
                                                         '& th, & td': {

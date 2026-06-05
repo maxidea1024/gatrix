@@ -72,10 +72,10 @@ import { apiService } from '../../services/api';
 import EnvironmentCopyDialog from '../../components/EnvironmentCopyDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import PageContentLoader from '../../components/common/PageContentLoader';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
+import { CopyButton } from '@/components/common/CopyButton';
 
 interface EnvironmentsPageProps {
   /** When true, renders without outer padding and breadcrumbs */
@@ -777,7 +777,6 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
                               cursor: 'pointer',
                               '&:hover': {
                                 color: 'primary.main',
@@ -788,30 +787,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                           >
                             {env.environmentName}
                           </Typography>
-                          <Tooltip title={t('common.copy')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                copyToClipboardWithNotification(
-                                  env.environmentName,
-                                  () =>
-                                    enqueueSnackbar(
-                                      t('common.copiedToClipboard'),
-                                      {
-                                        variant: 'success',
-                                      }
-                                    ),
-                                  () =>
-                                    enqueueSnackbar(t('common.copyFailed'), {
-                                      variant: 'error',
-                                    })
-                                );
-                              }}
-                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
-                            >
-                              <CopyIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                          </Tooltip>
+                          <CopyButton text={env.environmentName} size={13} />
                         </Box>
                       </TableCell>
                       <TableCell>
@@ -1509,7 +1485,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                   }
                   style={{ width: 50, height: 40, cursor: 'pointer' }}
                 />
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                <Typography variant="body2" >
                   {editEnv.color || '#2e7d32'}
                 </Typography>
               </Box>

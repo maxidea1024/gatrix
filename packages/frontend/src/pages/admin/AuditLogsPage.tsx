@@ -88,10 +88,7 @@ import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
-import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, {
-  DateRangePreset,
-} from '../../components/common/DateRangePicker';
+import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -184,7 +181,7 @@ const AuditLogsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
 
-  // 페이지 State management (localStorage 연동)
+  // ?�이지 State management (localStorage ?�동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -218,27 +215,20 @@ const AuditLogsPage: React.FC = () => {
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Date range state
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.start_date
-      ? dayjs(pageState.filters.start_date)
-      : dayjs().subtract(7, 'day')
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : dayjs()
-  );
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>('last7d');
 
-  // Filters - localStorage에서 복원
+  // Filters - localStorage?�서 복원
   const [userFilter, setUserFilter] = useState<string>(
     pageState.filters?.user || ''
   );
 
-  // 동적 Filter Status
+  // ?�적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // Debouncing된 Search어 (500ms 지연)
+  // Debouncing??Search??(500ms 지??
   const debouncedUserFilter = useDebounce(userFilter, 500);
 
   // Column configuration
@@ -318,12 +308,9 @@ const AuditLogsPage: React.FC = () => {
       setLoading(true);
 
       const dateFilters: AuditLogFilters = { ...pageState.filters };
-      if (dateFrom) {
-        dateFilters.start_date = dateFrom.toISOString();
-      }
-      if (dateTo) {
-        dateFilters.end_date = dateTo.toISOString();
-      }
+      const { start, end } = dateRangeToDatePair(dateRange);
+      dateFilters.start_date = start.toISOString();
+      dateFilters.end_date = end.toISOString();
       if (debouncedUserFilter) {
         (dateFilters as any).user = debouncedUserFilter.trim();
       }
@@ -375,8 +362,7 @@ const AuditLogsPage: React.FC = () => {
     }
   }, [
     pageState,
-    dateFrom,
-    dateTo,
+    dateRange,
     debouncedUserFilter,
     activeFilters,
     enqueueSnackbar,
@@ -389,7 +375,7 @@ const AuditLogsPage: React.FC = () => {
 
   // Handlers
   const handlePageChange = (event: unknown, newPage: number) => {
-    updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
+    updatePage(newPage + 1); // MUI??0부???�작, ?�리??1부???�작
   };
 
   const handleRowsPerPageChange = (
@@ -411,7 +397,7 @@ const AuditLogsPage: React.FC = () => {
     loadAuditLogs();
   };
 
-  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
+  // ?�이지 로드 ??pageState.filters?�서 activeFilters 복원
   useEffect(() => {
     if (filtersInitialized) return;
 
@@ -595,7 +581,7 @@ const AuditLogsPage: React.FC = () => {
         );
       case 'ipAddress':
         return (
-          <Typography variant="body2" fontFamily="monospace">
+          <Typography variant="body2">
             {log.ipAddress || '-'}
           </Typography>
         );
@@ -682,26 +668,10 @@ const AuditLogsPage: React.FC = () => {
           }}
         >
           {/* Date Range Picker */}
-          <DateRangePicker
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            onChange={(from, to, preset) => {
-              setDateFrom(from);
-              setDateTo(to);
-              setDateRangePreset(preset);
-            }}
-            preset={dateRangePreset}
-            availablePresets={[
-              'today',
-              'yesterday',
-              'last7d',
-              'last30d',
-              'last3m',
-              'last6m',
-              'last12m',
-              'custom',
-            ]}
-            size="small"
+          <DateRangeSelector
+            value={dateRange}
+            onChange={setDateRange}
+            compact
           />
 
           {/* Search */}
@@ -901,7 +871,7 @@ const AuditLogsPage: React.FC = () => {
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
@@ -947,7 +917,6 @@ const AuditLogsPage: React.FC = () => {
                                             variant="body2"
                                             color="text.secondary"
                                             sx={{
-                                              fontFamily: 'monospace',
                                               fontSize: '0.8rem',
                                             }}
                                           >
@@ -1022,7 +991,6 @@ const AuditLogsPage: React.FC = () => {
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: 'monospace',
                                                     color: 'text.secondary',
                                                   }}
                                                 >
@@ -1052,7 +1020,7 @@ const AuditLogsPage: React.FC = () => {
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                      sx={{ mt: 0.5}}
                                     >
                                       {log.ipAddress || '-'}
                                     </Typography>
@@ -1079,7 +1047,6 @@ const AuditLogsPage: React.FC = () => {
                                           sx={{
                                             mt: 0.5,
                                             wordBreak: 'break-all',
-                                            fontFamily: 'monospace',
                                             fontSize: '0.75rem',
                                             color: 'text.secondary',
                                           }}
@@ -1233,8 +1200,6 @@ const AuditLogsPage: React.FC = () => {
                                                           <TableCell
                                                             sx={{
                                                               fontWeight: 500,
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                             }}
@@ -1243,8 +1208,6 @@ const AuditLogsPage: React.FC = () => {
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1270,8 +1233,6 @@ const AuditLogsPage: React.FC = () => {
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                'monospace',
                                                               fontSize:
                                                                 '0.75rem',
                                                               bgcolor: alpha(
@@ -1349,7 +1310,6 @@ const AuditLogsPage: React.FC = () => {
                                                 style={{
                                                   margin: 0,
                                                   fontSize: '0.75rem',
-                                                  fontFamily: 'monospace',
                                                   color:
                                                     theme.palette.text.primary,
                                                 }}
@@ -1410,7 +1370,6 @@ const AuditLogsPage: React.FC = () => {
                                                 style={{
                                                   margin: 0,
                                                   fontSize: '0.75rem',
-                                                  fontFamily: 'monospace',
                                                   color:
                                                     theme.palette.text.primary,
                                                 }}
@@ -1440,7 +1399,7 @@ const AuditLogsPage: React.FC = () => {
 
               <SimplePagination
                 count={total}
-                page={pageState.page - 1} // MUI는 0부터 시작
+                page={pageState.page - 1} // MUI??0부???�작
                 rowsPerPage={pageState.limit}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

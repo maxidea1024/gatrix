@@ -36,7 +36,7 @@ import {
   TextField,
 } from '@mui/material';
 import {
-  ContentCopy as CopyIcon,
+
   Refresh as RefreshIcon,
   UnfoldMore as GroupIcon,
   FiberManualRecord as OnlineIcon,
@@ -50,6 +50,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useSearchParams } from 'react-router-dom';
+import { CopyButton } from '@/components/common/CopyButton';
 import SearchTextField from '../common/SearchTextField';
 import SimplePagination from '../common/SimplePagination';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
@@ -828,15 +829,6 @@ export default function AllCharactersTab({
     return Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
   }, [data.users, groupBy, t]);
 
-  // ── Copy ──
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    enqueueSnackbar(t('common.copied'), {
-      variant: 'success',
-      autoHideDuration: 1500,
-    });
-  };
-
   // ── Visible columns ──
   const visibleColumns = columns.filter((c) => c.visible);
 
@@ -849,7 +841,6 @@ export default function AllCharactersTab({
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'monospace',
                 cursor: 'pointer',
                 '&:hover': {
                   color: 'primary.main',
@@ -863,13 +854,9 @@ export default function AllCharactersTab({
             >
               {user.userId}
             </Typography>
-            <IconButton
-              size="small"
-              onClick={() => copyToClipboard(String(user.userId))}
+            <CopyButton text={String(user.userId)} size={13}
               sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-            >
-              <CopyIcon sx={{ fontSize: 13 }} />
-            </IconButton>
+            />
           </Box>
         );
       case 'name':
@@ -893,13 +880,9 @@ export default function AllCharactersTab({
               {user.name || '-'}
             </Typography>
             {user.name && (
-              <IconButton
-                size="small"
-                onClick={() => copyToClipboard(user.name)}
+              <CopyButton text={user.name} size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
+              />
             )}
           </Box>
         );
@@ -909,7 +892,6 @@ export default function AllCharactersTab({
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
                 '&:hover': {
@@ -925,13 +907,9 @@ export default function AllCharactersTab({
               {user.characterId || '-'}
             </Typography>
             {user.characterId && (
-              <IconButton
-                size="small"
-                onClick={() => copyToClipboard(user.characterId)}
+              <CopyButton text={user.characterId} size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
+              />
             )}
           </Box>
         );
@@ -941,7 +919,6 @@ export default function AllCharactersTab({
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
                 '&:hover': {
@@ -957,13 +934,9 @@ export default function AllCharactersTab({
               {user.accountId || '-'}
             </Typography>
             {user.accountId && (
-              <IconButton
-                size="small"
-                onClick={() => copyToClipboard(user.accountId)}
+              <CopyButton text={user.accountId} size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
+              />
             )}
           </Box>
         );
@@ -972,13 +945,9 @@ export default function AllCharactersTab({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="body2">{user.worldId || '-'}</Typography>
             {user.worldId && (
-              <IconButton
-                size="small"
-                onClick={() => copyToClipboard(user.worldId)}
+              <CopyButton text={user.worldId} size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
+              />
             )}
           </Box>
         );
@@ -987,13 +956,9 @@ export default function AllCharactersTab({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="body2">{user.nationCmsId || '-'}</Typography>
             {user.nationCmsId !== 0 && user.nationCmsId && (
-              <IconButton
-                size="small"
-                onClick={() => copyToClipboard(String(user.nationCmsId))}
+              <CopyButton text={String(user.nationCmsId)} size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-              >
-                <CopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
+              />
             )}
           </Box>
         );
@@ -1044,7 +1009,7 @@ export default function AllCharactersTab({
         return (
           <Typography
             variant="body2"
-            sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+            sx={{ fontSize: '0.75rem' }}
           >
             {user.clientVersion || '-'}
           </Typography>
@@ -1182,7 +1147,6 @@ export default function AllCharactersTab({
                   resize: 'both',
                   overflow: 'auto',
                   fontSize: '0.85rem',
-                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
                   fontWeight: 500,
                 },
               }}
@@ -1524,20 +1488,9 @@ export default function AllCharactersTab({
                               {displayValue}
                             </Typography>
                             {displayValue !== '-' && (
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  copyToClipboard(String(rawValue ?? ''))
-                                }
-                                sx={{
-                                  opacity: 0.4,
-                                  '&:hover': { opacity: 1 },
-                                  ml: 1,
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <CopyIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
+                              <CopyButton text={String(rawValue ?? '')} size={13}
+                                sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, ml: 1, flexShrink: 0 }}
+                              />
                             )}
                           </Box>
                         </TableCell>
@@ -1550,24 +1503,10 @@ export default function AllCharactersTab({
           )}
         </DialogContent>
         <DialogActions sx={{ px: 2, pb: 2 }}>
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<CopyIcon />}
-            onClick={() => {
-              if (detailUser) {
-                navigator.clipboard.writeText(
-                  JSON.stringify(detailUser, null, 2)
-                );
-                enqueueSnackbar(t('common.copied'), {
-                  variant: 'success',
-                  autoHideDuration: 1500,
-                });
-              }
-            }}
-          >
-            {t('common.copyJson')}
-          </Button>
+          <CopyButton
+            text={detailUser ? JSON.stringify(detailUser, null, 2) : ''}
+            tooltip={t('common.copyJson')}
+          />
         </DialogActions>
       </Dialog>
 

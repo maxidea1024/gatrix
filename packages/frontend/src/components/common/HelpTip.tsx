@@ -107,7 +107,6 @@ const HelpTip: React.FC<HelpTipProps> = ({
                         px: 0.5,
                         py: 0.25,
                         borderRadius: 0.5,
-                        fontFamily: 'monospace',
                         fontSize: '0.8rem',
                       },
                       '& .good': { color: 'success.main' },

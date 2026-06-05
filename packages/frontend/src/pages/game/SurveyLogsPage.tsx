@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import {
   History as HistoryIcon,
-  ContentCopy as ContentCopyIcon,
   ViewColumn as ViewColumnIcon,
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
@@ -31,14 +30,14 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import SimplePagination from '@/components/common/SimplePagination';
 import SearchTextField from '@/components/common/SearchTextField';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { CopyButton } from '@/components/common/CopyButton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePageState } from '@/hooks/usePageState';
 import RewardDisplay from '@/components/game/RewardDisplay';
-import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, {
-  DateRangePreset,
-} from '@/components/common/DateRangePicker';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '@/components/common/DateRangeSelector';
 import DynamicFilterBar, {
   ActiveFilter,
   FilterDefinition,
@@ -129,11 +128,7 @@ const SurveyLogsPage: React.FC = () => {
     defaultState: {
       page: 1,
       limit: 50,
-      filters: {
-        dateRangePreset: 'last7d',
-        startDate: dayjs().subtract(7, 'day').startOf('day').toISOString(),
-        endDate: dayjs().endOf('day').toISOString(),
-      },
+      filters: {},
     },
     storageKey: 'surveyLogsState',
   });
@@ -146,18 +141,8 @@ const SurveyLogsPage: React.FC = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // Date Range State
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.startDate
-      ? dayjs(pageState.filters.startDate)
-      : dayjs().subtract(7, 'day').startOf('day')
-  );
-  const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.endDate
-      ? dayjs(pageState.filters.endDate)
-      : dayjs().endOf('day')
-  );
-  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>(
-    pageState.filters?.dateRangePreset || 'last7d'
+  const [dateRange, setDateRange] = useState<DateRangeValue>(
+    () => ({ type: 'preset', preset: '7d' })
   );
 
   // active filters
@@ -345,16 +330,7 @@ const SurveyLogsPage: React.FC = () => {
     localStorage.setItem('surveyLogsColumns', JSON.stringify(defaultColumns));
   };
 
-  // Copy to clipboard handler
-  const handleCopy = (text: string | undefined) => {
-    if (!text) return;
-    copyToClipboardWithNotification(
-      text,
-      () =>
-        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-    );
-  };
+
 
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters((prev) => [...prev, filter]);
@@ -373,19 +349,13 @@ const SurveyLogsPage: React.FC = () => {
     updateFilters({ ...pageState.filters, [filterKey]: value });
   };
 
-  const handleDateRangeChange = (
-    from: Dayjs | null,
-    to: Dayjs | null,
-    preset: DateRangePreset
-  ) => {
-    setDateFrom(from);
-    setDateTo(to);
-    setDateRangePreset(preset);
+  const handleDateRangeChange = (newDateRange: DateRangeValue) => {
+    setDateRange(newDateRange);
+    const { start, end } = dateRangeToDatePair(newDateRange);
     updateFilters({
       ...pageState.filters,
-      startDate: from ? from.toISOString() : undefined,
-      endDate: to ? to.toISOString() : undefined,
-      dateRangePreset: preset,
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
     });
   };
 
@@ -457,11 +427,7 @@ const SurveyLogsPage: React.FC = () => {
             <Typography variant="body2">
               {getSurveyTitle(r.surveyId)}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => handleCopy(r.surveyId)}>
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.surveyId} size={13} />
           </Box>
         );
       case 'action':
@@ -487,11 +453,7 @@ const SurveyLogsPage: React.FC = () => {
             >
               {r.accountId}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => handleCopy(r.accountId)}>
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.accountId} size={13} />
           </Box>
         );
       case 'userName':
@@ -508,14 +470,7 @@ const SurveyLogsPage: React.FC = () => {
             >
               {r.userName}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={() => handleCopy(r.userName || '')}
-              >
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.userName || ''} size={13} />
           </Box>
         ) : (
           '-'
@@ -534,14 +489,7 @@ const SurveyLogsPage: React.FC = () => {
             >
               {r.characterId}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton
-                size="small"
-                onClick={() => handleCopy(r.characterId!)}
-              >
-                <ContentCopyIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-            </Tooltip>
+            <CopyButton text={r.characterId!} size={13} />
           </Box>
         ) : (
           '-'
@@ -622,19 +570,10 @@ const SurveyLogsPage: React.FC = () => {
                     flexShrink: 0,
                   }}
                 >
-                  <DateRangePicker
-                    dateFrom={dateFrom}
-                    dateTo={dateTo}
-                    preset={dateRangePreset}
+                  <DateRangeSelector
+                    value={dateRange}
                     onChange={handleDateRangeChange}
-                    availablePresets={[
-                      'today',
-                      'yesterday',
-                      'last7d',
-                      'last30d',
-                      'custom',
-                    ]}
-                    size="small"
+                    compact
                   />
                   <Tooltip title={t('common.columnSettings')}>
                     <IconButton

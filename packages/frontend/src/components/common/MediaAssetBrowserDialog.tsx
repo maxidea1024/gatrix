@@ -26,7 +26,6 @@ import {
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
-  ContentCopy as CopyIcon,
   ViewModule as GridIcon,
   ViewList as ListIcon,
   Image as ImageIcon,
@@ -40,6 +39,7 @@ import {
 } from '../../services/mediaAssetService';
 import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { CopyButton } from '@/components/common/CopyButton';
 
 interface MediaAssetBrowserDialogProps {
   open: boolean;
@@ -330,18 +330,7 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
                       </Box>
                     }
                     actionIcon={
-                      <Tooltip title={t('common.copy')}>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopy(asset.cdnUrl);
-                          }}
-                          sx={{ color: 'rgba(255,255,255,0.7)' }}
-                        >
-                          <CopyIcon sx={{ fontSize: 13 }} />
-                        </IconButton>
-                      </Tooltip>
+                      <CopyButton text={asset.cdnUrl} size={13} />
                     }
                   />
                 </ImageListItem>

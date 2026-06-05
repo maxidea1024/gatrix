@@ -135,7 +135,7 @@ const ValueDisplay: React.FC<{ value: any }> = ({ value }) => {
     return (
       <Typography
         variant="body2"
-        sx={{ fontFamily: 'monospace', fontSize: 12 }}
+        sx={{ fontSize: 12 }}
       >
         {String(value)}
       </Typography>
@@ -146,7 +146,6 @@ const ValueDisplay: React.FC<{ value: any }> = ({ value }) => {
     <Typography
       variant="body2"
       sx={{
-        fontFamily: 'monospace',
         fontSize: 11,
         maxWidth: 300,
         overflow: 'hidden',
@@ -249,7 +248,6 @@ const VariantsDiff: React.FC<{
               <Typography
                 variant="body2"
                 sx={{
-                  fontFamily: 'monospace',
                   fontSize: 12,
                   textDecoration: 'line-through',
                   color: 'error.main',
@@ -266,7 +264,6 @@ const VariantsDiff: React.FC<{
               <Typography
                 variant="body2"
                 sx={{
-                  fontFamily: 'monospace',
                   fontSize: 12,
                   color: 'error.main',
                 }}
@@ -278,7 +275,6 @@ const VariantsDiff: React.FC<{
               <Typography
                 variant="body2"
                 sx={{
-                  fontFamily: 'monospace',
                   fontSize: 12,
                   color: 'error.main',
                 }}
@@ -316,7 +312,6 @@ const VariantsDiff: React.FC<{
                 <Typography
                   variant="body2"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: 12,
                     maxWidth: 120,
                     overflow: 'hidden',
@@ -333,7 +328,7 @@ const VariantsDiff: React.FC<{
                 ) : (
                   <Typography
                     variant="body2"
-                    sx={{ fontFamily: 'monospace', fontSize: 12 }}
+                    sx={{ fontSize: 12 }}
                   >
                     {v.weight}
                   </Typography>
@@ -507,7 +502,6 @@ const StrategiesDiff: React.FC<{
                 <Typography
                   variant="caption"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: 11,
                     fontWeight: 600,
                     color: 'text.secondary',
@@ -522,7 +516,6 @@ const StrategiesDiff: React.FC<{
                     <Typography
                       variant="caption"
                       sx={{
-                        fontFamily: 'monospace',
                         fontSize: 11,
                         color: 'error.main',
                         textDecoration: 'line-through',
@@ -536,7 +529,6 @@ const StrategiesDiff: React.FC<{
                     <Typography
                       variant="caption"
                       sx={{
-                        fontFamily: 'monospace',
                         fontSize: 11,
                         color: 'success.main',
                         fontWeight: 600,
@@ -548,7 +540,7 @@ const StrategiesDiff: React.FC<{
                 ) : (
                   <Typography
                     variant="caption"
-                    sx={{ fontFamily: 'monospace', fontSize: 11 }}
+                    sx={{ fontSize: 11 }}
                   >
                     {typeof v === 'object' ? JSON.stringify(v) : String(v)}
                   </Typography>
@@ -614,7 +606,6 @@ const StrategiesDiff: React.FC<{
                   <Typography
                     variant="body2"
                     sx={{
-                      fontFamily: 'monospace',
                       fontSize: 12,
                       maxWidth: 120,
                       overflow: 'hidden',
@@ -676,7 +667,6 @@ const StrategiesDiff: React.FC<{
                 <Typography
                   variant="body2"
                   sx={{
-                    fontFamily: 'monospace',
                     fontSize: 12,
                     color: isAdded ? 'text.primary' : 'error.main',
                     textDecoration: isAdded ? 'none' : 'line-through',

@@ -474,7 +474,6 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
                     </TableCell>
                     <TableCell
                       sx={{
-                        fontFamily: 'monospace',
                         fontSize: '0.75rem',
                         whiteSpace: 'nowrap',
                       }}
@@ -551,7 +550,6 @@ const HotTimeBuffDrawer: React.FC<HotTimeBuffDrawerProps> = ({
                     </TableCell>
                     <TableCell
                       sx={{
-                        fontFamily: 'monospace',
                         fontSize: '0.75rem',
                         whiteSpace: 'nowrap',
                       }}
