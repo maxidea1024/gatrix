@@ -213,7 +213,11 @@ const ArgusLogsSearchInput: React.FC<{
     const { start, end } = getWordAtCursor();
     const before = localSearch.slice(0, start);
     const after = localSearch.slice(end);
-    const joined = before + replacement + (after.startsWith(' ') ? after : ' ' + after.trimStart());
+    // Don't add space after ':' — user is about to type a value
+    const needsTrailingSpace = !replacement.endsWith(':');
+    const joined = needsTrailingSpace
+      ? before + replacement + (after.startsWith(' ') ? after : ' ' + after.trimStart())
+      : before + replacement + after;
     const result = joined.replace(/^ +/, '').replace(/ {2,}/g, ' ');
 
     setLocalSearch(result);

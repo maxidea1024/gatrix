@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Box, Typography, Popover, Divider, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -50,132 +50,154 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const highlightedRef = useRef<HTMLDivElement>(null);
 
-  // ─── Determine if popover should display ───
+  // ─── Editing Context State Machine ───
+  type EditingContext =
+    | { state: 'empty' }
+    | { state: 'typing_field'; partial: string }
+    | { state: 'typing_value'; field: string; partial: string }
+    | { state: 'has_field'; partial: string }
+    | { state: 'after_condition' }
+    | { state: 'after_operator' }
+    | { state: 'completed_value' }
+
+  const TOKEN_RE_SRC = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|"[^"]*$|'[^']*$|\S+))|(\bAND\b|\bOR\b)|(\S+)/g.source;
+
+  const getEditingContext = useCallback((q: string): EditingContext => {
+    if (!q.trim()) return { state: 'empty' };
+
+    // Check for key:value at end (actively editing a value)
+    const colonMatch = q.match(/([\w.-]+):([^\s]*)$/);
+    if (colonMatch) {
+      const [, field, val] = colonMatch;
+      if ((val.startsWith('"') && val.endsWith('"') && val.length >= 2) ||
+          (val.startsWith("'") && val.endsWith("'") && val.length >= 2)) {
+        return { state: 'completed_value' };
+      }
+      if (field === 'has') return { state: 'has_field', partial: val.toLowerCase() };
+      return { state: 'typing_value', field, partial: val.replace(/^["']/, '').toLowerCase() };
+    }
+
+    // Tokenize
+    const tokens: string[] = [];
+    let m: RegExpExecArray | null;
+    const re = new RegExp(TOKEN_RE_SRC, 'g');
+    while ((m = re.exec(q)) !== null) tokens.push(m[0]);
+
+    if (/\s$/.test(q)) {
+      // New token position (trailing space)
+      const last = (tokens[tokens.length - 1] || '').toUpperCase();
+      if (last === 'AND' || last === 'OR') return { state: 'after_operator' };
+      if (tokens.length > 0) return { state: 'after_condition' };
+      return { state: 'empty' };
+    }
+
+    // Typing something (no trailing space) → last token is being edited
+    const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
+    return { state: 'typing_field', partial: lastToken };
+  }, []);
+
+  const editingContext = useMemo(() => getEditingContext(query), [query, getEditingContext]);
+
+  // ─── Should show popover ───
   const shouldShowPopover = useMemo(() => {
     if (!open || !anchorEl) return false;
-    const colonMatch = query.match(/([\w.-]+):([^\s]*)$/);
-    if (colonMatch) {
-      const val = colonMatch[2];
-      // Completed quoted value: key:"value" — hide
-      if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) return false;
-      if (val.startsWith("'") && val.endsWith("'") && val.length >= 2) return false;
-      return true; // Stage 2: actively typing a value
+    if (editingContext.state === 'completed_value') return false;
+    // If typing a field and nothing matches, hide
+    if (editingContext.state === 'typing_field') {
+      const p = editingContext.partial;
+      const anyField = fields.some(f => f.toLowerCase().includes(p));
+      const anySyntax = ['and', 'or'].some(s => s.includes(p));
+      const anyHas = 'has'.includes(p);
+      if (!anyField && !anySyntax && !anyHas) return false;
     }
-    // Stage 1: field/syntax suggestions
-    // Key insight: if query ends with whitespace, cursor is at a NEW token position
-    const isNewTokenPos = query.length === 0 || /\s$/.test(query);
-    const tokenRe2 = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|"[^"]*$|'[^']*$|\S+))|(\bAND\b|\bOR\b)|(\S+)/g;
-    const allTokens2: string[] = [];
-    let m2: RegExpExecArray | null;
-    while ((m2 = tokenRe2.exec(query)) !== null) allTokens2.push(m2[0]);
-    const lastToken = isNewTokenPos ? '' : (allTokens2[allTokens2.length - 1] || '').toLowerCase();
-    // Empty or new-token position → always show fields
-    if (!lastToken) return true;
-    // Typing a partial token → only show if it matches something
-    const hasMatchingFields = fields.some(f => f.toLowerCase().includes(lastToken));
-    const hasMatchingSyntax = ['AND', 'OR'].some(s => s.toLowerCase().includes(lastToken));
-    const showHas = 'has'.includes(lastToken);
-    return hasMatchingFields || hasMatchingSyntax || showHas;
-  }, [open, anchorEl, query, fields]);
+    return true;
+  }, [open, anchorEl, editingContext, fields]);
 
-  // ─── Compute flat selectable items list ───
+  // ─── Compute items ───
   const items = useMemo((): AutocompleteItem[] => {
     if (!shouldShowPopover) return [];
-
-    const colonMatch = query.match(/([\w.-]+):([^\s]*)$/);
-
-    // has: special case — suggest field names
-    if (colonMatch && colonMatch[1] === 'has') {
-      const partial = colonMatch[2].toLowerCase();
-      const matched = partial ? fields.filter(f => f.toLowerCase().includes(partial)) : fields;
-      return matched.map(f => ({
-        key: `has-${f}`, type: 'has-field' as const, label: f,
-        action: () => onSelectTag('has', f),
-      }));
-    }
-
-    // Stage 2: field:value — show facet values
-    if (colonMatch) {
-      const fieldKey = colonMatch[1];
-      const partialValue = colonMatch[2].replace(/^["']/, '').toLowerCase();
-      const values = (facets[fieldKey] || []) as SearchAutocompleteFacet[];
-      const filtered = partialValue
-        ? values.filter(v => v.value?.toLowerCase().includes(partialValue))
-        : values;
-      const totalCount = filtered.reduce((s, x) => s + x.count, 0);
-      return filtered.slice(0, 10).map(v => ({
-        key: `val-${v.value}`, type: 'value' as const,
-        label: v.value || '(empty)', fieldKey,
-        count: v.count,
-        pct: totalCount > 0 ? (v.count / totalCount) * 100 : 0,
-        action: () => onSelectTag(fieldKey, v.value),
-      }));
-    }
-
-    // Stage 1: field/syntax suggestions
     const result: AutocompleteItem[] = [];
-    // Proper tokenizer: keeps key:"value" together, matches AND/OR, bare words
-    const isNewTokenPos = query.length === 0 || /\s$/.test(query);
-    const tokenRe = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|"[^"]*$|'[^']*$|\S+))|(\bAND\b|\bOR\b)|(\S+)/g;
-    const allTokens: string[] = [];
-    let tokenMatch: RegExpExecArray | null;
-    while ((tokenMatch = tokenRe.exec(query)) !== null) {
-      allTokens.push(tokenMatch[0]);
-    }
-    const lastToken = isNewTokenPos ? '' : (allTokens[allTokens.length - 1] || '').toLowerCase();
-    const completedTokens = isNewTokenPos ? allTokens : allTokens.slice(0, -1);
-    const prevCompleted = (completedTokens[completedTokens.length - 1] || '').toUpperCase();
+    const ctx = editingContext;
 
-    // Recent searches (only when no active token and query is empty/minimal)
-    if (!lastToken && recentSearches.length > 0 && completedTokens.length === 0) {
-      recentSearches.slice(0, 5).forEach((q, i) => {
-        result.push({
-          key: `recent-${i}`, type: 'recent', label: q,
-          action: () => onSelectRecentSearch?.(q),
+    const addAllFields = () => {
+      fields.forEach(f => result.push({ key: `field-${f}`, type: 'field', label: f, action: () => onSelectField(f) }));
+      result.push({ key: 'field-has', type: 'has-field', label: 'has', sublabel: t('argus.discover.hasDesc', 'Find events with this tag'), action: () => onSelectField('has') });
+    };
+
+    switch (ctx.state) {
+      case 'empty': {
+        if (recentSearches.length > 0) {
+          recentSearches.slice(0, 5).forEach((q, i) => {
+            result.push({ key: `recent-${i}`, type: 'recent', label: q, action: () => onSelectRecentSearch?.(q) });
+          });
+        }
+        addAllFields();
+        break;
+      }
+
+      case 'typing_field': {
+        const p = ctx.partial;
+        // Tokenize to decide whether AND/OR is relevant
+        const re = new RegExp(TOKEN_RE_SRC, 'g');
+        const tokens: string[] = [];
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(query)) !== null) tokens.push(m[0]);
+        const completed = tokens.slice(0, -1);
+        const lastCompUpper = (completed[completed.length - 1] || '').toUpperCase();
+        const isAfterOp = lastCompUpper === 'AND' || lastCompUpper === 'OR';
+        const isExactOp = p.toUpperCase() === 'AND' || p.toUpperCase() === 'OR';
+
+        // AND/OR: show only if prior condition exists, prior isn't operator, and user hasn't fully typed it
+        if (completed.length > 0 && !isAfterOp && !isExactOp) {
+          ['AND', 'OR'].filter(s => s.toLowerCase().includes(p)).forEach(s => {
+            result.push({ key: `syntax-${s}`, type: 'syntax', label: s, action: () => onSelectSyntax(s) });
+          });
+        }
+
+        // Filtered fields
+        fields.filter(f => f.toLowerCase().includes(p)).forEach(f => {
+          result.push({ key: `field-${f}`, type: 'field', label: f, action: () => onSelectField(f) });
         });
-      });
-    }
+        if ('has'.includes(p)) {
+          result.push({ key: 'field-has', type: 'has-field', label: 'has', sublabel: t('argus.discover.hasDesc', 'Find events with this tag'), action: () => onSelectField('has') });
+        }
+        break;
+      }
 
-    // AND/OR syntax — only when there's a completed condition before,
-    // and the previous completed token is NOT already AND/OR,
-    // and lastToken is not already a complete AND/OR (user already typed it fully)
-    const lastTokenUpper = lastToken.toUpperCase();
-    const isLastTokenOperator = lastTokenUpper === 'AND' || lastTokenUpper === 'OR';
-    const hasCompletedCondition = completedTokens.length > 0
-      && prevCompleted !== 'AND' && prevCompleted !== 'OR'
-      && !isLastTokenOperator;
-    if (hasCompletedCondition) {
-      const syntax = ['AND', 'OR'];
-      const filteredSyntax = lastToken
-        ? syntax.filter(s => s.toLowerCase().includes(lastToken))
-        : syntax;
-      filteredSyntax.forEach(s => {
-        result.push({ key: `syntax-${s}`, type: 'syntax', label: s, action: () => onSelectSyntax(s) });
-      });
-    }
+      case 'typing_value': {
+        const values = (facets[ctx.field] || []) as SearchAutocompleteFacet[];
+        const filtered = ctx.partial ? values.filter(v => v.value?.toLowerCase().includes(ctx.partial)) : values;
+        const totalCount = filtered.reduce((s, x) => s + x.count, 0);
+        filtered.slice(0, 15).forEach(v => {
+          result.push({
+            key: `val-${v.value}`, type: 'value' as const, label: v.value || '(empty)', fieldKey: ctx.field,
+            count: v.count, pct: totalCount > 0 ? (v.count / totalCount) * 100 : 0,
+            action: () => onSelectTag(ctx.field, v.value),
+          });
+        });
+        break;
+      }
 
-    // Field suggestions (excluding 'has' — it's shown separately below)
-    // When lastToken is AND/OR, show all fields (user needs to pick a new condition)
-    const effectiveLastToken = isLastTokenOperator ? '' : lastToken;
-    const filteredFields = effectiveLastToken
-      ? fields.filter(f => f.toLowerCase().includes(effectiveLastToken))
-      : fields;
-    filteredFields.forEach(f => {
-      result.push({ key: `field-${f}`, type: 'field', label: f, action: () => onSelectField(f) });
-    });
+      case 'has_field': {
+        const matched = ctx.partial ? fields.filter(f => f.toLowerCase().includes(ctx.partial)) : fields;
+        matched.forEach(f => result.push({ key: `has-${f}`, type: 'has-field' as const, label: f, action: () => onSelectTag('has', f) }));
+        break;
+      }
 
-    // has: — shown as a separate special item at the end
-    const showHas = !effectiveLastToken || 'has'.includes(effectiveLastToken);
-    if (showHas) {
-      result.push({
-        key: 'field-has', type: 'has-field', label: 'has',
-        sublabel: t('argus.discover.hasDesc', 'Find events with this tag'),
-        action: () => onSelectField('has'),
-      });
+      case 'after_condition': {
+        ['AND', 'OR'].forEach(s => result.push({ key: `syntax-${s}`, type: 'syntax', label: s, action: () => onSelectSyntax(s) }));
+        addAllFields();
+        break;
+      }
+
+      case 'after_operator': {
+        addAllFields();
+        break;
+      }
     }
 
     return result;
-  }, [shouldShowPopover, query, fields, facets, recentSearches, t, onSelectTag, onSelectField, onSelectSyntax, onSelectRecentSearch]);
+  }, [shouldShowPopover, editingContext, query, fields, facets, recentSearches, t, onSelectTag, onSelectField, onSelectSyntax, onSelectRecentSearch]);
 
   // Reset highlight when query changes
   useEffect(() => setHighlightedIndex(-1), [query]);
