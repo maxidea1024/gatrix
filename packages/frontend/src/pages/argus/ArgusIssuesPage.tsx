@@ -566,7 +566,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   // ─── Render ────────────────────────────────────────────────────
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <PageHeader
         icon={<BugReportIcon />}
         title={
