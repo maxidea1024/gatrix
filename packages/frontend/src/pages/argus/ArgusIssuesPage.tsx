@@ -47,8 +47,9 @@ const DEFAULT_PAGE_SIZE = 25;
 const VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 
 const QUERY_BUILDER_FIELDS = [
-  'level', 'status', 'platform', 'browser', 'os', 'device',
-  'environment', 'release', 'assigned', 'times_seen', 'user_count',
+  'level', 'status', 'platform', 'priority', 'assigned_to',
+  'browser', 'os', 'device', 'environment', 'release',
+  'times_seen', 'user_count',
 ];
 
 /** URL param keys that, when present, signal a deep-link / cross-page intent. */
@@ -413,12 +414,30 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
 
-  const mappedFacets = useMemo(() => ({
-    status: statusOptions.filter(o => o.value).map(o => ({ value: o.value, count: 0 })),
-    level: levelOptions.filter(o => o.value).map(o => ({ value: o.value, count: 0 })),
-    sort: sortOptions.map(o => ({ value: o.value, count: 0 })),
-    assigned: members.map(m => ({ value: m.name || m.email || '', count: 0 })).filter(m => m.value),
-  }), [members]);
+  const mappedFacets = useMemo(() => {
+    // Count occurrences of each field value from loaded issues
+    const countBy = (field: keyof ArgusIssue) => {
+      const counts = new Map<string, number>();
+      issues.forEach(issue => {
+        const val = issue[field];
+        if (val != null && val !== '') {
+          const key = String(val);
+          counts.set(key, (counts.get(key) || 0) + 1);
+        }
+      });
+      return Array.from(counts.entries())
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count);
+    };
+
+    return {
+      level: countBy('level'),
+      status: countBy('status'),
+      platform: countBy('platform'),
+      assigned_to: countBy('assigned_to'),
+      priority: countBy('priority'),
+    };
+  }, [issues]);
 
   // ─── Render ────────────────────────────────────────────────────
 
