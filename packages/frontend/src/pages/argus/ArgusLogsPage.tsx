@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
@@ -227,34 +228,6 @@ const ArgusLogsPage: React.FC = () => {
 
   // Display density
   const [displayDensity, setDisplayDensity] = useState<DisplayDensity>('default');
-
-  // ─── Side panel handlers ───
-  const handleSelectLog = useCallback((idx: number) => {
-    const log = logs[idx];
-    if (log) {
-      setUrlState({ log: log.log_id });
-      setIsRightPanelOpen(true);
-    }
-  }, [logs, setUrlState, setIsRightPanelOpen]);
-
-  const handleCloseSidePanel = useCallback(() => {
-    setUrlState({ log: '' });
-    setIsRightPanelOpen(false);
-  }, [setUrlState, setIsRightPanelOpen]);
-
-  const handlePrevLog = useCallback(() => {
-    if (selectedLogIndex !== null && selectedLogIndex > 0) {
-      const prevLog = logs[selectedLogIndex - 1];
-      if (prevLog) setUrlState({ log: prevLog.log_id });
-    }
-  }, [selectedLogIndex, logs, setUrlState]);
-
-  const handleNextLog = useCallback(() => {
-    if (selectedLogIndex !== null && selectedLogIndex < logs.length - 1) {
-      const nextLog = logs[selectedLogIndex + 1];
-      if (nextLog) setUrlState({ log: nextLog.log_id });
-    }
-  }, [selectedLogIndex, logs, setUrlState]);
 
   // ─── Active Filters (chip tags from facet sidebar / detail panel) ───
   type ActiveFilter = { key: string; value: string; exclude: boolean; enabled: boolean };
@@ -845,15 +818,11 @@ const ArgusLogsPage: React.FC = () => {
         ...(logsFullscreen ? { flex: 1, overflowY: 'auto' } : { maxHeight: 'none' }),
       }}>
         {logs.length === 0 && !loading ? (
-          <Box sx={{ py: 8, textAlign: 'center' }}>
-            <SearchIcon sx={{ fontSize: 48, color: alpha(theme.palette.primary.main, 0.15), mb: 1 }} />
-            <Typography sx={{ fontSize: '0.95rem', fontWeight: 600, mb: 0.5 }}>
-              {t('argus.logs.noLogs', 'No logs found yet')}
-            </Typography>
-            <Typography color="text.disabled" sx={{ fontSize: '0.8rem' }}>
-              {t('argus.logs.noLogsDesc', 'Try adjusting your filters or time range.')}
-            </Typography>
-          </Box>
+          <EmptyPlaceholder
+            icon={<SearchIcon sx={{ fontSize: 48 }} />}
+            message={t('argus.logs.noLogs', 'No logs found yet')}
+            description={t('argus.logs.noLogsDesc', 'Try adjusting your filters or time range.')}
+          />
         ) : (
           <>
             {logs.map((log, idx) => {
