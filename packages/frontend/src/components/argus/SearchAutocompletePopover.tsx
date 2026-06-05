@@ -62,9 +62,11 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
       return true; // Stage 2: actively typing a value
     }
     // Stage 1: field/syntax suggestions
-    const tokens = query.split(/\s+/).filter(t => t.length > 0);
-    const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
-    // Empty query or after space → show fields (always have something)
+    // Key insight: if query ends with whitespace, cursor is at a NEW token position
+    const isNewTokenPos = query.length === 0 || /\s$/.test(query);
+    const allTokens = query.split(/\s+/).filter(t => t.length > 0);
+    const lastToken = isNewTokenPos ? '' : (allTokens[allTokens.length - 1] || '').toLowerCase();
+    // Empty or new-token position → always show fields
     if (!lastToken) return true;
     // Typing a partial token → only show if it matches something
     const hasMatchingFields = fields.some(f => f.toLowerCase().includes(lastToken));
@@ -109,10 +111,11 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
 
     // Stage 1: field/syntax suggestions
     const result: AutocompleteItem[] = [];
-    const tokens = query.split(/\s+/).filter(t => t.length > 0);
-    const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
-    // Tokens before the currently-typed one (completed tokens)
-    const completedTokens = lastToken ? tokens.slice(0, -1) : tokens;
+    // Consistent token parsing: trailing space = new token position
+    const isNewTokenPos = query.length === 0 || /\s$/.test(query);
+    const allTokens = query.split(/\s+/).filter(t => t.length > 0);
+    const lastToken = isNewTokenPos ? '' : (allTokens[allTokens.length - 1] || '').toLowerCase();
+    const completedTokens = isNewTokenPos ? allTokens : allTokens.slice(0, -1);
     const prevCompleted = (completedTokens[completedTokens.length - 1] || '').toUpperCase();
 
     // Recent searches (only when no active token and query is empty/minimal)
