@@ -442,7 +442,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
           </SafeTooltip>
         </Box>
         <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 4 }}>
-          {t('argus.logs.panel.selectLog', 'Select a log item to view details')}
+          {t('argus.logs.panel.selectLog', 'Select a log event to view details')}
         </Typography>
       </Box>
     );
