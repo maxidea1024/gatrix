@@ -81,6 +81,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const activeViewId = useArgusIssueStore((s) => s.activeViewId);
   const substatus = useArgusIssueStore((s) => s.substatus);
   const assignedTo = useArgusIssueStore((s) => s.assignedTo);
+  const storePeriod = useArgusIssueStore((s) => s.period);
+  const storeCustomStart = useArgusIssueStore((s) => s.customStart);
+  const storeCustomEnd = useArgusIssueStore((s) => s.customEnd);
 
   const setCurrentPage = useArgusIssueStore((s) => s.setCurrentPage);
   const setStoreSearch = useArgusIssueStore((s) => s.setSearch);
@@ -90,6 +93,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const setActiveViewId = useArgusIssueStore((s) => s.setActiveViewId);
   const setSubstatus = useArgusIssueStore((s) => s.setSubstatus);
   const setAssignedTo = useArgusIssueStore((s) => s.setAssignedTo);
+  const setStorePeriod = useArgusIssueStore((s) => s.setPeriod);
+  const setStoreCustomDateRange = useArgusIssueStore((s) => s.setCustomDateRange);
   const hydrateFromParams = useArgusIssueStore((s) => s.hydrateFromParams);
   const resetStore = useArgusIssueStore((s) => s.resetStore);
 
@@ -218,7 +223,20 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [savedPeriod, setSavedPeriod] = useLocalStorage('argus-issues-period', '14d');
 
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
-    const state = defaultArgusFilterState(savedPeriod);
+    // Build initial dateRange from Zustand store (survives back-navigation)
+    let initialDateRange: ArgusFilterState['dateRange'] | null = null;
+    if (storePeriod === 'custom' && storeCustomStart && storeCustomEnd) {
+      const startDate = new Date(storeCustomStart);
+      const endDate = new Date(storeCustomEnd);
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        initialDateRange = { type: 'custom', start: startDate, end: endDate };
+      }
+    }
+    if (!initialDateRange) {
+      initialDateRange = { type: 'preset', preset: storePeriod || savedPeriod };
+    }
+
+    const state = { ...defaultArgusFilterState(savedPeriod), dateRange: initialDateRange };
     const env = searchParams.get('environment');
     const br = searchParams.get('browser');
     const osParam = searchParams.get('os');
@@ -344,6 +362,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setSavedPeriod(newFilters.dateRange.preset);
+      setStorePeriod(newFilters.dateRange.preset);
+    } else if (newFilters.dateRange.type === 'custom' && newFilters.dateRange.start && newFilters.dateRange.end) {
+      setStoreCustomDateRange(
+        newFilters.dateRange.start.toISOString(),
+        newFilters.dateRange.end.toISOString(),
+      );
     }
   };
 
@@ -433,6 +457,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       ...prev,
       dateRange: { type: 'custom', start, end },
     }));
+    setStoreCustomDateRange(start.toISOString(), end.toISOString());
     setCurrentPage(1);
   };
 

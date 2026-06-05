@@ -21,6 +21,9 @@ const DEFAULTS = {
   activeViewId: 'unresolved',
   substatus: '',
   assignedTo: '',
+  period: '14d',
+  customStart: '',
+  customEnd: '',
 } as const;
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -34,6 +37,9 @@ interface ArgusIssueListState {
   activeViewId: string;
   substatus: string;
   assignedTo: string;
+  period: string;
+  customStart: string;
+  customEnd: string;
 
   // Actions
   setCurrentPage: (page: number) => void;
@@ -44,6 +50,8 @@ interface ArgusIssueListState {
   setActiveViewId: (viewId: string) => void;
   setSubstatus: (substatus: string) => void;
   setAssignedTo: (assignedTo: string) => void;
+  setPeriod: (period: string) => void;
+  setCustomDateRange: (start: string, end: string) => void;
 
   /** Bulk-hydrate state from URL params (deep-link support). */
   hydrateFromParams: (params: Partial<Omit<ArgusIssueListState, 'hydrateFromParams' | 'resetStore' | 'setCurrentPage' | 'setSearch' | 'setStatus' | 'setLevel' | 'setSort' | 'setActiveViewId' | 'setSubstatus' | 'setAssignedTo'>>) => void;
@@ -66,6 +74,8 @@ export const useArgusIssueStore = create<ArgusIssueListState>((set) => ({
   setActiveViewId: (activeViewId) => set({ activeViewId }),
   setSubstatus: (substatus) => set({ substatus }),
   setAssignedTo: (assignedTo) => set({ assignedTo }),
+  setPeriod: (period) => set({ period, customStart: '', customEnd: '' }),
+  setCustomDateRange: (start, end) => set({ period: 'custom', customStart: start, customEnd: end }),
 
   // Bulk hydration from URL query params
   hydrateFromParams: (params) => set((state) => ({ ...state, ...params })),
