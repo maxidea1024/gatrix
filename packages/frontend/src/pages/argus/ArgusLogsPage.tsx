@@ -126,8 +126,8 @@ const ArgusLogsSearchInput: React.FC<{
 
   const { chips, remainder, chipsText } = useMemo(() => {
     const chipList: SearchChip[] = [];
-    // Match completed key:"value", key:'value', key:value, AND, OR
-    const re = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|\S+))|(\bAND\b|\bOR\b)/g;
+    // Match key:"complete", key:'complete', key:"incomplete..., key:unquoted, AND, OR
+    const re = /(!?[\w.-]+:(?:"[^"]*"|'[^']*'|"[^"]*$|'[^']*$|\S+))|(\bAND\b|\bOR\b)/g;
     let lastIdx = 0;
     let match: RegExpExecArray | null;
     const text = localSearch;
@@ -149,12 +149,14 @@ const ArgusLogsSearchInput: React.FC<{
         if (key === 'has') {
           chipList.push({ type: 'has', raw: tok, key: 'has', value: val });
         } else {
-          // Completed if: quoted value OR unquoted value that is followed by space (not at end of input)
+          // Completed if: quoted value OR unquoted value (no opening quote) followed by space
           const rawVal = clean.slice(ci + 1);
-          const isQuoted = (rawVal.startsWith('"') && rawVal.endsWith('"')) || (rawVal.startsWith("'") && rawVal.endsWith("'"));
+          const isQuoted = (rawVal.startsWith('"') && rawVal.endsWith('"') && rawVal.length >= 2)
+            || (rawVal.startsWith("'") && rawVal.endsWith("'") && rawVal.length >= 2);
+          const startsWithQuote = rawVal.startsWith('"') || rawVal.startsWith("'");
           const matchEnd = match.index + match[0].length;
           const hasTrailingSpace = matchEnd < text.length && text[matchEnd] === ' ';
-          const isComplete = isQuoted || (rawVal.length > 0 && hasTrailingSpace);
+          const isComplete = isQuoted || (!startsWithQuote && rawVal.length > 0 && hasTrailingSpace);
           if (isComplete) {
             chipList.push({ type: isNeg ? 'negated' : 'filter', raw: tok, key, value: val });
           } else {
