@@ -56,19 +56,22 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
     const colonMatch = query.match(/([\w.-]+):([^\s]*)$/);
     if (colonMatch) {
       const val = colonMatch[2];
+      // Completed quoted value: key:"value" — hide
       if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) return false;
       if (val.startsWith("'") && val.endsWith("'") && val.length >= 2) return false;
-      return true;
+      return true; // Stage 2: actively typing a value
     }
-    const tokens = query.split(/\s+/);
+    // Stage 1: field/syntax suggestions
+    const tokens = query.split(/\s+/).filter(t => t.length > 0);
     const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
-    if (!lastToken && recentSearches.length > 0) return true;
+    // Empty query or after space → show fields (always have something)
     if (!lastToken) return true;
+    // Typing a partial token → only show if it matches something
     const hasMatchingFields = fields.some(f => f.toLowerCase().includes(lastToken));
     const hasMatchingSyntax = ['AND', 'OR'].some(s => s.toLowerCase().includes(lastToken));
     const showHas = 'has'.includes(lastToken);
     return hasMatchingFields || hasMatchingSyntax || showHas;
-  }, [open, anchorEl, query, fields, recentSearches]);
+  }, [open, anchorEl, query, fields]);
 
   // ─── Compute flat selectable items list ───
   const items = useMemo((): AutocompleteItem[] => {
@@ -106,11 +109,14 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
 
     // Stage 1: field/syntax suggestions
     const result: AutocompleteItem[] = [];
-    const tokens = query.split(/\s+/);
+    const tokens = query.split(/\s+/).filter(t => t.length > 0);
     const lastToken = (tokens[tokens.length - 1] || '').toLowerCase();
+    // Tokens before the currently-typed one (completed tokens)
+    const completedTokens = lastToken ? tokens.slice(0, -1) : tokens;
+    const prevCompleted = (completedTokens[completedTokens.length - 1] || '').toUpperCase();
 
-    // Recent searches (only when no active token)
-    if (!lastToken && recentSearches.length > 0) {
+    // Recent searches (only when no active token and query is empty/minimal)
+    if (!lastToken && recentSearches.length > 0 && completedTokens.length === 0) {
       recentSearches.slice(0, 5).forEach((q, i) => {
         result.push({
           key: `recent-${i}`, type: 'recent', label: q,
@@ -119,28 +125,37 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
       });
     }
 
-    // Syntax
-    const syntax = ['AND', 'OR'];
-    const filteredSyntax = lastToken ? syntax.filter(s => s.toLowerCase().includes(lastToken)) : syntax;
-    filteredSyntax.forEach(s => {
-      result.push({ key: `syntax-${s}`, type: 'syntax', label: s, action: () => onSelectSyntax(s) });
+    // AND/OR syntax — only when there's a completed condition before,
+    // and the previous completed token is NOT already AND/OR
+    const hasCompletedCondition = completedTokens.length > 0
+      && prevCompleted !== 'AND' && prevCompleted !== 'OR';
+    if (hasCompletedCondition) {
+      const syntax = ['AND', 'OR'];
+      const filteredSyntax = lastToken
+        ? syntax.filter(s => s.toLowerCase().includes(lastToken))
+        : syntax;
+      filteredSyntax.forEach(s => {
+        result.push({ key: `syntax-${s}`, type: 'syntax', label: s, action: () => onSelectSyntax(s) });
+      });
+    }
+
+    // Field suggestions (excluding 'has' — it's shown separately below)
+    const filteredFields = lastToken
+      ? fields.filter(f => f.toLowerCase().includes(lastToken))
+      : fields;
+    filteredFields.forEach(f => {
+      result.push({ key: `field-${f}`, type: 'field', label: f, action: () => onSelectField(f) });
     });
 
-    // has:
+    // has: — shown as a separate special item at the end
     const showHas = !lastToken || 'has'.includes(lastToken);
     if (showHas) {
       result.push({
-        key: 'field-has', type: 'field', label: 'has',
+        key: 'field-has', type: 'has-field', label: 'has',
         sublabel: t('argus.discover.hasDesc', 'Find events with this tag'),
         action: () => onSelectField('has'),
       });
     }
-
-    // Field suggestions
-    const filteredFields = lastToken ? fields.filter(f => f.toLowerCase().includes(lastToken)) : fields;
-    filteredFields.forEach(f => {
-      result.push({ key: `field-${f}`, type: 'field', label: f, action: () => onSelectField(f) });
-    });
 
     return result;
   }, [shouldShowPopover, query, fields, facets, recentSearches, t, onSelectTag, onSelectField, onSelectSyntax, onSelectRecentSearch]);
@@ -245,7 +260,11 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
             headerText = `${item.fieldKey} ${t('argus.discover.values', 'values')}`;
             break;
           case 'has-field':
-            headerText = t('argus.discover.availableFields', 'Available Fields');
+            // Add divider before has section when it follows other items
+            if (prevType && prevType !== 'has-field') {
+              elements.push(<Divider key="div-has" sx={{ my: 0.5 }} />);
+            }
+            headerText = t('argus.discover.special', 'Special');
             break;
         }
 

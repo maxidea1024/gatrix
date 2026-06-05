@@ -171,7 +171,7 @@ const ArgusLogsSearchInput: React.FC<{
           }}
         />
         {localSearch && (
-          <IconButton size="small" onClick={() => { setLocalSearch(''); onSubmit(''); }} sx={{ p: 0.2, mr: 0.5 }}>
+          <IconButton size="small" onClick={() => { setLocalSearch(''); onSubmit(''); setSearchFocused(false); }} sx={{ p: 0.2, mr: 0.5 }}>
             <CloseIcon sx={{ fontSize: 14 }} />
           </IconButton>
         )}
@@ -212,15 +212,19 @@ const ArgusLogsSearchInput: React.FC<{
           addSearchTag(field, value);
         }}
         onSelectField={(field) => {
-          const tokens = localSearch.split(/\s+/);
-          const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + field + ':';
-          setLocalSearch(newCond);
+          // Strip orphan field: tokens (incomplete key: with no value)
+          const tokens = localSearch.split(/\s+/).filter(t => t.length > 0);
+          const cleaned = tokens.filter(t => !/^[\w.-]+:$/.test(t));
+          const prefix = cleaned.length > 0 ? cleaned.join(' ') + ' ' : '';
+          setLocalSearch(prefix + field + ':');
           searchContainerRef.current?.querySelector('input')?.focus();
         }}
         onSelectSyntax={(syntax) => {
-          const tokens = localSearch.split(/\s+/);
-          const newCond = tokens.slice(0, -1).join(' ') + (tokens.length > 1 ? ' ' : '') + syntax + ' ';
-          setLocalSearch(newCond);
+          // Strip orphan field: tokens before appending syntax
+          const tokens = localSearch.split(/\s+/).filter(t => t.length > 0);
+          const cleaned = tokens.filter(t => !/^[\w.-]+:$/.test(t));
+          const prefix = cleaned.length > 0 ? cleaned.join(' ') + ' ' : '';
+          setLocalSearch(prefix + syntax + ' ');
           searchContainerRef.current?.querySelector('input')?.focus();
         }}
         onClose={() => setSearchFocused(false)}
