@@ -9,7 +9,6 @@ import {
   alpha,
   CircularProgress,
   Link,
-  Tooltip,
 } from '@mui/material';
 import {
   CheckCircle as ResolvedIcon,
@@ -198,45 +197,26 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
         {/* Content */}
         <Box sx={{ flex: 1, minWidth: 0, pb: isLast ? 0 : 1.5 }}>
           {isComment ? (
-            // ---- Comment style (Sentry-like bubble) ----
+            // ---- Comment style ----
             <>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.3 }}>
                 <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.primary' }}>
                   {displayName}
                 </Typography>
-                <Typography sx={{ fontSize: '0.62rem', color: 'text.disabled' }}>
+                <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled' }}>
+                  ·
+                </Typography>
+                <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled' }}>
                   {formatRelativeTime(activity.created_at, undefined, i18n.language)}
                 </Typography>
               </Box>
               <Box sx={{
-                px: 1.5, py: 1,
-                borderRadius: '8px',
-                backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.025)',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                position: 'relative',
-                // Speech bubble arrow
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 8,
-                  left: -6,
-                  width: 0, height: 0,
-                  borderStyle: 'solid',
-                  borderWidth: '6px 6px 6px 0',
-                  borderColor: `transparent ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} transparent transparent`,
-                },
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 9,
-                  left: -5,
-                  width: 0, height: 0,
-                  borderStyle: 'solid',
-                  borderWidth: '5px 5px 5px 0',
-                  borderColor: `transparent ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.025)'} transparent transparent`,
-                },
+                px: 1.5, py: 0.8,
+                borderRadius: '6px',
+                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.018)',
+                borderLeft: `2px solid ${alpha(config.color, 0.5)}`,
               }}>
-                <Typography sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.5 }}>
+                <Typography sx={{ fontSize: '0.76rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.5, color: 'text.primary' }}>
                   {getActivityDescription(activity, t)}
                 </Typography>
               </Box>
@@ -282,7 +262,15 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
 
       {/* Comment input */}
       <Box sx={{
-        display: 'flex', gap: 1, mb: 2, alignItems: 'flex-start',
+        display: 'flex', gap: 0, mb: 2, alignItems: 'flex-end',
+        borderRadius: '10px',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.012)',
+        transition: 'border-color 0.2s, box-shadow 0.2s',
+        '&:focus-within': {
+          borderColor: alpha(theme.palette.primary.main, 0.4),
+          boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.08)}`,
+        },
       }}>
         <TextField
           size="small"
@@ -300,35 +288,34 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ projectId, issueId,
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
-              fontSize: '0.8rem',
-              borderRadius: '8px',
-              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)',
-              '& fieldset': {
-                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-              },
-              '&:hover fieldset': {
-                borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-              },
+              fontSize: '0.78rem',
+              borderRadius: '10px',
+              backgroundColor: 'transparent',
+              '& fieldset': { border: 'none' },
+              '&:hover fieldset': { border: 'none' },
+              '&.Mui-focused fieldset': { border: 'none' },
             },
-            '& .MuiOutlinedInput-input': { py: 0.8 },
+            '& .MuiOutlinedInput-input': { py: 0.8, px: 1.2 },
           }}
         />
-        <Tooltip title={t('argus.activity.send')}>
-          <span>
-            <IconButton
-              size="small"
-              onClick={handleAddComment}
-              disabled={!commentText.trim() || submitting}
-              sx={{
-                mt: 0.3,
-                color: commentText.trim() ? theme.palette.primary.main : 'text.disabled',
-                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
-              }}
-            >
-              {submitting ? <CircularProgress size={16} /> : <SendIcon sx={{ fontSize: 16 }} />}
-            </IconButton>
-          </span>
-        </Tooltip>
+        <IconButton
+          size="small"
+          onClick={handleAddComment}
+          disabled={!commentText.trim() || submitting}
+          sx={{
+            mb: 0.4, mr: 0.4,
+            width: 28, height: 28,
+            borderRadius: '8px',
+            color: commentText.trim() ? '#fff' : 'text.disabled',
+            backgroundColor: commentText.trim() ? theme.palette.primary.main : 'transparent',
+            '&:hover': {
+              backgroundColor: commentText.trim() ? theme.palette.primary.dark : alpha(theme.palette.primary.main, 0.08),
+            },
+            transition: 'all 0.2s',
+          }}
+        >
+          {submitting ? <CircularProgress size={14} sx={{ color: 'inherit' }} /> : <SendIcon sx={{ fontSize: 14 }} />}
+        </IconButton>
       </Box>
 
       {/* Activity list */}
