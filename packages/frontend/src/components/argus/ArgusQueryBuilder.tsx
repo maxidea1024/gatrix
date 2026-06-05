@@ -177,9 +177,13 @@ function generateSqlPreview(rules: Rule[], activeFilters?: ActiveFilter[]): stri
     
     switch (rule.type) {
       case 'tag': {
-        // e.g. service = 'game-world'
-        const op = rule.op === '!=' ? '!=' : rule.op === '=' ? '=' : rule.op;
-        lines.push(`${prefix}${rule.field} ${op} ${escapeSqlString(rule.value)}`);
+        let op = rule.op === '!=' ? '!=' : rule.op === '=' ? '=' : rule.op;
+        let val = rule.value;
+        if (['=', '!='].includes(rule.op) && val.includes('*')) {
+          op = rule.op === '!=' ? 'NOT ILIKE' : 'ILIKE';
+          val = val.replace(/\*/g, '%');
+        }
+        lines.push(`${prefix}${rule.field} ${op} ${escapeSqlString(val)}`);
         break;
       }
       case 'has': {
@@ -201,8 +205,13 @@ function generateSqlPreview(rules: Rule[], activeFilters?: ActiveFilter[]): stri
     lines.push('-- Applied Facets');
     enabledFilters.forEach((f, idx) => {
       const prefix = (lines.length === 1 && idx === 0) ? 'WHERE ' : '  AND ';
-      const op = f.exclude ? '!=' : '=';
-      lines.push(`${prefix}${f.key} ${op} ${escapeSqlString(f.value)}`);
+      let op = f.exclude ? '!=' : '=';
+      let val = f.value;
+      if (val.includes('*')) {
+        op = f.exclude ? 'NOT ILIKE' : 'ILIKE';
+        val = val.replace(/\*/g, '%');
+      }
+      lines.push(`${prefix}${f.key} ${op} ${escapeSqlString(val)}`);
     });
   }
 
