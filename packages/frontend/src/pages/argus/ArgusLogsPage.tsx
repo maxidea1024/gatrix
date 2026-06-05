@@ -1030,7 +1030,7 @@ const ArgusLogsPage: React.FC = () => {
         {/* Right: Main log content */}
         <Box sx={{
           flex: 1, overflow: 'hidden', minWidth: 0,
-          pl: facetSidebarCollapsed ? 0.25 : 0.75,
+          pl: facetSidebarCollapsed ? 0.25 : 0.75, pr: 0.75,
           display: 'flex', flexDirection: 'column',
         }}>
           {/* Volume Chart - fixed at top */}
