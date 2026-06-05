@@ -8,6 +8,8 @@ import { CronSupervisorWorker } from './workers/cron-supervisor-worker';
 import { testClickHouseConnection } from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import { createLogger } from './utils/logger';
+import { alertRuleStore } from './utils/alert-rule-store';
+import { dsnStore } from './utils/dsn-store';
 
 const logger = createLogger('worker');
 
@@ -27,6 +29,11 @@ async function start() {
     if (!mysqlOk) {
       throw new Error('MySQL connection failed');
     }
+
+    // Initialize in-memory stores (must complete before workers start)
+    logger.info('Initializing in-memory stores...');
+    await alertRuleStore.init();
+    await dsnStore.init();
 
     // Start all workers
     const errorWorker = new ErrorWorker();
@@ -63,6 +70,10 @@ async function start() {
           uptimeWorker.close(),
           cronSupervisorWorker.close(),
         ]);
+
+        // Close stores after workers
+        await alertRuleStore.close();
+        await dsnStore.close();
 
         logger.info('All workers closed');
         process.exit(0);

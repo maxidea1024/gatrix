@@ -7,6 +7,7 @@ import {
 import { testMySQLConnection } from './config/mysql';
 import { ensureStorageBucket } from './config/minio';
 import { createLogger } from './utils/logger';
+import { dsnStore } from './utils/dsn-store';
 
 const logger = createLogger('api');
 
@@ -34,6 +35,10 @@ async function start() {
     // Ensure MinIO bucket exists
     await ensureStorageBucket();
 
+    // Initialize in-memory stores (must be ready before routes handle requests)
+    logger.info('Initializing in-memory stores...');
+    await dsnStore.init();
+
     // Create Fastify app
     const app = await createApp();
 
@@ -52,6 +57,7 @@ async function start() {
 
       try {
         await app.close();
+        await dsnStore.close();
         logger.info('Server closed');
         process.exit(0);
       } catch (error) {

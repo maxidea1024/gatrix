@@ -2,6 +2,7 @@ import { mysqlPool } from '../config/mysql';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from './logger';
 import { IssueGroupResult } from '../processing/issue-grouper';
+import { alertRuleStore } from './alert-rule-store';
 
 const logger = createLogger('alert-evaluator');
 
@@ -39,15 +40,11 @@ export async function evaluateFeedbackAlerts(
   feedback: FeedbackData
 ): Promise<void> {
   try {
-    // Fetch enabled rules for this project that contain 'new_feedback' conditions
-    const [rows] = await mysqlPool.query(
-      `SELECT * FROM g_argus_alert_rules
-       WHERE project_id = ? AND enabled = 1
-       AND conditions LIKE '%new_feedback%'`,
-      [feedback.project_id]
-    );
-
-    const rules = (rows as AlertRule[]) || [];
+    // Fetch enabled rules with 'new_feedback' conditions from in-memory store
+    const rules = alertRuleStore.getRulesWithCondition(
+      parseInt(String(feedback.project_id), 10),
+      ['new_feedback']
+    ) as AlertRule[];
 
     for (const rule of rules) {
       try {
@@ -131,19 +128,11 @@ export async function evaluateErrorAlerts(
   groupResult: IssueGroupResult
 ): Promise<void> {
   try {
-    // Fetch all enabled rules for this project that have error-related conditions
-    const [rows] = await mysqlPool.query(
-      `SELECT * FROM g_argus_alert_rules
-       WHERE project_id = ? AND enabled = 1
-       AND (conditions LIKE '%new_issue%'
-         OR conditions LIKE '%regression%'
-         OR conditions LIKE '%event_frequency%'
-         OR conditions LIKE '%user_count%'
-         OR conditions LIKE '%project_error_rate%')`,
-      [event.internal_project_id]
-    );
-
-    const rules = (rows as AlertRule[]) || [];
+    // Fetch enabled rules with error-related conditions from in-memory store
+    const rules = alertRuleStore.getRulesWithCondition(
+      event.internal_project_id,
+      ['new_issue', 'regression', 'event_frequency', 'user_count', 'project_error_rate', 'high_priority_issue', 'property_match']
+    ) as AlertRule[];
     if (rules.length === 0) return;
 
     for (const rule of rules) {
