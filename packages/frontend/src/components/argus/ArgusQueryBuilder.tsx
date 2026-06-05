@@ -406,7 +406,7 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
                     <Autocomplete
                       freeSolo
                       size="small"
-                      options={(facets[rule.field] || []).map(v => v.value)}
+                      options={(facets[rule.field] || []).map(v => String(v.value ?? ''))}
                       value={rule.value || ''}
                       onInputChange={(_e, val) => updateRule(rule.id, { value: val })}
                       onChange={(_e, val) => updateRule(rule.id, { value: val || '' })}
@@ -419,7 +419,7 @@ const ArgusQueryBuilder: React.FC<ArgusQueryBuilderProps> = ({ fields, query, fa
                         />
                       )}
                       renderOption={(props, option) => {
-                        const fv = (facets[rule.field] || []).find(v => v.value === option);
+                        const fv = (facets[rule.field] || []).find(v => String(v.value ?? '') === option);
                         return (
                           <Box component="li" {...props} sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', px: 1.5, py: 0.5 }}>
                             <span>{option}</span>

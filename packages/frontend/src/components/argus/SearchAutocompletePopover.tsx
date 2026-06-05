@@ -171,13 +171,14 @@ const SearchAutocompletePopover = forwardRef<SearchAutocompletePopoverHandle, Se
 
       case 'typing_value': {
         const values = (facets[ctx.field] || []) as SearchAutocompleteFacet[];
-        const filtered = ctx.partial ? values.filter(v => v.value?.toLowerCase().includes(ctx.partial)) : values;
+        const filtered = ctx.partial ? values.filter(v => String(v.value ?? '').toLowerCase().includes(ctx.partial)) : values;
         const totalCount = filtered.reduce((s, x) => s + x.count, 0);
         filtered.slice(0, 15).forEach(v => {
+          const strVal = String(v.value ?? '');
           result.push({
-            key: `val-${v.value}`, type: 'value' as const, label: v.value || '(empty)', fieldKey: ctx.field,
+            key: `val-${strVal}`, type: 'value' as const, label: strVal || '(empty)', fieldKey: ctx.field,
             count: v.count, pct: totalCount > 0 ? (v.count / totalCount) * 100 : 0,
-            action: () => onSelectTag(ctx.field, v.value),
+            action: () => onSelectTag(ctx.field, strVal),
           });
         });
         break;
