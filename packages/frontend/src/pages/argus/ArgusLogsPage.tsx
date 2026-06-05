@@ -23,7 +23,7 @@ import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState, argusFilterStateToApiParams } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
 import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
-import SearchAutocompletePopover from '@/components/argus/SearchAutocompletePopover';
+import SearchAutocompletePopover, { SearchAutocompletePopoverHandle } from '@/components/argus/SearchAutocompletePopover';
 import argusService, { ArgusLogEntry, ArgusSavedQuery } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
@@ -77,6 +77,7 @@ const ArgusLogsSearchInput: React.FC<{
   const [localSearch, setLocalSearch] = useState(initialValue);
   const [searchFocused, setSearchFocused] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const autocompleteRef = useRef<SearchAutocompletePopoverHandle>(null);
   const [builderAnchorEl, setBuilderAnchorEl] = useState<HTMLElement | null>(null);
 
   // Recent searches (persisted in localStorage)
@@ -134,6 +135,8 @@ const ArgusLogsSearchInput: React.FC<{
   };
 
   const handleSearchKey = (e: React.KeyboardEvent) => {
+    // Forward to autocomplete for arrow/enter/tab navigation
+    if (autocompleteRef.current?.handleKeyDown(e)) return;
     if (e.key === 'Enter') {
       saveRecentSearch(localSearch.trim());
       onSubmit(localSearch.trim());
@@ -198,6 +201,7 @@ const ArgusLogsSearchInput: React.FC<{
 
       {/* Search Autocomplete Popover */}
       <SearchAutocompletePopover
+        ref={autocompleteRef}
         open={searchFocused}
         anchorEl={searchContainerRef.current}
         query={localSearch}
