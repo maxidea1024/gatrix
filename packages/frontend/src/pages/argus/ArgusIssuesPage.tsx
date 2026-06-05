@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import {
   BugReport as BugReportIcon,
 } from '@mui/icons-material';
@@ -784,62 +785,64 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
           />
 
           <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />}>
-            <Paper
-              elevation={0}
-              sx={{
-                mb: 2,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-                overflow: 'hidden',
-              }}
-            >
-              {issues.length === 0 ? (
-                <Box sx={{ py: 8, textAlign: 'center' }}>
-                  <BugReportIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-                  <Typography color="text.secondary">{t('argus.issues.noIssues')}</Typography>
-                </Box>
-              ) : (
-                issues.map((issue, idx) => (
-                  <IssueListItem
-                    key={issue.id}
-                    issue={issue}
-                    onClick={handleIssueClick}
-                    highlight={searchDebounce}
-                    showCheckbox
-                    checked={selectedIds.has(issue.id)}
-                    onCheckChange={(id) => {
-                      setSelectedIds(prev => {
-                        const next = new Set(prev);
-                        next.has(id) ? next.delete(id) : next.add(id);
-                        return next;
-                      });
-                    }}
-                    showAssignee
-                    onAssigneeClick={(e, iss) => setAssigneeAnchor({ el: e.currentTarget as HTMLElement, issue: iss })}
-                    showSparkline
-                    showLastSeen
-                    isFirst={idx === 0}
-                    isLast={idx === issues.length - 1}
-                    showDivider={idx < issues.length - 1}
-                  />
-                ))
-              )}
-            </Paper>
-
-            {total > 0 && (
-              <Box sx={{ mt: 3 }}>
-                <SimplePagination
-                  count={total}
-                  page={currentPage - 1}
-                  rowsPerPage={rowsPerPage}
-                  onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
-                  onRowsPerPageChange={(e) => {
-                    setRowsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
+            {issues.length === 0 ? (
+              <EmptyPlaceholder
+                icon={<BugReportIcon sx={{ fontSize: 48 }} />}
+                message={t('argus.issues.noIssues')}
+              />
+            ) : (
+              <>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    mb: 2,
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                    borderRadius: 2,
+                    overflow: 'hidden',
                   }}
-                  size="small"
-                />
-              </Box>
+                >
+                  {issues.map((issue, idx) => (
+                    <IssueListItem
+                      key={issue.id}
+                      issue={issue}
+                      onClick={handleIssueClick}
+                      highlight={searchDebounce}
+                      showCheckbox
+                      checked={selectedIds.has(issue.id)}
+                      onCheckChange={(id) => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          next.has(id) ? next.delete(id) : next.add(id);
+                          return next;
+                        });
+                      }}
+                      showAssignee
+                      onAssigneeClick={(e, iss) => setAssigneeAnchor({ el: e.currentTarget as HTMLElement, issue: iss })}
+                      showSparkline
+                      showLastSeen
+                      isFirst={idx === 0}
+                      isLast={idx === issues.length - 1}
+                      showDivider={idx < issues.length - 1}
+                    />
+                  ))}
+                </Paper>
+
+                {total > 0 && (
+                  <Box sx={{ mt: 3 }}>
+                    <SimplePagination
+                      count={total}
+                      page={currentPage - 1}
+                      rowsPerPage={rowsPerPage}
+                      onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
+                      onRowsPerPageChange={(e) => {
+                        setRowsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      size="small"
+                    />
+                  </Box>
+                )}
+              </>
             )}
           </PageContentLoader>
 
