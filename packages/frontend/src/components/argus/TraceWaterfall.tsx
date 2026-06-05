@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Box,
   Typography,
@@ -60,8 +61,11 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
   const { t } = useTranslation();
   const theme = useTheme();
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [hoverX, setHoverX] = useState<number | null>(null);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
+  const [hoverClientX, setHoverClientX] = useState<number | null>(null);
+  const [hoverClientY, setHoverClientY] = useState<number | null>(null);
   const [selectedSpanId, setSelectedSpanId] = useState<string | null>(null);
   const [collapsedSpanIds, setCollapsedSpanIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
@@ -192,6 +196,19 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
     return () => el.removeEventListener('wheel', handleWheel);
   }, []);
 
+  // ─── Container Width for Sticky Detail Panel ───
+  useEffect(() => {
+    const el = waterfallContainerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        setContainerWidth(entries[0].contentRect.width);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // ─── Mouse hover for time indicator ───
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -204,22 +221,32 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
       if (pct >= 0 && pct <= 1) {
         setHoverTime(pct * totalDuration);
         setHoverX(x);
+        setHoverClientX(e.clientX);
+        setHoverClientY(rect.top + 2);
       } else {
         setHoverX(null);
         setHoverTime(null);
+        setHoverClientX(null);
+        setHoverClientY(null);
       }
     } else if (x > 280) {
       setHoverX(x);
       setHoverTime(null);
+      setHoverClientX(null);
+      setHoverClientY(null);
     } else {
       setHoverX(null);
       setHoverTime(null);
+      setHoverClientX(null);
+      setHoverClientY(null);
     }
   }, [totalDuration]);
 
   const handleMouseLeave = useCallback(() => {
     setHoverX(null);
     setHoverTime(null);
+    setHoverClientX(null);
+    setHoverClientY(null);
   }, []);
 
   const getBarPosition = (startTs: string, dur: number) => {
@@ -416,7 +443,7 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
       }}>
         <Box sx={{ overflowX: 'auto' }} ref={timelineRef}>
         <Box
-          sx={{ position: 'relative' }}
+          sx={{ position: 'relative', minWidth: 'max-content' }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
@@ -431,28 +458,7 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
               backgroundColor: hoverLineColor,
               zIndex: 10,
               pointerEvents: 'none',
-            }}>
-              {hoverTime !== null && (
-                <Box sx={{
-                  position: 'absolute',
-                  top: 2,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  backgroundColor: isDark ? '#2a2a2a' : '#fff',
-                  boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.5)' : '0 1px 4px rgba(0,0,0,0.15)',
-                  borderRadius: 0.5,
-                  px: 0.6, py: 0.15,
-                  whiteSpace: 'nowrap',
-                  zIndex: 11,
-                }}>
-                  <Typography variant="caption" sx={{
-                    fontSize: '0.6rem', fontWeight: 600, color: theme.palette.text.primary,
-                  }}>
-                    {fmtDur(hoverTime)}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
+            }} />
           )}
 
           {/* Header row */}
@@ -541,7 +547,9 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
                     borderLeft: `3px solid ${theme.palette.primary.main}`,
                     backgroundColor: isDark ? '#1e1e1e' : '#fafafa',
-                    position: 'relative',
+                    position: 'sticky',
+                    left: 0,
+                    width: containerWidth > 0 ? containerWidth : '100%',
                     zIndex: 12,
                   }}>
                     <SpanDetailPanel
@@ -571,6 +579,30 @@ const TraceWaterfall: React.FC<{ trace: ArgusTraceDetail; isDark: boolean }> = (
       <Typography variant="caption" sx={{ display: 'block', mt: 0.5, color: 'text.disabled', fontSize: '0.65rem', textAlign: 'right' }}>
         ↑↓ {t('argus.performance.navigate', 'navigate')} · Enter {t('argus.performance.select', 'select')} · Esc {t('argus.performance.close', 'close')} · / {t('argus.performance.search', 'search')} · {t('argus.performance.dblClickZoom', 'double-click to zoom')}
       </Typography>
+
+      {/* Hover tooltip rendered as fixed overlay to prevent layout/scrollbar interference */}
+      {hoverTime !== null && hoverClientX !== null && hoverClientY !== null && document.body && createPortal(
+        <Box sx={{
+          position: 'fixed',
+          top: hoverClientY,
+          left: hoverClientX,
+          transform: 'translateX(-50%)',
+          backgroundColor: isDark ? '#2a2a2a' : '#fff',
+          boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.5)' : '0 1px 4px rgba(0,0,0,0.15)',
+          borderRadius: 0.5,
+          px: 0.6, py: 0.15,
+          whiteSpace: 'nowrap',
+          zIndex: 99999,
+          pointerEvents: 'none',
+        }}>
+          <Typography variant="caption" sx={{
+            fontSize: '0.6rem', fontWeight: 600, color: theme.palette.text.primary,
+          }}>
+            {fmtDur(hoverTime)}
+          </Typography>
+        </Box>,
+        document.body
+      )}
     </Box>
   );
 };

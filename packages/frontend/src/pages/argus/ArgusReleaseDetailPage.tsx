@@ -13,6 +13,8 @@ import {
   Tooltip,
   Avatar,
   LinearProgress,
+  Collapse,
+  IconButton,
 } from '@mui/material';
 import {
   NewReleases as ReleaseIcon,
@@ -28,6 +30,8 @@ import {
   Person as PersonIcon,
   RocketLaunch as DeployIcon,
   FiberManualRecord as DotIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -42,6 +46,7 @@ import IssueListItem from '@/components/argus/IssueListItem';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
+const COLLAPSE_STORAGE_KEY = 'argus_release_detail_collapsed';
 
 
 // --- Issue Tabs ---
@@ -99,10 +104,6 @@ const ReleaseHealthChart: React.FC<{
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
       borderRadius: 2, p: 2, mb: 3,
     }}>
-      <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <CheckIcon sx={{ fontSize: 16, color: lineColor }} />
-        {t('argus.releases.crashFreeRate', 'Crash Free Rate')}
-      </Typography>
       <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} width="100%" style={{ maxHeight: 180 }}>
         {/* Y-axis grid + labels */}
         {yTicks.map(tick => {
@@ -354,6 +355,22 @@ const ArgusReleaseDetailPage: React.FC = () => {
   });
   const [totalIssues, setTotalIssues] = useState(0);
 
+  // Collapsible sections - persisted in localStorage
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem(COLLAPSE_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+
+  const toggleSection = useCallback((key: string) => {
+    setCollapsed(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem(COLLAPSE_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
   }, [rowsPerPage]);
@@ -522,15 +539,47 @@ const ArgusReleaseDetailPage: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Release Health Chart */}
-            <ReleaseHealthChart data={healthData} isDark={isDark} />
-
-            {/* Session Status + Authors + Deploys */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
-              <SessionStatusChart releaseData={r} isDark={isDark} />
-              <CommitAuthorBreakdown isDark={isDark} />
-              <DeployHistory isDark={isDark} />
+            {/* Release Health Chart - Collapsible */}
+            <Box
+              onClick={() => toggleSection('healthChart')}
+              sx={{
+                display: 'flex', alignItems: 'center', cursor: 'pointer',
+                mb: collapsed.healthChart ? 3 : 0,
+                '&:hover': { opacity: 0.8 },
+              }}
+            >
+              <CheckIcon sx={{ fontSize: 16, color: '#4caf50', mr: 0.5 }} />
+              <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1 }}>
+                {t('argus.releases.crashFreeRate', 'Crash Free Rate')}
+              </Typography>
+              {collapsed.healthChart ? <ExpandMoreIcon sx={{ fontSize: 18, color: 'text.disabled' }} /> : <ExpandLessIcon sx={{ fontSize: 18, color: 'text.disabled' }} />}
             </Box>
+            <Collapse in={!collapsed.healthChart}>
+              <ReleaseHealthChart data={healthData} isDark={isDark} />
+            </Collapse>
+
+            {/* Session Status + Authors + Deploys - Collapsible */}
+            <Box
+              onClick={() => toggleSection('detailCards')}
+              sx={{
+                display: 'flex', alignItems: 'center', cursor: 'pointer',
+                mb: collapsed.detailCards ? 3 : 1,
+                '&:hover': { opacity: 0.8 },
+              }}
+            >
+              <DonutIcon sx={{ fontSize: 16, color: '#7c4dff', mr: 0.5 }} />
+              <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1 }}>
+                {t('argus.releaseDetail.detailCards', 'Details')}
+              </Typography>
+              {collapsed.detailCards ? <ExpandMoreIcon sx={{ fontSize: 18, color: 'text.disabled' }} /> : <ExpandLessIcon sx={{ fontSize: 18, color: 'text.disabled' }} />}
+            </Box>
+            <Collapse in={!collapsed.detailCards}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+                <SessionStatusChart releaseData={r} isDark={isDark} />
+                <CommitAuthorBreakdown isDark={isDark} />
+                <DeployHistory isDark={isDark} />
+              </Box>
+            </Collapse>
 
             <Divider sx={{ mb: 3 }} />
 
