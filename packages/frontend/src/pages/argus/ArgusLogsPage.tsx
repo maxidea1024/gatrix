@@ -161,7 +161,7 @@ const ArgusLogsSearchInput: React.FC<{
         <Box component="input"
           value={localSearch}
           spellCheck={false}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setLocalSearch(e.target.value); setSearchFocused(true); }}
           onKeyDown={handleSearchKey as any}
           onFocus={() => setSearchFocused(true)}
           placeholder={t('argus.discover.searchPlaceholder', 'Search for events, users, tags (e.g. level:error OR browser:Chrome)')}
