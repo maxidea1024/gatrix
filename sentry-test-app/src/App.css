@@ -1,0 +1,317 @@
+/* ========== Layout ========== */
+.app-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.app-header {
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-header h1 span {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* ========== Status Bar ========== */
+.status-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.status-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ========== Navigation ========== */
+.nav-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-secondary);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.nav-tab {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: all var(--transition);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-tab:hover {
+  color: var(--text-secondary);
+  background: var(--bg-card);
+}
+
+.nav-tab.active {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ========== Page Content ========== */
+.page-content {
+  min-height: 400px;
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.page-desc {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* ========== Cards ========== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: border-color var(--transition);
+}
+
+.card:hover {
+  border-color: var(--border-active);
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.card-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* ========== Buttons ========== */
+.btn-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  transition: all var(--transition);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-red { background: var(--accent-red); }
+.btn-orange { background: var(--accent-orange); }
+.btn-yellow { background: var(--accent-yellow); color: #1a1a2e; }
+.btn-green { background: var(--accent-green); }
+.btn-blue { background: var(--accent-blue); }
+.btn-purple { background: var(--accent-purple); }
+.btn-pink { background: var(--accent-pink); }
+.btn-cyan { background: var(--accent-cyan); }
+.btn-gray { background: var(--accent-gray); }
+.btn-dark { background: #374151; }
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* ========== Toggle ========== */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggle-label {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  appearance: none;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all var(--transition);
+}
+
+.toggle-switch:checked {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
+.toggle-switch:checked::after {
+  left: 20px;
+  background: #fff;
+}
+
+.active-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--accent-green);
+  padding: 0.15rem 0.5rem;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 10px;
+  animation: pulse 2s infinite;
+}
+
+/* ========== Log Level Badges ========== */
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  opacity: 0;
+  transition: all 300ms ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 1rem;
+  }
+
+  .nav-tabs {
+    gap: 0.125rem;
+  }
+
+  .nav-tab {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-row {
+    gap: 0.35rem;
+  }
+
+  .btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
