@@ -1,0 +1,38 @@
+[package]
+name = "symbolicator-js"
+publish = false
+version = "26.5.2"
+authors = ["Sentry <hello@getsentry.com>"]
+edition = "2024"
+license-file = "../../LICENSE.md"
+
+[dependencies]
+data-url = { workspace = true }
+futures = { workspace = true }
+humantime = { workspace = true }
+moka = { workspace = true }
+rand = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true, features = [
+    "gzip",
+    "brotli",
+    "deflate",
+    "json",
+    "stream",
+    "hickory-dns",
+] }
+sentry = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+symbolic = { workspace = true, features = ["common-serde", "sourcemapcache"] }
+symbolicator-service = { workspace = true }
+symbolicator-sources = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["rt", "macros", "fs"] }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+symbolicator-test = { workspace = true }

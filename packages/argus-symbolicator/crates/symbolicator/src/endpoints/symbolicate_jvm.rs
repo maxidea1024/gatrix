@@ -1,0 +1,88 @@
+use std::sync::Arc;
+
+use axum::{Json, extract};
+use serde::{Deserialize, Serialize};
+use symbolicator_proguard::interface::{
+    JvmException, JvmModule, JvmStacktrace, SymbolicateJvmStacktraces,
+};
+use symbolicator_service::types::{FrameOrder, Platform};
+use symbolicator_sources::SourceConfig;
+
+use crate::service::{RequestService, SymbolicationResponse};
+use crate::utils::sentry::ConfigureScope;
+
+use crate::endpoints::ResponseError;
+use crate::endpoints::symbolicate::SymbolicationRequestQueryParams;
+
+#[derive(Serialize, Deserialize)]
+pub struct JvmSymbolicationRequestBody {
+    pub platform: Option<Platform>,
+    pub sources: Arc<[SourceConfig]>,
+    #[serde(default)]
+    pub exceptions: Vec<JvmException>,
+    #[serde(default)]
+    pub stacktraces: Vec<JvmStacktrace>,
+    #[serde(default)]
+    pub modules: Vec<JvmModule>,
+    #[serde(default)]
+    pub release_package: Option<String>,
+    #[serde(default)]
+    pub classes: Vec<Arc<str>>,
+    #[serde(default)]
+    pub options: JvmRequestOptions,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(default)]
+pub struct JvmRequestOptions {
+    /// Whether to apply source context for the stack frames.
+    pub apply_source_context: bool,
+    /// The order in which stack frames are received by Symbolicator and returned to the caller.
+    pub frame_order: FrameOrder,
+}
+
+impl Default for JvmRequestOptions {
+    fn default() -> Self {
+        Self {
+            apply_source_context: true,
+            frame_order: FrameOrder::CallerFirst,
+        }
+    }
+}
+
+pub async fn handle_symbolication_request(
+    extract::State(service): extract::State<RequestService>,
+    extract::Query(params): extract::Query<SymbolicationRequestQueryParams>,
+    extract::Json(body): extract::Json<JvmSymbolicationRequestBody>,
+) -> Result<Json<SymbolicationResponse>, ResponseError> {
+    params.configure_scope();
+
+    let JvmSymbolicationRequestBody {
+        platform,
+        sources,
+        exceptions,
+        stacktraces,
+        modules,
+        release_package,
+        classes,
+        options,
+    } = body;
+
+    let request_id = service.symbolicate_jvm_stacktraces(SymbolicateJvmStacktraces {
+        platform,
+        scope: params.scope,
+        sources,
+        exceptions,
+        stacktraces,
+        modules,
+        release_package,
+        classes,
+        apply_source_context: options.apply_source_context,
+        frame_order: options.frame_order,
+    })?;
+
+    match service.get_response(request_id, params.timeout).await {
+        Some(response) => Ok(Json(response)),
+        None => Err("symbolication request did not start".into()),
+    }
+}

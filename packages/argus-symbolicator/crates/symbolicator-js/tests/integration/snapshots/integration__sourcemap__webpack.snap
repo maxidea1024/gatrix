@@ -1,0 +1,83 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+expression: response
+---
+stacktraces:
+  - frames:
+      - function: test
+        filename: "./src/components/CampaignContent.tsx"
+        module: src/components/CampaignContent
+        abs_path: "webpack:///./src/components/CampaignContent.tsx"
+        lineno: 20
+        colno: 5
+        pre_context:
+          - "    cb(data);"
+          - "  }"
+          - ""
+          - "  function test() {"
+          - "    var data = {failed: true, value: 42};"
+        context_line: "    invoke(data);"
+        post_context:
+          - "  }"
+          - ""
+          - "  return test;"
+          - "})();"
+        data:
+          sourcemap: "http://example.com/test1.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release-old
+          symbolicated: true
+      - function: test
+        filename: "./src/node_modules/components/CampaignContent.tsx"
+        module: src/node_modules/components/CampaignContent
+        abs_path: "webpack:///./src/node_modules/components/CampaignContent.tsx"
+        lineno: 20
+        colno: 5
+        pre_context:
+          - "    cb(data);"
+          - "  }"
+          - ""
+          - "  function test() {"
+          - "    var data = {failed: true, value: 42};"
+        context_line: "    invoke(data);"
+        post_context:
+          - "  }"
+          - ""
+          - "  return test;"
+          - "})();"
+        data:
+          sourcemap: "http://example.com/test2.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/4"
+          resolved_with: release-old
+          symbolicated: true
+raw_stacktraces:
+  - frames:
+      - function: i
+        filename: test1.min.js
+        abs_path: "http://example.com/test1.min.js"
+        lineno: 1
+        colno: 183
+        context_line: "{snip} row new Error(\"failed!\")}function r(r){var i=null;if(r.failed){i=e}else{i=n}i(r)}function i(){var n={failed:true,value:42};r(n)}return i}();"
+        post_context:
+          - "//# sourceMappingURL=test1.min.js.map"
+        data:
+          symbolicated: false
+      - function: i
+        filename: test2.min.js
+        abs_path: "http://example.com/test2.min.js"
+        lineno: 1
+        colno: 183
+        context_line: "{snip} row new Error(\"failed!\")}function r(r){var i=null;if(r.failed){i=e}else{i=n}i(r)}function i(){var n={failed:true,value:42};r(n)}return i}();"
+        post_context:
+          - "//# sourceMappingURL=test2.min.js.map"
+        data:
+          symbolicated: false
+scraping_attempts:
+  - url: "http://example.com/test1.min.js"
+    status: not_attempted
+  - url: "http://example.com/test1.min.js.map"
+    status: not_attempted
+  - url: "http://example.com/test2.min.js"
+    status: not_attempted
+  - url: "http://example.com/test2.min.js.map"
+    status: not_attempted

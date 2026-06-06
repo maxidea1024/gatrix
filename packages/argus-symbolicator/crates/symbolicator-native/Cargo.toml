@@ -1,0 +1,47 @@
+[package]
+name = "symbolicator-native"
+publish = false
+version = "26.5.2"
+authors = ["Sentry <hello@getsentry.com>"]
+edition = "2024"
+license-file = "../../LICENSE.md"
+
+[dependencies]
+anyhow = { workspace = true }
+apple-crash-report-parser = { workspace = true }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+futures = { workspace = true }
+minidump = { workspace = true }
+minidump-processor = { workspace = true }
+minidump-unwind = { workspace = true }
+moka = { workspace = true }
+regex = { workspace = true }
+sentry = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+symbolic = { workspace = true, features = [
+    "cfi",
+    "common-serde",
+    "debuginfo",
+    "demangle",
+    "symcache",
+    "il2cpp",
+    "ppdb",
+] }
+symbolicator-service = { workspace = true }
+symbolicator-sources = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true, features = ["io"] }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+axum = { workspace = true }
+insta = { workspace = true }
+symbolicator-test = { workspace = true }
+test-assembler = { workspace = true }
+tokio = { workspace = true, features = ["rt", "macros", "fs"] }
+zstd = { workspace = true }

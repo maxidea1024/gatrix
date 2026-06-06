@@ -1,0 +1,76 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+expression: response
+---
+stacktraces:
+  - frames:
+      - function: add
+        filename: file1.js
+        module: file1
+        abs_path: "http://example.com/file1.js"
+        lineno: 3
+        colno: 9
+        pre_context:
+          - "function add(a, b) {"
+          - "\t\"use strict\";"
+        context_line: "\treturn a + b; // fôo"
+        post_context:
+          - "}"
+        data:
+          sourcemap: "http://example.com/indexed.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release-old
+          symbolicated: true
+      - function: multiply
+        filename: file2.js
+        module: file2
+        abs_path: "http://example.com/file2.js"
+        lineno: 3
+        colno: 9
+        pre_context:
+          - "function multiply(a, b) {"
+          - "\t\"use strict\";"
+        context_line: "\treturn a * b;"
+        post_context:
+          - "}"
+          - "function divide(a, b) {"
+          - "\t\"use strict\";"
+          - "\ttry {"
+          - "\t\treturn multiply(add(a, b), a, b) / c;"
+        data:
+          sourcemap: "http://example.com/indexed.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release-old
+          symbolicated: true
+raw_stacktraces:
+  - frames:
+      - filename: indexed.min.js
+        abs_path: "http://example.com/indexed.min.js"
+        lineno: 1
+        colno: 39
+        context_line: "function add(a,b){\"use strict\";return a+b}"
+        post_context:
+          - "function multiply(a,b){\"use strict\";return a*b}function divide(a,b){\"use strict\";try{return multiply(add(a,b),a,b)/c}catch(e){Raven.captureE {snip}"
+          - "//# sourceMappingURL=indexed.min.js.map"
+        data:
+          symbolicated: false
+      - filename: indexed.min.js
+        abs_path: "http://example.com/indexed.min.js"
+        lineno: 2
+        colno: 44
+        pre_context:
+          - "function add(a,b){\"use strict\";return a+b}"
+        context_line: "function multiply(a,b){\"use strict\";return a*b}function divide(a,b){\"use strict\";try{return multiply(add(a,b),a,b)/c}catch(e){Raven.captureE {snip}"
+        post_context:
+          - "//# sourceMappingURL=indexed.min.js.map"
+        data:
+          symbolicated: false
+scraping_attempts:
+  - url: "http://example.com/file1.js"
+    status: not_attempted
+  - url: "http://example.com/file2.js"
+    status: not_attempted
+  - url: "http://example.com/indexed.min.js"
+    status: not_attempted
+  - url: "http://example.com/indexed.min.js.map"
+    status: not_attempted

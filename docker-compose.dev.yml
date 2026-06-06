@@ -643,6 +643,31 @@ services:
     networks:
       - gatrix-dev-network
 
+  # Argus Symbolicator - Debug symbol & source map symbolication service (Rust)
+  argus-symbolicator:
+    build:
+      context: ./packages/argus-symbolicator
+      dockerfile: Dockerfile
+    container_name: gatrix-symbolicator-dev
+    restart: unless-stopped
+    ports:
+      - '0.0.0.0:${SYMBOLICATOR_PORT:-3021}:3021'
+    volumes:
+      - ./packages/argus-symbolicator/symbolicator.yml:/etc/symbolicator/config.yml:ro
+      - ${DATA_ROOT:-./data}/symbolicator/cache:/data/cache
+      - ${DATA_ROOT:-./data}/symbolicator/symbols:/data/symbols
+    networks:
+      gatrix-dev-network:
+        aliases:
+          - symbolicator
+    command: run -c /etc/symbolicator/config.yml
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:3021/healthcheck || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+
 networks:
   gatrix-dev-network:
     driver: bridge

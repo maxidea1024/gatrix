@@ -1,0 +1,41 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+assertion_line: 293
+expression: response
+---
+stacktraces:
+  - frames:
+      - function: add
+        abs_path: "app:///nofiles.js"
+        lineno: 3
+        colno: 9
+        pre_context:
+          - "function add(a, b) {"
+          - "\t\"use strict\";"
+        context_line: "\treturn a + b; // fôo"
+        post_context:
+          - "}"
+        data:
+          sourcemap: "app:///nofiles.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release
+          symbolicated: true
+raw_stacktraces:
+  - frames:
+      - abs_path: "app:///nofiles.js"
+        lineno: 1
+        colno: 39
+        context_line: "function add(a, b) {"
+        post_context:
+          - "  'use strict';"
+          - "  return a + b;"
+          - "}"
+          - "function multiply(a, b) {"
+          - "  'use strict';"
+        data:
+          symbolicated: false
+scraping_attempts:
+  - url: "app:///nofiles.js"
+    status: not_attempted
+  - url: "app:///nofiles.js.map"
+    status: not_attempted

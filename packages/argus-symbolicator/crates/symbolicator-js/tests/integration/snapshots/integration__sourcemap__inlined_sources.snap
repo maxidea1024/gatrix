@@ -1,0 +1,34 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+assertion_line: 261
+expression: response
+---
+stacktraces:
+  - frames:
+      - function: "<unknown>"
+        filename: /test.js
+        module: test
+        abs_path: "http://example.com/test.js"
+        lineno: 1
+        colno: 1
+        context_line: "console.log('hello, World!')"
+        data:
+          sourcemap: "http://example.com/test.min.js"
+          sourcemap_origin: embedded
+          resolved_with: release
+          symbolicated: true
+raw_stacktraces:
+  - frames:
+      - filename: test.js
+        abs_path: "http://example.com/test.min.js"
+        lineno: 1
+        colno: 1
+        context_line: // <generated source>
+        post_context:
+          - "// Decoded sourcemap: {\"version\":3,\"file\":\"generated.js\",\"sources\":[\"/test.js\"],\"names\":[],\"mappings\":\"AAAA\",\"sourcesContent\":[\"console.log( {snip}"
+          - "//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ2VuZXJhdGVkLmpzIiwic291cmNlcyI6WyIvdGVzdC5qcyJdLCJuYW1lcyI6W1 {snip}"
+        data:
+          symbolicated: false
+scraping_attempts:
+  - url: "http://example.com/test.min.js"
+    status: not_attempted

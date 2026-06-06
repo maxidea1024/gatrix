@@ -1,0 +1,723 @@
+use std::collections::{BTreeMap, HashMap};
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
+use std::time::Instant;
+
+use anyhow::Result;
+use async_trait::async_trait;
+use chrono::{DateTime, Utc};
+use minidump::system_info::Os;
+use minidump::{MinidumpContext, MinidumpModuleList, MinidumpSystemInfo};
+use minidump::{MinidumpModule, Module};
+use minidump_processor::ProcessState;
+use minidump_unwind::{
+    FileError, FileKind, FillSymbolError, FrameSymbolizer, FrameWalker, SymbolProvider,
+};
+use sentry::types::DebugId;
+use sentry::{Hub, SentryFutureExt};
+use serde::{Deserialize, Serialize};
+use symbolic::common::{Arch, ByteView};
+use symbolicator_service::metric;
+use symbolicator_service::types::{FrameOrder, ObjectFileStatus, RawObjectInfo, Scope};
+use symbolicator_service::utils::hex::HexValue;
+use symbolicator_sources::{ObjectId, ObjectType, SourceConfig};
+use tokio::sync::Notify;
+
+use crate::caches::cficaches::{CfiCacheActor, CfiModuleInfo, FetchCfiCache, FetchedCfiCache};
+use crate::caches::derived::DerivedCache;
+use crate::caches::symcaches::{FetchSymCache, OwnedSymCache, SymCacheActor};
+use crate::interface::{
+    CompleteObjectInfo, CompletedSymbolicationResponse, ProcessMinidump, RawFrame, RawStacktrace,
+    Registers, RewriteRules, SymbolicateStacktraces, SystemInfo,
+};
+use crate::metrics::StacktraceOrigin;
+use crate::symbolication::attachments::download_attachment;
+
+use super::minidump_stacktraces::parse_stacktraces_from_minidump;
+use super::module_lookup::object_file_status_from_cache_contents;
+use super::symbolicate::SymbolicationActor;
+
+type Minidump = minidump::Minidump<'static, ByteView<'static>>;
+
+#[derive(Debug, Serialize, Deserialize)]
+struct StackWalkMinidumpResult {
+    modules: Vec<CompleteObjectInfo>,
+    stacktraces: Vec<RawStacktrace>,
+    minidump_state: MinidumpState,
+    duration: std::time::Duration,
+}
+
+/// Contains some meta-data about a minidump.
+///
+/// The minidump meta-data contained here is extracted in the [`stackwalk`]
+/// function and merged into the final symbolication result.
+///
+/// A few more convenience methods exist to help with building the symbolication results.
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub(super) struct MinidumpState {
+    timestamp: DateTime<Utc>,
+    system_info: SystemInfo,
+    crashed: bool,
+    crash_reason: String,
+    assertion: String,
+}
+
+impl MinidumpState {
+    fn from_process_state(process_state: &ProcessState) -> Self {
+        let info = &process_state.system_info;
+
+        let cpu_arch = match info.cpu {
+            minidump::system_info::Cpu::X86 => Arch::X86,
+            minidump::system_info::Cpu::X86_64 => Arch::Amd64,
+            minidump::system_info::Cpu::Ppc => Arch::Ppc,
+            minidump::system_info::Cpu::Ppc64 => Arch::Ppc64,
+            minidump::system_info::Cpu::Arm => Arch::Arm,
+            minidump::system_info::Cpu::Arm64 => Arch::Arm64,
+            minidump::system_info::Cpu::Mips => Arch::Mips,
+            minidump::system_info::Cpu::Mips64 => Arch::Mips64,
+            arch => {
+                let msg = format!("Unknown minidump arch: {arch}");
+                sentry::capture_message(&msg, sentry::Level::Error);
+                Arch::Unknown
+            }
+        };
+
+        MinidumpState {
+            timestamp: process_state.time.into(),
+            system_info: SystemInfo {
+                os_name: normalize_minidump_os_name(info.os).to_owned(),
+                os_version: info.os_version.clone().unwrap_or_default(),
+                os_build: info.os_build.clone().unwrap_or_default(),
+                cpu_arch,
+                device_model: String::default(),
+            },
+            crashed: process_state.crashed(),
+            crash_reason: process_state
+                .exception_info
+                .as_ref()
+                .map(|info| format!("{} / {:#x}", info.reason, info.address.0))
+                .unwrap_or_default(),
+            assertion: process_state.assertion.clone().unwrap_or_default(),
+        }
+    }
+
+    /// Merges this meta-data into a symbolication result.
+    ///
+    /// This updates the `response` with the meta-data contained.
+    fn merge_into(mut self, response: &mut CompletedSymbolicationResponse) {
+        if self.system_info.cpu_arch == Arch::Unknown {
+            self.system_info.cpu_arch = response
+                .modules
+                .iter()
+                .map(|object| object.arch)
+                .find(|arch| *arch != Arch::Unknown)
+                .unwrap_or_default();
+        }
+
+        response.timestamp = Some(self.timestamp);
+        response.system_info = Some(self.system_info);
+        response.crashed = Some(self.crashed);
+        response.crash_reason = Some(self.crash_reason);
+        response.assertion = Some(self.assertion);
+    }
+}
+
+/// The Key that is used for looking up the [`Module`] in the per-stackwalk CFI / computation cache.
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+struct LookupKey {
+    base_addr: u64,
+    size: u64,
+}
+
+impl LookupKey {
+    /// Creates a new lookup key for the given [`Module`].
+    fn new(module: &dyn Module) -> Self {
+        Self {
+            base_addr: module.base_address(),
+            size: module.size(),
+        }
+    }
+}
+
+#[derive(Clone)]
+enum LazyCfiCache {
+    Fetched(Arc<FetchedCfiCache>),
+    Fetching(Arc<Notify>),
+}
+
+/// A [`SymbolProvider`] that uses a [`CfiCacheActor`] to fetch
+/// CFI for stackwalking.
+///
+/// An instance of this type is always used to stackwalk one particular minidump.
+struct SymbolicatorSymbolProvider {
+    /// The scope of the stackwalking request.
+    scope: Scope,
+    /// The sources from which to fetch CFI.
+    sources: Arc<[SourceConfig]>,
+    /// The object type of the minidump to stackwalk.
+    object_type: ObjectType,
+    /// The actor used for fetching CFI.
+    cficache_actor: CfiCacheActor,
+    /// The actor used for fetching symcaches.
+    ///
+    /// Note that debug information is currently _not_ used to symbolicate frames
+    /// during stackwalking (which `rust-minidump` supports in principle). Rather,
+    /// we use it as a sanity check for `rust-minidump`'s stackwalker. See the
+    /// implementation of `fill_symbol` for details.
+    symcache_actor: SymCacheActor,
+    /// The debug ID of the first module in the minidump
+    /// (by address).
+    ///
+    /// This is used in conjunction with `rewrite_first_module`
+    /// to rewrite the first module's debug file.
+    first_module_debug_id: Option<DebugId>,
+    /// Rules to rewrite the first module's debug file.
+    ///
+    /// Note that the debug file is "rewritten" only for the
+    /// purpose of the lookup. The file name in the minidump itself
+    /// is unaffected.
+    rewrite_first_module: RewriteRules,
+    /// An internal database of loaded CFI.
+    cficaches: Mutex<HashMap<LookupKey, LazyCfiCache>>,
+}
+
+impl SymbolicatorSymbolProvider {
+    pub fn new(
+        scope: Scope,
+        sources: Arc<[SourceConfig]>,
+        cficache_actor: CfiCacheActor,
+        symcache_actor: SymCacheActor,
+        object_type: ObjectType,
+        first_module_debug_id: Option<DebugId>,
+        rewrite_first_module: RewriteRules,
+    ) -> Self {
+        Self {
+            scope,
+            sources,
+            cficache_actor,
+            symcache_actor,
+            object_type,
+            first_module_debug_id,
+            rewrite_first_module,
+            cficaches: Default::default(),
+        }
+    }
+
+    fn object_id_from_module(&self, module: &dyn Module) -> ObjectId {
+        let code_file = non_empty_file_name(&module.code_file());
+        let mut debug_file = module.debug_file().as_deref().and_then(non_empty_file_name);
+
+        // Rewrite the first module's debug file according to the configured rewrite rules.
+        if module.debug_identifier() == self.first_module_debug_id
+            && let Some(new_debug_file) = debug_file
+                .as_ref()
+                .and_then(|debug_file| self.rewrite_first_module.rewrite(debug_file))
+        {
+            debug_file = Some(new_debug_file);
+        }
+
+        ObjectId {
+            code_id: module.code_identifier(),
+            code_file,
+            debug_id: module.debug_identifier(),
+            debug_file,
+            debug_checksum: None,
+            object_type: self.object_type,
+        }
+    }
+
+    /// Fetches CFI for the given module, parses it into a `SymbolFile`, and stores it internally.
+    async fn load_cfi_module(&self, module: &(dyn Module + Sync)) -> Arc<FetchedCfiCache> {
+        let key = LookupKey::new(module);
+
+        loop {
+            // FIXME: ideally, we would like to only lock once here, but the borrow checker does not
+            // understand that `drop()`-ing the guard before the `notified().await` does not hold
+            // the guard across an `await` point.
+            // Currently, it still thinks it does, and makes the resulting future `!Send`.
+            // We will therefore double-lock again in the `None` branch.
+            let entry = self.cficaches.lock().unwrap().get(&key).cloned();
+            match entry {
+                Some(LazyCfiCache::Fetched(cficache)) => return cficache,
+                Some(LazyCfiCache::Fetching(notify)) => {
+                    // unlock, wait and then try again
+                    notify.notified().await;
+                }
+                None => {
+                    // insert a notifier for concurrent accesses, then go on to actually fetch
+                    let mut cficaches = self.cficaches.lock().unwrap();
+                    cficaches.insert(key.clone(), LazyCfiCache::Fetching(Arc::new(Notify::new())));
+                    break;
+                }
+            }
+        }
+
+        let sources = self.sources.clone();
+        let scope = self.scope.clone();
+        let identifier = self.object_id_from_module(module);
+
+        let cficache = self
+            .cficache_actor
+            .fetch(FetchCfiCache {
+                object_type: self.object_type,
+                identifier,
+                sources,
+                scope,
+            })
+            // NOTE: this `bind_hub` is important!
+            // `load_cfi_module` is being called concurrently from `rust-minidump` via
+            // `join_all`. We do need proper isolation of any async task that might
+            // manipulate any Sentry scope.
+            .bind_hub(Hub::new_from_top(Hub::current()))
+            .await;
+
+        let cficache = Arc::new(cficache);
+        let mut cficaches = self.cficaches.lock().unwrap();
+        if let Some(LazyCfiCache::Fetching(notify)) =
+            cficaches.insert(key, LazyCfiCache::Fetched(cficache.clone()))
+        {
+            notify.notify_waiters();
+        }
+        cficache
+    }
+
+    /// Fetches debug info for the given module and parses it into a `SymCache`.
+    async fn load_symcache(&self, module: &(dyn Module + Sync)) -> DerivedCache<OwnedSymCache> {
+        let sources = self.sources.clone();
+        let scope = self.scope.clone();
+        let identifier = self.object_id_from_module(module);
+
+        self.symcache_actor
+            .fetch(FetchSymCache {
+                object_type: self.object_type,
+                identifier,
+                sources,
+                scope,
+            })
+            // NOTE: this `bind_hub` is important!
+            // `load_symcache` is being called concurrently from `rust-minidump` via
+            // `join_all`. We do need proper isolation of any async task that might
+            // manipulate any Sentry scope.
+            .bind_hub(Hub::new_from_top(Hub::current()))
+            .await
+    }
+
+    /// Try to validate the given frame's instruction address against the CFI for the module
+    /// (if we have it).
+    ///
+    /// Returns `false` if we have CFI for the module, but that CFI doesn't cover the frame's
+    /// instruction address. Returns `true` in any other case.
+    ///
+    /// This helps the `rust-minidump`'s stack-walker to make better decisions.
+    /// If the successfully loaded CFI unwind info can not find the potential instruction
+    /// the passed instruction is most likely not a valid instruction from this module.
+    /// But since the instruction maps into the range of this module, we know it cannot
+    /// be part of a different module either -> it's not a valid instruction.
+    ///
+    /// See: <https://github.com/rust-minidump/rust-minidump/blob/32e01a0e54d987025aa64486ebc4154f7f6b16d2/minidump-unwind/src/lib.rs#L865-L877>
+    async fn check_frame_by_cfi(
+        &self,
+        module: &(dyn Module + Sync),
+        frame: &mut (dyn FrameSymbolizer + Send),
+    ) -> bool {
+        // This function is being called (through `fill_symbol`) for every context frame,
+        // regardless if any stack walking happens.
+        // In contrast, `walk_frame` below will be skipped in case the minidump
+        // does not contain any actionable stack memory that would allow stack walking.
+        // Loading this module here means we will be able to backfill a possibly missing
+        // debug_id/file.
+        let cfi_module = self.load_cfi_module(module).await;
+
+        if let Ok(Some(cached)) = &cfi_module.cache {
+            let cfi = &cached.0.cfi_stack_info;
+            let instruction = frame.get_instruction() - module.base_address();
+
+            if !cfi.is_empty() && cfi.get(instruction).is_none() {
+                // We definitely do have CFI information loaded, but the given instruction does not
+                // map to any stack frame info.
+                return false;
+            }
+        }
+
+        true
+    }
+
+    /// Try to validate the given frame's instruction address against the debug information
+    /// for the module (if we have it).
+    ///
+    /// Returns `false` if we have debug info for the module, but that debug info doesn't cover the frame's
+    /// instruction address. Returns `true` in any other case.
+    ///
+    /// This helps the `rust-minidump`'s stack-walker to make better decisions.
+    /// If the successfully loaded symcache can not find the potential instruction
+    /// the passed instruction is most likely not a valid instruction from this module.
+    /// But since the instruction maps into the range of this module, we know it cannot
+    /// be part of a different module either -> it's not a valid instruction.
+    ///
+    /// See: <https://github.com/rust-minidump/rust-minidump/blob/32e01a0e54d987025aa64486ebc4154f7f6b16d2/minidump-unwind/src/lib.rs#L865-L877>
+    async fn check_frame_by_symbol_info(
+        &self,
+        module: &(dyn Module + Sync),
+        frame: &mut (dyn FrameSymbolizer + Send),
+    ) -> bool {
+        let symcache = self.load_symcache(module).await;
+
+        if let Ok(cached) = &symcache.cache {
+            let instruction = frame.get_instruction() - module.base_address();
+
+            if cached.get().lookup(instruction).next().is_none() {
+                // We definitely do have symbol information loaded, but the given instruction does not
+                // map to any symbol info.
+                return false;
+            }
+        }
+
+        true
+    }
+}
+
+#[async_trait]
+impl SymbolProvider for SymbolicatorSymbolProvider {
+    async fn fill_symbol(
+        &self,
+        module: &(dyn Module + Sync),
+        frame: &mut (dyn FrameSymbolizer + Send),
+    ) -> Result<(), FillSymbolError> {
+        if self.check_frame_by_cfi(module, frame).await
+            || self.check_frame_by_symbol_info(module, frame).await
+        {
+            // If either CFI or symbol info does not reject the frame, return an error here to signal that
+            // we have no useful symbol information to contribute. Doing nothing would stop the stack scanning prematurely.
+            Err(FillSymbolError {})
+        } else {
+            // To indicate a that a potential instruction is not valid, we can return success
+            // here but also not fill in the symbol name. This will cause `rust-minidump`'s stack
+            // scanner to disregard the frame.
+            Ok(())
+        }
+    }
+
+    async fn walk_frame(
+        &self,
+        module: &(dyn Module + Sync),
+        walker: &mut (dyn FrameWalker + Send),
+    ) -> Option<()> {
+        let cfi_module = self.load_cfi_module(module).await;
+        cfi_module.cache.clone().ok()??.0.walk_frame(module, walker)
+    }
+
+    async fn get_file_path(
+        &self,
+        _module: &(dyn Module + Sync),
+        _kind: FileKind,
+    ) -> Result<PathBuf, FileError> {
+        Err(FileError::NotFound)
+    }
+}
+
+fn object_info_from_minidump_module(ty: ObjectType, module: &MinidumpModule) -> CompleteObjectInfo {
+    // Some modules are not objects but rather fonts or JIT areas or other mmapped files
+    // which we don't care about.  These may not have complete information so map these to
+    // our schema by converting to None when needed.
+    let code_id = module
+        .code_identifier()
+        .filter(|code_id| !code_id.is_nil())
+        .map(|code_id| code_id.to_string().to_lowercase());
+    let code_file = non_empty_file_name(&module.code_file());
+    let debug_file = module.debug_file().as_deref().and_then(non_empty_file_name);
+
+    CompleteObjectInfo::from(RawObjectInfo {
+        ty,
+        code_id,
+        code_file,
+        debug_id: module.debug_identifier().map(|c| c.breakpad().to_string()),
+        debug_file,
+        debug_checksum: None,
+        image_addr: HexValue(module.base_address()),
+        image_size: match module.size() {
+            0 => None,
+            size => Some(size),
+        },
+    })
+}
+
+async fn stackwalk(
+    cficaches: CfiCacheActor,
+    symcaches: SymCacheActor,
+    minidump: &Minidump,
+    scope: Scope,
+    sources: Arc<[SourceConfig]>,
+    rewrite_first_module: RewriteRules,
+) -> Result<StackWalkMinidumpResult> {
+    // Stackwalk the minidump.
+    let duration = Instant::now();
+    let system_info = minidump
+        .get_stream::<MinidumpSystemInfo>()
+        .map_err(|_| minidump_processor::ProcessError::MissingSystemInfo)?;
+    let ty = match system_info.os {
+        Os::Windows => ObjectType::Pe,
+        Os::MacOs | Os::Ios => ObjectType::Macho,
+        Os::Linux | Os::Solaris | Os::Android => ObjectType::Elf,
+        _ => ObjectType::Unknown,
+    };
+    let first_module_debug_id =
+        minidump
+            .get_stream::<MinidumpModuleList>()
+            .ok()
+            .and_then(|modules| {
+                let m = modules.by_addr().next()?;
+                m.debug_identifier()
+            });
+    let provider = SymbolicatorSymbolProvider::new(
+        scope,
+        sources,
+        cficaches,
+        symcaches,
+        ty,
+        first_module_debug_id,
+        rewrite_first_module,
+    );
+    let process_state = minidump_processor::process_minidump(minidump, &provider).await?;
+    let duration = duration.elapsed();
+
+    let minidump_state = MinidumpState::from_process_state(&process_state);
+
+    // Finally iterate through the threads and build the stacktraces to
+    // return, marking modules as used when they are referenced by a frame.
+    let requesting_thread_index: Option<usize> = process_state.requesting_thread;
+    let threads = process_state.threads;
+    let mut stacktraces = Vec::with_capacity(threads.len());
+    for (index, thread) in threads.into_iter().enumerate() {
+        let registers = match thread.frames.first() {
+            Some(frame) => map_symbolic_registers(&frame.context),
+            None => Registers::new(),
+        };
+
+        // We trim stack traces to 256 frames from the top. A similar limit is also in place in
+        // relay / store normalization, so any excess frames will be thrown away by Sentry anyway.
+        let frames = thread
+            .frames
+            .into_iter()
+            .take(256)
+            .map(|frame| {
+                let package = frame
+                    .module
+                    .and_then(|module| non_empty_file_name(&module.code_file()));
+                RawFrame {
+                    instruction_addr: HexValue(frame.resume_address),
+                    package,
+                    trust: frame.trust.into(),
+                    ..RawFrame::default()
+                }
+            })
+            .collect();
+
+        stacktraces.push(RawStacktrace {
+            is_requesting: requesting_thread_index.map(|r| r == index),
+            thread_name: thread.thread_name,
+            thread_id: Some(thread.thread_id.into()),
+            registers,
+            frames,
+        });
+    }
+
+    // Start building the module list for the symbolication response.
+    // After stackwalking, `provider.cficaches` contains entries for exactly
+    // those modules that were referenced by some stack frame in the minidump.
+    let mut modules = vec![];
+    let mut cficaches = provider.cficaches.into_inner().unwrap();
+    for module in process_state.modules.by_addr() {
+        let key = LookupKey::new(module);
+
+        // Discard modules that weren't used and don't have any valid id to go by.
+        let debug_id = module.debug_identifier();
+        let code_id = module.code_identifier();
+        if !cficaches.contains_key(&key) && debug_id.is_none() && code_id.is_none() {
+            continue;
+        }
+
+        let mut obj_info = object_info_from_minidump_module(ty, module);
+
+        let unwind_status = match cficaches.remove(&key) {
+            Some(LazyCfiCache::Fetched(cfi_module)) => {
+                let cfi_module = Arc::into_inner(cfi_module).unwrap();
+                obj_info.features.merge(cfi_module.features);
+                // NOTE: minidump stackwalking is the first thing that happens to a request,
+                // hence the current candidate list is empty.
+                obj_info.candidates = cfi_module.candidates;
+
+                // if the debug_id/file is empty, it might be possible to
+                // backfill that using the reference in the executable file.
+                if let Ok(Some(cfi_item)) = &cfi_module.cache
+                    && let Some(cfi_module_info) = &cfi_item.1
+                {
+                    maybe_backfill_debugid(&mut obj_info.raw, cfi_module_info);
+                }
+
+                object_file_status_from_cache_contents(&cfi_module.cache)
+            }
+            _ => ObjectFileStatus::Unused,
+        };
+        obj_info.unwind_status = Some(unwind_status);
+
+        metric!(
+            counter("symbolication.unwind_status") += 1,
+            "status" => obj_info.unwind_status.unwrap_or(ObjectFileStatus::Unused).name(),
+        );
+
+        modules.push(obj_info);
+    }
+
+    Ok(StackWalkMinidumpResult {
+        modules,
+        stacktraces,
+        minidump_state,
+        duration,
+    })
+}
+
+fn maybe_backfill_debugid(info: &mut RawObjectInfo, cfi_module: &CfiModuleInfo) {
+    if info.debug_id.is_none() {
+        info.debug_id = Some(cfi_module.debug_id.to_string());
+    }
+    if info.debug_file.is_none() {
+        info.debug_file = Some(cfi_module.debug_file.clone());
+    }
+}
+
+impl SymbolicationActor {
+    pub async fn process_minidump(
+        &self,
+        request: ProcessMinidump,
+    ) -> Result<CompletedSymbolicationResponse> {
+        let (request, state) = self.stackwalk_minidump(request).await?;
+
+        let mut response = self.symbolicate(request).await?;
+        state.merge_into(&mut response);
+
+        Ok(response)
+    }
+
+    #[tracing::instrument(skip_all)]
+    async fn stackwalk_minidump(
+        &self,
+        request: ProcessMinidump,
+    ) -> Result<(SymbolicateStacktraces, MinidumpState)> {
+        let ProcessMinidump {
+            platform,
+            scope,
+            minidump_file,
+            sources,
+            scraping,
+            rewrite_first_module,
+        } = request;
+        let minidump_file = download_attachment(&self.download_svc, minidump_file).await?;
+        let len = minidump_file.metadata()?.len();
+        tracing::debug!("Processing minidump ({} bytes)", len);
+        metric!(distribution("minidump.upload.size") = len as f64);
+
+        let bv = ByteView::map_file(minidump_file)?;
+        let minidump = Minidump::read(bv)?;
+
+        let StackWalkMinidumpResult {
+            modules,
+            mut stacktraces,
+            minidump_state,
+            duration,
+        } = stackwalk(
+            self.cficaches.clone(),
+            self.symcaches.clone(),
+            &minidump,
+            scope.clone(),
+            sources.clone(),
+            rewrite_first_module.clone(),
+        )
+        .await?;
+
+        metric!(timer("minidump.stackwalk.duration") = duration);
+
+        match parse_stacktraces_from_minidump(&minidump) {
+            Ok(Some(client_stacktraces)) => {
+                merge_clientside_with_processed_stacktraces(&mut stacktraces, client_stacktraces)
+            }
+            Err(e) => tracing::error!("invalid minidump extension: {}", e),
+            _ => (),
+        }
+
+        let request = SymbolicateStacktraces {
+            platform,
+            modules,
+            scope,
+            sources,
+            origin: StacktraceOrigin::Minidump,
+            signal: None,
+            stacktraces,
+            apply_source_context: true,
+            scraping,
+            rewrite_first_module,
+            frame_order: FrameOrder::CalleeFirst,
+        };
+
+        Ok((request, minidump_state))
+    }
+}
+
+/// Merges the stacktraces processed via rust-minidump with the ones captured on the client.
+///
+/// For now, this means we will prefer the client-side stack trace over the processed one, but in
+/// the future we could be a bit smarter about what to do.
+fn merge_clientside_with_processed_stacktraces(
+    processed_stacktraces: &mut [RawStacktrace],
+    clientside_stacktraces: Vec<RawStacktrace>,
+) {
+    let mut client_traces_by_id: HashMap<_, _> = clientside_stacktraces
+        .into_iter()
+        .filter_map(|trace| trace.thread_id.map(|thread_id| (thread_id, trace)))
+        .collect();
+
+    for thread in processed_stacktraces {
+        if let Some(thread_id) = thread.thread_id
+            && let Some(client_thread) = client_traces_by_id.remove(&thread_id)
+        {
+            // NOTE: we could gather all kinds of metrics here, as in:
+            // - are we finding more or less frames via CFI?
+            // - how many frames are the same
+            // - etc.
+            // We could also be a lot smarter about which threads/frames we chose. For now we
+            // will just always prefer client-side stack traces
+            if !client_thread.frames.is_empty() {
+                thread.frames = client_thread.frames;
+            }
+        }
+    }
+}
+
+fn map_symbolic_registers(context: &MinidumpContext) -> BTreeMap<String, HexValue> {
+    context
+        .valid_registers()
+        .map(|(reg, val)| (reg.to_owned(), HexValue(val)))
+        .collect()
+}
+
+fn normalize_minidump_os_name(os: Os) -> &'static str {
+    // Be aware that MinidumpState::object_type matches on names produced here.
+    match os {
+        Os::Windows => "Windows",
+        Os::MacOs => "macOS",
+        Os::Ios => "iOS",
+        Os::Linux => "Linux",
+        Os::Solaris => "Solaris",
+        Os::Android => "Android",
+        Os::Ps3 => "PS3",
+        Os::NaCl => "NaCl",
+        Os::Unknown(_) => "",
+    }
+}
+
+/// Returns an owned version of `file_name`, or `None` if it is empty.
+fn non_empty_file_name(file_name: &str) -> Option<String> {
+    if file_name.is_empty() {
+        return None;
+    }
+    Some(file_name.to_owned())
+}

@@ -3437,17 +3437,74 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gatrix/argus@workspace:packages/argus":
+"@gatrix/argus-cli@workspace:packages/argus-cli":
+  version: 0.0.0-use.local
+  resolution: "@gatrix/argus-cli@workspace:packages/argus-cli"
+  dependencies:
+    "@types/node": "npm:^22.16.0"
+    "@types/node-fetch": "npm:^2.6.12"
+    chalk: "npm:^4.1.2"
+    commander: "npm:^13.1.0"
+    form-data: "npm:^4.0.2"
+    glob: "npm:^11.0.3"
+    node-fetch: "npm:^2.7.0"
+    ora: "npm:^5.4.1"
+    typescript: "npm:^5.8.3"
+  bin:
+    argus-cli: ./dist/index.js
+  languageName: unknown
+  linkType: soft
+
+"@gatrix/argus-optic@workspace:*, @gatrix/argus-optic@workspace:packages/argus-optic":
+  version: 0.0.0-use.local
+  resolution: "@gatrix/argus-optic@workspace:packages/argus-optic"
+  dependencies:
+    "@clickhouse/client": "npm:^1.0.0"
+    "@types/node": "npm:^20.10.4"
+    jest: "npm:^29.7.0"
+    ts-jest: "npm:^29.1.1"
+    typescript: "npm:^5.3.2"
+    winston: "npm:^3.11.0"
+    winston-daily-rotate-file: "npm:^5.0.0"
+  languageName: unknown
+  linkType: soft
+
+"@gatrix/argus-worker@workspace:packages/argus-worker":
+  version: 0.0.0-use.local
+  resolution: "@gatrix/argus-worker@workspace:packages/argus-worker"
+  dependencies:
+    "@gatrix/argus": "workspace:*"
+    "@gatrix/argus-optic": "workspace:*"
+    "@types/node": "npm:^20.10.4"
+    "@types/ua-parser-js": "npm:^0.7.39"
+    axios: "npm:^1.16.1"
+    cron-parser: "npm:^5.5.0"
+    dotenv: "npm:^16.3.1"
+    groupmq: "npm:^1.1.0"
+    ioredis: "npm:^5.3.2"
+    mysql2: "npm:^3.15.0"
+    ts-node: "npm:^10.9.1"
+    ts-node-dev: "npm:^2.0.0"
+    typescript: "npm:^5.3.2"
+    ua-parser-js: "npm:^1.0.37"
+    ulid: "npm:^2.3.0"
+    winston: "npm:^3.11.0"
+    winston-daily-rotate-file: "npm:^5.0.0"
+    winston-loki: "npm:^6.1.3"
+  languageName: unknown
+  linkType: soft
+
+"@gatrix/argus@workspace:*, @gatrix/argus@workspace:packages/argus":
   version: 0.0.0-use.local
   resolution: "@gatrix/argus@workspace:packages/argus"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.700.0"
     "@aws-sdk/lib-storage": "npm:^3.700.0"
-    "@clickhouse/client": "npm:^1.0.0"
     "@fastify/cors": "npm:^8.4.2"
     "@fastify/helmet": "npm:^11.1.1"
     "@fastify/multipart": "npm:^8.0.0"
     "@fastify/rate-limit": "npm:^9.1.0"
+    "@gatrix/argus-optic": "workspace:*"
     "@gatrix/gatrix-node-server-sdk": "workspace:*"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^20.10.4"
@@ -3456,6 +3513,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^6.13.1"
     axios: "npm:^1.16.1"
     bullmq: "npm:^5.0.0"
+    cron-parser: "npm:^5.5.0"
     dotenv: "npm:^16.3.1"
     eslint: "npm:^8.54.0"
     fastify: "npm:^4.25.0"
@@ -3463,6 +3521,7 @@ __metadata:
     ioredis: "npm:^5.3.2"
     jest: "npm:^29.7.0"
     jsonwebtoken: "npm:^9.0.3"
+    knex: "npm:^3.2.10"
     maxmind: "npm:^4.3.11"
     mysql2: "npm:^3.15.0"
     prom-client: "npm:^15.1.3"
@@ -3847,7 +3906,7 @@ __metadata:
     sharp: "npm:^0.34.5"
     socket.io-client: "npm:^4.8.1"
     swagger-ui-react: "npm:^5.30.0"
-    swr: "npm:^2.2.4"
+    swr: "npm:^2.4.1"
     typescript: "npm:^5.3.3"
     vite: "npm:^4.5.0"
     vitest: "npm:^1.0.4"
@@ -9476,6 +9535,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node-fetch@npm:^2.6.12":
+  version: 2.6.13
+  resolution: "@types/node-fetch@npm:2.6.13"
+  dependencies:
+    "@types/node": "npm:*"
+    form-data: "npm:^4.0.4"
+  checksum: 10c0/6313c89f62c50bd0513a6839cdff0a06727ac5495ccbb2eeda51bb2bbbc4f3c0a76c0393a491b7610af703d3d2deb6cf60e37e59c81ceeca803ffde745dbf309
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:>=10.0.0, @types/node@npm:>=13.7.0":
   version: 25.4.0
   resolution: "@types/node@npm:25.4.0"
@@ -9516,6 +9585,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10c0/f17eaf3d0d1da5e93ad9e287efb78201f8a5282973c004c5f70d91675c5c6b926a23acaa7b158a42b3d7e27e36b349d65a531710c91c308fca53dd7fa280ef98
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22.16.0":
+  version: 22.19.20
+  resolution: "@types/node@npm:22.19.20"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/933d4466f1a498dd7c8e173af7265a53e9d410cab4a827ccc348414d5065a9a40ba7a7c994a71b3ee651188111db3b43573b830dc30a61a7489f3e6efc537bf7
   languageName: node
   linkType: hard
 
@@ -14056,7 +14134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.1.0":
+"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:
@@ -14533,6 +14611,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^13.1.0":
+  version: 13.1.0
+  resolution: "commander@npm:13.1.0"
+  checksum: 10c0/7b8c5544bba704fbe84b7cab2e043df8586d5c114a4c5b607f83ae5060708940ed0b5bd5838cf8ce27539cde265c1cbd59ce3c8c6b017ed3eec8943e3a415164
+  languageName: node
+  linkType: hard
+
 "commander@npm:^6.0.0, commander@npm:^6.2.1":
   version: 6.2.1
   resolution: "commander@npm:6.2.1"
@@ -14955,7 +15040,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:^5.3.0":
+"cron-parser@npm:^5.3.0, cron-parser@npm:^5.5.0":
   version: 5.5.0
   resolution: "cron-parser@npm:5.5.0"
   dependencies:
@@ -17793,7 +17878,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^4.0.0, form-data@npm:^4.0.5, form-data@npm:~4.0.4":
+"form-data@npm:^4.0.0, form-data@npm:^4.0.2, form-data@npm:^4.0.4, form-data@npm:^4.0.5, form-data@npm:~4.0.4":
   version: 4.0.5
   resolution: "form-data@npm:4.0.5"
   dependencies:
@@ -20588,6 +20673,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"knex@npm:^3.2.10":
+  version: 3.2.10
+  resolution: "knex@npm:3.2.10"
+  dependencies:
+    colorette: "npm:2.0.19"
+    commander: "npm:^10.0.0"
+    debug: "npm:4.3.4"
+    escalade: "npm:^3.1.1"
+    esm: "npm:^3.2.25"
+    get-package-type: "npm:^0.1.0"
+    getopts: "npm:2.3.0"
+    interpret: "npm:^2.2.0"
+    lodash: "npm:^4.18.1"
+    pg-connection-string: "npm:2.6.2"
+    rechoir: "npm:^0.8.0"
+    resolve-from: "npm:^5.0.0"
+    tarn: "npm:^3.0.2"
+    tildify: "npm:2.0.0"
+  peerDependencies:
+    pg-query-stream: ^4.14.0
+  peerDependenciesMeta:
+    better-sqlite3:
+      optional: true
+    mysql:
+      optional: true
+    mysql2:
+      optional: true
+    pg:
+      optional: true
+    pg-native:
+      optional: true
+    pg-query-stream:
+      optional: true
+    sqlite3:
+      optional: true
+    tedious:
+      optional: true
+  bin:
+    knex: bin/cli.js
+  checksum: 10c0/b2dbb6a01f520a5775e6885ae09d9e35f998e1d0eea9aa283e5125d563ebade39b69d9e362368384415195f3db9cb3ac415b97875532e2ad3099d0f9685a6a37
+  languageName: node
+  linkType: hard
+
 "kolorist@npm:^1.8.0":
   version: 1.8.0
   resolution: "kolorist@npm:1.8.0"
@@ -21019,6 +21147,13 @@ __metadata:
   version: 4.17.23
   resolution: "lodash@npm:4.17.23"
   checksum: 10c0/1264a90469f5bb95d4739c43eb6277d15b6d9e186df4ac68c3620443160fc669e2f14c11e7d8b2ccf078b81d06147c01a8ccced9aab9f9f63d50dcf8cace6bf6
+  languageName: node
+  linkType: hard
+
+"lodash@npm:^4.18.1":
+  version: 4.18.1
+  resolution: "lodash@npm:4.18.1"
+  checksum: 10c0/757228fc68805c59789e82185135cf85f05d0b2d3d54631d680ca79ec21944ec8314d4533639a14b8bcfbd97a517e78960933041a5af17ecb693ec6eecb99a27
   languageName: node
   linkType: hard
 
@@ -22639,7 +22774,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.9":
+"node-fetch@npm:^2.6.9, node-fetch@npm:^2.7.0":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -23070,7 +23205,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ora@npm:^5.1.0":
+"ora@npm:^5.1.0, ora@npm:^5.4.1":
   version: 5.4.1
   resolution: "ora@npm:5.4.1"
   dependencies:
@@ -27004,7 +27139,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swr@npm:^2.2.4":
+"swr@npm:^2.4.1":
   version: 2.4.1
   resolution: "swr@npm:2.4.1"
   dependencies:
@@ -27857,7 +27992,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.0.0, typescript@npm:^5.3.2, typescript@npm:^5.3.3, typescript@npm:^5.7.2":
+"typescript@npm:^5.0.0, typescript@npm:^5.3.2, typescript@npm:^5.3.3, typescript@npm:^5.7.2, typescript@npm:^5.8.3":
   version: 5.9.3
   resolution: "typescript@npm:5.9.3"
   bin:
@@ -27887,7 +28022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.0.0#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.7.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^5.0.0#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.7.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.8.3#optional!builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
   bin:

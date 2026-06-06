@@ -1,0 +1,21 @@
+[package]
+name = "symbolicator-test"
+version = "26.5.2"
+authors = ["Sentry <hello@getsentry.com>"]
+edition = "2024"
+license-file = "../../LICENSE.md"
+
+[dependencies]
+axum = { workspace = true }
+humantime = { workspace = true }
+insta = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true, features = ["gzip", "json", "stream", "hickory-dns", "multipart"] }
+rustls = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+symbolicator-sources = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["rt", "macros", "fs"] }
+tower-http = { workspace = true }
+tracing-subscriber = { workspace = true }

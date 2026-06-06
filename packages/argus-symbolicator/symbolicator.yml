@@ -1,0 +1,32 @@
+# Argus Symbolicator Configuration
+# Based on Sentry Symbolicator local.example.yml
+
+bind: "0.0.0.0:3021"
+
+# Cache directory
+cache_dir: /data/cache
+
+# Download timeouts
+max_download_timeout: 300s
+streaming_timeout: 600s
+
+# Logging
+logging:
+  level: info
+
+# Default symbol sources
+sources:
+  # Local filesystem source (for uploaded source maps / debug symbols)
+  - id: argus-local
+    type: filesystem
+    path: /data/symbols
+    layout: { type: "unified" }
+    is_public: false
+
+  # Microsoft public symbol server
+  - id: microsoft
+    type: http
+    url: https://msdl.microsoft.com/download/symbols/
+    layout: { type: "symstore" }
+    filters: { filetypes: ["pe", "pdb", "portablepdb"] }
+    is_public: true

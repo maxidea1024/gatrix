@@ -1,0 +1,232 @@
+//! Exposes the command line application.
+use std::net::SocketAddr;
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+
+use anyhow::{Context, Result};
+use clap::Parser;
+
+use humantime::Duration;
+use symbolicator_service::caching;
+use symbolicator_service::metrics;
+
+use crate::config::Config;
+use crate::healthcheck;
+use crate::logging;
+use crate::server;
+
+fn get_crate_version() -> &'static str {
+    env!("CARGO_PKG_VERSION")
+}
+
+fn get_long_crate_version() -> &'static str {
+    concat!(
+        "version: ",
+        env!("CARGO_PKG_VERSION"),
+        "\ngit commit: ",
+        env!("SYMBOLICATOR_RELEASE")
+    )
+}
+
+/// Symbolicator commands.
+#[derive(Parser, Debug)]
+#[command(bin_name = "symbolicator")]
+enum Command {
+    /// Run the web server.
+    #[command(name = "run")]
+    Run,
+
+    /// Clean local caches.
+    #[command(name = "cleanup")]
+    Cleanup {
+        /// Only simulate the cleanup without deleting any files.
+        #[arg(long)]
+        dry_run: bool,
+        /// Instead of exiting immediately, perform the cleanup
+        /// periodically with a pause of length INTERVAL between runs.
+        ///
+        /// If no INTERVAL is passed, the `cache_cleanup_interval`
+        /// config option is used.
+        #[arg(long, value_name = "INTERVAL")]
+        repeat: Option<Option<Duration>>,
+    },
+
+    /// Checks the health of the Symbolicator server.
+    #[command(name = "healthcheck")]
+    Healthcheck {
+        /// Address to check.
+        ///
+        /// For example: `127.0.0.1:5555`.
+        /// Defaults to the address configured in `config.bind`.
+        #[arg(long)]
+        addr: Option<SocketAddr>,
+
+        /// Timeout for the healthcheck request.
+        ///
+        /// Defaults to 30 seconds.
+        #[arg(long, default_value_t = 30)]
+        timeout: u64,
+    },
+}
+
+/// Command line interface parser.
+#[derive(Parser)]
+#[command(
+    version = get_crate_version(),
+    long_version = get_long_crate_version(),
+)]
+struct Cli {
+    /// Path to your configuration file.
+    #[arg(long = "config", short = 'c', global(true), value_name = "FILE")]
+    pub config: Option<PathBuf>,
+
+    #[command(subcommand)]
+    command: Command,
+}
+
+impl Cli {
+    /// Returns the path to the configuration file.
+    fn config(&self) -> Option<&Path> {
+        self.config.as_deref()
+    }
+}
+
+/// Runs the main application.
+pub fn execute() -> Result<()> {
+    let cli = Cli::parse();
+    let config = Config::get(cli.config()).context("failed loading config")?;
+
+    let release = Some(env!("SYMBOLICATOR_RELEASE").into());
+
+    #[cfg(feature = "symbolicator-crash")]
+    {
+        let dsn = config.sentry_dsn.as_ref().map(|d| d.to_string());
+        let db = config._crash_db.clone().or_else(|| {
+            config
+                .cache_dir
+                .as_ref()
+                .map(|cache_dir| cache_dir.join(".sentry-native"))
+        });
+        if let (Some(dsn), Some(db)) = (dsn, db) {
+            symbolicator_crash::CrashHandler::new(dsn.as_ref(), &db)
+                .transport(capture_native_envelope)
+                .release(release.as_deref())
+                .install();
+        }
+    }
+    let sentry = sentry::init(sentry::ClientOptions {
+        dsn: config.sentry_dsn.clone(),
+        release,
+        attach_stacktrace: config.logging.enable_backtraces,
+        traces_sampler: Some(Arc::new(move |ctx| {
+            if Some(true) == ctx.sampled() && config.propagate_traces {
+                1.0
+            } else if ctx.operation() != "http.server" {
+                config.traces_sample_rate
+            } else {
+                0.0
+            }
+        })),
+        enable_logs: true,
+        ..Default::default()
+    });
+
+    // SAFETY: We are definitely single-threaded right now, so `init_logging`
+    // is safe to call.
+    unsafe { logging::init_logging(&config) };
+
+    // We depend on `rustls` with both the `aws-lc-rs` and
+    // `ring` features enabled. This means that `rustls` can't automatically
+    // decide which provider to use and we have to initialize it manually.
+    if rustls::crypto::ring::default_provider()
+        .install_default()
+        .is_err()
+    {
+        anyhow::bail!("Failed to initialize crypto provider");
+    }
+
+    if let Some(ref statsd) = config.metrics.statsd {
+        let mut tags = config.metrics.custom_tags.clone();
+
+        if let Some(hostname_tag) = config.metrics.hostname_tag.clone() {
+            if tags.contains_key(&hostname_tag) {
+                tracing::warn!(
+                    "tag {} defined both as hostname tag and as a custom tag",
+                    hostname_tag
+                );
+            }
+            if let Some(hostname) = hostname::get().ok().and_then(|s| s.into_string().ok()) {
+                tags.insert(hostname_tag, hostname);
+            } else {
+                tracing::error!("could not read host name");
+            }
+        };
+        if let Some(environment_tag) = config.metrics.environment_tag.clone() {
+            if tags.contains_key(&environment_tag) {
+                tracing::warn!(
+                    "tag {} defined both as environment tag and as a custom tag",
+                    environment_tag
+                );
+            }
+            if let Some(environment) = sentry.options().environment.as_ref().map(|s| s.to_string())
+            {
+                tags.insert(environment_tag, environment);
+            } else {
+                tracing::error!("environment name not available");
+            }
+        };
+
+        if let Some(platform_tag) = config.metrics.platform_tag.clone() {
+            if tags.contains_key(&platform_tag) {
+                tracing::warn!(
+                    "tag {} defined both as platform tag and as a custom tag",
+                    platform_tag
+                );
+            }
+            match std::env::var("SYMBOLICATOR_PLATFORM") {
+                Ok(platform) => {
+                    tags.insert(platform_tag, platform.to_string());
+                }
+                Err(e) => {
+                    tracing::error!(error = %e, "platform not available");
+                }
+            }
+        };
+
+        if let Err(e) = metrics::configure_statsd(&config.metrics.prefix, statsd, tags) {
+            tracing::error!(error = %e, "failed to initialize statsd backend");
+            return Err(e);
+        }
+    }
+
+    match cli.command {
+        Command::Run => server::run(config).context("failed to start the server")?,
+        Command::Cleanup { dry_run, repeat } => caching::cleanup(
+            config,
+            dry_run,
+            repeat.map(|inner| inner.map(|time| time.into())),
+        )
+        .context("failed to clean up caches")?,
+        Command::Healthcheck { addr, timeout } => {
+            healthcheck::healthcheck(config, addr, timeout).context("healthcheck failed")?
+        }
+    }
+
+    Ok(())
+}
+
+/// Captures an envelope from the native crash reporter using the main Sentry SDK.
+#[cfg(feature = "symbolicator-crash")]
+fn capture_native_envelope(data: &[u8]) {
+    if let Some(client) = sentry::Hub::main().client() {
+        match sentry::Envelope::from_bytes_raw(data.to_owned()) {
+            Ok(envelope) => client.send_envelope(envelope),
+            Err(error) => {
+                let error = &error as &dyn std::error::Error;
+                tracing::error!(error, "failed to capture crash")
+            }
+        }
+    } else {
+        tracing::error!("failed to capture crash: no sentry client registered");
+    }
+}

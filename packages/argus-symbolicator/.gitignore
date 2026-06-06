@@ -1,0 +1,26 @@
+# Rust
+/target
+**/*.rs.bk
+
+# Python
+.venv
+*.pyc
+__pycache__
+
+# Local testing
+/local.yml
+/cache/
+/symbols/
+/shared_cache/
+/symbolicator-gcs-test-key.json
+/gcs-service-account.json
+
+# mkdocs
+site
+
+# New test snapshots
+*.snap.new
+
+# GoCD
+gocd/templates/vendor/
+gocd/generated-pipelines/

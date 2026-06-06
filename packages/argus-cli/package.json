@@ -1,0 +1,27 @@
+{
+  "name": "@gatrix/argus-cli",
+  "version": "1.0.0",
+  "description": "Argus CLI — Source map upload and project management",
+  "main": "dist/index.js",
+  "bin": "./dist/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "lint": "eslint src/ --ext .ts"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^13.1.0",
+    "form-data": "^4.0.2",
+    "glob": "^11.0.3",
+    "node-fetch": "^2.7.0",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.0",
+    "@types/node-fetch": "^2.6.12",
+    "typescript": "^5.8.3"
+  },
+  "license": "Proprietary",
+  "private": true
+}

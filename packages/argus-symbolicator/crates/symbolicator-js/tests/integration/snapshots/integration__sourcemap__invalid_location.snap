@@ -1,0 +1,28 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+assertion_line: 424
+expression: response
+---
+stacktraces:
+  - frames:
+      - function: e
+        filename: invalidlocation.js
+        abs_path: "http://example.com/invalidlocation.js"
+        lineno: 0
+        colno: 0
+        data:
+          symbolicated: false
+raw_stacktraces:
+  - frames:
+      - function: e
+        filename: invalidlocation.js
+        abs_path: "http://example.com/invalidlocation.js"
+        lineno: 0
+        colno: 0
+        data:
+          symbolicated: false
+errors:
+  - abs_path: "http://example.com/invalidlocation.js"
+    type: invalid_location
+    line: 0
+    col: 0

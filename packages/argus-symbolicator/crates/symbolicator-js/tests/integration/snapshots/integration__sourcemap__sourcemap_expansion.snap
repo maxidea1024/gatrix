@@ -1,0 +1,133 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+expression: response
+---
+stacktraces:
+  - frames:
+      - function: produceStack
+        filename: index.html
+        abs_path: "http://example.com/index.html"
+        lineno: 6
+        colno: 7
+        data:
+          symbolicated: false
+      - function: test
+        filename: test.js
+        module: test
+        abs_path: "http://example.com/test.js"
+        lineno: 20
+        colno: 5
+        pre_context:
+          - "    cb(data);"
+          - "  }"
+          - ""
+          - "  function test() {"
+          - "    var data = {failed: true, value: 42};"
+        context_line: "    invoke(data);"
+        post_context:
+          - "  }"
+          - ""
+          - "  return test;"
+          - "})();"
+        data:
+          sourcemap: "http://example.com/test.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release
+          symbolicated: true
+      - function: invoke
+        filename: test.js
+        module: test
+        abs_path: "http://example.com/test.js"
+        lineno: 15
+        colno: 5
+        pre_context:
+          - "    if (data.failed) {"
+          - "      cb = onFailure;"
+          - "    } else {"
+          - "      cb = onSuccess;"
+          - "    }"
+        context_line: "    cb(data);"
+        post_context:
+          - "  }"
+          - ""
+          - "  function test() {"
+          - "    var data = {failed: true, value: 42};"
+          - "    invoke(data);"
+        data:
+          sourcemap: "http://example.com/test.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release
+          symbolicated: true
+      - function: onFailure
+        filename: test.js
+        module: test
+        abs_path: "http://example.com/test.js"
+        lineno: 5
+        colno: 11
+        pre_context:
+          - "var makeAFailure = (function() {"
+          - "  function onSuccess(data) {}"
+          - ""
+          - "  function onFailure(data) {"
+        context_line: "    throw new Error('failed!');"
+        post_context:
+          - "  }"
+          - ""
+          - "  function invoke(data) {"
+          - "    var cb = null;"
+          - "    if (data.failed) {"
+        data:
+          sourcemap: "http://example.com/test.min.js.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release
+          symbolicated: true
+raw_stacktraces:
+  - frames:
+      - function: produceStack
+        filename: index.html
+        abs_path: "http://example.com/index.html"
+        lineno: 6
+        colno: 7
+        data:
+          symbolicated: false
+      - function: i
+        filename: test.min.js
+        abs_path: "http://example.com/test.min.js"
+        lineno: 1
+        colno: 183
+        context_line: "{snip} row new Error(\"failed!\")}function r(r){var i=null;if(r.failed){i=e}else{i=n}i(r)}function i(){var n={failed:true,value:42};r(n)}return i}();"
+        post_context:
+          - "//# sourceMappingURL=test.min.js.map"
+        data:
+          symbolicated: false
+      - function: r
+        filename: test.min.js
+        abs_path: "http://example.com/test.min.js"
+        lineno: 1
+        colno: 136
+        context_line: "{snip} row new Error(\"failed!\")}function r(r){var i=null;if(r.failed){i=e}else{i=n}i(r)}function i(){var n={failed:true,value:42};r(n)}return i}();"
+        post_context:
+          - "//# sourceMappingURL=test.min.js.map"
+        data:
+          symbolicated: false
+      - function: e
+        filename: test.min.js
+        abs_path: "http://example.com/test.min.js"
+        lineno: 1
+        colno: 64
+        context_line: "var makeAFailure=function(){function n(n){}function e(n){throw new Error(\"failed!\")}function r(r){var i=null;if(r.failed){i=e}else{i=n}i(r)} {snip}"
+        post_context:
+          - "//# sourceMappingURL=test.min.js.map"
+        data:
+          symbolicated: false
+errors:
+  - abs_path: "http://example.com/index.html"
+    type: scraping_disabled
+scraping_attempts:
+  - url: "http://example.com/index.html"
+    status: failure
+    reason: disabled
+  - url: "http://example.com/test.min.js"
+    status: not_attempted
+  - url: "http://example.com/test.min.js.map"
+    status: not_attempted

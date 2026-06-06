@@ -105,6 +105,13 @@ export const config = {
       10
     ),
   },
+
+  // Symbolicator (source map / debug symbol resolution)
+  symbolicator: {
+    url: process.env.ARGUS_SYMBOLICATOR_URL || 'http://localhost:3021',
+    timeoutMs: parseInt(process.env.ARGUS_SYMBOLICATOR_TIMEOUT_MS || '30000', 10),
+    enabled: process.env.ARGUS_SYMBOLICATOR_ENABLED !== 'false',
+  },
 };
 
 export default config;

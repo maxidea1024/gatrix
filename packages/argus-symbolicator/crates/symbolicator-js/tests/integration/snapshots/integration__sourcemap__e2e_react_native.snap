@@ -1,0 +1,35 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+expression: response
+snapshot_kind: text
+---
+stacktraces:
+  - frames:
+      - function: foo
+        filename: module.js
+        module: module
+        abs_path: "app:///module.js"
+        lineno: 2
+        colno: 11
+        pre_context:
+          - "export function foo() {"
+        context_line: "    throw new Error(\"lets throw!\");"
+        post_context:
+          - "}"
+        data:
+          sourcemap: "app:///index.android.bundle.map"
+          sourcemap_origin: "sentry://project_debug_file/2"
+          resolved_with: release
+          symbolicated: true
+raw_stacktraces:
+  - frames:
+      - abs_path: "app:///index.android.bundle"
+        lineno: 1
+        colno: 11940
+        data:
+          symbolicated: false
+scraping_attempts:
+  - url: "app:///index.android.bundle"
+    status: not_attempted
+  - url: "app:///index.android.bundle.map"
+    status: not_attempted

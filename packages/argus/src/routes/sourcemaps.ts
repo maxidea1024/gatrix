@@ -65,19 +65,27 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         const parts = request.parts();
         let release = '';
         let dist = '';
+        const filePaths: string[] = [];
         const files: { filePath: string; data: Buffer }[] = [];
 
         for await (const part of parts) {
           if (part.type === 'field') {
             if (part.fieldname === 'release') release = String(part.value);
             if (part.fieldname === 'dist') dist = String(part.value);
+            if (part.fieldname === 'file_path') filePaths.push(String(part.value));
           } else if (part.type === 'file') {
             const buf = await part.toBuffer();
             files.push({
+              // Will be overridden with file_path if available
               filePath: part.filename || part.fieldname,
               data: buf,
             });
           }
+        }
+
+        // Apply file_path fields (sent before each file by argus-cli)
+        for (let i = 0; i < files.length && i < filePaths.length; i++) {
+          files[i].filePath = filePaths[i];
         }
 
         if (!release) {
@@ -91,7 +99,7 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         // Upsert release record
         const [existing] = await mysqlPool.query(
           `SELECT id FROM g_argus_sourcemap_releases
-           WHERE project_id = ? AND release = ? AND dist = ?`,
+           WHERE project_id = ? AND \`release\` = ? AND \`dist\` = ?`,
           [projectId, release, dist]
         );
         const existingRows = existing as any[];
@@ -106,7 +114,7 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           );
         } else {
           const [insertResult] = await mysqlPool.query(
-            `INSERT INTO g_argus_sourcemap_releases (project_id, release, dist, file_count)
+            `INSERT INTO g_argus_sourcemap_releases (project_id, \`release\`, \`dist\`, file_count)
              VALUES (?, ?, ?, ?)`,
             [projectId, release, dist, files.length]
           );
@@ -117,6 +125,8 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         const releaseDir = path.join(SOURCEMAP_DIR, String(projectId), String(releaseId));
         await fs.mkdir(releaseDir, { recursive: true });
 
+        // Save files to disk and collect DB entries
+        const dbRows: any[][] = [];
         for (const file of files) {
           const safeName = file.filePath.replace(/[^a-zA-Z0-9._\-/]/g, '_');
           const diskPath = path.join(releaseDir, safeName);
@@ -124,18 +134,24 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           await fs.mkdir(diskDir, { recursive: true });
           await fs.writeFile(diskPath, file.data);
 
+          dbRows.push([
+            releaseId,
+            projectId,
+            file.filePath,
+            path.basename(file.filePath),
+            diskPath,
+            file.data.length,
+          ]);
+        }
+
+        // Single bulk INSERT for all sourcemap file records
+        if (dbRows.length > 0) {
+          const ph = dbRows.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
           await mysqlPool.query(
             `INSERT INTO g_argus_sourcemap_files
              (release_id, project_id, file_path, file_name, sourcemap_path, file_size)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-              releaseId,
-              projectId,
-              file.filePath,
-              path.basename(file.filePath),
-              diskPath,
-              file.data.length,
-            ]
+             VALUES ${ph}`,
+            dbRows.flat()
           );
         }
 
@@ -164,7 +180,10 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to upload sourcemaps' });
+        return reply.code(500).send({
+          error: 'Failed to upload sourcemaps',
+          detail: error instanceof Error ? error.message : String(error),
+        });
       }
     }
   );
@@ -221,6 +240,86 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to list sourcemap files' });
+      }
+    }
+  );
+
+  // Lookup a source map file by release + path (used by Symbolicator)
+  // GET /:projectId/sourcemaps/lookup?release=1.0.0&dist=&file_path=~/static/js/main.js.map
+  app.get(
+    '/:projectId/sourcemaps/lookup',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { release, dist, file_path } = request.query as {
+        release?: string;
+        dist?: string;
+        file_path?: string;
+      };
+
+      if (!release || !file_path) {
+        return reply.code(400).send({ error: 'release and file_path are required' });
+      }
+
+      try {
+        // Find the release
+        const [releaseRows] = await mysqlPool.query(
+          `SELECT id FROM g_argus_sourcemap_releases
+           WHERE project_id = ? AND \`release\` = ? AND \`dist\` = ?
+           ORDER BY created_at DESC LIMIT 1`,
+          [projectId, release, dist || '']
+        );
+        const releases = releaseRows as any[];
+
+        if (releases.length === 0) {
+          return reply.code(404).send({ error: 'Release not found' });
+        }
+
+        const releaseId = releases[0].id;
+
+        // Find the file by path (exact match or suffix match)
+        const [fileRows] = await mysqlPool.query(
+          `SELECT sourcemap_path, file_path FROM g_argus_sourcemap_files
+           WHERE release_id = ? AND project_id = ? AND file_path = ?`,
+          [releaseId, projectId, file_path]
+        );
+        let files = fileRows as any[];
+
+        // If no exact match, try suffix match (strip ~/ prefix)
+        if (files.length === 0) {
+          const stripped = file_path.replace(/^~\//, '');
+          const [suffixRows] = await mysqlPool.query(
+            `SELECT sourcemap_path, file_path FROM g_argus_sourcemap_files
+             WHERE release_id = ? AND project_id = ? AND file_path LIKE ?`,
+            [releaseId, projectId, `%${stripped}`]
+          );
+          files = suffixRows as any[];
+        }
+
+        if (files.length === 0) {
+          return reply.code(404).send({ error: 'File not found' });
+        }
+
+        const diskPath = files[0].sourcemap_path;
+
+        try {
+          await fs.access(diskPath);
+        } catch {
+          return reply.code(404).send({ error: 'File not found on disk' });
+        }
+
+        const fileBuffer = await fs.readFile(diskPath);
+        return reply
+          .header('Content-Type', 'application/octet-stream')
+          .header('Content-Disposition', `attachment; filename="${path.basename(diskPath)}"`)
+          .send(fileBuffer);
+      } catch (error) {
+        logger.error('Sourcemap lookup failed', {
+          projectId,
+          release,
+          file_path,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Sourcemap lookup failed' });
       }
     }
   );

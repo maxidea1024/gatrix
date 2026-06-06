@@ -1,0 +1,24 @@
+---
+source: crates/symbolicator-js/tests/integration/sourcemap.rs
+assertion_line: 362
+expression: response
+---
+stacktraces:
+  - frames:
+      - filename: test.js
+        abs_path: http//example.com/test.min.js
+        lineno: 1
+        colno: 1
+        data:
+          symbolicated: false
+raw_stacktraces:
+  - frames:
+      - filename: test.js
+        abs_path: http//example.com/test.min.js
+        lineno: 1
+        colno: 1
+        data:
+          symbolicated: false
+errors:
+  - abs_path: http//example.com/test.min.js
+    type: missing_source
