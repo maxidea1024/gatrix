@@ -226,7 +226,8 @@ export function useArgusLogs() {
     if (serialized !== (urlState.filters || '')) {
       setUrlState({ filters: serialized });
     }
-  }, [activeFilters, serializeFiltersToUrl, urlState.filters, setUrlState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilters]);
 
   const toggleActiveFilter = useCallback(
     (key: string, value: string, exclude: boolean = false) => {

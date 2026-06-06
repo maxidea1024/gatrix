@@ -8,6 +8,7 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
@@ -36,6 +37,8 @@ import ActiveFiltersBar from './components/ActiveFiltersBar';
 
 // Custom Hooks
 import { useArgusLogs } from './hooks/useArgusLogs';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip, Legend);
 
 const ArgusLogsPage: React.FC = () => {
   const theme = useTheme();
