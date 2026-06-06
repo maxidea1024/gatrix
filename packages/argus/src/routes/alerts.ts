@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { ConfigBroadcaster } from '../utils/config-broadcaster';
@@ -16,7 +16,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
 
       try {
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           'SELECT * FROM g_argus_alert_rules WHERE project_id = ? ORDER BY created_at DESC',
           [projectId]
         );
@@ -59,16 +59,16 @@ export default async function alertsRoutes(app: FastifyInstance) {
 
       try {
         // Ensure new columns exist
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS description TEXT DEFAULT NULL AFTER name`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS condition_logic VARCHAR(10) DEFAULT 'any' AFTER name`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS muted_until DATETIME DEFAULT NULL`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS tags JSON DEFAULT NULL`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS dataset VARCHAR(50) DEFAULT 'errors'`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS query_config JSON DEFAULT NULL`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_history ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'success'`); } catch { /* may already exist */ }
-        try { await mysqlPool.query(`ALTER TABLE g_argus_alert_history ADD COLUMN IF NOT EXISTS response_body TEXT DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS description TEXT DEFAULT NULL AFTER name`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS condition_logic VARCHAR(10) DEFAULT 'any' AFTER name`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS muted_until DATETIME DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS tags JSON DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS dataset VARCHAR(50) DEFAULT 'errors'`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_rules ADD COLUMN IF NOT EXISTS query_config JSON DEFAULT NULL`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_history ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'success'`); } catch { /* may already exist */ }
+        try { await db.raw(`ALTER TABLE g_argus_alert_history ADD COLUMN IF NOT EXISTS response_body TEXT DEFAULT NULL`); } catch { /* may already exist */ }
 
-        const [result] = await mysqlPool.query(
+        const [result] = await db.raw(
           `INSERT INTO g_argus_alert_rules (project_id, name, description, conditions, actions, frequency, environment, level, tags, condition_logic, dataset, query_config)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
@@ -146,7 +146,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         }
 
         params.push(ruleId, projectId);
-        await mysqlPool.query(
+        await db.raw(
           `UPDATE g_argus_alert_rules SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           params
         );
@@ -172,7 +172,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
       const { projectId, ruleId } = request.params as { projectId: string; ruleId: string };
 
       try {
-        await mysqlPool.query(
+        await db.raw(
           'DELETE FROM g_argus_alert_rules WHERE id = ? AND project_id = ?',
           [ruleId, projectId]
         );
@@ -215,7 +215,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         sql += ' ORDER BY h.triggered_at DESC LIMIT ?';
         params.push(parseInt(limit, 10));
 
-        const [rows] = await mysqlPool.query(sql, params);
+        const [rows] = await db.raw(sql, params);
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to get alert history', {
@@ -244,7 +244,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
           GROUP BY rule_id, bucket
           ORDER BY bucket ASC
         `;
-        const [rows] = await mysqlPool.query(sql, [formatStr, projectId, daysInt]);
+        const [rows] = await db.raw(sql, [formatStr, projectId, daysInt]);
         return reply.send({ success: true, data: rows });
       } catch (error) {
         logger.error('Failed to get alert stats', { projectId, error: String(error) });
@@ -260,7 +260,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
       const { projectId, ruleId } = request.params as { projectId: string; ruleId: string };
 
       try {
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           'SELECT * FROM g_argus_alert_rules WHERE id = ? AND project_id = ?',
           [ruleId, projectId]
         );

@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 import { buildScheduleConfig, getNextSchedule } from '../utils/cron-schedule';
 
@@ -26,7 +26,7 @@ async function updateMonitorAfterCheckin(monitor: any, status: string) {
     logger.warn('Failed to compute next_checkin_at', { monitorId: monitor.id });
   }
 
-  await mysqlPool.query(
+  await db.raw(
     `UPDATE g_argus_cronMonitors 
        SET last_checkin_at = NOW(), last_status = ?, next_checkin_at = ?
      WHERE id = ?`,
@@ -41,7 +41,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       try {
         const { projectId } = request.params;
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           `SELECT * FROM g_argus_cronMonitors WHERE project_id = ? ORDER BY created_at DESC`,
           [projectId]
         );
@@ -94,7 +94,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
           return reply.code(400).send({ success: false, error: 'Invalid schedule expression' });
         }
 
-        const [result]: any = await mysqlPool.query(
+        const [result]: any = await db.raw(
           `INSERT INTO g_argus_cronMonitors 
             (project_id, name, slug, schedule_type, schedule_value, environment,
              checkin_margin, max_runtime, timezone, failure_issue_threshold,
@@ -105,7 +105,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
            recovery_threshold, nextCheckinAt]
         );
 
-        const [newMonitor] = await mysqlPool.query(
+        const [newMonitor] = await db.raw(
           `SELECT * FROM g_argus_cronMonitors WHERE id = ?`,
           [result.insertId]
         );
@@ -165,7 +165,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
         
         values.push(monitorId, projectId);
         
-        const [result]: any = await mysqlPool.query(
+        const [result]: any = await db.raw(
           `UPDATE g_argus_cronMonitors SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           values
         );
@@ -189,7 +189,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
       try {
         const { projectId, monitorId } = request.params;
         
-        const [result]: any = await mysqlPool.query(
+        const [result]: any = await db.raw(
           `DELETE FROM g_argus_cronMonitors WHERE id = ? AND project_id = ?`,
           [monitorId, projectId]
         );
@@ -232,7 +232,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
         const { status, check_in_id, duration, environment, trace_id } = request.body;
         
         // Find monitor
-        const [monitors]: any = await mysqlPool.query(
+        const [monitors]: any = await db.raw(
           `SELECT * FROM g_argus_cronMonitors WHERE project_id = ? AND slug = ?`,
           [projectId, slug]
         );
@@ -244,14 +244,14 @@ export default async function cronsRoutes(app: FastifyInstance) {
 
         // If check_in_id is provided AND status is ok/error, try to close an existing in_progress checkin
         if (check_in_id && (status === 'ok' || status === 'error')) {
-          const [existing]: any = await mysqlPool.query(
+          const [existing]: any = await db.raw(
             `SELECT * FROM g_argus_cronCheckins WHERE checkin_id = ? AND monitor_id = ? AND status = 'in_progress'`,
             [check_in_id, monitor.id]
           );
           if (existing.length > 0) {
             const inProgressCheckin = existing[0];
             const computedDuration = duration ?? (Date.now() - new Date(inProgressCheckin.date_in_progress).getTime());
-            await mysqlPool.query(
+            await db.raw(
               `UPDATE g_argus_cronCheckins SET status = ?, duration = ? WHERE id = ?`,
               [status, computedDuration, inProgressCheckin.id]
             );
@@ -274,7 +274,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
           timeoutAt = new Date(now.getTime() + (monitor.max_runtime || 30) * 60_000);
         }
 
-        await mysqlPool.query(
+        await db.raw(
           `INSERT INTO g_argus_cronCheckins 
             (monitor_id, checkin_id, status, duration, environment, timeout_at, date_in_progress, trace_id)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -290,7 +290,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
         // For `in_progress`, only update last_checkin_at (status remains unchanged until terminal state).
         // For `ok`/`error`, also compute next_checkin_at.
         if (status === 'in_progress') {
-          await mysqlPool.query(
+          await db.raw(
             `UPDATE g_argus_cronMonitors SET last_checkin_at = NOW() WHERE id = ?`,
             [monitor.id]
           );
@@ -319,7 +319,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
         const offset = parseInt(request.query.offset || '0', 10);
 
         // Verify monitor belongs to project
-        const [monitors]: any = await mysqlPool.query(
+        const [monitors]: any = await db.raw(
           `SELECT id FROM g_argus_cronMonitors WHERE id = ? AND project_id = ?`,
           [monitorId, projectId]
         );
@@ -327,7 +327,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
           return reply.code(404).send({ success: false, error: 'Monitor not found' });
         }
 
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           `SELECT * FROM g_argus_cronCheckins
            WHERE monitor_id = ?
            ORDER BY created_at DESC
@@ -335,7 +335,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
           [monitorId, limit, offset]
         );
 
-        const [countResult]: any = await mysqlPool.query(
+        const [countResult]: any = await db.raw(
           `SELECT COUNT(*) as total FROM g_argus_cronCheckins WHERE monitor_id = ?`,
           [monitorId]
         );
@@ -364,7 +364,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
         const testStatus = request.body?.status || 'ok';
 
         // Verify monitor belongs to project
-        const [monitors]: any = await mysqlPool.query(
+        const [monitors]: any = await db.raw(
           `SELECT * FROM g_argus_cronMonitors WHERE id = ? AND project_id = ?`,
           [monitorId, projectId]
         );
@@ -375,7 +375,7 @@ export default async function cronsRoutes(app: FastifyInstance) {
 
         // Create test checkin
         const checkinId = require('crypto').randomBytes(16).toString('hex');
-        await mysqlPool.query(
+        await db.raw(
           `INSERT INTO g_argus_cronCheckins
             (monitor_id, checkin_id, status, duration, environment)
            VALUES (?, ?, ?, ?, ?)`,

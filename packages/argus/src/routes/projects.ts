@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { redis } from '../config/redis';
 import { optic } from '@gatrix/argus-optic';
 import { getBucketingConfig } from '../utils/timeBucket';
@@ -17,13 +17,13 @@ export default async function projectsRoutes(app: FastifyInstance) {
     '/projects',
     async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const [rows] = await mysqlPool.query(
-          `SELECT p.*, 
-            (SELECT COUNT(*) FROM g_argus_issues WHERE project_id = p.id AND status = 'unresolved') as unresolved_issues,
-            (SELECT COUNT(*) FROM g_argus_dsnKeys WHERE project_id = p.id AND is_active = 1) as active_dsn_count
-           FROM g_argus_projects p
-           ORDER BY p.updated_at DESC`
-        );
+        const rows = await db('g_argus_projects as p')
+          .select(
+            'p.*',
+            db.raw("(SELECT COUNT(*) FROM g_argus_issues WHERE project_id = p.id AND status = 'unresolved') as unresolved_issues"),
+            db.raw('(SELECT COUNT(*) FROM g_argus_dsnKeys WHERE project_id = p.id AND is_active = 1) as active_dsn_count'),
+          )
+          .orderBy('p.updated_at', 'desc');
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to list projects', {
@@ -52,40 +52,38 @@ export default async function projectsRoutes(app: FastifyInstance) {
         });
       }
 
-      const connection = await mysqlPool.getConnection();
+      let projectId: string = '';
+      let publicKey: string;
+      let secretKey: string;
+
       try {
-        await connection.beginTransaction();
-
-        // Create project
-        const [result] = await connection.query(
-          `INSERT INTO g_argus_projects (gatrix_project_id, name, slug, platform)
-           VALUES (?, ?, ?, ?)`,
-          [body.gatrix_project_id, body.name, body.slug, body.platform || 'javascript']
-        );
-        const projectId = (result as any).insertId;
-
         // Auto-generate default DSN key
-        const publicKey = generateKey(32);
-        const secretKey = generateKey(32);
+        publicKey = generateKey(32);
+        secretKey = generateKey(32);
 
-        await connection.query(
-          `INSERT INTO g_argus_dsnKeys (project_id, label, public_key, secret_key)
-           VALUES (?, 'Default', ?, ?)`,
-          [projectId, publicKey, secretKey]
-        );
+        await db.transaction(async (trx) => {
+          const [id] = await trx('g_argus_projects').insert({
+            gatrix_project_id: body.gatrix_project_id,
+            name: body.name,
+            slug: body.slug,
+            platform: body.platform || 'javascript',
+          });
+          projectId = String(id);
 
-        await connection.commit();
+          await trx('g_argus_dsnKeys').insert({
+            project_id: projectId,
+            label: 'Default',
+            public_key: publicKey,
+            secret_key: secretKey,
+          });
+        });
 
-        // Fetch the created project with DSN
-        const [rows] = await mysqlPool.query(
-          `SELECT p.*, d.public_key, d.secret_key
-           FROM g_argus_projects p
-           JOIN g_argus_dsnKeys d ON d.project_id = p.id
-           WHERE p.id = ?`,
-          [projectId]
-        );
+        const rows = await db('g_argus_projects as p')
+          .select('p.*', 'd.public_key', 'd.secret_key')
+          .join('g_argus_dsnKeys as d', 'd.project_id', 'p.id')
+          .where('p.id', projectId!);
 
-        const project = (rows as any[])[0];
+        const project = rows[0];
 
         logger.info('Project created', {
           projectId,
@@ -99,7 +97,6 @@ export default async function projectsRoutes(app: FastifyInstance) {
           },
         });
       } catch (error: any) {
-        await connection.rollback();
         if (error.code === 'ER_DUP_ENTRY') {
           return reply.code(409).send({
             error: 'Conflict',
@@ -110,8 +107,6 @@ export default async function projectsRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to create project' });
-      } finally {
-        connection.release();
       }
     }
   );
@@ -124,25 +119,19 @@ export default async function projectsRoutes(app: FastifyInstance) {
 
       try {
         const isNumeric = /^\d+$/.test(projectId);
-        const [rows] = await mysqlPool.query(
-          isNumeric
-            ? 'SELECT * FROM g_argus_projects WHERE id = ?'
-            : 'SELECT * FROM g_argus_projects WHERE gatrix_project_id = ?',
-          [projectId]
-        );
-        const results = rows as any[];
+        const results = await db('g_argus_projects')
+          .where(isNumeric ? 'id' : 'gatrix_project_id', projectId);
         if (results.length === 0) {
           return reply.code(404).send({ error: 'Project not found' });
         }
 
         // Get DSN keys
-        const [dsnRows] = await mysqlPool.query(
-          'SELECT id, label, public_key, is_active, rate_limit_window, rate_limit_count, first_seen, last_seen, created_at FROM g_argus_dsnKeys WHERE project_id = ?',
-          [projectId]
-        );
+        const dsnRows = await db('g_argus_dsnKeys')
+          .select('id', 'label', 'public_key', 'is_active', 'rate_limit_window', 'rate_limit_count', 'first_seen', 'last_seen', 'created_at')
+          .where('project_id', projectId);
 
         const project = results[0];
-        project.dsn_keys = (dsnRows as any[]).map((d: any) => ({
+        project.dsn_keys = dsnRows.map((d: any) => ({
           ...d,
           dsn: buildDsnUrl(d.public_key, project.gatrix_project_id),
         }));
@@ -186,15 +175,18 @@ export default async function projectsRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: 'No fields to update' });
       }
 
-      params.push(projectId);
       const isNumeric = /^\d+$/.test(projectId);
       const whereCol = isNumeric ? 'id' : 'gatrix_project_id';
+      const updateObj: any = {};
+      if (body.name) updateObj.name = body.name;
+      if (body.platform) updateObj.platform = body.platform;
+      if (body.error_quota_daily !== undefined) updateObj.error_quota_daily = body.error_quota_daily;
+      if (body.transaction_sample_rate !== undefined) updateObj.transaction_sample_rate = body.transaction_sample_rate;
+      if (body.session_sample_rate !== undefined) updateObj.session_sample_rate = body.session_sample_rate;
+      if (body.retention_days !== undefined) updateObj.retention_days = body.retention_days;
 
       try {
-        await mysqlPool.query(
-          `UPDATE g_argus_projects SET ${updates.join(', ')} WHERE ${whereCol} = ?`,
-          params
-        );
+        await db('g_argus_projects').where(whereCol, projectId).update(updateObj);
 
         // Notify workers of project settings change
         await broadcaster.publish({ type: CONFIG_TYPES.PROJECT_SETTINGS, projectId });
@@ -227,16 +219,17 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const secretKey = generateKey(32);
 
       try {
-        const [result] = await mysqlPool.query(
-          `INSERT INTO g_argus_dsnKeys (project_id, label, public_key, secret_key, rate_limit_count, rate_limit_window)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [projectId, body.label || 'Default', publicKey, secretKey, body.rate_limit_count ?? 0, body.rate_limit_window ?? 0]
-        );
+        const [dsnKeyId] = await db('g_argus_dsnKeys').insert({
+          project_id: projectId,
+          label: body.label || 'Default',
+          public_key: publicKey,
+          secret_key: secretKey,
+          rate_limit_count: body.rate_limit_count ?? 0,
+          rate_limit_window: body.rate_limit_window ?? 0,
+        });
 
-        const dsnKeyId = (result as any).insertId;
-
-        const [projRows] = await mysqlPool.query('SELECT gatrix_project_id FROM g_argus_projects WHERE id = ?', [projectId]);
-        const gatrixProjectId = (projRows as any[])[0]?.gatrix_project_id || projectId;
+        const projRows = await db('g_argus_projects').select('gatrix_project_id').where('id', projectId);
+        const gatrixProjectId = projRows[0]?.gatrix_project_id || projectId;
 
         return reply.code(201).send({
           data: {
@@ -272,10 +265,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
       };
 
       try {
-        await mysqlPool.query(
-          'DELETE FROM g_argus_dsnKeys WHERE id = ? AND project_id = ?',
-          [keyId, projectId]
-        );
+        await db('g_argus_dsnKeys').where({ id: keyId, project_id: projectId }).del();
 
         // Notify workers to reload DSN cache
         await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
@@ -302,10 +292,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
       };
 
       try {
-        await mysqlPool.query(
-          'UPDATE g_argus_dsnKeys SET is_active = 0 WHERE id = ? AND project_id = ?',
-          [keyId, projectId]
-        );
+        await db('g_argus_dsnKeys').where({ id: keyId, project_id: projectId }).update({ is_active: 0 });
 
         // Notify workers to reload DSN cache
         await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
@@ -353,12 +340,11 @@ export default async function projectsRoutes(app: FastifyInstance) {
           params.push(body.rate_limit_window);
         }
 
-        params.push(keyId, projectId);
+        const dsnUpdateObj: any = { label: body.label!.trim() };
+        if (body.rate_limit_count !== undefined) dsnUpdateObj.rate_limit_count = body.rate_limit_count;
+        if (body.rate_limit_window !== undefined) dsnUpdateObj.rate_limit_window = body.rate_limit_window;
 
-        await mysqlPool.query(
-          `UPDATE g_argus_dsnKeys SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
-          params
-        );
+        await db('g_argus_dsnKeys').where({ id: keyId, project_id: projectId }).update(dsnUpdateObj);
 
         // Notify workers to reload DSN cache
         await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });

@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 import { createExternalIssue, testTrackerConnection, type TrackerConfig, type IssuePayload } from '../services/trackerAdapter';
 
@@ -8,7 +8,7 @@ const logger = createLogger('issue-trackers-api');
 export default async function issueTrackersRoutes(app: FastifyInstance) {
   // Ensure table exists
   const ensureTable = async () => {
-    await mysqlPool.query(`
+    await db.raw(`
       CREATE TABLE IF NOT EXISTS g_argus_issue_trackers (
         id INT AUTO_INCREMENT PRIMARY KEY,
         project_id VARCHAR(64) NOT NULL,
@@ -27,7 +27,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
     // Attempt to alter the table to update the ENUM if it was created with fewer providers.
     // This is safe to run multiple times, though it might throw a warning.
     try {
-      await mysqlPool.query(`
+      await db.raw(`
         ALTER TABLE g_argus_issue_trackers 
         MODIFY COLUMN provider ENUM('jira', 'github', 'linear', 'clickup', 'asana', 'notion', 'shortcut', 'azure_devops', 'redmine', 'youtrack', 'trello') NOT NULL
       `);
@@ -43,7 +43,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       try {
         await ensureTable();
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           'SELECT id, project_id, provider, name, api_url, config, enabled, created_at, updated_at FROM g_argus_issue_trackers WHERE project_id = ? ORDER BY created_at DESC',
           [projectId]
         );
@@ -79,7 +79,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
 
       try {
         await ensureTable();
-        const [result] = await mysqlPool.query(
+        const [result] = await db.raw(
           `INSERT INTO g_argus_issue_trackers (project_id, provider, name, api_url, api_token, config)
            VALUES (?, ?, ?, ?, ?, ?)`,
           [
@@ -129,7 +129,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         }
 
         params.push(trackerId, projectId);
-        await mysqlPool.query(
+        await db.raw(
           `UPDATE g_argus_issue_trackers SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           params
         );
@@ -148,7 +148,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, trackerId } = request.params as { projectId: string; trackerId: string };
       try {
-        await mysqlPool.query(
+        await db.raw(
           'DELETE FROM g_argus_issue_trackers WHERE id = ? AND project_id = ?',
           [trackerId, projectId]
         );
@@ -198,7 +198,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, trackerId } = request.params as { projectId: string; trackerId: string };
       try {
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           'SELECT * FROM g_argus_issue_trackers WHERE id = ? AND project_id = ?',
           [trackerId, projectId]
         );
@@ -231,7 +231,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       const body = request.body as IssuePayload;
 
       try {
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           'SELECT * FROM g_argus_issue_trackers WHERE id = ? AND project_id = ?',
           [trackerId, projectId]
         );

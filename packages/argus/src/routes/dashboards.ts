@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
 import { getBucketingConfig } from '../utils/timeBucket';
@@ -188,11 +188,10 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
-        const [rows] = await mysqlPool.query(
-          `SELECT id, project_id, title, description, widgets_config, created_at, updated_at
-           FROM g_argus_dashboards WHERE project_id = ? ORDER BY updated_at DESC`,
-          [projectId]
-        );
+        const rows = await db('g_argus_dashboards')
+          .select('id', 'project_id', 'title', 'description', 'widgets_config', 'created_at', 'updated_at')
+          .where('project_id', projectId)
+          .orderBy('updated_at', 'desc');
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to list dashboards', { projectId, error: String(error) });
@@ -207,11 +206,9 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
       try {
-        const [rows] = await mysqlPool.query(
-          `SELECT * FROM g_argus_dashboards WHERE id = ? AND project_id = ?`,
-          [dashboardId, projectId]
-        );
-        const arr = rows as any[];
+        const rows = await db('g_argus_dashboards')
+          .where({ id: dashboardId, project_id: projectId });
+        const arr = rows;
         if (arr.length === 0) return reply.code(404).send({ error: 'Dashboard not found' });
         const row = arr[0];
         row.widgets_config = typeof row.widgets_config === 'string' ? JSON.parse(row.widgets_config) : row.widgets_config;
@@ -243,12 +240,12 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           }
         }
 
-        const [result] = await mysqlPool.query(
-          `INSERT INTO g_argus_dashboards (project_id, title, description, widgets_config)
-           VALUES (?, ?, ?, ?)`,
-          [projectId, title, description || '', JSON.stringify(widgets)]
-        );
-        const insertId = (result as any).insertId;
+        const [insertId] = await db('g_argus_dashboards').insert({
+          project_id: projectId,
+          title,
+          description: description || '',
+          widgets_config: JSON.stringify(widgets),
+        });
         return reply.code(201).send({ data: { id: insertId, title, description, widgets_config: widgets } });
       } catch (error) {
         logger.error('Failed to create dashboard', { projectId, error: String(error) });
@@ -276,11 +273,14 @@ export default async function dashboardRoutes(app: FastifyInstance) {
 
         if (updates.length === 0) return reply.code(400).send({ error: 'Nothing to update' });
 
-        values.push(dashboardId, projectId);
-        await mysqlPool.query(
-          `UPDATE g_argus_dashboards SET ${updates.join(', ')}, updated_at = UTC_TIMESTAMP() WHERE id = ? AND project_id = ?`,
-          values
-        );
+        const updateObj: any = {};
+        if (title !== undefined) updateObj.title = title;
+        if (description !== undefined) updateObj.description = description;
+        if (widgets_config !== undefined) updateObj.widgets_config = JSON.stringify(widgets_config);
+        updateObj.updated_at = db.fn.now();
+        await db('g_argus_dashboards')
+          .where({ id: dashboardId, project_id: projectId })
+          .update(updateObj);
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update dashboard', { dashboardId, error: String(error) });
@@ -295,10 +295,9 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
       try {
-        await mysqlPool.query(
-          `DELETE FROM g_argus_dashboards WHERE id = ? AND project_id = ?`,
-          [dashboardId, projectId]
-        );
+        await db('g_argus_dashboards')
+          .where({ id: dashboardId, project_id: projectId })
+          .del();
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete dashboard', { dashboardId, error: String(error) });

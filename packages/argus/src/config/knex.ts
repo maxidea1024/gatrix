@@ -26,8 +26,22 @@ const knexConfig = {
     createRetryIntervalMillis: 100,
   },
   // Convert Date objects to ISO strings in query results
+  // Note: db.raw() returns [rows, fields] from mysql2 driver.
+  // We must NOT process the fields array, only the rows.
   postProcessResponse: (result: any) => {
     if (result === null || result === undefined) return result;
+    // Detect db.raw() tuple: [RowDataPacket[], FieldPacket[]]
+    // FieldPacket objects have a 'columnLength' property that normal row objects don't
+    if (
+      Array.isArray(result) &&
+      result.length === 2 &&
+      Array.isArray(result[0]) &&
+      Array.isArray(result[1]) &&
+      result[1][0]?.constructor?.name?.includes('ColumnDefinition')
+    ) {
+      // Only process the rows, leave fields untouched
+      return [result[0].map(convertRow), result[1]];
+    }
     if (Array.isArray(result)) return result.map(convertRow);
     if (typeof result === 'object' && !(result instanceof Buffer)) return convertRow(result);
     return result;

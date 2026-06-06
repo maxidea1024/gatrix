@@ -1,13 +1,14 @@
 import * as jwt from 'jsonwebtoken';
 import axios from 'axios';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 
 export class GithubAppService {
   private static async getAppCredentials(): Promise<{ app_id: string; private_key: string } | null> {
-    const [rows] = await mysqlPool.execute(
-      'SELECT credentials FROM g_argus_global_integrations WHERE provider = "github" AND is_active = 1 LIMIT 1'
-    );
-    const row = (rows as any[])[0];
+    const rows = await db('g_argus_global_integrations')
+      .select('credentials')
+      .where({ provider: 'github', is_active: 1 })
+      .limit(1);
+    const row = rows[0];
     if (!row) return null;
     return typeof row.credentials === 'string' ? JSON.parse(row.credentials) : row.credentials;
   }

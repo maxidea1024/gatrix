@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
 import { getBucketingConfig } from '../utils/timeBucket';
@@ -431,17 +431,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { query_type } = request.query as { query_type?: string };
       try {
-        let sql = 'SELECT * FROM g_argus_saved_queries WHERE project_id = ?';
-        const params: any[] = [projectId];
-
+        const query = db('g_argus_saved_queries').where('project_id', projectId);
         if (query_type) {
-          sql += ' AND query_type = ?';
-          params.push(query_type);
+          query.where('query_type', query_type);
         }
-
-        sql += ' ORDER BY updated_at DESC';
-
-        const [rows] = await mysqlPool.execute(sql, params);
+        const rows = await query.orderBy('updated_at', 'desc');
         return reply.send({ data: rows });
       } catch (error: any) {
         // Table might not exist yet ??return empty gracefully
@@ -474,12 +468,16 @@ export default async function discoverRoutes(app: FastifyInstance) {
       const createdBy = (request.headers['x-user-name'] as string) || 'system';
 
       try {
-        const [result] = await mysqlPool.execute(
-          `INSERT INTO g_argus_saved_queries (project_id, name, description, query_type, query_config, display_type, is_global, created_by)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [projectId, name, description || null, query_type || 'discover', JSON.stringify(query_config), display_type || 'table', is_global ? 1 : 0, createdBy]
-        );
-        const insertId = (result as any).insertId;
+        const [insertId] = await db('g_argus_saved_queries').insert({
+          project_id: projectId,
+          name,
+          description: description || null,
+          query_type: query_type || 'discover',
+          query_config: JSON.stringify(query_config),
+          display_type: display_type || 'table',
+          is_global: is_global ? 1 : 0,
+          created_by: createdBy,
+        });
         return reply.code(201).send({ data: { id: insertId, name, query_type: query_type || 'discover' } });
       } catch (error) {
         logger.error('Failed to save query', {
@@ -505,22 +503,18 @@ export default async function discoverRoutes(app: FastifyInstance) {
       };
 
       try {
-        const updates: string[] = [];
-        const values: any[] = [];
+        const updateObj: any = {};
+        if (name !== undefined) updateObj.name = name;
+        if (description !== undefined) updateObj.description = description;
+        if (query_config !== undefined) updateObj.query_config = JSON.stringify(query_config);
+        if (display_type !== undefined) updateObj.display_type = display_type;
+        if (is_favorite !== undefined) updateObj.is_favorite = is_favorite ? 1 : 0;
 
-        if (name !== undefined) { updates.push('name = ?'); values.push(name); }
-        if (description !== undefined) { updates.push('description = ?'); values.push(description); }
-        if (query_config !== undefined) { updates.push('query_config = ?'); values.push(JSON.stringify(query_config)); }
-        if (display_type !== undefined) { updates.push('display_type = ?'); values.push(display_type); }
-        if (is_favorite !== undefined) { updates.push('is_favorite = ?'); values.push(is_favorite ? 1 : 0); }
+        if (Object.keys(updateObj).length === 0) return reply.code(400).send({ error: 'Nothing to update' });
 
-        if (updates.length === 0) return reply.code(400).send({ error: 'Nothing to update' });
-
-        values.push(queryId, projectId);
-        await mysqlPool.execute(
-          `UPDATE g_argus_saved_queries SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
-          values
-        );
+        await db('g_argus_saved_queries')
+          .where({ id: queryId, project_id: projectId })
+          .update(updateObj);
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update saved query', {
@@ -539,10 +533,9 @@ export default async function discoverRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, queryId } = request.params as { projectId: string; queryId: string };
       try {
-        await mysqlPool.execute(
-          'DELETE FROM g_argus_saved_queries WHERE id = ? AND project_id = ?',
-          [queryId, projectId]
-        );
+        await db('g_argus_saved_queries')
+          .where({ id: queryId, project_id: projectId })
+          .del();
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete saved query', {

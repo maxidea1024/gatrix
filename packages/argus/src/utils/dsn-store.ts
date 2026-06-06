@@ -1,4 +1,4 @@
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from './logger';
 import { DsnAuthResult } from '../middleware/dsn-auth';
 
@@ -70,12 +70,10 @@ export class DsnStore {
    * Called by ConfigSubscriber on Pub/Sub notification.
    */
   async loadAll(): Promise<void> {
-    const [rows] = await mysqlPool.query(`
-      SELECT dk.*, ap.gatrix_project_id, ap.id as internal_project_id
-      FROM g_argus_dsnKeys dk
-      JOIN g_argus_projects ap ON dk.project_id = ap.id
-      WHERE dk.is_active = 1
-    `);
+    const rows = await db('g_argus_dsnKeys as dk')
+      .select('dk.*', 'ap.gatrix_project_id', 'ap.id as internal_project_id')
+      .join('g_argus_projects as ap', 'dk.project_id', 'ap.id')
+      .where('dk.is_active', 1);
 
     // Build new map first, then swap atomically
     const newMap = new Map<string, StoredDsn>();

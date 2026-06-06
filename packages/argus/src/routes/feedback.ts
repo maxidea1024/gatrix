@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
@@ -160,11 +160,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         if (feedbackIds.length > 0) {
           try {
             await ensureIssueLinkTable();
-            const [linkRows] = await mysqlPool.query(
-              `SELECT feedback_id, issue_id FROM g_argus_feedback_issue_links WHERE project_id = ? AND feedback_id IN (${feedbackIds.map(() => '?').join(',')})`,
-              [projectId, ...feedbackIds]
-            );
-            for (const row of (linkRows as any[])) {
+            const linkRows = await db('g_argus_feedback_issue_links')
+              .select('feedback_id', 'issue_id')
+              .where('project_id', projectId)
+              .whereIn('feedback_id', feedbackIds);
+            for (const row of linkRows) {
               manualLinks[row.feedback_id] = row.issue_id;
             }
           } catch (e) {
@@ -192,12 +192,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             ])];
 
             if (allIssueIds.length > 0) {
-              const [issueRows] = await mysqlPool.query(
-                `SELECT id, title, status FROM g_argus_issues WHERE id IN (${allIssueIds.map(() => '?').join(',')})`,
-                [...allIssueIds]
-              );
+              const issueRows = await db('g_argus_issues')
+                .select('id', 'title', 'status')
+                .whereIn('id', allIssueIds);
               const issueMap: Record<number, { id: number; title: string; status: string }> = {};
-              for (const row of (issueRows as any[])) {
+              for (const row of issueRows) {
                 issueMap[row.id] = { id: row.id, title: row.title, status: row.status };
               }
               for (const [eid, issueId] of Object.entries(eventToIssueId)) {
@@ -218,11 +217,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         let extraIssueMap: Record<number, { id: number; title: string; status: string }> = {};
         if (manualIssueIdsNotFetched.length > 0) {
           try {
-            const [rows] = await mysqlPool.query(
-              `SELECT id, title, status FROM g_argus_issues WHERE id IN (${manualIssueIdsNotFetched.map(() => '?').join(',')})`,
-              [...manualIssueIdsNotFetched]
-            );
-            for (const row of (rows as any[])) {
+            const rows = await db('g_argus_issues')
+              .select('id', 'title', 'status')
+              .whereIn('id', manualIssueIdsNotFetched);
+            for (const row of rows) {
               extraIssueMap[row.id] = { id: row.id, title: row.title, status: row.status };
             }
           } catch { /* ok */ }
@@ -279,11 +277,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         await ensureIssueLinkTable();
 
         // 1) Get manually linked feedback IDs from MySQL
-        const [linkRows] = await mysqlPool.query(
-          'SELECT feedback_id FROM g_argus_feedback_issue_links WHERE project_id = ? AND issue_id = ?',
-          [projectId, Number(issueId)]
-        );
-        const feedbackIds = (linkRows as any[]).map(r => r.feedback_id);
+        const linkRows = await db('g_argus_feedback_issue_links')
+          .select('feedback_id')
+          .where({ project_id: projectId, issue_id: Number(issueId) });
+        const feedbackIds = linkRows.map((r: any) => r.feedback_id);
 
         if (feedbackIds.length === 0) {
           return reply.send({ data: [] });
@@ -353,22 +350,23 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         try {
           await ensureActivityTable();
           if (body.status) {
-            await mysqlPool.query(
-              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
-              [projectId, feedbackId, 'status_change', JSON.stringify({ from: '', to: body.status })]
-            );
+            await db('g_argus_feedback_activity').insert({
+              project_id: projectId, feedback_id: feedbackId, action: 'status_change',
+              data: JSON.stringify({ from: '', to: body.status }), created_at: db.fn.now(),
+            });
           }
           if (body.assigned_to !== undefined) {
-            await mysqlPool.query(
-              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
-              [projectId, feedbackId, 'assign', JSON.stringify({ assigned_to: body.assigned_to })]
-            );
+            await db('g_argus_feedback_activity').insert({
+              project_id: projectId, feedback_id: feedbackId, action: 'assign',
+              data: JSON.stringify({ assigned_to: body.assigned_to }), created_at: db.fn.now(),
+            });
           }
           if (body.is_spam !== undefined) {
-            await mysqlPool.query(
-              'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, action, data, created_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
-              [projectId, feedbackId, body.is_spam ? 'mark_spam' : 'unmark_spam', null]
-            );
+            await db('g_argus_feedback_activity').insert({
+              project_id: projectId, feedback_id: feedbackId,
+              action: body.is_spam ? 'mark_spam' : 'unmark_spam',
+              data: null, created_at: db.fn.now(),
+            });
           }
         } catch (e) {
           logger.warn('Failed to record feedback activity', { error: (e as Error).message });
@@ -492,15 +490,14 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
-        const [rows] = await mysqlPool.query(
-          'SELECT * FROM g_argus_spam_keywords WHERE project_id = ? ORDER BY created_at DESC',
-          [projectId]
-        );
+        const rows = await db('g_argus_spam_keywords')
+          .where('project_id', projectId)
+          .orderBy('created_at', 'desc');
         return reply.send({ data: rows });
       } catch (error: any) {
         if (error?.code === 'ER_NO_SUCH_TABLE') {
           // Auto-create the table if it doesn't exist
-          await mysqlPool.query(`
+          await db.raw(`
             CREATE TABLE IF NOT EXISTS g_argus_spam_keywords (
               id INT AUTO_INCREMENT PRIMARY KEY,
               project_id VARCHAR(64) NOT NULL,
@@ -531,7 +528,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
       try {
         // Ensure table exists
-        await mysqlPool.query(`
+        await db.raw(`
           CREATE TABLE IF NOT EXISTS g_argus_spam_keywords (
             id INT AUTO_INCREMENT PRIMARY KEY,
             project_id VARCHAR(64) NOT NULL,
@@ -542,12 +539,13 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           )
         `);
 
-        const [result] = await mysqlPool.query(
-          'INSERT INTO g_argus_spam_keywords (project_id, keyword, is_regex) VALUES (?, ?, ?)',
-          [projectId, keyword.trim(), is_regex ? 1 : 0]
-        );
+        const [insertId] = await db('g_argus_spam_keywords').insert({
+          project_id: projectId,
+          keyword: keyword.trim(),
+          is_regex: is_regex ? 1 : 0,
+        });
 
-        return reply.code(201).send({ data: { id: (result as any).insertId } });
+        return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to add spam keyword', { projectId, error: (error as Error).message });
         return reply.code(500).send({ error: 'Failed to add spam keyword' });
@@ -562,10 +560,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       const { projectId, keywordId } = request.params as { projectId: string; keywordId: string };
 
       try {
-        await mysqlPool.query(
-          'DELETE FROM g_argus_spam_keywords WHERE id = ? AND project_id = ?',
-          [keywordId, projectId]
-        );
+        await db('g_argus_spam_keywords')
+          .where({ id: keywordId, project_id: projectId })
+          .del();
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete spam keyword', { error: (error as Error).message });
@@ -582,11 +579,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
       try {
         // Get keywords
-        const [keywords] = await mysqlPool.query(
-          'SELECT keyword, is_regex FROM g_argus_spam_keywords WHERE project_id = ?',
-          [projectId]
-        );
-        const kws = keywords as any[];
+        const kws = await db('g_argus_spam_keywords')
+          .select('keyword', 'is_regex')
+          .where('project_id', projectId);
         if (kws.length === 0) {
           return reply.send({ matched: 0, message: 'No spam keywords configured' });
         }
@@ -736,12 +731,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         const limitVal = limit ? parseInt(limit, 10) : 50;
         const offsetVal = offset ? parseInt(offset, 10) : 0;
 
-        const [rows] = await mysqlPool.query(
-          `SELECT * FROM g_argus_feedback_activity
-           WHERE project_id = ? AND feedback_id = ?
-           ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-          [projectId, feedbackId, limitVal, offsetVal]
-        );
+        const rows = await db('g_argus_feedback_activity')
+          .where({ project_id: projectId, feedback_id: feedbackId })
+          .orderBy('created_at', 'desc')
+          .limit(limitVal)
+          .offset(offsetVal);
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to get feedback activity', {
@@ -767,11 +761,13 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
       try {
         await ensureActivityTable();
-        const [result] = await mysqlPool.query(
-          'INSERT INTO g_argus_feedback_activity (project_id, feedback_id, user_name, action, data, created_at) VALUES (?, ?, ?, ?, ?, UTC_TIMESTAMP())',
-          [projectId, feedbackId, user_name || null, 'comment', JSON.stringify({ text: text.trim() })]
-        );
-        return reply.code(201).send({ data: { id: (result as any).insertId } });
+        const [insertId] = await db('g_argus_feedback_activity').insert({
+          project_id: projectId, feedback_id: feedbackId,
+          user_name: user_name || null, action: 'comment',
+          data: JSON.stringify({ text: text.trim() }),
+          created_at: db.fn.now(),
+        });
+        return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to add feedback comment', {
           projectId, feedbackId,
@@ -795,7 +791,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         if (issue_id) {
           // Upsert link
-          await mysqlPool.query(
+          await db.raw(
             `INSERT INTO g_argus_feedback_issue_links (project_id, feedback_id, issue_id)
              VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE issue_id = VALUES(issue_id), updated_at = UTC_TIMESTAMP()`,
@@ -804,10 +800,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           logger.info('Linked feedback to issue', { projectId, feedbackId, issueId: issue_id });
         } else {
           // Unlink
-          await mysqlPool.query(
-            'DELETE FROM g_argus_feedback_issue_links WHERE project_id = ? AND feedback_id = ?',
-            [projectId, feedbackId]
-          );
+          await db('g_argus_feedback_issue_links')
+            .where({ project_id: projectId, feedback_id: feedbackId })
+            .del();
           logger.info('Unlinked feedback from issue', { projectId, feedbackId });
         }
 
@@ -827,7 +822,7 @@ let activityTableChecked = false;
 async function ensureActivityTable(): Promise<void> {
   if (activityTableChecked) return;
   try {
-    await mysqlPool.query(`
+    await db.raw(`
       CREATE TABLE IF NOT EXISTS g_argus_feedback_activity (
         id INT AUTO_INCREMENT PRIMARY KEY,
         project_id VARCHAR(64) NOT NULL,
@@ -850,7 +845,7 @@ let issueLinkTableChecked = false;
 async function ensureIssueLinkTable(): Promise<void> {
   if (issueLinkTableChecked) return;
   try {
-    await mysqlPool.query(`
+    await db.raw(`
       CREATE TABLE IF NOT EXISTS g_argus_feedback_issue_links (
         id INT AUTO_INCREMENT PRIMARY KEY,
         project_id VARCHAR(64) NOT NULL,

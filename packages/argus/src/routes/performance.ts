@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
@@ -171,10 +171,9 @@ export default async function performanceRoutes(app: FastifyInstance) {
         let relatedIssuesList = batch.errors.data as any[];
         if (relatedIssuesList.length > 0) {
           const issueIds = relatedIssuesList.map((i: any) => i.issue_id);
-          const [issueRows] = await mysqlPool.query(
-            `SELECT id, title, level FROM g_argus_issues WHERE id IN (${issueIds.map(() => '?').join(',')})`,
-            issueIds
-          ) as any;
+          const issueRows = await db('g_argus_issues')
+            .select('id', 'title', 'level')
+            .whereIn('id', issueIds);
 
           relatedIssuesList = relatedIssuesList.map((r: any) => {
             const row = issueRows.find((i: any) => i.id === Number(r.issue_id));

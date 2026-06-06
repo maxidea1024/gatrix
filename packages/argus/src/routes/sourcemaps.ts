@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import multipart from '@fastify/multipart';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 import path from 'path';
 import fs from 'fs/promises';
@@ -33,13 +33,10 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
 
       try {
-        const [rows] = await mysqlPool.query(
-          `SELECT * FROM g_argus_sourcemap_releases
-           WHERE project_id = ?
-           ORDER BY created_at DESC
-           LIMIT 50`,
-          [projectId]
-        );
+        const rows = await db('g_argus_sourcemap_releases')
+          .where('project_id', projectId)
+          .orderBy('created_at', 'desc')
+          .limit(50);
         return reply.send({ data: rows });
       } catch (error: any) {
         // If table doesn't exist yet, return empty
@@ -97,28 +94,23 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         }
 
         // Upsert release record
-        const [existing] = await mysqlPool.query(
-          `SELECT id FROM g_argus_sourcemap_releases
-           WHERE project_id = ? AND \`release\` = ? AND \`dist\` = ?`,
-          [projectId, release, dist]
-        );
-        const existingRows = existing as any[];
+        const existingRows = await db('g_argus_sourcemap_releases')
+          .select('id')
+          .where({ project_id: projectId, release, dist });
         let releaseId: number;
 
         if (existingRows.length > 0) {
           releaseId = existingRows[0].id;
           // Delete old files for this release
-          await mysqlPool.query(
-            `DELETE FROM g_argus_sourcemap_files WHERE release_id = ?`,
-            [releaseId]
-          );
+          await db('g_argus_sourcemap_files').where('release_id', releaseId).del();
         } else {
-          const [insertResult] = await mysqlPool.query(
-            `INSERT INTO g_argus_sourcemap_releases (project_id, \`release\`, \`dist\`, file_count)
-             VALUES (?, ?, ?, ?)`,
-            [projectId, release, dist, files.length]
-          );
-          releaseId = (insertResult as any).insertId;
+          const [insertedId] = await db('g_argus_sourcemap_releases').insert({
+            project_id: projectId,
+            release,
+            dist,
+            file_count: files.length,
+          });
+          releaseId = insertedId;
         }
 
         // Save files to disk and create DB entries
@@ -146,20 +138,15 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
 
         // Single bulk INSERT for all sourcemap file records
         if (dbRows.length > 0) {
-          const ph = dbRows.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
-          await mysqlPool.query(
-            `INSERT INTO g_argus_sourcemap_files
-             (release_id, project_id, file_path, file_name, sourcemap_path, file_size)
-             VALUES ${ph}`,
-            dbRows.flat()
+          await db('g_argus_sourcemap_files').insert(
+            dbRows.map(([release_id, project_id, file_path, file_name, sourcemap_path, file_size]) => ({
+              release_id, project_id, file_path, file_name, sourcemap_path, file_size,
+            }))
           );
         }
 
         // Update file count
-        await mysqlPool.query(
-          `UPDATE g_argus_sourcemap_releases SET file_count = ? WHERE id = ?`,
-          [files.length, releaseId]
-        );
+        await db('g_argus_sourcemap_releases').where('id', releaseId).update({ file_count: files.length });
 
         logger.info('Sourcemaps uploaded', {
           projectId,
@@ -202,10 +189,7 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         } catch { /* ignore if dir doesn't exist */ }
 
         // Delete from DB (cascade deletes files)
-        await mysqlPool.query(
-          `DELETE FROM g_argus_sourcemap_releases WHERE id = ? AND project_id = ?`,
-          [releaseId, projectId]
-        );
+        await db('g_argus_sourcemap_releases').where({ id: releaseId, project_id: projectId }).del();
 
         return reply.send({ success: true });
       } catch (error) {
@@ -226,12 +210,9 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
       const { projectId, releaseId } = request.params as { projectId: string; releaseId: string };
 
       try {
-        const [rows] = await mysqlPool.query(
-          `SELECT id, file_path, file_name, file_size, created_at
-           FROM g_argus_sourcemap_files
-           WHERE release_id = ? AND project_id = ?`,
-          [releaseId, projectId]
-        );
+        const rows = await db('g_argus_sourcemap_files')
+          .select('id', 'file_path', 'file_name', 'file_size', 'created_at')
+          .where({ release_id: releaseId, project_id: projectId });
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to list sourcemap files', {
@@ -262,13 +243,11 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
 
       try {
         // Find the release
-        const [releaseRows] = await mysqlPool.query(
-          `SELECT id FROM g_argus_sourcemap_releases
-           WHERE project_id = ? AND \`release\` = ? AND \`dist\` = ?
-           ORDER BY created_at DESC LIMIT 1`,
-          [projectId, release, dist || '']
-        );
-        const releases = releaseRows as any[];
+        const releases = await db('g_argus_sourcemap_releases')
+          .select('id')
+          .where({ project_id: projectId, release, dist: dist || '' })
+          .orderBy('created_at', 'desc')
+          .limit(1);
 
         if (releases.length === 0) {
           return reply.code(404).send({ error: 'Release not found' });
@@ -277,22 +256,17 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         const releaseId = releases[0].id;
 
         // Find the file by path (exact match or suffix match)
-        const [fileRows] = await mysqlPool.query(
-          `SELECT sourcemap_path, file_path FROM g_argus_sourcemap_files
-           WHERE release_id = ? AND project_id = ? AND file_path = ?`,
-          [releaseId, projectId, file_path]
-        );
-        let files = fileRows as any[];
+        let files = await db('g_argus_sourcemap_files')
+          .select('sourcemap_path', 'file_path')
+          .where({ release_id: releaseId, project_id: projectId, file_path });
 
         // If no exact match, try suffix match (strip ~/ prefix)
         if (files.length === 0) {
           const stripped = file_path.replace(/^~\//, '');
-          const [suffixRows] = await mysqlPool.query(
-            `SELECT sourcemap_path, file_path FROM g_argus_sourcemap_files
-             WHERE release_id = ? AND project_id = ? AND file_path LIKE ?`,
-            [releaseId, projectId, `%${stripped}`]
-          );
-          files = suffixRows as any[];
+          files = await db('g_argus_sourcemap_files')
+            .select('sourcemap_path', 'file_path')
+            .where({ release_id: releaseId, project_id: projectId })
+            .andWhere('file_path', 'like', `%${stripped}`);
         }
 
         if (files.length === 0) {

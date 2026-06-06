@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('argus-notification-channels');
@@ -8,7 +8,7 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
 
   // Ensure table exists
   try {
-    await mysqlPool.query(`
+    await db.raw(`
       CREATE TABLE IF NOT EXISTS g_argus_notification_channels (
         id INT AUTO_INCREMENT PRIMARY KEY,
         project_id VARCHAR(64) NOT NULL,
@@ -32,13 +32,12 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
-        const [rows] = await mysqlPool.execute(
-          `SELECT id, project_id, provider, name, config, enabled, created_at, updated_at
-           FROM g_argus_notification_channels WHERE project_id = ? ORDER BY created_at DESC`,
-          [projectId]
-        );
+        const rows = await db('g_argus_notification_channels')
+          .select('id', 'project_id', 'provider', 'name', 'config', 'enabled', 'created_at', 'updated_at')
+          .where('project_id', projectId)
+          .orderBy('created_at', 'desc');
         // Parse JSON config
-        const channels = (rows as any[]).map(row => ({
+        const channels = rows.map((row: any) => ({
           ...row,
           config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
         }));
@@ -66,12 +65,12 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
       }
 
       try {
-        const [result] = await mysqlPool.execute(
-          `INSERT INTO g_argus_notification_channels (project_id, provider, name, config)
-           VALUES (?, ?, ?, ?)`,
-          [projectId, provider, name || null, JSON.stringify(config || {})]
-        );
-        const insertId = (result as any).insertId;
+        const [insertId] = await db('g_argus_notification_channels').insert({
+          project_id: projectId,
+          provider,
+          name: name || null,
+          config: JSON.stringify(config || {}),
+        });
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to create notification channel', { projectId, error: error instanceof Error ? error.message : String(error) });
@@ -99,11 +98,13 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
       }
 
       try {
-        values.push(channelId, projectId);
-        await mysqlPool.execute(
-          `UPDATE g_argus_notification_channels SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
-          values
-        );
+        const updateObj: any = {};
+        if (body.name !== undefined) updateObj.name = body.name;
+        if (body.enabled !== undefined) updateObj.enabled = body.enabled ? 1 : 0;
+        if (body.config !== undefined) updateObj.config = JSON.stringify(body.config);
+        await db('g_argus_notification_channels')
+          .where({ id: channelId, project_id: projectId })
+          .update(updateObj);
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update notification channel', { projectId, channelId, error: error instanceof Error ? error.message : String(error) });
@@ -118,10 +119,9 @@ export default async function notificationChannelsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, channelId } = request.params as { projectId: string; channelId: string };
       try {
-        await mysqlPool.execute(
-          'DELETE FROM g_argus_notification_channels WHERE id = ? AND project_id = ?',
-          [channelId, projectId]
-        );
+        await db('g_argus_notification_channels')
+          .where({ id: channelId, project_id: projectId })
+          .del();
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete notification channel', { error: error instanceof Error ? error.message : String(error) });

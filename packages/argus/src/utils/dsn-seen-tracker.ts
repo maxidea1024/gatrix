@@ -1,4 +1,4 @@
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from './logger';
 
 const logger = createLogger('dsn-seen-tracker');
@@ -26,15 +26,13 @@ export function updateDsnKeyLastSeen(dsnKeyId: number): void {
 
   lastUpdateMap.set(dsnKeyId, now);
 
-  mysqlPool
-    .query(
-      `UPDATE g_argus_dsnKeys
-       SET last_seen = UTC_TIMESTAMP(),
-           first_seen = COALESCE(first_seen, UTC_TIMESTAMP())
-       WHERE id = ?`,
-      [dsnKeyId]
-    )
-    .catch((err) => {
+  db('g_argus_dsnKeys')
+    .where('id', dsnKeyId)
+    .update({
+      last_seen: db.fn.now(),
+      first_seen: db.raw('COALESCE(first_seen, UTC_TIMESTAMP())'),
+    })
+    .catch((err: any) => {
       logger.warn('Failed to update DSN key last_seen', {
         dsnKeyId,
         error: err instanceof Error ? err.message : String(err),

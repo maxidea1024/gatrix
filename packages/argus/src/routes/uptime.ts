@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('uptime-api');
@@ -16,7 +16,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
     async (request, reply) => {
       try {
         const { projectId } = request.params;
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           `SELECT * FROM g_argus_uptimeMonitors WHERE project_id = ? ORDER BY created_at DESC`,
           [projectId]
         );
@@ -67,7 +67,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
           });
         }
 
-        const [result]: any = await mysqlPool.query(
+        const [result]: any = await db.raw(
           `INSERT INTO g_argus_uptimeMonitors 
             (project_id, name, url, method, interval_seconds, environment,
              timeout_ms, headers, body, expected_status_codes,
@@ -83,7 +83,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
           ]
         );
 
-        const [newMonitor] = await mysqlPool.query(
+        const [newMonitor] = await db.raw(
           `SELECT * FROM g_argus_uptimeMonitors WHERE id = ?`,
           [result.insertId]
         );
@@ -152,7 +152,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
         
         values.push(monitorId, projectId);
         
-        const [result]: any = await mysqlPool.query(
+        const [result]: any = await db.raw(
           `UPDATE g_argus_uptimeMonitors SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           values
         );
@@ -176,7 +176,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
       try {
         const { projectId, monitorId } = request.params;
         
-        const [result]: any = await mysqlPool.query(
+        const [result]: any = await db.raw(
           `DELETE FROM g_argus_uptimeMonitors WHERE id = ? AND project_id = ?`,
           [monitorId, projectId]
         );
@@ -206,7 +206,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
         const offset = parseInt(request.query.offset || '0', 10);
 
         // Verify monitor belongs to project
-        const [monitors]: any = await mysqlPool.query(
+        const [monitors]: any = await db.raw(
           `SELECT id FROM g_argus_uptimeMonitors WHERE id = ? AND project_id = ?`,
           [monitorId, projectId]
         );
@@ -214,7 +214,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
           return reply.code(404).send({ success: false, error: 'Monitor not found' });
         }
 
-        const [rows] = await mysqlPool.query(
+        const [rows] = await db.raw(
           `SELECT * FROM g_argus_uptimeCheckins
            WHERE monitor_id = ?
            ORDER BY checked_at DESC
@@ -222,7 +222,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
           [monitorId, limit, offset]
         );
 
-        const [countResult]: any = await mysqlPool.query(
+        const [countResult]: any = await db.raw(
           `SELECT COUNT(*) as total FROM g_argus_uptimeCheckins WHERE monitor_id = ?`,
           [monitorId]
         );
@@ -249,7 +249,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
         const { projectId, monitorId, captureId } = request.params;
 
         // Verify monitor belongs to project
-        const [monitors]: any = await mysqlPool.query(
+        const [monitors]: any = await db.raw(
           `SELECT id FROM g_argus_uptimeMonitors WHERE id = ? AND project_id = ?`,
           [monitorId, projectId]
         );
@@ -257,7 +257,7 @@ export default async function uptimeRoutes(app: FastifyInstance) {
           return reply.code(404).send({ success: false, error: 'Monitor not found' });
         }
 
-        const [captures]: any = await mysqlPool.query(
+        const [captures]: any = await db.raw(
           `SELECT * FROM g_argus_uptimeResponseCaptures WHERE id = ? AND monitor_id = ?`,
           [captureId, monitorId]
         );

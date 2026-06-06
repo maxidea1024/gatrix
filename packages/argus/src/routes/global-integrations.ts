@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('argus-global-integrations');
@@ -7,7 +7,7 @@ const logger = createLogger('argus-global-integrations');
 export default async function globalIntegrationsRoutes(app: FastifyInstance) {
   // Initialize table
   try {
-    await mysqlPool.query(`
+    await db.raw(`
       CREATE TABLE IF NOT EXISTS g_argus_global_integrations (
         id INT AUTO_INCREMENT PRIMARY KEY,
         provider VARCHAR(50) NOT NULL,
@@ -31,12 +31,12 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { provider } = request.params as { provider: string };
       try {
-        const [rows] = await mysqlPool.execute(
-          'SELECT id, name, url, is_active, created_at, updated_at FROM g_argus_global_integrations WHERE provider = ? AND is_active = 1 LIMIT 1',
-          [provider]
-        );
-        const configured = (rows as any[]).length > 0;
-        return reply.send({ data: { configured, config: (rows as any[])[0] || null } });
+        const rows = await db('g_argus_global_integrations')
+          .select('id', 'name', 'url', 'is_active', 'created_at', 'updated_at')
+          .where({ provider, is_active: 1 })
+          .limit(1);
+        const configured = rows.length > 0;
+        return reply.send({ data: { configured, config: rows[0] || null } });
       } catch (error) {
         logger.error('Failed to check global integration config', { provider, error: error instanceof Error ? error.message : String(error) });
         return reply.code(500).send({ error: 'Failed to check config' });
@@ -56,7 +56,7 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
       }
 
       try {
-        await mysqlPool.execute(
+        await db.raw(
           `INSERT INTO g_argus_global_integrations (provider, name, url, credentials)
            VALUES (?, ?, ?, ?)
            ON DUPLICATE KEY UPDATE
@@ -193,10 +193,9 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { provider } = request.params as { provider: string };
       try {
-        await mysqlPool.execute(
-          'UPDATE g_argus_global_integrations SET is_active = 0 WHERE provider = ?',
-          [provider]
-        );
+        await db('g_argus_global_integrations')
+          .where('provider', provider)
+          .update({ is_active: 0 });
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete global integration', { provider, error: error instanceof Error ? error.message : String(error) });

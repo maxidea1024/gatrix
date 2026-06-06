@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('argus-integrations');
@@ -14,11 +14,10 @@ export default async function integrationsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
-        const [rows] = await mysqlPool.execute(
-          `SELECT id, project_id, provider, repo_url, default_branch, enabled, created_at, updated_at
-           FROM g_argus_integrations WHERE project_id = ? ORDER BY created_at DESC`,
-          [projectId]
-        );
+        const rows = await db('g_argus_integrations')
+          .select('id', 'project_id', 'provider', 'repo_url', 'default_branch', 'enabled', 'created_at', 'updated_at')
+          .where('project_id', projectId)
+          .orderBy('created_at', 'desc');
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to list integrations', { projectId, error: error instanceof Error ? error.message : String(error) });
@@ -40,12 +39,13 @@ export default async function integrationsRoutes(app: FastifyInstance) {
       };
 
       try {
-        const [result] = await mysqlPool.execute(
-          `INSERT INTO g_argus_integrations (project_id, provider, repo_url, default_branch, access_token)
-           VALUES (?, ?, ?, ?, ?)`,
-          [projectId, provider, repo_url, default_branch || 'main', access_token || null]
-        );
-        const insertId = (result as any).insertId;
+        const [insertId] = await db('g_argus_integrations').insert({
+          project_id: projectId,
+          provider,
+          repo_url,
+          default_branch: default_branch || 'main',
+          access_token: access_token || null,
+        });
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to create integration', { projectId, error: error instanceof Error ? error.message : String(error) });
@@ -77,11 +77,13 @@ export default async function integrationsRoutes(app: FastifyInstance) {
       }
 
       try {
-        values.push(integrationId, projectId);
-        await mysqlPool.execute(
-          `UPDATE g_argus_integrations SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
-          values
-        );
+        const intUpdateObj: any = {};
+        for (const field of allowedFields) {
+          if (body[field] !== undefined) intUpdateObj[field] = body[field];
+        }
+        await db('g_argus_integrations')
+          .where({ id: integrationId, project_id: projectId })
+          .update(intUpdateObj);
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update integration', { projectId, integrationId, error: error instanceof Error ? error.message : String(error) });
@@ -96,10 +98,9 @@ export default async function integrationsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, integrationId } = request.params as { projectId: string; integrationId: string };
       try {
-        await mysqlPool.execute(
-          'DELETE FROM g_argus_integrations WHERE id = ? AND project_id = ?',
-          [integrationId, projectId]
-        );
+        await db('g_argus_integrations')
+          .where({ id: integrationId, project_id: projectId })
+          .del();
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete integration', { error: error instanceof Error ? error.message : String(error) });
@@ -118,18 +119,11 @@ export default async function integrationsRoutes(app: FastifyInstance) {
       const { release, limit = '20' } = request.query as { release?: string; limit?: string };
 
       try {
-        let query = 'SELECT * FROM g_argus_commits WHERE project_id = ?';
-        const params: any[] = [projectId];
-
+        const q = db('g_argus_commits').where('project_id', projectId);
         if (release) {
-          query += ' AND release_version = ?';
-          params.push(release);
+          q.where('release_version', release);
         }
-
-        query += ' ORDER BY timestamp DESC LIMIT ?';
-        params.push(parseInt(limit as string, 10));
-
-        const [rows] = await mysqlPool.execute(query, params);
+        const rows = await q.orderBy('timestamp', 'desc').limit(parseInt(limit as string, 10));
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to list commits', { projectId, error: error instanceof Error ? error.message : String(error) });
@@ -176,7 +170,7 @@ export default async function integrationsRoutes(app: FastifyInstance) {
         }
 
         const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
-        await mysqlPool.query(
+        await db.raw(
           `INSERT INTO g_argus_commits
            (project_id, commit_hash, author_name, author_email, message, timestamp, release_version, files_changed, additions, deletions)
            VALUES ${placeholders}
@@ -201,14 +195,11 @@ export default async function integrationsRoutes(app: FastifyInstance) {
 
       try {
         // Get recent commits that changed files matching the issue's stacktrace
-        const [commits] = await mysqlPool.execute(
-          `SELECT * FROM g_argus_commits
-           WHERE project_id = ?
-             AND timestamp >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)
-           ORDER BY timestamp DESC
-           LIMIT 20`,
-          [projectId]
-        );
+        const commits = await db('g_argus_commits')
+          .where('project_id', projectId)
+          .andWhere('timestamp', '>=', db.raw('DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)'))
+          .orderBy('timestamp', 'desc')
+          .limit(20);
 
         return reply.send({ data: commits });
       } catch (error) {
@@ -226,10 +217,9 @@ export default async function integrationsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
-        const [rows] = await mysqlPool.execute(
-          'SELECT * FROM g_argus_ownership_rules WHERE project_id = ? ORDER BY priority DESC, id ASC',
-          [projectId]
-        );
+        const rows = await db('g_argus_ownership_rules')
+          .where('project_id', projectId)
+          .orderBy([{ column: 'priority', order: 'desc' }, { column: 'id', order: 'asc' }]);
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to list ownership rules', { projectId, error: error instanceof Error ? error.message : String(error) });
@@ -253,12 +243,15 @@ export default async function integrationsRoutes(app: FastifyInstance) {
       };
 
       try {
-        const [result] = await mysqlPool.execute(
-          `INSERT INTO g_argus_ownership_rules (project_id, name, match_type, match_pattern, owners, priority, auto_assign)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [projectId, name, match_type, match_pattern, JSON.stringify(owners), priority || 0, auto_assign !== false ? 1 : 0]
-        );
-        const insertId = (result as any).insertId;
+        const [insertId] = await db('g_argus_ownership_rules').insert({
+          project_id: projectId,
+          name,
+          match_type,
+          match_pattern,
+          owners: JSON.stringify(owners),
+          priority: priority || 0,
+          auto_assign: auto_assign !== false ? 1 : 0,
+        });
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to create ownership rule', { projectId, error: error instanceof Error ? error.message : String(error) });
@@ -294,11 +287,14 @@ export default async function integrationsRoutes(app: FastifyInstance) {
       }
 
       try {
-        values.push(ruleId, projectId);
-        await mysqlPool.execute(
-          `UPDATE g_argus_ownership_rules SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
-          values
-        );
+        const ownUpdateObj: any = {};
+        for (const field of allowedFields) {
+          if (body[field] !== undefined) ownUpdateObj[field] = body[field];
+        }
+        if (body.owners !== undefined) ownUpdateObj.owners = JSON.stringify(body.owners);
+        await db('g_argus_ownership_rules')
+          .where({ id: ruleId, project_id: projectId })
+          .update(ownUpdateObj);
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update ownership rule', { projectId, ruleId, error: error instanceof Error ? error.message : String(error) });
@@ -313,10 +309,9 @@ export default async function integrationsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId, ruleId } = request.params as { projectId: string; ruleId: string };
       try {
-        await mysqlPool.execute(
-          'DELETE FROM g_argus_ownership_rules WHERE id = ? AND project_id = ?',
-          [ruleId, projectId]
-        );
+        await db('g_argus_ownership_rules')
+          .where({ id: ruleId, project_id: projectId })
+          .del();
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to delete ownership rule', { error: error instanceof Error ? error.message : String(error) });

@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 import { GithubAppService } from '../services/githubAppService';
 
@@ -8,7 +8,7 @@ const logger = createLogger('github-app-routes');
 export default async function githubAppRoutes(app: FastifyInstance) {
   // Ensure installations table
   try {
-    await mysqlPool.query(`
+    await db.raw(`
       CREATE TABLE IF NOT EXISTS g_argus_github_installations (
         id INT AUTO_INCREMENT PRIMARY KEY,
         installation_id VARCHAR(100) NOT NULL,
@@ -42,14 +42,14 @@ export default async function githubAppRoutes(app: FastifyInstance) {
       // Handle installation events
       if (event === 'installation') {
         if (body.action === 'created') {
-          await mysqlPool.execute(
+          await db.raw(
             `INSERT INTO g_argus_github_installations (installation_id, account_name, target_type)
              VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE account_name = VALUES(account_name), target_type = VALUES(target_type)`,
             [body.installation.id, body.installation.account.login, body.installation.target_type]
           );
         } else if (body.action === 'deleted') {
-          await mysqlPool.execute('DELETE FROM g_argus_github_installations WHERE installation_id = ?', [body.installation.id]);
+          await db('g_argus_github_installations').where('installation_id', body.installation.id).del();
         }
       }
 
@@ -98,8 +98,11 @@ export default async function githubAppRoutes(app: FastifyInstance) {
       ];
 
       try {
-        const [rows] = await mysqlPool.execute('SELECT installation_id FROM g_argus_github_installations ORDER BY created_at DESC LIMIT 1');
-        const installation = (rows as any[])[0];
+        const rows = await db('g_argus_github_installations')
+          .select('installation_id')
+          .orderBy('created_at', 'desc')
+          .limit(1);
+        const installation = rows[0];
         
         if (!installation) {
           // Mock data fallback in dev environment so UI can be fully tested

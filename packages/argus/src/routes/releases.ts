@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
-import { mysqlPool } from '../config/mysql';
+import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('releases-api');
@@ -127,16 +127,15 @@ export default async function releasesRoutes(app: FastifyInstance) {
           }),
 
           // New Issues from MySQL (not ClickHouse)
-          mysqlPool.query(
-            `SELECT first_release as release_name, COUNT(*) as new_issues 
-             FROM g_argus_issues 
-             WHERE project_id = ? AND first_release IS NOT NULL 
-             GROUP BY first_release`,
-            [projectId]
-          ),
+          db('g_argus_issues')
+            .select('first_release as release_name')
+            .count('* as new_issues')
+            .where('project_id', projectId)
+            .whereNotNull('first_release')
+            .groupBy('first_release'),
         ]);
 
-        const newIssuesRows = newIssuesResult[0] as any[];
+        const newIssuesRows = newIssuesResult as any[];
 
         // Build lookup maps
         const sessionMap = new Map<string, any>();
