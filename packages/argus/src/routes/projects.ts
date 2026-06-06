@@ -1,11 +1,15 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
 import { mysqlPool } from '../config/mysql';
+import { redis } from '../config/redis';
 import { clickhouse } from '../config/clickhouse';
 import { createLogger } from '../utils/logger';
 import { getBucketingConfig } from '../utils/timeBucket';
+import { ConfigBroadcaster } from '../utils/config-broadcaster';
+import { CONFIG_TYPES } from '../config/redis-keys';
 
 const logger = createLogger('projects-api');
+const broadcaster = new ConfigBroadcaster(redis);
 
 export default async function projectsRoutes(app: FastifyInstance) {
   // List all Argus projects
@@ -191,6 +195,10 @@ export default async function projectsRoutes(app: FastifyInstance) {
           `UPDATE g_argus_projects SET ${updates.join(', ')} WHERE ${whereCol} = ?`,
           params
         );
+
+        // Notify workers of project settings change
+        await broadcaster.publish({ type: CONFIG_TYPES.PROJECT_SETTINGS, projectId });
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update project', {
@@ -241,6 +249,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
             dsn: buildDsnUrl(publicKey, gatrixProjectId),
           },
         });
+
+        // Notify workers to reload DSN cache (after response)
+        broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId }).catch(() => {});
       } catch (error) {
         logger.error('Failed to create DSN key', {
           projectId,
@@ -265,6 +276,10 @@ export default async function projectsRoutes(app: FastifyInstance) {
           'DELETE FROM g_argus_dsnKeys WHERE id = ? AND project_id = ?',
           [keyId, projectId]
         );
+
+        // Notify workers to reload DSN cache
+        await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to hard delete DSN key', {
@@ -291,6 +306,10 @@ export default async function projectsRoutes(app: FastifyInstance) {
           'UPDATE g_argus_dsnKeys SET is_active = 0 WHERE id = ? AND project_id = ?',
           [keyId, projectId]
         );
+
+        // Notify workers to reload DSN cache
+        await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to revoke DSN key', {
@@ -340,6 +359,10 @@ export default async function projectsRoutes(app: FastifyInstance) {
           `UPDATE g_argus_dsnKeys SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           params
         );
+
+        // Notify workers to reload DSN cache
+        await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
+
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to update DSN key', {

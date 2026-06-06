@@ -1,8 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { clickhouse } from '../config/clickhouse';
+import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
 import { getBucketingConfig } from '../utils/timeBucket';
+import { CACHE, STREAMS, KNOWN_STREAMS } from '../config/redis-keys';
 
 const logger = createLogger('logs-api');
 
@@ -153,6 +155,19 @@ export default async function logsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h', start, end } = request.query as Record<string, string>;
 
+      // Use a cache key based on period (custom start/end bypass cache)
+      const cacheKey = (!start && !end) ? CACHE.LOG_FACETS(String(projectId), period) : null;
+
+      // Check Redis cache first
+      if (cacheKey) {
+        try {
+          const cached = await redis.get(cacheKey);
+          if (cached) {
+            return reply.send({ data: JSON.parse(cached) });
+          }
+        } catch { /* cache miss, proceed to ClickHouse */ }
+      }
+
       const bucket = getBucketingConfig(period, start, end);
       const qp: Record<string, any> = { 
         projectId: String(projectId),
@@ -185,14 +200,19 @@ export default async function logsRoutes(app: FastifyInstance) {
           levelsRes.json(), servicesRes.json(), envsRes.json(), loggersRes.json(),
         ]);
 
-        return reply.send({
-          data: {
-            levels: (levels as any).data || [],
-            services: (services as any).data || [],
-            environments: (envs as any).data || [],
-            loggers: (loggers as any).data || [],
-          },
-        });
+        const facetData = {
+          levels: (levels as any).data || [],
+          services: (services as any).data || [],
+          environments: (envs as any).data || [],
+          loggers: (loggers as any).data || [],
+        };
+
+        // Cache for 5 minutes (non-blocking)
+        if (cacheKey) {
+          redis.set(cacheKey, JSON.stringify(facetData), 'EX', 300).catch(() => {});
+        }
+
+        return reply.send({ data: facetData });
       } catch (error) {
         logger.error('Failed to get log facets', { projectId, error: String(error) });
         return reply.code(500).send({ error: 'Failed to get log facets' });
@@ -351,25 +371,39 @@ export default async function logsRoutes(app: FastifyInstance) {
       }
 
       try {
-        const rows = logs.map(log => ({
-          log_id: log.log_id || crypto.randomUUID().replace(/-/g, ''),
-          project_id: String(projectId),
-          trace_id: log.trace_id || '',
-          span_id: log.span_id || '',
-          issue_id: log.issue_id || 0,
-          timestamp: log.timestamp || new Date().toISOString(),
-          level: log.level || 'info',
-          logger_name: log.logger_name || '',
-          message: log.message || '',
-          body: log.body || '',
-          environment: log.environment || '',
-          release: log.release || '',
-          service: log.service || '',
-          attributes: log.attributes || {},
-        }));
+        const streamKey = STREAMS.streamKey(STREAMS.LOGS, String(projectId));
+        const pipeline = redis.pipeline();
 
-        await clickhouse.insert({ table: 'argus.logs', values: rows, format: 'JSONEachRow' });
-        return reply.code(202).send({ inserted: rows.length });
+        // Register this stream in the known-streams set
+        pipeline.sadd(KNOWN_STREAMS.LOGS, streamKey);
+
+        for (const log of logs) {
+          const row = {
+            log_id: log.log_id || crypto.randomUUID().replace(/-/g, ''),
+            project_id: String(projectId),
+            trace_id: log.trace_id || '',
+            span_id: log.span_id || '',
+            issue_id: log.issue_id || 0,
+            timestamp: log.timestamp || new Date().toISOString(),
+            level: log.level || 'info',
+            logger_name: log.logger_name || '',
+            message: log.message || '',
+            body: log.body || '',
+            environment: log.environment || '',
+            release: log.release || '',
+            service: log.service || '',
+            attributes: log.attributes || {},
+          };
+          pipeline.xadd(
+            streamKey,
+            'MAXLEN', '~', '500000',
+            '*',
+            'data', JSON.stringify(row),
+          );
+        }
+
+        await pipeline.exec();
+        return reply.code(202).send({ inserted: logs.length });
       } catch (error) {
         logger.error('Failed to ingest logs', { projectId, error: String(error) });
         return reply.code(500).send({ error: 'Failed to ingest logs' });

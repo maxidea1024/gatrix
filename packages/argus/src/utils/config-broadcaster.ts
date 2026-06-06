@@ -23,7 +23,7 @@ export class ConfigBroadcaster {
    */
   async publish(payload: {
     type: string;
-    projectId?: number;
+    projectId?: string | number;
     issueId?: number;
   }): Promise<void> {
     try {

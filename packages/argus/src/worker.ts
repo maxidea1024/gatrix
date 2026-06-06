@@ -5,6 +5,7 @@ import { FeedbackWorker } from './workers/feedback-worker';
 import { MetricWorker } from './workers/metric-worker';
 import { UptimeWorker } from './workers/uptime-worker';
 import { CronSupervisorWorker } from './workers/cron-supervisor-worker';
+import { LogWorker } from './workers/log-worker';
 import { testClickHouseConnection } from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import { createLogger } from './utils/logger';
@@ -51,6 +52,7 @@ async function start() {
     const metricWorker = new MetricWorker();
     const uptimeWorker = new UptimeWorker();
     const cronSupervisorWorker = new CronSupervisorWorker();
+    const logWorker = new LogWorker();
 
     await errorWorker.start();
     await transactionWorker.start();
@@ -59,9 +61,10 @@ async function start() {
     await metricWorker.start();
     await uptimeWorker.start();
     await cronSupervisorWorker.start();
+    await logWorker.start();
 
     logger.info('All workers started successfully', {
-      workers: ['error', 'transaction', 'session', 'feedback', 'metric', 'uptime', 'cron'],
+      workers: ['error', 'transaction', 'session', 'feedback', 'metric', 'uptime', 'cron', 'log'],
     });
 
     // Graceful shutdown
@@ -77,6 +80,7 @@ async function start() {
           metricWorker.close(),
           uptimeWorker.close(),
           cronSupervisorWorker.close(),
+          logWorker.close(),
         ]);
 
         // Close stores and flusher after workers
