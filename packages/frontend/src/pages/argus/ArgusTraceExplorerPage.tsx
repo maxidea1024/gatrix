@@ -433,7 +433,11 @@ const ArgusTraceExplorerPage: React.FC = () => {
   useEffect(() => {
     fetchAll();
     fetchTags();
-  }, [fetchAll, fetchTags]);
+    argusService
+      .listSavedQueries(projectId, 'traces')
+      .then(setSavedQueries)
+      .catch(() => setSavedQueries([]));
+  }, [fetchAll, fetchTags, projectId]);
 
   // ─── Handlers ───
   const handleSearchKey = (e: React.KeyboardEvent) => {
@@ -491,11 +495,11 @@ const ArgusTraceExplorerPage: React.FC = () => {
           groupBy: aggGroupBy,
         },
         display_type: 'table',
-        query_type: 'spans' as any,
+        query_type: 'traces',
       });
       const updated = await argusService.listSavedQueries(
         projectId,
-        'spans' as any
+        'traces'
       );
       setSavedQueries(updated);
       setQueryName(saveName.trim());
@@ -516,7 +520,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         });
         const updated = await argusService.listSavedQueries(
           projectId,
-          'spans' as any
+          'traces'
         );
         setSavedQueries(updated);
       } catch (err) {
