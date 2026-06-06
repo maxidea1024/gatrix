@@ -1,5 +1,12 @@
 import Redis from 'ioredis';
-import { config, createLogger, ArgusSessionEvent, KNOWN_STREAMS, CONSUMER_GROUPS, pipelineConfig } from '@gatrix/argus';
+import {
+  config,
+  createLogger,
+  ArgusSessionEvent,
+  KNOWN_STREAMS,
+  CONSUMER_GROUPS,
+  pipelineConfig,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 const logger = createLogger('session-worker');
@@ -86,7 +93,13 @@ export class SessionWorker {
     for (const key of keys) {
       if (!this.knownStreams.has(key)) {
         try {
-          await this.redis.xgroup('CREATE', key, CONSUMER_GROUP, '0', 'MKSTREAM');
+          await this.redis.xgroup(
+            'CREATE',
+            key,
+            CONSUMER_GROUP,
+            '0',
+            'MKSTREAM'
+          );
           logger.info('Consumer group created', { stream: key });
         } catch (error: any) {
           if (!error.message?.includes('BUSYGROUP')) {
@@ -134,7 +147,9 @@ export class SessionWorker {
             continue;
           }
 
-          const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusSessionEvent & {
+          const rawEvent = JSON.parse(
+            fields[dataIndex + 1]
+          ) as ArgusSessionEvent & {
             project_id: string;
           };
 
@@ -159,7 +174,9 @@ export class SessionWorker {
     }
   }
 
-  private normalizeSession(event: ArgusSessionEvent & { project_id: string }): NormalizedSession {
+  private normalizeSession(
+    event: ArgusSessionEvent & { project_id: string }
+  ): NormalizedSession {
     return {
       session_id: event.session_id,
       project_id: event.project_id,

@@ -1042,7 +1042,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ fontWeight: 600}}
+                        sx={{ fontWeight: 600 }}
                       >
                         {new Date(cr.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -1161,7 +1161,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           <Typography
                             variant="caption"
                             color="text.secondary"
-                            sx={{ fontWeight: 600}}
+                            sx={{ fontWeight: 600 }}
                           >
                             {new Date(event.timestamp).toLocaleTimeString([], {
                               hour: '2-digit',

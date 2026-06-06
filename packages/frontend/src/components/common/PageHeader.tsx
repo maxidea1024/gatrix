@@ -63,7 +63,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   const navigate = useNavigate();
 
   const isFromSidebar = (location.state as any)?.fromSidebar === true;
-  const showBackButton = !!onBack || (enableAutoBack && location.key !== 'default' && !isFromSidebar);
+  const showBackButton =
+    !!onBack ||
+    (enableAutoBack && location.key !== 'default' && !isFromSidebar);
   const showRightSection = tabs || actions || headerActions || onRefresh;
 
   return (
@@ -97,8 +99,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         >
           {showBackButton && (
             <Tooltip title={t('common.goBack', '뒤로 가기')} placement="bottom">
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={onBack ? onBack : () => navigate(-1)}
                 sx={{
                   mr: 0.25,
@@ -117,7 +119,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   transition: 'all 0.15s ease',
                 }}
               >
-                <ArrowBackIcon sx={{ fontSize: 18, strokeWidth: 1, stroke: 'currentColor' }} />
+                <ArrowBackIcon
+                  sx={{ fontSize: 18, strokeWidth: 1, stroke: 'currentColor' }}
+                />
               </IconButton>
             </Tooltip>
           )}

@@ -691,7 +691,7 @@ export class ChangeRequestController {
           }
         });
 
-        let envNameMap: Record<string, string> = {};
+        const envNameMap: Record<string, string> = {};
         if (envIds.size > 0) {
           const { Environment } = await import('../models/environment');
           const envs = await Environment.query()

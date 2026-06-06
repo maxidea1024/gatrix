@@ -8,8 +8,18 @@
  */
 import React, { useState } from 'react';
 import {
-  Box, IconButton, Tooltip, Menu, MenuItem, ListItemIcon,
-  ListItemText, Divider, Typography, Snackbar, alpha, useTheme,
+  Box,
+  IconButton,
+  Tooltip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Typography,
+  Snackbar,
+  alpha,
+  useTheme,
 } from '@mui/material';
 import {
   Share as ShareIcon,
@@ -42,7 +52,9 @@ const ShareIssueButton: React.FC<ShareIssueButtonProps> = ({
   const [snackMessage, setSnackMessage] = useState('');
 
   const baseUrl = `${window.location.origin}/argus/issues/${projectSlug}/${issueId}`;
-  const eventUrl = currentEventId ? `${baseUrl}?event=${currentEventId}` : baseUrl;
+  const eventUrl = currentEventId
+    ? `${baseUrl}?event=${currentEventId}`
+    : baseUrl;
 
   const copyToClipboard = (text: string, message: string) => {
     navigator.clipboard.writeText(text);
@@ -71,7 +83,8 @@ const ShareIssueButton: React.FC<ShareIssueButtonProps> = ({
           size="small"
           onClick={(e) => setAnchorEl(e.currentTarget)}
           sx={{
-            width: 30, height: 30,
+            width: 30,
+            height: 30,
             border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
             borderRadius: '6px',
             '&:hover': {
@@ -89,17 +102,33 @@ const ShareIssueButton: React.FC<ShareIssueButtonProps> = ({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
         slotProps={{
-          paper: { sx: { minWidth: 220, borderRadius: '10px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' } },
+          paper: {
+            sx: {
+              minWidth: 220,
+              borderRadius: '10px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            },
+          },
         }}
       >
         <Box sx={{ px: 2, py: 0.5, mb: 0.5 }}>
-          <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <Typography
+            sx={{
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              color: 'text.disabled',
+              textTransform: 'uppercase',
+              letterSpacing: 0.5,
+            }}
+          >
             {t('argus.share.title')}
           </Typography>
         </Box>
 
         <MenuItem onClick={handleCopyLink} dense>
-          <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <LinkIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText
             primary={t('argus.share.copyLink')}
             secondary={currentEventId ? t('argus.share.withEvent') : undefined}
@@ -109,7 +138,9 @@ const ShareIssueButton: React.FC<ShareIssueButtonProps> = ({
         </MenuItem>
 
         <MenuItem onClick={handleCopyMarkdown} dense>
-          <ListItemIcon><MarkdownIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <MarkdownIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText
             primary={t('argus.share.copyMarkdown')}
             primaryTypographyProps={{ fontSize: '0.78rem' }}
@@ -119,12 +150,14 @@ const ShareIssueButton: React.FC<ShareIssueButtonProps> = ({
         <Divider />
 
         <MenuItem onClick={handleCopyShortId} dense>
-          <ListItemIcon><CopyIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <CopyIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText
             primary={t('argus.share.copyShortId')}
             secondary={shortId}
             primaryTypographyProps={{ fontSize: '0.78rem' }}
-            secondaryTypographyProps={{ fontSize: '0.65rem'}}
+            secondaryTypographyProps={{ fontSize: '0.65rem' }}
           />
         </MenuItem>
       </Menu>

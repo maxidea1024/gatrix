@@ -960,11 +960,7 @@ const HotTimeBuffEventPage: React.FC = () => {
                     </Typography>
                   );
                 case 'cmsId':
-                  return (
-                    <Typography variant="body2">
-                      {row.cmsId}
-                    </Typography>
-                  );
+                  return <Typography variant="body2">{row.cmsId}</Typography>;
                 case 'world': {
                   const wids = (override || row.savedOverride)?.worldIds;
                   if (!wids || wids.length === 0) {
@@ -1988,9 +1984,7 @@ const HotTimeBuffEventPage: React.FC = () => {
                           openDrawer(row);
                         }}
                       >
-                        <TableCell
-                          sx={{ fontSize: '0.7rem' }}
-                        >
+                        <TableCell sx={{ fontSize: '0.7rem' }}>
                           {row.cmsId}
                         </TableCell>
                         <TableCell

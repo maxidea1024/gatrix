@@ -22,7 +22,11 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import DateRangeSelector, { DateRangeValue, presetToHours, dateRangeToDatePair } from '../common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  presetToHours,
+  dateRangeToDatePair,
+} from '../common/DateRangeSelector';
 import {
   People as PeopleIcon,
   SmartToy as BotIcon,
@@ -61,8 +65,6 @@ ChartJS.register(
   Filler,
   crosshairPlugin
 );
-
-
 
 const WORLD_COLORS = [
   { border: '#2196f3', bg: 'rgba(33,150,243,0.1)' },
@@ -374,7 +376,8 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   // Persist range to URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
-    const preset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : 'custom';
+    const preset =
+      dateRange.type === 'preset' ? dateRange.preset || '24h' : 'custom';
     if (preset !== '24h') params.set('range', preset);
     else params.delete('range');
     params.set('tab', '1');
@@ -571,11 +574,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             </IconButton>
           </Tooltip>
         </Stack>
-        <DateRangeSelector
-          value={dateRange}
-          onChange={setDateRange}
-          compact
-        />
+        <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
       </Box>
 
       <PageContentLoader loading={loading}>

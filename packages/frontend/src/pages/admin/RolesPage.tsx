@@ -34,7 +34,8 @@ import {
   Shield as ShieldIcon,
   People as PeopleIcon,
   Group as GroupIcon,
-  MoreVert as MoreVertIcon,} from '@mui/icons-material';
+  MoreVert as MoreVertIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { CopyButton } from '@/components/common/CopyButton';

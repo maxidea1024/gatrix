@@ -2,11 +2,7 @@
 // Argus Issue Types — MySQL metadata
 // =====================================================
 
-export type IssueStatus =
-  | 'unresolved'
-  | 'resolved'
-  | 'ignored'
-  | 'archived';
+export type IssueStatus = 'unresolved' | 'resolved' | 'ignored' | 'archived';
 
 export type IssuePriority = 'critical' | 'high' | 'medium' | 'low';
 

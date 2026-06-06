@@ -7,9 +7,19 @@
  */
 import React, { useState } from 'react';
 import {
-  Box, Typography, Paper, Chip, IconButton, Collapse,
-  Table, TableRow, TableCell, TableBody,
-  Tooltip, alpha, useTheme,
+  Box,
+  Typography,
+  Paper,
+  Chip,
+  IconButton,
+  Collapse,
+  Table,
+  TableRow,
+  TableCell,
+  TableBody,
+  Tooltip,
+  alpha,
+  useTheme,
 } from '@mui/material';
 import {
   Http as HttpIcon,
@@ -57,33 +67,71 @@ const CollapsibleKV: React.FC<{
       <Box
         onClick={() => setOpen(!open)}
         sx={{
-          display: 'flex', alignItems: 'center', gap: 0.5,
-          px: 2, py: 0.5, cursor: 'pointer',
-          '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          px: 2,
+          py: 0.5,
+          cursor: 'pointer',
+          '&:hover': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.02)'
+              : 'rgba(0,0,0,0.01)',
+          },
         }}
       >
         <IconButton size="small" sx={{ width: 16, height: 16 }}>
-          {open ? <CollapseIcon sx={{ fontSize: 12 }} /> : <ExpandIcon sx={{ fontSize: 12 }} />}
+          {open ? (
+            <CollapseIcon sx={{ fontSize: 12 }} />
+          ) : (
+            <ExpandIcon sx={{ fontSize: 12 }} />
+          )}
         </IconButton>
-        <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase' }}>
+        <Typography
+          sx={{
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+          }}
+        >
           {title}
         </Typography>
-        <Chip label={Object.keys(data).length} size="small" sx={{ height: 14, fontSize: '0.5rem' }} />
+        <Chip
+          label={Object.keys(data).length}
+          size="small"
+          sx={{ height: 14, fontSize: '0.5rem' }}
+        />
       </Box>
       <Collapse in={open}>
         <Table size="small" sx={{ mx: 2, mb: 1, width: 'calc(100% - 32px)' }}>
           <TableBody>
             {Object.entries(data).map(([key, value]) => (
-              <TableRow key={key} sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                <TableCell sx={{ py: 0.25, px: 1, width: '30%', verticalAlign: 'top' }}>
-                  <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
+              <TableRow
+                key={key}
+                sx={{ '&:last-child td': { borderBottom: 0 } }}
+              >
+                <TableCell
+                  sx={{ py: 0.25, px: 1, width: '30%', verticalAlign: 'top' }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: '0.68rem',
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                    }}
+                  >
                     {key}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ py: 0.25, px: 1 }}>
-                  <Typography sx={{
-                    fontSize: '0.68rem', wordBreak: 'break-all', whiteSpace: 'pre-wrap',
-                  }}>
+                  <Typography
+                    sx={{
+                      fontSize: '0.68rem',
+                      wordBreak: 'break-all',
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
                     {value}
                   </Typography>
                 </TableCell>
@@ -107,9 +155,10 @@ const HttpRequestSection: React.FC<HttpRequestSectionProps> = ({ request }) => {
   const method = (request.method || 'GET').toUpperCase();
   const methodColor = METHOD_COLORS[method] || '#607d8b';
 
-  const queryParams = typeof request.query_string === 'string'
-    ? Object.fromEntries(new URLSearchParams(request.query_string))
-    : request.query_string;
+  const queryParams =
+    typeof request.query_string === 'string'
+      ? Object.fromEntries(new URLSearchParams(request.query_string))
+      : request.query_string;
 
   const handleCopyUrl = () => {
     if (request.url) navigator.clipboard.writeText(request.url);
@@ -120,16 +169,26 @@ const HttpRequestSection: React.FC<HttpRequestSectionProps> = ({ request }) => {
       elevation={0}
       sx={{
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2, overflow: 'hidden', mb: 1.5,
+        borderRadius: 2,
+        overflow: 'hidden',
+        mb: 1.5,
       }}
     >
       {/* Header */}
       <Box
         onClick={() => setExpanded(!expanded)}
         sx={{
-          display: 'flex', alignItems: 'center', gap: 1,
-          px: 2, py: 1, cursor: 'pointer',
-          '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 2,
+          py: 1,
+          cursor: 'pointer',
+          '&:hover': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.02)'
+              : 'rgba(0,0,0,0.01)',
+          },
         }}
       >
         <HttpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
@@ -137,57 +196,106 @@ const HttpRequestSection: React.FC<HttpRequestSectionProps> = ({ request }) => {
           {t('argus.httpRequest.title')}
         </Typography>
         <IconButton size="small" sx={{ width: 20, height: 20 }}>
-          {expanded ? <CollapseIcon sx={{ fontSize: 14 }} /> : <ExpandIcon sx={{ fontSize: 14 }} />}
+          {expanded ? (
+            <CollapseIcon sx={{ fontSize: 14 }} />
+          ) : (
+            <ExpandIcon sx={{ fontSize: 14 }} />
+          )}
         </IconButton>
       </Box>
 
       <Collapse in={expanded}>
         {/* Method + URL */}
-        <Box sx={{ px: 2, pb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box
+          sx={{ px: 2, pb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
+        >
           <Chip
             label={method}
             size="small"
             sx={{
-              height: 22, fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5,
+              height: 22,
+              fontSize: '0.68rem',
+              fontWeight: 800,
+              letterSpacing: 0.5,
               backgroundColor: alpha(methodColor, 0.1),
               color: methodColor,
               borderRadius: '4px',
             }}
           />
-          <Typography sx={{
-            fontSize: '0.75rem', color: 'text.primary', wordBreak: 'break-all', flex: 1,
-          }}>
+          <Typography
+            sx={{
+              fontSize: '0.75rem',
+              color: 'text.primary',
+              wordBreak: 'break-all',
+              flex: 1,
+            }}
+          >
             {request.url}
           </Typography>
           <Tooltip title={t('argus.httpRequest.copyUrl')}>
-            <IconButton size="small" onClick={handleCopyUrl} sx={{ width: 22, height: 22 }}>
+            <IconButton
+              size="small"
+              onClick={handleCopyUrl}
+              sx={{ width: 22, height: 22 }}
+            >
               <CopyIcon sx={{ fontSize: 12 }} />
             </IconButton>
           </Tooltip>
         </Box>
 
         {/* Collapsible sub-sections */}
-        <CollapsibleKV title={t('argus.httpRequest.headers')} data={request.headers} isDark={isDark} />
-        <CollapsibleKV title={t('argus.httpRequest.queryParams')} data={queryParams} isDark={isDark} />
-        <CollapsibleKV title={t('argus.httpRequest.cookies')} data={request.cookies} isDark={isDark} />
-        <CollapsibleKV title={t('argus.httpRequest.env')} data={request.env} isDark={isDark} />
+        <CollapsibleKV
+          title={t('argus.httpRequest.headers')}
+          data={request.headers}
+          isDark={isDark}
+        />
+        <CollapsibleKV
+          title={t('argus.httpRequest.queryParams')}
+          data={queryParams}
+          isDark={isDark}
+        />
+        <CollapsibleKV
+          title={t('argus.httpRequest.cookies')}
+          data={request.cookies}
+          isDark={isDark}
+        />
+        <CollapsibleKV
+          title={t('argus.httpRequest.env')}
+          data={request.env}
+          isDark={isDark}
+        />
 
         {/* Body */}
         {request.data && (
           <Box sx={{ px: 2, pb: 1.5 }}>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', mb: 0.5 }}>
+            <Typography
+              sx={{
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                color: 'text.secondary',
+                textTransform: 'uppercase',
+                mb: 0.5,
+              }}
+            >
               {t('argus.httpRequest.body')}
             </Typography>
-            <Box sx={{
-              p: 1.5, borderRadius: '6px',
-              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-              fontSize: '0.7rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-              maxHeight: 200, overflow: 'auto',
-            }}>
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: '6px',
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.03)'
+                  : 'rgba(0,0,0,0.02)',
+                fontSize: '0.7rem',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-all',
+                maxHeight: 200,
+                overflow: 'auto',
+              }}
+            >
               {typeof request.data === 'object'
                 ? JSON.stringify(request.data, null, 2)
-                : String(request.data)
-              }
+                : String(request.data)}
             </Box>
           </Box>
         )}

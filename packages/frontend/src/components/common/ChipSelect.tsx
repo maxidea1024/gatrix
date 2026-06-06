@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Popover,
-  Typography,
-} from '@mui/material';
+import { Box, Popover, Typography } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   Check as CheckMarkIcon,

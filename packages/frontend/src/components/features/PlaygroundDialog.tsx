@@ -2801,7 +2801,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             variant="caption"
                             sx={{
                               color: 'error.main',
-                              }}
+                            }}
                           >
                             &quot;&quot;
                           </Typography>
@@ -2926,11 +2926,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 )}
                               </Box>
                               <Box sx={{ flex: 1 }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    }}
-                                >
+                                <Typography variant="caption" sx={{}}>
                                   {renderValue(entry.value, entry.type)}
                                 </Typography>
                               </Box>
@@ -3088,11 +3084,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   )}
                                 </Box>
                                 <Box sx={{ flex: 1 }}>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      }}
-                                  >
+                                  <Typography variant="caption" sx={{}}>
                                     {!provided ? (
                                       <Typography
                                         component="span"
@@ -4148,14 +4140,19 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     {t('playground.appliedVariant')}
                   </Typography>
                   {selectedEvaluation.result.variant && (
-                    <CopyButton text={(() => {
-                      const value = selectedEvaluation.result.variant?.value;
-                      return typeof value === 'object' && value !== null && 'value' in value
-                        ? String((value as any).value)
-                        : typeof value === 'object'
-                          ? JSON.stringify(value)
-                          : String(value ?? '');
-                    })()} size={13} />
+                    <CopyButton
+                      text={(() => {
+                        const value = selectedEvaluation.result.variant?.value;
+                        return typeof value === 'object' &&
+                          value !== null &&
+                          'value' in value
+                          ? String((value as any).value)
+                          : typeof value === 'object'
+                            ? JSON.stringify(value)
+                            : String(value ?? '');
+                      })()}
+                      size={13}
+                    />
                   )}
                 </Box>
                 <Box
@@ -4574,15 +4571,18 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     <Typography variant="subtitle2" color="text.secondary">
                       {t('playground.rawResponse')}
                     </Typography>
-                    <CopyButton text={JSON.stringify(
-                      {
-                        enabled: selectedEvaluation.result.enabled,
-                        variant: selectedEvaluation.result.variant,
-                        reason: selectedEvaluation.result.reason,
-                      },
-                      null,
-                      2
-                    )} size={13} />
+                    <CopyButton
+                      text={JSON.stringify(
+                        {
+                          enabled: selectedEvaluation.result.enabled,
+                          variant: selectedEvaluation.result.variant,
+                          reason: selectedEvaluation.result.reason,
+                        },
+                        null,
+                        2
+                      )}
+                      size={13}
+                    />
                   </Box>
                   <JsonEditor
                     value={JSON.stringify(

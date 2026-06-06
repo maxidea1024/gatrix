@@ -188,9 +188,7 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
           <TableBody>
             {changes.map((change) => (
               <TableRow key={change.field} hover>
-                <TableCell sx={{ fontWeight: 500 }}>
-                  {change.field}
-                </TableCell>
+                <TableCell sx={{ fontWeight: 500 }}>{change.field}</TableCell>
                 <TableCell
                   sx={{
                     bgcolor: 'error.dark',

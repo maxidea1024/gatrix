@@ -45,7 +45,12 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <Typography>{message}</Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading} variant="text" sx={{ color: 'text.secondary' }}>
+        <Button
+          onClick={onClose}
+          disabled={loading}
+          variant="text"
+          sx={{ color: 'text.secondary' }}
+        >
           {cancelText || t('common.cancel')}
         </Button>
         <Button

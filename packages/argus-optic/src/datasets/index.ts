@@ -38,7 +38,9 @@ register(uptimeCheckinsDataset);
 export function getDataset(name: string): DatasetConfig {
   const dataset = datasets.get(name);
   if (!dataset) {
-    throw new Error(`Unknown dataset: '${name}'. Available: ${[...datasets.keys()].join(', ')}`);
+    throw new Error(
+      `Unknown dataset: '${name}'. Available: ${[...datasets.keys()].join(', ')}`
+    );
   }
   return dataset;
 }

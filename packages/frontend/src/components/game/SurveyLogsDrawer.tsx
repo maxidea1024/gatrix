@@ -20,9 +20,7 @@ import {
   MenuItem,
   Paper,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { CopyButton } from '@/components/common/CopyButton';
@@ -126,8 +124,6 @@ const SurveyLogsDrawer: React.FC<SurveyLogsDrawerProps> = ({
     joined: 0,
     sent: 0,
   });
-
-
 
   const loadLogs = useCallback(async () => {
     if (!survey) return;

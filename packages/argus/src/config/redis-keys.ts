@@ -95,15 +95,13 @@ export const COUNTERS = {
     `argus:usr-hll:${projectId}:${issueId}`,
 
   /** Simple counter for project-level event rate */
-  PROJECT_EVENT_COUNT: (projectId: string) =>
-    `argus:proj-evt:${projectId}`,
+  PROJECT_EVENT_COUNT: (projectId: string) => `argus:proj-evt:${projectId}`,
 
   /** Hash: field="issue:{id}", value=pending increment (flushed periodically to MySQL) */
   ISSUE_TIMES_SEEN: 'argus:issue-times-seen',
 
   /** Hash: atomic short_id counter per project */
-  ISSUE_SHORT_ID: (projectId: string) =>
-    `argus:issue-counter:${projectId}`,
+  ISSUE_SHORT_ID: (projectId: string) => `argus:issue-counter:${projectId}`,
 } as const;
 
 // ── Batch Flush Buffers ──

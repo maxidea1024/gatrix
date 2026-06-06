@@ -6,8 +6,16 @@
  */
 import React, { useState } from 'react';
 import {
-  Box, Typography, Paper, Chip, IconButton, Collapse,
-  Tooltip, alpha, useTheme, LinearProgress,
+  Box,
+  Typography,
+  Paper,
+  Chip,
+  IconButton,
+  Collapse,
+  Tooltip,
+  alpha,
+  useTheme,
+  LinearProgress,
 } from '@mui/material';
 import {
   Speed as SpanIcon,
@@ -24,7 +32,12 @@ interface SpanEvidence {
   description: string;
   duration_ms: number;
   status: 'ok' | 'internal_error' | 'deadline_exceeded' | string;
-  problem_type?: 'slow_db_query' | 'n_plus_one' | 'slow_http' | 'slow_resource' | string;
+  problem_type?:
+    | 'slow_db_query'
+    | 'n_plus_one'
+    | 'slow_http'
+    | 'slow_resource'
+    | string;
   parent_span_id?: string;
   repeats?: number;
 }
@@ -53,7 +66,10 @@ function getOpIcon(op: string) {
   return <SpanIcon sx={{ fontSize: 12 }} />;
 }
 
-const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transactionDuration }) => {
+const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({
+  spans,
+  transactionDuration,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -61,22 +77,33 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
 
   if (!spans || spans.length === 0) return null;
 
-  const totalDuration = transactionDuration || spans.reduce((sum, s) => sum + s.duration_ms, 0);
+  const totalDuration =
+    transactionDuration || spans.reduce((sum, s) => sum + s.duration_ms, 0);
 
   return (
     <Paper
       elevation={0}
       sx={{
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2, overflow: 'hidden', mb: 1.5,
+        borderRadius: 2,
+        overflow: 'hidden',
+        mb: 1.5,
       }}
     >
       <Box
         onClick={() => setExpanded(!expanded)}
         sx={{
-          display: 'flex', alignItems: 'center', gap: 1,
-          px: 2, py: 1, cursor: 'pointer',
-          '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 2,
+          py: 1,
+          cursor: 'pointer',
+          '&:hover': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.02)'
+              : 'rgba(0,0,0,0.01)',
+          },
         }}
       >
         <SlowIcon sx={{ fontSize: 16, color: '#ff9800' }} />
@@ -86,35 +113,59 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
         <Chip
           label={`${spans.length} span(s)`}
           size="small"
-          sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha('#ff9800', 0.1), color: '#ff9800' }}
+          sx={{
+            height: 18,
+            fontSize: '0.6rem',
+            fontWeight: 700,
+            backgroundColor: alpha('#ff9800', 0.1),
+            color: '#ff9800',
+          }}
         />
         <IconButton size="small" sx={{ width: 20, height: 20 }}>
-          {expanded ? <CollapseIcon sx={{ fontSize: 14 }} /> : <ExpandIcon sx={{ fontSize: 14 }} />}
+          {expanded ? (
+            <CollapseIcon sx={{ fontSize: 14 }} />
+          ) : (
+            <ExpandIcon sx={{ fontSize: 14 }} />
+          )}
         </IconButton>
       </Box>
 
       <Collapse in={expanded}>
         <Box sx={{ px: 2, pb: 1.5 }}>
           {spans.map((span, idx) => {
-            const problemCfg = span.problem_type ? PROBLEM_CONFIG[span.problem_type] : null;
-            const pct = totalDuration > 0 ? (span.duration_ms / totalDuration) * 100 : 0;
+            const problemCfg = span.problem_type
+              ? PROBLEM_CONFIG[span.problem_type]
+              : null;
+            const pct =
+              totalDuration > 0 ? (span.duration_ms / totalDuration) * 100 : 0;
 
             return (
               <Box
                 key={idx}
                 sx={{
-                  mb: 1, p: 1, borderRadius: '8px',
+                  mb: 1,
+                  p: 1,
+                  borderRadius: '8px',
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.02)'
+                    : 'rgba(0,0,0,0.01)',
                 }}
               >
                 {/* Header */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    mb: 0.5,
+                  }}
+                >
                   {getOpIcon(span.op)}
                   <Chip
                     label={span.op}
                     size="small"
-                    sx={{ height: 16, fontSize: '0.55rem', fontWeight: 700}}
+                    sx={{ height: 16, fontSize: '0.55rem', fontWeight: 700 }}
                   />
                   {problemCfg && (
                     <Chip
@@ -122,7 +173,9 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
                       label={problemCfg.label}
                       size="small"
                       sx={{
-                        height: 18, fontSize: '0.55rem', fontWeight: 700,
+                        height: 18,
+                        fontSize: '0.55rem',
+                        fontWeight: 700,
                         backgroundColor: alpha(problemCfg.color, 0.1),
                         color: problemCfg.color,
                         '& .MuiChip-icon': { color: problemCfg.color },
@@ -133,22 +186,40 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
                     <Chip
                       label={`×${span.repeats}`}
                       size="small"
-                      sx={{ height: 16, fontSize: '0.55rem', fontWeight: 700, color: '#f44336' }}
+                      sx={{
+                        height: 16,
+                        fontSize: '0.55rem',
+                        fontWeight: 700,
+                        color: '#f44336',
+                      }}
                     />
                   )}
                   <Box sx={{ flex: 1 }} />
-                  <Typography sx={{
-                    fontSize: '0.75rem', fontWeight: 700, color: span.duration_ms > 1000 ? '#f44336' : span.duration_ms > 200 ? '#ff9800' : 'text.primary',
-                  }}>
+                  <Typography
+                    sx={{
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      color:
+                        span.duration_ms > 1000
+                          ? '#f44336'
+                          : span.duration_ms > 200
+                            ? '#ff9800'
+                            : 'text.primary',
+                    }}
+                  >
                     {formatDuration(span.duration_ms)}
                   </Typography>
                 </Box>
 
                 {/* Description */}
-                <Typography sx={{
-                  fontSize: '0.7rem', color: 'text.secondary', wordBreak: 'break-all',
-                  mb: 0.5,
-                }}>
+                <Typography
+                  sx={{
+                    fontSize: '0.7rem',
+                    color: 'text.secondary',
+                    wordBreak: 'break-all',
+                    mb: 0.5,
+                  }}
+                >
                   {span.description}
                 </Typography>
 
@@ -158,15 +229,30 @@ const SpanEvidenceSection: React.FC<SpanEvidenceSectionProps> = ({ spans, transa
                     variant="determinate"
                     value={Math.min(pct, 100)}
                     sx={{
-                      flex: 1, height: 4, borderRadius: 2,
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                      flex: 1,
+                      height: 4,
+                      borderRadius: 2,
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.05)'
+                        : 'rgba(0,0,0,0.05)',
                       '& .MuiLinearProgress-bar': {
-                        backgroundColor: pct > 50 ? '#f44336' : pct > 20 ? '#ff9800' : '#4caf50',
+                        backgroundColor:
+                          pct > 50
+                            ? '#f44336'
+                            : pct > 20
+                              ? '#ff9800'
+                              : '#4caf50',
                         borderRadius: 2,
                       },
                     }}
                   />
-                  <Typography sx={{ fontSize: '0.55rem', color: 'text.disabled', minWidth: 30 }}>
+                  <Typography
+                    sx={{
+                      fontSize: '0.55rem',
+                      color: 'text.disabled',
+                      minWidth: 30,
+                    }}
+                  >
                     {pct.toFixed(0)}%
                   </Typography>
                 </Box>

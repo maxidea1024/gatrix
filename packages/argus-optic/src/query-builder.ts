@@ -55,11 +55,15 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
     query.timeRange.period,
     query.timeRange.start,
     query.timeRange.end,
-    tsCol,
+    tsCol
   );
 
   const selectParts: string[] = query.select.map((field) => {
-    const expr = resolveSelectField(field.field, dataset, bucketConfig.selectExpr);
+    const expr = resolveSelectField(
+      field.field,
+      dataset,
+      bucketConfig.selectExpr
+    );
     return field.alias ? `${expr} AS ${field.alias}` : expr;
   });
 
@@ -94,7 +98,7 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
     const parser = new QueryParser(
       new Set(dataset.columns.keys()),
       dataset.aggregates,
-      dataset.columnAliases,
+      dataset.columnAliases
     );
     const ast = parser.parse(query.search);
     if (ast) {
@@ -166,7 +170,10 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
 
   if (orderByParts.length > 0) {
     // If withFill, append fill expression to the first ORDER BY column
-    if (query.withFill && groupByParts.some((g) => g === bucketConfig.selectExpr)) {
+    if (
+      query.withFill &&
+      groupByParts.some((g) => g === bucketConfig.selectExpr)
+    ) {
       const fillExpr = bucketConfig.fillExpr;
       sql += `\nORDER BY ${orderByParts[0]} ${fillExpr}`;
       if (orderByParts.length > 1) {
@@ -181,8 +188,11 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
     // otherwise ClickHouse rejects ORDER BY on non-grouped columns.
     const hasOnlyAggregates = query.select.every((s) => {
       const f = s.field.trim();
-      return /^(count|sum|avg|min|max|uniq|any|p\d+|quantile|countIf|sumIf|if)\s*\(/i.test(f)
-        || /\/\s*count\(\)/i.test(f);  // e.g., countIf(x) / count() * 100
+      return (
+        /^(count|sum|avg|min|max|uniq|any|p\d+|quantile|countIf|sumIf|if)\s*\(/i.test(
+          f
+        ) || /\/\s*count\(\)/i.test(f)
+      ); // e.g., countIf(x) / count() * 100
     });
     if (!hasOnlyAggregates) {
       sql += `\nORDER BY ${dataset.defaultOrderBy}`;
@@ -220,7 +230,7 @@ export function buildTagDistributionQuery(options: {
     options.timeRange.period,
     options.timeRange.start,
     options.timeRange.end,
-    dataset.timestampColumn,
+    dataset.timestampColumn
   );
 
   Object.assign(params, {
@@ -287,7 +297,7 @@ LIMIT ${tagLimit}`;
 function resolveSelectField(
   field: string,
   dataset: DatasetConfig,
-  bucketExpr: string,
+  bucketExpr: string
 ): string {
   // $bucket → auto time bucket
   if (field === '$bucket') {
@@ -314,7 +324,16 @@ function resolveSelectField(
     }
 
     // countIf/sumIf/avgIf with expression (pass through)
-    if (['countIf', 'sumIf', 'avgIf', 'uniqIf', 'countIfMerge', 'uniqIfMerge'].includes(fn)) {
+    if (
+      [
+        'countIf',
+        'sumIf',
+        'avgIf',
+        'uniqIf',
+        'countIfMerge',
+        'uniqIfMerge',
+      ].includes(fn)
+    ) {
       return field;
     }
 
@@ -341,7 +360,7 @@ function buildCondition(
   cond: Condition,
   dataset: DatasetConfig,
   params: Record<string, any>,
-  nextParam: (prefix: string) => string,
+  nextParam: (prefix: string) => string
 ): string | null {
   const field = resolveColumn(cond.field, dataset);
 
@@ -352,7 +371,12 @@ function buildCondition(
       params[p] = v;
       return `{${p}:String}`;
     });
-    const op = cond.op === '!=' ? 'NOT IN' : (cond.op === 'IN' || cond.op === 'NOT IN' ? cond.op : 'IN');
+    const op =
+      cond.op === '!='
+        ? 'NOT IN'
+        : cond.op === 'IN' || cond.op === 'NOT IN'
+          ? cond.op
+          : 'IN';
     return `${field} ${op} (${paramNames.join(', ')})`;
   }
 
@@ -363,15 +387,22 @@ function buildCondition(
   // Determine ClickHouse type hint
   const colDef = dataset.columns.get(field);
   const isNumericOp = ['>', '<', '>=', '<='].includes(cond.op);
-  const isNumericValue = typeof cond.value === 'number' || (typeof cond.value === 'string' && !isNaN(Number(cond.value)));
+  const isNumericValue =
+    typeof cond.value === 'number' ||
+    (typeof cond.value === 'string' && !isNaN(Number(cond.value)));
 
   if (isNumericOp && isNumericValue) {
     // Numeric comparison
-    const numType = colDef?.type === 'UInt64' ? 'UInt64'
-      : colDef?.type === 'UInt32' ? 'UInt32'
-      : colDef?.type === 'UInt16' ? 'UInt16'
-      : colDef?.type === 'Float64' ? 'Float64'
-      : 'Float64'; // default to Float64 for numeric comparisons
+    const numType =
+      colDef?.type === 'UInt64'
+        ? 'UInt64'
+        : colDef?.type === 'UInt32'
+          ? 'UInt32'
+          : colDef?.type === 'UInt16'
+            ? 'UInt16'
+            : colDef?.type === 'Float64'
+              ? 'Float64'
+              : 'Float64'; // default to Float64 for numeric comparisons
     return `${field} ${cond.op} {${p}:${numType}}`;
   }
 

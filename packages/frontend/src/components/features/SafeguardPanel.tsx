@@ -605,10 +605,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                   />
                 </TableCell>
                 <TableCell align="center">
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                  >
+                  <Typography variant="body2" fontWeight={600}>
                     {sg.operator} {sg.threshold}
                   </Typography>
                 </TableCell>
@@ -733,10 +730,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                     return (
                       <li {...props} key={option}>
                         <Box>
-                          <Typography
-                            variant="body2"
-                            fontSize="0.8rem"
-                          >
+                          <Typography variant="body2" fontSize="0.8rem">
                             {option}
                           </Typography>
                           {metric?.help && (

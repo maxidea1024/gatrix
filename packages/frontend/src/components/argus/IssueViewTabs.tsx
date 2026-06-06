@@ -1,9 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box, Typography, Chip, IconButton, Menu, MenuItem,
-  ListItemIcon, ListItemText, Divider, Dialog, DialogTitle,
-  DialogContent, DialogActions, TextField, Button, Tooltip,
-  alpha, useTheme,
+  Box,
+  Typography,
+  Chip,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Tooltip,
+  alpha,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -107,7 +121,9 @@ function loadCustomViews(): IssueView[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return [];
 }
 
@@ -126,9 +142,18 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
   const isDark = theme.palette.mode === 'dark';
 
   const [customViews, setCustomViews] = useState<IssueView[]>(loadCustomViews);
-  const [contextMenu, setContextMenu] = useState<{ el: HTMLElement; view: IssueView } | null>(null);
-  const [editDialog, setEditDialog] = useState<{ open: boolean; view: IssueView | null; isNew: boolean }>({
-    open: false, view: null, isNew: false,
+  const [contextMenu, setContextMenu] = useState<{
+    el: HTMLElement;
+    view: IssueView;
+  } | null>(null);
+  const [editDialog, setEditDialog] = useState<{
+    open: boolean;
+    view: IssueView | null;
+    isNew: boolean;
+  }>({
+    open: false,
+    view: null,
+    isNew: false,
   });
   const [editName, setEditName] = useState('');
 
@@ -147,18 +172,27 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
   };
 
   const allViews = [
-    ...DEFAULT_VIEWS.map(v => ({ ...v, name: defaultViewNames[v.id] || v.id })),
+    ...DEFAULT_VIEWS.map((v) => ({
+      ...v,
+      name: defaultViewNames[v.id] || v.id,
+    })),
     ...customViews,
   ];
 
   const getViewWithUser = (view: IssueView): IssueView => {
     if (view.id === 'mine' && currentUser) {
-      return { ...view, urlParams: { ...view.urlParams, assigned_to: currentUser } };
+      return {
+        ...view,
+        urlParams: { ...view.urlParams, assigned_to: currentUser },
+      };
     }
     return view;
   };
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLElement>, view: IssueView) => {
+  const handleContextMenu = (
+    e: React.MouseEvent<HTMLElement>,
+    view: IssueView
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ el: e.currentTarget, view });
@@ -167,7 +201,7 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
   const handleCloseMenu = () => setContextMenu(null);
 
   const handleDeleteView = (viewId: string) => {
-    setCustomViews(prev => prev.filter(v => v.id !== viewId));
+    setCustomViews((prev) => prev.filter((v) => v.id !== viewId));
     handleCloseMenu();
     if (activeViewId === viewId) {
       onViewChange(getViewWithUser(allViews[1])); // fallback to unresolved
@@ -192,10 +226,12 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
         isCustom: true,
         urlParams: {},
       };
-      setCustomViews(prev => [...prev, newView]);
+      setCustomViews((prev) => [...prev, newView]);
     } else if (editDialog.view) {
-      setCustomViews(prev =>
-        prev.map(v => v.id === editDialog.view!.id ? { ...v, name: editName.trim() } : v)
+      setCustomViews((prev) =>
+        prev.map((v) =>
+          v.id === editDialog.view!.id ? { ...v, name: editName.trim() } : v
+        )
       );
     }
     setEditDialog({ open: false, view: null, isNew: false });
@@ -216,7 +252,15 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          mb: 1.5,
+          flexWrap: 'wrap',
+        }}
+      >
         {allViews.map((view) => (
           <Chip
             key={view.id}
@@ -230,7 +274,9 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
               ) : undefined
             }
             onDelete={
-              view.isCustom ? (e) => handleContextMenu(e as any, view) : undefined
+              view.isCustom
+                ? (e) => handleContextMenu(e as any, view)
+                : undefined
             }
             variant={activeViewId === view.id ? 'filled' : 'outlined'}
             sx={{
@@ -238,18 +284,22 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
               fontWeight: activeViewId === view.id ? 700 : 500,
               borderRadius: '16px',
               transition: 'all 0.15s',
-              ...(activeViewId === view.id ? {
-                backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                color: theme.palette.primary.main,
-                borderColor: 'transparent',
-              } : {
-                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                color: 'text.secondary',
-                '&:hover': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
-                  backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                },
-              }),
+              ...(activeViewId === view.id
+                ? {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                    color: theme.palette.primary.main,
+                    borderColor: 'transparent',
+                  }
+                : {
+                    borderColor: isDark
+                      ? 'rgba(255,255,255,0.08)'
+                      : 'rgba(0,0,0,0.08)',
+                    color: 'text.secondary',
+                    '&:hover': {
+                      borderColor: alpha(theme.palette.primary.main, 0.3),
+                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    },
+                  }),
             }}
           />
         ))}
@@ -261,9 +311,12 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
               size="small"
               onClick={onSaveCurrentAsView}
               sx={{
-                width: 24, height: 24,
+                width: 24,
+                height: 24,
                 border: '1px dashed',
-                borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+                borderColor: isDark
+                  ? 'rgba(255,255,255,0.12)'
+                  : 'rgba(0,0,0,0.12)',
                 borderRadius: '12px',
                 '&:hover': {
                   borderColor: theme.palette.primary.main,
@@ -282,9 +335,12 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
             size="small"
             onClick={handleAddView}
             sx={{
-              width: 24, height: 24,
+              width: 24,
+              height: 24,
               border: '1px dashed',
-              borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+              borderColor: isDark
+                ? 'rgba(255,255,255,0.12)'
+                : 'rgba(0,0,0,0.12)',
               borderRadius: '12px',
               '&:hover': {
                 borderColor: theme.palette.primary.main,
@@ -303,28 +359,52 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
         anchorEl={contextMenu?.el}
         onClose={handleCloseMenu}
         slotProps={{
-          paper: { sx: { minWidth: 160, borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)' } },
+          paper: {
+            sx: {
+              minWidth: 160,
+              borderRadius: '8px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+            },
+          },
         }}
       >
         {contextMenu?.view.isCustom && (
           <MenuItem onClick={() => handleEditView(contextMenu!.view)} dense>
-            <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+            <ListItemIcon>
+              <EditIcon fontSize="small" />
+            </ListItemIcon>
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.issueViews.rename')}
             </ListItemText>
           </MenuItem>
         )}
-        <MenuItem onClick={() => contextMenu && handleShareView(contextMenu.view)} dense>
-          <ListItemIcon><ShareIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => contextMenu && handleShareView(contextMenu.view)}
+          dense
+        >
+          <ListItemIcon>
+            <ShareIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
             {t('argus.issueViews.share')}
           </ListItemText>
         </MenuItem>
         {contextMenu?.view.isCustom && [
           <Divider key="divider" />,
-          <MenuItem key="delete" onClick={() => handleDeleteView(contextMenu!.view.id)} dense>
-            <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: 'error.main' }} /></ListItemIcon>
-            <ListItemText primaryTypographyProps={{ fontSize: '0.8rem', color: 'error.main' }}>
+          <MenuItem
+            key="delete"
+            onClick={() => handleDeleteView(contextMenu!.view.id)}
+            dense
+          >
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{
+                fontSize: '0.8rem',
+                color: 'error.main',
+              }}
+            >
               {t('argus.issueViews.delete')}
             </ListItemText>
           </MenuItem>,
@@ -340,7 +420,9 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
         PaperProps={{ sx: { borderRadius: '12px' } }}
       >
         <DialogTitle sx={{ fontSize: '0.95rem', fontWeight: 700 }}>
-          {editDialog.isNew ? t('argus.issueViews.createView') : t('argus.issueViews.renameView')}
+          {editDialog.isNew
+            ? t('argus.issueViews.createView')
+            : t('argus.issueViews.renameView')}
         </DialogTitle>
         <DialogContent>
           <TextField
@@ -350,14 +432,18 @@ const IssueViewTabs: React.FC<IssueViewTabsProps> = ({
             label={t('argus.issueViews.viewName')}
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSaveEdit();
+            }}
             sx={{ mt: 1 }}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button
             size="small"
-            onClick={() => setEditDialog({ open: false, view: null, isNew: false })}
+            onClick={() =>
+              setEditDialog({ open: false, view: null, isNew: false })
+            }
             sx={{ textTransform: 'none' }}
           >
             {t('common.cancel')}

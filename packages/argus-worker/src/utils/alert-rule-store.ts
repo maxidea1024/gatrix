@@ -37,7 +37,9 @@ export class AlertRuleStore {
    */
   async init(): Promise<void> {
     await this.loadAll();
-    logger.info('AlertRuleStore initialized', { totalRules: this.totalCount() });
+    logger.info('AlertRuleStore initialized', {
+      totalRules: this.totalCount(),
+    });
   }
 
   /**
@@ -51,7 +53,10 @@ export class AlertRuleStore {
    * Get rules matching a specific condition type pattern.
    * Used to filter rules for error vs feedback evaluation.
    */
-  getRulesWithCondition(projectId: string, conditionPatterns: string[]): AlertRule[] {
+  getRulesWithCondition(
+    projectId: string,
+    conditionPatterns: string[]
+  ): AlertRule[] {
     const projectRules = this.rules.get(projectId) || [];
     return projectRules.filter((rule) =>
       conditionPatterns.some((pattern) => rule.conditions.includes(pattern))
@@ -75,7 +80,9 @@ export class AlertRuleStore {
    */
   async reloadAll(): Promise<void> {
     await this.loadAll();
-    logger.info('Alert rules fully reloaded', { totalRules: this.totalCount() });
+    logger.info('Alert rules fully reloaded', {
+      totalRules: this.totalCount(),
+    });
   }
 
   /**

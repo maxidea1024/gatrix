@@ -133,10 +133,7 @@ const ValueDisplay: React.FC<{ value: any }> = ({ value }) => {
   }
   if (typeof value === 'string' || typeof value === 'number') {
     return (
-      <Typography
-        variant="body2"
-        sx={{ fontSize: 12 }}
-      >
+      <Typography variant="body2" sx={{ fontSize: 12 }}>
         {String(value)}
       </Typography>
     );
@@ -326,10 +323,7 @@ const VariantsDiff: React.FC<{
                 {weightChanged ? (
                   <ChangeArrow oldValue={old.weight} newValue={v.weight} />
                 ) : (
-                  <Typography
-                    variant="body2"
-                    sx={{ fontSize: 12 }}
-                  >
+                  <Typography variant="body2" sx={{ fontSize: 12 }}>
                     {v.weight}
                   </Typography>
                 )}
@@ -538,10 +532,7 @@ const StrategiesDiff: React.FC<{
                     </Typography>
                   </Box>
                 ) : (
-                  <Typography
-                    variant="caption"
-                    sx={{ fontSize: 11 }}
-                  >
+                  <Typography variant="caption" sx={{ fontSize: 11 }}>
                     {typeof v === 'object' ? JSON.stringify(v) : String(v)}
                   </Typography>
                 )}

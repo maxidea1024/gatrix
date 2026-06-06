@@ -37,10 +37,7 @@ export async function ensureStorageBucket(): Promise<void> {
     await s3.send(new HeadBucketCommand({ Bucket: bucketName }));
     logger.info(`Storage bucket '${bucketName}' exists`);
   } catch (error: any) {
-    if (
-      error.name === 'NotFound' ||
-      error.$metadata?.httpStatusCode === 404
-    ) {
+    if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
       logger.info(`Creating storage bucket '${bucketName}'...`);
       await s3.send(new CreateBucketCommand({ Bucket: bucketName }));
       logger.info(`Storage bucket '${bucketName}' created`);

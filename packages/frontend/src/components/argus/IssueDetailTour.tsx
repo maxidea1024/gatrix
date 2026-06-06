@@ -7,8 +7,16 @@
  */
 import React, { useState, useCallback, useEffect } from 'react';
 import {
-  Box, Typography, Paper, Button, IconButton,
-  Stepper, Step, StepLabel, alpha, useTheme,
+  Box,
+  Typography,
+  Paper,
+  Button,
+  IconButton,
+  Stepper,
+  Step,
+  StepLabel,
+  alpha,
+  useTheme,
   Backdrop,
 } from '@mui/material';
 import {
@@ -20,9 +28,9 @@ import {
 import { useTranslation } from 'react-i18next';
 
 interface TourStep {
-  target: string;       // CSS selector for the target element
-  title: string;        // i18n key for step title
-  description: string;  // i18n key for step description
+  target: string; // CSS selector for the target element
+  title: string; // i18n key for step title
+  description: string; // i18n key for step description
   placement?: 'top' | 'bottom' | 'left' | 'right';
 }
 
@@ -90,7 +98,7 @@ const IssueDetailTour: React.FC<IssueDetailTourProps> = ({ onComplete }) => {
 
   const handleNext = () => {
     if (currentStep < TOUR_STEPS.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     } else {
       handleComplete();
     }
@@ -98,7 +106,7 @@ const IssueDetailTour: React.FC<IssueDetailTourProps> = ({ onComplete }) => {
 
   const handlePrev = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
@@ -121,7 +129,8 @@ const IssueDetailTour: React.FC<IssueDetailTourProps> = ({ onComplete }) => {
         onClick={startTour}
         sx={{
           position: 'fixed',
-          bottom: 16, right: 16,
+          bottom: 16,
+          right: 16,
           zIndex: 1000,
           textTransform: 'none',
           fontSize: '0.72rem',
@@ -157,33 +166,50 @@ const IssueDetailTour: React.FC<IssueDetailTourProps> = ({ onComplete }) => {
         elevation={8}
         sx={{
           position: 'fixed',
-          bottom: '50%', left: '50%',
+          bottom: '50%',
+          left: '50%',
           transform: 'translate(-50%, 50%)',
           zIndex: 1400,
-          width: 380, maxWidth: '90vw',
+          width: 380,
+          maxWidth: '90vw',
           borderRadius: '16px',
           overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <Box sx={{
-          display: 'flex', alignItems: 'center', gap: 1,
-          px: 2.5, py: 1.5,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)}, ${alpha(theme.palette.primary.main, 0.05)})`,
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 2.5,
+            py: 1.5,
+            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)}, ${alpha(theme.palette.primary.main, 0.05)})`,
+          }}
+        >
           <TourIcon sx={{ fontSize: 18, color: theme.palette.primary.main }} />
           <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, flex: 1 }}>
             {t(step.title)}
           </Typography>
-          <IconButton size="small" onClick={handleSkip} sx={{ width: 24, height: 24 }}>
+          <IconButton
+            size="small"
+            onClick={handleSkip}
+            sx={{ width: 24, height: 24 }}
+          >
             <CloseIcon sx={{ fontSize: 14 }} />
           </IconButton>
         </Box>
 
         {/* Content */}
         <Box sx={{ px: 2.5, py: 2 }}>
-          <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', lineHeight: 1.5 }}>
+          <Typography
+            sx={{
+              fontSize: '0.78rem',
+              color: 'text.secondary',
+              lineHeight: 1.5,
+            }}
+          >
             {t(step.description)}
           </Typography>
         </Box>
@@ -195,7 +221,10 @@ const IssueDetailTour: React.FC<IssueDetailTourProps> = ({ onComplete }) => {
               <Step key={idx}>
                 <StepLabel
                   StepIconProps={{
-                    sx: { fontSize: 16, '&.Mui-active': { color: theme.palette.primary.main } },
+                    sx: {
+                      fontSize: 16,
+                      '&.Mui-active': { color: theme.palette.primary.main },
+                    },
                   }}
                 />
               </Step>
@@ -204,26 +233,47 @@ const IssueDetailTour: React.FC<IssueDetailTourProps> = ({ onComplete }) => {
         </Box>
 
         {/* Actions */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2.5, pb: 2 }}>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2.5, pb: 2 }}
+        >
           <Button
             size="small"
             onClick={handleSkip}
-            sx={{ textTransform: 'none', fontSize: '0.72rem', color: 'text.secondary' }}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.72rem',
+              color: 'text.secondary',
+            }}
           >
             {t('argus.tour.skip')}
           </Button>
           <Box sx={{ flex: 1 }} />
-          <IconButton size="small" onClick={handlePrev} disabled={currentStep === 0}>
+          <IconButton
+            size="small"
+            onClick={handlePrev}
+            disabled={currentStep === 0}
+          >
             <PrevIcon sx={{ fontSize: 16 }} />
           </IconButton>
           <Button
             size="small"
             variant="contained"
             onClick={handleNext}
-            endIcon={currentStep < TOUR_STEPS.length - 1 ? <NextIcon sx={{ fontSize: 14 }} /> : undefined}
-            sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '8px', px: 2 }}
+            endIcon={
+              currentStep < TOUR_STEPS.length - 1 ? (
+                <NextIcon sx={{ fontSize: 14 }} />
+              ) : undefined
+            }
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.72rem',
+              borderRadius: '8px',
+              px: 2,
+            }}
           >
-            {currentStep < TOUR_STEPS.length - 1 ? t('argus.tour.next') : t('argus.tour.finish')}
+            {currentStep < TOUR_STEPS.length - 1
+              ? t('argus.tour.next')
+              : t('argus.tour.finish')}
           </Button>
         </Box>
       </Paper>

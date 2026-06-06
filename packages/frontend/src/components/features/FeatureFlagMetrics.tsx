@@ -28,7 +28,11 @@ import {
   Chip,
   Divider,
 } from '@mui/material';
-import DateRangeSelector, { DateRangeValue, presetToHours, dateRangeToDatePair } from '../common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  presetToHours,
+  dateRangeToDatePair,
+} from '../common/DateRangeSelector';
 import {
   KeyboardArrowDown as ExpandIcon,
   KeyboardArrowUp as CollapseIcon,
@@ -100,8 +104,6 @@ interface TimeSeriesPoint {
   appName?: string;
 }
 
-
-
 export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   flagName,
   environments,
@@ -140,7 +142,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const [dateRange, setDateRange] = useState<DateRangeValue>(() => {
     const periodParam = searchParams.get('period');
     const validPresets = ['1h', '6h', '24h', '7d', '30d'];
-    const preset = periodParam && validPresets.includes(periodParam) ? periodParam : '7d';
+    const preset =
+      periodParam && validPresets.includes(periodParam) ? periodParam : '7d';
     return { type: 'preset', preset };
   });
   const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
@@ -301,7 +304,14 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [flagName, selectedEnvs, selectedApps, availableApps.length, dateRange, t]);
+  }, [
+    flagName,
+    selectedEnvs,
+    selectedApps,
+    availableApps.length,
+    dateRange,
+    t,
+  ]);
 
   useEffect(() => {
     fetchMetrics();
@@ -343,7 +353,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
     // Period
     const currentPeriodParam = searchParams.get('period') || '';
-    const periodPreset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : 'custom';
+    const periodPreset =
+      dateRange.type === 'preset' ? dateRange.preset || '24h' : 'custom';
     if (periodPreset !== '24h') {
       if (currentPeriodParam !== periodPreset) {
         params.set('period', periodPreset);
@@ -401,8 +412,6 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     if (newSelected.length === 0) return;
     setSelectedApps(newSelected);
   };
-
-
 
   // Aggregate metrics
   const aggregatedMetrics: AggregatedMetrics = useMemo(
@@ -1074,7 +1083,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             >
               <Typography variant="subtitle2" color="text.secondary">
                 {t('featureFlags.metrics.requestsInPeriod', {
-                  period: dateRange.type === 'preset' ? (dateRange.preset || '24h') : 'custom',
+                  period:
+                    dateRange.type === 'preset'
+                      ? dateRange.preset || '24h'
+                      : 'custom',
                 })}
               </Typography>
               <ToggleButtonGroup

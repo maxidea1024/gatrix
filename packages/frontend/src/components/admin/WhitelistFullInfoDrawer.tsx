@@ -576,10 +576,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                                 gap: 0.5,
                               }}
                             >
-                              <Typography
-                                variant="body2"
-                                
-                              >
+                              <Typography variant="body2">
                                 {ip.ipAddress}
                               </Typography>
                               <CopyButton text={ip.ipAddress} size={13} />

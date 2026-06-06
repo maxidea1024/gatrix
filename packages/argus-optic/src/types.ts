@@ -104,8 +104,17 @@ export interface SelectField {
 /** WHERE/HAVING condition */
 export interface Condition {
   field: string;
-  op: '=' | '!=' | '>' | '<' | '>=' | '<='
-    | 'IN' | 'NOT IN' | 'ILIKE' | 'NOT ILIKE';
+  op:
+    | '='
+    | '!='
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    | 'IN'
+    | 'NOT IN'
+    | 'ILIKE'
+    | 'NOT ILIKE';
   value: string | number | string[] | number[];
 }
 

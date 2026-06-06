@@ -13,7 +13,10 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
-import DateRangeSelector, { DateRangeValue, dateRangeToApiParams } from '@/components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToApiParams,
+} from '@/components/common/DateRangeSelector';
 import argusService from '@/services/argusService';
 
 // ==================== Types ====================
@@ -43,7 +46,9 @@ interface ArgusFilterBarProps {
 
 // ==================== Default State ====================
 
-export const defaultArgusFilterState = (savedPreset?: string): ArgusFilterState => ({
+export const defaultArgusFilterState = (
+  savedPreset?: string
+): ArgusFilterState => ({
   dateRange: { type: 'preset', preset: savedPreset || '14d' },
   environments: [],
   browsers: [],
@@ -81,7 +86,9 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
     }
   }, [projectId]);
 
-  useEffect(() => { fetchOptions(); }, [fetchOptions]);
+  useEffect(() => {
+    fetchOptions();
+  }, [fetchOptions]);
 
   const handleDateRangeChange = (dateRange: DateRangeValue) => {
     onChange({ ...value, dateRange });
@@ -115,9 +122,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         py: 0.8,
         borderRadius: '10px',
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        background: isDark
-          ? 'rgba(255,255,255,0.02)'
-          : 'rgba(0,0,0,0.015)',
+        background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
         backdropFilter: 'blur(8px)',
         flexWrap: 'wrap',
         position: 'relative',
@@ -129,29 +134,36 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
     >
       {/* Filter icon indicator */}
       <Tooltip title={t('argus.filters.filters', { defaultValue: 'Filters' })}>
-        <FilterIcon sx={{
-          fontSize: 16,
-          color: hasActiveFilters ? theme.palette.primary.main : 'text.disabled',
-          transition: 'color 0.2s',
-        }} />
+        <FilterIcon
+          sx={{
+            fontSize: 16,
+            color: hasActiveFilters
+              ? theme.palette.primary.main
+              : 'text.disabled',
+            transition: 'color 0.2s',
+          }}
+        />
       </Tooltip>
 
       {/* Environment */}
-      {!hideFilters.includes('environment') && options.environments.length > 0 && (
-        <MultiSelectFilterChip
-          label={t('argus.filters.environment', { defaultValue: 'Environment' })}
-          options={options.environments.map(e => ({ value: e, label: e }))}
-          selected={value.environments}
-          onChange={handleEnvironmentChange}
-          emptyMeansAll
-        />
-      )}
+      {!hideFilters.includes('environment') &&
+        options.environments.length > 0 && (
+          <MultiSelectFilterChip
+            label={t('argus.filters.environment', {
+              defaultValue: 'Environment',
+            })}
+            options={options.environments.map((e) => ({ value: e, label: e }))}
+            selected={value.environments}
+            onChange={handleEnvironmentChange}
+            emptyMeansAll
+          />
+        )}
 
       {/* Browser */}
       {!hideFilters.includes('browser') && options.browsers.length > 0 && (
         <MultiSelectFilterChip
           label={t('argus.filters.browser', { defaultValue: 'Browser' })}
-          options={options.browsers.map(b => ({ value: b, label: b }))}
+          options={options.browsers.map((b) => ({ value: b, label: b }))}
           selected={value.browsers}
           onChange={handleBrowserChange}
           emptyMeansAll
@@ -162,7 +174,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
       {!hideFilters.includes('os') && options.os.length > 0 && (
         <MultiSelectFilterChip
           label={t('argus.filters.os', { defaultValue: 'OS' })}
-          options={options.os.map(o => ({ value: o, label: o }))}
+          options={options.os.map((o) => ({ value: o, label: o }))}
           selected={value.os}
           onChange={handleOsChange}
           emptyMeansAll
@@ -184,21 +196,37 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
       {/* Divider + Refresh */}
       {onRefresh && (
         <>
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.3, borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)' }} />
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{
+              mx: 0.3,
+              borderColor: isDark
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.08)',
+            }}
+          />
           <Tooltip title={t('common.refresh', { defaultValue: 'Refresh' })}>
             <span>
-              <IconButton onClick={onRefresh} disabled={loading} size="small" sx={{ p: 0.5 }}>
-                <RefreshIcon sx={{
-                  fontSize: 18,
-                  transition: 'transform 0.3s',
-                  ...(loading && {
-                    animation: 'argus-spin 1s linear infinite',
-                    '@keyframes argus-spin': {
-                      from: { transform: 'rotate(0deg)' },
-                      to: { transform: 'rotate(360deg)' },
-                    },
-                  }),
-                }} />
+              <IconButton
+                onClick={onRefresh}
+                disabled={loading}
+                size="small"
+                sx={{ p: 0.5 }}
+              >
+                <RefreshIcon
+                  sx={{
+                    fontSize: 18,
+                    transition: 'transform 0.3s',
+                    ...(loading && {
+                      animation: 'argus-spin 1s linear infinite',
+                      '@keyframes argus-spin': {
+                        from: { transform: 'rotate(0deg)' },
+                        to: { transform: 'rotate(360deg)' },
+                      },
+                    }),
+                  }}
+                />
               </IconButton>
             </span>
           </Tooltip>
@@ -227,7 +255,8 @@ export function argusFilterStateToApiParams(state: ArgusFilterState): {
   const dateParams = dateRangeToApiParams(state.dateRange);
   return {
     ...dateParams,
-    environment: state.environments.length === 1 ? state.environments[0] : undefined,
+    environment:
+      state.environments.length === 1 ? state.environments[0] : undefined,
     browser: state.browsers.length === 1 ? state.browsers[0] : undefined,
     os: state.os.length === 1 ? state.os[0] : undefined,
   };

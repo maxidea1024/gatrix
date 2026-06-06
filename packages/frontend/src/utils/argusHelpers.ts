@@ -24,8 +24,16 @@ export function stringToColor(str: string): string {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
   const colors = [
-    '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
-    '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ff9800',
+    '#f44336',
+    '#e91e63',
+    '#9c27b0',
+    '#673ab7',
+    '#3f51b5',
+    '#2196f3',
+    '#00bcd4',
+    '#009688',
+    '#4caf50',
+    '#ff9800',
   ];
   return colors[Math.abs(hash) % colors.length];
 }
@@ -41,7 +49,10 @@ export function getInitials(name: string): string {
 }
 
 /** Format a date string as a relative time ("5 minutes ago", "2 days ago"). */
-export function formatRelative(dateStr: string, t: (key: string, opts?: any) => string): string {
+export function formatRelative(
+  dateStr: string,
+  t: (key: string, opts?: any) => string
+): string {
   try {
     const d = new Date(dateStr);
     const now = new Date();
@@ -72,26 +83,71 @@ export const LEVEL_COLORS: Record<string, string> = {
 };
 
 /** Rich level config with icon and background color for issue rows. */
-export const LEVEL_CONFIG: Record<string, { color: string; icon: React.ReactElement; bg: string }> = {
-  fatal: { color: '#f44336', icon: React.createElement(ErrorIcon, { sx: { fontSize: 16 } }), bg: 'rgba(244,67,54,0.08)' },
-  error: { color: '#ff5722', icon: React.createElement(ErrorIcon, { sx: { fontSize: 16 } }), bg: 'rgba(255,87,34,0.08)' },
-  warning: { color: '#ff9800', icon: React.createElement(WarningIcon, { sx: { fontSize: 16 } }), bg: 'rgba(255,152,0,0.08)' },
-  info: { color: '#2196f3', icon: React.createElement(InfoIcon, { sx: { fontSize: 16 } }), bg: 'rgba(33,150,243,0.08)' },
-  debug: { color: '#9e9e9e', icon: React.createElement(InfoIcon, { sx: { fontSize: 16 } }), bg: 'rgba(158,158,158,0.08)' },
+export const LEVEL_CONFIG: Record<
+  string,
+  { color: string; icon: React.ReactElement; bg: string }
+> = {
+  fatal: {
+    color: '#f44336',
+    icon: React.createElement(ErrorIcon, { sx: { fontSize: 16 } }),
+    bg: 'rgba(244,67,54,0.08)',
+  },
+  error: {
+    color: '#ff5722',
+    icon: React.createElement(ErrorIcon, { sx: { fontSize: 16 } }),
+    bg: 'rgba(255,87,34,0.08)',
+  },
+  warning: {
+    color: '#ff9800',
+    icon: React.createElement(WarningIcon, { sx: { fontSize: 16 } }),
+    bg: 'rgba(255,152,0,0.08)',
+  },
+  info: {
+    color: '#2196f3',
+    icon: React.createElement(InfoIcon, { sx: { fontSize: 16 } }),
+    bg: 'rgba(33,150,243,0.08)',
+  },
+  debug: {
+    color: '#9e9e9e',
+    icon: React.createElement(InfoIcon, { sx: { fontSize: 16 } }),
+    bg: 'rgba(158,158,158,0.08)',
+  },
 };
 
 // ─── Priority Config ─────────────────────────────────────────────────
 
-export const PRIORITY_CONFIG: Record<string, { color: string; label: string; icon: React.ReactElement }> = {
-  critical: { color: '#f44336', label: 'Critical', icon: React.createElement(CriticalPriorityIcon, { sx: { fontSize: 14 } }) },
-  high: { color: '#ff5722', label: 'High', icon: React.createElement(HighPriorityIcon, { sx: { fontSize: 14 } }) },
-  medium: { color: '#ff9800', label: 'Medium', icon: React.createElement(MediumPriorityIcon, { sx: { fontSize: 14 } }) },
-  low: { color: '#2196f3', label: 'Low', icon: React.createElement(LowPriorityIcon, { sx: { fontSize: 14 } }) },
+export const PRIORITY_CONFIG: Record<
+  string,
+  { color: string; label: string; icon: React.ReactElement }
+> = {
+  critical: {
+    color: '#f44336',
+    label: 'Critical',
+    icon: React.createElement(CriticalPriorityIcon, { sx: { fontSize: 14 } }),
+  },
+  high: {
+    color: '#ff5722',
+    label: 'High',
+    icon: React.createElement(HighPriorityIcon, { sx: { fontSize: 14 } }),
+  },
+  medium: {
+    color: '#ff9800',
+    label: 'Medium',
+    icon: React.createElement(MediumPriorityIcon, { sx: { fontSize: 14 } }),
+  },
+  low: {
+    color: '#2196f3',
+    label: 'Low',
+    icon: React.createElement(LowPriorityIcon, { sx: { fontSize: 14 } }),
+  },
 };
 
 // ─── Issue Status Config ─────────────────────────────────────────────
 
-export const ISSUE_STATUS_CONFIG: Record<string, { color: string; label: string }> = {
+export const ISSUE_STATUS_CONFIG: Record<
+  string,
+  { color: string; label: string }
+> = {
   unresolved: { color: '#f44336', label: 'Unresolved' },
   resolved: { color: '#4caf50', label: 'Resolved' },
   ignored: { color: '#9e9e9e', label: 'Ignored' },

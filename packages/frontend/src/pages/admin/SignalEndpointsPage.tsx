@@ -36,7 +36,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Sensors as SensorsIcon,
@@ -208,7 +207,10 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
                 {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim() || '{name}'}`}
               </Typography>
               {name.trim() && (
-                <CopyButton text={`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`} size={13} />
+                <CopyButton
+                  text={`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`}
+                  size={13}
+                />
               )}
             </Box>
             <Typography
@@ -337,9 +339,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
               value={createdToken}
               InputProps={{
                 readOnly: true,
-                endAdornment: (
-                  <CopyButton text={createdToken} size={13} />
-                ),
+                endAdornment: <CopyButton text={createdToken} size={13} />,
               }}
             />
           </Box>
@@ -764,7 +764,10 @@ const SignalEndpointsPage: React.FC = () => {
                               >
                                 {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`}
                               </Typography>
-                              <CopyButton text={`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`} size={13} />
+                              <CopyButton
+                                text={`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`}
+                                size={13}
+                              />
                             </Box>
 
                             {/* Tokens Section */}

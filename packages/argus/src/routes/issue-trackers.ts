@@ -1,7 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import db from '../config/knex';
 import { createLogger } from '../utils/logger';
-import { createExternalIssue, testTrackerConnection, type TrackerConfig, type IssuePayload } from '../services/trackerAdapter';
+import {
+  createExternalIssue,
+  testTrackerConnection,
+  type TrackerConfig,
+  type IssuePayload,
+} from '../services/trackerAdapter';
 
 const logger = createLogger('issue-trackers-api');
 
@@ -23,7 +28,7 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         INDEX idx_project (project_id)
       )
     `);
-    
+
     // Attempt to alter the table to update the ENUM if it was created with fewer providers.
     // This is safe to run multiple times, though it might throw a warning.
     try {
@@ -32,7 +37,9 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         MODIFY COLUMN provider ENUM('jira', 'github', 'linear', 'clickup', 'asana', 'notion', 'shortcut', 'azure_devops', 'redmine', 'youtrack', 'trello') NOT NULL
       `);
     } catch (e) {
-      logger.warn('Failed to alter provider ENUM', { error: (e as Error).message });
+      logger.warn('Failed to alter provider ENUM', {
+        error: (e as Error).message,
+      });
     }
   };
 
@@ -48,13 +55,17 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
           [projectId]
         );
         // Mask tokens - never send to frontend
-        const masked = (rows as any[]).map(r => ({
+        const masked = (rows as any[]).map((r) => ({
           ...r,
-          config: typeof r.config === 'string' ? JSON.parse(r.config) : r.config,
+          config:
+            typeof r.config === 'string' ? JSON.parse(r.config) : r.config,
         }));
         return reply.send({ data: masked });
       } catch (error) {
-        logger.error('Failed to list issue trackers', { projectId, error: (error as Error).message });
+        logger.error('Failed to list issue trackers', {
+          projectId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Failed to list issue trackers' });
       }
     }
@@ -66,7 +77,18 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const body = request.body as {
-        provider: 'jira' | 'github' | 'linear' | 'clickup' | 'asana' | 'notion' | 'shortcut' | 'azure_devops' | 'redmine' | 'youtrack' | 'trello';
+        provider:
+          | 'jira'
+          | 'github'
+          | 'linear'
+          | 'clickup'
+          | 'asana'
+          | 'notion'
+          | 'shortcut'
+          | 'azure_devops'
+          | 'redmine'
+          | 'youtrack'
+          | 'trello';
         name: string;
         api_url: string;
         api_token: string;
@@ -74,7 +96,11 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       };
 
       if (!body.provider || !body.name || !body.api_url || !body.api_token) {
-        return reply.code(400).send({ error: 'provider, name, api_url, and api_token are required' });
+        return reply
+          .code(400)
+          .send({
+            error: 'provider, name, api_url, and api_token are required',
+          });
       }
 
       try {
@@ -92,11 +118,20 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
           ]
         );
         const insertId = (result as any).insertId;
-        logger.info('Issue tracker created', { projectId, id: insertId, provider: body.provider });
+        logger.info('Issue tracker created', {
+          projectId,
+          id: insertId,
+          provider: body.provider,
+        });
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
-        logger.error('Failed to create issue tracker', { projectId, error: (error as Error).message });
-        return reply.code(500).send({ error: 'Failed to create issue tracker' });
+        logger.error('Failed to create issue tracker', {
+          projectId,
+          error: (error as Error).message,
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to create issue tracker' });
       }
     }
   );
@@ -105,7 +140,10 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
   app.put(
     '/:projectId/issue-trackers/:trackerId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, trackerId } = request.params as { projectId: string; trackerId: string };
+      const { projectId, trackerId } = request.params as {
+        projectId: string;
+        trackerId: string;
+      };
       const body = request.body as {
         name?: string;
         api_url?: string;
@@ -118,11 +156,26 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         const updates: string[] = [];
         const params: any[] = [];
 
-        if (body.name !== undefined) { updates.push('name = ?'); params.push(body.name); }
-        if (body.api_url !== undefined) { updates.push('api_url = ?'); params.push(body.api_url); }
-        if (body.api_token !== undefined) { updates.push('api_token = ?'); params.push(body.api_token); }
-        if (body.config !== undefined) { updates.push('config = ?'); params.push(JSON.stringify(body.config)); }
-        if (body.enabled !== undefined) { updates.push('enabled = ?'); params.push(body.enabled ? 1 : 0); }
+        if (body.name !== undefined) {
+          updates.push('name = ?');
+          params.push(body.name);
+        }
+        if (body.api_url !== undefined) {
+          updates.push('api_url = ?');
+          params.push(body.api_url);
+        }
+        if (body.api_token !== undefined) {
+          updates.push('api_token = ?');
+          params.push(body.api_token);
+        }
+        if (body.config !== undefined) {
+          updates.push('config = ?');
+          params.push(JSON.stringify(body.config));
+        }
+        if (body.enabled !== undefined) {
+          updates.push('enabled = ?');
+          params.push(body.enabled ? 1 : 0);
+        }
 
         if (updates.length === 0) {
           return reply.code(400).send({ error: 'No fields to update' });
@@ -136,8 +189,13 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
 
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to update issue tracker', { trackerId, error: (error as Error).message });
-        return reply.code(500).send({ error: 'Failed to update issue tracker' });
+        logger.error('Failed to update issue tracker', {
+          trackerId,
+          error: (error as Error).message,
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to update issue tracker' });
       }
     }
   );
@@ -146,7 +204,10 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
   app.delete(
     '/:projectId/issue-trackers/:trackerId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, trackerId } = request.params as { projectId: string; trackerId: string };
+      const { projectId, trackerId } = request.params as {
+        projectId: string;
+        trackerId: string;
+      };
       try {
         await db.raw(
           'DELETE FROM g_argus_issue_trackers WHERE id = ? AND project_id = ?',
@@ -154,8 +215,13 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         );
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to delete issue tracker', { trackerId, error: (error as Error).message });
-        return reply.code(500).send({ error: 'Failed to delete issue tracker' });
+        logger.error('Failed to delete issue tracker', {
+          trackerId,
+          error: (error as Error).message,
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to delete issue tracker' });
       }
     }
   );
@@ -172,7 +238,9 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       };
 
       if (!body.provider || !body.api_url || !body.api_token) {
-        return reply.code(400).send({ error: 'provider, api_url, and api_token are required' });
+        return reply
+          .code(400)
+          .send({ error: 'provider, api_url, and api_token are required' });
       }
 
       try {
@@ -186,8 +254,12 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
         const result = await testTrackerConnection(config);
         return reply.send({ data: result });
       } catch (error) {
-        logger.error('Pre-save tracker connection test failed', { error: (error as Error).message });
-        return reply.send({ data: { ok: false, message: (error as Error).message } });
+        logger.error('Pre-save tracker connection test failed', {
+          error: (error as Error).message,
+        });
+        return reply.send({
+          data: { ok: false, message: (error as Error).message },
+        });
       }
     }
   );
@@ -196,7 +268,10 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
   app.post(
     '/:projectId/issue-trackers/:trackerId/test',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, trackerId } = request.params as { projectId: string; trackerId: string };
+      const { projectId, trackerId } = request.params as {
+        projectId: string;
+        trackerId: string;
+      };
       try {
         const [rows] = await db.raw(
           'SELECT * FROM g_argus_issue_trackers WHERE id = ? AND project_id = ?',
@@ -211,13 +286,19 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
           provider: tracker.provider,
           apiUrl: tracker.api_url,
           apiToken: tracker.api_token,
-          config: typeof tracker.config === 'string' ? JSON.parse(tracker.config) : (tracker.config || {}),
+          config:
+            typeof tracker.config === 'string'
+              ? JSON.parse(tracker.config)
+              : tracker.config || {},
         };
 
         const result = await testTrackerConnection(config);
         return reply.send({ data: result });
       } catch (error) {
-        logger.error('Failed to test tracker connection', { trackerId, error: (error as Error).message });
+        logger.error('Failed to test tracker connection', {
+          trackerId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Connection test failed' });
       }
     }
@@ -227,7 +308,10 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
   app.post(
     '/:projectId/issue-trackers/:trackerId/create-issue',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, trackerId } = request.params as { projectId: string; trackerId: string };
+      const { projectId, trackerId } = request.params as {
+        projectId: string;
+        trackerId: string;
+      };
       const body = request.body as IssuePayload;
 
       try {
@@ -247,15 +331,30 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
           provider: tracker.provider,
           apiUrl: tracker.api_url,
           apiToken: tracker.api_token,
-          config: typeof tracker.config === 'string' ? JSON.parse(tracker.config) : (tracker.config || {}),
+          config:
+            typeof tracker.config === 'string'
+              ? JSON.parse(tracker.config)
+              : tracker.config || {},
         };
 
         const result = await createExternalIssue(config, body);
-        logger.info('External issue created', { trackerId, provider: tracker.provider, url: result.url, key: result.key });
+        logger.info('External issue created', {
+          trackerId,
+          provider: tracker.provider,
+          url: result.url,
+          key: result.key,
+        });
         return reply.send({ data: result });
       } catch (error) {
-        logger.error('Failed to create external issue', { trackerId, error: (error as Error).message });
-        return reply.code(500).send({ error: `Failed to create issue: ${(error as Error).message}` });
+        logger.error('Failed to create external issue', {
+          trackerId,
+          error: (error as Error).message,
+        });
+        return reply
+          .code(500)
+          .send({
+            error: `Failed to create issue: ${(error as Error).message}`,
+          });
       }
     }
   );

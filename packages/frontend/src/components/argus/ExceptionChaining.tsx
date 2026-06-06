@@ -1,5 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Chip, Collapse, IconButton, alpha, useTheme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Chip,
+  Collapse,
+  IconButton,
+  alpha,
+  useTheme,
+} from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -87,7 +95,7 @@ const ExceptionChaining: React.FC<ExceptionChainingProps> = ({
   if (chain.length <= 1) return null; // No chaining detected
 
   const toggleExpand = (idx: number) => {
-    setExpandedIds(prev => {
+    setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(idx)) next.delete(idx);
       else next.add(idx);
@@ -99,10 +107,16 @@ const ExceptionChaining: React.FC<ExceptionChainingProps> = ({
     <Box sx={{ mb: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
         <ChainIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-        <Typography variant="caption" sx={{
-          fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary',
-          textTransform: 'uppercase', letterSpacing: 0.5,
-        }}>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+          }}
+        >
           {t('argus.exceptionChain.title')}
         </Typography>
         <Chip
@@ -121,40 +135,78 @@ const ExceptionChaining: React.FC<ExceptionChainingProps> = ({
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
             borderRadius: '8px',
             overflow: 'hidden',
-            borderLeft: `3px solid ${idx === 0
-              ? theme.palette.error.main
-              : alpha(theme.palette.warning.main, 0.6 + idx * 0.1)
+            borderLeft: `3px solid ${
+              idx === 0
+                ? theme.palette.error.main
+                : alpha(theme.palette.warning.main, 0.6 + idx * 0.1)
             }`,
           }}
         >
           <Box
             onClick={() => toggleExpand(idx)}
             sx={{
-              display: 'flex', alignItems: 'center', gap: 1,
-              px: 1.5, py: 0.8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1.5,
+              py: 0.8,
               cursor: 'pointer',
-              backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.02)'
+                : 'rgba(0,0,0,0.01)',
+              '&:hover': {
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.04)'
+                  : 'rgba(0,0,0,0.03)',
+              },
             }}
           >
             <IconButton size="small" sx={{ width: 18, height: 18, p: 0 }}>
-              {expandedIds.has(idx)
-                ? <ExpandLessIcon sx={{ fontSize: 14 }} />
-                : <ExpandMoreIcon sx={{ fontSize: 14 }} />
-              }
+              {expandedIds.has(idx) ? (
+                <ExpandLessIcon sx={{ fontSize: 14 }} />
+              ) : (
+                <ExpandMoreIcon sx={{ fontSize: 14 }} />
+              )}
             </IconButton>
             {idx > 0 && (
-              <Typography component="span" sx={{ fontSize: '0.65rem', color: 'text.disabled', fontStyle: 'italic' }}>
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: '0.65rem',
+                  color: 'text.disabled',
+                  fontStyle: 'italic',
+                }}
+              >
                 {t('argus.exceptionChain.causedBy')}
               </Typography>
             )}
-            <Typography component="span" sx={{ fontSize: '0.78rem', fontWeight: 700, color: idx === 0 ? 'error.main' : 'warning.main'}}>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: idx === 0 ? 'error.main' : 'warning.main',
+              }}
+            >
               {entry.type}
             </Typography>
           </Box>
           <Collapse in={expandedIds.has(idx)}>
-            <Box sx={{ px: 1.5, py: 1, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
-              <Typography sx={{ fontSize: '0.78rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: 'text.primary' }}>
+            <Box
+              sx={{
+                px: 1.5,
+                py: 1,
+                borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: '0.78rem',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  color: 'text.primary',
+                }}
+              >
                 {entry.value}
               </Typography>
             </Box>

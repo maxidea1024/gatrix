@@ -1089,10 +1089,7 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 borderColor: (theme) => alpha(theme.palette.error.main, 0.15),
               }}
             >
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 700, mb: 0.5 }}
-              >
+              <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
                 {deleteWarningTarget.name}
               </Typography>
               <Typography variant="caption" color="text.secondary">

@@ -8,7 +8,10 @@
  *   });
  */
 import { useEffect, useState, useCallback, useRef } from 'react';
-import argusRealtimeService, { ArgusRealtimeEvent, ArgusRealtimeEventType } from '@/services/argusRealtimeService';
+import argusRealtimeService, {
+  ArgusRealtimeEvent,
+  ArgusRealtimeEventType,
+} from '@/services/argusRealtimeService';
 
 interface UseArgusRealtimeOptions {
   onIssueCreated?: (data: any) => void;
@@ -43,7 +46,7 @@ export function useArgusRealtime(
 
     const handleConnected = () => setIsConnected(true);
     const handleIssueCreated = (event: ArgusRealtimeEvent) => {
-      setNewIssueCount(prev => prev + 1);
+      setNewIssueCount((prev) => prev + 1);
       optionsRef.current.onIssueCreated?.(event.data);
     };
     const handleIssueUpdated = (event: ArgusRealtimeEvent) => {

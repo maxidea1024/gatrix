@@ -143,8 +143,10 @@ export async function cleanupExpiredCounters(maxAgeMs: number): Promise<void> {
     do {
       const [nextCursor, keys] = await redis.scan(
         cursor,
-        'MATCH', 'argus:evt-count:*',
-        'COUNT', '100'
+        'MATCH',
+        'argus:evt-count:*',
+        'COUNT',
+        '100'
       );
       cursor = nextCursor;
 
@@ -158,7 +160,10 @@ export async function cleanupExpiredCounters(maxAgeMs: number): Promise<void> {
       }
     } while (cursor !== '0');
 
-    logger.debug('Counter cleanup complete', { keysScanned: cleaned, maxAgeMs });
+    logger.debug('Counter cleanup complete', {
+      keysScanned: cleaned,
+      maxAgeMs,
+    });
   } catch (e) {
     logger.warn('Counter cleanup failed', {
       error: e instanceof Error ? e.message : String(e),

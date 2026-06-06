@@ -1,6 +1,12 @@
 import Redis from 'ioredis';
 import { Queue, Worker } from 'groupmq';
-import { config, createLogger, ArgusTransactionEvent, QUEUES, pipelineConfig } from '@gatrix/argus';
+import {
+  config,
+  createLogger,
+  ArgusTransactionEvent,
+  QUEUES,
+  pipelineConfig,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 import {
@@ -44,7 +50,7 @@ export class TransactionWorker {
     // Start periodic ClickHouse flush timer
     this.chFlushTimer = setInterval(
       () => this.flushClickHouse(),
-      flushIntervalMs,
+      flushIntervalMs
     );
 
     // Start GroupMQ worker ??per-project FIFO for future-proofing
@@ -60,7 +66,7 @@ export class TransactionWorker {
           const { transaction, spans } = normalizeTransactionEvent(
             rawEvent,
             rawEvent.project_id,
-            rawEvent.dsn_key_id || 0,
+            rawEvent.dsn_key_id || 0
           );
 
           this.txnBuffer.push(transaction);
@@ -69,7 +75,10 @@ export class TransactionWorker {
           }
 
           // Flush immediately if either buffer reaches max size
-          if (this.txnBuffer.length >= maxBatchSize || this.spanBuffer.length >= maxBatchSize) {
+          if (
+            this.txnBuffer.length >= maxBatchSize ||
+            this.spanBuffer.length >= maxBatchSize
+          ) {
             await this.flushClickHouse();
           }
         } catch (error) {
@@ -127,25 +136,29 @@ export class TransactionWorker {
 
       if (txnBatch.length > 0) {
         promises.push(
-          optic.insert({
-            table: 'argus.transactions',
-            values: txnBatch,
-            format: 'JSONEachRow',
-          }).then(() => {
-            logger.info('Transactions flushed', { count: txnBatch.length });
-          }),
+          optic
+            .insert({
+              table: 'argus.transactions',
+              values: txnBatch,
+              format: 'JSONEachRow',
+            })
+            .then(() => {
+              logger.info('Transactions flushed', { count: txnBatch.length });
+            })
         );
       }
 
       if (spanBatch.length > 0) {
         promises.push(
-          optic.insert({
-            table: 'argus.spans',
-            values: spanBatch,
-            format: 'JSONEachRow',
-          }).then(() => {
-            logger.info('Spans flushed', { count: spanBatch.length });
-          }),
+          optic
+            .insert({
+              table: 'argus.spans',
+              values: spanBatch,
+              format: 'JSONEachRow',
+            })
+            .then(() => {
+              logger.info('Spans flushed', { count: spanBatch.length });
+            })
         );
       }
 

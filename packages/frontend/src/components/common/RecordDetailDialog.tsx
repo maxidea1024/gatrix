@@ -14,9 +14,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { CopyButton } from '@/components/common/CopyButton';
 import { copyToClipboard } from '@/utils/clipboard';
@@ -120,15 +118,21 @@ const RecordDetailDialog: React.FC<RecordDetailDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-
                               wordBreak: 'break-all',
                             }}
                           >
                             {displayValue}
                           </Typography>
                           {displayValue !== '-' && (
-                            <CopyButton text={String(rawValue ?? '')} size={13}
-                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, ml: 1, flexShrink: 0 }}
+                            <CopyButton
+                              text={String(rawValue ?? '')}
+                              size={13}
+                              sx={{
+                                opacity: 0.4,
+                                '&:hover': { opacity: 1 },
+                                ml: 1,
+                                flexShrink: 0,
+                              }}
                             />
                           )}
                         </Box>

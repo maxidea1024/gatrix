@@ -48,7 +48,10 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '../../components/common/DateRangeSelector';
 
 // Types and Services
 import { CrashState, getPlatformName } from '@/types/crash';
@@ -117,9 +120,10 @@ const CrashesPage: React.FC = () => {
   const [total, setTotal] = useState(0);
 
   // Date range state
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
 
   // Search state - restore from pageState.filters
   const [searchTerm, setSearchTerm] = useState<string>(

@@ -16,8 +16,10 @@ const PROJECT_ID = '01KN8GSHBJ10JTQ9D0HD60RKFV';
 const TOTAL_FEEDBACK = 5000;
 const DAYS_BACK = 14;
 
-const randomPick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomPick = <T>(arr: T[]): T =>
+  arr[Math.floor(Math.random() * arr.length)];
+const randomInt = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 
 const FEEDBACK_MESSAGES = [
   '해전 중에 자꾸 튕겨요. 교역품 날아갔어요.',
@@ -37,19 +39,36 @@ const FEEDBACK_MESSAGES = [
   'Matchmaking takes forever and then times out.',
 ];
 
-const NAMES = ['김민준', '이서연', '박지호', '최유진', '정하은', '강도현', 'Player_Alpha', 'Player_Beta', 'TestUser01', 'CaptainJack'];
-const EMAILS = NAMES.map(n => `${n.replace(/\s/g, '').toLowerCase()}@test.com`);
+const NAMES = [
+  '김민준',
+  '이서연',
+  '박지호',
+  '최유진',
+  '정하은',
+  '강도현',
+  'Player_Alpha',
+  'Player_Beta',
+  'TestUser01',
+  'CaptainJack',
+];
+const EMAILS = NAMES.map(
+  (n) => `${n.replace(/\s/g, '').toLowerCase()}@test.com`
+);
 const RELEASES = ['3.13.0-rc.1', '3.12.5', '3.12.4', '3.11.0'];
 
 async function main() {
   const ch = createClient({
-    url: CH_CONFIG.url, database: CH_CONFIG.database,
-    username: CH_CONFIG.username, password: CH_CONFIG.password,
+    url: CH_CONFIG.url,
+    database: CH_CONFIG.database,
+    username: CH_CONFIG.username,
+    password: CH_CONFIG.password,
     clickhouse_settings: { date_time_input_format: 'best_effort' },
   });
 
   console.log('🗑️  Truncating user_feedback...');
-  await ch.exec({ query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.user_feedback` });
+  await ch.exec({
+    query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.user_feedback`,
+  });
 
   console.log(`💬 Generating ${TOTAL_FEEDBACK} feedback entries...`);
   const batch: any[] = [];
@@ -65,7 +84,9 @@ async function main() {
       for (let a = 0; a < numAttachments; a++) {
         const w = randomPick([800, 1024, 1280, 1920]);
         const h = randomPick([600, 768, 720, 1080]);
-        attachments.push(`https://picsum.photos/seed/${uuid().substring(0, 8)}/${w}/${h}`);
+        attachments.push(
+          `https://picsum.photos/seed/${uuid().substring(0, 8)}/${w}/${h}`
+        );
       }
     }
 
@@ -78,7 +99,14 @@ async function main() {
       email: EMAILS[nameIdx],
       message: randomPick(FEEDBACK_MESSAGES),
       contact_email: EMAILS[nameIdx],
-      url: randomPick(['/game/play', '/game/port', '/game/battle', '/settings', '/inventory', '/guild']),
+      url: randomPick([
+        '/game/play',
+        '/game/port',
+        '/game/battle',
+        '/settings',
+        '/inventory',
+        '/guild',
+      ]),
       environment: randomPick(['production', 'production', 'staging']),
       release: randomPick(RELEASES),
       source: randomPick(['widget', 'dialog', 'api']),
@@ -87,12 +115,21 @@ async function main() {
     });
   }
 
-  await ch.insert({ table: `${CH_CONFIG.database}.user_feedback`, values: batch, format: 'JSONEachRow' });
+  await ch.insert({
+    table: `${CH_CONFIG.database}.user_feedback`,
+    values: batch,
+    format: 'JSONEachRow',
+  });
 
-  const withAtt = batch.filter(b => b.attachments.length > 0).length;
-  console.log(`✅ Inserted ${batch.length} feedback entries (${withAtt} with attachments)`);
+  const withAtt = batch.filter((b) => b.attachments.length > 0).length;
+  console.log(
+    `✅ Inserted ${batch.length} feedback entries (${withAtt} with attachments)`
+  );
 
   await ch.close();
 }
 
-main().catch(e => { console.error('❌ Error:', e); process.exit(1); });
+main().catch((e) => {
+  console.error('❌ Error:', e);
+  process.exit(1);
+});

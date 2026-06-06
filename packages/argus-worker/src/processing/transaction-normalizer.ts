@@ -78,7 +78,8 @@ export function normalizeTransactionEvent(
     dsn_key_id: dsnKeyId,
 
     timestamp: event.timestamp || new Date().toISOString(),
-    start_timestamp: event.start_timestamp || event.timestamp || new Date().toISOString(),
+    start_timestamp:
+      event.start_timestamp || event.timestamp || new Date().toISOString(),
     duration: event.duration || 0,
 
     transaction: event.transaction || '',
@@ -97,7 +98,9 @@ export function normalizeTransactionEvent(
     span_count: spans.length,
   };
 
-  const normalizedSpans = spans.map((span) => normalizeSpan(span, event.event_id, projectId));
+  const normalizedSpans = spans.map((span) =>
+    normalizeSpan(span, event.event_id, projectId)
+  );
 
   logger.debug('Transaction normalized', {
     eventId: event.event_id,
@@ -124,7 +127,8 @@ function normalizeSpan(
     project_id: projectId,
 
     timestamp: span.timestamp || new Date().toISOString(),
-    start_timestamp: span.start_timestamp || span.timestamp || new Date().toISOString(),
+    start_timestamp:
+      span.start_timestamp || span.timestamp || new Date().toISOString(),
     duration: span.duration || 0,
 
     op: span.op || '',
@@ -157,13 +161,17 @@ function extractSpanMeta(span: ArgusSpan): { action: string; domain: string } {
   if (span.description) {
     if (domain === 'db') {
       // SQL: extract verb (SELECT, INSERT, UPDATE, DELETE)
-      const match = span.description.match(/^\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)/i);
+      const match = span.description.match(
+        /^\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)/i
+      );
       if (match) {
         action = match[1].toUpperCase();
       }
     } else if (domain === 'http') {
       // HTTP: extract method
-      const match = span.description.match(/^\s*(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s/i);
+      const match = span.description.match(
+        /^\s*(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s/i
+      );
       if (match) {
         action = match[1].toUpperCase();
       }

@@ -1654,10 +1654,7 @@ const GameWorldsPage: React.FC = () => {
       case 'worldServerAddress':
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{ maxWidth: 250 }}
-            >
+            <Typography variant="body2" sx={{ maxWidth: 250 }}>
               {world.worldServerAddress || '-'}
             </Typography>
             {world.worldServerAddress && (

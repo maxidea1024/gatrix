@@ -39,7 +39,11 @@ import {
   ToggleButtonGroup,
   Divider,
 } from '@mui/material';
-import DateRangeSelector, { DateRangeValue, presetToHours, dateRangeToDatePair } from '../common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  presetToHours,
+  dateRangeToDatePair,
+} from '../common/DateRangeSelector';
 import {
   Add as AddIcon,
   Refresh as RefreshIcon,
@@ -198,7 +202,8 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [seriesData, setSeriesData] = useState<TimeSeriesResponse | null>(null);
-  const rangePreset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : '24h';
+  const rangePreset =
+    dateRange.type === 'preset' ? dateRange.preset || '24h' : '24h';
   const rangeHours = presetToHours(rangePreset) || 24;
   const [localChartType, setLocalChartType] = useState<ChartType>(
     config.chartType
@@ -1494,8 +1499,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   };
 
   // Global dashboard controls (Grafana-style)
-  const [dateRangeValue, setDateRangeValueState] =
-    useState<DateRangeValue>(resolveInitialDateRange);
+  const [dateRangeValue, setDateRangeValueState] = useState<DateRangeValue>(
+    resolveInitialDateRange
+  );
   const [refreshInterval, setRefreshIntervalState] = useState<number>(
     resolveInitialRefresh
   );
@@ -1506,7 +1512,8 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   const setDateRangeValue = useCallback(
     (value: DateRangeValue) => {
       setDateRangeValueState(value);
-      const presetStr = value.type === 'preset' ? (value.preset || '24h') : 'custom';
+      const presetStr =
+        value.type === 'preset' ? value.preset || '24h' : 'custom';
       localStorage.setItem(`${STORAGE_KEY}.range`, presetStr);
       setSearchParams(
         (prev) => {

@@ -63,7 +63,16 @@ async function start() {
     await logWorker.start();
 
     logger.info('All workers started successfully', {
-      workers: ['error', 'transaction', 'session', 'feedback', 'metric', 'uptime', 'cron', 'log'],
+      workers: [
+        'error',
+        'transaction',
+        'session',
+        'feedback',
+        'metric',
+        'uptime',
+        'cron',
+        'log',
+      ],
     });
 
     // Graceful shutdown

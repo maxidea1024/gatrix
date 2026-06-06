@@ -40,16 +40,56 @@ function generateFingerprint(): string[] {
 
 // ============ Error Generators ============
 const ERROR_TYPES = [
-  { type: 'TypeError', value: "Cannot read properties of undefined (reading 'map')", culprit: 'UserList.render' },
-  { type: 'ReferenceError', value: 'playerData is not defined', culprit: 'GameScene.update' },
-  { type: 'RangeError', value: 'Maximum call stack size exceeded', culprit: 'EventEmitter.emit' },
-  { type: 'NetworkError', value: 'Failed to fetch: /api/v1/inventory', culprit: 'InventoryService.load' },
-  { type: 'SyntaxError', value: "Unexpected token '<' in JSON at position 0", culprit: 'ResponseParser.parse' },
-  { type: 'TimeoutError', value: 'Request timed out after 30000ms', culprit: 'HttpClient.request' },
-  { type: 'DatabaseError', value: 'Connection pool exhausted', culprit: 'DatabaseService.query' },
-  { type: 'AuthenticationError', value: 'JWT token expired', culprit: 'AuthMiddleware.verify' },
-  { type: 'ValidationError', value: 'Invalid email format', culprit: 'UserRegistration.validate' },
-  { type: 'PermissionError', value: 'Insufficient permissions for resource', culprit: 'AccessControl.check' },
+  {
+    type: 'TypeError',
+    value: "Cannot read properties of undefined (reading 'map')",
+    culprit: 'UserList.render',
+  },
+  {
+    type: 'ReferenceError',
+    value: 'playerData is not defined',
+    culprit: 'GameScene.update',
+  },
+  {
+    type: 'RangeError',
+    value: 'Maximum call stack size exceeded',
+    culprit: 'EventEmitter.emit',
+  },
+  {
+    type: 'NetworkError',
+    value: 'Failed to fetch: /api/v1/inventory',
+    culprit: 'InventoryService.load',
+  },
+  {
+    type: 'SyntaxError',
+    value: "Unexpected token '<' in JSON at position 0",
+    culprit: 'ResponseParser.parse',
+  },
+  {
+    type: 'TimeoutError',
+    value: 'Request timed out after 30000ms',
+    culprit: 'HttpClient.request',
+  },
+  {
+    type: 'DatabaseError',
+    value: 'Connection pool exhausted',
+    culprit: 'DatabaseService.query',
+  },
+  {
+    type: 'AuthenticationError',
+    value: 'JWT token expired',
+    culprit: 'AuthMiddleware.verify',
+  },
+  {
+    type: 'ValidationError',
+    value: 'Invalid email format',
+    culprit: 'UserRegistration.validate',
+  },
+  {
+    type: 'PermissionError',
+    value: 'Insufficient permissions for resource',
+    culprit: 'AccessControl.check',
+  },
 ];
 
 const PLATFORMS = ['javascript', 'node', 'python', 'java'];
@@ -71,12 +111,22 @@ function generateErrorEvent() {
     release: randomItem(RELEASES),
     level: randomItem(['fatal', 'error', 'warning'] as const),
     logger: randomItem(['app', 'server', 'worker', 'scheduler']),
-    transaction: randomItem(['/api/users', '/api/game/match', '/api/inventory', '/dashboard']),
+    transaction: randomItem([
+      '/api/users',
+      '/api/game/match',
+      '/api/inventory',
+      '/dashboard',
+    ]),
     fingerprint: fp,
     exception: {
       type: errDef.type,
       value: errDef.value,
-      mechanism: randomItem(['onerror', 'onunhandledrejection', 'instrument', 'generic']),
+      mechanism: randomItem([
+        'onerror',
+        'onunhandledrejection',
+        'instrument',
+        'generic',
+      ]),
       stacktrace: {
         frames: [
           {
@@ -97,9 +147,22 @@ function generateErrorEvent() {
       },
     },
     breadcrumbs: [
-      { timestamp: pastTimestamp(24), category: 'navigation', message: 'Page loaded' },
-      { timestamp: pastTimestamp(24), category: 'http', message: `GET /api/data`, data: { status_code: 200 } },
-      { timestamp: pastTimestamp(24), category: 'ui.click', message: 'button#submit' },
+      {
+        timestamp: pastTimestamp(24),
+        category: 'navigation',
+        message: 'Page loaded',
+      },
+      {
+        timestamp: pastTimestamp(24),
+        category: 'http',
+        message: `GET /api/data`,
+        data: { status_code: 200 },
+      },
+      {
+        timestamp: pastTimestamp(24),
+        category: 'ui.click',
+        message: 'button#submit',
+      },
     ],
     user: {
       id: randomItem(USER_IDS),
@@ -107,8 +170,14 @@ function generateErrorEvent() {
       ip_address: `192.168.${randomInt(0, 255)}.${randomInt(1, 254)}`,
     },
     contexts: {
-      os: { name: randomItem(OS_NAMES), version: `${randomInt(10, 15)}.${randomInt(0, 9)}` },
-      browser: { name: randomItem(BROWSERS), version: `${randomInt(90, 125)}.0` },
+      os: {
+        name: randomItem(OS_NAMES),
+        version: `${randomInt(10, 15)}.${randomInt(0, 9)}`,
+      },
+      browser: {
+        name: randomItem(BROWSERS),
+        version: `${randomInt(90, 125)}.0`,
+      },
     },
     tags: {
       component: randomItem(['frontend', 'backend', 'worker']),
@@ -140,13 +209,16 @@ function generateTransactionEvent() {
 
   const trace_id = uuid().replace(/-/g, '');
   const span_id = uuid().replace(/-/g, '').slice(0, 16);
-  
+
   const numSpans = randomInt(2, 8);
   const spans = [];
   let currentStart = start.getTime();
   let parentSpanId = span_id;
   for (let i = 0; i < numSpans; i++) {
-    const spanDur = randomInt(10, Math.max(10, Math.floor(duration / numSpans)));
+    const spanDur = randomInt(
+      10,
+      Math.max(10, Math.floor(duration / numSpans))
+    );
     spans.push({
       span_id: uuid().replace(/-/g, '').slice(0, 16),
       parent_span_id: parentSpanId,
@@ -157,7 +229,7 @@ function generateTransactionEvent() {
       timestamp: new Date(currentStart + spanDur).toISOString(),
       duration: spanDur,
       status: 'ok',
-      data: { 'db.system': 'mysql' }
+      data: { 'db.system': 'mysql' },
     });
     // Create some hierarchy
     if (Math.random() > 0.5) parentSpanId = spans[spans.length - 1].span_id;
@@ -178,7 +250,14 @@ function generateTransactionEvent() {
     start_timestamp: start.toISOString(),
     duration,
     spans,
-    transaction_status: randomItem(['ok', 'ok', 'ok', 'ok', 'internal_error', 'deadline_exceeded']),
+    transaction_status: randomItem([
+      'ok',
+      'ok',
+      'ok',
+      'ok',
+      'internal_error',
+      'deadline_exceeded',
+    ]),
     http_method: randomItem(['GET', 'POST', 'PUT', 'DELETE']),
     http_status_code: randomItem([200, 200, 200, 201, 400, 404, 500]),
     user: {
@@ -197,7 +276,15 @@ function generateTransactionEvent() {
 
 // ============ Session Generators ============
 function generateSessionEvent() {
-  const status = randomItem(['ok', 'ok', 'ok', 'exited', 'exited', 'crashed', 'abnormal'] as const);
+  const status = randomItem([
+    'ok',
+    'ok',
+    'ok',
+    'exited',
+    'exited',
+    'crashed',
+    'abnormal',
+  ] as const);
   return {
     type: 'session',
     event_id: uuid().replace(/-/g, ''),
@@ -209,7 +296,10 @@ function generateSessionEvent() {
     started: pastTimestamp(24),
     status,
     seq: 0,
-    duration: status === 'ok' || status === 'exited' ? randomInt(1000, 600000) : randomInt(100, 30000),
+    duration:
+      status === 'ok' || status === 'exited'
+        ? randomInt(1000, 600000)
+        : randomInt(100, 30000),
     errors: status === 'crashed' ? randomInt(1, 5) : 0,
     distinct_id: randomItem(USER_IDS),
     user_agent: `Mozilla/5.0 (${randomItem(OS_NAMES)}) Chrome/${randomInt(90, 125)}.0`,
@@ -218,16 +308,16 @@ function generateSessionEvent() {
 
 // ============ Feedback Generators ============
 const FEEDBACK_MESSAGES = [
-  "The dashboard keeps crashing when I try to view reports.",
-  "Login page is very slow today. Takes over 10 seconds.",
-  "Excellent performance improvements in the latest update!",
+  'The dashboard keeps crashing when I try to view reports.',
+  'Login page is very slow today. Takes over 10 seconds.',
+  'Excellent performance improvements in the latest update!',
   "Getting 'undefined' errors on the inventory page.",
-  "Mobile layout is broken on iOS Safari.",
+  'Mobile layout is broken on iOS Safari.',
   "The search feature doesn't return expected results.",
-  "Game client crashes during matchmaking since last patch.",
-  "Payment processing failed multiple times.",
-  "Please add dark mode support for the admin panel.",
-  "Export to CSV is not working for large datasets.",
+  'Game client crashes during matchmaking since last patch.',
+  'Payment processing failed multiple times.',
+  'Please add dark mode support for the admin panel.',
+  'Export to CSV is not working for large datasets.',
 ];
 
 function generateFeedbackEvent(linkedEventId?: string) {
@@ -236,11 +326,14 @@ function generateFeedbackEvent(linkedEventId?: string) {
   // ~40% of feedbacks include screenshot attachments
   const attachments: string[] = [];
   if (Math.random() < 0.4) {
-    const numScreenshots = Math.random() < 0.6 ? 1 : Math.random() < 0.8 ? 2 : 3;
+    const numScreenshots =
+      Math.random() < 0.6 ? 1 : Math.random() < 0.8 ? 2 : 3;
     for (let i = 0; i < numScreenshots; i++) {
       const w = randomItem([800, 1024, 1280, 1920]);
       const h = randomItem([600, 768, 720, 1080]);
-      attachments.push(`https://picsum.photos/${w}/${h}?random=${Date.now()}_${i}`);
+      attachments.push(
+        `https://picsum.photos/${w}/${h}?random=${Date.now()}_${i}`
+      );
     }
   }
 
@@ -256,7 +349,13 @@ function generateFeedbackEvent(linkedEventId?: string) {
     email: `${userId}@example.com`,
     message: randomItem(FEEDBACK_MESSAGES),
     contact_email: `${userId}@example.com`,
-    url: randomItem(['/dashboard', '/game/lobby', '/settings', '/inventory', '/leaderboard']),
+    url: randomItem([
+      '/dashboard',
+      '/game/lobby',
+      '/settings',
+      '/inventory',
+      '/leaderboard',
+    ]),
     source: randomItem(['widget', 'api', 'dialog']),
     attachments,
   };
@@ -291,9 +390,13 @@ async function sendBatch(dsnKey: string, events: any[], label: string) {
         timeout: 30000,
       }
     );
-    console.log(`  ✅ ${label}: ${events.length} events → ${resp.status} (${resp.data?.event_ids?.length || 0} accepted)`);
+    console.log(
+      `  ✅ ${label}: ${events.length} events → ${resp.status} (${resp.data?.event_ids?.length || 0} accepted)`
+    );
   } catch (error: any) {
-    console.error(`  ❌ ${label}: ${error.response?.status || error.code} — ${error.response?.data?.message || error.message}`);
+    console.error(
+      `  ❌ ${label}: ${error.response?.status || error.code} — ${error.response?.data?.message || error.message}`
+    );
   }
 }
 
@@ -309,16 +412,24 @@ async function main() {
   console.log('📦 Generating events...');
 
   const errors = Array.from({ length: ERROR_COUNT }, generateErrorEvent);
-  const transactions = Array.from({ length: TRANSACTION_COUNT }, generateTransactionEvent);
+  const transactions = Array.from(
+    { length: TRANSACTION_COUNT },
+    generateTransactionEvent
+  );
   const sessions = Array.from({ length: SESSION_COUNT }, generateSessionEvent);
   // Link ~70% of feedbacks to actual error events so issue linking works
   const feedbacks = Array.from({ length: FEEDBACK_COUNT }, (_, i) => {
-    const linkedError = i < Math.floor(FEEDBACK_COUNT * 0.7) ? errors[i % errors.length] : null;
+    const linkedError =
+      i < Math.floor(FEEDBACK_COUNT * 0.7) ? errors[i % errors.length] : null;
     return generateFeedbackEvent(linkedError?.event_id);
   });
 
-  console.log(`   ${errors.length} errors, ${transactions.length} transactions, ${sessions.length} sessions, ${feedbacks.length} feedbacks`);
-  console.log(`   (${feedbacks.filter(f => f.linked_event_id).length} feedbacks linked to error events)`);
+  console.log(
+    `   ${errors.length} errors, ${transactions.length} transactions, ${sessions.length} sessions, ${feedbacks.length} feedbacks`
+  );
+  console.log(
+    `   (${feedbacks.filter((f) => f.linked_event_id).length} feedbacks linked to error events)`
+  );
   console.log('');
 
   // Send in batches
@@ -326,17 +437,29 @@ async function main() {
 
   // Send errors in chunks of 20
   for (let i = 0; i < errors.length; i += 20) {
-    await sendBatch(dsnKey, errors.slice(i, i + 20), `Errors [${i + 1}-${Math.min(i + 20, errors.length)}]`);
+    await sendBatch(
+      dsnKey,
+      errors.slice(i, i + 20),
+      `Errors [${i + 1}-${Math.min(i + 20, errors.length)}]`
+    );
   }
 
   // Send transactions in chunks of 30
   for (let i = 0; i < transactions.length; i += 30) {
-    await sendBatch(dsnKey, transactions.slice(i, i + 30), `Transactions [${i + 1}-${Math.min(i + 30, transactions.length)}]`);
+    await sendBatch(
+      dsnKey,
+      transactions.slice(i, i + 30),
+      `Transactions [${i + 1}-${Math.min(i + 30, transactions.length)}]`
+    );
   }
 
   // Send sessions in chunks of 20
   for (let i = 0; i < sessions.length; i += 20) {
-    await sendBatch(dsnKey, sessions.slice(i, i + 20), `Sessions [${i + 1}-${Math.min(i + 20, sessions.length)}]`);
+    await sendBatch(
+      dsnKey,
+      sessions.slice(i, i + 20),
+      `Sessions [${i + 1}-${Math.min(i + 20, sessions.length)}]`
+    );
   }
 
   // Send feedback
@@ -351,11 +474,23 @@ async function main() {
   console.log('🔎 Verifying data in API...');
 
   const checks = [
-    { name: 'Overview', url: `${ARGUS_URL}/argus/api/overview/${PROJECT_ID}?period=24h` },
+    {
+      name: 'Overview',
+      url: `${ARGUS_URL}/argus/api/overview/${PROJECT_ID}?period=24h`,
+    },
     { name: 'Issues', url: `${ARGUS_URL}/argus/api/${PROJECT_ID}/issues` },
-    { name: 'Performance', url: `${ARGUS_URL}/argus/api/performance/${PROJECT_ID}/transactions?period=24h` },
-    { name: 'Sessions', url: `${ARGUS_URL}/argus/api/sessions/${PROJECT_ID}?period=24h` },
-    { name: 'Feedback', url: `${ARGUS_URL}/argus/api/feedback/${PROJECT_ID}?period=48h` },
+    {
+      name: 'Performance',
+      url: `${ARGUS_URL}/argus/api/performance/${PROJECT_ID}/transactions?period=24h`,
+    },
+    {
+      name: 'Sessions',
+      url: `${ARGUS_URL}/argus/api/sessions/${PROJECT_ID}?period=24h`,
+    },
+    {
+      name: 'Feedback',
+      url: `${ARGUS_URL}/argus/api/feedback/${PROJECT_ID}?period=48h`,
+    },
   ];
 
   for (const check of checks) {
@@ -376,7 +511,9 @@ async function main() {
       }
       console.log(`  ✅ ${check.name}: ${summary}`);
     } catch (error: any) {
-      console.error(`  ❌ ${check.name}: ${error.response?.status || error.message}`);
+      console.error(
+        `  ❌ ${check.name}: ${error.response?.status || error.message}`
+      );
     }
   }
 

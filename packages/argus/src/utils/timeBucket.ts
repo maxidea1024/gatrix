@@ -43,20 +43,32 @@ export function getBucketingConfig(
   if (isNaN(startDt.getTime())) startDt = new Date(Date.now() - 86400 * 1000);
   if (isNaN(endDt.getTime())) endDt = new Date();
 
-  const deltaSeconds = Math.max(1, (endDt.getTime() - startDt.getTime()) / 1000);
+  const deltaSeconds = Math.max(
+    1,
+    (endDt.getTime() - startDt.getTime()) / 1000
+  );
 
   // Choose interval to keep ~40-80 data points for smooth charts
   let interval = '1 DAY';
-  if (deltaSeconds <= 600) interval = '10 SECOND';            // ≤10min → ~60 pts
-  else if (deltaSeconds <= 1800) interval = '30 SECOND';      // ≤30min → ~60 pts
-  else if (deltaSeconds <= 3600) interval = '1 MINUTE';       // ≤1h    → 60 pts
-  else if (deltaSeconds <= 6 * 3600) interval = '5 MINUTE';   // ≤6h    → 72 pts
-  else if (deltaSeconds <= 12 * 3600) interval = '15 MINUTE'; // ≤12h   → 48 pts
-  else if (deltaSeconds <= 24 * 3600) interval = '30 MINUTE'; // ≤24h   → 48 pts
-  else if (deltaSeconds <= 2 * 86400) interval = '1 HOUR';    // ≤2d    → 48 pts
-  else if (deltaSeconds <= 7 * 86400) interval = '4 HOUR';    // ≤7d    → 42 pts
-  else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';   // ≤14d   → 42 pts
-  else if (deltaSeconds <= 30 * 86400) interval = '1 DAY';    // ≤30d   → 30 pts
+  if (deltaSeconds <= 600)
+    interval = '10 SECOND'; // ≤10min → ~60 pts
+  else if (deltaSeconds <= 1800)
+    interval = '30 SECOND'; // ≤30min → ~60 pts
+  else if (deltaSeconds <= 3600)
+    interval = '1 MINUTE'; // ≤1h    → 60 pts
+  else if (deltaSeconds <= 6 * 3600)
+    interval = '5 MINUTE'; // ≤6h    → 72 pts
+  else if (deltaSeconds <= 12 * 3600)
+    interval = '15 MINUTE'; // ≤12h   → 48 pts
+  else if (deltaSeconds <= 24 * 3600)
+    interval = '30 MINUTE'; // ≤24h   → 48 pts
+  else if (deltaSeconds <= 2 * 86400)
+    interval = '1 HOUR'; // ≤2d    → 48 pts
+  else if (deltaSeconds <= 7 * 86400)
+    interval = '4 HOUR'; // ≤7d    → 42 pts
+  else if (deltaSeconds <= 14 * 86400)
+    interval = '8 HOUR'; // ≤14d   → 42 pts
+  else if (deltaSeconds <= 30 * 86400) interval = '1 DAY'; // ≤30d   → 30 pts
   // >30d → 1 DAY (90d = 90 pts, acceptable)
 
   const selectExpr = `toStartOfInterval(${timestampColumn}, INTERVAL ${interval})`;

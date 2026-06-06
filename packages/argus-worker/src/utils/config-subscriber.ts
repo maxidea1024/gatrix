@@ -1,5 +1,11 @@
 import Redis from 'ioredis';
-import { config, CHANNELS, CONFIG_TYPES, createLogger, dsnStore } from '@gatrix/argus';
+import {
+  config,
+  CHANNELS,
+  CONFIG_TYPES,
+  createLogger,
+  dsnStore,
+} from '@gatrix/argus';
 
 import { issueLookupCache } from '../processing/issue-cache';
 import { alertRuleStore } from './alert-rule-store';
@@ -43,20 +49,26 @@ export class ConfigSubscriber {
 
           case CONFIG_TYPES.DSN_KEYS:
             await dsnStore.loadAll();
-            logger.debug('DSN keys reloaded via Pub/Sub', { count: 'reloaded' });
+            logger.debug('DSN keys reloaded via Pub/Sub', {
+              count: 'reloaded',
+            });
             break;
 
           case CONFIG_TYPES.ISSUE_STATUS:
             if (payload.issueId) {
               issueLookupCache.invalidateByIssueId(payload.issueId);
-              logger.debug('Issue cache invalidated', { issueId: payload.issueId });
+              logger.debug('Issue cache invalidated', {
+                issueId: payload.issueId,
+              });
             }
             break;
 
           case CONFIG_TYPES.PROJECT_SETTINGS:
             if (payload.projectId) {
               issueLookupCache.invalidateByProjectId(payload.projectId);
-              logger.debug('Project issue cache invalidated', { projectId: payload.projectId });
+              logger.debug('Project issue cache invalidated', {
+                projectId: payload.projectId,
+              });
             }
             break;
         }

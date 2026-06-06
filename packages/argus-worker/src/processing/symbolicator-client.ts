@@ -88,7 +88,10 @@ function toSymbolicatorFrames(
  */
 export async function symbolicateErrorEvent(
   event: ArgusErrorEvent & { project_id: string }
-): Promise<{ event: ArgusErrorEvent & { project_id: string }; symbolicated: boolean }> {
+): Promise<{
+  event: ArgusErrorEvent & { project_id: string };
+  symbolicated: boolean;
+}> {
   const { symbolicator } = config;
 
   // Skip if symbolicator is disabled
@@ -112,8 +115,11 @@ export async function symbolicateErrorEvent(
   // Check if frames are already symbolicated (have valid source locations)
   const hasMinifiedFrames = frames.some(
     (f) =>
-      (f.filename && (f.filename.includes('.min.') || f.filename.includes('bundle'))) ||
-      (!f.function || f.function === '?' || f.function === '<anonymous>')
+      (f.filename &&
+        (f.filename.includes('.min.') || f.filename.includes('bundle'))) ||
+      !f.function ||
+      f.function === '?' ||
+      f.function === '<anonymous>'
   );
 
   if (!hasMinifiedFrames) {
@@ -123,7 +129,10 @@ export async function symbolicateErrorEvent(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), symbolicator.timeoutMs);
+    const timeout = setTimeout(
+      () => controller.abort(),
+      symbolicator.timeoutMs
+    );
 
     const body = {
       stacktraces: [
@@ -209,13 +218,20 @@ export async function symbolicateErrorEvent(
       frameCount: symbolicatedFrames.length,
     });
 
-    return { event: updatedEvent as ArgusErrorEvent & { project_id: string }, symbolicated: true };
+    return {
+      event: updatedEvent as ArgusErrorEvent & { project_id: string },
+      symbolicated: true,
+    };
   } catch (error) {
     // AbortError = timeout, other = network issue — both non-fatal
     const isTimeout = error instanceof Error && error.name === 'AbortError';
     logger.warn('Symbolicator call failed (non-blocking)', {
       eventId: event.event_id,
-      reason: isTimeout ? 'timeout' : (error instanceof Error ? error.message : String(error)),
+      reason: isTimeout
+        ? 'timeout'
+        : error instanceof Error
+          ? error.message
+          : String(error),
     });
     return { event, symbolicated: false };
   }

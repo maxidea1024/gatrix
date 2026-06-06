@@ -31,7 +31,11 @@ interface ArgusReleaseListState {
   setSortBy: (sort: 'date' | 'crash_free' | 'sessions' | 'errors') => void;
 
   /** Bulk-hydrate state from URL params (deep-link support). */
-  hydrateFromParams: (params: Partial<Pick<ArgusReleaseListState, 'currentPage' | 'searchTerm' | 'sortBy'>>) => void;
+  hydrateFromParams: (
+    params: Partial<
+      Pick<ArgusReleaseListState, 'currentPage' | 'searchTerm' | 'sortBy'>
+    >
+  ) => void;
 
   /** Reset all state to defaults (called by GNB navigation). */
   resetStore: () => void;

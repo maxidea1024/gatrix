@@ -1,0 +1,805 @@
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import useArgusUrlState from '@/hooks/useArgusUrlState';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import argusService, {
+  ArgusLogEntry,
+  ArgusSavedQuery,
+} from '@/services/argusService';
+import {
+  ArgusFilterState,
+  defaultArgusFilterState,
+  argusFilterStateToApiParams,
+} from '@/components/argus/ArgusFilterBar';
+import { VolumePoint } from '../components/LogVolumeChart';
+import { FacetGroup } from '@/components/argus/FacetSidebar';
+import { PatternEntry } from '../components/LogsPatternsPanel';
+import { ActiveFilter } from '../components/ActiveFiltersBar';
+
+interface LogFacets {
+  levels: { level: string; count: number }[];
+  services: { service: string; count: number }[];
+  environments: { environment: string; count: number }[];
+  loggers: { logger_name: string; count: number }[];
+}
+
+const DEFAULT_COLUMNS = ['timestamp', 'severity', 'message'];
+const AVAILABLE_COLUMNS = [
+  { key: 'timestamp', label: 'TIMESTAMP' },
+  { key: 'severity', label: 'SEVERITY' },
+  { key: 'message', label: 'MESSAGE' },
+  { key: 'service', label: 'SERVICE' },
+  { key: 'environment', label: 'ENVIRONMENT' },
+  { key: 'logger_name', label: 'LOGGER' },
+  { key: 'trace_id', label: 'TRACE ID' },
+  { key: 'release', label: 'RELEASE' },
+];
+
+export function useArgusLogs() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { currentProject } = useOrgProject();
+  const projectId = currentProject?.id || '1';
+
+  // ─── URL-driven state ───
+  const URL_PARAMS = useMemo(
+    () => ({
+      period: {
+        key: 'period',
+        default: '14d',
+        storageKey: 'argus-logs-period',
+      },
+      start: { key: 'start', default: '' },
+      end: { key: 'end', default: '' },
+      q: { key: 'q', default: '' },
+      tab: { key: 'tab', default: '0' },
+      groupBy: { key: 'groupBy', default: 'level' },
+      queryId: { key: 'queryId', default: '' },
+      filters: { key: 'filters', default: '' },
+      log: { key: 'log', default: '' },
+    }),
+    []
+  );
+  const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
+
+  const activeTab = parseInt(urlState.tab, 10) || 0;
+  const aggGroupBy = urlState.groupBy;
+
+  // Derive filters from URL period
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
+    if (urlState.period === 'custom') {
+      if (urlState.start && urlState.end) {
+        const base = defaultArgusFilterState('custom');
+        base.dateRange = {
+          type: 'custom',
+          start: new Date(urlState.start),
+          end: new Date(urlState.end),
+        };
+        return base;
+      }
+      return defaultArgusFilterState('14d');
+    }
+    return defaultArgusFilterState(urlState.period);
+  });
+
+  useEffect(() => {
+    setFilters((prev) => {
+      if (urlState.period === 'custom') {
+        if (urlState.start && urlState.end) {
+          return {
+            ...prev,
+            dateRange: {
+              type: 'custom',
+              start: new Date(urlState.start),
+              end: new Date(urlState.end),
+            },
+          };
+        }
+        return {
+          ...prev,
+          dateRange: { type: 'preset', preset: '14d' },
+        };
+      }
+      return {
+        ...prev,
+        dateRange: { type: 'preset', preset: urlState.period },
+      };
+    });
+  }, [urlState.period, urlState.start, urlState.end]);
+
+  useEffect(() => {
+    if (urlState.period === 'custom' && (!urlState.start || !urlState.end)) {
+      setUrlState({ period: '14d' });
+    }
+  }, [urlState.period, urlState.start, urlState.end, setUrlState]);
+
+  // Search state
+  const [search, setSearch] = useState<string>(urlState.q || '');
+  const [searchDebounce, setSearchDebounce] = useState(urlState.q || '');
+
+  useEffect(() => {
+    setSearch(urlState.q || '');
+  }, [urlState.q]);
+
+  // ─── State ───
+  const [logs, setLogs] = useState<ArgusLogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [facets, setFacets] = useState<LogFacets>({
+    levels: [],
+    services: [],
+    environments: [],
+    loggers: [],
+  });
+  const [volume, setVolume] = useState<VolumePoint[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+
+  const [columns, setColumns] = useLocalStorage<string[]>(
+    'argus_log_columns',
+    DEFAULT_COLUMNS
+  );
+  const [columnNames, setColumnNames] = useLocalStorage<Record<string, string>>(
+    'argus_log_column_names',
+    {}
+  );
+
+  const dynamicAvailableColumns = useMemo(() => {
+    const baseKeys = AVAILABLE_COLUMNS.map((c) => c.key);
+    const logKeys = new Set<string>();
+    logs.forEach((log) => {
+      if (log.attributes)
+        Object.keys(log.attributes).forEach((k) => logKeys.add(k));
+    });
+    const result = [...AVAILABLE_COLUMNS];
+    logKeys.forEach((key) => {
+      if (!baseKeys.includes(key)) {
+        result.push({ key, label: key.toUpperCase() });
+      }
+    });
+    return result;
+  }, [logs]);
+
+  // Side panel state (selected log via URL)
+  const selectedLogIndex = useMemo(() => {
+    if (!urlState.log) return null;
+    const idx = logs.findIndex((l) => l.log_id === urlState.log);
+    return idx >= 0 ? idx : null;
+  }, [logs, urlState.log]);
+  const selectedLog =
+    selectedLogIndex !== null ? logs[selectedLogIndex] || null : null;
+  const [isRightPanelOpen, setIsRightPanelOpen] = useLocalStorage(
+    'argus_right_panel_open',
+    false
+  );
+
+  // ─── Active Filters (chip tags from facet sidebar / detail panel) ───
+  const parseFiltersFromUrl = useCallback((raw: string): ActiveFilter[] => {
+    if (!raw) return [];
+    return raw
+      .split(',')
+      .map((part) => {
+        let enabled = true;
+        let exclude = false;
+        let s = part.trim();
+        if (s.startsWith('~')) {
+          enabled = false;
+          s = s.slice(1);
+        }
+        if (s.startsWith('!')) {
+          exclude = true;
+          s = s.slice(1);
+        }
+        const colonIdx = s.indexOf(':');
+        if (colonIdx < 0) return null;
+        return {
+          key: s.slice(0, colonIdx),
+          value: s.slice(colonIdx + 1),
+          exclude,
+          enabled,
+        };
+      })
+      .filter(Boolean) as ActiveFilter[];
+  }, []);
+
+  const serializeFiltersToUrl = useCallback(
+    (filters: ActiveFilter[]): string => {
+      if (filters.length === 0) return '';
+      return filters
+        .map((f) => {
+          const prefix = (!f.enabled ? '~' : '') + (f.exclude ? '!' : '');
+          return `${prefix}${f.key}:${f.value}`;
+        })
+        .join(',');
+    },
+    []
+  );
+
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() =>
+    parseFiltersFromUrl(urlState.filters)
+  );
+
+  // Sync activeFilters → URL
+  useEffect(() => {
+    const serialized = serializeFiltersToUrl(activeFilters);
+    if (serialized !== (urlState.filters || '')) {
+      setUrlState({ filters: serialized });
+    }
+  }, [activeFilters, serializeFiltersToUrl, urlState.filters, setUrlState]);
+
+  const toggleActiveFilter = useCallback(
+    (key: string, value: string, exclude: boolean = false) => {
+      setActiveFilters((prev) => {
+        const idx = prev.findIndex(
+          (f) => f.key === key && f.value === value && f.exclude === exclude
+        );
+        if (idx >= 0) {
+          return prev.map((f, i) =>
+            i === idx ? { ...f, enabled: !f.enabled } : f
+          );
+        }
+        return [...prev, { key, value, exclude, enabled: true }];
+      });
+    },
+    []
+  );
+
+  const handleToggleFilterByIndex = useCallback((idx: number) => {
+    setActiveFilters((prev) =>
+      prev.map((item, i) =>
+        i === idx ? { ...item, enabled: !item.enabled } : item
+      )
+    );
+  }, []);
+
+  const removeActiveFilter = useCallback((idx: number) => {
+    setActiveFilters((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const clearAllActiveFilters = useCallback(() => {
+    setActiveFilters([]);
+  }, []);
+
+  // ─── Custom Facets (user-defined attribute keys) ───
+  const CUSTOM_FACETS_KEY = 'argus_custom_facets';
+  const [customFacetKeys, setCustomFacetKeys] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CUSTOM_FACETS_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [customFacetData, setCustomFacetData] = useState<FacetGroup[]>([]);
+
+  // Persist custom facet keys
+  useEffect(() => {
+    localStorage.setItem(CUSTOM_FACETS_KEY, JSON.stringify(customFacetKeys));
+  }, [customFacetKeys]);
+
+  // Fetch custom facet values from backend
+  const fetchCustomFacets = useCallback(async () => {
+    if (customFacetKeys.length === 0) {
+      setCustomFacetData([]);
+      return;
+    }
+    const apiParams = argusFilterStateToApiParams(filters);
+    const results = await Promise.all(
+      customFacetKeys.map(async (key) => {
+        try {
+          const data = await argusService.getAttributeFacet(projectId, key, {
+            period: apiParams.period,
+            start: apiParams.start,
+            end: apiParams.end,
+          });
+          return {
+            key: `attr.${key}`,
+            label: key,
+            values: data.map((d) => ({
+              value: d.attr_value,
+              count: Number(d.count),
+            })),
+          } as FacetGroup;
+        } catch {
+          return { key: `attr.${key}`, label: key, values: [] } as FacetGroup;
+        }
+      })
+    );
+    setCustomFacetData(results);
+  }, [customFacetKeys, projectId, filters]);
+
+  useEffect(() => {
+    fetchCustomFacets();
+  }, [fetchCustomFacets]);
+
+  const handleAddCustomFacet = useCallback((key: string) => {
+    setCustomFacetKeys((prev) => {
+      if (prev.includes(key)) return prev;
+      return [...prev, key];
+    });
+  }, []);
+
+  const handleRemoveCustomFacet = useCallback((facetKey: string) => {
+    const realKey = facetKey.startsWith('attr.') ? facetKey.slice(5) : facetKey;
+    setCustomFacetKeys((prev) => prev.filter((k) => k !== realKey));
+    setCustomFacetData((prev) => prev.filter((f) => f.key !== facetKey));
+  }, []);
+
+  // Aggregates state
+  const [aggData, setAggData] = useState<{
+    groupBy: string;
+    topValues: { group_value: string; count: number }[];
+    timeSeries: { bucket: string; group_value: string; count: number }[];
+  } | null>(null);
+  const [aggLoading, setAggLoading] = useState(false);
+
+  // Saved Queries State
+  const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
+  const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
+
+  // Editable Query Name
+  const defaultQueryName = t('argus.logs.newQuery', 'New Logs Query');
+  const [queryName, setQueryName] = useState(
+    (location.state as any)?.queryName || defaultQueryName
+  );
+
+  // Sync URL queryId to state
+  useEffect(() => {
+    if (urlState.queryId && savedQueries.length > 0) {
+      const qId = parseInt(urlState.queryId, 10);
+      const matched = savedQueries.find((q) => q.id === qId);
+      if (matched && currentQueryId !== qId) {
+        setCurrentQueryId(matched.id);
+        setQueryName(matched.name);
+      }
+    }
+  }, [urlState.queryId, savedQueries, currentQueryId]);
+
+  const currentPeriod = useMemo(() => {
+    if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
+      return filters.dateRange.preset;
+    return '14d';
+  }, [filters.dateRange]);
+
+  const mappedFacets = useMemo(
+    () => ({
+      severity:
+        facets.levels?.map((l) => ({
+          value: l.level,
+          count: Number(l.count),
+        })) || [],
+      service:
+        facets.services?.map((s) => ({
+          value: s.service,
+          count: Number(s.count),
+        })) || [],
+      environment:
+        facets.environments?.map((e) => ({
+          value: e.environment,
+          count: Number(e.count),
+        })) || [],
+      logger:
+        facets.loggers?.map((l) => ({
+          value: l.logger_name,
+          count: Number(l.count),
+        })) || [],
+    }),
+    [facets]
+  );
+
+  // Build facet groups for the sidebar component
+  const facetGroups: FacetGroup[] = useMemo(
+    () =>
+      [
+        {
+          key: 'severity',
+          label: t('argus.logs.facet.severity', 'Severity'),
+          values: mappedFacets.severity,
+        },
+        {
+          key: 'service',
+          label: t('argus.logs.facet.service', 'Service'),
+          values: mappedFacets.service,
+        },
+        {
+          key: 'environment',
+          label: t('argus.logs.facet.environment', 'Environment'),
+          values: mappedFacets.environment,
+        },
+        {
+          key: 'logger',
+          label: t('argus.logs.facet.logger', 'Logger'),
+          values: mappedFacets.logger,
+        },
+      ].filter((g) => g.values.length > 0),
+    [mappedFacets, t]
+  );
+
+  const discoveredFacets = useMemo(() => {
+    const counts: Record<string, Record<string, number>> = {};
+    const customKeys = customFacetData?.map((f) => f.key) || [];
+    logs.forEach((log) => {
+      if (log.attributes) {
+        Object.entries(log.attributes).forEach(([k, v]) => {
+          if (
+            customKeys.includes(k) ||
+            AVAILABLE_COLUMNS.some((c) => c.key === k)
+          )
+            return;
+          if (!counts[k]) counts[k] = {};
+          const valStr = String(v);
+          counts[k][valStr] = (counts[k][valStr] || 0) + 1;
+        });
+      }
+    });
+    return Object.entries(counts).map(([k, valCounts]) => ({
+      key: `discovered.${k}`,
+      label: k,
+      values: Object.entries(valCounts)
+        .map(([val, count]) => ({ value: val, count }))
+        .sort((a, b) => b.count - a.count),
+    }));
+  }, [logs, customFacetData]);
+
+  // ─── Search + Filter Merge Helper ───
+  const buildSearchWithFilters = useCallback((): string | undefined => {
+    const parts: string[] = [];
+    if (searchDebounce.trim()) parts.push(searchDebounce.trim());
+    for (const f of activeFilters) {
+      if (!f.enabled) continue;
+      const prefix = f.exclude ? '!' : '';
+      parts.push(`${prefix}${f.key}:"${f.value}"`);
+    }
+    return parts.length > 0 ? parts.join(' ') : undefined;
+  }, [searchDebounce, activeFilters]);
+
+  // ─── Fetch ───
+  const fetchLogs = useCallback(
+    async (append = false, cursor?: string) => {
+      setLoading(true);
+      try {
+        const apiParams = argusFilterStateToApiParams(filters);
+        const params: Record<string, any> = {
+          period: apiParams.period || '14d',
+          limit: 25,
+          order: 'DESC',
+        };
+        if (apiParams.start) params.start = apiParams.start;
+        if (apiParams.end) params.end = apiParams.end;
+        if (apiParams.environment) params.environment = apiParams.environment;
+        if (searchDebounce.trim()) params.search = searchDebounce.trim();
+        if (cursor) params.cursor = cursor;
+
+        const mergedSearch = buildSearchWithFilters();
+        if (mergedSearch) params.search = mergedSearch;
+
+        const result = await argusService.browseLogs(projectId, params);
+        const newLogs = result.data || [];
+        if (append) {
+          setLogs((prev) => [...prev, ...newLogs]);
+        } else {
+          setLogs(newLogs);
+          setUrlState({ log: '' });
+        }
+        setHasMore(result.meta?.hasMore || false);
+      } catch (err) {
+        console.error('Failed to fetch logs', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [projectId, filters, searchDebounce, buildSearchWithFilters, setUrlState]
+  );
+
+  const fetchFacets = useCallback(async () => {
+    try {
+      const apiParams = argusFilterStateToApiParams(filters);
+      const data = await argusService.getLogFacets(
+        projectId,
+        apiParams.period || currentPeriod,
+        apiParams.start,
+        apiParams.end
+      );
+      setFacets(data);
+    } catch (err) {
+      console.error('Failed to fetch facets', err);
+    }
+  }, [projectId, filters, currentPeriod]);
+
+  const fetchVolume = useCallback(async () => {
+    try {
+      const apiParams = argusFilterStateToApiParams(filters);
+      const data = await argusService.getLogVolume(projectId, {
+        period: apiParams.period || '14d',
+        start: apiParams.start,
+        end: apiParams.end,
+        search: buildSearchWithFilters(),
+      });
+      setVolume(data);
+    } catch (err) {
+      console.error('Failed to fetch volume', err);
+    }
+  }, [projectId, filters, buildSearchWithFilters]);
+
+  const fetchAll = useCallback(() => {
+    fetchLogs();
+    fetchFacets();
+    fetchVolume();
+  }, [fetchLogs, fetchFacets, fetchVolume]);
+
+  const fetchAggregates = useCallback(
+    async (groupByVal?: string) => {
+      setAggLoading(true);
+      try {
+        const apiParams = argusFilterStateToApiParams(filters);
+        const data = await argusService.getLogAggregate(projectId, {
+          period: apiParams.period || currentPeriod,
+          start: apiParams.start,
+          end: apiParams.end,
+          groupBy: groupByVal || aggGroupBy,
+          search: buildSearchWithFilters(),
+        });
+        setAggData(data);
+      } catch (err) {
+        console.error('Failed to fetch aggregates', err);
+      } finally {
+        setAggLoading(false);
+      }
+    },
+    [projectId, filters, currentPeriod, aggGroupBy, buildSearchWithFilters]
+  );
+
+  useEffect(() => {
+    fetchAll();
+    if (activeTab === 1) fetchAggregates();
+    argusService
+      .listSavedQueries(projectId, 'logs')
+      .then(setSavedQueries)
+      .catch(() => setSavedQueries([]));
+  }, [fetchAll]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Patterns state ───
+  const [patterns, setPatterns] = useState<PatternEntry[]>([]);
+  const [patternsLoading, setPatternsLoading] = useState(false);
+
+  const fetchPatterns = useCallback(async () => {
+    setPatternsLoading(true);
+    try {
+      const apiParams = argusFilterStateToApiParams(filters);
+      const data = await argusService.getLogPatterns(projectId, {
+        period: apiParams.period,
+        start: apiParams.start,
+        end: apiParams.end,
+        search: buildSearchWithFilters(),
+      });
+      setPatterns(data);
+    } catch (e) {
+      console.error('Failed to fetch patterns', e);
+    }
+    setPatternsLoading(false);
+  }, [projectId, filters, buildSearchWithFilters]);
+
+  // Auto-fetch patterns when switching to patterns tab
+  useEffect(() => {
+    if (activeTab === 2) fetchPatterns();
+  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-fetch when activeFilters change
+  useEffect(() => {
+    fetchLogs();
+    fetchVolume();
+  }, [activeFilters]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDebouncedSearchChange = useCallback((val: string) => {
+    setSearchDebounce(val);
+  }, []);
+
+  const handleSearchSubmit = useCallback(
+    (val: string) => {
+      setSearch(val);
+      setUrlState({ q: val });
+      setTimeout(() => fetchLogs(), 10);
+    },
+    [setUrlState, fetchLogs]
+  );
+
+  // Side panel handlers
+  const handleSelectLog = useCallback(
+    (index: number) => {
+      const log = logs[index];
+      if (log) {
+        setUrlState({ log: log.log_id });
+        setIsRightPanelOpen(true);
+      }
+    },
+    [logs, setUrlState, setIsRightPanelOpen]
+  );
+
+  const handleCloseSidePanel = useCallback(() => {
+    setIsRightPanelOpen(false);
+  }, [setIsRightPanelOpen]);
+
+  const handlePrevLog = useCallback(() => {
+    if (selectedLogIndex !== null && selectedLogIndex > 0) {
+      setUrlState({ log: logs[selectedLogIndex - 1].log_id });
+    }
+  }, [selectedLogIndex, logs, setUrlState]);
+
+  const handleNextLog = useCallback(() => {
+    if (selectedLogIndex !== null && selectedLogIndex < logs.length - 1) {
+      setUrlState({ log: logs[selectedLogIndex + 1].log_id });
+    }
+  }, [selectedLogIndex, logs, setUrlState]);
+
+  const handleLoadMore = useCallback(() => {
+    if (logs.length > 0) fetchLogs(true, logs[logs.length - 1].timestamp);
+  }, [logs, fetchLogs]);
+
+  const handleFilterChange = (newFilters: ArgusFilterState) => {
+    setFilters(newFilters);
+    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
+    } else if (
+      newFilters.dateRange.type === 'custom' &&
+      newFilters.dateRange.start &&
+      newFilters.dateRange.end
+    ) {
+      setUrlState({
+        period: 'custom',
+        start: newFilters.dateRange.start.toISOString(),
+        end: newFilters.dateRange.end.toISOString(),
+      });
+    }
+  };
+
+  const handleZoom = useCallback(
+    (start: string, end: string) => {
+      setUrlState({ period: 'custom', start, end });
+    },
+    [setUrlState]
+  );
+
+  const handleDetailFilter = useCallback(
+    (key: string, val: string, exclude: boolean) => {
+      toggleActiveFilter(key, val, exclude);
+    },
+    [toggleActiveFilter]
+  );
+
+  // ─── Saved Query Handlers ───
+  const handleSaveQuery = async (finalName: string) => {
+    if (!finalName.trim()) return;
+    try {
+      const res = await argusService.createSavedQuery(projectId, {
+        name: finalName.trim(),
+        query_config: {
+          search: search.trim(),
+          columns,
+          period: currentPeriod,
+          groupBy: aggGroupBy,
+        },
+        display_type: 'table',
+        query_type: 'logs',
+      });
+      const updated = await argusService.listSavedQueries(projectId, 'logs');
+      setSavedQueries(updated);
+      setQueryName(finalName.trim());
+      if (res.id) setCurrentQueryId(res.id);
+    } catch (err) {
+      console.error('Failed to save log query:', err);
+    }
+  };
+
+  const handleRename = async (newName: string) => {
+    setQueryName(newName);
+    if (currentQueryId) {
+      try {
+        await argusService.updateSavedQuery(projectId, currentQueryId, {
+          name: newName,
+        });
+        const updated = await argusService.listSavedQueries(projectId, 'logs');
+        setSavedQueries(updated);
+      } catch (err) {
+        console.error('Failed to rename query:', err);
+      }
+    }
+  };
+
+  const handleDeleteSavedQuery = async (id: number) => {
+    try {
+      await argusService.deleteSavedQuery(projectId, id);
+      setSavedQueries((prev) => prev.filter((q) => q.id !== id));
+      if (currentQueryId === id) setCurrentQueryId(null);
+    } catch (err) {
+      console.error('Failed to delete saved query:', err);
+    }
+  };
+
+  const handleLoadSavedQuery = (sq: ArgusSavedQuery) => {
+    const cfg =
+      typeof sq.query_config === 'string'
+        ? JSON.parse(sq.query_config)
+        : sq.query_config;
+    if (cfg.search !== undefined) {
+      setSearch(cfg.search);
+      setUrlState({ q: cfg.search });
+    }
+    if (cfg.columns) setColumns(cfg.columns);
+    if (cfg.period) setUrlState({ period: cfg.period });
+    if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
+    setQueryName(sq.name);
+    setCurrentQueryId(sq.id);
+  };
+
+  const totalLogCount =
+    facets.levels?.reduce((s, l) => s + Number(l.count), 0) || 0;
+
+  return {
+    projectId,
+    activeTab,
+    aggGroupBy,
+    filters,
+    search,
+    searchDebounce,
+    logs,
+    loading,
+    facets,
+    volume,
+    hasMore,
+    columns,
+    setColumns,
+    columnNames,
+    dynamicAvailableColumns,
+    selectedLogIndex,
+    selectedLog,
+    isRightPanelOpen,
+    setIsRightPanelOpen,
+    activeFilters,
+    customFacetKeys,
+    customFacetData,
+    discoveredFacets,
+    aggData,
+    aggLoading,
+    savedQueries,
+    currentQueryId,
+    queryName,
+    defaultQueryName,
+    currentPeriod,
+    mappedFacets,
+    facetGroups,
+    totalLogCount,
+
+    // Handlers
+    setUrlState,
+    fetchLogs,
+    fetchFacets,
+    fetchVolume,
+    fetchAggregates,
+    fetchPatterns,
+    fetchAll,
+    toggleActiveFilter,
+    handleToggleFilterByIndex,
+    removeActiveFilter,
+    clearAllActiveFilters,
+    handleAddCustomFacet,
+    handleRemoveCustomFacet,
+    handleDebouncedSearchChange,
+    handleSearchSubmit,
+    handleSelectLog,
+    handleCloseSidePanel,
+    handlePrevLog,
+    handleNextLog,
+    handleLoadMore,
+    handleFilterChange,
+    handleZoom,
+    handleDetailFilter,
+    handleSaveQuery,
+    handleRename,
+    handleDeleteSavedQuery,
+    handleLoadSavedQuery,
+
+    // Patterns
+    patterns,
+    patternsLoading,
+  };
+}

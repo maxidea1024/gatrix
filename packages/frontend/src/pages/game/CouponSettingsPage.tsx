@@ -48,7 +48,8 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
   ViewColumn as ViewColumnIcon,
-  List as ListIcon,Code as CodeIcon,
+  List as ListIcon,
+  Code as CodeIcon,
   CardGiftcard as CardGiftcardIcon,
   HourglassEmpty as HourglassEmptyIcon,
   Download as DownloadIcon,
@@ -3495,10 +3496,7 @@ const CouponSettingsPage: React.FC = () => {
                                   gap: 0.5,
                                 }}
                               >
-                                <Typography
-                                  variant="caption"
-                                  
-                                >
+                                <Typography variant="caption">
                                   {c.code}
                                 </Typography>
                                 <CopyButton text={c.code} size={13} />

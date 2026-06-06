@@ -6,38 +6,69 @@ import { Condition } from '@gatrix/argus-optic';
 const logger = createLogger('traces-api');
 
 export default async function tracesRoutes(app: FastifyInstance) {
-  // ?€?€ Span search ??query individual spans ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Span search ??query individual spans ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/traces/:projectId/spans',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period = '24h', search, op, status, limit = '50',
-        orderBy = '-duration', start, end,
+        period = '24h',
+        search,
+        op,
+        status,
+        limit = '50',
+        orderBy = '-duration',
+        start,
+        end,
       } = request.query as {
-        period?: string; search?: string; op?: string; status?: string;
-        limit?: string; orderBy?: string; start?: string; end?: string;
+        period?: string;
+        search?: string;
+        op?: string;
+        status?: string;
+        limit?: string;
+        orderBy?: string;
+        start?: string;
+        end?: string;
       };
 
       const conditions: Condition[] = [];
-      if (search) conditions.push({ field: 'description', op: 'ILIKE', value: `%${search}%` });
+      if (search)
+        conditions.push({
+          field: 'description',
+          op: 'ILIKE',
+          value: `%${search}%`,
+        });
       if (op) conditions.push({ field: 'op', op: '=', value: op });
       if (status) conditions.push({ field: 'status', op: '=', value: status });
 
-      const orderDir = orderBy.startsWith('-') ? 'DESC' as const : 'ASC' as const;
+      const orderDir = orderBy.startsWith('-')
+        ? ('DESC' as const)
+        : ('ASC' as const);
       const orderCol = orderBy.replace(/^-/, '');
-      const safeOrderCol = ['duration', 'timestamp', 'op', 'status'].includes(orderCol)
-        ? orderCol : 'duration';
+      const safeOrderCol = ['duration', 'timestamp', 'op', 'status'].includes(
+        orderCol
+      )
+        ? orderCol
+        : 'duration';
 
       try {
         const result = await optic.query({
-          dataset: 'spans', projectId,
+          dataset: 'spans',
+          projectId,
           timeRange: start && end ? { start, end } : { period },
           select: [
-            { field: 'span_id' }, { field: 'trace_id' }, { field: 'parent_span_id' },
-            { field: 'transaction_id' }, { field: 'op' }, { field: 'description' },
-            { field: 'status' }, { field: 'action' }, { field: 'domain' },
-            { field: 'timestamp' }, { field: 'start_timestamp' }, { field: 'duration' },
+            { field: 'span_id' },
+            { field: 'trace_id' },
+            { field: 'parent_span_id' },
+            { field: 'transaction_id' },
+            { field: 'op' },
+            { field: 'description' },
+            { field: 'status' },
+            { field: 'action' },
+            { field: 'domain' },
+            { field: 'timestamp' },
+            { field: 'start_timestamp' },
+            { field: 'duration' },
             { field: 'tags' },
           ],
           conditions,
@@ -48,30 +79,45 @@ export default async function tracesRoutes(app: FastifyInstance) {
         return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to search spans', {
-          projectId, error: error instanceof Error ? error.message : String(error),
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to search spans' });
       }
     }
   );
 
-  // ?€?€ Trace samples ??group by trace_id ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Trace samples ??group by trace_id ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/traces/:projectId/samples',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period = '24h', search, limit = '25', start, end,
+        period = '24h',
+        search,
+        limit = '25',
+        start,
+        end,
       } = request.query as {
-        period?: string; search?: string; limit?: string; start?: string; end?: string;
+        period?: string;
+        search?: string;
+        limit?: string;
+        start?: string;
+        end?: string;
       };
 
       const conditions: Condition[] = [];
-      if (search) conditions.push({ field: 'description', op: 'ILIKE', value: `%${search}%` });
+      if (search)
+        conditions.push({
+          field: 'description',
+          op: 'ILIKE',
+          value: `%${search}%`,
+        });
 
       try {
         const result = await optic.query({
-          dataset: 'spans', projectId,
+          dataset: 'spans',
+          projectId,
           timeRange: start && end ? { start, end } : { period },
           select: [
             { field: 'trace_id' },
@@ -82,7 +128,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
             { field: 'max(duration)', alias: 'max_span_duration' },
             { field: 'groupArray(DISTINCT op)', alias: 'operations' },
             { field: 'any(description)', alias: 'root_description' },
-            { field: "countIf(status != 'ok' AND status != '')", alias: 'error_count' },
+            {
+              field: "countIf(status != 'ok' AND status != '')",
+              alias: 'error_count',
+            },
           ],
           conditions,
           groupBy: ['trace_id'],
@@ -93,32 +142,42 @@ export default async function tracesRoutes(app: FastifyInstance) {
         return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get trace samples', {
-          projectId, error: error instanceof Error ? error.message : String(error),
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get trace samples' });
       }
     }
   );
 
-  // ?€?€ Span aggregation ??group by op/status/domain ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Span aggregation ??group by op/status/domain ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/traces/:projectId/aggregate',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period = '24h', groupBy = 'op', start, end,
+        period = '24h',
+        groupBy = 'op',
+        start,
+        end,
       } = request.query as {
-        period?: string; groupBy?: string; start?: string; end?: string;
+        period?: string;
+        groupBy?: string;
+        start?: string;
+        end?: string;
       };
 
       const safeGroupBy = ['op', 'status', 'domain', 'action'].includes(groupBy)
-        ? groupBy : 'op';
+        ? groupBy
+        : 'op';
       const timeRange = start && end ? { start, end } : { period };
 
       try {
         const batch = await optic.queryBatch({
           topValues: {
-            dataset: 'spans', projectId, timeRange,
+            dataset: 'spans',
+            projectId,
+            timeRange,
             select: [
               { field: safeGroupBy, alias: 'group_value' },
               { field: 'count()', alias: 'count' },
@@ -131,7 +190,9 @@ export default async function tracesRoutes(app: FastifyInstance) {
           },
 
           timeSeries: {
-            dataset: 'spans', projectId, timeRange,
+            dataset: 'spans',
+            projectId,
+            timeRange,
             select: [
               { field: '$bucket', alias: 'hour' },
               { field: safeGroupBy, alias: 'group_value' },
@@ -154,14 +215,15 @@ export default async function tracesRoutes(app: FastifyInstance) {
         });
       } catch (error) {
         logger.error('Failed to get span aggregates', {
-          projectId, error: error instanceof Error ? error.message : String(error),
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get span aggregates' });
       }
     }
   );
 
-  // ?€?€ Span tags ??available filter facets ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Span tags ??available filter facets ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/traces/:projectId/tags',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -171,7 +233,9 @@ export default async function tracesRoutes(app: FastifyInstance) {
       try {
         const batch = await optic.queryBatch({
           ops: {
-            dataset: 'spans', projectId, timeRange: { period },
+            dataset: 'spans',
+            projectId,
+            timeRange: { period },
             select: [
               { field: 'op', alias: 'value' },
               { field: 'count()', alias: 'count' },
@@ -181,7 +245,9 @@ export default async function tracesRoutes(app: FastifyInstance) {
             limit: 30,
           },
           statuses: {
-            dataset: 'spans', projectId, timeRange: { period },
+            dataset: 'spans',
+            projectId,
+            timeRange: { period },
             select: [
               { field: 'status', alias: 'value' },
               { field: 'count()', alias: 'count' },
@@ -192,7 +258,9 @@ export default async function tracesRoutes(app: FastifyInstance) {
             limit: 20,
           },
           domains: {
-            dataset: 'spans', projectId, timeRange: { period },
+            dataset: 'spans',
+            projectId,
+            timeRange: { period },
             select: [
               { field: 'domain', alias: 'value' },
               { field: 'count()', alias: 'count' },
@@ -213,30 +281,43 @@ export default async function tracesRoutes(app: FastifyInstance) {
         });
       } catch (error) {
         logger.error('Failed to get span tags', {
-          projectId, error: error instanceof Error ? error.message : String(error),
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get span tags' });
       }
     }
   );
 
-  // ?€?€ Span volume ??time series for chart ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Span volume ??time series for chart ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/traces/:projectId/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period = '24h', search, start, end,
+        period = '24h',
+        search,
+        start,
+        end,
       } = request.query as {
-        period?: string; search?: string; start?: string; end?: string;
+        period?: string;
+        search?: string;
+        start?: string;
+        end?: string;
       };
 
       const conditions: Condition[] = [];
-      if (search) conditions.push({ field: 'description', op: 'ILIKE', value: `%${search}%` });
+      if (search)
+        conditions.push({
+          field: 'description',
+          op: 'ILIKE',
+          value: `%${search}%`,
+        });
 
       try {
         const result = await optic.query({
-          dataset: 'spans', projectId,
+          dataset: 'spans',
+          projectId,
           timeRange: start && end ? { start, end } : { period },
           select: [
             { field: '$bucket', alias: 'hour' },
@@ -251,7 +332,8 @@ export default async function tracesRoutes(app: FastifyInstance) {
         return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get span volume', {
-          projectId, error: error instanceof Error ? error.message : String(error),
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get span volume' });
       }

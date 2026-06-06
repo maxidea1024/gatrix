@@ -298,9 +298,7 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
               {references.map((ref) => (
                 <React.Fragment key={ref.id}>
                   <TableRow hover>
-                    <TableCell
-                      sx={{ fontSize: '0.8rem' }}
-                    >
+                    <TableCell sx={{ fontSize: '0.8rem' }}>
                       {ref.filePath}
                       {ref.repository && (
                         <Box

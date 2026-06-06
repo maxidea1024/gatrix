@@ -6,7 +6,7 @@ import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('argus-dashboards');
 
-/* ?€?€?€ Dashboard Presets ?€?€?€ */
+/* ?ï¿½?ï¿½?ï¿½ Dashboard Presets ?ï¿½?ï¿½?ï¿½ */
 
 interface DashboardPreset {
   id: string;
@@ -38,38 +38,62 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
     description: 'Monitor error trends, top issues, and affected users',
     widgets: [
       {
-        id: 'w1', title: 'Error Count', type: 'number',
+        id: 'w1',
+        title: 'Error Count',
+        type: 'number',
         query: { fields: ['count()'], period: '24h' },
         layout: { x: 0, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w2', title: 'Unique Issues', type: 'number',
+        id: 'w2',
+        title: 'Unique Issues',
+        type: 'number',
         query: { fields: ['uniq(primary_hash)'], period: '24h' },
         layout: { x: 3, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w3', title: 'Affected Users', type: 'number',
+        id: 'w3',
+        title: 'Affected Users',
+        type: 'number',
         query: { fields: ['uniq(user_id)'], period: '24h' },
         layout: { x: 6, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w4', title: 'Unhandled Rate', type: 'number',
+        id: 'w4',
+        title: 'Unhandled Rate',
+        type: 'number',
         query: { fields: ['avg(is_handled)'], period: '24h' },
         layout: { x: 9, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w5', title: 'Errors Over Time', type: 'line',
+        id: 'w5',
+        title: 'Errors Over Time',
+        type: 'line',
         query: { fields: ['count()'], groupBy: ['timestamp'], period: '24h' },
         layout: { x: 0, y: 2, w: 8, h: 4 },
       },
       {
-        id: 'w6', title: 'Errors by Level', type: 'pie',
-        query: { fields: ['count()', 'level'], groupBy: ['level'], period: '24h' },
+        id: 'w6',
+        title: 'Errors by Level',
+        type: 'pie',
+        query: {
+          fields: ['count()', 'level'],
+          groupBy: ['level'],
+          period: '24h',
+        },
         layout: { x: 8, y: 2, w: 4, h: 4 },
       },
       {
-        id: 'w7', title: 'Top Issues', type: 'table',
-        query: { fields: ['count()', 'type', 'value'], groupBy: ['type', 'value'], orderBy: '-count', limit: 10, period: '24h' },
+        id: 'w7',
+        title: 'Top Issues',
+        type: 'table',
+        query: {
+          fields: ['count()', 'type', 'value'],
+          groupBy: ['type', 'value'],
+          orderBy: '-count',
+          limit: 10,
+          period: '24h',
+        },
         layout: { x: 0, y: 6, w: 12, h: 4 },
       },
     ],
@@ -80,23 +104,55 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
     description: 'Browser and device error distribution',
     widgets: [
       {
-        id: 'w1', title: 'Errors by Browser', type: 'bar',
-        query: { fields: ['count()', 'browser'], groupBy: ['browser'], orderBy: '-count', limit: 10, period: '7d' },
+        id: 'w1',
+        title: 'Errors by Browser',
+        type: 'bar',
+        query: {
+          fields: ['count()', 'browser'],
+          groupBy: ['browser'],
+          orderBy: '-count',
+          limit: 10,
+          period: '7d',
+        },
         layout: { x: 0, y: 0, w: 6, h: 4 },
       },
       {
-        id: 'w2', title: 'Errors by OS', type: 'bar',
-        query: { fields: ['count()', 'os'], groupBy: ['os'], orderBy: '-count', limit: 10, period: '7d' },
+        id: 'w2',
+        title: 'Errors by OS',
+        type: 'bar',
+        query: {
+          fields: ['count()', 'os'],
+          groupBy: ['os'],
+          orderBy: '-count',
+          limit: 10,
+          period: '7d',
+        },
         layout: { x: 6, y: 0, w: 6, h: 4 },
       },
       {
-        id: 'w3', title: 'Errors by Platform', type: 'pie',
-        query: { fields: ['count()', 'platform'], groupBy: ['platform'], orderBy: '-count', limit: 8, period: '7d' },
+        id: 'w3',
+        title: 'Errors by Platform',
+        type: 'pie',
+        query: {
+          fields: ['count()', 'platform'],
+          groupBy: ['platform'],
+          orderBy: '-count',
+          limit: 8,
+          period: '7d',
+        },
         layout: { x: 0, y: 4, w: 4, h: 4 },
       },
       {
-        id: 'w4', title: 'Error Trend by Browser', type: 'line',
-        query: { fields: ['count()', 'browser'], groupBy: ['browser', 'timestamp'], orderBy: '-count', limit: 5, period: '7d' },
+        id: 'w4',
+        title: 'Error Trend by Browser',
+        type: 'line',
+        query: {
+          fields: ['count()', 'browser'],
+          groupBy: ['browser', 'timestamp'],
+          orderBy: '-count',
+          limit: 5,
+          period: '7d',
+        },
         layout: { x: 4, y: 4, w: 8, h: 4 },
       },
     ],
@@ -107,18 +163,42 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
     description: 'Monitor errors across releases',
     widgets: [
       {
-        id: 'w1', title: 'Errors by Release', type: 'bar',
-        query: { fields: ['count()', 'release'], groupBy: ['release'], orderBy: '-count', limit: 10, period: '30d' },
+        id: 'w1',
+        title: 'Errors by Release',
+        type: 'bar',
+        query: {
+          fields: ['count()', 'release'],
+          groupBy: ['release'],
+          orderBy: '-count',
+          limit: 10,
+          period: '30d',
+        },
         layout: { x: 0, y: 0, w: 8, h: 4 },
       },
       {
-        id: 'w2', title: 'Users by Release', type: 'bar',
-        query: { fields: ['uniq(user_id)', 'release'], groupBy: ['release'], orderBy: '-uniq_user_id', limit: 10, period: '30d' },
+        id: 'w2',
+        title: 'Users by Release',
+        type: 'bar',
+        query: {
+          fields: ['uniq(user_id)', 'release'],
+          groupBy: ['release'],
+          orderBy: '-uniq_user_id',
+          limit: 10,
+          period: '30d',
+        },
         layout: { x: 8, y: 0, w: 4, h: 4 },
       },
       {
-        id: 'w3', title: 'Release Error Trend', type: 'line',
-        query: { fields: ['count()', 'release'], groupBy: ['release', 'timestamp'], orderBy: '-count', limit: 5, period: '30d' },
+        id: 'w3',
+        title: 'Release Error Trend',
+        type: 'line',
+        query: {
+          fields: ['count()', 'release'],
+          groupBy: ['release', 'timestamp'],
+          orderBy: '-count',
+          limit: 5,
+          period: '30d',
+        },
         layout: { x: 0, y: 4, w: 12, h: 4 },
       },
     ],
@@ -129,22 +209,30 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
     description: 'Transaction latency and throughput metrics',
     widgets: [
       {
-        id: 'w1', title: 'Total Transactions', type: 'number',
+        id: 'w1',
+        title: 'Total Transactions',
+        type: 'number',
         query: { fields: ['count()'], period: '24h' },
         layout: { x: 0, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w2', title: 'Avg Duration', type: 'number',
+        id: 'w2',
+        title: 'Avg Duration',
+        type: 'number',
         query: { fields: ['avg(duration)'], period: '24h' },
         layout: { x: 3, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w3', title: 'P95 Latency', type: 'number',
+        id: 'w3',
+        title: 'P95 Latency',
+        type: 'number',
         query: { fields: ['p95(duration)'], period: '24h' },
         layout: { x: 6, y: 0, w: 3, h: 2 },
       },
       {
-        id: 'w4', title: 'Throughput', type: 'line',
+        id: 'w4',
+        title: 'Throughput',
+        type: 'line',
         query: { fields: ['count()'], groupBy: ['timestamp'], period: '24h' },
         layout: { x: 0, y: 2, w: 12, h: 4 },
       },
@@ -152,16 +240,15 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
   },
 ];
 
-/* ?€?€?€ Routes ?€?€?€ */
+/* ?ï¿½?ï¿½?ï¿½ Routes ?ï¿½?ï¿½?ï¿½ */
 
 export default async function dashboardRoutes(app: FastifyInstance) {
-
-  // ?€?€?€ Get Presets ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Get Presets ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/dashboards/presets',
     async (_request: FastifyRequest, reply: FastifyReply) => {
       return reply.send({
-        data: DASHBOARD_PRESETS.map(p => ({
+        data: DASHBOARD_PRESETS.map((p) => ({
           id: p.id,
           title: p.title,
           description: p.description,
@@ -171,70 +258,97 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // ?€?€?€ Get Single Preset ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Get Single Preset ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/dashboards/presets/:presetId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { presetId } = request.params as { presetId: string };
-      const preset = DASHBOARD_PRESETS.find(p => p.id === presetId);
+      const preset = DASHBOARD_PRESETS.find((p) => p.id === presetId);
       if (!preset) return reply.code(404).send({ error: 'Preset not found' });
       return reply.send({ data: preset });
     }
   );
 
-  // ?€?€?€ List Dashboards ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ List Dashboards ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/dashboards',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
         const rows = await db('g_argus_dashboards')
-          .select('id', 'project_id', 'title', 'description', 'widgets_config', 'created_at', 'updated_at')
+          .select(
+            'id',
+            'project_id',
+            'title',
+            'description',
+            'widgets_config',
+            'created_at',
+            'updated_at'
+          )
           .where('project_id', projectId)
           .orderBy('updated_at', 'desc');
         return reply.send({ data: rows });
       } catch (error) {
-        logger.error('Failed to list dashboards', { projectId, error: String(error) });
+        logger.error('Failed to list dashboards', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to list dashboards' });
       }
     }
   );
 
-  // ?€?€?€ Get Single Dashboard ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Get Single Dashboard ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/dashboards/:dashboardId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
+      const { projectId, dashboardId } = request.params as {
+        projectId: string;
+        dashboardId: string;
+      };
       try {
-        const rows = await db('g_argus_dashboards')
-          .where({ id: dashboardId, project_id: projectId });
+        const rows = await db('g_argus_dashboards').where({
+          id: dashboardId,
+          project_id: projectId,
+        });
         const arr = rows;
-        if (arr.length === 0) return reply.code(404).send({ error: 'Dashboard not found' });
+        if (arr.length === 0)
+          return reply.code(404).send({ error: 'Dashboard not found' });
         const row = arr[0];
-        row.widgets_config = typeof row.widgets_config === 'string' ? JSON.parse(row.widgets_config) : row.widgets_config;
+        row.widgets_config =
+          typeof row.widgets_config === 'string'
+            ? JSON.parse(row.widgets_config)
+            : row.widgets_config;
         return reply.send({ data: row });
       } catch (error) {
-        logger.error('Failed to get dashboard', { dashboardId, error: String(error) });
+        logger.error('Failed to get dashboard', {
+          dashboardId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to get dashboard' });
       }
     }
   );
 
-  // ?€?€?€ Create Dashboard ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Create Dashboard ?ï¿½?ï¿½?ï¿½
   app.post(
     '/:projectId/dashboards',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { title, description, widgets_config, preset_id } = request.body as {
-        title: string; description?: string; widgets_config?: any; preset_id?: string;
-      };
+      const { title, description, widgets_config, preset_id } =
+        request.body as {
+          title: string;
+          description?: string;
+          widgets_config?: any;
+          preset_id?: string;
+        };
 
       try {
         let widgets = widgets_config || [];
 
         // If creating from preset, use preset widgets
         if (preset_id) {
-          const preset = DASHBOARD_PRESETS.find(p => p.id === preset_id);
+          const preset = DASHBOARD_PRESETS.find((p) => p.id === preset_id);
           if (preset) {
             widgets = preset.widgets;
           }
@@ -246,67 +360,99 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           description: description || '',
           widgets_config: JSON.stringify(widgets),
         });
-        return reply.code(201).send({ data: { id: insertId, title, description, widgets_config: widgets } });
+        return reply
+          .code(201)
+          .send({
+            data: { id: insertId, title, description, widgets_config: widgets },
+          });
       } catch (error) {
-        logger.error('Failed to create dashboard', { projectId, error: String(error) });
+        logger.error('Failed to create dashboard', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to create dashboard' });
       }
     }
   );
 
-  // ?€?€?€ Update Dashboard ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Update Dashboard ?ï¿½?ï¿½?ï¿½
   app.put(
     '/:projectId/dashboards/:dashboardId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
+      const { projectId, dashboardId } = request.params as {
+        projectId: string;
+        dashboardId: string;
+      };
       const { title, description, widgets_config } = request.body as {
-        title?: string; description?: string; widgets_config?: any;
+        title?: string;
+        description?: string;
+        widgets_config?: any;
       };
 
       try {
         const updates: string[] = [];
         const values: any[] = [];
 
-        if (title !== undefined) { updates.push('title = ?'); values.push(title); }
-        if (description !== undefined) { updates.push('description = ?'); values.push(description); }
-        if (widgets_config !== undefined) { updates.push('widgets_config = ?'); values.push(JSON.stringify(widgets_config)); }
+        if (title !== undefined) {
+          updates.push('title = ?');
+          values.push(title);
+        }
+        if (description !== undefined) {
+          updates.push('description = ?');
+          values.push(description);
+        }
+        if (widgets_config !== undefined) {
+          updates.push('widgets_config = ?');
+          values.push(JSON.stringify(widgets_config));
+        }
 
-        if (updates.length === 0) return reply.code(400).send({ error: 'Nothing to update' });
+        if (updates.length === 0)
+          return reply.code(400).send({ error: 'Nothing to update' });
 
         const updateObj: any = {};
         if (title !== undefined) updateObj.title = title;
         if (description !== undefined) updateObj.description = description;
-        if (widgets_config !== undefined) updateObj.widgets_config = JSON.stringify(widgets_config);
+        if (widgets_config !== undefined)
+          updateObj.widgets_config = JSON.stringify(widgets_config);
         updateObj.updated_at = db.fn.now();
         await db('g_argus_dashboards')
           .where({ id: dashboardId, project_id: projectId })
           .update(updateObj);
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to update dashboard', { dashboardId, error: String(error) });
+        logger.error('Failed to update dashboard', {
+          dashboardId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to update dashboard' });
       }
     }
   );
 
-  // ?€?€?€ Delete Dashboard ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Delete Dashboard ?ï¿½?ï¿½?ï¿½
   app.delete(
     '/:projectId/dashboards/:dashboardId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, dashboardId } = request.params as { projectId: string; dashboardId: string };
+      const { projectId, dashboardId } = request.params as {
+        projectId: string;
+        dashboardId: string;
+      };
       try {
         await db('g_argus_dashboards')
           .where({ id: dashboardId, project_id: projectId })
           .del();
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to delete dashboard', { dashboardId, error: String(error) });
+        logger.error('Failed to delete dashboard', {
+          dashboardId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to delete dashboard' });
       }
     }
   );
 
-  // ?€?€?€ Execute Widget Query ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Execute Widget Query ?ï¿½?ï¿½?ï¿½
   app.post(
     '/:projectId/dashboards/widget-query',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -314,7 +460,15 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       const { query } = request.body as { query: WidgetConfig['query'] };
 
       try {
-        const { fields = ['count()'], conditions, groupBy, orderBy, limit = 20, period = '24h', dataset = 'errors' } = query;
+        const {
+          fields = ['count()'],
+          conditions,
+          groupBy,
+          orderBy,
+          limit = 20,
+          period = '24h',
+          dataset = 'errors',
+        } = query;
 
         const bucket = getBucketingConfig(period);
 
@@ -328,12 +482,13 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         const tableName = datasetTableMap[dataset] || 'argus.errors';
 
         // Build simple query (reuse discover logic)
-        const selectParts = fields.map(f => {
+        const selectParts = fields.map((f) => {
           const aggMatch = f.match(/^(\w+)\((\w*)\)$/);
           if (aggMatch) {
             const [, fn, col] = aggMatch;
             if (fn === 'count' && !col) return 'count() AS count';
-            if (fn === 'uniq') return `uniq(${col || '*'}) AS uniq_${col || 'all'}`;
+            if (fn === 'uniq')
+              return `uniq(${col || '*'}) AS uniq_${col || 'all'}`;
             if (['p50', 'p75', 'p95', 'p99'].includes(fn)) {
               const pct = parseInt(fn.replace('p', ''), 10);
               return `quantile(${pct / 100})(${col || 'timestamp'}) AS ${fn}_${col || 'timestamp'}`;
@@ -350,11 +505,12 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         }
 
         if (groupBy && groupBy.length > 0) {
-          const safeCols = groupBy.filter(c => c !== 'timestamp');
+          const safeCols = groupBy.filter((c) => c !== 'timestamp');
           if (groupBy.includes('timestamp')) {
             safeCols.unshift(`${bucket.selectExpr} AS hour`);
           }
-          if (safeCols.length > 0) sql += ` GROUP BY ${safeCols.map(c => c.startsWith('toStart') ? 'hour' : c).join(', ')}`;
+          if (safeCols.length > 0)
+            sql += ` GROUP BY ${safeCols.map((c) => (c.startsWith('toStart') ? 'hour' : c)).join(', ')}`;
         }
 
         if (orderBy) {
@@ -365,29 +521,32 @@ export default async function dashboardRoutes(app: FastifyInstance) {
 
         // Apply fill expr if timestamp is in group by
         if (groupBy && groupBy.includes('timestamp') && !orderBy) {
-            sql += ` ORDER BY hour ${bucket.fillExpr}`;
+          sql += ` ORDER BY hour ${bucket.fillExpr}`;
         } else if (groupBy && groupBy.includes('timestamp') && orderBy) {
-            // Can't easily use WITH FILL with arbitrary order by without breaking syntax (ORDER BY col DESC, hour WITH FILL).
-            // It should work as long as hour is grouped, we just append it if not already ordered by hour.
-            if (orderBy.replace(/^-/, '') === 'hour') {
-                sql += ` ${bucket.fillExpr}`;
-            }
+          // Can't easily use WITH FILL with arbitrary order by without breaking syntax (ORDER BY col DESC, hour WITH FILL).
+          // It should work as long as hour is grouped, we just append it if not already ordered by hour.
+          if (orderBy.replace(/^-/, '') === 'hour') {
+            sql += ` ${bucket.fillExpr}`;
+          }
         }
 
         sql += ` LIMIT ${Math.min(limit, 1000)}`;
 
-        const result = await optic.rawQuery({ 
-          query: sql, 
-          params: { 
+        const result = await optic.rawQuery({
+          query: sql,
+          params: {
             projectId: String(projectId),
             fillStart: bucket.queryParams.fillStart,
-            fillEnd: bucket.queryParams.fillEnd
-          } 
+            fillEnd: bucket.queryParams.fillEnd,
+          },
         });
 
         return reply.send({ data: result.data || [] });
       } catch (error) {
-        logger.error('Widget query failed', { projectId, error: String(error) });
+        logger.error('Widget query failed', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Widget query failed' });
       }
     }

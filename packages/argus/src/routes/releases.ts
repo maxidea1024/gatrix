@@ -6,32 +6,56 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('releases-api');
 
 export default async function releasesRoutes(app: FastifyInstance) {
-  // ?€?€ Release health time-series (for a specific release) ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Release health time-series (for a specific release) ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/releases/:projectId/health',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { release, period = '30d' } = request.query as { release: string; period?: string };
+      const { release, period = '30d' } = request.query as {
+        release: string;
+        period?: string;
+      };
 
       if (!release) {
-        return reply.code(400).send({ error: 'release query param is required' });
+        return reply
+          .code(400)
+          .send({ error: 'release query param is required' });
       }
 
       try {
         const result = await optic.query({
-          dataset: 'sessions', projectId, timestampField: 'started',
+          dataset: 'sessions',
+          projectId,
+          timestampField: 'started',
           timeRange: { period },
           select: [
             { field: '$bucket', alias: 'timestamp' },
             { field: 'count()', alias: 'total_sessions' },
             { field: "countIf(status = 'crashed')", alias: 'crashed_sessions' },
             { field: "countIf(status = 'errored')", alias: 'errored_sessions' },
-            { field: "countIf(status = 'abnormal')", alias: 'abnormal_sessions' },
-            { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy_sessions' },
-            { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+            {
+              field: "countIf(status = 'abnormal')",
+              alias: 'abnormal_sessions',
+            },
+            {
+              field: "countIf(status IN ('ok', 'exited'))",
+              alias: 'healthy_sessions',
+            },
+            {
+              field:
+                "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)",
+              alias: 'crash_free_rate',
+            },
             { field: 'uniq(distinct_id)', alias: 'total_users' },
-            { field: "uniqIf(distinct_id, status = 'crashed')", alias: 'crashed_users' },
-            { field: "if(uniq(distinct_id) > 0, (1 - uniqIf(distinct_id, status = 'crashed') / uniq(distinct_id)) * 100, 100)", alias: 'crash_free_users' },
+            {
+              field: "uniqIf(distinct_id, status = 'crashed')",
+              alias: 'crashed_users',
+            },
+            {
+              field:
+                "if(uniq(distinct_id) > 0, (1 - uniqIf(distinct_id, status = 'crashed') / uniq(distinct_id)) * 100, 100)",
+              alias: 'crash_free_users',
+            },
           ],
           conditions: [{ field: 'release', op: '=', value: release }],
           groupBy: ['$bucket'],
@@ -42,7 +66,8 @@ export default async function releasesRoutes(app: FastifyInstance) {
         return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get release health', {
-          projectId, release,
+          projectId,
+          release,
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get release health' });
@@ -50,7 +75,7 @@ export default async function releasesRoutes(app: FastifyInstance) {
     }
   );
 
-  // ?€?€ List releases with enriched stats ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ List releases with enriched stats ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/releases/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -62,7 +87,9 @@ export default async function releasesRoutes(app: FastifyInstance) {
           optic.queryBatch({
             // Error stats per release
             errors: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'release' },
                 { field: 'min(timestamp)', alias: 'first_seen' },
@@ -80,16 +107,29 @@ export default async function releasesRoutes(app: FastifyInstance) {
 
             // Session crash-free per release
             sessions: {
-              dataset: 'sessions', projectId, timestampField: 'started',
+              dataset: 'sessions',
+              projectId,
+              timestampField: 'started',
               timeRange: { period },
               select: [
                 { field: 'release' },
                 { field: 'count()', alias: 'total_sessions' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },
-                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+                {
+                  field:
+                    "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)",
+                  alias: 'crash_free_rate',
+                },
                 { field: 'uniq(distinct_id)', alias: 'session_users' },
-                { field: "uniqIf(distinct_id, status = 'crashed')", alias: 'crashed_users' },
-                { field: "if(uniq(distinct_id) > 0, (1 - uniqIf(distinct_id, status = 'crashed') / uniq(distinct_id)) * 100, 100)", alias: 'crash_free_users' },
+                {
+                  field: "uniqIf(distinct_id, status = 'crashed')",
+                  alias: 'crashed_users',
+                },
+                {
+                  field:
+                    "if(uniq(distinct_id) > 0, (1 - uniqIf(distinct_id, status = 'crashed') / uniq(distinct_id)) * 100, 100)",
+                  alias: 'crash_free_users',
+                },
               ],
               conditions: [{ field: 'release', op: '!=', value: '' }],
               groupBy: ['release'],
@@ -97,13 +137,18 @@ export default async function releasesRoutes(app: FastifyInstance) {
 
             // Transaction performance per release
             transactions: {
-              dataset: 'transactions', projectId, timeRange: { period },
+              dataset: 'transactions',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'release' },
                 { field: 'count()', alias: 'transaction_count' },
                 { field: 'avg(duration)', alias: 'avg_duration' },
                 { field: 'p95(duration)', alias: 'p95' },
-                { field: "countIf(transaction_status != 'ok') / count() * 100", alias: 'error_rate' },
+                {
+                  field: "countIf(transaction_status != 'ok') / count() * 100",
+                  alias: 'error_rate',
+                },
               ],
               conditions: [{ field: 'release', op: '!=', value: '' }],
               groupBy: ['release'],
@@ -111,7 +156,9 @@ export default async function releasesRoutes(app: FastifyInstance) {
 
             // Error trend per release (for sparklines)
             errorTrend: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'release' },
                 { field: '$bucket', alias: 'day' },

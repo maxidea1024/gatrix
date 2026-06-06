@@ -29,9 +29,13 @@ function migrateAll(relPath: string, replacements: [string, string][]) {
   let changed = 0;
   for (const [from, to] of replacements) {
     let count = 0;
-    while (content.includes(from)) { content = content.replace(from, to); count++; }
+    while (content.includes(from)) {
+      content = content.replace(from, to);
+      count++;
+    }
     if (count > 0) changed += count;
-    else console.error(`  X NOT FOUND in ${relPath}: "${from.slice(0, 60)}..."`);
+    else
+      console.error(`  X NOT FOUND in ${relPath}: "${from.slice(0, 60)}..."`);
   }
   fs.writeFileSync(filePath, content, 'latin1');
   console.log(`  OK ${relPath} (${changed} replacements)`);
@@ -41,7 +45,10 @@ console.log('Phase 5: Migrating uptime.ts, issue-trackers.ts...\n');
 
 // --- uptime.ts ---
 migrate('routes/uptime.ts', [
-  [`import { mysqlPool } from '../config/mysql';`, `import db from '../config/knex';`],
+  [
+    `import { mysqlPool } from '../config/mysql';`,
+    `import db from '../config/knex';`,
+  ],
 ]);
 migrateAll('routes/uptime.ts', [
   [`mysqlPool.query(`, `db.raw(`],
@@ -50,7 +57,10 @@ migrateAll('routes/uptime.ts', [
 
 // --- issue-trackers.ts ---
 migrate('routes/issue-trackers.ts', [
-  [`import { mysqlPool } from '../config/mysql';`, `import db from '../config/knex';`],
+  [
+    `import { mysqlPool } from '../config/mysql';`,
+    `import db from '../config/knex';`,
+  ],
 ]);
 migrateAll('routes/issue-trackers.ts', [
   [`mysqlPool.query(`, `db.raw(`],

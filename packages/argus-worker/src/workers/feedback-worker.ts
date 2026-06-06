@@ -1,5 +1,12 @@
 import Redis from 'ioredis';
-import { config, createLogger, ArgusFeedbackEvent, KNOWN_STREAMS, CONSUMER_GROUPS, pipelineConfig } from '@gatrix/argus';
+import {
+  config,
+  createLogger,
+  ArgusFeedbackEvent,
+  KNOWN_STREAMS,
+  CONSUMER_GROUPS,
+  pipelineConfig,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 import { evaluateFeedbackAlerts } from '../utils/alert-evaluator';
@@ -104,7 +111,13 @@ export class FeedbackWorker {
     for (const key of keys) {
       if (!this.knownStreams.has(key)) {
         try {
-          await this.redis.xgroup('CREATE', key, CONSUMER_GROUP, '0', 'MKSTREAM');
+          await this.redis.xgroup(
+            'CREATE',
+            key,
+            CONSUMER_GROUP,
+            '0',
+            'MKSTREAM'
+          );
           logger.info('Consumer group created', { stream: key });
         } catch (error: any) {
           if (!error.message?.includes('BUSYGROUP')) {
@@ -149,7 +162,9 @@ export class FeedbackWorker {
             continue;
           }
 
-          const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusFeedbackEvent & {
+          const rawEvent = JSON.parse(
+            fields[dataIndex + 1]
+          ) as ArgusFeedbackEvent & {
             project_id: string;
           };
 
@@ -168,18 +183,25 @@ export class FeedbackWorker {
     if (batch.length > 0) {
       // AI classification (non-blocking ??enrich before insert)
       try {
-        await Promise.all(batch.map(async (item) => {
-          const classification = await classifyFeedback(item.project_id, item.message);
-          if (classification) {
-            item.sentiment = classification.sentiment;
-            item.category = classification.category;
-            if (classification.spam_score > 0.7) {
-              (item as any).is_spam = 1;
+        await Promise.all(
+          batch.map(async (item) => {
+            const classification = await classifyFeedback(
+              item.project_id,
+              item.message
+            );
+            if (classification) {
+              item.sentiment = classification.sentiment;
+              item.category = classification.category;
+              if (classification.spam_score > 0.7) {
+                (item as any).is_spam = 1;
+              }
             }
-          }
-        }));
+          })
+        );
       } catch (e) {
-        logger.warn('AI classification batch failed (non-fatal)', { error: (e as Error).message });
+        logger.warn('AI classification batch failed (non-fatal)', {
+          error: (e as Error).message,
+        });
       }
 
       try {
@@ -203,7 +225,10 @@ export class FeedbackWorker {
             source: item.source,
             tags: item.tags,
           }).catch((e) => {
-            logger.warn('Feedback alert evaluation failed', { feedbackId: item.feedback_id, error: (e as Error).message });
+            logger.warn('Feedback alert evaluation failed', {
+              feedbackId: item.feedback_id,
+              error: (e as Error).message,
+            });
           });
         }
       } catch (error) {
@@ -219,7 +244,9 @@ export class FeedbackWorker {
     }
   }
 
-  private normalize(event: ArgusFeedbackEvent & { project_id: string }): NormalizedFeedback {
+  private normalize(
+    event: ArgusFeedbackEvent & { project_id: string }
+  ): NormalizedFeedback {
     const contexts = event.contexts || {};
     const user = event.user || {};
 
@@ -243,7 +270,10 @@ export class FeedbackWorker {
       browser_version: (contexts.browser as any)?.version || '',
       os: (contexts.os as any)?.name || '',
       os_version: (contexts.os as any)?.version || '',
-      device: (contexts.device as any)?.family || (contexts.device as any)?.name || '',
+      device:
+        (contexts.device as any)?.family ||
+        (contexts.device as any)?.name ||
+        '',
       // User identity
       user_id: user.id || '',
       locale: event.tags?.locale || (contexts as any).locale || '',

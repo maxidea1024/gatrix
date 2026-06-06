@@ -52,7 +52,10 @@ import {
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useI18n } from '../../contexts/I18nContext';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '../../components/common/DateRangeSelector';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -178,9 +181,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Filters
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
   const [userFilter, setUserFilter] = useState('');
   const debouncedUserFilter = useDebounce(userFilter, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -497,11 +501,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
           </Tooltip>
         );
       case 'ipAddress':
-        return (
-          <Typography variant="body2">
-            {log.ipAddress || '-'}
-          </Typography>
-        );
+        return <Typography variant="body2">{log.ipAddress || '-'}</Typography>;
       default:
         return null;
     }
@@ -714,7 +714,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5}}
+                                      sx={{ mt: 0.5 }}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
@@ -854,7 +854,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5}}
+                                      sx={{ mt: 0.5 }}
                                     >
                                       {log.ipAddress || '-'}
                                     </Typography>
@@ -1169,7 +1169,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                       justifyContent: 'flex-end',
                                     }}
                                   >
-                                    <CopyButton text={JSON.stringify(log, null, 2)} size={13} />
+                                    <CopyButton
+                                      text={JSON.stringify(log, null, 2)}
+                                      size={13}
+                                    />
                                   </Box>
                                 </Box>
                               </Box>

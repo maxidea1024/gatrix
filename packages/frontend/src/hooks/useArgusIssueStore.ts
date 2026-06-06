@@ -54,7 +54,23 @@ interface ArgusIssueListState {
   setCustomDateRange: (start: string, end: string) => void;
 
   /** Bulk-hydrate state from URL params (deep-link support). */
-  hydrateFromParams: (params: Partial<Omit<ArgusIssueListState, 'hydrateFromParams' | 'resetStore' | 'setCurrentPage' | 'setSearch' | 'setStatus' | 'setLevel' | 'setSort' | 'setActiveViewId' | 'setSubstatus' | 'setAssignedTo'>>) => void;
+  hydrateFromParams: (
+    params: Partial<
+      Omit<
+        ArgusIssueListState,
+        | 'hydrateFromParams'
+        | 'resetStore'
+        | 'setCurrentPage'
+        | 'setSearch'
+        | 'setStatus'
+        | 'setLevel'
+        | 'setSort'
+        | 'setActiveViewId'
+        | 'setSubstatus'
+        | 'setAssignedTo'
+      >
+    >
+  ) => void;
 
   /** Reset all state to defaults (called by GNB navigation). */
   resetStore: () => void;
@@ -75,7 +91,8 @@ export const useArgusIssueStore = create<ArgusIssueListState>((set) => ({
   setSubstatus: (substatus) => set({ substatus }),
   setAssignedTo: (assignedTo) => set({ assignedTo }),
   setPeriod: (period) => set({ period, customStart: '', customEnd: '' }),
-  setCustomDateRange: (start, end) => set({ period: 'custom', customStart: start, customEnd: end }),
+  setCustomDateRange: (start, end) =>
+    set({ period: 'custom', customStart: start, customEnd: end }),
 
   // Bulk hydration from URL query params
   hydrateFromParams: (params) => set((state) => ({ ...state, ...params })),

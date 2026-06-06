@@ -1,6 +1,12 @@
 import Redis from 'ioredis';
 import { Queue, Worker } from 'groupmq';
-import { config, createLogger, ArgusErrorEvent, QUEUES, pipelineConfig } from '@gatrix/argus';
+import {
+  config,
+  createLogger,
+  ArgusErrorEvent,
+  QUEUES,
+  pipelineConfig,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 import { normalizeErrorEvent, NormalizedError } from '../processing/normalizer';
@@ -46,7 +52,7 @@ export class ErrorWorker {
     // Start periodic ClickHouse flush timer
     this.chFlushTimer = setInterval(
       () => this.flushClickHouse(),
-      flushIntervalMs,
+      flushIntervalMs
     );
 
     // Start GroupMQ worker ??each groupId (projectId) is processed sequentially,
@@ -98,7 +104,11 @@ export class ErrorWorker {
   }
 
   private async processEvent(
-    rawEvent: ArgusErrorEvent & { project_id: string; internal_project_id: number; dsn_key_id: number }
+    rawEvent: ArgusErrorEvent & {
+      project_id: string;
+      internal_project_id: number;
+      dsn_key_id: number;
+    }
   ): Promise<NormalizedError | null> {
     try {
       // 1. Symbolicate (non-blocking — original event returned on failure)
@@ -106,11 +116,15 @@ export class ErrorWorker {
         await symbolicateErrorEvent(rawEvent);
 
       // 2. Normalize (uses symbolicated frames if available)
-      const normalized = normalizeErrorEvent(symbolicatedEvent, rawEvent.project_id);
+      const normalized = normalizeErrorEvent(
+        symbolicatedEvent,
+        rawEvent.project_id
+      );
       normalized.is_symbolicated = symbolicated ? 1 : 0;
 
       // 3. Fingerprint (uses symbolicated frames for better grouping)
-      const { fingerprint, primary_hash } = computeFingerprint(symbolicatedEvent);
+      const { fingerprint, primary_hash } =
+        computeFingerprint(symbolicatedEvent);
 
       // 4. Issue grouping (per-project FIFO guaranteed by GroupMQ — no lock contention)
       const groupResult = await groupIntoIssue(
@@ -143,7 +157,9 @@ export class ErrorWorker {
           title: symbolicatedEvent.exception?.type
             ? `${symbolicatedEvent.exception.type}: ${symbolicatedEvent.exception.value || ''}`
             : 'Unknown Error',
-          culprit: symbolicatedEvent.exception?.stacktrace?.frames?.slice(-1)?.[0]?.function || '',
+          culprit:
+            symbolicatedEvent.exception?.stacktrace?.frames?.slice(-1)?.[0]
+              ?.function || '',
           tags: symbolicatedEvent.tags,
         },
         groupResult

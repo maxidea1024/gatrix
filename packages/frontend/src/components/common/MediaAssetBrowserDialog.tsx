@@ -329,9 +329,7 @@ const MediaAssetBrowserDialog: React.FC<MediaAssetBrowserDialogProps> = ({
                         </Typography>
                       </Box>
                     }
-                    actionIcon={
-                      <CopyButton text={asset.cdnUrl} size={13} />
-                    }
+                    actionIcon={<CopyButton text={asset.cdnUrl} size={13} />}
                   />
                 </ImageListItem>
               );

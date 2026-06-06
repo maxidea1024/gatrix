@@ -27,7 +27,8 @@ import {
   Cloud as CloudIcon,
   Code as CodeIcon,
   ErrorOutline as ErrorOutlineIcon,
-  ViewColumn as ViewColumnIcon,} from '@mui/icons-material';
+  ViewColumn as ViewColumnIcon,
+} from '@mui/icons-material';
 
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -124,20 +125,16 @@ const EventRow: React.FC<EventRowProps> = ({
           <Typography variant="body2">{event.serviceGroup || '-'}</Typography>
         );
       case 'hostname':
-        return (
-          <Typography variant="body2" >
-            {event.hostname || '-'}
-          </Typography>
-        );
+        return <Typography variant="body2">{event.hostname || '-'}</Typography>;
       case 'externalAddress':
         return (
-          <Typography variant="body2" >
+          <Typography variant="body2">
             {event.externalAddress || '-'}
           </Typography>
         );
       case 'internalAddress':
         return (
-          <Typography variant="body2" >
+          <Typography variant="body2">
             {event.internalAddress || '-'}
           </Typography>
         );
@@ -176,17 +173,10 @@ const EventRow: React.FC<EventRowProps> = ({
           <Typography variant="body2">{event.environmentId || '-'}</Typography>
         );
       case 'instanceId':
-        return (
-          <Typography variant="body2" >
-            {event.instanceId}
-          </Typography>
-        );
+        return <Typography variant="body2">{event.instanceId}</Typography>;
       case 'ports':
         return (
-          <Typography
-            variant="body2"
-            sx={{ fontSize: '0.75rem' }}
-          >
+          <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
             {event.ports
               ? Object.entries(event.ports)
                   .map(([k, v]) => `${k}:${v}`)
@@ -304,10 +294,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      <Typography
-                        variant="body2"
-                        
-                      >
+                      <Typography variant="body2">
                         {event.instanceId}
                       </Typography>
                       <CopyButton text={event.instanceId} size={13} />
@@ -363,10 +350,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      <Typography
-                        variant="body2"
-                        
-                      >
+                      <Typography variant="body2">
                         {event.hostname || '-'}
                       </Typography>
                       {event.hostname && (
@@ -406,10 +390,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      <Typography
-                        variant="body2"
-                        
-                      >
+                      <Typography variant="body2">
                         {event.externalAddress || '-'}
                       </Typography>
                       {event.externalAddress && (
@@ -429,10 +410,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      <Typography
-                        variant="body2"
-                        
-                      >
+                      <Typography variant="body2">
                         {event.internalAddress || '-'}
                       </Typography>
                       {event.internalAddress && (
@@ -452,10 +430,7 @@ const EventRow: React.FC<EventRowProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontSize: '0.75rem' }}
-                      >
+                      <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
                         {event.ports
                           ? Object.entries(event.ports)
                               .map(([k, v]) => `${k}:${v}`)
@@ -463,7 +438,10 @@ const EventRow: React.FC<EventRowProps> = ({
                           : '-'}
                       </Typography>
                       {event.ports && Object.keys(event.ports).length > 0 && (
-                        <CopyButton text={JSON.stringify(event.ports)} size={13} />
+                        <CopyButton
+                          text={JSON.stringify(event.ports)}
+                          size={13}
+                        />
                       )}
                     </Box>
                   </Box>
@@ -486,7 +464,10 @@ const EventRow: React.FC<EventRowProps> = ({
                       {(event.cloudProvider ||
                         event.cloudRegion ||
                         event.cloudZone) && (
-                        <CopyButton text={`${event.cloudProvider || ''} / ${event.cloudRegion || ''} / ${event.cloudZone || ''}`} size={13} />
+                        <CopyButton
+                          text={`${event.cloudProvider || ''} / ${event.cloudRegion || ''} / ${event.cloudZone || ''}`}
+                          size={13}
+                        />
                       )}
                     </Box>
                   </Box>
@@ -580,7 +561,10 @@ const EventRow: React.FC<EventRowProps> = ({
                             variant="outlined"
                           />
                         ))}
-                        <CopyButton text={JSON.stringify(event.labels, null, 2)} size={13} />
+                        <CopyButton
+                          text={JSON.stringify(event.labels, null, 2)}
+                          size={13}
+                        />
                       </Box>
                     </Box>
                   )}
@@ -611,7 +595,10 @@ const EventRow: React.FC<EventRowProps> = ({
                         >
                           {JSON.stringify(event.metadata, null, 2)}
                         </Typography>
-                        <CopyButton text={JSON.stringify(event.metadata, null, 2)} size={13} />
+                        <CopyButton
+                          text={JSON.stringify(event.metadata, null, 2)}
+                          size={13}
+                        />
                       </Box>
                     </Box>
                   )}

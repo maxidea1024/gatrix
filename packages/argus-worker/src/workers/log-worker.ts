@@ -1,4 +1,10 @@
-import { redis, createLogger, KNOWN_STREAMS, CONSUMER_GROUPS, pipelineConfig } from '@gatrix/argus';
+import {
+  redis,
+  createLogger,
+  KNOWN_STREAMS,
+  CONSUMER_GROUPS,
+  pipelineConfig,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 const logger = createLogger('log-worker');
@@ -68,21 +74,31 @@ export class LogWorker {
     // Ensure consumer groups exist
     for (const streamKey of streamKeys) {
       try {
-        await redis.xgroup('CREATE', streamKey, CONSUMER_GROUPS.LOGS, '0', 'MKSTREAM');
+        await redis.xgroup(
+          'CREATE',
+          streamKey,
+          CONSUMER_GROUPS.LOGS,
+          '0',
+          'MKSTREAM'
+        );
       } catch {
         // Group already exists ??expected
       }
     }
 
     // Read from all streams using xreadgroup
-    const result = await (redis as any).xreadgroup(
-      'GROUP', CONSUMER_GROUPS.LOGS, 'log-worker-1',
-      'COUNT', '100',
-      'BLOCK', String(pipelineConfig.worker.blockMs),
+    const result = (await (redis as any).xreadgroup(
+      'GROUP',
+      CONSUMER_GROUPS.LOGS,
+      'log-worker-1',
+      'COUNT',
+      '100',
+      'BLOCK',
+      String(pipelineConfig.worker.blockMs),
       'STREAMS',
       ...streamKeys,
-      ...streamKeys.map(() => '>'),
-    ) as any;
+      ...streamKeys.map(() => '>')
+    )) as any;
     if (!result) return;
 
     for (const [streamKey, entries] of result) {

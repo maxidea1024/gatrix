@@ -88,7 +88,10 @@ import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '../../components/common/DateRangeSelector';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -181,7 +184,7 @@ const AuditLogsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
 
-  // ?�이지 State management (localStorage ?�동)
+  // ?�이지 State management (localStorage ?�동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -215,16 +218,17 @@ const AuditLogsPage: React.FC = () => {
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Date range state
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
 
-  // Filters - localStorage?�서 복원
+  // Filters - localStorage?�서 복원
   const [userFilter, setUserFilter] = useState<string>(
     pageState.filters?.user || ''
   );
 
-  // ?�적 Filter Status
+  // ?�적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
@@ -375,7 +379,7 @@ const AuditLogsPage: React.FC = () => {
 
   // Handlers
   const handlePageChange = (event: unknown, newPage: number) => {
-    updatePage(newPage + 1); // MUI??0부???�작, ?�리??1부???�작
+    updatePage(newPage + 1); // MUI??0부???�작, ?�리??1부???�작
   };
 
   const handleRowsPerPageChange = (
@@ -397,7 +401,7 @@ const AuditLogsPage: React.FC = () => {
     loadAuditLogs();
   };
 
-  // ?�이지 로드 ??pageState.filters?�서 activeFilters 복원
+  // ?�이지 로드 ??pageState.filters?�서 activeFilters 복원
   useEffect(() => {
     if (filtersInitialized) return;
 
@@ -580,11 +584,7 @@ const AuditLogsPage: React.FC = () => {
           </Typography>
         );
       case 'ipAddress':
-        return (
-          <Typography variant="body2">
-            {log.ipAddress || '-'}
-          </Typography>
-        );
+        return <Typography variant="body2">{log.ipAddress || '-'}</Typography>;
       case 'description':
         return (
           <Tooltip
@@ -871,7 +871,7 @@ const AuditLogsPage: React.FC = () => {
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5}}
+                                      sx={{ mt: 0.5 }}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
@@ -1020,7 +1020,7 @@ const AuditLogsPage: React.FC = () => {
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5}}
+                                      sx={{ mt: 0.5 }}
                                     >
                                       {log.ipAddress || '-'}
                                     </Typography>
@@ -1399,7 +1399,7 @@ const AuditLogsPage: React.FC = () => {
 
               <SimplePagination
                 count={total}
-                page={pageState.page - 1} // MUI??0부???�작
+                page={pageState.page - 1} // MUI??0부???�작
                 rowsPerPage={pageState.limit}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

@@ -20,8 +20,12 @@ export default async function projectsRoutes(app: FastifyInstance) {
         const rows = await db('g_argus_projects as p')
           .select(
             'p.*',
-            db.raw("(SELECT COUNT(*) FROM g_argus_issues WHERE project_id = p.id AND status = 'unresolved') as unresolved_issues"),
-            db.raw('(SELECT COUNT(*) FROM g_argus_dsnKeys WHERE project_id = p.id AND is_active = 1) as active_dsn_count'),
+            db.raw(
+              "(SELECT COUNT(*) FROM g_argus_issues WHERE project_id = p.id AND status = 'unresolved') as unresolved_issues"
+            ),
+            db.raw(
+              '(SELECT COUNT(*) FROM g_argus_dsnKeys WHERE project_id = p.id AND is_active = 1) as active_dsn_count'
+            )
           )
           .orderBy('p.updated_at', 'desc');
         return reply.send({ data: rows });
@@ -100,7 +104,8 @@ export default async function projectsRoutes(app: FastifyInstance) {
         if (error.code === 'ER_DUP_ENTRY') {
           return reply.code(409).send({
             error: 'Conflict',
-            message: 'Project with this gatrix_project_id or slug already exists',
+            message:
+              'Project with this gatrix_project_id or slug already exists',
           });
         }
         logger.error('Failed to create project', {
@@ -119,15 +124,27 @@ export default async function projectsRoutes(app: FastifyInstance) {
 
       try {
         const isNumeric = /^\d+$/.test(projectId);
-        const results = await db('g_argus_projects')
-          .where(isNumeric ? 'id' : 'gatrix_project_id', projectId);
+        const results = await db('g_argus_projects').where(
+          isNumeric ? 'id' : 'gatrix_project_id',
+          projectId
+        );
         if (results.length === 0) {
           return reply.code(404).send({ error: 'Project not found' });
         }
 
         // Get DSN keys
         const dsnRows = await db('g_argus_dsnKeys')
-          .select('id', 'label', 'public_key', 'is_active', 'rate_limit_window', 'rate_limit_count', 'first_seen', 'last_seen', 'created_at')
+          .select(
+            'id',
+            'label',
+            'public_key',
+            'is_active',
+            'rate_limit_window',
+            'rate_limit_count',
+            'first_seen',
+            'last_seen',
+            'created_at'
+          )
           .where('project_id', projectId);
 
         const project = results[0];
@@ -164,12 +181,30 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const updates: string[] = [];
       const params: any[] = [];
 
-      if (body.name) { updates.push('name = ?'); params.push(body.name); }
-      if (body.platform) { updates.push('platform = ?'); params.push(body.platform); }
-      if (body.error_quota_daily !== undefined) { updates.push('error_quota_daily = ?'); params.push(body.error_quota_daily); }
-      if (body.transaction_sample_rate !== undefined) { updates.push('transaction_sample_rate = ?'); params.push(body.transaction_sample_rate); }
-      if (body.session_sample_rate !== undefined) { updates.push('session_sample_rate = ?'); params.push(body.session_sample_rate); }
-      if (body.retention_days !== undefined) { updates.push('retention_days = ?'); params.push(body.retention_days); }
+      if (body.name) {
+        updates.push('name = ?');
+        params.push(body.name);
+      }
+      if (body.platform) {
+        updates.push('platform = ?');
+        params.push(body.platform);
+      }
+      if (body.error_quota_daily !== undefined) {
+        updates.push('error_quota_daily = ?');
+        params.push(body.error_quota_daily);
+      }
+      if (body.transaction_sample_rate !== undefined) {
+        updates.push('transaction_sample_rate = ?');
+        params.push(body.transaction_sample_rate);
+      }
+      if (body.session_sample_rate !== undefined) {
+        updates.push('session_sample_rate = ?');
+        params.push(body.session_sample_rate);
+      }
+      if (body.retention_days !== undefined) {
+        updates.push('retention_days = ?');
+        params.push(body.retention_days);
+      }
 
       if (updates.length === 0) {
         return reply.code(400).send({ error: 'No fields to update' });
@@ -180,16 +215,25 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const updateObj: any = {};
       if (body.name) updateObj.name = body.name;
       if (body.platform) updateObj.platform = body.platform;
-      if (body.error_quota_daily !== undefined) updateObj.error_quota_daily = body.error_quota_daily;
-      if (body.transaction_sample_rate !== undefined) updateObj.transaction_sample_rate = body.transaction_sample_rate;
-      if (body.session_sample_rate !== undefined) updateObj.session_sample_rate = body.session_sample_rate;
-      if (body.retention_days !== undefined) updateObj.retention_days = body.retention_days;
+      if (body.error_quota_daily !== undefined)
+        updateObj.error_quota_daily = body.error_quota_daily;
+      if (body.transaction_sample_rate !== undefined)
+        updateObj.transaction_sample_rate = body.transaction_sample_rate;
+      if (body.session_sample_rate !== undefined)
+        updateObj.session_sample_rate = body.session_sample_rate;
+      if (body.retention_days !== undefined)
+        updateObj.retention_days = body.retention_days;
 
       try {
-        await db('g_argus_projects').where(whereCol, projectId).update(updateObj);
+        await db('g_argus_projects')
+          .where(whereCol, projectId)
+          .update(updateObj);
 
         // Notify workers of project settings change
-        await broadcaster.publish({ type: CONFIG_TYPES.PROJECT_SETTINGS, projectId });
+        await broadcaster.publish({
+          type: CONFIG_TYPES.PROJECT_SETTINGS,
+          projectId,
+        });
 
         return reply.send({ success: true });
       } catch (error) {
@@ -209,7 +253,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
     '/projects/:projectId/dsn-keys',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const body = request.body as { 
+      const body = request.body as {
         label?: string;
         rate_limit_count?: number;
         rate_limit_window?: number;
@@ -228,7 +272,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
           rate_limit_window: body.rate_limit_window ?? 0,
         });
 
-        const projRows = await db('g_argus_projects').select('gatrix_project_id').where('id', projectId);
+        const projRows = await db('g_argus_projects')
+          .select('gatrix_project_id')
+          .where('id', projectId);
         const gatrixProjectId = projRows[0]?.gatrix_project_id || projectId;
 
         return reply.code(201).send({
@@ -244,7 +290,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
         });
 
         // Notify workers to reload DSN cache (after response)
-        broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId }).catch(() => {});
+        broadcaster
+          .publish({ type: CONFIG_TYPES.DSN_KEYS, projectId })
+          .catch(() => {});
       } catch (error) {
         logger.error('Failed to create DSN key', {
           projectId,
@@ -265,7 +313,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
       };
 
       try {
-        await db('g_argus_dsnKeys').where({ id: keyId, project_id: projectId }).del();
+        await db('g_argus_dsnKeys')
+          .where({ id: keyId, project_id: projectId })
+          .del();
 
         // Notify workers to reload DSN cache
         await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
@@ -292,7 +342,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
       };
 
       try {
-        await db('g_argus_dsnKeys').where({ id: keyId, project_id: projectId }).update({ is_active: 0 });
+        await db('g_argus_dsnKeys')
+          .where({ id: keyId, project_id: projectId })
+          .update({ is_active: 0 });
 
         // Notify workers to reload DSN cache
         await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
@@ -317,14 +369,16 @@ export default async function projectsRoutes(app: FastifyInstance) {
         projectId: string;
         keyId: string;
       };
-      const body = request.body as { 
+      const body = request.body as {
         label?: string;
         rate_limit_count?: number;
         rate_limit_window?: number;
       };
 
       if (!body.label || !body.label.trim()) {
-        return reply.code(400).send({ error: 'Bad Request', message: 'Label is required' });
+        return reply
+          .code(400)
+          .send({ error: 'Bad Request', message: 'Label is required' });
       }
 
       try {
@@ -341,10 +395,14 @@ export default async function projectsRoutes(app: FastifyInstance) {
         }
 
         const dsnUpdateObj: any = { label: body.label!.trim() };
-        if (body.rate_limit_count !== undefined) dsnUpdateObj.rate_limit_count = body.rate_limit_count;
-        if (body.rate_limit_window !== undefined) dsnUpdateObj.rate_limit_window = body.rate_limit_window;
+        if (body.rate_limit_count !== undefined)
+          dsnUpdateObj.rate_limit_count = body.rate_limit_count;
+        if (body.rate_limit_window !== undefined)
+          dsnUpdateObj.rate_limit_window = body.rate_limit_window;
 
-        await db('g_argus_dsnKeys').where({ id: keyId, project_id: projectId }).update(dsnUpdateObj);
+        await db('g_argus_dsnKeys')
+          .where({ id: keyId, project_id: projectId })
+          .update(dsnUpdateObj);
 
         // Notify workers to reload DSN cache
         await broadcaster.publish({ type: CONFIG_TYPES.DSN_KEYS, projectId });
@@ -372,7 +430,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
 
       try {
         const result = await optic.query({
-          dataset: 'errors', projectId, timeRange: { period },
+          dataset: 'errors',
+          projectId,
+          timeRange: { period },
           select: [
             { field: '$bucket', alias: 'hour' },
             { field: 'count()', alias: 'event_count' },
@@ -436,10 +496,16 @@ export default async function projectsRoutes(app: FastifyInstance) {
         ]);
 
         const errors = errorsResult.data as { ts: string; accepted: string }[];
-        const transactions = txnResult.data as { ts: string; accepted: string }[];
+        const transactions = txnResult.data as {
+          ts: string;
+          accepted: string;
+        }[];
 
         // Merge into unified timeline
-        const timeMap = new Map<string, { errors: number; transactions: number }>();
+        const timeMap = new Map<
+          string,
+          { errors: number; transactions: number }
+        >();
         for (const row of errors) {
           const entry = timeMap.get(row.ts) || { errors: 0, transactions: 0 };
           entry.errors = Number(row.accepted);
@@ -456,7 +522,10 @@ export default async function projectsRoutes(app: FastifyInstance) {
           .map(([ts, counts]) => ({ timestamp: ts, ...counts }));
 
         const totals = data.reduce(
-          (acc, d) => ({ errors: acc.errors + d.errors, transactions: acc.transactions + d.transactions }),
+          (acc, d) => ({
+            errors: acc.errors + d.errors,
+            transactions: acc.transactions + d.transactions,
+          }),
           { errors: 0, transactions: 0 }
         );
 

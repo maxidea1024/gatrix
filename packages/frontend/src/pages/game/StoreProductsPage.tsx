@@ -1376,7 +1376,10 @@ const StoreProductsPage: React.FC = () => {
                                     {product.cmsProductId ?? '-'}
                                   </Box>
                                   {product.cmsProductId && (
-                                    <CopyButton text={String(product.cmsProductId)} size={13} />
+                                    <CopyButton
+                                      text={String(product.cmsProductId)}
+                                      size={13}
+                                    />
                                   )}
                                 </Box>
                               </TableCell>
@@ -1428,7 +1431,10 @@ const StoreProductsPage: React.FC = () => {
                                   >
                                     {product.productId}
                                   </Typography>
-                                  <CopyButton text={product.productId} size={13} />
+                                  <CopyButton
+                                    text={product.productId}
+                                    size={13}
+                                  />
                                 </Box>
                               </TableCell>
                             );

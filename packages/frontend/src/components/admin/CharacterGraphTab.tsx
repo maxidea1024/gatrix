@@ -46,7 +46,10 @@ import type { CharacterHistoryRecord } from '../../services/playerConnectionServ
 import PageContentLoader from '../common/PageContentLoader';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import { crosshairPlugin } from '../../utils/chartCrosshairPlugin';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '../common/DateRangeSelector';
 
 ChartJS.register(
   CategoryScale,
@@ -333,9 +336,10 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
     localStorage.setItem('character-show-legend', String(v));
   }, []);
 
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
 
   const getDateRange = useCallback(() => {
     return dateRangeToDatePair(dateRange);
@@ -598,11 +602,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             </IconButton>
           </Tooltip>
         </Stack>
-        <DateRangeSelector
-          value={dateRange}
-          onChange={setDateRange}
-          compact
-        />
+        <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
       </Box>
 
       <PageContentLoader loading={loading}>

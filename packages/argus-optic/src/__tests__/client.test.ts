@@ -13,8 +13,6 @@ jest.mock('../config/clickhouse', () => ({
   }),
 }));
 
-
-
 // ?????????????????????????????????????????????????????????????????????????????
 // OpticClient Unit Tests
 // ?????????????????????????????????????????????????????????????????????????????
@@ -61,7 +59,7 @@ describe('OpticClient', () => {
       expect(callArgs.query_params).toBeDefined();
       // Project ID should be in params
       const pidValue = Object.values(callArgs.query_params).find(
-        (v) => v === 'proj-test',
+        (v) => v === 'proj-test'
       );
       expect(pidValue).toBeDefined();
     });
@@ -75,7 +73,7 @@ describe('OpticClient', () => {
           projectId: 'p1',
           timeRange: { period: '1h' },
           select: [{ field: 'count()' }],
-        }),
+        })
       ).rejects.toThrow('ClickHouse timeout');
     });
 
@@ -131,15 +129,21 @@ describe('OpticClient', () => {
 
       const results = await client.queryBatch({
         first: {
-          dataset: 'errors', projectId: 'p1', timeRange: { period: '1h' },
+          dataset: 'errors',
+          projectId: 'p1',
+          timeRange: { period: '1h' },
           select: [{ field: 'count()', alias: 'a' }],
         },
         second: {
-          dataset: 'errors', projectId: 'p1', timeRange: { period: '1h' },
+          dataset: 'errors',
+          projectId: 'p1',
+          timeRange: { period: '1h' },
           select: [{ field: 'count()', alias: 'b' }],
         },
         third: {
-          dataset: 'errors', projectId: 'p1', timeRange: { period: '1h' },
+          dataset: 'errors',
+          projectId: 'p1',
+          timeRange: { period: '1h' },
           select: [{ field: 'count()', alias: 'c' }],
         },
       });
@@ -155,7 +159,8 @@ describe('OpticClient', () => {
       mockJson.mockResolvedValueOnce([{ op: 'db', count: 50 }]);
 
       const result = await client.rawQuery<{ op: string; count: number }>({
-        query: 'SELECT op, count() AS count FROM argus.spans WHERE project_id = {pid:String} GROUP BY op',
+        query:
+          'SELECT op, count() AS count FROM argus.spans WHERE project_id = {pid:String} GROUP BY op',
         params: { pid: 'p1' },
       });
 
@@ -173,11 +178,11 @@ describe('OpticClient', () => {
   describe('queryTagDistribution()', () => {
     it('should group results by tag key', async () => {
       mockJson.mockResolvedValueOnce([
-          { tag_key: 'browser_name', tag_value: 'Chrome', count: '100' },
-          { tag_key: 'browser_name', tag_value: 'Firefox', count: '50' },
-          { tag_key: 'os_name', tag_value: 'Windows', count: '80' },
-          { tag_key: 'os_name', tag_value: 'macOS', count: '60' },
-        ]);
+        { tag_key: 'browser_name', tag_value: 'Chrome', count: '100' },
+        { tag_key: 'browser_name', tag_value: 'Firefox', count: '50' },
+        { tag_key: 'os_name', tag_value: 'Windows', count: '80' },
+        { tag_key: 'os_name', tag_value: 'macOS', count: '60' },
+      ]);
 
       const result = await client.queryTagDistribution({
         dataset: 'errors',
@@ -199,8 +204,8 @@ describe('OpticClient', () => {
 
     it('should return empty arrays for tags with no data', async () => {
       mockJson.mockResolvedValueOnce([
-          { tag_key: 'level', tag_value: 'error', count: '10' },
-        ]);
+        { tag_key: 'level', tag_value: 'error', count: '10' },
+      ]);
 
       const result = await client.queryTagDistribution({
         dataset: 'errors',
@@ -215,8 +220,8 @@ describe('OpticClient', () => {
 
     it('should convert count strings to numbers', async () => {
       mockJson.mockResolvedValueOnce([
-          { tag_key: 'level', tag_value: 'error', count: '12345' },
-        ]);
+        { tag_key: 'level', tag_value: 'error', count: '12345' },
+      ]);
 
       const result = await client.queryTagDistribution({
         dataset: 'errors',

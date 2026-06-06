@@ -13,27 +13,44 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period = '7d', page = '1', limit = '20', search = '', status = '',
-        start, end, sort = 'newest',
-        filterUrl, filterAssigned, filterEnvironment, filterBrowser, filterOs,
+        period = '7d',
+        page = '1',
+        limit = '20',
+        search = '',
+        status = '',
+        start,
+        end,
+        sort = 'newest',
+        filterUrl,
+        filterAssigned,
+        filterEnvironment,
+        filterBrowser,
+        filterOs,
       } = request.query as {
-        period?: string; page?: string; limit?: string;
-        search?: string; status?: string;
-        start?: string; end?: string;
+        period?: string;
+        page?: string;
+        limit?: string;
+        search?: string;
+        status?: string;
+        start?: string;
+        end?: string;
         sort?: string;
-        filterUrl?: string; filterAssigned?: string; filterEnvironment?: string;
-        filterBrowser?: string; filterOs?: string;
+        filterUrl?: string;
+        filterAssigned?: string;
+        filterEnvironment?: string;
+        filterBrowser?: string;
+        filterOs?: string;
       };
 
       const bucket = getBucketingConfig(period, start, end);
       const limitNum = parseInt(limit, 10);
       const offset = (parseInt(page, 10) - 1) * limitNum;
-      const qp: Record<string, any> = { 
-        projectId: String(projectId), 
-        limit: limitNum, 
+      const qp: Record<string, any> = {
+        projectId: String(projectId),
+        limit: limitNum,
         offset,
         fillStart: bucket.queryParams.fillStart,
-        fillEnd: bucket.queryParams.fillEnd
+        fillEnd: bucket.queryParams.fillEnd,
       };
 
       // Date filter
@@ -89,14 +106,15 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         const baseConditionNoStatus = `project_id = {projectId:String} AND ${dateClause} ${searchClause} ${structuredClause}`;
         const whereBase = `${baseConditionNoStatus} ${statusClause}`;
 
-        const [countResult, itemsResult, trendResult, summaryResult] = await Promise.all([
-          optic.rawQuery({
-            query: `SELECT count() AS total FROM argus.user_feedback WHERE ${whereBase}`,
-            params: qp,
-          }),
+        const [countResult, itemsResult, trendResult, summaryResult] =
+          await Promise.all([
+            optic.rawQuery({
+              query: `SELECT count() AS total FROM argus.user_feedback WHERE ${whereBase}`,
+              params: qp,
+            }),
 
-          optic.rawQuery({
-            query: `SELECT
+            optic.rawQuery({
+              query: `SELECT
               feedback_id, event_id, email, name, message, contact_email,
               timestamp AS submitted_at, url,
               status, assigned_to, is_spam, attachments,
@@ -107,21 +125,21 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             WHERE ${whereBase}
             ORDER BY ${orderBy}
             LIMIT {limit:UInt32} OFFSET {offset:UInt32}`,
-            params: qp,
-          }),
+              params: qp,
+            }),
 
-          optic.rawQuery({
-            query: `SELECT
+            optic.rawQuery({
+              query: `SELECT
               ${bucket.selectExpr} AS day,
               count() AS count
             FROM argus.user_feedback
             WHERE ${whereBase}
             GROUP BY day ORDER BY day ${bucket.fillExpr}`,
-            params: qp,
-          }),
+              params: qp,
+            }),
 
-          optic.rawQuery({
-            query: `SELECT
+            optic.rawQuery({
+              query: `SELECT
               count() AS total_feedback,
               uniq(email) AS unique_users,
               countIf(contact_email != '') AS with_contact,
@@ -139,9 +157,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               countIf(category = 'question') AS category_question
             FROM argus.user_feedback
             WHERE ${baseConditionNoStatus}`,
-            params: qp,
-          }),
-        ]);
+              params: qp,
+            }),
+          ]);
 
         const countData = countResult;
         const itemsData = itemsResult;
@@ -150,10 +168,17 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         // Enrich items with issue info via event_id + manual links
         const items = (itemsData.data || []) as any[];
-        const feedbackIds = items.map((i: any) => i.feedback_id).filter(Boolean);
-        const eventIds = [...new Set(items.map((i: any) => i.event_id).filter(Boolean))];
+        const feedbackIds = items
+          .map((i: any) => i.feedback_id)
+          .filter(Boolean);
+        const eventIds = [
+          ...new Set(items.map((i: any) => i.event_id).filter(Boolean)),
+        ];
 
-        let eventToIssue: Record<string, { id: number; title: string; status: string }> = {};
+        let eventToIssue: Record<
+          string,
+          { id: number; title: string; status: string }
+        > = {};
         let manualLinks: Record<string, number> = {};
 
         // Manual links from MySQL (take priority)
@@ -168,7 +193,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               manualLinks[row.feedback_id] = row.issue_id;
             }
           } catch (e) {
-            logger.warn('Failed to get manual issue links', { error: (e as Error).message });
+            logger.warn('Failed to get manual issue links', {
+              error: (e as Error).message,
+            });
           }
         }
 
@@ -186,18 +213,27 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             }
 
             // Collect all issue IDs (auto + manual)
-            const allIssueIds = [...new Set([
-              ...Object.values(eventToIssueId).filter(Boolean),
-              ...Object.values(manualLinks).filter(Boolean),
-            ])];
+            const allIssueIds = [
+              ...new Set([
+                ...Object.values(eventToIssueId).filter(Boolean),
+                ...Object.values(manualLinks).filter(Boolean),
+              ]),
+            ];
 
             if (allIssueIds.length > 0) {
               const issueRows = await db('g_argus_issues')
                 .select('id', 'title', 'status')
                 .whereIn('id', allIssueIds);
-              const issueMap: Record<number, { id: number; title: string; status: string }> = {};
+              const issueMap: Record<
+                number,
+                { id: number; title: string; status: string }
+              > = {};
               for (const row of issueRows) {
-                issueMap[row.id] = { id: row.id, title: row.title, status: row.status };
+                issueMap[row.id] = {
+                  id: row.id,
+                  title: row.title,
+                  status: row.status,
+                };
               }
               for (const [eid, issueId] of Object.entries(eventToIssueId)) {
                 if (issueMap[issueId]) {
@@ -206,31 +242,46 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               }
             }
           } catch (e) {
-            logger.warn('Failed to enrich feedback with issue data', { error: (e as Error).message });
+            logger.warn('Failed to enrich feedback with issue data', {
+              error: (e as Error).message,
+            });
           }
         }
 
         // Build issueMap for manual links that weren't fetched yet
-        const manualIssueIdsNotFetched = Object.values(manualLinks).filter(id => {
-          return id && !Object.values(eventToIssue).some(i => i.id === id);
-        });
-        let extraIssueMap: Record<number, { id: number; title: string; status: string }> = {};
+        const manualIssueIdsNotFetched = Object.values(manualLinks).filter(
+          (id) => {
+            return id && !Object.values(eventToIssue).some((i) => i.id === id);
+          }
+        );
+        let extraIssueMap: Record<
+          number,
+          { id: number; title: string; status: string }
+        > = {};
         if (manualIssueIdsNotFetched.length > 0) {
           try {
             const rows = await db('g_argus_issues')
               .select('id', 'title', 'status')
               .whereIn('id', manualIssueIdsNotFetched);
             for (const row of rows) {
-              extraIssueMap[row.id] = { id: row.id, title: row.title, status: row.status };
+              extraIssueMap[row.id] = {
+                id: row.id,
+                title: row.title,
+                status: row.status,
+              };
             }
-          } catch { /* ok */ }
+          } catch {
+            /* ok */
+          }
         }
 
         const enrichedItems = items.map((item: any) => {
           // Manual link takes priority
           const manualIssueId = manualLinks[item.feedback_id];
           if (manualIssueId) {
-            const issue = Object.values(eventToIssue).find(i => i.id === manualIssueId) || extraIssueMap[manualIssueId];
+            const issue =
+              Object.values(eventToIssue).find((i) => i.id === manualIssueId) ||
+              extraIssueMap[manualIssueId];
             return {
               ...item,
               issue_id: issue?.id || manualIssueId,
@@ -272,7 +323,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
   app.get(
     '/feedback/:projectId/by-issue/:issueId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, issueId } = request.params as { projectId: string; issueId: string };
+      const { projectId, issueId } = request.params as {
+        projectId: string;
+        issueId: string;
+      };
       try {
         await ensureIssueLinkTable();
 
@@ -298,10 +352,13 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         return reply.send({ data: result.data || [] });
       } catch (error) {
         logger.error('Failed to get feedbacks by issue', {
-          projectId, issueId,
+          projectId,
+          issueId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to get feedbacks by issue' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get feedbacks by issue' });
       }
     }
   );
@@ -310,12 +367,22 @@ export default async function feedbackRoutes(app: FastifyInstance) {
   app.patch(
     '/feedback/:projectId/:feedbackId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
-      const body = request.body as { status?: string; assigned_to?: string; is_spam?: boolean };
+      const { projectId, feedbackId } = request.params as {
+        projectId: string;
+        feedbackId: string;
+      };
+      const body = request.body as {
+        status?: string;
+        assigned_to?: string;
+        is_spam?: boolean;
+      };
 
       try {
         const setClauses: string[] = [];
-        const params: Record<string, any> = { projectId: String(projectId), feedbackId };
+        const params: Record<string, any> = {
+          projectId: String(projectId),
+          feedbackId,
+        };
 
         if (body.status) {
           setClauses.push('status = {status:String}');
@@ -351,30 +418,44 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           await ensureActivityTable();
           if (body.status) {
             await db('g_argus_feedback_activity').insert({
-              project_id: projectId, feedback_id: feedbackId, action: 'status_change',
-              data: JSON.stringify({ from: '', to: body.status }), created_at: db.fn.now(),
+              project_id: projectId,
+              feedback_id: feedbackId,
+              action: 'status_change',
+              data: JSON.stringify({ from: '', to: body.status }),
+              created_at: db.fn.now(),
             });
           }
           if (body.assigned_to !== undefined) {
             await db('g_argus_feedback_activity').insert({
-              project_id: projectId, feedback_id: feedbackId, action: 'assign',
-              data: JSON.stringify({ assigned_to: body.assigned_to }), created_at: db.fn.now(),
+              project_id: projectId,
+              feedback_id: feedbackId,
+              action: 'assign',
+              data: JSON.stringify({ assigned_to: body.assigned_to }),
+              created_at: db.fn.now(),
             });
           }
           if (body.is_spam !== undefined) {
             await db('g_argus_feedback_activity').insert({
-              project_id: projectId, feedback_id: feedbackId,
+              project_id: projectId,
+              feedback_id: feedbackId,
               action: body.is_spam ? 'mark_spam' : 'unmark_spam',
-              data: null, created_at: db.fn.now(),
+              data: null,
+              created_at: db.fn.now(),
             });
           }
         } catch (e) {
-          logger.warn('Failed to record feedback activity', { error: (e as Error).message });
+          logger.warn('Failed to record feedback activity', {
+            error: (e as Error).message,
+          });
         }
 
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to update feedback', { projectId, feedbackId, error: (error as Error).message });
+        logger.error('Failed to update feedback', {
+          projectId,
+          feedbackId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Failed to update feedback' });
       }
     }
@@ -429,10 +510,18 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           params: params,
         });
 
-        return reply.send({ success: true, affected: body.feedback_ids.length });
+        return reply.send({
+          success: true,
+          affected: body.feedback_ids.length,
+        });
       } catch (error) {
-        logger.error('Failed to bulk update feedback', { projectId, error: (error as Error).message });
-        return reply.code(500).send({ error: 'Failed to bulk update feedback' });
+        logger.error('Failed to bulk update feedback', {
+          projectId,
+          error: (error as Error).message,
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to bulk update feedback' });
       }
     }
   );
@@ -441,7 +530,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
   app.post(
     '/feedback/:projectId/:feedbackId/attachments',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
+      const { projectId, feedbackId } = request.params as {
+        projectId: string;
+        feedbackId: string;
+      };
 
       try {
         const parts = await request.files();
@@ -449,7 +541,12 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         const fs = require('fs');
         const path = require('path');
-        const uploadDir = path.join(process.cwd(), 'uploads', 'feedback', projectId);
+        const uploadDir = path.join(
+          process.cwd(),
+          'uploads',
+          'feedback',
+          projectId
+        );
 
         if (!fs.existsSync(uploadDir)) {
           fs.mkdirSync(uploadDir, { recursive: true });
@@ -465,7 +562,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         if (urls.length > 0) {
           // Append to existing attachments array
-          const urlValues = urls.map(u => `'${u}'`).join(', ');
+          const urlValues = urls.map((u) => `'${u}'`).join(', ');
           await optic.command({
             query: `ALTER TABLE argus.user_feedback UPDATE
               attachments = arrayConcat(attachments, [${urlValues}])
@@ -476,13 +573,17 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         return reply.send({ success: true, urls });
       } catch (error) {
-        logger.error('Failed to upload attachments', { projectId, feedbackId, error: (error as Error).message });
+        logger.error('Failed to upload attachments', {
+          projectId,
+          feedbackId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Failed to upload attachments' });
       }
     }
   );
 
-  // ?€?€?€ Spam Filter Keywords CRUD ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Spam Filter Keywords CRUD ?ï¿½?ï¿½?ï¿½
 
   // Get spam keywords for a project
   app.get(
@@ -509,7 +610,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           `);
           return reply.send({ data: [] });
         }
-        logger.error('Failed to get spam keywords', { projectId, error: (error as Error).message });
+        logger.error('Failed to get spam keywords', {
+          projectId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Failed to get spam keywords' });
       }
     }
@@ -520,7 +624,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     '/feedback/:projectId/spam-keywords',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { keyword, is_regex } = request.body as { keyword: string; is_regex?: boolean };
+      const { keyword, is_regex } = request.body as {
+        keyword: string;
+        is_regex?: boolean;
+      };
 
       if (!keyword?.trim()) {
         return reply.code(400).send({ error: 'keyword is required' });
@@ -547,7 +654,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
-        logger.error('Failed to add spam keyword', { projectId, error: (error as Error).message });
+        logger.error('Failed to add spam keyword', {
+          projectId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Failed to add spam keyword' });
       }
     }
@@ -557,7 +667,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
   app.delete(
     '/feedback/:projectId/spam-keywords/:keywordId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, keywordId } = request.params as { projectId: string; keywordId: string };
+      const { projectId, keywordId } = request.params as {
+        projectId: string;
+        keywordId: string;
+      };
 
       try {
         await db('g_argus_spam_keywords')
@@ -565,7 +678,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           .del();
         return reply.send({ success: true });
       } catch (error) {
-        logger.error('Failed to delete spam keyword', { error: (error as Error).message });
+        logger.error('Failed to delete spam keyword', {
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Failed to delete spam keyword' });
       }
     }
@@ -583,11 +698,14 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           .select('keyword', 'is_regex')
           .where('project_id', projectId);
         if (kws.length === 0) {
-          return reply.send({ matched: 0, message: 'No spam keywords configured' });
+          return reply.send({
+            matched: 0,
+            message: 'No spam keywords configured',
+          });
         }
 
         // Build ClickHouse conditions
-        const conditions = kws.map(k => {
+        const conditions = kws.map((k) => {
           if (k.is_regex) {
             return `match(message, '${k.keyword.replace(/'/g, "\\'")}')`;
           }
@@ -617,16 +735,22 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           });
         }
 
-        logger.info('Auto-spam scan completed', { projectId, matched: matchedCount });
+        logger.info('Auto-spam scan completed', {
+          projectId,
+          matched: matchedCount,
+        });
         return reply.send({ matched: matchedCount });
       } catch (error) {
-        logger.error('Auto-spam scan failed', { projectId, error: (error as Error).message });
+        logger.error('Auto-spam scan failed', {
+          projectId,
+          error: (error as Error).message,
+        });
         return reply.code(500).send({ error: 'Auto-spam scan failed' });
       }
     }
   );
 
-  // ?€?€?€ Feedback Filter Options ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Feedback Filter Options ?ï¿½?ï¿½?ï¿½
 
   // Get distinct filter values for feedback
   app.get(
@@ -636,47 +760,54 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       const { period = '30d' } = request.query as { period?: string };
 
       const bucket = getBucketingConfig(period);
-      const qp: Record<string, any> = { 
+      const qp: Record<string, any> = {
         projectId: String(projectId),
         fillStart: bucket.queryParams.fillStart,
-        fillEnd: bucket.queryParams.fillEnd
+        fillEnd: bucket.queryParams.fillEnd,
       };
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const [envResult, browserResult, osResult, assignedResult] = await Promise.all([
-          optic.rawQuery({
-            query: `SELECT DISTINCT environment FROM argus.user_feedback
+        const [envResult, browserResult, osResult, assignedResult] =
+          await Promise.all([
+            optic.rawQuery({
+              query: `SELECT DISTINCT environment FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND environment != '' ORDER BY environment`,
-            params: qp,
-          }),
-          optic.rawQuery({
-            query: `SELECT DISTINCT browser FROM argus.user_feedback
+              params: qp,
+            }),
+            optic.rawQuery({
+              query: `SELECT DISTINCT browser FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND browser != '' ORDER BY browser`,
-            params: qp,
-          }),
-          optic.rawQuery({
-            query: `SELECT DISTINCT os FROM argus.user_feedback
+              params: qp,
+            }),
+            optic.rawQuery({
+              query: `SELECT DISTINCT os FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND os != '' ORDER BY os`,
-            params: qp,
-          }),
-          optic.rawQuery({
-            query: `SELECT DISTINCT assigned_to FROM argus.user_feedback
+              params: qp,
+            }),
+            optic.rawQuery({
+              query: `SELECT DISTINCT assigned_to FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND assigned_to != '' ORDER BY assigned_to`,
-            params: qp,
-          }),
-        ]);
+              params: qp,
+            }),
+          ]);
 
         return reply.send({
           data: {
-            environments: ((envResult.data || []) as any[]).map((r: any) => r.environment),
-            browsers: ((browserResult.data || []) as any[]).map((r: any) => r.browser),
+            environments: ((envResult.data || []) as any[]).map(
+              (r: any) => r.environment
+            ),
+            browsers: ((browserResult.data || []) as any[]).map(
+              (r: any) => r.browser
+            ),
             os: ((osResult.data || []) as any[]).map((r: any) => r.os),
-            assigned: ((assignedResult.data || []) as any[]).map((r: any) => r.assigned_to),
+            assigned: ((assignedResult.data || []) as any[]).map(
+              (r: any) => r.assigned_to
+            ),
           },
         });
       } catch (error) {
@@ -684,12 +815,14 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to get feedback filter options' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get feedback filter options' });
       }
     }
   );
 
-  // ?€?€?€ Mark Feedback as Read ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Mark Feedback as Read ?ï¿½?ï¿½?ï¿½
 
   app.post(
     '/feedback/:projectId/mark-read',
@@ -713,17 +846,22 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           projectId,
           error: (error as Error).message,
         });
-        return reply.code(500).send({ error: 'Failed to mark feedback as read' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to mark feedback as read' });
       }
     }
   );
 
-  // ?€?€?€ Feedback Activity History ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Feedback Activity History ?ï¿½?ï¿½?ï¿½
 
   app.get(
     '/feedback/:projectId/:feedbackId/activity',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
+      const { projectId, feedbackId } = request.params as {
+        projectId: string;
+        feedbackId: string;
+      };
 
       try {
         await ensureActivityTable();
@@ -739,21 +877,30 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to get feedback activity', {
-          projectId, feedbackId,
+          projectId,
+          feedbackId,
           error: (error as Error).message,
         });
-        return reply.code(500).send({ error: 'Failed to get feedback activity' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get feedback activity' });
       }
     }
   );
 
-  // ?€?€?€ Add Comment to Feedback ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Add Comment to Feedback ?ï¿½?ï¿½?ï¿½
 
   app.post(
     '/feedback/:projectId/:feedbackId/comment',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
-      const { text, user_name } = request.body as { text: string; user_name?: string };
+      const { projectId, feedbackId } = request.params as {
+        projectId: string;
+        feedbackId: string;
+      };
+      const { text, user_name } = request.body as {
+        text: string;
+        user_name?: string;
+      };
 
       if (!text?.trim()) {
         return reply.code(400).send({ error: 'Comment text is required' });
@@ -762,28 +909,36 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       try {
         await ensureActivityTable();
         const [insertId] = await db('g_argus_feedback_activity').insert({
-          project_id: projectId, feedback_id: feedbackId,
-          user_name: user_name || null, action: 'comment',
+          project_id: projectId,
+          feedback_id: feedbackId,
+          user_name: user_name || null,
+          action: 'comment',
           data: JSON.stringify({ text: text.trim() }),
           created_at: db.fn.now(),
         });
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
         logger.error('Failed to add feedback comment', {
-          projectId, feedbackId,
+          projectId,
+          feedbackId,
           error: (error as Error).message,
         });
-        return reply.code(500).send({ error: 'Failed to add feedback comment' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to add feedback comment' });
       }
     }
   );
 
-  // ?€?€?€ Link / Unlink Issue to Feedback ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Link / Unlink Issue to Feedback ?ï¿½?ï¿½?ï¿½
 
   app.patch(
     '/feedback/:projectId/:feedbackId/link-issue',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, feedbackId } = request.params as { projectId: string; feedbackId: string };
+      const { projectId, feedbackId } = request.params as {
+        projectId: string;
+        feedbackId: string;
+      };
       const { issue_id } = request.body as { issue_id: number | null };
 
       try {
@@ -797,19 +952,27 @@ export default async function feedbackRoutes(app: FastifyInstance) {
              ON DUPLICATE KEY UPDATE issue_id = VALUES(issue_id), updated_at = UTC_TIMESTAMP()`,
             [projectId, feedbackId, issue_id]
           );
-          logger.info('Linked feedback to issue', { projectId, feedbackId, issueId: issue_id });
+          logger.info('Linked feedback to issue', {
+            projectId,
+            feedbackId,
+            issueId: issue_id,
+          });
         } else {
           // Unlink
           await db('g_argus_feedback_issue_links')
             .where({ project_id: projectId, feedback_id: feedbackId })
             .del();
-          logger.info('Unlinked feedback from issue', { projectId, feedbackId });
+          logger.info('Unlinked feedback from issue', {
+            projectId,
+            feedbackId,
+          });
         }
 
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to link/unlink feedback issue', {
-          projectId, feedbackId,
+          projectId,
+          feedbackId,
           error: (error as Error).message,
         });
         return reply.code(500).send({ error: 'Failed to link/unlink issue' });
@@ -837,7 +1000,9 @@ async function ensureActivityTable(): Promise<void> {
     `);
     activityTableChecked = true;
   } catch (e) {
-    logger.warn('Failed to ensure activity table', { error: (e as Error).message });
+    logger.warn('Failed to ensure activity table', {
+      error: (e as Error).message,
+    });
   }
 }
 
@@ -859,6 +1024,8 @@ async function ensureIssueLinkTable(): Promise<void> {
     `);
     issueLinkTableChecked = true;
   } catch (e) {
-    logger.warn('Failed to ensure issue link table', { error: (e as Error).message });
+    logger.warn('Failed to ensure issue link table', {
+      error: (e as Error).message,
+    });
   }
 }

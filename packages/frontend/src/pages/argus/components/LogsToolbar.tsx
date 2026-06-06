@@ -1,7 +1,12 @@
 import React from 'react';
 import {
-  Box, Typography, Chip, IconButton,
-  Button, useTheme, alpha,
+  Box,
+  Typography,
+  Chip,
+  IconButton,
+  Button,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import {
@@ -69,7 +74,14 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        mb: 0.5,
+      }}
+    >
       <SegmentedTabs
         items={[
           { key: '0', label: t('argus.logs.logsTab', 'Logs') },
@@ -87,22 +99,36 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
             size="small"
             label={`${displayCount.toLocaleString()} / ${totalLogCount.toLocaleString()}`}
             sx={{
-              height: 22, fontSize: '0.68rem', fontWeight: 700,
+              height: 22,
+              fontSize: '0.68rem',
+              fontWeight: 700,
               backgroundColor: alpha(theme.palette.primary.main, 0.08),
-              color: 'text.secondary', border: 'none',
+              color: 'text.secondary',
+              border: 'none',
             }}
           />
         )}
 
-
-
-        <Button variant="outlined" size="small" startIcon={<EditTableIcon sx={{ fontSize: 15 }} />}
+        <Button
+          variant="text"
+          size="small"
+          startIcon={<EditTableIcon sx={{ fontSize: 15 }} />}
           onClick={onOpenEditTable}
           sx={{
-            textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, px: 1.2,
-            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-            borderRadius: '6px', whiteSpace: 'nowrap',
-          }}>
+            textTransform: 'none',
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            px: 1.2,
+            color: 'text.primary',
+            borderRadius: '6px',
+            whiteSpace: 'nowrap',
+            '&:hover': {
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.04)',
+            },
+          }}
+        >
           {t('argus.logs.editTable', 'Edit Table')}
         </Button>
 
@@ -114,20 +140,31 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
 
         {/* Time Jump */}
         {showGotoTime ? (
-          <Box component="input"
+          <Box
+            component="input"
             placeholder="HH:MM:SS"
             value={gotoTime}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onGotoTimeChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onGotoTimeChange(e.target.value)
+            }
             onKeyDown={(e: React.KeyboardEvent) => {
               if (e.key === 'Enter') onGotoTimeSubmit();
               else if (e.key === 'Escape') onGotoTimeCancel();
             }}
             autoFocus
             sx={{
-              width: 90, height: 26, border: '1px solid',
-              borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-              borderRadius: '6px', px: 1, fontSize: '0.72rem',
-              backgroundColor: 'transparent', color: 'text.primary', outline: 'none',
+              width: 90,
+              height: 26,
+              border: '1px solid',
+              borderColor: isDark
+                ? 'rgba(255,255,255,0.15)'
+                : 'rgba(0,0,0,0.15)',
+              borderRadius: '6px',
+              px: 1,
+              fontSize: '0.72rem',
+              backgroundColor: 'transparent',
+              color: 'text.primary',
+              outline: 'none',
               '&:focus': { borderColor: theme.palette.primary.main },
             }}
           />
@@ -140,40 +177,124 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
         )}
 
         {/* Wrap Lines */}
-        <SafeTooltip title={wrapLines ? t('argus.logs.unwrapLines', 'Unwrap lines') : t('argus.logs.wrapLines', 'Wrap lines')}>
-          <IconButton size="small" onClick={onWrapLinesToggle} color={wrapLines ? 'primary' : 'default'} sx={{ p: 0.4 }}>
+        <SafeTooltip
+          title={
+            wrapLines
+              ? t('argus.logs.unwrapLines', 'Unwrap lines')
+              : t('argus.logs.wrapLines', 'Wrap lines')
+          }
+        >
+          <IconButton
+            size="small"
+            onClick={onWrapLinesToggle}
+            color={wrapLines ? 'primary' : 'default'}
+            sx={{ p: 0.4 }}
+          >
             <WrapTextIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </SafeTooltip>
 
         {/* Display Density */}
         {onDensityChange && (
-          <Box sx={{ display: 'flex', alignItems: 'center', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, borderRadius: '6px', overflow: 'hidden' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+              borderRadius: '6px',
+              overflow: 'hidden',
+            }}
+          >
             <SafeTooltip title={t('argus.logs.density.compact', 'Compact')}>
-              <IconButton size="small" onClick={() => onDensityChange('compact')}
-                sx={{ p: 0.3, borderRadius: 0, backgroundColor: displayDensity === 'compact' ? alpha(theme.palette.primary.main, 0.12) : 'transparent' }}>
-                <CompactIcon sx={{ fontSize: 16, color: displayDensity === 'compact' ? theme.palette.primary.main : 'text.disabled' }} />
+              <IconButton
+                size="small"
+                onClick={() => onDensityChange('compact')}
+                sx={{
+                  p: 0.3,
+                  borderRadius: 0,
+                  backgroundColor:
+                    displayDensity === 'compact'
+                      ? alpha(theme.palette.primary.main, 0.12)
+                      : 'transparent',
+                }}
+              >
+                <CompactIcon
+                  sx={{
+                    fontSize: 16,
+                    color:
+                      displayDensity === 'compact'
+                        ? theme.palette.primary.main
+                        : 'text.disabled',
+                  }}
+                />
               </IconButton>
             </SafeTooltip>
             <SafeTooltip title={t('argus.logs.density.default', 'Default')}>
-              <IconButton size="small" onClick={() => onDensityChange('default')}
-                sx={{ p: 0.3, borderRadius: 0, backgroundColor: displayDensity === 'default' ? alpha(theme.palette.primary.main, 0.12) : 'transparent' }}>
-                <DefaultDensityIcon sx={{ fontSize: 16, color: displayDensity === 'default' ? theme.palette.primary.main : 'text.disabled' }} />
+              <IconButton
+                size="small"
+                onClick={() => onDensityChange('default')}
+                sx={{
+                  p: 0.3,
+                  borderRadius: 0,
+                  backgroundColor:
+                    displayDensity === 'default'
+                      ? alpha(theme.palette.primary.main, 0.12)
+                      : 'transparent',
+                }}
+              >
+                <DefaultDensityIcon
+                  sx={{
+                    fontSize: 16,
+                    color:
+                      displayDensity === 'default'
+                        ? theme.palette.primary.main
+                        : 'text.disabled',
+                  }}
+                />
               </IconButton>
             </SafeTooltip>
             <SafeTooltip title={t('argus.logs.density.expanded', 'Expanded')}>
-              <IconButton size="small" onClick={() => onDensityChange('expanded')}
-                sx={{ p: 0.3, borderRadius: 0, backgroundColor: displayDensity === 'expanded' ? alpha(theme.palette.primary.main, 0.12) : 'transparent' }}>
-                <ExpandedIcon sx={{ fontSize: 16, color: displayDensity === 'expanded' ? theme.palette.primary.main : 'text.disabled' }} />
+              <IconButton
+                size="small"
+                onClick={() => onDensityChange('expanded')}
+                sx={{
+                  p: 0.3,
+                  borderRadius: 0,
+                  backgroundColor:
+                    displayDensity === 'expanded'
+                      ? alpha(theme.palette.primary.main, 0.12)
+                      : 'transparent',
+                }}
+              >
+                <ExpandedIcon
+                  sx={{
+                    fontSize: 16,
+                    color:
+                      displayDensity === 'expanded'
+                        ? theme.palette.primary.main
+                        : 'text.disabled',
+                  }}
+                />
               </IconButton>
             </SafeTooltip>
           </Box>
         )}
 
         {/* Fullscreen */}
-        <SafeTooltip placement="bottom-end" title={logsFullscreen ? t('argus.logs.exitFullscreen', 'Exit fullscreen') : t('argus.logs.fullscreen', 'Fullscreen')}>
+        <SafeTooltip
+          placement="bottom-end"
+          title={
+            logsFullscreen
+              ? t('argus.logs.exitFullscreen', 'Exit fullscreen')
+              : t('argus.logs.fullscreen', 'Fullscreen')
+          }
+        >
           <IconButton size="small" onClick={onFullscreenToggle} sx={{ p: 0.4 }}>
-            {logsFullscreen ? <FullscreenExitIcon sx={{ fontSize: 18 }} /> : <FullscreenIcon sx={{ fontSize: 18 }} />}
+            {logsFullscreen ? (
+              <FullscreenExitIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <FullscreenIcon sx={{ fontSize: 18 }} />
+            )}
           </IconButton>
         </SafeTooltip>
       </Box>

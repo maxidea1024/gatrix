@@ -57,7 +57,14 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
       }}
     >
       {icon && (
-        <Box sx={{ mb: 1, color: 'text.disabled', display: 'flex', justifyContent: 'center' }}>
+        <Box
+          sx={{
+            mb: 1,
+            color: 'text.disabled',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           {icon}
         </Box>
       )}

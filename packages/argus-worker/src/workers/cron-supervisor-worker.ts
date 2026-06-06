@@ -1,4 +1,13 @@
-import { mysqlPool, redis, createLogger, CACHE, COUNTERS, pipelineConfig, buildScheduleConfig, getNextSchedule } from '@gatrix/argus';
+import {
+  mysqlPool,
+  redis,
+  createLogger,
+  CACHE,
+  COUNTERS,
+  pipelineConfig,
+  buildScheduleConfig,
+  getNextSchedule,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 const logger = createLogger('cron-supervisor-worker');
@@ -94,7 +103,10 @@ export class CronSupervisorWorker {
           monitor.schedule_value,
           monitor.schedule_unit
         );
-        const tz = monitor.timezone && monitor.timezone !== 'UTC' ? monitor.timezone : undefined;
+        const tz =
+          monitor.timezone && monitor.timezone !== 'UTC'
+            ? monitor.timezone
+            : undefined;
         nextCheckinAt = getNextSchedule(new Date(), scheduleConfig, tz);
       } catch {
         logger.warn('Failed to compute next_checkin_at for missed monitor', {
@@ -120,7 +132,8 @@ export class CronSupervisorWorker {
            LIMIT ?`,
           [monitor.id, threshold]
         );
-        const allFailed = recentCheckins.length >= threshold &&
+        const allFailed =
+          recentCheckins.length >= threshold &&
           recentCheckins.every((c: any) => c.status !== 'ok');
         if (!allFailed) continue; // Not enough consecutive failures
       }
@@ -177,7 +190,10 @@ export class CronSupervisorWorker {
           checkin.schedule_value,
           checkin.schedule_unit
         );
-        const tz = checkin.timezone && checkin.timezone !== 'UTC' ? checkin.timezone : undefined;
+        const tz =
+          checkin.timezone && checkin.timezone !== 'UTC'
+            ? checkin.timezone
+            : undefined;
         nextCheckinAt = getNextSchedule(new Date(), scheduleConfig, tz);
       } catch {
         // best effort
@@ -237,10 +253,13 @@ export class CronSupervisorWorker {
           });
 
           if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-            logger.error('Discover cache refresh aborted: too many consecutive failures', {
-              failures: consecutiveFailures,
-              remainingProjects: projects.length,
-            });
+            logger.error(
+              'Discover cache refresh aborted: too many consecutive failures',
+              {
+                failures: consecutiveFailures,
+                remainingProjects: projects.length,
+              }
+            );
             break;
           }
         }
@@ -309,8 +328,11 @@ export class CronSupervisorWorker {
   }
 
   private async createIssue(monitor: any): Promise<void> {
-    const hash = require('crypto').createHash('md5').update(`cron_missed_${monitor.id}`).digest('hex');
-    
+    const hash = require('crypto')
+      .createHash('md5')
+      .update(`cron_missed_${monitor.id}`)
+      .digest('hex');
+
     // Check if unresolved issue already exists
     const [existing]: any = await mysqlPool.query(
       `SELECT id FROM g_argus_issues WHERE project_id = ? AND primary_hash = ? AND status = 'unresolved'`,
@@ -345,7 +367,7 @@ export class CronSupervisorWorker {
         'cron_error',
         'error',
         'other',
-        hash
+        hash,
       ]
     );
   }

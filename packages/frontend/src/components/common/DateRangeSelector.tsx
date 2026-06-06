@@ -73,9 +73,21 @@ export interface DateRangeSelectorProps {
 
 const DEFAULT_PRESETS: DateRangePresetOption[] = [
   { value: '5min', labelKey: 'dateRange.preset.5min', fallback: '5 Minutes' },
-  { value: '10min', labelKey: 'dateRange.preset.10min', fallback: '10 Minutes' },
-  { value: '15min', labelKey: 'dateRange.preset.15min', fallback: '15 Minutes' },
-  { value: '30min', labelKey: 'dateRange.preset.30min', fallback: '30 Minutes' },
+  {
+    value: '10min',
+    labelKey: 'dateRange.preset.10min',
+    fallback: '10 Minutes',
+  },
+  {
+    value: '15min',
+    labelKey: 'dateRange.preset.15min',
+    fallback: '15 Minutes',
+  },
+  {
+    value: '30min',
+    labelKey: 'dateRange.preset.30min',
+    fallback: '30 Minutes',
+  },
   { value: '1h', labelKey: 'dateRange.preset.1h', fallback: '1 Hour' },
   { value: '3h', labelKey: 'dateRange.preset.3h', fallback: '3 Hours' },
   { value: '6h', labelKey: 'dateRange.preset.6h', fallback: '6 Hours' },
@@ -105,7 +117,10 @@ function parseDateTimeLocal(s: string): Date | null {
   return d.isValid() ? d.toDate() : null;
 }
 
-function presetToDisplay(preset: string, t: (key: string, options?: any) => string): string {
+function presetToDisplay(
+  preset: string,
+  t: (key: string, options?: any) => string
+): string {
   const key = `dateRange.preset.${preset}`;
   const translated = t(key, { defaultValue: '' });
   if (translated && translated !== key && translated !== '') return translated;
@@ -144,19 +159,26 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   const open = Boolean(anchorEl);
 
   const [draftStart, setDraftStart] = useState<string>(() => {
-    if (value.type === 'custom' && value.start) return formatDateTimeLocal(value.start);
-    const d = new Date(); d.setHours(d.getHours() - 24);
+    if (value.type === 'custom' && value.start)
+      return formatDateTimeLocal(value.start);
+    const d = new Date();
+    d.setHours(d.getHours() - 24);
     return formatDateTimeLocal(d);
   });
   const [draftEnd, setDraftEnd] = useState<string>(() => {
-    if (value.type === 'custom' && value.end) return formatDateTimeLocal(value.end);
+    if (value.type === 'custom' && value.end)
+      return formatDateTimeLocal(value.end);
     return formatDateTimeLocal(new Date());
   });
   const [showCustom, setShowCustom] = useState(value.type === 'custom');
 
   const displayText = useMemo(() => {
     if (value.type === 'preset') {
-      return t('dateRange.last', { defaultValue: 'Last' }) + ' ' + presetToDisplay(value.preset || '24h', t);
+      return (
+        t('dateRange.last', { defaultValue: 'Last' }) +
+        ' ' +
+        presetToDisplay(value.preset || '24h', t)
+      );
     }
     if (value.type === 'custom' && value.start && value.end) {
       return `${formatDateDisplay(value.start)} ~ ${formatDateDisplay(value.end)}`;
@@ -175,7 +197,9 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     }
   };
 
-  const handleClose = () => { setAnchorEl(null); };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handlePresetClick = (preset: string) => {
     onChange({ type: 'preset', preset });
@@ -217,7 +241,9 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
           borderRadius: '6px',
           border: '1px solid',
           borderColor: open ? 'primary.main' : 'divider',
-          bgcolor: open ? alpha(theme.palette.primary.main, 0.04) : 'background.paper',
+          bgcolor: open
+            ? alpha(theme.palette.primary.main, 0.04)
+            : 'background.paper',
           cursor: 'pointer',
           transition: 'all 0.15s',
           overflow: 'hidden',
@@ -227,27 +253,41 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
           },
         }}
       >
-        <Box sx={{
-          px: 1, height: '100%', display: 'flex', alignItems: 'center',
-          bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-          borderRight: '1px solid', borderRightColor: 'divider',
-        }}>
-          <CalendarIcon sx={{ fontSize: 15, color: isDark ? 'grey.400' : 'text.secondary' }} />
+        <Box
+          sx={{
+            px: 1,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+            borderRight: '1px solid',
+            borderRightColor: 'divider',
+          }}
+        >
+          <CalendarIcon
+            sx={{ fontSize: 15, color: isDark ? 'grey.400' : 'text.secondary' }}
+          />
         </Box>
         <Box sx={{ px: 1.2, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography component="span" sx={{
-            fontSize: compact ? '0.7rem' : '0.75rem',
-            fontWeight: 600,
-            color: 'text.primary',
-            whiteSpace: 'nowrap',
-          }}>
+          <Typography
+            component="span"
+            sx={{
+              fontSize: compact ? '0.7rem' : '0.75rem',
+              fontWeight: 600,
+              color: 'text.primary',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {displayText}
           </Typography>
-          <ExpandMoreIcon sx={{
-            fontSize: 14, color: 'text.disabled',
-            transition: 'transform 0.2s',
-            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-          }} />
+          <ExpandMoreIcon
+            sx={{
+              fontSize: 14,
+              color: 'text.disabled',
+              transition: 'transform 0.2s',
+              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
         </Box>
       </Box>
 
@@ -272,39 +312,61 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
         }}
       >
         {/* Left: Presets */}
-        <Box sx={{
-          width: 150,
-          borderRight: showCustomRange ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` : undefined,
-          py: 1,
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-          <Typography variant="caption" sx={{ px: 1.5, pb: 0.5, fontWeight: 600, color: 'text.secondary', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <Box
+          sx={{
+            width: 150,
+            borderRight: showCustomRange
+              ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`
+              : undefined,
+            py: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              px: 1.5,
+              pb: 0.5,
+              fontWeight: 600,
+              color: 'text.secondary',
+              fontSize: '0.65rem',
+              textTransform: 'uppercase',
+              letterSpacing: 0.5,
+            }}
+          >
             {t('dateRange.relative', { defaultValue: 'Relative' })}
           </Typography>
           {presets.map((p, idx) => {
-            const isActive = value.type === 'preset' && value.preset === p.value;
+            const isActive =
+              value.type === 'preset' && value.preset === p.value;
             // Detect unit group change for divider
             const getUnit = (v: string) => {
               if (v.endsWith('min')) return 'min';
               if (v.endsWith('h')) return 'h';
               return 'd';
             };
-            const showDivider = idx > 0 && getUnit(p.value) !== getUnit(presets[idx - 1].value);
+            const showDivider =
+              idx > 0 && getUnit(p.value) !== getUnit(presets[idx - 1].value);
             return (
               <React.Fragment key={p.value}>
                 {showDivider && <Divider sx={{ my: 0.5 }} />}
                 <Box
                   onClick={() => handlePresetClick(p.value)}
                   sx={{
-                    px: 1.5, py: 0.6,
+                    px: 1.5,
+                    py: 0.6,
                     cursor: 'pointer',
                     fontSize: '0.78rem',
                     fontWeight: isActive ? 700 : 400,
                     color: isActive ? 'primary.main' : 'text.primary',
-                    backgroundColor: isActive ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                    backgroundColor: isActive
+                      ? alpha(theme.palette.primary.main, 0.08)
+                      : 'transparent',
                     transition: 'all 0.1s',
-                    '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.06) },
+                    '&:hover': {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.06),
+                    },
                   }}
                 >
                   {t(p.labelKey, { defaultValue: p.fallback })}
@@ -319,15 +381,22 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
               <Box
                 onClick={() => setShowCustom(true)}
                 sx={{
-                  px: 1.5, py: 0.6,
+                  px: 1.5,
+                  py: 0.6,
                   cursor: 'pointer',
                   fontSize: '0.78rem',
                   fontWeight: showCustom && value.type === 'custom' ? 700 : 400,
                   color: showCustom ? 'primary.main' : 'text.primary',
-                  backgroundColor: showCustom ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                  backgroundColor: showCustom
+                    ? alpha(theme.palette.primary.main, 0.08)
+                    : 'transparent',
                   transition: 'all 0.1s',
-                  display: 'flex', alignItems: 'center', gap: 0.5,
-                  '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.06) },
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.06),
+                  },
                 }}
               >
                 <TimeIcon sx={{ fontSize: 14 }} />
@@ -339,15 +408,36 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
 
         {/* Right: Custom Range or Preview */}
         {showCustomRange && (
-          <Box sx={{ width: 340, p: 2, display: 'flex', flexDirection: 'column' }}>
+          <Box
+            sx={{ width: 340, p: 2, display: 'flex', flexDirection: 'column' }}
+          >
             {showCustom ? (
               <>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  sx={{
+                    mb: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                  }}
+                >
                   <CalendarIcon sx={{ fontSize: 16 }} />
-                  {t('dateRange.customRange', { defaultValue: 'Custom Date Range' })}
+                  {t('dateRange.customRange', {
+                    defaultValue: 'Custom Date Range',
+                  })}
                 </Typography>
 
-                <Typography variant="caption" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary', fontSize: '0.7rem' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mb: 0.5,
+                    fontWeight: 500,
+                    color: 'text.secondary',
+                    fontSize: '0.7rem',
+                  }}
+                >
                   {t('dateRange.from', { defaultValue: 'From' })}
                 </Typography>
                 <TextField
@@ -356,11 +446,25 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                   value={draftStart.slice(0, 19)}
                   onChange={(e) => setDraftStart(e.target.value)}
                   inputProps={{ step: 1 }}
-                  sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontSize: '0.82rem' } }}
+                  sx={{
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 1.5,
+                      fontSize: '0.82rem',
+                    },
+                  }}
                   fullWidth
                 />
 
-                <Typography variant="caption" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary', fontSize: '0.7rem' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mb: 0.5,
+                    fontWeight: 500,
+                    color: 'text.secondary',
+                    fontSize: '0.7rem',
+                  }}
+                >
                   {t('dateRange.to', { defaultValue: 'To' })}
                 </Typography>
                 <TextField
@@ -369,16 +473,37 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                   value={draftEnd.slice(0, 19)}
                   onChange={(e) => setDraftEnd(e.target.value)}
                   inputProps={{ step: 1 }}
-                  sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontSize: '0.82rem' } }}
+                  sx={{
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 1.5,
+                      fontSize: '0.82rem',
+                    },
+                  }}
                   fullWidth
                 />
 
                 <Divider sx={{ mb: 1 }} />
-                <Typography variant="caption" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary', fontSize: '0.7rem' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mb: 0.5,
+                    fontWeight: 500,
+                    color: 'text.secondary',
+                    fontSize: '0.7rem',
+                  }}
+                >
                   {t('dateRange.quickSelect', { defaultValue: 'Quick Select' })}
                 </Typography>
 
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.5, mb: 1 }}>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: 0.5,
+                    mb: 1,
+                  }}
+                >
                   {presets.map((p) => {
                     const hours = presetToHours(p.value);
                     const minutes = hours != null ? Math.round(hours * 60) : 60;
@@ -389,11 +514,18 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                         variant="outlined"
                         onClick={() => handleQuickSet(minutes)}
                         sx={{
-                          fontSize: '0.65rem', px: 0.5, py: 0.3, minWidth: 0,
-                          textTransform: 'none', borderRadius: 1,
+                          fontSize: '0.65rem',
+                          px: 0.5,
+                          py: 0.3,
+                          minWidth: 0,
+                          textTransform: 'none',
+                          borderRadius: 1,
                           borderColor: 'divider',
                           color: 'text.secondary',
-                          '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                          },
                         }}
                       >
                         {t(p.labelKey, { defaultValue: p.fallback })}
@@ -403,8 +535,14 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                 </Box>
 
                 {!isValidCustomRange && draftStart && draftEnd && (
-                  <Typography variant="caption" color="error" sx={{ mb: 1, fontSize: '0.7rem' }}>
-                    {t('dateRange.invalidRange', { defaultValue: 'Start must be before end' })}
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mb: 1, fontSize: '0.7rem' }}
+                  >
+                    {t('dateRange.invalidRange', {
+                      defaultValue: 'Start must be before end',
+                    })}
                   </Typography>
                 )}
 
@@ -415,27 +553,60 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                   size="small"
                   disabled={!isValidCustomRange}
                   onClick={handleApplyCustom}
-                  sx={{ alignSelf: 'flex-end', textTransform: 'none', borderRadius: 1.5, px: 3, mb: 1 }}
+                  sx={{
+                    alignSelf: 'flex-end',
+                    textTransform: 'none',
+                    borderRadius: 1.5,
+                    px: 3,
+                    mb: 1,
+                  }}
                 >
                   {t('dateRange.apply', { defaultValue: 'Apply' })}
                 </Button>
               </>
             ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-                <CalendarIcon sx={{ fontSize: 40, color: alpha(theme.palette.primary.main, 0.2), mb: 1 }} />
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                }}
+              >
+                <CalendarIcon
+                  sx={{
+                    fontSize: 40,
+                    color: alpha(theme.palette.primary.main, 0.2),
+                    mb: 1,
+                  }}
+                />
                 <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
                   {displayText}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                  {t('dateRange.selectPresetOrCustom', { defaultValue: 'Select a preset or choose a custom range' })}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: '0.7rem' }}
+                >
+                  {t('dateRange.selectPresetOrCustom', {
+                    defaultValue: 'Select a preset or choose a custom range',
+                  })}
                 </Typography>
                 <Button
                   variant="outlined"
                   size="small"
                   onClick={() => setShowCustom(true)}
-                  sx={{ mt: 2, textTransform: 'none', borderRadius: 1.5, fontSize: '0.78rem' }}
+                  sx={{
+                    mt: 2,
+                    textTransform: 'none',
+                    borderRadius: 1.5,
+                    fontSize: '0.78rem',
+                  }}
                 >
-                  {t('dateRange.setCustomRange', { defaultValue: 'Set Custom Range' })}
+                  {t('dateRange.setCustomRange', {
+                    defaultValue: 'Set Custom Range',
+                  })}
                 </Button>
               </Box>
             )}
@@ -464,7 +635,11 @@ export function dateRangeToApiParams(value: DateRangeValue): {
     return { period: value.preset || '24h' };
   }
   if (value.type === 'custom' && value.start && value.end) {
-    return { period: 'custom', start: value.start.toISOString(), end: value.end.toISOString() };
+    return {
+      period: 'custom',
+      start: value.start.toISOString(),
+      end: value.end.toISOString(),
+    };
   }
   return { period: '24h' };
 }
@@ -489,7 +664,10 @@ export function presetToHours(preset: string): number | undefined {
  * Convert a DateRangeValue to a concrete { start: Date, end: Date } range.
  * For presets this calculates relative to `now` in the user's configured timezone.
  */
-export function dateRangeToDatePair(value: DateRangeValue): { start: Date; end: Date } {
+export function dateRangeToDatePair(value: DateRangeValue): {
+  start: Date;
+  end: Date;
+} {
   if (value.type === 'custom' && value.start && value.end) {
     return { start: value.start, end: value.end };
   }
@@ -508,5 +686,3 @@ export function dateRangeToDatePair(value: DateRangeValue): { start: Date; end: 
   const start = now.subtract(hours, 'hour');
   return { start: start.toDate(), end: end.toDate() };
 }
-
-

@@ -700,9 +700,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                 <TableBody>
                   {SUPPORTED_FILES.map((file) => (
                     <TableRow key={file.name}>
-                      <TableCell
-                        sx={{ fontSize: '0.85rem' }}
-                      >
+                      <TableCell sx={{ fontSize: '0.85rem' }}>
                         {file.name}
                       </TableCell>
                       <TableCell>

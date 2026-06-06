@@ -44,7 +44,9 @@ function parseArgs(): BenchArgs {
   const scenario = get('scenario');
   if (!scenario) {
     console.error('Error: --scenario is required');
-    console.error('Available: ingest, full-pipeline, worker-processing, trace-processing, query, stress');
+    console.error(
+      'Available: ingest, full-pipeline, worker-processing, trace-processing, query, stress'
+    );
     process.exit(1);
   }
 
@@ -57,7 +59,7 @@ function parseArgs(): BenchArgs {
     iterations: parseInt(get('iterations', '100')!, 10),
     save: get('save'),
     compare: get('compare'),
-    output: (get('output', 'table') as 'table' | 'json'),
+    output: get('output', 'table') as 'table' | 'json',
     apiUrl: get('api-url', 'http://localhost:4000')!,
     dsnKey: get('dsn-key', 'bench-test-key')!,
   };
@@ -104,7 +106,8 @@ class MetricCollector {
     const sorted = [...this.latencies].sort((a, b) => a - b);
     const len = sorted.length;
 
-    const p = (pct: number) => len > 0 ? sorted[Math.min(Math.floor(len * pct / 100), len - 1)] : 0;
+    const p = (pct: number) =>
+      len > 0 ? sorted[Math.min(Math.floor((len * pct) / 100), len - 1)] : 0;
 
     return {
       scenario,
@@ -119,9 +122,12 @@ class MetricCollector {
         'Latency min (ms)': Math.round((sorted[0] || 0) * 100) / 100,
         'Latency max (ms)': Math.round((sorted[len - 1] || 0) * 100) / 100,
         'Error Count': this.errors,
-        'Error Rate (%)': Math.round(this.errors / this.totalEvents * 10000) / 100,
+        'Error Rate (%)':
+          Math.round((this.errors / this.totalEvents) * 10000) / 100,
         'Peak RSS (MB)': Math.round(process.memoryUsage().rss / 1024 / 1024),
-        'RSS Delta (MB)': Math.round((process.memoryUsage().rss - this.startRss) / 1024 / 1024),
+        'RSS Delta (MB)': Math.round(
+          (process.memoryUsage().rss - this.startRss) / 1024 / 1024
+        ),
       },
       latencies: sorted,
     };
@@ -131,7 +137,13 @@ class MetricCollector {
 // ── Event generators ──
 
 function generateErrorEvent(projectId: string): object {
-  const errorTypes = ['TypeError', 'ReferenceError', 'SyntaxError', 'RangeError', 'NetworkError'];
+  const errorTypes = [
+    'TypeError',
+    'ReferenceError',
+    'SyntaxError',
+    'RangeError',
+    'NetworkError',
+  ];
   const levels = ['error', 'fatal', 'warning'];
   const environments = ['production', 'staging', 'development'];
   const platforms = ['javascript', 'python', 'node', 'java'];
@@ -181,7 +193,11 @@ function generateTransactionEvent(): object {
   };
 }
 
-function generateSpans(count: number, traceId: string, parentSpanId: string): object[] {
+function generateSpans(
+  count: number,
+  traceId: string,
+  parentSpanId: string
+): object[] {
   const ops = ['db.query', 'http.client', 'cache.get', 'serialize', 'render'];
   return Array.from({ length: count }, () => ({
     span_id: randomUUID().replace(/-/g, '').slice(0, 16),
@@ -198,13 +214,17 @@ function generateSpans(count: number, traceId: string, parentSpanId: string): ob
 
 // ── HTTP client ──
 
-async function postEvent(url: string, dsnKey: string, body: object): Promise<number> {
+async function postEvent(
+  url: string,
+  dsnKey: string,
+  body: object
+): Promise<number> {
   const start = performance.now();
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${dsnKey}`,
+      Authorization: `Bearer ${dsnKey}`,
     },
     body: JSON.stringify(body),
   });
@@ -232,7 +252,9 @@ async function runWithConcurrency<T>(
     }
   }
 
-  await Promise.all(Array.from({ length: Math.min(concurrency, tasks.length) }, () => worker()));
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, tasks.length) }, () => worker())
+  );
   return results;
 }
 
@@ -243,7 +265,9 @@ async function scenarioIngest(args: BenchArgs): Promise<BenchResult> {
   const runId = randomUUID().slice(0, 8);
   const ingestUrl = `${args.apiUrl}/api/ingest/error`;
 
-  console.log(`\n🔥 Ingest Scenario: ${args.events} events, ${args.concurrency} concurrency`);
+  console.log(
+    `\n🔥 Ingest Scenario: ${args.events} events, ${args.concurrency} concurrency`
+  );
   console.log(`   Target: ${ingestUrl}`);
   console.log(`   DSN Key: ${args.dsnKey}\n`);
 
@@ -295,7 +319,9 @@ async function scenarioTraceProcessing(args: BenchArgs): Promise<BenchResult> {
 
   const result = collector.getResult('trace-processing');
   result.metrics['Total Spans'] = totalSpans;
-  result.metrics['Spans/sec'] = Math.round(totalSpans / (result.metrics['Duration (s)'] || 1));
+  result.metrics['Spans/sec'] = Math.round(
+    totalSpans / (result.metrics['Duration (s)'] || 1)
+  );
 
   return result;
 }
@@ -333,7 +359,9 @@ async function scenarioStress(args: BenchArgs): Promise<BenchResult> {
   const runId = randomUUID().slice(0, 8);
   let eventsSent = 0;
 
-  console.log(`\n💥 Stress Scenario: ${args.duration}s sustained load, ${args.concurrency} concurrency\n`);
+  console.log(
+    `\n💥 Stress Scenario: ${args.duration}s sustained load, ${args.concurrency} concurrency\n`
+  );
 
   const endTime = Date.now() + args.duration * 1000;
   collector.begin(0);
@@ -356,7 +384,9 @@ async function scenarioStress(args: BenchArgs): Promise<BenchResult> {
 
   const result = collector.getResult('stress');
   result.metrics['Total Events'] = eventsSent;
-  result.metrics['Throughput (events/sec)'] = Math.round(eventsSent / (result.metrics['Duration (s)'] || 1));
+  result.metrics['Throughput (events/sec)'] = Math.round(
+    eventsSent / (result.metrics['Duration (s)'] || 1)
+  );
 
   return result;
 }
@@ -366,22 +396,27 @@ async function scenarioStress(args: BenchArgs): Promise<BenchResult> {
 function printTable(result: BenchResult, baseline?: BenchResult): void {
   const divider = '─'.repeat(64);
   console.log(`\n┌${divider}┐`);
-  console.log(`│ ${'Metric'.padEnd(30)} │ ${'Current'.padEnd(15)} │ ${'Change'.padEnd(12)} │`);
+  console.log(
+    `│ ${'Metric'.padEnd(30)} │ ${'Current'.padEnd(15)} │ ${'Change'.padEnd(12)} │`
+  );
   console.log(`├${divider}┤`);
 
   for (const [key, value] of Object.entries(result.metrics)) {
-    const formatted = typeof value === 'number' ? value.toLocaleString() : String(value);
+    const formatted =
+      typeof value === 'number' ? value.toLocaleString() : String(value);
     let change = '';
 
     if (baseline?.metrics[key] !== undefined) {
       const baseVal = baseline.metrics[key];
       if (baseVal > 0) {
-        const pct = ((value - baseVal) / baseVal * 100).toFixed(1);
+        const pct = (((value - baseVal) / baseVal) * 100).toFixed(1);
         change = Number(pct) >= 0 ? `+${pct}%` : `${pct}%`;
       }
     }
 
-    console.log(`│ ${key.padEnd(30)} │ ${formatted.padEnd(15)} │ ${change.padEnd(12)} │`);
+    console.log(
+      `│ ${key.padEnd(30)} │ ${formatted.padEnd(15)} │ ${change.padEnd(12)} │`
+    );
   }
 
   console.log(`└${divider}┘\n`);

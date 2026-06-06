@@ -643,20 +643,14 @@ const RippleMonitorPage: React.FC = () => {
                               )}
                             </TableCell>
                             <TableCell align="right">
-                              <Typography
-                                variant="body2"
-                                
-                              >
+                              <Typography variant="body2">
                                 {handler.timeoutMs != null
                                   ? `${handler.timeoutMs}ms`
                                   : '—'}
                               </Typography>
                             </TableCell>
                             <TableCell align="right">
-                              <Typography
-                                variant="body2"
-                                
-                              >
+                              <Typography variant="body2">
                                 {handler.debounceMs != null
                                   ? `${handler.debounceMs}ms`
                                   : '—'}

@@ -59,19 +59,25 @@ export const ActionChip: React.FC<ActionChipProps> = ({
       border: `1px solid ${borderColor}`,
       backgroundColor: 'transparent',
       color: 'text.primary',
-      '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+      '&:hover': {
+        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+      },
     },
     filled: {
       border: 'none',
       backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
       color: 'text.primary',
-      '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)' },
+      '&:hover': {
+        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)',
+      },
     },
     tinted: {
       border: `1px solid ${tintColor ? alpha(tintColor, 0.3) : borderColor}`,
       backgroundColor: tintColor ? alpha(tintColor, 0.12) : 'transparent',
       color: tintColor || 'text.primary',
-      '&:hover': { backgroundColor: tintColor ? alpha(tintColor, 0.18) : undefined },
+      '&:hover': {
+        backgroundColor: tintColor ? alpha(tintColor, 0.18) : undefined,
+      },
     },
   };
 
@@ -127,26 +133,39 @@ export const ActionChipSplit: React.FC<ActionChipSplitProps> = ({
   const borderColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)';
 
   return (
-    <Box sx={{
-      display: 'flex', alignItems: 'center', height,
-      border: `1px solid ${borderColor}`,
-      borderRadius: '6px', overflow: 'hidden',
-      opacity: disabled ? 0.5 : 1,
-      pointerEvents: disabled ? 'none' : 'auto',
-      ...sx,
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        height,
+        border: `1px solid ${borderColor}`,
+        borderRadius: '6px',
+        overflow: 'hidden',
+        opacity: disabled ? 0.5 : 1,
+        pointerEvents: disabled ? 'none' : 'auto',
+        ...sx,
+      }}
+    >
       <Chip
         icon={icon}
         label={label}
         size="small"
         onClick={onClick}
         sx={{
-          height: '100%', borderRadius: 0, border: 'none',
+          height: '100%',
+          borderRadius: 0,
+          border: 'none',
           backgroundColor: 'transparent',
-          color: 'text.primary', fontWeight: 600, fontSize: '0.75rem',
+          color: 'text.primary',
+          fontWeight: 600,
+          fontSize: '0.75rem',
           '& .MuiChip-icon': { color: 'inherit', ml: 0.8 },
           '& .MuiChip-label': { px: 0.8 },
-          '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+          '&:hover': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.04)',
+          },
         }}
       />
       <Divider orientation="vertical" flexItem />
@@ -155,12 +174,19 @@ export const ActionChipSplit: React.FC<ActionChipSplitProps> = ({
         size="small"
         onClick={onDropdownClick}
         sx={{
-          height: '100%', borderRadius: 0, border: 'none', minWidth: 28,
+          height: '100%',
+          borderRadius: 0,
+          border: 'none',
+          minWidth: 28,
           backgroundColor: 'transparent',
           color: 'text.secondary',
           '& .MuiChip-icon': { color: 'inherit', ml: 0.5, mr: -0.5 },
           '& .MuiChip-label': { display: 'none' },
-          '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+          '&:hover': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.04)',
+          },
         }}
       />
     </Box>

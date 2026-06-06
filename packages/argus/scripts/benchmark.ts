@@ -25,8 +25,10 @@ function parseArgs() {
   };
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--events' && args[i + 1]) config.events = parseInt(args[i + 1], 10);
-    if (args[i] === '--concurrency' && args[i + 1]) config.concurrency = parseInt(args[i + 1], 10);
+    if (args[i] === '--events' && args[i + 1])
+      config.events = parseInt(args[i + 1], 10);
+    if (args[i] === '--concurrency' && args[i + 1])
+      config.concurrency = parseInt(args[i + 1], 10);
     if (args[i] === '--dsn' && args[i + 1]) config.dsn = args[i + 1];
     if (args[i] === '--project' && args[i + 1]) config.projectId = args[i + 1];
   }
@@ -167,7 +169,9 @@ async function fetchDsnKey(): Promise<{ dsn: string; projectId: string }> {
     console.log(`⚠️  Could not auto-discover DSN: ${e.message}`);
   }
 
-  throw new Error('No DSN key found. Provide --dsn <publicKey> --project <projectId>');
+  throw new Error(
+    'No DSN key found. Provide --dsn <publicKey> --project <projectId>'
+  );
 }
 
 // ── Send single event ──
@@ -183,7 +187,7 @@ async function sendEvent(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${dsn}`,
+        Authorization: `Bearer ${dsn}`,
       },
       body: JSON.stringify(event),
     });
@@ -207,7 +211,7 @@ async function sendBatch(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${dsn}`,
+        Authorization: `Bearer ${dsn}`,
       },
       body: JSON.stringify({ events }),
     });
@@ -224,12 +228,15 @@ async function runConcurrent<T>(
   concurrency: number
 ): Promise<void> {
   let idx = 0;
-  const workers = Array.from({ length: Math.min(concurrency, tasks.length) }, async () => {
-    while (idx < tasks.length) {
-      const taskIdx = idx++;
-      await tasks[taskIdx]();
+  const workers = Array.from(
+    { length: Math.min(concurrency, tasks.length) },
+    async () => {
+      while (idx < tasks.length) {
+        const taskIdx = idx++;
+        await tasks[taskIdx]();
+      }
     }
-  });
+  );
   await Promise.all(workers);
 }
 
@@ -278,7 +285,8 @@ async function main() {
 
   const singleTracker = new LatencyTracker();
   const singleTasks = Array.from({ length: cfg.events }, (_, i) => {
-    return () => sendEvent(projectId, dsn, generateErrorEvent(i), singleTracker);
+    return () =>
+      sendEvent(projectId, dsn, generateErrorEvent(i), singleTracker);
   });
 
   const singleStart = performance.now();
@@ -291,7 +299,9 @@ async function main() {
   console.log(`\n   ✅ Results:`);
   console.log(`   Total time:    ${(singleElapsed / 1000).toFixed(2)}s`);
   console.log(`   Throughput:    ${singleEps} events/sec`);
-  console.log(`   Latency (ms):  min=${singleReport.min}  avg=${singleReport.avg}  p50=${singleReport.p50}  p95=${singleReport.p95}  p99=${singleReport.p99}  max=${singleReport.max}`);
+  console.log(
+    `   Latency (ms):  min=${singleReport.min}  avg=${singleReport.avg}  p50=${singleReport.p50}  p95=${singleReport.p95}  p99=${singleReport.p99}  max=${singleReport.max}`
+  );
   console.log(`   Status codes:  ${JSON.stringify(singleReport.statusCodes)}`);
   console.log(`   Errors:        ${singleReport.errors}`);
   console.log('');
@@ -303,7 +313,9 @@ async function main() {
   const batchCount = Math.ceil(cfg.events / BATCH_SIZE);
 
   console.log('── Scenario 2: Batch Event Ingest ──');
-  console.log(`   Sending ${cfg.events} events in ${batchCount} batches of ${BATCH_SIZE}...`);
+  console.log(
+    `   Sending ${cfg.events} events in ${batchCount} batches of ${BATCH_SIZE}...`
+  );
 
   const batchTracker = new LatencyTracker();
   const batchTasks = Array.from({ length: batchCount }, (_, batchIdx) => {
@@ -323,8 +335,12 @@ async function main() {
 
   console.log(`\n   ✅ Results:`);
   console.log(`   Total time:    ${(batchElapsed / 1000).toFixed(2)}s`);
-  console.log(`   Throughput:    ${batchEps} events/sec (${batchReport.count} batches)`);
-  console.log(`   Latency (ms):  min=${batchReport.min}  avg=${batchReport.avg}  p50=${batchReport.p50}  p95=${batchReport.p95}  p99=${batchReport.p99}  max=${batchReport.max}`);
+  console.log(
+    `   Throughput:    ${batchEps} events/sec (${batchReport.count} batches)`
+  );
+  console.log(
+    `   Latency (ms):  min=${batchReport.min}  avg=${batchReport.avg}  p50=${batchReport.p50}  p95=${batchReport.p95}  p99=${batchReport.p99}  max=${batchReport.max}`
+  );
   console.log(`   Status codes:  ${JSON.stringify(batchReport.statusCodes)}`);
   console.log(`   Errors:        ${batchReport.errors}`);
   console.log('');
@@ -335,9 +351,15 @@ async function main() {
   console.log('═══════════════════════════════════════════════════');
   console.log('                    Summary');
   console.log('═══════════════════════════════════════════════════');
-  console.log(`   Single ingest:  ${singleEps} events/sec  (p95: ${singleReport.p95}ms)`);
-  console.log(`   Batch ingest:   ${batchEps} events/sec  (p95: ${batchReport.p95}ms)`);
-  console.log(`   Batch speedup:  ${(parseInt(batchEps) / parseInt(singleEps)).toFixed(1)}x`);
+  console.log(
+    `   Single ingest:  ${singleEps} events/sec  (p95: ${singleReport.p95}ms)`
+  );
+  console.log(
+    `   Batch ingest:   ${batchEps} events/sec  (p95: ${batchReport.p95}ms)`
+  );
+  console.log(
+    `   Batch speedup:  ${(parseInt(batchEps) / parseInt(singleEps)).toFixed(1)}x`
+  );
   console.log('═══════════════════════════════════════════════════');
   console.log('');
 }

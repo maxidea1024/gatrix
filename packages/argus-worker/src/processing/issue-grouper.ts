@@ -1,4 +1,11 @@
-import { mysqlPool, redis, createLogger, ArgusErrorEvent, COUNTERS, BUFFERS } from '@gatrix/argus';
+import {
+  mysqlPool,
+  redis,
+  createLogger,
+  ArgusErrorEvent,
+  COUNTERS,
+  BUFFERS,
+} from '@gatrix/argus';
 
 import { issueLookupCache } from './issue-cache';
 
@@ -30,7 +37,14 @@ export async function groupIntoIssue(
   // 1. Check in-memory cache first (O(1) lookup)
   const cached = issueLookupCache.get(projectId, primaryHash);
   if (cached) {
-    return handleExistingIssue(cached.issueId, cached.status, cached.substatus, projectId, primaryHash, event);
+    return handleExistingIssue(
+      cached.issueId,
+      cached.status,
+      cached.substatus,
+      projectId,
+      primaryHash,
+      event
+    );
   }
 
   // 2. Cache miss → plain SELECT (no FOR UPDATE, no connection.getConnection())
@@ -52,11 +66,24 @@ export async function groupIntoIssue(
       substatus: issue.substatus || null,
     });
 
-    return handleExistingIssue(issue.id, issue.status, issue.substatus, projectId, primaryHash, event);
+    return handleExistingIssue(
+      issue.id,
+      issue.status,
+      issue.substatus,
+      projectId,
+      primaryHash,
+      event
+    );
   }
 
   // 3. New issue — create with Redis-based short_id
-  return createNewIssue(internalProjectId, projectId, event, primaryHash, fingerprint);
+  return createNewIssue(
+    internalProjectId,
+    projectId,
+    event,
+    primaryHash,
+    fingerprint
+  );
 }
 
 /**
@@ -76,7 +103,11 @@ async function handleExistingIssue(
   // Defer times_seen and last_seen to Redis (BatchFlusher writes periodically)
   const pipeline = redis.pipeline();
   pipeline.hincrby(COUNTERS.ISSUE_TIMES_SEEN, `issue:${issueId}`, 1);
-  pipeline.hset(BUFFERS.ISSUE_LAST_SEEN, `issue:${issueId}`, Date.now().toString());
+  pipeline.hset(
+    BUFFERS.ISSUE_LAST_SEEN,
+    `issue:${issueId}`,
+    Date.now().toString()
+  );
   await pipeline.exec();
 
   if (isRegression) {
@@ -171,10 +202,19 @@ async function createNewIssue(
         status: existing.status,
         substatus: existing.substatus || null,
       });
-      return handleExistingIssue(existing.id, existing.status, existing.substatus, projectId, primaryHash, event);
+      return handleExistingIssue(
+        existing.id,
+        existing.status,
+        existing.substatus,
+        projectId,
+        primaryHash,
+        event
+      );
     }
     // Extremely rare: IGNORE triggered but row not found — log and re-throw
-    throw new Error(`INSERT IGNORE returned 0 but no existing issue found for hash ${primaryHash}`);
+    throw new Error(
+      `INSERT IGNORE returned 0 but no existing issue found for hash ${primaryHash}`
+    );
   }
 
   // Populate cache immediately
@@ -223,7 +263,8 @@ export async function initShortIdCounters(): Promise<void> {
 function buildIssueTitle(event: ArgusErrorEvent): string {
   const exc = event.exception;
   if (exc?.type && exc?.value) {
-    const value = exc.value.length > 200 ? exc.value.slice(0, 200) + '...' : exc.value;
+    const value =
+      exc.value.length > 200 ? exc.value.slice(0, 200) + '...' : exc.value;
     return `${exc.type}: ${value}`;
   }
   if (exc?.type) {

@@ -41,7 +41,9 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
   const { t, i18n } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
-  const [volumeData, setVolumeData] = useState<{ day: string; count: number; issue_count: number }[]>([]);
+  const [volumeData, setVolumeData] = useState<
+    { day: string; count: number; issue_count: number }[]
+  >([]);
   const [volumeLoading, setVolumeLoading] = useState(true);
 
   const fetchVolume = useCallback(async () => {
@@ -67,7 +69,9 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
     }
   }, [projectId, filters, status, level, query, environment, browser, os]);
 
-  useEffect(() => { fetchVolume(); }, [fetchVolume]);
+  useEffect(() => {
+    fetchVolume();
+  }, [fetchVolume]);
 
   const { chartData, buckets } = useMemo(() => {
     if (volumeData.length === 0) return { chartData: [], buckets: [] };
@@ -76,62 +80,100 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
       let label = d.day;
       try {
         const dt = new Date(d.day);
-        label = dt.toLocaleString(i18n.language || 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-      } catch { /* ignore */ }
+        label = dt.toLocaleString(i18n.language || 'en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+      } catch {
+        /* ignore */
+      }
       return { label, count: d.count };
     });
 
-    return { chartData: mapped, buckets: volumeData.map(d => d.day) };
+    return { chartData: mapped, buckets: volumeData.map((d) => d.day) };
   }, [volumeData, i18n.language]);
 
-  const handleZoom = useCallback((startIndex: number, endIndex: number) => {
-    if (!onDateRangeSelect) return;
-    const startIdx = Math.min(startIndex, endIndex);
-    const endIdx = Math.max(startIndex, endIndex);
+  const handleZoom = useCallback(
+    (startIndex: number, endIndex: number) => {
+      if (!onDateRangeSelect) return;
+      const startIdx = Math.min(startIndex, endIndex);
+      const endIdx = Math.max(startIndex, endIndex);
 
-    if (buckets[startIdx] && buckets[endIdx]) {
-      try {
-        const startDate = new Date(buckets[startIdx]);
-        let endDate = new Date(buckets[endIdx]);
-        
-        // Add duration of one bucket to the end date
-        if (buckets.length > 1) {
-          const gap = new Date(buckets[1]).getTime() - new Date(buckets[0]).getTime();
-          endDate = new Date(endDate.getTime() + gap - 1);
-        } else {
-          endDate.setHours(23, 59, 59, 999);
-        }
+      if (buckets[startIdx] && buckets[endIdx]) {
+        try {
+          const startDate = new Date(buckets[startIdx]);
+          let endDate = new Date(buckets[endIdx]);
 
-        if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-          onDateRangeSelect(startDate, endDate);
+          // Add duration of one bucket to the end date
+          if (buckets.length > 1) {
+            const gap =
+              new Date(buckets[1]).getTime() - new Date(buckets[0]).getTime();
+            endDate = new Date(endDate.getTime() + gap - 1);
+          } else {
+            endDate.setHours(23, 59, 59, 999);
+          }
+
+          if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+            onDateRangeSelect(startDate, endDate);
+          }
+        } catch {
+          /* ignore */
         }
-      } catch { /* ignore */ }
-    }
-  }, [buckets, onDateRangeSelect]);
+      }
+    },
+    [buckets, onDateRangeSelect]
+  );
+
+  if (
+    !volumeLoading &&
+    (chartData.length === 0 || chartData.every((d) => d.count === 0))
+  ) {
+    return (
+      <Box sx={{ mb: 1.5 }}>
+        <EmptyPlaceholder
+          icon={<BarChartIcon sx={{ fontSize: 36 }} />}
+          message={t('argus.issues.noVolumeData', 'No event data')}
+          minHeight={144}
+        />
+      </Box>
+    );
+  }
 
   return (
-    <Paper elevation={0} sx={{ p: 1.5, mb: 1.5, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, borderRadius: 2, position: 'relative' }}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 1.5,
+        mb: 1.5,
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        borderRadius: 2,
+        position: 'relative',
+      }}
+    >
       <Box sx={{ height: 120 }}>
         {volumeLoading ? (
-          <ArgusChartSkeleton type="bar" height={120} color={theme.palette.error.main} />
-        ) : chartData.length === 0 || chartData.every(d => d.count === 0) ? (
-          <EmptyPlaceholder
-            icon={<BarChartIcon sx={{ fontSize: 36 }} />}
-            message={t('argus.issues.noVolumeData', 'No event data')}
-            sx={{ height: '100%', py: 0, minHeight: 'unset' }}
+          <ArgusChartSkeleton
+            type="bar"
+            height={120}
+            color={theme.palette.error.main}
           />
         ) : (
-          <InteractiveTimeSeriesChart 
-            data={chartData} 
-            type="bar" 
-            height={120} 
-            onZoom={onDateRangeSelect ? handleZoom : undefined} 
-            datasets={[{
-              label: t('argus.issues.events'),
-              data: chartData.map(d => d.count),
-              type: 'bar',
-              color: theme.palette.error.main,
-            }]}
+          <InteractiveTimeSeriesChart
+            data={chartData}
+            type="bar"
+            height={120}
+            onZoom={onDateRangeSelect ? handleZoom : undefined}
+            datasets={[
+              {
+                label: t('argus.issues.events'),
+                data: chartData.map((d) => d.count),
+                type: 'bar',
+                color: theme.palette.error.main,
+              },
+            ]}
           />
         )}
       </Box>

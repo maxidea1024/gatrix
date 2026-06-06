@@ -339,9 +339,7 @@ const ArgusDiscoverPage = React.lazy(
 const ArgusDashboardsPage = React.lazy(
   () => import('./pages/argus/ArgusDashboardsPage')
 );
-const ArgusLogsPage = React.lazy(
-  () => import('./pages/argus/ArgusLogsPage')
-);
+const ArgusLogsPage = React.lazy(() => import('./pages/argus/ArgusLogsPage'));
 const ArgusTraceExplorerPage = React.lazy(
   () => import('./pages/argus/ArgusTraceExplorerPage')
 );
@@ -351,9 +349,7 @@ const ArgusMetricsExplorerPage = React.lazy(
 const ArgusExplorePage = React.lazy(
   () => import('./pages/argus/ArgusExplorePage')
 );
-const ArgusCronsPage = React.lazy(
-  () => import('./pages/argus/ArgusCronsPage')
-);
+const ArgusCronsPage = React.lazy(() => import('./pages/argus/ArgusCronsPage'));
 const ArgusUptimePage = React.lazy(
   () => import('./pages/argus/ArgusUptimePage')
 );
@@ -1234,7 +1230,12 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="discover"
-                                          element={<Navigate to="/argus/explore/discover" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/argus/explore/discover"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="dashboards"
@@ -1242,15 +1243,30 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="logs"
-                                          element={<Navigate to="/argus/explore/logs" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/argus/explore/logs"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="traces"
-                                          element={<Navigate to="/argus/explore/traces" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/argus/explore/traces"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="metrics"
-                                          element={<Navigate to="/argus/explore/metrics" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/argus/explore/metrics"
+                                              replace
+                                            />
+                                          }
                                         />
                                         <Route
                                           path="explore"

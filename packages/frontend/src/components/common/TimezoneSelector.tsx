@@ -173,7 +173,7 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   {t('common.currentLocalTime')}
                 </Typography>
-                <Typography variant="body2" >
+                <Typography variant="body2">
                   {formatDateTimeDetailed(new Date())}
                 </Typography>
               </Box>
@@ -182,7 +182,7 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   {t('common.serverTime')}
                 </Typography>
-                <Typography variant="body2" >
+                <Typography variant="body2">
                   {formatDateTimeDetailed(serverTime)}
                   {serverTimeData && (
                     <Typography
@@ -202,7 +202,7 @@ const TimezoneSelector: React.FC = () => {
                   <Typography variant="caption" color="text.secondary">
                     {t('common.serverUptime')}
                   </Typography>
-                  <Typography variant="body2" >
+                  <Typography variant="body2">
                     {formatUptime(currentUptime)}
                   </Typography>
                 </Box>
@@ -253,7 +253,7 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
                   {formatTimezone(timezone)}
                 </Typography>
-                <Typography variant="body2" >
+                <Typography variant="body2">
                   {dayjs().tz(timezone).format('YYYY-MM-DD HH:mm:ss')}
                 </Typography>
               </Box>

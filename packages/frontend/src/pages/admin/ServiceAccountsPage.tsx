@@ -807,9 +807,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({
               value={createdToken}
               InputProps={{
                 readOnly: true,
-                endAdornment: (
-                  <CopyButton text={createdToken} size={13} />
-                ),
+                endAdornment: <CopyButton text={createdToken} size={13} />,
               }}
             />
           </Box>

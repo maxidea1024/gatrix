@@ -806,10 +806,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
                         )}
                         {visibleColumns.includes('accessCount') && (
                           <TableCell align="right" sx={{ py: 0.75, px: 1.5 }}>
-                            <Typography
-                              variant="body2"
-                              
-                            >
+                            <Typography variant="body2">
                               {formatNumber(field.accessCount)}
                             </Typography>
                           </TableCell>
@@ -980,11 +977,7 @@ const DiscoveredContextFieldsTab: React.FC<DiscoveredContextFieldsTabProps> = ({
               <Typography variant="body2" color="text.secondary">
                 {t('contextFieldUsage.accessCount')}
               </Typography>
-              <Typography
-                variant="body2"
-                fontWeight={600}
-                
-              >
+              <Typography variant="body2" fontWeight={600}>
                 {editingField ? formatNumber(editingField.accessCount) : ''}
               </Typography>
 

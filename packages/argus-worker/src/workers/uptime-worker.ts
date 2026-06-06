@@ -70,7 +70,9 @@ export class UptimeWorker {
 
     const now = Date.now();
     const dueMonitors = rows.filter((monitor: any) => {
-      const lastCheck = monitor.last_checked_at ? new Date(monitor.last_checked_at).getTime() : 0;
+      const lastCheck = monitor.last_checked_at
+        ? new Date(monitor.last_checked_at).getTime()
+        : 0;
       const intervalMs = monitor.interval_seconds * 1000;
       return now - lastCheck >= intervalMs;
     });
@@ -110,7 +112,13 @@ export class UptimeWorker {
     const [insertResult]: any = await mysqlPool.query(
       `INSERT INTO g_argus_uptimeCheckins (monitor_id, status, response_ms, status_code, error_message)
        VALUES (?, ?, ?, ?, ?)`,
-      [result.monitorId, result.status, result.responseMs, result.statusCode, result.errorMessage]
+      [
+        result.monitorId,
+        result.status,
+        result.responseMs,
+        result.statusCode,
+        result.errorMessage,
+      ]
     );
 
     // 2. Update consecutive counters
@@ -130,7 +138,10 @@ export class UptimeWorker {
     const downtimeThreshold = result.downtimeThreshold || 3;
     const recoveryThreshold = result.recoveryThreshold || 1;
 
-    if (result.status === 'down' && newConsecutiveFailures >= downtimeThreshold) {
+    if (
+      result.status === 'down' &&
+      newConsecutiveFailures >= downtimeThreshold
+    ) {
       // Transition to 'down' — threshold met
       if (result.prevStatus !== 'down') {
         newStatus = 'down';
@@ -150,7 +161,10 @@ export class UptimeWorker {
           });
         }
       }
-    } else if (result.status === 'up' && newConsecutiveSuccesses >= recoveryThreshold) {
+    } else if (
+      result.status === 'up' &&
+      newConsecutiveSuccesses >= recoveryThreshold
+    ) {
       // Transition to 'up' — recovery threshold met
       if (result.prevStatus === 'down') {
         newStatus = 'up';
@@ -172,7 +186,12 @@ export class UptimeWorker {
              consecutive_failures = ?,
              consecutive_successes = ?
        WHERE id = ?`,
-      [newStatus, newConsecutiveFailures, newConsecutiveSuccesses, result.monitorId]
+      [
+        newStatus,
+        newConsecutiveFailures,
+        newConsecutiveSuccesses,
+        result.monitorId,
+      ]
     );
 
     // 5. Capture response on failure (mirrors Sentry's UptimeResponseCapture)
@@ -187,13 +206,18 @@ export class UptimeWorker {
             insertResult.insertId,
             result.statusCode,
             result.responseHeaders,
-            result.responseBody ? result.responseBody.substring(0, 65536) : null, // Cap at 64KB
+            result.responseBody
+              ? result.responseBody.substring(0, 65536)
+              : null, // Cap at 64KB
           ]
         );
       } catch (captureErr) {
         logger.warn('Failed to capture response', {
           monitorId: result.monitorId,
-          error: captureErr instanceof Error ? captureErr.message : String(captureErr),
+          error:
+            captureErr instanceof Error
+              ? captureErr.message
+              : String(captureErr),
         });
       }
     }
@@ -221,7 +245,10 @@ export class UptimeWorker {
       let headers: Record<string, string> = {};
       if (monitor.headers) {
         try {
-          headers = typeof monitor.headers === 'string' ? JSON.parse(monitor.headers) : monitor.headers;
+          headers =
+            typeof monitor.headers === 'string'
+              ? JSON.parse(monitor.headers)
+              : monitor.headers;
         } catch {
           // Invalid headers JSON, use empty
         }
@@ -246,9 +273,10 @@ export class UptimeWorker {
       let expectedCodes: number[] | null = null;
       if (monitor.expected_status_codes) {
         try {
-          expectedCodes = typeof monitor.expected_status_codes === 'string'
-            ? JSON.parse(monitor.expected_status_codes)
-            : monitor.expected_status_codes;
+          expectedCodes =
+            typeof monitor.expected_status_codes === 'string'
+              ? JSON.parse(monitor.expected_status_codes)
+              : monitor.expected_status_codes;
         } catch {
           // Invalid JSON, fall through to default behavior
         }
@@ -272,9 +300,10 @@ export class UptimeWorker {
       if (status === 'down') {
         try {
           responseHeaders = JSON.stringify(response.headers);
-          responseBody = typeof response.data === 'string'
-            ? response.data
-            : JSON.stringify(response.data);
+          responseBody =
+            typeof response.data === 'string'
+              ? response.data
+              : JSON.stringify(response.data);
         } catch {
           // Best effort
         }
@@ -282,9 +311,10 @@ export class UptimeWorker {
     } catch (error: any) {
       status = 'down';
       responseMs = Date.now() - startTime;
-      errorMessage = error.code === 'ECONNABORTED'
-        ? `Timeout after ${monitor.timeout_ms || 10000}ms`
-        : (error.message || 'Unknown error');
+      errorMessage =
+        error.code === 'ECONNABORTED'
+          ? `Timeout after ${monitor.timeout_ms || 10000}ms`
+          : error.message || 'Unknown error';
 
       logger.warn('Uptime check failed', {
         monitorId: monitor.id,
@@ -314,8 +344,11 @@ export class UptimeWorker {
   }
 
   private async createIssue(monitor: any): Promise<void> {
-    const hash = require('crypto').createHash('md5').update(`uptime_down_${monitor.id}`).digest('hex');
-    
+    const hash = require('crypto')
+      .createHash('md5')
+      .update(`uptime_down_${monitor.id}`)
+      .digest('hex');
+
     // Check if unresolved issue already exists
     const [existing]: any = await mysqlPool.query(
       `SELECT id FROM g_argus_issues WHERE project_id = ? AND primary_hash = ? AND status = 'unresolved'`,
@@ -350,7 +383,7 @@ export class UptimeWorker {
         'uptime_error',
         'error',
         'other',
-        hash
+        hash,
       ]
     );
   }
@@ -359,8 +392,14 @@ export class UptimeWorker {
    * Auto-resolve an open uptime issue when the monitor recovers.
    * Mirrors Sentry's resolve_incident_group.
    */
-  private async resolveIssue(monitorId: number, projectId: string): Promise<void> {
-    const hash = require('crypto').createHash('md5').update(`uptime_down_${monitorId}`).digest('hex');
+  private async resolveIssue(
+    monitorId: number,
+    projectId: string
+  ): Promise<void> {
+    const hash = require('crypto')
+      .createHash('md5')
+      .update(`uptime_down_${monitorId}`)
+      .digest('hex');
 
     await mysqlPool.query(
       `UPDATE g_argus_issues SET status = 'resolved' 

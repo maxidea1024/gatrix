@@ -19,9 +19,7 @@ const format = winston.format.combine(
   })
 );
 
-const sharedTransports = [
-  new winston.transports.Console({ format }),
-];
+const sharedTransports = [new winston.transports.Console({ format })];
 
 /**
  * Create a logger with a category label.

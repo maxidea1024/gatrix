@@ -239,11 +239,7 @@ const RippleTrackingDialog: React.FC<RippleTrackingDialogProps> = ({
             flexWrap: 'wrap',
           }}
         >
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            
-          >
+          <Typography variant="caption" color="text.secondary">
             {requestId} / {pattern}
           </Typography>
         </Box>

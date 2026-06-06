@@ -731,9 +731,7 @@ const PlayerListTab: React.FC<Props> = ({
           <Typography
             variant="body2"
             sx={{
-              ...(isMono
-                ? { fontSize: '0.8rem' }
-                : {}),
+              ...(isMono ? { fontSize: '0.8rem' } : {}),
               ...(isClickable
                 ? {
                     cursor: 'pointer',
@@ -770,10 +768,7 @@ const PlayerListTab: React.FC<Props> = ({
     }
 
     return (
-      <Typography
-        variant="body2"
-        sx={isMono ? { fontSize: '0.8rem' } : {}}
-      >
+      <Typography variant="body2" sx={isMono ? { fontSize: '0.8rem' } : {}}>
         {value}
       </Typography>
     );

@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Chip,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
+import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import {
-  BugReport as BugReportIcon,
-} from '@mui/icons-material';
+import { BugReport as BugReportIcon } from '@mui/icons-material';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, {
@@ -23,7 +20,10 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { rbacService } from '@/services/rbacService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
-import ArgusFilterBar, { ArgusFilterState, defaultArgusFilterState } from '@/components/argus/ArgusFilterBar';
+import ArgusFilterBar, {
+  ArgusFilterState,
+  defaultArgusFilterState,
+} from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { formatCompactNumber } from '@/utils/numberFormat';
@@ -50,19 +50,39 @@ const DEFAULT_PAGE_SIZE = 25;
 const VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 
 const QUERY_BUILDER_FIELDS = [
-  'level', 'status', 'platform', 'priority', 'assigned_to',
-  'browser', 'os', 'device', 'environment', 'release',
-  'times_seen', 'user_count',
+  'level',
+  'status',
+  'platform',
+  'priority',
+  'assigned_to',
+  'browser',
+  'os',
+  'device',
+  'environment',
+  'release',
+  'times_seen',
+  'user_count',
 ];
 
 /** URL param keys that, when present, signal a deep-link / cross-page intent. */
-const DEEP_LINK_KEYS = ['page', 'search', 'status', 'level', 'sort', 'view', 'substatus', 'assigned_to'];
+const DEEP_LINK_KEYS = [
+  'page',
+  'search',
+  'status',
+  'level',
+  'sort',
+  'view',
+  'substatus',
+  'assigned_to',
+];
 
 interface ArgusIssuesPageProps {
   projectId?: string | number;
 }
 
-const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjectId }) => {
+const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
+  projectId: propProjectId,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -94,7 +114,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const setSubstatus = useArgusIssueStore((s) => s.setSubstatus);
   const setAssignedTo = useArgusIssueStore((s) => s.setAssignedTo);
   const setStorePeriod = useArgusIssueStore((s) => s.setPeriod);
-  const setStoreCustomDateRange = useArgusIssueStore((s) => s.setCustomDateRange);
+  const setStoreCustomDateRange = useArgusIssueStore(
+    (s) => s.setCustomDateRange
+  );
   const hydrateFromParams = useArgusIssueStore((s) => s.hydrateFromParams);
   const resetStore = useArgusIssueStore((s) => s.resetStore);
 
@@ -152,9 +174,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   // ─── Project / Page-size ────────────────────────────────────────
   const { currentProject } = useOrgProject();
-  const projectId = propProjectId || searchParams.get('projectId') || currentProject?.id || '1';
+  const projectId =
+    propProjectId || searchParams.get('projectId') || currentProject?.id || '1';
   const [rowsPerPage, setRowsPerPage] = useState(() => {
-    const saved = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '', 10);
+    const saved = parseInt(
+      localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '',
+      10
+    );
     if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
     return DEFAULT_PAGE_SIZE;
   });
@@ -172,7 +198,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [merging, setMerging] = useState(false);
 
   const [members, setMembers] = useState<any[]>([]);
-  const [assigneeAnchor, setAssigneeAnchor] = useState<{ el: HTMLElement; issue: ArgusIssue } | null>(null);
+  const [assigneeAnchor, setAssigneeAnchor] = useState<{
+    el: HTMLElement;
+    issue: ArgusIssue;
+  } | null>(null);
 
   // Filter chip popover anchors
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
@@ -180,8 +209,15 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
 
   // ─── Facet sidebar state ────────────────────────────────────────
-  const [facetCollapsed, setFacetCollapsed] = useLocalStorage('argus_issue_facet_collapsed', false);
-  const { splitWidth: facetWidth, isDragging: isFacetDragging, handleMouseDown: handleFacetSplitterMouseDown } = useResizableSplit({
+  const [facetCollapsed, setFacetCollapsed] = useLocalStorage(
+    'argus_issue_facet_collapsed',
+    false
+  );
+  const {
+    splitWidth: facetWidth,
+    isDragging: isFacetDragging,
+    handleMouseDown: handleFacetSplitterMouseDown,
+  } = useResizableSplit({
     storageKey: 'argus_issue_facet_width',
     defaultWidth: 220,
     minWidth: 150,
@@ -189,21 +225,33 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   });
 
   // ─── Active Filters (chip tags from facet sidebar) ─────────────
-  type ActiveFilter = { key: string; value: string; exclude: boolean; enabled: boolean };
+  type ActiveFilter = {
+    key: string;
+    value: string;
+    exclude: boolean;
+    enabled: boolean;
+  };
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  const toggleActiveFilter = useCallback((key: string, value: string, exclude: boolean = false) => {
-    setActiveFilters(prev => {
-      const idx = prev.findIndex(f => f.key === key && f.value === value && f.exclude === exclude);
-      if (idx >= 0) {
-        return prev.map((f, i) => i === idx ? { ...f, enabled: !f.enabled } : f);
-      }
-      return [...prev, { key, value, exclude, enabled: true }];
-    });
-  }, []);
+  const toggleActiveFilter = useCallback(
+    (key: string, value: string, exclude: boolean = false) => {
+      setActiveFilters((prev) => {
+        const idx = prev.findIndex(
+          (f) => f.key === key && f.value === value && f.exclude === exclude
+        );
+        if (idx >= 0) {
+          return prev.map((f, i) =>
+            i === idx ? { ...f, enabled: !f.enabled } : f
+          );
+        }
+        return [...prev, { key, value, exclude, enabled: true }];
+      });
+    },
+    []
+  );
 
   const removeActiveFilter = useCallback((idx: number) => {
-    setActiveFilters(prev => prev.filter((_, i) => i !== idx));
+    setActiveFilters((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
   const clearAllActiveFilters = useCallback(() => {
@@ -220,7 +268,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   );
 
   // ─── Date / Filter State ────────────────────────────────────────
-  const [savedPeriod, setSavedPeriod] = useLocalStorage('argus-issues-period', '14d');
+  const [savedPeriod, setSavedPeriod] = useLocalStorage(
+    'argus-issues-period',
+    '14d'
+  );
 
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
     // Build initial dateRange from Zustand store (survives back-navigation)
@@ -236,7 +287,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       initialDateRange = { type: 'preset', preset: storePeriod || savedPeriod };
     }
 
-    const state = { ...defaultArgusFilterState(savedPeriod), dateRange: initialDateRange };
+    const state = {
+      ...defaultArgusFilterState(savedPeriod),
+      dateRange: initialDateRange,
+    };
     const env = searchParams.get('environment');
     const br = searchParams.get('browser');
     const osParam = searchParams.get('os');
@@ -330,8 +384,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         limit: rowsPerPage,
         offset: (currentPage - 1) * rowsPerPage,
         query: buildSearchWithFilters(),
-        environment: filters.environments.length === 1 ? filters.environments[0] : undefined,
-        browser: filters.browsers.length === 1 ? filters.browsers[0] : undefined,
+        environment:
+          filters.environments.length === 1
+            ? filters.environments[0]
+            : undefined,
+        browser:
+          filters.browsers.length === 1 ? filters.browsers[0] : undefined,
         os: filters.os.length === 1 ? filters.os[0] : undefined,
         ...dateParams,
         substatus: substatus || undefined,
@@ -347,14 +405,27 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     } finally {
       setLoading(false);
     }
-  }, [projectId, status, level, sort, currentPage, rowsPerPage, buildSearchWithFilters, filters, substatus, assignedTo]);
+  }, [
+    projectId,
+    status,
+    level,
+    sort,
+    currentPage,
+    rowsPerPage,
+    buildSearchWithFilters,
+    filters,
+    substatus,
+    assignedTo,
+  ]);
 
   // Persist page size
   useEffect(() => {
     localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
   }, [rowsPerPage]);
 
-  useEffect(() => { fetchIssues(); }, [fetchIssues]);
+  useEffect(() => {
+    fetchIssues();
+  }, [fetchIssues]);
 
   // ─── Handlers ──────────────────────────────────────────────────
 
@@ -363,10 +434,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
       setSavedPeriod(newFilters.dateRange.preset);
       setStorePeriod(newFilters.dateRange.preset);
-    } else if (newFilters.dateRange.type === 'custom' && newFilters.dateRange.start && newFilters.dateRange.end) {
+    } else if (
+      newFilters.dateRange.type === 'custom' &&
+      newFilters.dateRange.start &&
+      newFilters.dateRange.end
+    ) {
       setStoreCustomDateRange(
         newFilters.dateRange.start.toISOString(),
-        newFilters.dateRange.end.toISOString(),
+        newFilters.dateRange.end.toISOString()
       );
     }
   };
@@ -379,12 +454,23 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     navigate(`/argus/issues/${projectId}/${issue.id}`);
   };
 
-  const handleAssignIssue = async (issueId: number | undefined, assignee: string) => {
+  const handleAssignIssue = async (
+    issueId: number | undefined,
+    assignee: string
+  ) => {
     if (!issueId) return;
     try {
       await argusService.assignIssue(projectId, issueId, assignee || null);
-      setIssues(prev => prev.map(issue => issue.id === issueId ? { ...issue, assigned_to: assignee || null } : issue));
-      enqueueSnackbar(t('argus.issues.assigneeUpdated'), { variant: 'success' });
+      setIssues((prev) =>
+        prev.map((issue) =>
+          issue.id === issueId
+            ? { ...issue, assigned_to: assignee || null }
+            : issue
+        )
+      );
+      enqueueSnackbar(t('argus.issues.assigneeUpdated'), {
+        variant: 'success',
+      });
     } catch {
       enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
@@ -409,10 +495,15 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const handleBulkAction = async (action: 'resolved' | 'ignored') => {
     if (selectedIds.size === 0) return;
     try {
-      await argusService.bulkUpdateIssues(projectId, Array.from(selectedIds), { status: action });
+      await argusService.bulkUpdateIssues(projectId, Array.from(selectedIds), {
+        status: action,
+      });
       setSelectedIds(new Set());
       enqueueSnackbar(
-        t('argus.issues.bulkSuccess', { count: selectedIds.size, action: t(`argus.issues.${action}`, action) }),
+        t('argus.issues.bulkSuccess', {
+          count: selectedIds.size,
+          action: t(`argus.issues.${action}`, action),
+        }),
         { variant: 'success' }
       );
       fetchIssues();
@@ -442,7 +533,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     const viewStatus = view.urlParams.status || '';
     const viewSubstatus = view.urlParams.substatus || '';
     const viewAssignedTo = view.urlParams.assigned_to
-      ? (view.urlParams.assigned_to === '__me__' ? (user?.name || '') : view.urlParams.assigned_to)
+      ? view.urlParams.assigned_to === '__me__'
+        ? user?.name || ''
+        : view.urlParams.assigned_to
       : '';
 
     setStatus(viewStatus);
@@ -450,10 +543,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
     setAssignedTo(viewAssignedTo);
   };
 
-
-
   const handleDateRangeSelect = (start: Date, end: Date) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       dateRange: { type: 'custom', start, end },
     }));
@@ -465,7 +556,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
   const statusOptions = [
     { value: '', label: t('common.all') },
-    { value: 'unresolved', label: t('argus.issues.unresolved'), color: '#f44336' },
+    {
+      value: 'unresolved',
+      label: t('argus.issues.unresolved'),
+      color: '#f44336',
+    },
     { value: 'resolved', label: t('argus.issues.resolved'), color: '#4caf50' },
     { value: 'ignored', label: t('argus.issues.ignored'), color: '#9e9e9e' },
   ];
@@ -485,7 +580,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   ];
 
   // ─── Facet data (separate fetch without activeFilters) ───
-  const [facetData, setFacetData] = useState<{ level: {value: string; count: number}[]; status: {value: string; count: number}[]; platform: {value: string; count: number}[]; assigned_to: {value: string; count: number}[]; priority: {value: string; count: number}[] }>({ level: [], status: [], platform: [], assigned_to: [], priority: [] });
+  const [facetData, setFacetData] = useState<{
+    level: { value: string; count: number }[];
+    status: { value: string; count: number }[];
+    platform: { value: string; count: number }[];
+    assigned_to: { value: string; count: number }[];
+    priority: { value: string; count: number }[];
+  }>({ level: [], status: [], platform: [], assigned_to: [], priority: [] });
 
   const fetchFacets = useCallback(async () => {
     try {
@@ -506,7 +607,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
       const countByField = (field: keyof ArgusIssue) => {
         const counts = new Map<string, number>();
-        allIssues.forEach(issue => {
+        allIssues.forEach((issue) => {
           const val = issue[field];
           if (val != null && val !== '') {
             const key = String(val);
@@ -525,21 +626,58 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         assigned_to: countByField('assigned_to'),
         priority: countByField('priority'),
       });
-    } catch { /* ignore */ }
-  }, [projectId, filters, status, level, sort, searchDebounce, substatus, assignedTo]);
+    } catch {
+      /* ignore */
+    }
+  }, [
+    projectId,
+    filters,
+    status,
+    level,
+    sort,
+    searchDebounce,
+    substatus,
+    assignedTo,
+  ]);
 
   // Fetch facets on base filter changes (NOT on activeFilters change)
-  useEffect(() => { fetchFacets(); }, [fetchFacets]);
+  useEffect(() => {
+    fetchFacets();
+  }, [fetchFacets]);
 
   const mappedFacets = facetData;
 
-  const facetGroups: FacetGroup[] = useMemo(() => [
-    { key: 'level', label: t('argus.issues.level', 'Level'), values: mappedFacets.level },
-    { key: 'status', label: t('argus.issues.status', 'Status'), values: mappedFacets.status },
-    { key: 'platform', label: t('argus.issues.platform', 'Platform'), values: mappedFacets.platform },
-    { key: 'assigned_to', label: t('argus.issues.assignee', 'Assignee'), values: mappedFacets.assigned_to },
-    { key: 'priority', label: t('argus.issues.priority', 'Priority'), values: mappedFacets.priority },
-  ].filter(g => g.values.length > 0), [mappedFacets, t]);
+  const facetGroups: FacetGroup[] = useMemo(
+    () =>
+      [
+        {
+          key: 'level',
+          label: t('argus.issues.level', 'Level'),
+          values: mappedFacets.level,
+        },
+        {
+          key: 'status',
+          label: t('argus.issues.status', 'Status'),
+          values: mappedFacets.status,
+        },
+        {
+          key: 'platform',
+          label: t('argus.issues.platform', 'Platform'),
+          values: mappedFacets.platform,
+        },
+        {
+          key: 'assigned_to',
+          label: t('argus.issues.assignee', 'Assignee'),
+          values: mappedFacets.assigned_to,
+        },
+        {
+          key: 'priority',
+          label: t('argus.issues.priority', 'Priority'),
+          values: mappedFacets.priority,
+        },
+      ].filter((g) => g.values.length > 0),
+    [mappedFacets, t]
+  );
 
   // Re-fetch displayed issues when activeFilters change
   useEffect(() => {
@@ -550,8 +688,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   // ─── Custom Facets (user-defined attribute keys) ───
   const CUSTOM_FACETS_KEY = 'argus_issue_custom_facets';
   const [customFacetKeys, setCustomFacetKeys] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem(CUSTOM_FACETS_KEY) || '[]'); }
-    catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem(CUSTOM_FACETS_KEY) || '[]');
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -561,9 +702,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   const customFacetData: FacetGroup[] = useMemo(() => {
     if (customFacetKeys.length === 0) return [];
     // For issues, custom facets try to count by arbitrary issue field
-    return customFacetKeys.map(key => {
+    return customFacetKeys.map((key) => {
       const counts = new Map<string, number>();
-      issues.forEach(issue => {
+      issues.forEach((issue) => {
         const val = (issue as any)[key];
         if (val != null && val !== '') {
           const k = String(val);
@@ -581,12 +722,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
   }, [customFacetKeys, issues]);
 
   const handleAddCustomFacet = useCallback((key: string) => {
-    setCustomFacetKeys(prev => prev.includes(key) ? prev : [...prev, key]);
+    setCustomFacetKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
   }, []);
 
   const handleRemoveCustomFacet = useCallback((facetKey: string) => {
     const realKey = facetKey.startsWith('attr.') ? facetKey.slice(5) : facetKey;
-    setCustomFacetKeys(prev => prev.filter(k => k !== realKey));
+    setCustomFacetKeys((prev) => prev.filter((k) => k !== realKey));
   }, []);
 
   // ─── Render ────────────────────────────────────────────────────
@@ -596,18 +737,22 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       <PageHeader
         icon={<BugReportIcon />}
         title={
-          <ArgusBreadcrumbs size="title" paths={[
-            { label: t('argus.issues.title') }
-          ]} />
+          <ArgusBreadcrumbs
+            size="title"
+            paths={[{ label: t('argus.issues.title') }]}
+          />
         }
         subtitle={t('argus.issues.subtitle')}
         actions={
-          !loading && total > 0 && (
+          !loading &&
+          total > 0 && (
             <Chip
               label={`${formatCompactNumber(total)} ${t('argus.issues.issuesLabel')}`}
               size="small"
               sx={{
-                fontWeight: 700, fontSize: '0.75rem', height: 22,
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                height: 22,
                 backgroundColor: alpha(theme.palette.error.main, 0.1),
                 color: theme.palette.error.main,
                 border: 'none',
@@ -632,7 +777,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
         loading={loading}
         extraControls={
           <>
-            <Box sx={{ height: 20, borderLeft: '1px solid', borderColor: 'divider', mx: 0.25 }} />
+            <Box
+              sx={{
+                height: 20,
+                borderLeft: '1px solid',
+                borderColor: 'divider',
+                mx: 0.25,
+              }}
+            />
             <Box sx={{ width: 360, minWidth: 200, flexShrink: 1 }}>
               <ArgusSearchInput
                 initialValue={storeSearch}
@@ -689,34 +841,51 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
 
       {/* ── Active Filter Chips ── */}
       {activeFilters.length > 0 && (
-        <Box sx={{
-          display: 'flex', flexWrap: 'wrap', gap: 0.5, px: 2, py: 0.75,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          backgroundColor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
-          alignItems: 'center', flexShrink: 0,
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 0.5,
+            px: 2,
+            py: 0.75,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.01)'
+              : 'rgba(0,0,0,0.01)',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
           {activeFilters.map((f, idx) => (
             <Chip
               key={`${f.key}-${f.value}-${f.exclude}-${idx}`}
               label={`${f.key}${f.exclude ? ' ≠ ' : ': '}${f.value}`}
               size="small"
               onClick={() => {
-                setActiveFilters(prev =>
-                  prev.map((item, i) => i === idx ? { ...item, enabled: !item.enabled } : item)
+                setActiveFilters((prev) =>
+                  prev.map((item, i) =>
+                    i === idx ? { ...item, enabled: !item.enabled } : item
+                  )
                 );
               }}
               onDelete={() => removeActiveFilter(idx)}
               sx={{
-                height: 24, fontSize: '0.73rem', fontWeight: 600,
+                height: 24,
+                fontSize: '0.73rem',
+                fontWeight: 600,
                 cursor: 'pointer',
                 backgroundColor: !f.enabled
-                  ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)')
+                  ? isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.04)'
                   : f.exclude
                     ? alpha(theme.palette.error.main, 0.12)
-                    : alpha(theme.palette.primary.main, 0.10),
+                    : alpha(theme.palette.primary.main, 0.1),
                 color: !f.enabled
                   ? 'text.disabled'
-                  : f.exclude ? theme.palette.error.main : theme.palette.primary.main,
+                  : f.exclude
+                    ? theme.palette.error.main
+                    : theme.palette.primary.main,
                 borderRadius: '6px',
                 opacity: f.enabled ? 1 : 0.55,
                 textDecoration: f.enabled ? 'none' : 'line-through',
@@ -728,7 +897,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
                   fontSize: 14,
                   color: !f.enabled
                     ? 'text.disabled'
-                    : f.exclude ? theme.palette.error.main : theme.palette.primary.main,
+                    : f.exclude
+                      ? theme.palette.error.main
+                      : theme.palette.primary.main,
                   opacity: 0.6,
                   '&:hover': { opacity: 1 },
                 },
@@ -739,8 +910,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             component="span"
             onClick={clearAllActiveFilters}
             sx={{
-              fontSize: '0.7rem', color: 'text.disabled', cursor: 'pointer',
-              ml: 0.5, '&:hover': { color: 'text.secondary', textDecoration: 'underline' },
+              fontSize: '0.7rem',
+              color: 'text.disabled',
+              cursor: 'pointer',
+              ml: 0.5,
+              '&:hover': {
+                color: 'text.secondary',
+                textDecoration: 'underline',
+              },
             }}
           >
             {t('argus.logs.clearAll', 'Clear all')}
@@ -749,15 +926,27 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
       )}
 
       {/* ── Body: Sidebar + Content split ── */}
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', borderTop: activeFilters.length === 0 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          overflow: 'hidden',
+          borderTop:
+            activeFilters.length === 0
+              ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`
+              : 'none',
+        }}
+      >
         {/* Left: Facet Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
           <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
-            onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
+            onFilter={(key, val, exclude) =>
+              toggleActiveFilter(key, val, exclude)
+            }
             collapsed={facetCollapsed}
-            onToggleCollapse={() => setFacetCollapsed(c => !c)}
+            onToggleCollapse={() => setFacetCollapsed((c) => !c)}
             loading={loading}
             customFacets={customFacetData}
             onAddCustomFacet={handleAddCustomFacet}
@@ -767,129 +956,183 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({ projectId: propProjec
             <Box
               onMouseDown={handleFacetSplitterMouseDown}
               sx={{
-                position: 'absolute', right: 0, top: 0, bottom: 0,
-                width: '1px', cursor: 'col-resize',
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: '1px',
+                cursor: 'col-resize',
                 bgcolor: isFacetDragging ? 'primary.main' : 'divider',
                 zIndex: 10,
                 transition: 'background-color 0.15s, transform 0.15s',
                 transformOrigin: 'center',
-                ...(isFacetDragging && { bgcolor: 'primary.main', transform: 'scaleX(4)' }),
+                ...(isFacetDragging && {
+                  bgcolor: 'primary.main',
+                  transform: 'scaleX(4)',
+                }),
                 '&::after': {
-                  content: '""', position: 'absolute',
-                  top: 0, bottom: 0, left: '-5px', right: '-5px', cursor: 'col-resize',
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: '-5px',
+                  right: '-5px',
+                  cursor: 'col-resize',
                 },
-                '&:hover, &:active': { bgcolor: 'primary.main', transform: 'scaleX(4)' },
+                '&:hover, &:active': {
+                  bgcolor: 'primary.main',
+                  transform: 'scaleX(4)',
+                },
               }}
             />
           )}
         </Box>
 
         {/* Right: Main content */}
-        <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden', pl: facetCollapsed ? 0.25 : 0.75, pt: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Volume Chart - fixed at top */}
-          <Box sx={{ flexShrink: 0 }}>
-            <IssueVolumeChart
-              projectId={projectId}
-              filters={filters}
-              status={status}
-              level={level}
-              query={buildSearchWithFilters()}
-              environment={filters.environments.length === 1 ? filters.environments[0] : undefined}
-              browser={filters.browsers.length === 1 ? filters.browsers[0] : undefined}
-              os={filters.os.length === 1 ? filters.os[0] : undefined}
-              onDateRangeSelect={handleDateRangeSelect}
-            />
-          </Box>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            overflow: 'hidden',
+            pl: facetCollapsed ? 0.25 : 0.75,
+            pt: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {/* Volume Chart - fixed at top (hidden when no issues) */}
+          {(loading || issues.length > 0) && (
+            <Box sx={{ flexShrink: 0 }}>
+              <IssueVolumeChart
+                projectId={projectId}
+                filters={filters}
+                status={status}
+                level={level}
+                query={buildSearchWithFilters()}
+                environment={
+                  filters.environments.length === 1
+                    ? filters.environments[0]
+                    : undefined
+                }
+                browser={
+                  filters.browsers.length === 1
+                    ? filters.browsers[0]
+                    : undefined
+                }
+                os={filters.os.length === 1 ? filters.os[0] : undefined}
+                onDateRangeSelect={handleDateRangeSelect}
+              />
+            </Box>
+          )}
 
           {/* Scrollable issue list area */}
-          <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-
-          {/* Bulk Actions */}
-          <IssueBulkActions
-            selectedIds={selectedIds}
-            merging={merging}
-            onResolve={() => handleBulkAction('resolved')}
-            onIgnore={() => handleBulkAction('ignored')}
-            onMerge={handleMerge}
-            onDelete={handleBulkDelete}
-            onCancel={() => setSelectedIds(new Set())}
-          />
-
-          {/* Real-time new issues banner */}
-          <NewIssuesBanner
-            count={newIssueCount}
-            onClick={() => {
-              resetNewIssueCount();
-              fetchIssues();
+          <Box
+            sx={{
+              flex: 1,
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
             }}
-          />
+          >
+            {/* Bulk Actions */}
+            <IssueBulkActions
+              selectedIds={selectedIds}
+              merging={merging}
+              onResolve={() => handleBulkAction('resolved')}
+              onIgnore={() => handleBulkAction('ignored')}
+              onMerge={handleMerge}
+              onDelete={handleBulkDelete}
+              onCancel={() => setSelectedIds(new Set())}
+            />
 
-          <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={8} />} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {issues.length === 0 ? (
-              <EmptyPlaceholder
-                icon={<BugReportIcon sx={{ fontSize: 48 }} />}
-                message={t('argus.issues.noIssues')}
-                sx={{ flex: 1 }}
-              />
-            ) : (
-              <>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    mb: 2,
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                  }}
-                >
-                  {issues.map((issue, idx) => (
-                    <IssueListItem
-                      key={issue.id}
-                      issue={issue}
-                      onClick={handleIssueClick}
-                      highlight={searchDebounce}
-                      showCheckbox
-                      checked={selectedIds.has(issue.id)}
-                      onCheckChange={(id) => {
-                        setSelectedIds(prev => {
-                          const next = new Set(prev);
-                          next.has(id) ? next.delete(id) : next.add(id);
-                          return next;
-                        });
-                      }}
-                      showAssignee
-                      onAssigneeClick={(e, iss) => setAssigneeAnchor({ el: e.currentTarget as HTMLElement, issue: iss })}
-                      showSparkline
-                      showLastSeen
-                      isFirst={idx === 0}
-                      isLast={idx === issues.length - 1}
-                      showDivider={idx < issues.length - 1}
-                    />
-                  ))}
-                </Paper>
+            {/* Real-time new issues banner */}
+            <NewIssuesBanner
+              count={newIssueCount}
+              onClick={() => {
+                resetNewIssueCount();
+                fetchIssues();
+              }}
+            />
 
-                {total > 0 && (
-                  <Box sx={{ mt: 3 }}>
-                    <SimplePagination
-                      count={total}
-                      page={currentPage - 1}
-                      rowsPerPage={rowsPerPage}
-                      onPageChange={(_, newPage) => handlePageChange(_, newPage + 1)}
-                      onRowsPerPageChange={(e) => {
-                        setRowsPerPage(Number(e.target.value));
-                        setCurrentPage(1);
-                      }}
-                      size="small"
-                    />
-                  </Box>
-                )}
-              </>
-            )}
-          </PageContentLoader>
+            <PageContentLoader
+              loading={loading}
+              skeleton={<ListSkeleton rows={8} />}
+              sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+            >
+              {issues.length === 0 ? (
+                <EmptyPlaceholder
+                  icon={<BugReportIcon sx={{ fontSize: 48 }} />}
+                  message={t('argus.issues.noIssues')}
+                  sx={{ flex: 1 }}
+                />
+              ) : (
+                <>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      mb: 2,
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {issues.map((issue, idx) => (
+                      <IssueListItem
+                        key={issue.id}
+                        issue={issue}
+                        onClick={handleIssueClick}
+                        highlight={searchDebounce}
+                        showCheckbox
+                        checked={selectedIds.has(issue.id)}
+                        onCheckChange={(id) => {
+                          setSelectedIds((prev) => {
+                            const next = new Set(prev);
+                            next.has(id) ? next.delete(id) : next.add(id);
+                            return next;
+                          });
+                        }}
+                        showAssignee
+                        onAssigneeClick={(e, iss) =>
+                          setAssigneeAnchor({
+                            el: e.currentTarget as HTMLElement,
+                            issue: iss,
+                          })
+                        }
+                        showSparkline
+                        showLastSeen
+                        isFirst={idx === 0}
+                        isLast={idx === issues.length - 1}
+                        showDivider={idx < issues.length - 1}
+                      />
+                    ))}
+                  </Paper>
 
-          </Box>{/* end scrollable area */}
-        </Box>{/* end right content area */}
-      </Box>{/* end flex sidebar container */}
+                  {total > 0 && (
+                    <Box sx={{ mt: 3 }}>
+                      <SimplePagination
+                        count={total}
+                        page={currentPage - 1}
+                        rowsPerPage={rowsPerPage}
+                        onPageChange={(_, newPage) =>
+                          handlePageChange(_, newPage + 1)
+                        }
+                        onRowsPerPageChange={(e) => {
+                          setRowsPerPage(Number(e.target.value));
+                          setCurrentPage(1);
+                        }}
+                        size="small"
+                      />
+                    </Box>
+                  )}
+                </>
+              )}
+            </PageContentLoader>
+          </Box>
+          {/* end scrollable area */}
+        </Box>
+        {/* end right content area */}
+      </Box>
+      {/* end flex sidebar container */}
 
       {/* Assignee Menu */}
       <IssueAssigneeMenu

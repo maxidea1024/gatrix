@@ -1037,7 +1037,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                                             >
                                               {field.fieldName}
                                             </Typography>
-                                            <CopyButton text={field.fieldName} size={13} />
+                                            <CopyButton
+                                              text={field.fieldName}
+                                              size={13}
+                                            />
                                           </Box>
                                           {field.displayName &&
                                             field.displayName !==

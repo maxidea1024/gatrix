@@ -10,7 +10,7 @@ import mysql from 'mysql2/promise';
 
 const PROJECT_ID = '01KN8GSHBJ10JTQ9D0HD60RKFV';
 const INTERNAL_PROJECT_ID = 1; // MySQL project_id (numeric)
-const LINK_RATIO = 0.20; // 20% of feedbacks get linked
+const LINK_RATIO = 0.2; // 20% of feedbacks get linked
 
 const ch = createClient({
   url: 'http://localhost:48123',
@@ -55,7 +55,7 @@ async function main() {
     query_params: { pid: PROJECT_ID },
   });
   const fbData = await fbResult.json<{ data: { feedback_id: string }[] }>();
-  const feedbackIds = fbData.data.map(r => r.feedback_id);
+  const feedbackIds = fbData.data.map((r) => r.feedback_id);
   console.log(`   Found ${feedbackIds.length} feedbacks`);
 
   // 3. Ensure tables exist
@@ -89,8 +89,14 @@ async function main() {
 
   // 4. Clear existing links and activities
   console.log('🗑️  Clearing existing links and activities...');
-  await pool.query('DELETE FROM g_argus_feedback_issue_links WHERE project_id = ?', [PROJECT_ID]);
-  await pool.query('DELETE FROM g_argus_feedback_activity WHERE project_id = ?', [PROJECT_ID]);
+  await pool.query(
+    'DELETE FROM g_argus_feedback_issue_links WHERE project_id = ?',
+    [PROJECT_ID]
+  );
+  await pool.query(
+    'DELETE FROM g_argus_feedback_activity WHERE project_id = ?',
+    [PROJECT_ID]
+  );
 
   // 5. Create links for ~20% of feedbacks
   const linkCount = Math.floor(feedbackIds.length * LINK_RATIO);
@@ -102,14 +108,16 @@ async function main() {
   const BATCH = 100;
   for (let i = 0; i < toLink.length; i += BATCH) {
     const batch = toLink.slice(i, i + BATCH);
-    const values = batch.map(fid => {
+    const values = batch.map((fid) => {
       const issue = pick(issues);
       return `('${PROJECT_ID}', '${fid}', ${issue.id}, UTC_TIMESTAMP())`;
     });
     await pool.query(
       `INSERT IGNORE INTO g_argus_feedback_issue_links (project_id, feedback_id, issue_id, created_at) VALUES ${values.join(',')}`
     );
-    console.log(`   Linked ${Math.min(i + BATCH, toLink.length)}/${toLink.length}`);
+    console.log(
+      `   Linked ${Math.min(i + BATCH, toLink.length)}/${toLink.length}`
+    );
   }
 
   // 6. Seed some activity records (comments + status_change)
@@ -128,7 +136,7 @@ async function main() {
   ];
 
   // ~30% of feedbacks get 1-3 activity entries
-  const activityCount = Math.floor(feedbackIds.length * 0.30);
+  const activityCount = Math.floor(feedbackIds.length * 0.3);
   const forActivity = shuffled.slice(0, activityCount);
 
   console.log(`💬 Seeding activities for ${forActivity.length} feedbacks...`);
@@ -173,7 +181,9 @@ async function main() {
         `INSERT INTO g_argus_feedback_activity (project_id, feedback_id, user_name, action, data, created_at) VALUES ${values.join(',')}`
       );
     }
-    console.log(`   Activities: ${Math.min(i + BATCH, forActivity.length)}/${forActivity.length} feedbacks processed`);
+    console.log(
+      `   Activities: ${Math.min(i + BATCH, forActivity.length)}/${forActivity.length} feedbacks processed`
+    );
   }
 
   // 7. Verify
@@ -188,7 +198,9 @@ async function main() {
 
   console.log(`\n✅ Done!`);
   console.log(`   🔗 Issue links: ${(linkResult as any[])[0].c}`);
-  console.log(`   💬 Activity records: ${(actResult as any[])[0].c} (${totalActivities} expected)`);
+  console.log(
+    `   💬 Activity records: ${(actResult as any[])[0].c} (${totalActivities} expected)`
+  );
 
   await cleanup();
 }

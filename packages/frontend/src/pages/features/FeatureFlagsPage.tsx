@@ -2767,7 +2767,10 @@ const FeatureFlagsPage: React.FC = () => {
                                             title={t('common.copy')}
                                             disableFocusListener
                                           >
-                                            <CopyButton text={flag.flagName} size={13} />
+                                            <CopyButton
+                                              text={flag.flagName}
+                                              size={13}
+                                            />
                                           </Tooltip>
                                           <SafeTooltip
                                             title={
@@ -4300,7 +4303,6 @@ const FeatureFlagsPage: React.FC = () => {
             value={importData}
             onChange={(e) => setImportData(e.target.value)}
             placeholder={t('featureFlags.importPlaceholder')}
-            
           />
         </DialogContent>
         <DialogActions>

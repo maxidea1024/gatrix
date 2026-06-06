@@ -43,18 +43,24 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const ok = await copyToClipboard(text);
-    if (ok) {
-      setCopied(true);
-      onCopied?.();
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [text, onCopied]);
+  const handleCopy = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const ok = await copyToClipboard(text);
+      if (ok) {
+        setCopied(true);
+        onCopied?.();
+        setTimeout(() => setCopied(false), 2000);
+      }
+    },
+    [text, onCopied]
+  );
 
   return (
-    <SafeTooltip title={copied ? copiedTooltip : tooltip} placement={tooltipPlacement}>
+    <SafeTooltip
+      title={copied ? copiedTooltip : tooltip}
+      placement={tooltipPlacement}
+    >
       <IconButton
         onClick={handleCopy}
         size="small"
@@ -65,10 +71,11 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
           ...sx,
         }}
       >
-        {copied
-          ? <CheckIcon sx={{ fontSize: size }} />
-          : <CopyIcon sx={{ fontSize: size }} />
-        }
+        {copied ? (
+          <CheckIcon sx={{ fontSize: size }} />
+        ) : (
+          <CopyIcon sx={{ fontSize: size }} />
+        )}
       </IconButton>
     </SafeTooltip>
   );
@@ -115,40 +122,70 @@ export const CopyableField: React.FC<CopyableFieldProps> = ({
   return (
     <Box sx={{ mb: 2 }}>
       {showLabel && (
-        <Typography sx={{
-          fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', mb: 0.5,
-          textTransform: 'uppercase', letterSpacing: '0.05em',
-        }}>
+        <Typography
+          sx={{
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            color: 'text.secondary',
+            mb: 0.5,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
           {label}
         </Typography>
       )}
       <Box
         onClick={handleCopy}
         sx={{
-          display: 'flex', alignItems: 'center', gap: 1,
-          p: '10px 14px', borderRadius: '8px', cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          p: '10px 14px',
+          borderRadius: '8px',
+          cursor: 'pointer',
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-          backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+          backgroundColor: isDark
+            ? 'rgba(255,255,255,0.03)'
+            : 'rgba(0,0,0,0.02)',
           transition: 'all 0.15s ease',
           '&:hover': {
             borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.05)'
+              : 'rgba(0,0,0,0.04)',
           },
         }}
       >
-        <Typography sx={{
-          flex: 1, fontSize: '0.82rem',
-          color: isDark ? '#c9d1d9' : '#24292f',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
+        <Typography
+          sx={{
+            flex: 1,
+            fontSize: '0.82rem',
+            color: isDark ? '#c9d1d9' : '#24292f',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
           {value}
         </Typography>
-        <SafeTooltip title={copied ? '✓ 복사됨' : '클릭하여 복사'} placement="top">
-          <Box sx={{
-            color: copied ? '#2ea44f' : 'text.secondary',
-            display: 'flex', alignItems: 'center', transition: 'color 0.15s',
-          }}>
-            {copied ? <CheckIcon sx={{ fontSize: 16 }} /> : <CopyIcon sx={{ fontSize: 16 }} />}
+        <SafeTooltip
+          title={copied ? '✓ 복사됨' : '클릭하여 복사'}
+          placement="top"
+        >
+          <Box
+            sx={{
+              color: copied ? '#2ea44f' : 'text.secondary',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'color 0.15s',
+            }}
+          >
+            {copied ? (
+              <CheckIcon sx={{ fontSize: 16 }} />
+            ) : (
+              <CopyIcon sx={{ fontSize: 16 }} />
+            )}
           </Box>
         </SafeTooltip>
       </Box>

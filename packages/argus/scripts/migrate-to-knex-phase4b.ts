@@ -44,7 +44,8 @@ function migrateAll(relPath: string, replacements: [string, string][]) {
       count++;
     }
     if (count > 0) changed += count;
-    else console.error(`  X NOT FOUND in ${relPath}: "${from.slice(0, 60)}..."`);
+    else
+      console.error(`  X NOT FOUND in ${relPath}: "${from.slice(0, 60)}..."`);
   }
 
   fs.writeFileSync(filePath, content, 'latin1');
@@ -287,9 +288,7 @@ migrate('routes/crons.ts', [
     `import db from '../config/knex';`,
   ],
 ]);
-migrateAll('routes/crons.ts', [
-  [`mysqlPool.query(`, `db.raw(`],
-]);
+migrateAll('routes/crons.ts', [[`mysqlPool.query(`, `db.raw(`]]);
 
 // --- alerts.ts ---
 migrate('routes/alerts.ts', [
@@ -298,8 +297,6 @@ migrate('routes/alerts.ts', [
     `import db from '../config/knex';`,
   ],
 ]);
-migrateAll('routes/alerts.ts', [
-  [`mysqlPool.query(`, `db.raw(`],
-]);
+migrateAll('routes/alerts.ts', [[`mysqlPool.query(`, `db.raw(`]]);
 
 console.log('\nPhase 4b complete!');

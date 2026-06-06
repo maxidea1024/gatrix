@@ -36,7 +36,6 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
-
   History as HistoryIcon,
 } from '@mui/icons-material';
 import { CopyButton } from '@/components/common/CopyButton';
@@ -696,7 +695,10 @@ const SurveysPage: React.FC = () => {
                                   >
                                     {survey.platformSurveyId}
                                   </Typography>
-                                  <CopyButton text={survey.platformSurveyId} size={13} />
+                                  <CopyButton
+                                    text={survey.platformSurveyId}
+                                    size={13}
+                                  />
                                 </Box>
                               </TableCell>
                             );

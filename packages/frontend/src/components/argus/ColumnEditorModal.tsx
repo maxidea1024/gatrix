@@ -40,9 +40,9 @@ import { CSS } from '@dnd-kit/utilities';
 /* ─── Types ─── */
 
 interface ColumnEntry {
-  id: string;         // unique key for dnd-kit
+  id: string; // unique key for dnd-kit
   expression: string; // e.g. "count()" or "level"
-  alias: string;      // custom display name
+  alias: string; // custom display name
 }
 
 interface ColumnEditorModalProps {
@@ -58,8 +58,6 @@ interface ColumnEditorModalProps {
 
 let _idCounter = 0;
 const nextId = () => `col-${++_idCounter}`;
-
-
 
 /** Parse "count() AS errors" → { expression: "count()", alias: "errors" } */
 function parseField(field: string): Omit<ColumnEntry, 'id'> {
@@ -91,9 +89,23 @@ const SortableColumnRow: React.FC<{
   onChangeAlias: (id: string, alias: string) => void;
   onRemove: (id: string) => void;
   aliasPlaceholder: string;
-}> = ({ entry, columns, aggregates, isDark, onChangeExpr, onChangeAlias, onRemove, aliasPlaceholder }) => {
+}> = ({
+  entry,
+  columns,
+  aggregates,
+  isDark,
+  onChangeExpr,
+  onChangeAlias,
+  onRemove,
+  aliasPlaceholder,
+}) => {
   const {
-    attributes, listeners, setNodeRef, transform, transition, isDragging,
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
   } = useSortable({ id: entry.id });
 
   const style: React.CSSProperties = {
@@ -113,12 +125,17 @@ const SortableColumnRow: React.FC<{
       ref={setNodeRef}
       style={style}
       sx={{
-        display: 'flex', alignItems: 'center', gap: 1,
-        p: 0.75, px: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        p: 0.75,
+        px: 1,
         borderRadius: 1.5,
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
         backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
-        '&:hover': { borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)' },
+        '&:hover': {
+          borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+        },
       }}
     >
       {/* Drag handle */}
@@ -126,8 +143,11 @@ const SortableColumnRow: React.FC<{
         {...attributes}
         {...listeners}
         sx={{
-          cursor: 'grab', display: 'flex', alignItems: 'center',
-          color: 'text.disabled', flexShrink: 0,
+          cursor: 'grab',
+          display: 'flex',
+          alignItems: 'center',
+          color: 'text.disabled',
+          flexShrink: 0,
           '&:active': { cursor: 'grabbing' },
         }}
       >
@@ -141,26 +161,57 @@ const SortableColumnRow: React.FC<{
         onChange={(e) => {
           const val = e.target.value;
           if (aggregates.includes(val)) {
-            onChangeExpr(entry.id, val === 'count' ? 'count()' : `${val}(${columns[0] || '*'})`);
+            onChangeExpr(
+              entry.id,
+              val === 'count' ? 'count()' : `${val}(${columns[0] || '*'})`
+            );
           } else {
             onChangeExpr(entry.id, val);
           }
         }}
         sx={{
-          flex: 1, minWidth: 140,
-          '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem'},
+          flex: 1,
+          minWidth: 140,
+          '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem' },
         }}
         MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
       >
-        <MenuItem disabled sx={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'text.secondary' }}>Functions</MenuItem>
-        {aggregates.map(agg => (
-          <MenuItem key={`agg-${agg}`} value={agg} sx={{ fontSize: '0.82rem', pl: 3 }}>
+        <MenuItem
+          disabled
+          sx={{
+            fontSize: '0.75rem',
+            fontWeight: 'bold',
+            color: 'text.secondary',
+          }}
+        >
+          Functions
+        </MenuItem>
+        {aggregates.map((agg) => (
+          <MenuItem
+            key={`agg-${agg}`}
+            value={agg}
+            sx={{ fontSize: '0.82rem', pl: 3 }}
+          >
             {agg}
           </MenuItem>
         ))}
-        <MenuItem disabled sx={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'text.secondary', mt: 1 }}>Columns</MenuItem>
-        {columns.map(col => (
-          <MenuItem key={`col-${col}`} value={col} sx={{ fontSize: '0.82rem', pl: 3 }}>
+        <MenuItem
+          disabled
+          sx={{
+            fontSize: '0.75rem',
+            fontWeight: 'bold',
+            color: 'text.secondary',
+            mt: 1,
+          }}
+        >
+          Columns
+        </MenuItem>
+        {columns.map((col) => (
+          <MenuItem
+            key={`col-${col}`}
+            value={col}
+            sx={{ fontSize: '0.82rem', pl: 3 }}
+          >
             {col}
           </MenuItem>
         ))}
@@ -175,20 +226,27 @@ const SortableColumnRow: React.FC<{
             onChangeExpr(entry.id, `${baseValue}(${e.target.value})`);
           }}
           sx={{
-            flex: 1, minWidth: 140,
-            '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem'},
+            flex: 1,
+            minWidth: 140,
+            '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem' },
           }}
           MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
         >
-          {columns.map(col => (
-            <MenuItem key={`param-${col}`} value={col} sx={{ fontSize: '0.82rem'}}>
+          {columns.map((col) => (
+            <MenuItem
+              key={`param-${col}`}
+              value={col}
+              sx={{ fontSize: '0.82rem' }}
+            >
               {col}
             </MenuItem>
           ))}
         </Select>
       )}
       {(!isFunc || baseValue === 'count') && (
-        <Box sx={{ flex: 1, minWidth: 140 }} /> /* Spacer to align alias input */
+        <Box
+          sx={{ flex: 1, minWidth: 140 }}
+        /> /* Spacer to align alias input */
       )}
 
       {/* Alias input */}
@@ -198,8 +256,9 @@ const SortableColumnRow: React.FC<{
         value={entry.alias}
         onChange={(e) => onChangeAlias(entry.id, e.target.value)}
         sx={{
-          width: 160, flexShrink: 0,
-          '& .MuiOutlinedInput-root': { fontSize: '0.8rem'},
+          width: 160,
+          flexShrink: 0,
+          '& .MuiOutlinedInput-root': { fontSize: '0.8rem' },
           '& .MuiOutlinedInput-input': { py: 0.75 },
         }}
       />
@@ -209,7 +268,8 @@ const SortableColumnRow: React.FC<{
         size="small"
         onClick={() => onRemove(entry.id)}
         sx={{
-          flexShrink: 0, color: 'text.disabled',
+          flexShrink: 0,
+          color: 'text.disabled',
           '&:hover': { color: '#f44336' },
         }}
       >
@@ -222,7 +282,12 @@ const SortableColumnRow: React.FC<{
 /* ─── Main Modal ─── */
 
 const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
-  open, onClose, fields, availableColumns, availableAggregates, onApply,
+  open,
+  onClose,
+  fields,
+  availableColumns,
+  availableAggregates,
+  onApply,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -230,48 +295,49 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
 
   const [entries, setEntries] = useState<ColumnEntry[]>([]);
 
-
-
   // Sync from parent on open
   useEffect(() => {
     if (open) {
-      setEntries(
-        fields.map(f => ({ id: nextId(), ...parseField(f) })),
-      );
+      setEntries(fields.map((f) => ({ id: nextId(), ...parseField(f) })));
     }
   }, [open, fields]);
 
   // DnD sensors
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
   );
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      setEntries(prev => {
-        const oldIdx = prev.findIndex(e => e.id === active.id);
-        const newIdx = prev.findIndex(e => e.id === over.id);
+      setEntries((prev) => {
+        const oldIdx = prev.findIndex((e) => e.id === active.id);
+        const newIdx = prev.findIndex((e) => e.id === over.id);
         return arrayMove(prev, oldIdx, newIdx);
       });
     }
   }, []);
 
   const handleChangeExpr = useCallback((id: string, expr: string) => {
-    setEntries(prev => prev.map(e => e.id === id ? { ...e, expression: expr } : e));
+    setEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, expression: expr } : e))
+    );
   }, []);
 
   const handleChangeAlias = useCallback((id: string, alias: string) => {
-    setEntries(prev => prev.map(e => e.id === id ? { ...e, alias } : e));
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, alias } : e)));
   }, []);
 
   const handleRemove = useCallback((id: string) => {
-    setEntries(prev => prev.filter(e => e.id !== id));
+    setEntries((prev) => prev.filter((e) => e.id !== id));
   }, []);
 
   const handleAddColumn = () => {
     const defaultExpr = availableColumns[0] || 'count()';
-    setEntries(prev => [...prev, { id: nextId(), expression: defaultExpr, alias: '' }]);
+    setEntries((prev) => [
+      ...prev,
+      { id: nextId(), expression: defaultExpr, alias: '' },
+    ]);
   };
 
   const handleApply = () => {
@@ -281,7 +347,10 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
     }
   };
 
-  const aliasPlaceholder = t('argus.discover.column.alias', 'Column name (alias)');
+  const aliasPlaceholder = t(
+    'argus.discover.column.alias',
+    'Column name (alias)'
+  );
 
   return (
     <Dialog
@@ -292,15 +361,29 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
       PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
     >
       {/* Title */}
-      <DialogTitle sx={{
-        m: 0, py: 1.5, px: 2.5,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      }}>
-        <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
+      <DialogTitle
+        sx={{
+          m: 0,
+          py: 1.5,
+          px: 2.5,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        }}
+      >
+        <Typography
+          variant="subtitle1"
+          fontWeight={700}
+          sx={{ fontSize: '0.95rem' }}
+        >
           {t('argus.discover.column.edit', 'Edit Columns')}
         </Typography>
-        <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{ color: 'text.secondary' }}
+        >
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -310,23 +393,59 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
         <Box sx={{ p: 2.5 }}>
           {/* Column header labels */}
           <Box sx={{ display: 'flex', gap: 1, mb: 1, pl: 4.5 }}>
-            <Typography variant="caption" sx={{ flex: 1, minWidth: 140, color: 'text.disabled', fontSize: '0.68rem', textTransform: 'uppercase', fontWeight: 600 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                flex: 1,
+                minWidth: 140,
+                color: 'text.disabled',
+                fontSize: '0.68rem',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+              }}
+            >
               {t('argus.discover.column.field', 'Field / Function')}
             </Typography>
-            <Typography variant="caption" sx={{ flex: 1, minWidth: 140, color: 'text.disabled', fontSize: '0.68rem', textTransform: 'uppercase', fontWeight: 600 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                flex: 1,
+                minWidth: 140,
+                color: 'text.disabled',
+                fontSize: '0.68rem',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+              }}
+            >
               {t('argus.discover.column.param', 'Parameter')}
             </Typography>
-            <Typography variant="caption" sx={{ width: 160, color: 'text.disabled', fontSize: '0.68rem', textTransform: 'uppercase', fontWeight: 600 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                width: 160,
+                color: 'text.disabled',
+                fontSize: '0.68rem',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+              }}
+            >
               {t('argus.discover.column.alias', 'Alias')}
             </Typography>
             <Box sx={{ width: 34 }} /> {/* spacer for delete btn */}
           </Box>
 
           {/* Sortable column list */}
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={entries.map(e => e.id)} strategy={verticalListSortingStrategy}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={entries.map((e) => e.id)}
+              strategy={verticalListSortingStrategy}
+            >
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-                {entries.map(entry => (
+                {entries.map((entry) => (
                   <SortableColumnRow
                     key={entry.id}
                     entry={entry}
@@ -345,8 +464,15 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
 
           {/* Empty state */}
           {entries.length === 0 && (
-            <Typography variant="body2" color="error" sx={{ py: 3, textAlign: 'center', fontSize: '0.82rem' }}>
-              {t('argus.discover.column.required', 'At least one column is required')}
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{ py: 3, textAlign: 'center', fontSize: '0.82rem' }}
+            >
+              {t(
+                'argus.discover.column.required',
+                'At least one column is required'
+              )}
             </Typography>
           )}
 
@@ -356,7 +482,10 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
             onClick={handleAddColumn}
             size="small"
             sx={{
-              mt: 1.5, textTransform: 'none', fontWeight: 600, fontSize: '0.8rem',
+              mt: 1.5,
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.8rem',
               color: theme.palette.primary.main,
             }}
           >
@@ -367,8 +496,13 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
 
       {/* Actions */}
       <Divider />
-      <DialogActions sx={{ p: 2, px: 2.5, backgroundColor: theme.palette.background.paper }}>
-        <Button onClick={onClose} sx={{ textTransform: 'none', fontWeight: 500 }}>
+      <DialogActions
+        sx={{ p: 2, px: 2.5, backgroundColor: theme.palette.background.paper }}
+      >
+        <Button
+          onClick={onClose}
+          sx={{ textTransform: 'none', fontWeight: 500 }}
+        >
           {t('common.cancel', 'Cancel')}
         </Button>
         <Button
@@ -376,7 +510,9 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
           variant="contained"
           disabled={entries.length === 0}
           sx={{
-            textTransform: 'none', fontWeight: 600, px: 3,
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 3,
           }}
         >
           {t('common.apply', 'Apply')}

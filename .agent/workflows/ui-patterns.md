@@ -115,6 +115,45 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 />
 ```
 
+### ⚠️ DO NOT Wrap EmptyPlaceholder in Empty Containers (결과 래퍼(껍데기) 유지 금지)
+
+데이터가 없어 `EmptyPlaceholder`를 보여줄 때, `<Paper>`, `TableHead`, 혹은 헤더 타이틀 등을 렌더링하고 그 안에 `EmptyPlaceholder`를 가두지(Wrap) 마세요. 대신 조건문을 최상위 래퍼 바깥으로 끌어올려, 컨테이너 자체를 렌더링하지 말고 `EmptyPlaceholder`가 해당 블록(카드, 섹션) 전체를 대체하게 하세요.
+
+**❌ 하지 마세요 (불필요하게 겉껍데기가 감싸지는 상태):**
+```tsx
+// ❌ 카드 껍데기와 헤더를 그려두고 그 내부에 빈 상태를 가두는 형태
+<Paper elevation={0} sx={{ border: '...' }}>
+  <Typography variant="subtitle2">Top Crash Issues</Typography>
+  {!data.length ? (
+    <EmptyPlaceholder message="No Data" /> // ❌ 불필요한 테두리와 빈 카드가 남음
+  ) : (
+    <List>...</List>
+  )}
+</Paper>
+
+// ❌ 테이블 헤더를 그려두고 그 내부에 빈 상태 표시
+<Box sx={{ display: 'grid' }}>
+  <Typography>Column 1</Typography>
+  <Typography>Column 2</Typography>
+</Box>
+{data.length === 0 ? <EmptyPlaceholder /> : data.map(...)}
+```
+
+**✅ 올바른 패턴 (결과가 비어있을 때 딱 EmptyPlaceholder만 단독 노출):**
+```tsx
+// ✅ 데이터가 없으면 컨테이너(Paper) 자체를 렌더링하지 않음
+{!data.length ? (
+  <Box sx={{ mb: 2 }}>
+    <EmptyPlaceholder message="No Data" minHeight={150} />
+  </Box>
+) : (
+  <Paper elevation={0} sx={{ border: '...' }}>
+    <Typography variant="subtitle2">Top Crash Issues</Typography>
+    <List>...</List>
+  </Paper>
+)}
+```
+
 > **요약:** 페이지 전체가 비었을 때 → `EmptyPagePlaceholder`, 페이지 내부 섹션/카드가 비었을 때 → `EmptyPlaceholder`
 
 ## Date Range Selection: Always Use DateRangeSelector

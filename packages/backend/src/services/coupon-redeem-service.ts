@@ -573,7 +573,7 @@ export class CouponRedeemService {
 
     return db.transaction(async (trx) => {
       // Find coupon
-      let coupon = await trx('g_coupons')
+      const coupon = await trx('g_coupons')
         .where('code', code)
         .where('environmentId', environmentId)
         .first();

@@ -32,7 +32,8 @@ export async function dsnAuthHook(
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     reply.code(401).send({
       error: 'Unauthorized',
-      message: 'Missing or invalid Authorization header. Expected: Bearer <publicKey>',
+      message:
+        'Missing or invalid Authorization header. Expected: Bearer <publicKey>',
     });
     return;
   }
@@ -50,7 +51,9 @@ export async function dsnAuthHook(
   const auth = resolveDsn(publicKey);
 
   if (!auth) {
-    logger.warn('DSN authentication failed', { publicKey: publicKey.slice(0, 8) + '...' });
+    logger.warn('DSN authentication failed', {
+      publicKey: publicKey.slice(0, 8) + '...',
+    });
     reply.code(403).send({
       error: 'Forbidden',
       message: 'Invalid or inactive DSN key',

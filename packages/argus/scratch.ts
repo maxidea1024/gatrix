@@ -38,15 +38,15 @@ async function run() {
     }
 
     if (relatedIssues.length > 0) {
-      const issueIds = relatedIssues.map(i => i.issue_id);
+      const issueIds = relatedIssues.map((i) => i.issue_id);
       console.log('Querying mysql for issues:', issueIds);
-      const [issueRows] = await mysqlPool.query(
+      const [issueRows] = (await mysqlPool.query(
         `SELECT id, title, subtitle, level FROM g_argus_issues WHERE id IN (${issueIds.map(() => '?').join(',')})`,
         issueIds
-      ) as any;
+      )) as any;
       console.log('issueRows', issueRows);
     }
-    
+
     console.log('Done!');
   } catch (e) {
     console.error('Error:', e);

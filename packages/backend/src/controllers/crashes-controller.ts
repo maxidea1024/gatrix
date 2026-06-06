@@ -370,7 +370,7 @@ export class CrashesController {
     ];
     if (envIds.length === 0) return crashes;
 
-    let envInfoMap: Record<
+    const envInfoMap: Record<
       string,
       { envName: string; projectName: string; organizationName: string }
     > = {};

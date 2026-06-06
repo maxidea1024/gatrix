@@ -81,28 +81,37 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
       }
     };
     fetchEvents();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [projectId, issueId]);
 
   // Sync currentIndex when events or currentEvent change
   useEffect(() => {
     if (!currentEvent || events.length === 0) return;
-    const idx = events.findIndex(e => e.event_id === currentEvent.event_id);
+    const idx = events.findIndex((e) => e.event_id === currentEvent.event_id);
     if (idx >= 0) setCurrentIndex(idx);
   }, [currentEvent, events]);
 
-  const goToEvent = useCallback((idx: number) => {
-    if (idx >= 0 && idx < events.length) {
-      setCurrentIndex(idx);
-      onEventChange(events[idx]);
-    }
-  }, [events, onEventChange]);
+  const goToEvent = useCallback(
+    (idx: number) => {
+      if (idx >= 0 && idx < events.length) {
+        setCurrentIndex(idx);
+        onEventChange(events[idx]);
+      }
+    },
+    [events, onEventChange]
+  );
 
   // Keyboard shortcuts: J=older, K=newer, [=oldest, ]=latest
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't capture when typing in inputs
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
+        return;
 
       if (e.key === 'j' || e.key === 'J') {
         e.preventDefault();
@@ -162,18 +171,27 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
   // Is current event the "recommended" one (latest = index 0)?
   const isRecommended = currentIndex === 0;
 
-
-
   if (loading) {
     return (
-      <Box sx={{
-        display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1,
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 1.5,
-        backgroundColor: theme.palette.background.paper,
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 2,
+          py: 1,
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 1.5,
+          backgroundColor: theme.palette.background.paper,
+        }}
+      >
         <Skeleton variant="text" width={140} height={24} />
-        <Skeleton variant="rectangular" width={200} height={20} sx={{ borderRadius: 1, ml: 'auto' }} />
+        <Skeleton
+          variant="rectangular"
+          width={200}
+          height={20}
+          sx={{ borderRadius: 1, ml: 'auto' }}
+        />
       </Box>
     );
   }
@@ -182,26 +200,39 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-      <Box sx={{
-        display: 'flex', alignItems: 'center', gap: 1,
-        px: 2, py: 0.8,
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 1.5,
-        backgroundColor: theme.palette.background.paper,
-        flexWrap: 'wrap',
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 2,
+          py: 0.8,
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 1.5,
+          backgroundColor: theme.palette.background.paper,
+          flexWrap: 'wrap',
+        }}
+      >
         {/* Navigation buttons */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
           <Tooltip title={`${t('argus.events.oldest', 'Oldest')} [ ]`}>
             <span>
-              <IconButton size="small" onClick={() => goToEvent(total - 1)} disabled={!hasNext}>
+              <IconButton
+                size="small"
+                onClick={() => goToEvent(total - 1)}
+                disabled={!hasNext}
+              >
                 <OldestIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
           </Tooltip>
           <Tooltip title={`${t('argus.events.older', 'Older')} [J]`}>
             <span>
-              <IconButton size="small" onClick={() => goToEvent(currentIndex + 1)} disabled={!hasNext}>
+              <IconButton
+                size="small"
+                onClick={() => goToEvent(currentIndex + 1)}
+                disabled={!hasNext}
+              >
                 <PrevIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
@@ -215,10 +246,14 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
               <RecommendedIcon sx={{ fontSize: 14, color: 'warning.main' }} />
             </Tooltip>
           )}
-          <Typography variant="caption" sx={{
-            fontSize: '0.78rem', fontWeight: 600,
-            color: theme.palette.text.primary,
-          }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              color: theme.palette.text.primary,
+            }}
+          >
             {t('argus.events.eventOf', {
               defaultValue: 'Event {{current}} of {{total}}',
               current: currentIndex + 1,
@@ -231,14 +266,22 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
           <Tooltip title={`${t('argus.events.newer', 'Newer')} [K]`}>
             <span>
-              <IconButton size="small" onClick={() => goToEvent(currentIndex - 1)} disabled={!hasPrev}>
+              <IconButton
+                size="small"
+                onClick={() => goToEvent(currentIndex - 1)}
+                disabled={!hasPrev}
+              >
                 <NextIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
           </Tooltip>
           <Tooltip title={`${t('argus.events.latest', 'Latest')} [ ] ]`}>
             <span>
-              <IconButton size="small" onClick={() => goToEvent(0)} disabled={!hasPrev}>
+              <IconButton
+                size="small"
+                onClick={() => goToEvent(0)}
+                disabled={!hasPrev}
+              >
                 <LatestIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
@@ -251,7 +294,8 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
             label={new Date(currentEvent.timestamp).toLocaleString()}
             size="small"
             sx={{
-              height: 20, fontSize: '0.68rem',
+              height: 20,
+              fontSize: '0.68rem',
               backgroundColor: alpha(theme.palette.text.primary, 0.05),
               color: theme.palette.text.secondary,
             }}
@@ -262,7 +306,10 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
         <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
           <TextField
             size="small"
-            placeholder={t('argus.events.searchPlaceholder', 'Search events...')}
+            placeholder={t(
+              'argus.events.searchPlaceholder',
+              'Search events...'
+            )}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => {
@@ -270,25 +317,39 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
             }}
             slotProps={{
               input: {
-                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} /></InputAdornment>,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+                  </InputAdornment>
+                ),
                 endAdornment: searchQuery && (
                   <InputAdornment position="end">
-                    <IconButton size="small" onClick={() => setSearchQuery('')} sx={{ p: 0.2 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => setSearchQuery('')}
+                      sx={{ p: 0.2 }}
+                    >
                       <CloseIcon sx={{ fontSize: 14 }} />
                     </IconButton>
                   </InputAdornment>
                 ),
-              }
+              },
             }}
             sx={{
               width: 220,
               '& .MuiOutlinedInput-root': {
-                height: 26, fontSize: '0.72rem', borderRadius: 1.5,
-              }
+                height: 26,
+                fontSize: '0.72rem',
+                borderRadius: 1.5,
+              },
             }}
           />
-          <Tooltip title={`${t('argus.events.keyboardShortcuts', 'Keyboard shortcuts')}: J/K ${t('argus.events.navigateEvents', 'navigate')}, [ / ] ${t('argus.events.jumpToEdge', 'jump')}`}>
-            <KeyboardIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+          <Tooltip
+            title={`${t('argus.events.keyboardShortcuts', 'Keyboard shortcuts')}: J/K ${t('argus.events.navigateEvents', 'navigate')}, [ / ] ${t('argus.events.jumpToEdge', 'jump')}`}
+          >
+            <KeyboardIcon
+              sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+            />
           </Tooltip>
         </Box>
       </Box>

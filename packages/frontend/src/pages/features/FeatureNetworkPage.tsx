@@ -35,7 +35,11 @@ import {
   Chip,
   keyframes,
 } from '@mui/material';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair, presetToHours } from '@/components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+  presetToHours,
+} from '@/components/common/DateRangeSelector';
 import {
   Refresh as RefreshIcon,
   Hub as HubIcon,
@@ -157,8 +161,6 @@ interface GlobalEnvironment {
   orgId: string;
   orgName: string;
 }
-
-
 
 // Global API base path (not project-scoped)
 const GLOBAL_API_PATH = '/admin/network';
@@ -296,9 +298,10 @@ const FeatureNetworkPage: React.FC = () => {
     const appsParam = searchParams.get('apps');
     return appsParam ? appsParam.split(',') : [];
   });
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: searchParams.get('range') || '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: searchParams.get('range') || '7d',
+  }));
   const [showTable, setShowTable] = useState(true);
   const [showEvalTable, setShowEvalTable] = useState(true);
   const [appsLoaded, setAppsLoaded] = useState(false);
@@ -351,7 +354,8 @@ const FeatureNetworkPage: React.FC = () => {
     if (selectedApps.length > 0 && selectedApps.length < applications.length) {
       params.set('apps', selectedApps.join(','));
     }
-    const preset = dateRange.type === 'preset' ? (dateRange.preset || '24h') : 'custom';
+    const preset =
+      dateRange.type === 'preset' ? dateRange.preset || '24h' : 'custom';
     if (preset !== '24h') {
       params.set('range', preset);
     }
@@ -949,8 +953,11 @@ const FeatureNetworkPage: React.FC = () => {
         value: evaluations
           ? Math.round(
               evaluations.totalEvaluations /
-                (presetToHours(dateRange.type === 'preset' ? (dateRange.preset || '24h') : '24h') ||
-                  24)
+                (presetToHours(
+                  dateRange.type === 'preset'
+                    ? dateRange.preset || '24h'
+                    : '24h'
+                ) || 24)
             ).toLocaleString()
           : '0',
         color: '#9c27b0',

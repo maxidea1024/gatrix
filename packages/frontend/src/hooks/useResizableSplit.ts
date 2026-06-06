@@ -42,7 +42,9 @@ export function useResizableSplit({
 }: UseResizableSplitOptions): UseResizableSplitReturn {
   const [splitWidth, setSplitWidth] = useState(() => {
     const saved = parseInt(localStorage.getItem(storageKey) || '', 10);
-    return !isNaN(saved) && saved >= minWidth && saved <= maxWidth ? saved : defaultWidth;
+    return !isNaN(saved) && saved >= minWidth && saved <= maxWidth
+      ? saved
+      : defaultWidth;
   });
   const [isDragging, setIsDragging] = useState(false);
 
@@ -52,47 +54,56 @@ export function useResizableSplit({
   // Time-based throttle: last state update timestamp
   const lastUpdateRef = useRef(0);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-    const startX = e.clientX;
-    const startWidth = latestWidthRef.current;
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsDragging(true);
+      const startX = e.clientX;
+      const startWidth = latestWidthRef.current;
 
-    const onMouseMove = (ev: MouseEvent) => {
-      const rawDelta = ev.clientX - startX;
-      const delta = invertDelta ? -rawDelta : rawDelta;
-      const newWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
+      const onMouseMove = (ev: MouseEvent) => {
+        const rawDelta = ev.clientX - startX;
+        const delta = invertDelta ? -rawDelta : rawDelta;
+        const newWidth = Math.min(
+          maxWidth,
+          Math.max(minWidth, startWidth + delta)
+        );
 
-      // Time-based throttle: max ~20 state updates/sec during drag
-      const now = performance.now();
-      if (now - lastUpdateRef.current < 50) return;
-      lastUpdateRef.current = now;
+        // Time-based throttle: max ~20 state updates/sec during drag
+        const now = performance.now();
+        if (now - lastUpdateRef.current < 50) return;
+        lastUpdateRef.current = now;
 
-      setSplitWidth(newWidth);
-    };
+        setSplitWidth(newWidth);
+      };
 
-    const onMouseUp = (ev: MouseEvent) => {
-      setIsDragging(false);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      const onMouseUp = (ev: MouseEvent) => {
+        setIsDragging(false);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
 
-      // Final precise width from the last mouse position
-      const rawDelta = ev.clientX - startX;
-      const delta = invertDelta ? -rawDelta : rawDelta;
-      const finalWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
-      setSplitWidth(finalWidth);
+        // Final precise width from the last mouse position
+        const rawDelta = ev.clientX - startX;
+        const delta = invertDelta ? -rawDelta : rawDelta;
+        const finalWidth = Math.min(
+          maxWidth,
+          Math.max(minWidth, startWidth + delta)
+        );
+        setSplitWidth(finalWidth);
 
-      // Persist to localStorage only once on drag end
-      localStorage.setItem(storageKey, String(finalWidth));
-    };
+        // Persist to localStorage only once on drag end
+        localStorage.setItem(storageKey, String(finalWidth));
+      };
 
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }, [storageKey, minWidth, maxWidth, invertDelta]);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    },
+    [storageKey, minWidth, maxWidth, invertDelta]
+  );
 
   return { splitWidth, isDragging, handleMouseDown };
 }

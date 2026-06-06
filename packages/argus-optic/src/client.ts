@@ -52,7 +52,9 @@ export class OpticClient {
    * console.log(result.data[0].count);
    * ```
    */
-  async query<T = Record<string, any>>(query: OpticQuery): Promise<OpticResult<T>> {
+  async query<T = Record<string, any>>(
+    query: OpticQuery
+  ): Promise<OpticResult<T>> {
     const built = buildQuery(query);
     return this.executeQuery<T>(built.sql, built.params, query.dataset);
   }
@@ -72,7 +74,7 @@ export class OpticClient {
    * ```
    */
   async queryBatch<T extends Record<string, OpticQuery>>(
-    queries: T,
+    queries: T
   ): Promise<{ [K in keyof T]: OpticResult<Record<string, any>> }> {
     const keys = Object.keys(queries) as (keyof T)[];
     const builtQueries = keys.map((key) => ({
@@ -83,11 +85,13 @@ export class OpticClient {
 
     const results = await Promise.all(
       builtQueries.map((bq) =>
-        this.executeQuery<Record<string, any>>(bq.sql, bq.params, bq.dataset),
-      ),
+        this.executeQuery<Record<string, any>>(bq.sql, bq.params, bq.dataset)
+      )
     );
 
-    const resultMap = {} as { [K in keyof T]: OpticResult<Record<string, any>> };
+    const resultMap = {} as {
+      [K in keyof T]: OpticResult<Record<string, any>>;
+    };
     keys.forEach((key, i) => {
       resultMap[key] = results[i];
     });
@@ -107,7 +111,7 @@ export class OpticClient {
    * ```
    */
   async rawQuery<T = Record<string, any>>(
-    options: RawQueryOptions,
+    options: RawQueryOptions
   ): Promise<OpticResult<T>> {
     return this.executeQuery<T>(options.query, options.params, 'raw');
   }
@@ -129,7 +133,7 @@ export class OpticClient {
    * ```
    */
   async queryTagDistribution(
-    options: TagDistributionOptions,
+    options: TagDistributionOptions
   ): Promise<Record<string, { value: string; count: number }[]>> {
     const built = buildTagDistributionQuery(options);
     const result = await this.executeQuery<{
@@ -258,7 +262,7 @@ export class OpticClient {
   private async executeQuery<T>(
     sql: string,
     params: Record<string, any>,
-    datasetName: string,
+    datasetName: string
   ): Promise<OpticResult<T>> {
     const startTime = Date.now();
     const clickhouse = getClickHouseClient();
@@ -270,7 +274,7 @@ export class OpticClient {
         format: 'JSONEachRow',
       });
 
-      const data = await result.json() as T[];
+      const data = (await result.json()) as T[];
 
       const executionTimeMs = Date.now() - startTime;
 

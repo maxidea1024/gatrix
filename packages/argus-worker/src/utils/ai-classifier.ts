@@ -13,7 +13,13 @@ const logger = createLogger('ai-classifier');
 
 export interface FeedbackClassification {
   sentiment: 'positive' | 'negative' | 'neutral';
-  category: 'bug' | 'feature_request' | 'complaint' | 'praise' | 'question' | 'other';
+  category:
+    | 'bug'
+    | 'feature_request'
+    | 'complaint'
+    | 'praise'
+    | 'question'
+    | 'other';
   spam_score: number; // 0.0 – 1.0
 }
 
@@ -26,7 +32,8 @@ interface AISettings {
 }
 
 // Cache AI settings to avoid per-request DB lookups
-let cachedSettings: { data: AISettings | null; fetchedAt: number } | null = null;
+let cachedSettings: { data: AISettings | null; fetchedAt: number } | null =
+  null;
 const CACHE_TTL_MS = 60_000; // 1 minute
 
 async function getAISettings(projectId: string): Promise<AISettings | null> {
@@ -138,14 +145,17 @@ async function callLLM(
     case 'deepseek':
     case 'qwen': {
       // All OpenAI-compatible providers
-      const baseUrl = apiBaseUrl ||
-        (provider === 'deepseek' ? 'https://api.deepseek.com' :
-         provider === 'qwen' ? 'https://dashscope.aliyuncs.com/compatible-mode' :
-         'https://api.openai.com');
+      const baseUrl =
+        apiBaseUrl ||
+        (provider === 'deepseek'
+          ? 'https://api.deepseek.com'
+          : provider === 'qwen'
+            ? 'https://dashscope.aliyuncs.com/compatible-mode'
+            : 'https://api.openai.com');
       url = `${baseUrl}/v1/chat/completions`;
       headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       };
       body = {
         model,
@@ -181,7 +191,14 @@ async function callLLM(
       headers = { 'Content-Type': 'application/json' };
       body = {
         contents: [
-          { role: 'user', parts: [{ text: `${CLASSIFICATION_PROMPT}\n\nFeedback message:\n"${message}"` }] },
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `${CLASSIFICATION_PROMPT}\n\nFeedback message:\n"${message}"`,
+              },
+            ],
+          },
         ],
         generationConfig: { temperature: 0.1, maxOutputTokens: 200 },
       };
@@ -227,24 +244,43 @@ async function callLLM(
   return parseClassificationResponse(text);
 }
 
-function parseClassificationResponse(text: string): FeedbackClassification | null {
+function parseClassificationResponse(
+  text: string
+): FeedbackClassification | null {
   try {
     // Remove markdown code fence if present
-    const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const cleaned = text
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
     const parsed = JSON.parse(cleaned);
 
     const validSentiments = ['positive', 'negative', 'neutral'];
-    const validCategories = ['bug', 'feature_request', 'complaint', 'praise', 'question', 'other'];
+    const validCategories = [
+      'bug',
+      'feature_request',
+      'complaint',
+      'praise',
+      'question',
+      'other',
+    ];
 
     return {
-      sentiment: validSentiments.includes(parsed.sentiment) ? parsed.sentiment : 'neutral',
-      category: validCategories.includes(parsed.category) ? parsed.category : 'other',
-      spam_score: typeof parsed.spam_score === 'number'
-        ? Math.max(0, Math.min(1, parsed.spam_score))
-        : 0,
+      sentiment: validSentiments.includes(parsed.sentiment)
+        ? parsed.sentiment
+        : 'neutral',
+      category: validCategories.includes(parsed.category)
+        ? parsed.category
+        : 'other',
+      spam_score:
+        typeof parsed.spam_score === 'number'
+          ? Math.max(0, Math.min(1, parsed.spam_score))
+          : 0,
     };
   } catch (error) {
-    logger.warn('Failed to parse classification response', { text: text.slice(0, 200) });
+    logger.warn('Failed to parse classification response', {
+      text: text.slice(0, 200),
+    });
     return null;
   }
 }

@@ -15,7 +15,17 @@ export default async function issuesRoutes(app: FastifyInstance) {
     '/:projectId/issues/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', status, level, start, end, query, environment, browser, os } = request.query as Record<string, string>;
+      const {
+        period = '24h',
+        status,
+        level,
+        start,
+        end,
+        query,
+        environment,
+        browser,
+        os,
+      } = request.query as Record<string, string>;
 
       try {
         let startDt: Date;
@@ -26,7 +36,13 @@ export default async function issuesRoutes(app: FastifyInstance) {
           endDt = new Date(end);
         } else {
           const periodMap: Record<string, number> = {
-            '1h': 3600, '6h': 21600, '24h': 86400, '7d': 604800, '14d': 1209600, '30d': 2592000, '90d': 7776000,
+            '1h': 3600,
+            '6h': 21600,
+            '24h': 86400,
+            '7d': 604800,
+            '14d': 1209600,
+            '30d': 2592000,
+            '90d': 7776000,
           };
           const deltaSecs = periodMap[period] || 86400;
           endDt = new Date();
@@ -37,7 +53,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
           return reply.code(400).send({ error: 'Invalid start or end date' });
         }
 
-        const deltaSeconds = Math.max(1, (endDt.getTime() - startDt.getTime()) / 1000);
+        const deltaSeconds = Math.max(
+          1,
+          (endDt.getTime() - startDt.getTime()) / 1000
+        );
         let interval = '1 DAY';
         if (deltaSeconds <= 3600) interval = '1 MINUTE';
         else if (deltaSeconds <= 6 * 3600) interval = '5 MINUTE';
@@ -54,7 +73,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
         const conditions = [
           `project_id = {projectId:String}`,
           `timestamp >= toDateTime({fillStart:UInt32})`,
-          `timestamp <= toDateTime({fillEnd:UInt32})`
+          `timestamp <= toDateTime({fillEnd:UInt32})`,
         ];
 
         if (level) {
@@ -94,15 +113,21 @@ export default async function issuesRoutes(app: FastifyInstance) {
             const queryRows = await db('g_argus_issues')
               .select('id')
               .where('project_id', projectId)
-              .andWhere(function() {
-                this.where('title', 'like', `%${query}%`).orWhere('culprit', 'like', `%${query}%`);
+              .andWhere(function () {
+                this.where('title', 'like', `%${query}%`).orWhere(
+                  'culprit',
+                  'like',
+                  `%${query}%`
+                );
               });
             const queryIssueIds = queryRows.map((r: any) => r.id);
             if (queryIssueIds.length === 0) {
               return reply.send({ data: [] });
             }
             conditions.push(`issue_id IN (${queryIssueIds.join(',')})`);
-          } catch { /* ignore query filter errors */ }
+          } catch {
+            /* ignore query filter errors */
+          }
         }
 
         const result = await optic.rawQuery({
@@ -124,7 +149,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
         });
         return reply.send({ data: result.data || [] });
       } catch (error) {
-        logger.error('Failed to get issue volume', { projectId, error: String(error) });
+        logger.error('Failed to get issue volume', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to get issue volume' });
       }
     }
@@ -183,8 +211,13 @@ export default async function issuesRoutes(app: FastifyInstance) {
             qp.endTs = Math.floor(new Date(end).getTime() / 1000);
           } else if (period) {
             const periodMap: Record<string, string> = {
-              '1h': '1 HOUR', '6h': '6 HOUR', '24h': '24 HOUR',
-              '7d': '7 DAY', '14d': '14 DAY', '30d': '30 DAY', '90d': '90 DAY',
+              '1h': '1 HOUR',
+              '6h': '6 HOUR',
+              '24h': '24 HOUR',
+              '7d': '7 DAY',
+              '14d': '14 DAY',
+              '30d': '30 DAY',
+              '90d': '90 DAY',
             };
             const interval = periodMap[period];
             if (interval) {
@@ -196,11 +229,18 @@ export default async function issuesRoutes(app: FastifyInstance) {
             query: `SELECT DISTINCT issue_id FROM argus.errors WHERE ${conditions.join(' AND ')} LIMIT 10000`,
             params: qp,
           });
-          issueIdFilter = (chResult.data || []).map((r: any) => Number(r.issue_id));
+          issueIdFilter = (chResult.data || []).map((r: any) =>
+            Number(r.issue_id)
+          );
 
           // If no matching issues found, return empty
           if (issueIdFilter.length === 0) {
-            return reply.send({ data: [], total: 0, limit: parseInt(limit, 10), offset: parseInt(offset, 10) });
+            return reply.send({
+              data: [],
+              total: 0,
+              limit: parseInt(limit, 10),
+              offset: parseInt(offset, 10),
+            });
           }
         }
 
@@ -275,14 +315,19 @@ export default async function issuesRoutes(app: FastifyInstance) {
             // Build 24-slot arrays (one per hour)
             for (const row of (sparkResult.data || []) as any[]) {
               const id = Number(row.issue_id);
-              if (!sparklineMap.has(id)) sparklineMap.set(id, new Array(24).fill(0));
+              if (!sparklineMap.has(id))
+                sparklineMap.set(id, new Array(24).fill(0));
               const hourDate = new Date(row.hour);
-              const hoursAgo = Math.floor((Date.now() - hourDate.getTime()) / 3600000);
+              const hoursAgo = Math.floor(
+                (Date.now() - hourDate.getTime()) / 3600000
+              );
               const slotIdx = 23 - Math.min(hoursAgo, 23);
               sparklineMap.get(id)![slotIdx] = Number(row.cnt);
             }
           } catch (e) {
-            logger.warn('Failed to fetch sparkline data', { error: e instanceof Error ? e.message : String(e) });
+            logger.warn('Failed to fetch sparkline data', {
+              error: e instanceof Error ? e.message : String(e),
+            });
           }
         }
 
@@ -344,13 +389,22 @@ export default async function issuesRoutes(app: FastifyInstance) {
       try {
         // Generate a fingerprint from title
         const crypto = require('crypto');
-        const fingerprint = crypto.createHash('md5').update(body.title).digest('hex');
+        const fingerprint = crypto
+          .createHash('md5')
+          .update(body.title)
+          .digest('hex');
 
         // Ensure external columns exist (idempotent)
         try {
-          await db.raw(`ALTER TABLE g_argus_issues ADD COLUMN IF NOT EXISTS external_url VARCHAR(512) DEFAULT NULL`);
-          await db.raw(`ALTER TABLE g_argus_issues ADD COLUMN IF NOT EXISTS external_key VARCHAR(100) DEFAULT NULL`);
-        } catch { /* columns may already exist */ }
+          await db.raw(
+            `ALTER TABLE g_argus_issues ADD COLUMN IF NOT EXISTS external_url VARCHAR(512) DEFAULT NULL`
+          );
+          await db.raw(
+            `ALTER TABLE g_argus_issues ADD COLUMN IF NOT EXISTS external_key VARCHAR(100) DEFAULT NULL`
+          );
+        } catch {
+          /* columns may already exist */
+        }
 
         const [insertId] = await db('g_argus_issues').insert({
           project_id: projectId,
@@ -364,7 +418,11 @@ export default async function issuesRoutes(app: FastifyInstance) {
           first_seen: db.fn.now(),
           last_seen: db.fn.now(),
         });
-        logger.info('Issue created manually', { projectId, issueId: insertId, title: body.title });
+        logger.info('Issue created manually', {
+          projectId,
+          issueId: insertId,
+          title: body.title,
+        });
 
         // Create on external tracker if tracker_id is provided
         let externalUrl: string | null = null;
@@ -372,9 +430,13 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
         if (body.tracker_id) {
           try {
-            const { createExternalIssue } = require('../services/trackerAdapter');
-            const trackerRows = await db('g_argus_issue_trackers')
-              .where({ id: body.tracker_id, project_id: projectId });
+            const {
+              createExternalIssue,
+            } = require('../services/trackerAdapter');
+            const trackerRows = await db('g_argus_issue_trackers').where({
+              id: body.tracker_id,
+              project_id: projectId,
+            });
             const tracker = trackerRows[0];
 
             if (tracker && tracker.enabled) {
@@ -382,7 +444,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
                 provider: tracker.provider,
                 apiUrl: tracker.api_url,
                 apiToken: tracker.api_token,
-                config: typeof tracker.config === 'string' ? JSON.parse(tracker.config) : (tracker.config || {}),
+                config:
+                  typeof tracker.config === 'string'
+                    ? JSON.parse(tracker.config)
+                    : tracker.config || {},
               };
 
               const externalResult = await createExternalIssue(trackerConfig, {
@@ -397,11 +462,16 @@ export default async function issuesRoutes(app: FastifyInstance) {
               // Store external link on the issue
               await db('g_argus_issues')
                 .where('id', insertId)
-                .update({ external_url: externalUrl, external_key: externalKey });
+                .update({
+                  external_url: externalUrl,
+                  external_key: externalKey,
+                });
 
               logger.info('External issue created', {
-                issueId: insertId, provider: tracker.provider,
-                externalUrl, externalKey,
+                issueId: insertId,
+                provider: tracker.provider,
+                externalUrl,
+                externalKey,
               });
             }
           } catch (trackerError) {
@@ -440,8 +510,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-        const results = await db('g_argus_issues')
-          .where({ id: issueId, project_id: projectId });
+        const results = await db('g_argus_issues').where({
+          id: issueId,
+          project_id: projectId,
+        });
         if (results.length === 0) {
           return reply.code(404).send({ error: 'Issue not found' });
         }
@@ -492,17 +564,23 @@ export default async function issuesRoutes(app: FastifyInstance) {
             // Parse JSON strings back to objects for the frontend
             let breadcrumbs: any[] = [];
             try {
-              breadcrumbs = typeof latestEvent.breadcrumbs === 'string'
-                ? JSON.parse(latestEvent.breadcrumbs || '[]')
-                : (latestEvent.breadcrumbs || []);
-            } catch { breadcrumbs = []; }
+              breadcrumbs =
+                typeof latestEvent.breadcrumbs === 'string'
+                  ? JSON.parse(latestEvent.breadcrumbs || '[]')
+                  : latestEvent.breadcrumbs || [];
+            } catch {
+              breadcrumbs = [];
+            }
 
             let contexts: any = {};
             try {
-              contexts = typeof latestEvent.contexts === 'string'
-                ? JSON.parse(latestEvent.contexts || '{}')
-                : (latestEvent.contexts || {});
-            } catch { contexts = {}; }
+              contexts =
+                typeof latestEvent.contexts === 'string'
+                  ? JSON.parse(latestEvent.contexts || '{}')
+                  : latestEvent.contexts || {};
+            } catch {
+              contexts = {};
+            }
 
             issue.latest_event = {
               ...latestEvent,
@@ -551,27 +629,56 @@ export default async function issuesRoutes(app: FastifyInstance) {
         projectId: string;
         issueId: string;
       };
-      const { limit = '20', offset = '0' } = request.query as Record<string, string>;
+      const { limit = '20', offset = '0' } = request.query as Record<
+        string,
+        string
+      >;
 
       try {
         const result = await optic.query({
-          dataset: 'errors', projectId,
+          dataset: 'errors',
+          projectId,
           timeRange: { period: '90d' },
           select: [
-            { field: 'event_id' }, { field: 'timestamp' }, { field: 'platform' },
-            { field: 'level' }, { field: 'type' }, { field: 'value' },
-            { field: 'mechanism' }, { field: 'exception' }, { field: 'stacktrace_frames' },
-            { field: 'breadcrumbs' }, { field: 'user_id' }, { field: 'user_email' },
-            { field: 'user_ip' }, { field: 'user_name' }, { field: 'environment' },
-            { field: 'release' }, { field: 'transaction' }, { field: 'os_name' },
-            { field: 'os_version' }, { field: 'browser_name' }, { field: 'browser_version' },
-            { field: 'device_name' }, { field: 'device_family' }, { field: 'runtime_name' },
-            { field: 'runtime_version' }, { field: 'sdk_name' }, { field: 'sdk_version' },
-            { field: 'tags' }, { field: 'extra' }, { field: 'contexts' },
-            { field: 'http_method' }, { field: 'http_url' }, { field: 'is_handled' },
-            { field: 'fingerprint' }, { field: 'issue_id' },
+            { field: 'event_id' },
+            { field: 'timestamp' },
+            { field: 'platform' },
+            { field: 'level' },
+            { field: 'type' },
+            { field: 'value' },
+            { field: 'mechanism' },
+            { field: 'exception' },
+            { field: 'stacktrace_frames' },
+            { field: 'breadcrumbs' },
+            { field: 'user_id' },
+            { field: 'user_email' },
+            { field: 'user_ip' },
+            { field: 'user_name' },
+            { field: 'environment' },
+            { field: 'release' },
+            { field: 'transaction' },
+            { field: 'os_name' },
+            { field: 'os_version' },
+            { field: 'browser_name' },
+            { field: 'browser_version' },
+            { field: 'device_name' },
+            { field: 'device_family' },
+            { field: 'runtime_name' },
+            { field: 'runtime_version' },
+            { field: 'sdk_name' },
+            { field: 'sdk_version' },
+            { field: 'tags' },
+            { field: 'extra' },
+            { field: 'contexts' },
+            { field: 'http_method' },
+            { field: 'http_url' },
+            { field: 'is_handled' },
+            { field: 'fingerprint' },
+            { field: 'issue_id' },
           ],
-          conditions: [{ field: 'issue_id', op: '=', value: parseInt(issueId, 10) }],
+          conditions: [
+            { field: 'issue_id', op: '=', value: parseInt(issueId, 10) },
+          ],
           orderBy: [{ field: 'timestamp', direction: 'DESC' }],
           limit: parseInt(limit, 10),
           offset: parseInt(offset, 10),
@@ -600,7 +707,13 @@ export default async function issuesRoutes(app: FastifyInstance) {
       const { period = '14d' } = request.query as { period?: string };
 
       const periodMap: Record<string, number> = {
-        '1h': 3600, '6h': 21600, '24h': 86400, '7d': 604800, '14d': 1209600, '30d': 2592000, '90d': 7776000
+        '1h': 3600,
+        '6h': 21600,
+        '24h': 86400,
+        '7d': 604800,
+        '14d': 1209600,
+        '30d': 2592000,
+        '90d': 7776000,
       };
       const deltaSeconds = periodMap[period] || 1209600;
       const endDt = new Date();
@@ -663,7 +776,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
       try {
         // Single UNION ALL query instead of 6 individual queries
-        const chParams = { projectId: String(projectId), issueId: parseInt(issueId, 10) };
+        const chParams = {
+          projectId: String(projectId),
+          issueId: parseInt(issueId, 10),
+        };
         const result = await optic.rawQuery({
           query: `
             SELECT 'browser' AS key, browser_name AS value, count() AS cnt
@@ -698,7 +814,9 @@ export default async function issuesRoutes(app: FastifyInstance) {
         const tagMap = new Map<string, { value: string; count: number }[]>();
         for (const row of rows) {
           if (!tagMap.has(row.key)) tagMap.set(row.key, []);
-          tagMap.get(row.key)!.push({ value: row.value, count: Number(row.cnt) });
+          tagMap
+            .get(row.key)!
+            .push({ value: row.value, count: Number(row.cnt) });
         }
 
         const filtered = Array.from(tagMap.entries())
@@ -712,7 +830,8 @@ export default async function issuesRoutes(app: FastifyInstance) {
         return reply.send({ data: filtered });
       } catch (error) {
         logger.error('Failed to get issue tags', {
-          projectId, issueId,
+          projectId,
+          issueId,
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get issue tags' });
@@ -780,24 +899,35 @@ export default async function issuesRoutes(app: FastifyInstance) {
         try {
           if (body.status) {
             await db('g_argus_issue_activity').insert({
-              project_id: projectId, issue_id: issueId, user_name: userName,
-              action: 'status_change', data: JSON.stringify({ to: body.status }),
+              project_id: projectId,
+              issue_id: issueId,
+              user_name: userName,
+              action: 'status_change',
+              data: JSON.stringify({ to: body.status }),
             });
           }
           if (body.assigned_to !== undefined) {
             await db('g_argus_issue_activity').insert({
-              project_id: projectId, issue_id: issueId, user_name: userName,
-              action: 'assign', data: JSON.stringify({ to: body.assigned_to }),
+              project_id: projectId,
+              issue_id: issueId,
+              user_name: userName,
+              action: 'assign',
+              data: JSON.stringify({ to: body.assigned_to }),
             });
           }
           if (body.priority) {
             await db('g_argus_issue_activity').insert({
-              project_id: projectId, issue_id: issueId, user_name: userName,
-              action: 'priority_change', data: JSON.stringify({ to: body.priority }),
+              project_id: projectId,
+              issue_id: issueId,
+              user_name: userName,
+              action: 'priority_change',
+              data: JSON.stringify({ to: body.priority }),
             });
           }
         } catch (actErr) {
-          logger.warn('Failed to record activity', { error: actErr instanceof Error ? actErr.message : String(actErr) });
+          logger.warn('Failed to record activity', {
+            error: actErr instanceof Error ? actErr.message : String(actErr),
+          });
         }
 
         // Notify workers to invalidate issue cache if status changed
@@ -901,14 +1031,22 @@ export default async function issuesRoutes(app: FastifyInstance) {
       const { issue_ids } = request.body as { issue_ids: number[] };
 
       if (!issue_ids || issue_ids.length < 2) {
-        return reply.code(400).send({ error: 'At least 2 issue IDs are required to merge' });
+        return reply
+          .code(400)
+          .send({ error: 'At least 2 issue IDs are required to merge' });
       }
 
       try {
         const mergeResult = await db.transaction(async (trx) => {
           // Get all issues sorted by times_seen DESC - the most seen one becomes primary
           const issues = await trx('g_argus_issues')
-            .select('id', 'times_seen', 'first_seen', 'last_seen', 'primary_hash')
+            .select(
+              'id',
+              'times_seen',
+              'first_seen',
+              'last_seen',
+              'primary_hash'
+            )
             .where('project_id', projectId)
             .whereIn('id', issue_ids)
             .orderBy('times_seen', 'desc');
@@ -921,26 +1059,47 @@ export default async function issuesRoutes(app: FastifyInstance) {
           const mergedIds = issues.slice(1).map((i: any) => i.id);
 
           // Aggregate stats into primary
-          const totalTimesSeen = issues.reduce((sum: number, i: any) => sum + i.times_seen, 0);
-          const earliestFirstSeen = issues.reduce((earliest: string, i: any) => i.first_seen < earliest ? i.first_seen : earliest, issues[0].first_seen);
-          const latestLastSeen = issues.reduce((latest: string, i: any) => i.last_seen > latest ? i.last_seen : latest, issues[0].last_seen);
+          const totalTimesSeen = issues.reduce(
+            (sum: number, i: any) => sum + i.times_seen,
+            0
+          );
+          const earliestFirstSeen = issues.reduce(
+            (earliest: string, i: any) =>
+              i.first_seen < earliest ? i.first_seen : earliest,
+            issues[0].first_seen
+          );
+          const latestLastSeen = issues.reduce(
+            (latest: string, i: any) =>
+              i.last_seen > latest ? i.last_seen : latest,
+            issues[0].last_seen
+          );
 
           // Update primary issue
           await trx('g_argus_issues')
             .where('id', primary.id)
-            .update({ times_seen: totalTimesSeen, first_seen: earliestFirstSeen, last_seen: latestLastSeen });
+            .update({
+              times_seen: totalTimesSeen,
+              first_seen: earliestFirstSeen,
+              last_seen: latestLastSeen,
+            });
 
           // Mark merged issues as "merged" status with reference to primary
           await trx('g_argus_issues')
             .whereIn('id', mergedIds)
             .where('project_id', projectId)
-            .update({ status: 'merged', substatus: String(primary.id), times_seen: 0 });
+            .update({
+              status: 'merged',
+              substatus: String(primary.id),
+              times_seen: 0,
+            });
 
           return { primary, mergedIds, totalTimesSeen };
         });
 
         if (!mergeResult) {
-          return reply.code(404).send({ error: 'Not enough matching issues found' });
+          return reply
+            .code(404)
+            .send({ error: 'Not enough matching issues found' });
         }
 
         const { primary, mergedIds, totalTimesSeen } = mergeResult;
@@ -991,7 +1150,8 @@ export default async function issuesRoutes(app: FastifyInstance) {
         return reply.send({ data: rows });
       } catch (error) {
         logger.error('Failed to fetch activity', {
-          projectId, issueId,
+          projectId,
+          issueId,
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to fetch activity' });
@@ -1016,13 +1176,17 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
       try {
         await db('g_argus_issue_activity').insert({
-          project_id: projectId, issue_id: issueId, user_name: userName,
-          action: 'comment', data: JSON.stringify({ text: text.trim() }),
+          project_id: projectId,
+          issue_id: issueId,
+          user_name: userName,
+          action: 'comment',
+          data: JSON.stringify({ text: text.trim() }),
         });
         return reply.send({ success: true });
       } catch (error) {
         logger.error('Failed to add comment', {
-          projectId, issueId,
+          projectId,
+          issueId,
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to add comment' });

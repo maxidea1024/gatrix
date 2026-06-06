@@ -1,5 +1,3 @@
-
-
 interface CachedIssue {
   issueId: number;
   status: string;

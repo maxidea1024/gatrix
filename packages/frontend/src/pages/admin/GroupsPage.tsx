@@ -43,7 +43,8 @@ import {
   Shield as ShieldIcon,
   PersonAdd as PersonAddIcon,
   PersonRemove as PersonRemoveIcon,
-  MoreVert as MoreVertIcon,} from '@mui/icons-material';
+  MoreVert as MoreVertIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';

@@ -8,7 +8,10 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '../common/DateRangeSelector';
 import {
   OpenInNew as OpenInNewIcon,
   Refresh as RefreshIcon,
@@ -41,8 +44,6 @@ ChartJS.register(
   Filler
 );
 
-
-
 const WORLD_COLORS = [
   { border: '#2196f3', bg: 'rgba(33,150,243,0.1)' },
   { border: '#4caf50', bg: 'rgba(76,175,80,0.1)' },
@@ -64,9 +65,10 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
-  const [dateRange, setDateRangeRaw] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: localStorage.getItem('ccu-time-range') || '24h' })
-  );
+  const [dateRange, setDateRangeRaw] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: localStorage.getItem('ccu-time-range') || '24h',
+  }));
   const setDateRange = useCallback((v: DateRangeValue) => {
     setDateRangeRaw(v);
     if (v.type === 'preset' && v.preset) {

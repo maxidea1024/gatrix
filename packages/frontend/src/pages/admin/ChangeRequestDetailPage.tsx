@@ -555,7 +555,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ fontWeight: 600}}
+                      sx={{ fontWeight: 600 }}
                     >
                       {new Date(cr.createdAt).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -671,7 +671,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontWeight: 600}}
+                          sx={{ fontWeight: 600 }}
                         >
                           {new Date(event.timestamp).toLocaleTimeString([], {
                             hour: '2-digit',
@@ -1330,10 +1330,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                     gap: 1,
                   }}
                 >
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600 }}
-                  >
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {item.table}/{item.targetId}
                   </Typography>
                   <Chip

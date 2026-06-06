@@ -225,10 +225,7 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                 >
                   {t('common.details')}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ wordBreak: 'break-all' }}
-                >
+                <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
                   {message}
                 </Typography>
               </Paper>

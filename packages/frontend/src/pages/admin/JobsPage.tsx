@@ -37,7 +37,6 @@ import {
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
   MoreVert as MoreVertIcon,
-
 } from '@mui/icons-material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';

@@ -36,7 +36,6 @@ import {
   TextField,
 } from '@mui/material';
 import {
-
   Refresh as RefreshIcon,
   UnfoldMore as GroupIcon,
   FiberManualRecord as OnlineIcon,
@@ -854,7 +853,9 @@ export default function AllCharactersTab({
             >
               {user.userId}
             </Typography>
-            <CopyButton text={String(user.userId)} size={13}
+            <CopyButton
+              text={String(user.userId)}
+              size={13}
               sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
             />
           </Box>
@@ -880,7 +881,9 @@ export default function AllCharactersTab({
               {user.name || '-'}
             </Typography>
             {user.name && (
-              <CopyButton text={user.name} size={13}
+              <CopyButton
+                text={user.name}
+                size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               />
             )}
@@ -907,7 +910,9 @@ export default function AllCharactersTab({
               {user.characterId || '-'}
             </Typography>
             {user.characterId && (
-              <CopyButton text={user.characterId} size={13}
+              <CopyButton
+                text={user.characterId}
+                size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               />
             )}
@@ -934,7 +939,9 @@ export default function AllCharactersTab({
               {user.accountId || '-'}
             </Typography>
             {user.accountId && (
-              <CopyButton text={user.accountId} size={13}
+              <CopyButton
+                text={user.accountId}
+                size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               />
             )}
@@ -945,7 +952,9 @@ export default function AllCharactersTab({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="body2">{user.worldId || '-'}</Typography>
             {user.worldId && (
-              <CopyButton text={user.worldId} size={13}
+              <CopyButton
+                text={user.worldId}
+                size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               />
             )}
@@ -956,7 +965,9 @@ export default function AllCharactersTab({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="body2">{user.nationCmsId || '-'}</Typography>
             {user.nationCmsId !== 0 && user.nationCmsId && (
-              <CopyButton text={String(user.nationCmsId)} size={13}
+              <CopyButton
+                text={String(user.nationCmsId)}
+                size={13}
                 sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
               />
             )}
@@ -1007,10 +1018,7 @@ export default function AllCharactersTab({
         );
       case 'clientVersion':
         return (
-          <Typography
-            variant="body2"
-            sx={{ fontSize: '0.75rem' }}
-          >
+          <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
             {user.clientVersion || '-'}
           </Typography>
         );
@@ -1488,8 +1496,15 @@ export default function AllCharactersTab({
                               {displayValue}
                             </Typography>
                             {displayValue !== '-' && (
-                              <CopyButton text={String(rawValue ?? '')} size={13}
-                                sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, ml: 1, flexShrink: 0 }}
+                              <CopyButton
+                                text={String(rawValue ?? '')}
+                                size={13}
+                                sx={{
+                                  opacity: 0.4,
+                                  '&:hover': { opacity: 1 },
+                                  ml: 1,
+                                  flexShrink: 0,
+                                }}
                               />
                             )}
                           </Box>

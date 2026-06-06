@@ -7,16 +7,29 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('performance-api');
 
 export default async function performanceRoutes(app: FastifyInstance) {
-  // ?€?€ Transaction list ??top transactions by count, avg duration, p95 ?€?€?€?€
+  // ?ï¿½?ï¿½ Transaction list ??top transactions by count, avg duration, p95 ?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/performance/:projectId/transactions',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', sort = 'count', limit = '20', start, end } = request.query as {
-        period?: string; sort?: string; limit?: string; start?: string; end?: string;
+      const {
+        period = '24h',
+        sort = 'count',
+        limit = '20',
+        start,
+        end,
+      } = request.query as {
+        period?: string;
+        sort?: string;
+        limit?: string;
+        start?: string;
+        end?: string;
       };
 
-      const sortMap: Record<string, { field: string; direction: 'ASC' | 'DESC' }> = {
+      const sortMap: Record<
+        string,
+        { field: string; direction: 'ASC' | 'DESC' }
+      > = {
         p95: { field: 'p95', direction: 'DESC' },
         avg: { field: 'avg_duration', direction: 'DESC' },
         error_rate: { field: 'error_rate', direction: 'DESC' },
@@ -26,7 +39,8 @@ export default async function performanceRoutes(app: FastifyInstance) {
 
       try {
         const result = await optic.query({
-          dataset: 'transactions', projectId,
+          dataset: 'transactions',
+          projectId,
           timeRange: start && end ? { start, end } : { period },
           select: [
             { field: 'transaction', alias: 'name' },
@@ -36,7 +50,10 @@ export default async function performanceRoutes(app: FastifyInstance) {
             { field: 'p75(duration)', alias: 'p75' },
             { field: 'p95(duration)', alias: 'p95' },
             { field: 'p99(duration)', alias: 'p99' },
-            { field: "countIf(transaction_status != 'ok') / count() * 100", alias: 'error_rate' },
+            {
+              field: "countIf(transaction_status != 'ok') / count() * 100",
+              alias: 'error_rate',
+            },
             { field: 'max(timestamp)', alias: 'last_seen' },
           ],
           groupBy: ['transaction'],
@@ -47,34 +64,47 @@ export default async function performanceRoutes(app: FastifyInstance) {
         return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get transactions', {
-          projectId, error: error instanceof Error ? error.message : String(error),
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get transactions' });
       }
     }
   );
 
-  // ?€?€ Transaction detail ??all stats for a specific transaction ?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Transaction detail ??all stats for a specific transaction ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/performance/:projectId/transactions/:txnName',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, txnName } = request.params as { projectId: string; txnName: string };
+      const { projectId, txnName } = request.params as {
+        projectId: string;
+        txnName: string;
+      };
       const { period = '24h' } = request.query as { period?: string };
 
       try {
-        const txnFilter = { field: 'transaction', op: '=' as const, value: txnName };
+        const txnFilter = {
+          field: 'transaction',
+          op: '=' as const,
+          value: txnName,
+        };
 
         const [batch, histogram, relatedIssues] = await Promise.all([
           // Main queries via DSL
           optic.queryBatch({
             trend: {
-              dataset: 'transactions', projectId, timeRange: { period },
+              dataset: 'transactions',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'count' },
                 { field: 'avg(duration)', alias: 'avg_duration' },
                 { field: 'p95(duration)', alias: 'p95' },
-                { field: "countIf(transaction_status != 'ok') / count() * 100", alias: 'error_rate' },
+                {
+                  field: "countIf(transaction_status != 'ok') / count() * 100",
+                  alias: 'error_rate',
+                },
               ],
               conditions: [txnFilter],
               groupBy: ['$bucket'],
@@ -83,23 +113,35 @@ export default async function performanceRoutes(app: FastifyInstance) {
             },
 
             summary: {
-              dataset: 'transactions', projectId, timeRange: { period },
+              dataset: 'transactions',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'count()', alias: 'count' },
                 { field: 'avg(duration)', alias: 'avg_duration' },
                 { field: 'p50(duration)', alias: 'p50' },
                 { field: 'p95(duration)', alias: 'p95' },
-                { field: "countIf(transaction_status != 'ok') / count() * 100", alias: 'error_rate' },
+                {
+                  field: "countIf(transaction_status != 'ok') / count() * 100",
+                  alias: 'error_rate',
+                },
               ],
               conditions: [txnFilter],
             },
 
             recentTraces: {
-              dataset: 'transactions', projectId, timeRange: { period },
+              dataset: 'transactions',
+              projectId,
+              timeRange: { period },
               select: [
-                { field: 'event_id' }, { field: 'trace_id' }, { field: 'timestamp' },
-                { field: 'duration' }, { field: 'transaction_status' },
-                { field: 'http_status_code' }, { field: 'span_count' }, { field: 'user_id' },
+                { field: 'event_id' },
+                { field: 'trace_id' },
+                { field: 'timestamp' },
+                { field: 'duration' },
+                { field: 'transaction_status' },
+                { field: 'http_status_code' },
+                { field: 'span_count' },
+                { field: 'user_id' },
               ],
               conditions: [txnFilter],
               orderBy: [{ field: 'timestamp', direction: 'DESC' }],
@@ -107,7 +149,9 @@ export default async function performanceRoutes(app: FastifyInstance) {
             },
 
             errors: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'issue_id' },
                 { field: 'count()', alias: 'event_count' },
@@ -115,7 +159,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
               ],
               conditions: [
                 txnFilter,
-                { field: "toString(issue_id)", op: '!=', value: '' },
+                { field: 'toString(issue_id)', op: '!=', value: '' },
               ],
               groupBy: ['issue_id'],
               orderBy: [{ field: 'event_count', direction: 'DESC' }],
@@ -198,45 +242,73 @@ export default async function performanceRoutes(app: FastifyInstance) {
         });
       } catch (error) {
         logger.error('Failed to get transaction detail', {
-          projectId, txnName,
+          projectId,
+          txnName,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to get transaction detail' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get transaction detail' });
       }
     }
   );
 
-  // ?€?€ Trace waterfall ??get all spans for a specific trace ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Trace waterfall ??get all spans for a specific trace ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/performance/:projectId/traces/:traceId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, traceId } = request.params as { projectId: string; traceId: string };
+      const { projectId, traceId } = request.params as {
+        projectId: string;
+        traceId: string;
+      };
 
       try {
         const [txnResult, spansResult] = await Promise.all([
           optic.query({
-            dataset: 'transactions', projectId,
+            dataset: 'transactions',
+            projectId,
             timeRange: { period: '30d' },
             select: [
-              { field: 'event_id' }, { field: 'trace_id' }, { field: 'span_id' },
-              { field: 'parent_span_id' }, { field: 'transaction' }, { field: 'transaction_op' },
-              { field: 'transaction_status' }, { field: 'http_method' }, { field: 'http_status_code' },
-              { field: 'timestamp' }, { field: 'start_timestamp' }, { field: 'duration' },
-              { field: 'platform' }, { field: 'environment' }, { field: 'release' }, { field: 'user_id' },
+              { field: 'event_id' },
+              { field: 'trace_id' },
+              { field: 'span_id' },
+              { field: 'parent_span_id' },
+              { field: 'transaction' },
+              { field: 'transaction_op' },
+              { field: 'transaction_status' },
+              { field: 'http_method' },
+              { field: 'http_status_code' },
+              { field: 'timestamp' },
+              { field: 'start_timestamp' },
+              { field: 'duration' },
+              { field: 'platform' },
+              { field: 'environment' },
+              { field: 'release' },
+              { field: 'user_id' },
             ],
             conditions: [{ field: 'trace_id', op: '=', value: traceId }],
             orderBy: [{ field: 'timestamp', direction: 'ASC' }],
             limit: 10,
           }),
           optic.query({
-            dataset: 'spans', projectId,
+            dataset: 'spans',
+            projectId,
             timeRange: { period: '30d' },
             select: [
-              { field: 'span_id' }, { field: 'trace_id' }, { field: 'parent_span_id' },
-              { field: 'transaction_id' }, { field: 'op' }, { field: 'description' },
-              { field: 'status' }, { field: 'action' }, { field: 'domain' },
-              { field: 'timestamp' }, { field: 'start_timestamp' }, { field: 'duration' },
-              { field: 'data' }, { field: 'tags' },
+              { field: 'span_id' },
+              { field: 'trace_id' },
+              { field: 'parent_span_id' },
+              { field: 'transaction_id' },
+              { field: 'op' },
+              { field: 'description' },
+              { field: 'status' },
+              { field: 'action' },
+              { field: 'domain' },
+              { field: 'timestamp' },
+              { field: 'start_timestamp' },
+              { field: 'duration' },
+              { field: 'data' },
+              { field: 'tags' },
             ],
             conditions: [{ field: 'trace_id', op: '=', value: traceId }],
             orderBy: [{ field: 'start_timestamp', direction: 'ASC' }],
@@ -256,7 +328,8 @@ export default async function performanceRoutes(app: FastifyInstance) {
         });
       } catch (error) {
         logger.error('Failed to get trace detail', {
-          projectId, traceId,
+          projectId,
+          traceId,
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get trace detail' });

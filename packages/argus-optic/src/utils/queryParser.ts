@@ -52,18 +52,18 @@ const logger = createLogger('query-parser');
 // The tokenizer produces a flat array of typed tokens from the raw input.
 
 type TokenType =
-  | 'WORD'            // Unquoted alphanumeric string (key name, unquoted value, etc.)
-  | 'QUOTED_STRING'   // String enclosed in single or double quotes (value)
-  | 'OR'              // Literal "OR" keyword (logical disjunction)
-  | 'AND'             // Literal "AND" keyword (logical conjunction — usually implicit)
-  | 'LPAREN'          // (  — opens a grouping expression
-  | 'RPAREN'          // )  — closes a grouping expression
-  | 'LBRACKET'        // [  — opens a list value (IN clause)
-  | 'RBRACKET'        // ]  — closes a list value
-  | 'COMMA'           // ,  — separates items inside a list
-  | 'OP'              // Operator: one of  :  =  !=  >  <  >=  <=
-  | 'NEGATION'        // !  — prefix negation before a key (e.g. !severity:error)
-  | 'EOF';            // End-of-input sentinel
+  | 'WORD' // Unquoted alphanumeric string (key name, unquoted value, etc.)
+  | 'QUOTED_STRING' // String enclosed in single or double quotes (value)
+  | 'OR' // Literal "OR" keyword (logical disjunction)
+  | 'AND' // Literal "AND" keyword (logical conjunction — usually implicit)
+  | 'LPAREN' // (  — opens a grouping expression
+  | 'RPAREN' // )  — closes a grouping expression
+  | 'LBRACKET' // [  — opens a list value (IN clause)
+  | 'RBRACKET' // ]  — closes a list value
+  | 'COMMA' // ,  — separates items inside a list
+  | 'OP' // Operator: one of  :  =  !=  >  <  >=  <=
+  | 'NEGATION' // !  — prefix negation before a key (e.g. !severity:error)
+  | 'EOF'; // End-of-input sentinel
 
 interface Token {
   type: TokenType;
@@ -75,11 +75,11 @@ interface Token {
 // (key-op-value) or a RAW_SEARCH (free-text). Internal nodes are AND / OR / NOT.
 
 export type ASTNode =
-  | { type: 'AND';        left: ASTNode; right: ASTNode }          // Conjunction
-  | { type: 'OR';         left: ASTNode; right: ASTNode }          // Disjunction
-  | { type: 'NOT';        expr: ASTNode }                          // Negation wrapper
-  | { type: 'CONDITION';  key: string; op: string; value: string | string[] }  // key op value
-  | { type: 'RAW_SEARCH'; value: string };                         // Free-text search
+  | { type: 'AND'; left: ASTNode; right: ASTNode } // Conjunction
+  | { type: 'OR'; left: ASTNode; right: ASTNode } // Disjunction
+  | { type: 'NOT'; expr: ASTNode } // Negation wrapper
+  | { type: 'CONDITION'; key: string; op: string; value: string | string[] } // key op value
+  | { type: 'RAW_SEARCH'; value: string }; // Free-text search
 
 // ─── QueryParser Class ──────────────────────────────────────────────────────
 
@@ -143,11 +143,31 @@ export class QueryParser {
       }
 
       // ── Single-character structural tokens ──
-      if (char === '(') { this.tokens.push({ type: 'LPAREN', value: '(' }); this.pos++; continue; }
-      if (char === ')') { this.tokens.push({ type: 'RPAREN', value: ')' }); this.pos++; continue; }
-      if (char === '[') { this.tokens.push({ type: 'LBRACKET', value: '[' }); this.pos++; continue; }
-      if (char === ']') { this.tokens.push({ type: 'RBRACKET', value: ']' }); this.pos++; continue; }
-      if (char === ',') { this.tokens.push({ type: 'COMMA', value: ',' }); this.pos++; continue; }
+      if (char === '(') {
+        this.tokens.push({ type: 'LPAREN', value: '(' });
+        this.pos++;
+        continue;
+      }
+      if (char === ')') {
+        this.tokens.push({ type: 'RPAREN', value: ')' });
+        this.pos++;
+        continue;
+      }
+      if (char === '[') {
+        this.tokens.push({ type: 'LBRACKET', value: '[' });
+        this.pos++;
+        continue;
+      }
+      if (char === ']') {
+        this.tokens.push({ type: 'RBRACKET', value: ']' });
+        this.pos++;
+        continue;
+      }
+      if (char === ',') {
+        this.tokens.push({ type: 'COMMA', value: ',' });
+        this.pos++;
+        continue;
+      }
 
       // ── Negation prefix (!) ──
       // Emitted only when '!' is NOT followed by '=' (which would be the != operator).
@@ -360,7 +380,10 @@ export class QueryParser {
     // ── Raw text search ──
     // If the token is a word or quoted string and the NEXT token is NOT an
     // operator, this is a free-text search term (e.g. "timeout" or "connection reset").
-    if ((token.type === 'WORD' || token.type === 'QUOTED_STRING') && !['OP'].includes(this.peek().type)) {
+    if (
+      (token.type === 'WORD' || token.type === 'QUOTED_STRING') &&
+      !['OP'].includes(this.peek().type)
+    ) {
       const node: ASTNode = { type: 'RAW_SEARCH', value: token.value };
       return isNegated ? { type: 'NOT', expr: node } : node;
     }
@@ -379,7 +402,10 @@ export class QueryParser {
         // ── List value: key:[val1, val2, val3] → IN clause ──
         if (this.match('LBRACKET')) {
           const values: string[] = [];
-          while (this.peek().type !== 'RBRACKET' && this.peek().type !== 'EOF') {
+          while (
+            this.peek().type !== 'RBRACKET' &&
+            this.peek().type !== 'EOF'
+          ) {
             const vToken = this.advance();
             if (vToken.type === 'WORD' || vToken.type === 'QUOTED_STRING') {
               values.push(vToken.value);
@@ -389,14 +415,24 @@ export class QueryParser {
           this.match('RBRACKET');
 
           if (values.length > 0) {
-            const node: ASTNode = { type: 'CONDITION', key, op: 'IN', value: values };
+            const node: ASTNode = {
+              type: 'CONDITION',
+              key,
+              op: 'IN',
+              value: values,
+            };
             return isNegated ? { type: 'NOT', expr: node } : node;
           }
         } else {
           // ── Single value: key:value or key:"value" ──
           const valToken = this.advance();
           if (valToken.type === 'WORD' || valToken.type === 'QUOTED_STRING') {
-            const node: ASTNode = { type: 'CONDITION', key, op, value: valToken.value };
+            const node: ASTNode = {
+              type: 'CONDITION',
+              key,
+              op,
+              value: valToken.value,
+            };
             return isNegated ? { type: 'NOT', expr: node } : node;
           }
         }
@@ -454,7 +490,10 @@ export class QueryParser {
    *                entries for each condition. Pass this to ClickHouse query_params.
    * @returns       { where: string, having: string } — ready to splice into SQL.
    */
-  public generateSQL(node: ASTNode | null, params: Record<string, string>): { where: string; having: string } {
+  public generateSQL(
+    node: ASTNode | null,
+    params: Record<string, string>
+  ): { where: string; having: string } {
     if (!node) return { where: '', having: '' };
 
     /**
@@ -464,13 +503,14 @@ export class QueryParser {
      * At most one of w/h will be non-empty for leaf nodes.
      */
     const genNode = (n: ASTNode): { w: string; h: string } => {
-
       // ── AND node: combine left and right with SQL AND ──
       if (n.type === 'AND') {
         const left = genNode(n.left);
         const right = genNode(n.right);
-        const w = (left.w && right.w) ? `(${left.w} AND ${right.w})` : (left.w || right.w);
-        const h = (left.h && right.h) ? `(${left.h} AND ${right.h})` : (left.h || right.h);
+        const w =
+          left.w && right.w ? `(${left.w} AND ${right.w})` : left.w || right.w;
+        const h =
+          left.h && right.h ? `(${left.h} AND ${right.h})` : left.h || right.h;
         return { w, h };
       }
 
@@ -482,11 +522,15 @@ export class QueryParser {
         // Cross-clause OR (WHERE OR HAVING) is not valid SQL without subqueries.
         // Following Sentry's approach, we reject this combination.
         if ((left.h && right.w) || (left.w && right.h)) {
-          throw new Error('Cannot OR between aggregate and non-aggregate filters');
+          throw new Error(
+            'Cannot OR between aggregate and non-aggregate filters'
+          );
         }
 
-        const w = (left.w && right.w) ? `(${left.w} OR ${right.w})` : (left.w || right.w);
-        const h = (left.h && right.h) ? `(${left.h} OR ${right.h})` : (left.h || right.h);
+        const w =
+          left.w && right.w ? `(${left.w} OR ${right.w})` : left.w || right.w;
+        const h =
+          left.h && right.h ? `(${left.h} OR ${right.h})` : left.h || right.h;
         return { w, h };
       }
 
@@ -495,7 +539,7 @@ export class QueryParser {
         const inner = genNode(n.expr);
         return {
           w: inner.w ? `NOT (${inner.w})` : '',
-          h: inner.h ? `NOT (${inner.h})` : ''
+          h: inner.h ? `NOT (${inner.h})` : '',
         };
       }
 
@@ -509,13 +553,24 @@ export class QueryParser {
 
         // Only search columns that exist in this table's allowedColumns set.
         // This prevents querying non-existent columns.
-        const textCandidates = ['message', 'body', 'value', 'type', 'transaction', 'logger_name'];
-        const textCols = textCandidates.filter(c => this.allowedColumns.has(c));
+        const textCandidates = [
+          'message',
+          'body',
+          'value',
+          'type',
+          'transaction',
+          'logger_name',
+        ];
+        const textCols = textCandidates.filter((c) =>
+          this.allowedColumns.has(c)
+        );
         if (textCols.length === 0) {
           // No searchable text column available — return impossible condition
           return { w: '1=0', h: '' };
         }
-        const conds = textCols.map(c => `${c} ILIKE {${pName}:String}`).join(' OR ');
+        const conds = textCols
+          .map((c) => `${c} ILIKE {${pName}:String}`)
+          .join(' OR ');
         return { w: `(${conds})`, h: '' };
       }
 
@@ -541,32 +596,40 @@ export class QueryParser {
             return { w: '1=1', h: '' }; // Invalid column inside aggregate → ignore
           }
 
-        // ── Special key: age (relative time filter) ──
-        // Syntax: age:>24h, age:<7d, age:>=1w
-        // Semantics: "age > 24h" means "the event is older than 24h",
-        // which translates to "timestamp < now() - 24 HOUR" (inverted operator).
+          // ── Special key: age (relative time filter) ──
+          // Syntax: age:>24h, age:<7d, age:>=1w
+          // Semantics: "age > 24h" means "the event is older than 24h",
+          // which translates to "timestamp < now() - 24 HOUR" (inverted operator).
         } else if (key === 'age') {
           const valStr = String(n.value);
           const match = valStr.match(/^(\d+)(h|d|w)$/);
           if (match) {
             const num = match[1];
-            const unit = match[2] === 'h' ? 'HOUR' : match[2] === 'd' ? 'DAY' : 'WEEK';
+            const unit =
+              match[2] === 'h' ? 'HOUR' : match[2] === 'd' ? 'DAY' : 'WEEK';
             // Invert the operator because "older than X" means "timestamp before X"
-            const realOp = op === '>' ? '<' : op === '<' ? '>' : op === '>=' ? '<=' : '>=';
-            return { w: `timestamp ${realOp} now() - INTERVAL ${num} ${unit}`, h: '' };
+            const realOp =
+              op === '>' ? '<' : op === '<' ? '>' : op === '>=' ? '<=' : '>=';
+            return {
+              w: `timestamp ${realOp} now() - INTERVAL ${num} ${unit}`,
+              h: '',
+            };
           }
 
-        // ── Special key: timestamp / event.timestamp ──
-        // Allows direct timestamp comparison using ClickHouse's flexible date parser.
+          // ── Special key: timestamp / event.timestamp ──
+          // Allows direct timestamp comparison using ClickHouse's flexible date parser.
         } else if (key === 'event.timestamp' || key === 'timestamp') {
           const pName = `ts_${Math.random().toString(36).substring(7)}`;
           params[pName] = String(n.value);
-          return { w: `timestamp ${op} parseDateTimeBestEffort({${pName}:String})`, h: '' };
+          return {
+            w: `timestamp ${op} parseDateTimeBestEffort({${pName}:String})`,
+            h: '',
+          };
 
-        // ── Special key: has (existence check) ──
-        // Syntax: has:environment  →  environment != '' AND environment IS NOT NULL
-        // Checks that the given column has a non-empty, non-null value.
-        // The value is also alias-resolved (e.g. has:severity → level != '' ...).
+          // ── Special key: has (existence check) ──
+          // Syntax: has:environment  →  environment != '' AND environment IS NOT NULL
+          // Checks that the given column has a non-empty, non-null value.
+          // The value is also alias-resolved (e.g. has:severity → level != '' ...).
         } else if (key === 'has') {
           const val = this.resolveKey(String(n.value));
           if (!this.allowedColumns.has(val)) {
@@ -574,9 +637,9 @@ export class QueryParser {
           }
           return { w: `${val} != '' AND ${val} IS NOT NULL`, h: '' };
 
-        // ── Unknown column → silently ignore ──
-        // This prevents SQL injection via arbitrary column names and also
-        // gracefully handles typos or columns that don't exist in this table.
+          // ── Unknown column → silently ignore ──
+          // This prevents SQL injection via arbitrary column names and also
+          // gracefully handles typos or columns that don't exist in this table.
         } else if (!this.allowedColumns.has(key)) {
           return { w: '1=1', h: '' };
         }
@@ -597,7 +660,6 @@ export class QueryParser {
           const clause = `${key} ${op} (${arrParams.join(', ')})`;
           // Route to WHERE or HAVING depending on whether the key is an aggregate
           return { w: isAggregate ? '' : clause, h: isAggregate ? clause : '' };
-
         } else {
           // Single value
           let val = String(n.value);
@@ -620,7 +682,10 @@ export class QueryParser {
             if (!isNaN(Number(val))) {
               params[pName] = val;
               const clause = `${key} ${op} {${pName}:Float64}`;
-              return { w: isAggregate ? '' : clause, h: isAggregate ? clause : '' };
+              return {
+                w: isAggregate ? '' : clause,
+                h: isAggregate ? clause : '',
+              };
             }
           }
 
@@ -642,8 +707,18 @@ export class QueryParser {
     // placeholder. This cleanup pass removes those artifacts from the final SQL
     // so they don't clutter the query or confuse debugging.
     return {
-      where: result.w.replace(/\(1=1 AND /g, '(').replace(/ AND 1=1\)/g, ')').replace(/^1=1 AND /, '').replace(/ AND 1=1$/, '').replace(/^1=1$/, ''),
-      having: result.h.replace(/\(1=1 AND /g, '(').replace(/ AND 1=1\)/g, ')').replace(/^1=1 AND /, '').replace(/ AND 1=1$/, '').replace(/^1=1$/, ''),
+      where: result.w
+        .replace(/\(1=1 AND /g, '(')
+        .replace(/ AND 1=1\)/g, ')')
+        .replace(/^1=1 AND /, '')
+        .replace(/ AND 1=1$/, '')
+        .replace(/^1=1$/, ''),
+      having: result.h
+        .replace(/\(1=1 AND /g, '(')
+        .replace(/ AND 1=1\)/g, ')')
+        .replace(/^1=1 AND /, '')
+        .replace(/ AND 1=1$/, '')
+        .replace(/^1=1$/, ''),
     };
   }
 }

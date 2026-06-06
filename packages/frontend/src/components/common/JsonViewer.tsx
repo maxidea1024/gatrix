@@ -13,12 +13,28 @@ export interface JsonViewerProps {
  * Syntax-highlighted JSON viewer with copy support.
  * Reusable across issue detail, feedback detail, etc.
  */
-const JsonViewer: React.FC<JsonViewerProps> = ({ data, isDark, maxHeight = 350 }) => {
+const JsonViewer: React.FC<JsonViewerProps> = ({
+  data,
+  isDark,
+  maxHeight = 350,
+}) => {
   const jsonString = JSON.stringify(data, null, 2);
 
   const colors = isDark
-    ? { key: '#9cdcfe', str: '#ce9178', num: '#b5cea8', bool: '#569cd6', null: '#569cd6' }
-    : { key: '#a31515', str: '#0451a5', num: '#098658', bool: '#0000ff', null: '#0000ff' };
+    ? {
+        key: '#9cdcfe',
+        str: '#ce9178',
+        num: '#b5cea8',
+        bool: '#569cd6',
+        null: '#569cd6',
+      }
+    : {
+        key: '#a31515',
+        str: '#0451a5',
+        num: '#098658',
+        bool: '#0000ff',
+        null: '#0000ff',
+      };
 
   const html = jsonString.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
@@ -53,7 +69,12 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, isDark, maxHeight = 350 }
           color: isDark ? '#e2e8f0' : '#334155',
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'}`,
           '&::-webkit-scrollbar': { width: '6px', height: '6px' },
-          '&::-webkit-scrollbar-thumb': { backgroundColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', borderRadius: '3px' },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.2)'
+              : 'rgba(0,0,0,0.2)',
+            borderRadius: '3px',
+          },
         }}
       >
         <code dangerouslySetInnerHTML={{ __html: html }} />

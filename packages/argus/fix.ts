@@ -12,7 +12,7 @@ async function fix() {
       WHERE JSONHas(contexts, 'trace', 'trace_id') = 1
         AND JSONExtractString(contexts, 'trace', 'trace_id') NOT IN (SELECT trace_id FROM transactions)
       LIMIT 10000
-    `
+    `,
   });
   const missing = await q.json();
   console.log('Found', missing.data.length, 'errors missing transactions');
@@ -21,11 +21,11 @@ async function fix() {
 
   const txnBatch = [];
   const spanBatch = [];
-  
+
   for (const ev of missing.data) {
     const traceId = ev.trace_id;
     const spanId = uuid().substring(0, 16);
-    
+
     txnBatch.push({
       event_id: uuid(),
       trace_id: traceId,
@@ -47,7 +47,7 @@ async function fix() {
       user_id: 'user-123',
       measurements: {},
       tags: {},
-      span_count: 3
+      span_count: 3,
     });
 
     spanBatch.push({
@@ -64,7 +64,8 @@ async function fix() {
       status: 'ok',
       action: 'query',
       domain: 'mysql',
-      data: {}, tags: {}
+      data: {},
+      tags: {},
     });
 
     spanBatch.push({
@@ -81,13 +82,22 @@ async function fix() {
       status: 'internal_error',
       action: 'validate',
       domain: '',
-      data: {}, tags: {}
+      data: {},
+      tags: {},
     });
   }
 
-  await ch.insert({ table: 'argus.transactions', values: txnBatch, format: 'JSONEachRow' });
-  await ch.insert({ table: 'argus.spans', values: spanBatch, format: 'JSONEachRow' });
-  
+  await ch.insert({
+    table: 'argus.transactions',
+    values: txnBatch,
+    format: 'JSONEachRow',
+  });
+  await ch.insert({
+    table: 'argus.spans',
+    values: spanBatch,
+    format: 'JSONEachRow',
+  });
+
   console.log('Fixed', txnBatch.length, 'traces!');
   process.exit(0);
 }

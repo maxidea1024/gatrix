@@ -97,10 +97,7 @@ migrate('routes/dashboards.ts', [
     `const rows = await db('g_argus_dashboards')
           .where({ id: dashboardId, project_id: projectId });`,
   ],
-  [
-    `const arr = rows as any[];`,
-    `const arr = rows;`,
-  ],
+  [`const arr = rows as any[];`, `const arr = rows;`],
   [
     `const [result] = await mysqlPool.query(
           \`INSERT INTO g_argus_dashboards (project_id, title, description, widgets_config)

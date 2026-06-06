@@ -64,7 +64,10 @@ import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import SearchTextField from '@/components/common/SearchTextField';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '@/components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '@/components/common/DateRangeSelector';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -79,9 +82,10 @@ const UnknownFlagsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -685,10 +689,7 @@ const UnknownFlagsPage: React.FC = () => {
                                       fontSize="small"
                                       color="warning"
                                     />
-                                    <Typography
-                                      fontWeight={500}
-                                      
-                                    >
+                                    <Typography fontWeight={500}>
                                       {flag.flagName}
                                     </Typography>
                                     <Tooltip title={t('common.copy')}>

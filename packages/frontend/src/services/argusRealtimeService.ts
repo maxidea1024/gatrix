@@ -30,7 +30,8 @@ type ArgusRealtimeHandler = (event: ArgusRealtimeEvent) => void;
 
 class ArgusRealtimeService {
   private eventSource: EventSource | null = null;
-  private handlers: Map<ArgusRealtimeEventType, ArgusRealtimeHandler[]> = new Map();
+  private handlers: Map<ArgusRealtimeEventType, ArgusRealtimeHandler[]> =
+    new Map();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private projectId: string | null = null;
   private _isConnected = false;
@@ -75,8 +76,12 @@ class ArgusRealtimeService {
 
       // Listen for named event types
       const eventTypes: ArgusRealtimeEventType[] = [
-        'issue:created', 'issue:updated', 'issue:resolved',
-        'issue:deleted', 'event:created', 'stats:updated',
+        'issue:created',
+        'issue:updated',
+        'issue:resolved',
+        'issue:deleted',
+        'event:created',
+        'stats:updated',
       ];
       for (const eventType of eventTypes) {
         this.eventSource.addEventListener(eventType, (event: any) => {
@@ -95,7 +100,9 @@ class ArgusRealtimeService {
 
       this.eventSource.onerror = () => {
         this._isConnected = false;
-        console.warn('[Argus Realtime] SSE connection error — will auto-reconnect');
+        console.warn(
+          '[Argus Realtime] SSE connection error — will auto-reconnect'
+        );
         // EventSource auto-reconnects, but if it closes permanently, schedule manual reconnect
         if (this.eventSource?.readyState === EventSource.CLOSED) {
           this.scheduleReconnect();
@@ -129,18 +136,22 @@ class ArgusRealtimeService {
   private scheduleReconnect(): void {
     if (this.reconnectTimer) return;
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.warn('[Argus Realtime] Max reconnect attempts reached. Giving up.');
+      console.warn(
+        '[Argus Realtime] Max reconnect attempts reached. Giving up.'
+      );
       return;
     }
-    
+
     // Exponential backoff
     const delay = Math.min(5000 * Math.pow(2, this.reconnectAttempts), 60000);
     this.reconnectAttempts++;
-    
+
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       if (this.projectId) {
-        console.log(`[Argus Realtime] Attempting reconnection (attempt ${this.reconnectAttempts})...`);
+        console.log(
+          `[Argus Realtime] Attempting reconnection (attempt ${this.reconnectAttempts})...`
+        );
         this.connect(this.projectId);
       }
     }, delay);

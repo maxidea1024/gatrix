@@ -6,10 +6,27 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Typography, Paper, Button, Chip, IconButton, Tooltip,
-  alpha, useTheme, TextField, InputAdornment, Skeleton,
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Select, MenuItem, FormControl, InputLabel, FormHelperText,
+  Box,
+  Typography,
+  Paper,
+  Button,
+  Chip,
+  IconButton,
+  Tooltip,
+  alpha,
+  useTheme,
+  TextField,
+  InputAdornment,
+  Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  FormHelperText,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -20,7 +37,7 @@ import {
   Pause as PausedIcon,
   Refresh as RefreshIcon,
   Language as UrlIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -64,7 +81,7 @@ const ArgusUptimePage: React.FC = () => {
     }, 300);
     return () => clearTimeout(handler);
   }, [search]);
-  
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -72,15 +89,34 @@ const ArgusUptimePage: React.FC = () => {
     url: '',
     method: 'GET',
     interval_seconds: 60,
-    environment: 'production'
+    environment: 'production',
   });
   const [formErrors, setFormErrors] = useState({ name: false, url: false });
 
-  const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactElement; label: string }> = {
-    up: { color: '#4caf50', icon: <UpIcon sx={{ fontSize: 16 }} />, label: t('argus.uptime.status.up', 'Up') },
-    down: { color: '#f44336', icon: <DownIcon sx={{ fontSize: 16 }} />, label: t('argus.uptime.status.down', 'Down') },
-    degraded: { color: '#ff9800', icon: <DegradedIcon sx={{ fontSize: 16 }} />, label: t('argus.uptime.status.degraded', 'Degraded') },
-    disabled: { color: '#9e9e9e', icon: <PausedIcon sx={{ fontSize: 16 }} />, label: t('argus.uptime.status.disabled', 'Disabled') },
+  const STATUS_CONFIG: Record<
+    string,
+    { color: string; icon: React.ReactElement; label: string }
+  > = {
+    up: {
+      color: '#4caf50',
+      icon: <UpIcon sx={{ fontSize: 16 }} />,
+      label: t('argus.uptime.status.up', 'Up'),
+    },
+    down: {
+      color: '#f44336',
+      icon: <DownIcon sx={{ fontSize: 16 }} />,
+      label: t('argus.uptime.status.down', 'Down'),
+    },
+    degraded: {
+      color: '#ff9800',
+      icon: <DegradedIcon sx={{ fontSize: 16 }} />,
+      label: t('argus.uptime.status.degraded', 'Degraded'),
+    },
+    disabled: {
+      color: '#9e9e9e',
+      icon: <PausedIcon sx={{ fontSize: 16 }} />,
+      label: t('argus.uptime.status.disabled', 'Disabled'),
+    },
   };
 
   const fetchMonitors = useCallback(async () => {
@@ -90,18 +126,22 @@ const ArgusUptimePage: React.FC = () => {
       setMonitors(data);
     } catch (error) {
       console.error('Failed to load uptimes', error);
-      enqueueSnackbar(t('common.error', 'An error occurred'), { variant: 'error' });
+      enqueueSnackbar(t('common.error', 'An error occurred'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
   }, [projectId, enqueueSnackbar, t]);
 
-  useEffect(() => { fetchMonitors(); }, [fetchMonitors]);
+  useEffect(() => {
+    fetchMonitors();
+  }, [fetchMonitors]);
 
   const handleCreate = async () => {
     const errors = {
       name: !formData.name.trim(),
-      url: !formData.url.trim()
+      url: !formData.url.trim(),
     };
     setFormErrors(errors);
     if (errors.name || errors.url) return;
@@ -111,11 +151,23 @@ const ArgusUptimePage: React.FC = () => {
       const newMonitor = await argusService.createUptime(projectId, formData);
       setMonitors([newMonitor, ...monitors]);
       setCreateDialogOpen(false);
-      setFormData({ name: '', url: '', method: 'GET', interval_seconds: 60, environment: 'production' });
-      enqueueSnackbar(t('argus.uptime.createSuccess', 'Monitor created successfully'), { variant: 'success' });
+      setFormData({
+        name: '',
+        url: '',
+        method: 'GET',
+        interval_seconds: 60,
+        environment: 'production',
+      });
+      enqueueSnackbar(
+        t('argus.uptime.createSuccess', 'Monitor created successfully'),
+        { variant: 'success' }
+      );
     } catch (error) {
       console.error('Create failed', error);
-      enqueueSnackbar(t('argus.uptime.createFailed', 'Failed to create monitor.'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.uptime.createFailed', 'Failed to create monitor.'),
+        { variant: 'error' }
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -125,17 +177,25 @@ const ArgusUptimePage: React.FC = () => {
     e.stopPropagation();
     try {
       await argusService.deleteUptime(projectId, id);
-      setMonitors(prev => prev.filter(m => m.id !== id));
-      enqueueSnackbar(t('common.deleteSuccess', 'Deleted successfully'), { variant: 'success' });
+      setMonitors((prev) => prev.filter((m) => m.id !== id));
+      enqueueSnackbar(t('common.deleteSuccess', 'Deleted successfully'), {
+        variant: 'success',
+      });
     } catch (error) {
       console.error('Delete failed', error);
-      enqueueSnackbar(t('common.deleteFailed', 'Failed to delete'), { variant: 'error' });
+      enqueueSnackbar(t('common.deleteFailed', 'Failed to delete'), {
+        variant: 'error',
+      });
     }
   };
 
-  const filtered = monitors.filter(m => {
-    if (debouncedSearch && !m.name.toLowerCase().includes(debouncedSearch.toLowerCase()) &&
-        !m.url.toLowerCase().includes(debouncedSearch.toLowerCase())) return false;
+  const filtered = monitors.filter((m) => {
+    if (
+      debouncedSearch &&
+      !m.name.toLowerCase().includes(debouncedSearch.toLowerCase()) &&
+      !m.url.toLowerCase().includes(debouncedSearch.toLowerCase())
+    )
+      return false;
     return true;
   });
 
@@ -144,23 +204,34 @@ const ArgusUptimePage: React.FC = () => {
       <PageHeader
         icon={<UrlIcon />}
         title={
-          <ArgusBreadcrumbs size="title" paths={[
-            { label: t('sidebar.argusUptime', 'Uptime Monitors') },
-          ]} />
+          <ArgusBreadcrumbs
+            size="title"
+            paths={[{ label: t('sidebar.argusUptime', 'Uptime Monitors') }]}
+          />
         }
-        subtitle={t('argus.uptime.subtitle', 'Monitor HTTP endpoint availability and response times')}
+        subtitle={t(
+          'argus.uptime.subtitle',
+          'Monitor HTTP endpoint availability and response times'
+        )}
       />
 
       {/* Toolbar */}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
         <TextField
           size="small"
-          placeholder={t('argus.uptime.searchPlaceholder', 'Search monitors...')}
+          placeholder={t(
+            'argus.uptime.searchPlaceholder',
+            'Search monitors...'
+          )}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           slotProps={{
             input: {
-              startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18 }} /></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 18 }} />
+                </InputAdornment>
+              ),
               sx: { fontSize: '0.8rem', borderRadius: '8px' },
             },
           }}
@@ -179,7 +250,12 @@ const ArgusUptimePage: React.FC = () => {
             setFormErrors({ name: false, url: false });
             setCreateDialogOpen(true);
           }}
-          sx={{ textTransform: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600 }}
+          sx={{
+            textTransform: 'none',
+            borderRadius: '8px',
+            fontSize: '0.78rem',
+            fontWeight: 600,
+          }}
         >
           {t('argus.uptime.createMonitor', 'Create Monitor')}
         </Button>
@@ -189,12 +265,17 @@ const ArgusUptimePage: React.FC = () => {
       {loading ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} variant="rectangular" height={100} sx={{ borderRadius: 2 }} />
+            <Skeleton
+              key={i}
+              variant="rectangular"
+              height={100}
+              sx={{ borderRadius: 2 }}
+            />
           ))}
         </Box>
       ) : filtered.length === 0 ? (
-        <EmptyPlaceholder 
-          message={t('argus.uptime.noMonitors', 'No uptime monitors found')} 
+        <EmptyPlaceholder
+          message={t('argus.uptime.noMonitors', 'No uptime monitors found')}
         />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -212,19 +293,30 @@ const ArgusUptimePage: React.FC = () => {
                   borderRadius: 2,
                   cursor: 'pointer',
                   transition: 'all 0.15s',
-                  '&:hover': { borderColor: alpha(statusCfg.color, 0.4), backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                  '&:hover': {
+                    borderColor: alpha(statusCfg.color, 0.4),
+                    backgroundColor: isDark
+                      ? 'rgba(255,255,255,0.02)'
+                      : 'rgba(0,0,0,0.01)',
+                  },
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}
+                >
                   {/* Status + Name */}
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Box
+                    sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+                  >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip
                         icon={statusCfg.icon}
                         label={statusCfg.label}
                         size="small"
                         sx={{
-                          height: 22, fontSize: '0.68rem', fontWeight: 700,
+                          height: 22,
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
                           backgroundColor: alpha(statusCfg.color, 0.1),
                           color: statusCfg.color,
                           '& .MuiChip-icon': { color: statusCfg.color },
@@ -234,7 +326,13 @@ const ArgusUptimePage: React.FC = () => {
                         {monitor.name}
                       </Typography>
                     </Box>
-                    <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', mt: 0.25 }}>
+                    <Typography
+                      sx={{
+                        fontSize: '0.72rem',
+                        color: 'text.disabled',
+                        mt: 0.25,
+                      }}
+                    >
                       {monitor.method} {monitor.url}
                     </Typography>
                   </Box>
@@ -242,26 +340,58 @@ const ArgusUptimePage: React.FC = () => {
                   {/* Metrics */}
                   <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
                     <Box sx={{ textAlign: 'center' }}>
-                      <Typography sx={{
-                        fontSize: '1.1rem', fontWeight: 700,
-                        color: uptimePercent >= 99.9 ? '#4caf50' : uptimePercent >= 99 ? '#ff9800' : '#f44336',
-                      }}>
+                      <Typography
+                        sx={{
+                          fontSize: '1.1rem',
+                          fontWeight: 700,
+                          color:
+                            uptimePercent >= 99.9
+                              ? '#4caf50'
+                              : uptimePercent >= 99
+                                ? '#ff9800'
+                                : '#f44336',
+                        }}
+                      >
                         {uptimePercent.toFixed(2)}%
                       </Typography>
-                      <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', textTransform: 'uppercase' }}>
+                      <Typography
+                        sx={{
+                          fontSize: '0.6rem',
+                          color: 'text.disabled',
+                          textTransform: 'uppercase',
+                        }}
+                      >
                         {t('argus.uptime.uptime', 'Uptime')}
                       </Typography>
                     </Box>
                     <Box sx={{ textAlign: 'center' }}>
                       <Typography sx={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                        {monitor.avg_response_ms > 0 ? `${monitor.avg_response_ms}ms` : '-'}
+                        {monitor.avg_response_ms > 0
+                          ? `${monitor.avg_response_ms}ms`
+                          : '-'}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', textTransform: 'uppercase' }}>
+                      <Typography
+                        sx={{
+                          fontSize: '0.6rem',
+                          color: 'text.disabled',
+                          textTransform: 'uppercase',
+                        }}
+                      >
                         {t('argus.uptime.avgResponse', 'Avg Response')}
                       </Typography>
                     </Box>
-                    <Chip label={t(`common.environment.${monitor.environment}`, monitor.environment)} size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 600 }} />
-                    <IconButton size="small" onClick={(e) => handleDelete(e, monitor.id)}>
+                    <Chip
+                      label={t(
+                        `common.environment.${monitor.environment}`,
+                        monitor.environment
+                      )}
+                      size="small"
+                      sx={{ height: 18, fontSize: '0.6rem', fontWeight: 600 }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={(e) => handleDelete(e, monitor.id)}
+                    >
                       <DeleteIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Box>
@@ -283,28 +413,40 @@ const ArgusUptimePage: React.FC = () => {
         <DialogTitle sx={{ fontWeight: 700 }}>
           {t('argus.uptime.createMonitor', 'Create Monitor')}
         </DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: '16px !important' }}>
-          <TextField 
-            size="small" 
-            label={t('argus.uptime.monitorName', 'Monitor Name')} 
-            fullWidth 
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2.5,
+            pt: '16px !important',
+          }}
+        >
+          <TextField
+            size="small"
+            label={t('argus.uptime.monitorName', 'Monitor Name')}
+            fullWidth
             value={formData.name}
-            onChange={e => {
+            onChange={(e) => {
               setFormData({ ...formData, name: e.target.value });
-              if (e.target.value.trim()) setFormErrors(p => ({ ...p, name: false }));
+              if (e.target.value.trim())
+                setFormErrors((p) => ({ ...p, name: false }));
             }}
             error={formErrors.name}
             helperText={formErrors.name ? t('common.required', 'Required') : ''}
           />
-          <TextField 
-            size="small" 
-            label={t('argus.uptime.url', 'URL')} 
-            placeholder={t('argus.uptime.urlPlaceholder', 'https://example.com/health')} 
-            fullWidth 
+          <TextField
+            size="small"
+            label={t('argus.uptime.url', 'URL')}
+            placeholder={t(
+              'argus.uptime.urlPlaceholder',
+              'https://example.com/health'
+            )}
+            fullWidth
             value={formData.url}
-            onChange={e => {
+            onChange={(e) => {
               setFormData({ ...formData, url: e.target.value });
-              if (e.target.value.trim()) setFormErrors(p => ({ ...p, url: false }));
+              if (e.target.value.trim())
+                setFormErrors((p) => ({ ...p, url: false }));
             }}
             error={formErrors.url}
             helperText={formErrors.url ? t('common.required', 'Required') : ''}
@@ -312,10 +454,12 @@ const ArgusUptimePage: React.FC = () => {
           <Box sx={{ display: 'flex', gap: 2 }}>
             <FormControl size="small" sx={{ flex: 1 }}>
               <InputLabel>{t('argus.uptime.method', 'Method')}</InputLabel>
-              <Select 
-                label={t('argus.uptime.method', 'Method')} 
+              <Select
+                label={t('argus.uptime.method', 'Method')}
                 value={formData.method}
-                onChange={e => setFormData({ ...formData, method: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({ ...formData, method: e.target.value as any })
+                }
               >
                 <MenuItem value="GET">GET</MenuItem>
                 <MenuItem value="HEAD">HEAD</MenuItem>
@@ -323,11 +467,18 @@ const ArgusUptimePage: React.FC = () => {
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ flex: 1 }}>
-              <InputLabel>{t('argus.uptime.interval', 'Check Interval')}</InputLabel>
-              <Select 
-                label={t('argus.uptime.interval', 'Check Interval')} 
+              <InputLabel>
+                {t('argus.uptime.interval', 'Check Interval')}
+              </InputLabel>
+              <Select
+                label={t('argus.uptime.interval', 'Check Interval')}
                 value={formData.interval_seconds}
-                onChange={e => setFormData({ ...formData, interval_seconds: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    interval_seconds: Number(e.target.value),
+                  })
+                }
               >
                 <MenuItem value={10}>{t('common.time.10s', '10s')}</MenuItem>
                 <MenuItem value={30}>{t('common.time.30s', '30s')}</MenuItem>
@@ -338,23 +489,42 @@ const ArgusUptimePage: React.FC = () => {
             </FormControl>
           </Box>
           <FormControl size="small" fullWidth>
-            <InputLabel>{t('argus.uptime.environment', 'Environment')}</InputLabel>
-            <Select 
-              label={t('argus.uptime.environment', 'Environment')} 
+            <InputLabel>
+              {t('argus.uptime.environment', 'Environment')}
+            </InputLabel>
+            <Select
+              label={t('argus.uptime.environment', 'Environment')}
               value={formData.environment}
-              onChange={e => setFormData({ ...formData, environment: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, environment: e.target.value })
+              }
             >
-              <MenuItem value="production">{t('common.environment.production', 'Production')}</MenuItem>
-              <MenuItem value="staging">{t('common.environment.staging', 'Staging')}</MenuItem>
-              <MenuItem value="development">{t('common.environment.development', 'Development')}</MenuItem>
+              <MenuItem value="production">
+                {t('common.environment.production', 'Production')}
+              </MenuItem>
+              <MenuItem value="staging">
+                {t('common.environment.staging', 'Staging')}
+              </MenuItem>
+              <MenuItem value="development">
+                {t('common.environment.development', 'Development')}
+              </MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setCreateDialogOpen(false)} sx={{ textTransform: 'none' }} disabled={isSubmitting}>
+          <Button
+            onClick={() => setCreateDialogOpen(false)}
+            sx={{ textTransform: 'none' }}
+            disabled={isSubmitting}
+          >
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={handleCreate} sx={{ textTransform: 'none' }} disabled={isSubmitting}>
+          <Button
+            variant="contained"
+            onClick={handleCreate}
+            sx={{ textTransform: 'none' }}
+            disabled={isSubmitting}
+          >
             {t('common.save')}
           </Button>
         </DialogActions>

@@ -4,7 +4,12 @@
  */
 import React, { useState } from 'react';
 import {
-  Button, Menu, MenuItem, ListItemIcon, ListItemText, Divider,
+  Button,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -59,7 +64,8 @@ const ExploreActions: React.FC<ExploreActionsProps> = ({
     const params = new URLSearchParams();
     params.set('action', 'add-widget');
     params.set('dataset', dataset);
-    if (queryContext?.fields) params.set('fields', queryContext.fields.join(','));
+    if (queryContext?.fields)
+      params.set('fields', queryContext.fields.join(','));
     if (queryContext?.search) params.set('conditions', queryContext.search);
     if (queryContext?.groupBy) params.set('groupBy', queryContext.groupBy);
     if (queryContext?.period) params.set('period', queryContext.period);
@@ -97,8 +103,16 @@ const ExploreActions: React.FC<ExploreActionsProps> = ({
         }}
       >
         {onSaveQuery && (
-          <MenuItem onClick={() => { setAnchorEl(null); onSaveQuery(); }} sx={{ fontSize: '0.8rem' }}>
-            <ListItemIcon><SaveIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              onSaveQuery();
+            }}
+            sx={{ fontSize: '0.8rem' }}
+          >
+            <ListItemIcon>
+              <SaveIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.explore.saveAsQuery', 'Save as Query')}
             </ListItemText>
@@ -106,13 +120,17 @@ const ExploreActions: React.FC<ExploreActionsProps> = ({
         )}
         {onSaveQuery && <Divider />}
         <MenuItem onClick={handleCreateAlert} sx={{ fontSize: '0.8rem' }}>
-          <ListItemIcon><AlertIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+          <ListItemIcon>
+            <AlertIcon sx={{ fontSize: 16 }} />
+          </ListItemIcon>
           <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
             {t('argus.explore.createAlert', 'Create Alert Rule')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={handleAddToDashboard} sx={{ fontSize: '0.8rem' }}>
-          <ListItemIcon><DashboardIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+          <ListItemIcon>
+            <DashboardIcon sx={{ fontSize: 16 }} />
+          </ListItemIcon>
           <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
             {t('argus.explore.addToDashboard', 'Add to Dashboard')}
           </ListItemText>

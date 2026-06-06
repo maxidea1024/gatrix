@@ -15,12 +15,14 @@ export const getCrosshairPlugin = (isDark: boolean): Plugin => ({
       ctx.moveTo(x, topY);
       ctx.lineTo(x, bottomY);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+      ctx.strokeStyle = isDark
+        ? 'rgba(255, 255, 255, 0.2)'
+        : 'rgba(0, 0, 0, 0.2)';
       ctx.setLineDash([4, 4]);
       ctx.stroke();
       ctx.restore();
     }
-  }
+  },
 });
 
 /**
@@ -29,7 +31,7 @@ export const getCrosshairPlugin = (isDark: boolean): Plugin => ({
  */
 export const getDragSelectPlugin = (
   isDark: boolean,
-  onRangeSelected: (startIndex: number, endIndex: number) => void,
+  onRangeSelected: (startIndex: number, endIndex: number) => void
 ): Plugin => {
   let dragging = false;
   let startX = 0;
@@ -55,7 +57,10 @@ export const getDragSelectPlugin = (
       const onPointerMove = (e: PointerEvent) => {
         if (!dragging) return;
         const rect = canvas.getBoundingClientRect();
-        currentX = Math.max(chart.scales.x.left, Math.min(e.clientX - rect.left, chart.scales.x.right));
+        currentX = Math.max(
+          chart.scales.x.left,
+          Math.min(e.clientX - rect.left, chart.scales.x.right)
+        );
         chart.draw();
       };
 
@@ -82,7 +87,10 @@ export const getDragSelectPlugin = (
 
         if (startIdx != null && endIdx != null) {
           const si = Math.max(0, Math.round(startIdx));
-          const ei = Math.min((chart.data.labels?.length || 1) - 1, Math.round(endIdx));
+          const ei = Math.min(
+            (chart.data.labels?.length || 1) - 1,
+            Math.round(endIdx)
+          );
           if (si !== ei) {
             onRangeSelected(si, ei);
           }
@@ -115,7 +123,11 @@ export const getDragSelectPlugin = (
       canvas.addEventListener('pointerdown', onPointerDown);
 
       // Store handlers for cleanup
-      (chart as any).__dragHandlers = { onPointerDown, onPointerMove, onPointerUp };
+      (chart as any).__dragHandlers = {
+        onPointerDown,
+        onPointerMove,
+        onPointerUp,
+      };
     },
 
     beforeDestroy(chart: any) {
@@ -148,7 +160,9 @@ export const getDragSelectPlugin = (
       ctx.fillRect(x1, yScale.top, x2 - x1, yScale.bottom - yScale.top);
 
       // Left and right edge lines
-      ctx.strokeStyle = isDark ? 'rgba(124, 77, 255, 0.6)' : 'rgba(124, 77, 255, 0.5)';
+      ctx.strokeStyle = isDark
+        ? 'rgba(124, 77, 255, 0.6)'
+        : 'rgba(124, 77, 255, 0.5)';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([]);
       ctx.beginPath();
@@ -160,7 +174,10 @@ export const getDragSelectPlugin = (
 
       // Top label showing drag range hint (drawn INSIDE chart area to avoid clipping)
       const si = Math.max(0, Math.round(xScale.getValueForPixel(x1) || 0));
-      const ei = Math.min((chart.data.labels?.length || 1) - 1, Math.round(xScale.getValueForPixel(x2) || 0));
+      const ei = Math.min(
+        (chart.data.labels?.length || 1) - 1,
+        Math.round(xScale.getValueForPixel(x2) || 0)
+      );
       const startLabel = chart.data.labels?.[si] || '';
       const endLabel = chart.data.labels?.[ei] || '';
       const labelText = `${startLabel} → ${endLabel}`;
@@ -169,10 +186,15 @@ export const getDragSelectPlugin = (
       const textW = ctx.measureText(labelText).width;
       const bgW = textW + 16;
       const bgH = 22;
-      const midX = Math.max(xScale.left, Math.min((x1 + x2) / 2 - bgW / 2, xScale.right - bgW));
+      const midX = Math.max(
+        xScale.left,
+        Math.min((x1 + x2) / 2 - bgW / 2, xScale.right - bgW)
+      );
       const labelY = yScale.top + 6;
 
-      ctx.fillStyle = isDark ? 'rgba(124, 77, 255, 0.92)' : 'rgba(124, 77, 255, 0.88)';
+      ctx.fillStyle = isDark
+        ? 'rgba(124, 77, 255, 0.92)'
+        : 'rgba(124, 77, 255, 0.88)';
       ctx.beginPath();
       ctx.roundRect(midX, labelY, bgW, bgH, 4);
       ctx.fill();

@@ -28,7 +28,8 @@ import {
 import {
   History as HistoryIcon,
   ViewColumn as ViewColumnIcon,
-  Download as DownloadIcon,MoreVert as MoreVertIcon,
+  Download as DownloadIcon,
+  MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
@@ -659,7 +660,10 @@ const CouponUsagePage: React.FC = () => {
                                       {r.couponName || '-'}
                                     </Typography>
                                     {r.couponName && (
-                                      <CopyButton text={r.couponName} size={13} />
+                                      <CopyButton
+                                        text={r.couponName}
+                                        size={13}
+                                      />
                                     )}
                                   </Box>
                                 </TableCell>
@@ -678,7 +682,10 @@ const CouponUsagePage: React.FC = () => {
                                       {r.couponCode || '-'}
                                     </Typography>
                                     {r.couponCode && (
-                                      <CopyButton text={r.couponCode} size={13} />
+                                      <CopyButton
+                                        text={r.couponCode}
+                                        size={13}
+                                      />
                                     )}
                                   </Box>
                                 </TableCell>
@@ -731,7 +738,10 @@ const CouponUsagePage: React.FC = () => {
                                       {r.characterId || '-'}
                                     </Typography>
                                     {r.characterId && (
-                                      <CopyButton text={r.characterId} size={13} />
+                                      <CopyButton
+                                        text={r.characterId}
+                                        size={13}
+                                      />
                                     )}
                                   </Box>
                                 </TableCell>

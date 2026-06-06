@@ -7,9 +7,7 @@ import {
   MenuItem,
   ListItemText,
 } from '@mui/material';
-import {
-  MoreHoriz as MoreHorizIcon,
-} from '@mui/icons-material';
+import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusErrorEvent } from '@/services/argusService';
 import { copyToClipboard } from '@/utils/clipboard';
@@ -24,18 +22,32 @@ export interface IssueStacktraceSectionProps {
   isDark: boolean;
 }
 
-const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, isDark }) => {
+const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({
+  event,
+  isDark,
+}) => {
   const { t } = useTranslation();
-  const [mode, setMode] = useLocalStorage<'relevant' | 'full'>('argus_stacktrace_mode', 'relevant');
-  const [order, setOrder] = useLocalStorage<'recent' | 'oldest'>('argus_stacktrace_order', 'recent');
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
+  const [mode, setMode] = useLocalStorage<'relevant' | 'full'>(
+    'argus_stacktrace_mode',
+    'relevant'
+  );
+  const [order, setOrder] = useLocalStorage<'recent' | 'oldest'>(
+    'argus_stacktrace_order',
+    'recent'
+  );
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
 
   const handleCopyRaw = () => {
     if (event.stacktrace_raw) {
       let raw = '';
       try {
-        const parsed = typeof event.stacktrace_raw === 'string' ? JSON.parse(event.stacktrace_raw) : event.stacktrace_raw;
+        const parsed =
+          typeof event.stacktrace_raw === 'string'
+            ? JSON.parse(event.stacktrace_raw)
+            : event.stacktrace_raw;
         raw = JSON.stringify(parsed, null, 2);
       } catch {
         raw = String(event.stacktrace_raw);
@@ -49,11 +61,18 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header */}
       <Box>
-        <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: isDark ? '#fff' : '#000' }}>
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          sx={{ mb: 1, color: isDark ? '#fff' : '#000' }}
+        >
           {t('argus.issues.stackTraceTitle', 'Stack Trace')}
         </Typography>
         {event.exception_value && (
-          <Typography variant="body1" sx={{ color: isDark ? '#ddd' : '#333', mb: 2 }}>
+          <Typography
+            variant="body1"
+            sx={{ color: isDark ? '#ddd' : '#333', mb: 2 }}
+          >
             {event.exception_value}
           </Typography>
         )}
@@ -66,7 +85,14 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
         />
 
         {/* Controls Row */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 0,
+          }}
+        >
           {/* Mode Toggle */}
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <ActionChip
@@ -86,7 +112,7 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
           {/* Order & More */}
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <FilterChipSelect
-              label={t('argus.issues.sort', '정렬')}
+              label={t('argus.issues.sort', 'Sort')}
               value={order}
               options={[
                 { value: 'recent', label: t('argus.issues.mostRecent') },
@@ -100,7 +126,10 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
             <ActionChip
               label={<MoreHorizIcon sx={{ fontSize: 16 }} />}
               onClick={(e) => setMoreMenuAnchor(e.currentTarget)}
-              sx={{ minWidth: 28, '& .MuiChip-label': { px: 0.5, display: 'flex' } }}
+              sx={{
+                minWidth: 28,
+                '& .MuiChip-label': { px: 0.5, display: 'flex' },
+              }}
             />
             <Menu
               anchorEl={moreMenuAnchor}
@@ -120,11 +149,20 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({ event, 
       </Box>
 
       {/* Stacktrace View */}
-      <Paper elevation={0} sx={{
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-        borderRadius: 2, overflow: 'hidden',
-      }}>
-        <StacktraceView stacktrace={event.stacktrace_raw} mode={mode} order={order} isDark={isDark} />
+      <Paper
+        elevation={0}
+        sx={{
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+          borderRadius: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <StacktraceView
+          stacktrace={event.stacktrace_raw}
+          mode={mode}
+          order={order}
+          isDark={isDark}
+        />
       </Paper>
     </Box>
   );

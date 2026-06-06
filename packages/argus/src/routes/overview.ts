@@ -7,8 +7,11 @@ const logger = createLogger('overview-api');
 /** Compute previous period time range for comparison */
 function getPrevPeriodRange(period: string): { start: string; end: string } {
   const ms: Record<string, number> = {
-    '1h': 3_600_000, '6h': 21_600_000, '24h': 86_400_000,
-    '7d': 604_800_000, '30d': 2_592_000_000,
+    '1h': 3_600_000,
+    '6h': 21_600_000,
+    '24h': 86_400_000,
+    '7d': 604_800_000,
+    '30d': 2_592_000_000,
   };
   const periodMs = ms[period] || 86_400_000;
   const now = Date.now();
@@ -19,7 +22,7 @@ function getPrevPeriodRange(period: string): { start: string; end: string } {
 }
 
 export default async function overviewRoutes(app: FastifyInstance) {
-  // ?€?€ Overview stats ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Overview stats ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/overview/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -30,10 +33,12 @@ export default async function overviewRoutes(app: FastifyInstance) {
         const prevRange = getPrevPeriodRange(period);
 
         const [batch, prevBatch] = await Promise.all([
-          // ?€?€ Main queries ??all share same projectId + period ?€?€
+          // ?ï¿½?ï¿½ Main queries ??all share same projectId + period ?ï¿½?ï¿½
           optic.queryBatch({
             errorTrend: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'count' },
@@ -45,7 +50,9 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             errorSummary: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'count()', alias: 'total_errors' },
                 { field: 'uniq(user_id)', alias: 'affected_users' },
@@ -54,19 +61,26 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             txnSummary: {
-              dataset: 'transactions', projectId, timeRange: { period },
+              dataset: 'transactions',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'count()', alias: 'total_transactions' },
                 { field: 'avg(duration)', alias: 'avg_duration' },
                 { field: 'p50(duration)', alias: 'p50' },
                 { field: 'p95(duration)', alias: 'p95' },
                 { field: 'p99(duration)', alias: 'p99' },
-                { field: "countIf(transaction_status != 'ok') / count() * 100", alias: 'error_rate' },
+                {
+                  field: "countIf(transaction_status != 'ok') / count() * 100",
+                  alias: 'error_rate',
+                },
               ],
             },
 
             txnTrend: {
-              dataset: 'transactions', projectId, timeRange: { period },
+              dataset: 'transactions',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'count' },
@@ -78,17 +92,31 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             sessionSummary: {
-              dataset: 'sessions', projectId, timeRange: { period },
+              dataset: 'sessions',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'count()', alias: 'total_sessions' },
-                { field: "countIf(status = 'crashed')", alias: 'crashed_sessions' },
-                { field: "countIf(status = 'errored')", alias: 'errored_sessions' },
-                { field: "if(count() > 0, (count() - countIf(status = 'crashed')) / count() * 100, 100)", alias: 'crash_free_rate' },
+                {
+                  field: "countIf(status = 'crashed')",
+                  alias: 'crashed_sessions',
+                },
+                {
+                  field: "countIf(status = 'errored')",
+                  alias: 'errored_sessions',
+                },
+                {
+                  field:
+                    "if(count() > 0, (count() - countIf(status = 'crashed')) / count() * 100, 100)",
+                  alias: 'crash_free_rate',
+                },
               ],
             },
 
             topIssues: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'primary_hash' },
                 { field: 'any(type)', alias: 'title' },
@@ -104,7 +132,9 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             heatmap: {
-              dataset: 'errors', projectId, timeRange: { period: '7d' },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period: '7d' },
               select: [
                 { field: 'toDayOfWeek(timestamp)', alias: 'day' },
                 { field: 'toHour(timestamp)', alias: 'hour' },
@@ -118,9 +148,14 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             envDist: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
-                { field: "if(environment = '', 'unknown', environment)", alias: 'environment' },
+                {
+                  field: "if(environment = '', 'unknown', environment)",
+                  alias: 'environment',
+                },
                 { field: 'count()', alias: 'count' },
               ],
               groupBy: ['environment'],
@@ -129,9 +164,14 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             browserDist: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
-                { field: "if(browser_name = '', 'Unknown', browser_name)", alias: 'browser' },
+                {
+                  field: "if(browser_name = '', 'Unknown', browser_name)",
+                  alias: 'browser',
+                },
                 { field: 'count()', alias: 'count' },
               ],
               groupBy: ['browser'],
@@ -140,7 +180,9 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             osDist: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: "if(os_name = '', 'Unknown', os_name)", alias: 'os' },
                 { field: 'count()', alias: 'count' },
@@ -151,9 +193,14 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             releaseDist: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
-                { field: "if(release = '', 'unknown', release)", alias: 'release' },
+                {
+                  field: "if(release = '', 'unknown', release)",
+                  alias: 'release',
+                },
                 { field: 'count()', alias: 'count' },
                 { field: 'uniq(user_id)', alias: 'users' },
               ],
@@ -163,19 +210,26 @@ export default async function overviewRoutes(app: FastifyInstance) {
             },
 
             unhandled: {
-              dataset: 'errors', projectId, timeRange: { period },
+              dataset: 'errors',
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'countIf(is_handled = 0)', alias: 'unhandled' },
                 { field: 'count()', alias: 'total' },
-                { field: 'if(count() > 0, countIf(is_handled = 0) / count() * 100, 0)', alias: 'unhandled_rate' },
+                {
+                  field:
+                    'if(count() > 0, countIf(is_handled = 0) / count() * 100, 0)',
+                  alias: 'unhandled_rate',
+                },
               ],
             },
           }),
 
-          // ?€?€ Previous period ??for comparison ?€?€
+          // ?ï¿½?ï¿½ Previous period ??for comparison ?ï¿½?ï¿½
           optic.queryBatch({
             errors: {
-              dataset: 'errors', projectId,
+              dataset: 'errors',
+              projectId,
               timeRange: prevRange,
               select: [
                 { field: 'count()', alias: 'total_errors' },
@@ -183,35 +237,55 @@ export default async function overviewRoutes(app: FastifyInstance) {
               ],
             },
             transactions: {
-              dataset: 'transactions', projectId,
+              dataset: 'transactions',
+              projectId,
               timeRange: prevRange,
-              select: [
-                { field: 'count()', alias: 'total_transactions' },
-              ],
+              select: [{ field: 'count()', alias: 'total_transactions' }],
             },
             sessions: {
-              dataset: 'sessions', projectId,
+              dataset: 'sessions',
+              projectId,
               timeRange: prevRange,
               select: [
-                { field: "if(count() > 0, (count() - countIf(status = 'crashed')) / count() * 100, 100)", alias: 'crash_free_rate' },
+                {
+                  field:
+                    "if(count() > 0, (count() - countIf(status = 'crashed')) / count() * 100, 100)",
+                  alias: 'crash_free_rate',
+                },
               ],
             },
           }),
         ]);
 
-        // ?€?€ Assemble response ?€?€
-        const unhandledRow = batch.unhandled.data[0] as any || {};
-        const prevErrorRow = prevBatch.errors.data[0] as any || {};
-        const prevTxnRow = prevBatch.transactions.data[0] as any || {};
-        const prevSessionRow = prevBatch.sessions.data[0] as any || {};
+        // ?ï¿½?ï¿½ Assemble response ?ï¿½?ï¿½
+        const unhandledRow = (batch.unhandled.data[0] as any) || {};
+        const prevErrorRow = (prevBatch.errors.data[0] as any) || {};
+        const prevTxnRow = (prevBatch.transactions.data[0] as any) || {};
+        const prevSessionRow = (prevBatch.sessions.data[0] as any) || {};
 
         return reply.send({
           data: {
             error_trend: batch.errorTrend.data,
-            error_summary: batch.errorSummary.data[0] || { total_errors: 0, affected_users: 0, unique_issues: 0 },
-            transaction_summary: batch.txnSummary.data[0] || { total_transactions: 0, avg_duration: 0, p50: 0, p95: 0, p99: 0, error_rate: 0 },
+            error_summary: batch.errorSummary.data[0] || {
+              total_errors: 0,
+              affected_users: 0,
+              unique_issues: 0,
+            },
+            transaction_summary: batch.txnSummary.data[0] || {
+              total_transactions: 0,
+              avg_duration: 0,
+              p50: 0,
+              p95: 0,
+              p99: 0,
+              error_rate: 0,
+            },
             transaction_trend: batch.txnTrend.data,
-            session_summary: batch.sessionSummary.data[0] || { total_sessions: 0, crashed_sessions: 0, errored_sessions: 0, crash_free_rate: 100 },
+            session_summary: batch.sessionSummary.data[0] || {
+              total_sessions: 0,
+              crashed_sessions: 0,
+              errored_sessions: 0,
+              crash_free_rate: 100,
+            },
             top_issues: batch.topIssues.data,
             error_heatmap: batch.heatmap.data,
             error_by_environment: batch.envDist.data,
@@ -237,7 +311,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
     }
   );
 
-  // ?€?€ Filter Options ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Filter Options ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/filters/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -247,20 +321,26 @@ export default async function overviewRoutes(app: FastifyInstance) {
       try {
         const batch = await optic.queryBatch({
           environments: {
-            dataset: 'errors', projectId, timeRange: { period },
+            dataset: 'errors',
+            projectId,
+            timeRange: { period },
             select: [{ field: 'environment' }],
             groupBy: ['environment'],
             orderBy: [{ field: 'environment', direction: 'ASC' }],
           },
           browsers: {
-            dataset: 'errors', projectId, timeRange: { period },
+            dataset: 'errors',
+            projectId,
+            timeRange: { period },
             select: [{ field: 'browser_name' }],
             conditions: [{ field: 'browser_name', op: '!=', value: '' }],
             groupBy: ['browser_name'],
             orderBy: [{ field: 'browser_name', direction: 'ASC' }],
           },
           os: {
-            dataset: 'errors', projectId, timeRange: { period },
+            dataset: 'errors',
+            projectId,
+            timeRange: { period },
             select: [{ field: 'os_name' }],
             conditions: [{ field: 'os_name', op: '!=', value: '' }],
             groupBy: ['os_name'],
@@ -270,8 +350,12 @@ export default async function overviewRoutes(app: FastifyInstance) {
 
         return reply.send({
           data: {
-            environments: batch.environments.data.map((r: any) => r.environment).filter(Boolean),
-            browsers: batch.browsers.data.map((r: any) => r.browser_name).filter(Boolean),
+            environments: batch.environments.data
+              .map((r: any) => r.environment)
+              .filter(Boolean),
+            browsers: batch.browsers.data
+              .map((r: any) => r.browser_name)
+              .filter(Boolean),
             os: batch.os.data.map((r: any) => r.os_name).filter(Boolean),
           },
         });

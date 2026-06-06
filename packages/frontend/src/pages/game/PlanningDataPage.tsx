@@ -899,7 +899,7 @@ const PlanningDataPage: React.FC<PlanningDataPageProps> = ({
                                 })
                             )
                           }
-                          sx={{ cursor: 'pointer'}}
+                          sx={{ cursor: 'pointer' }}
                         />
                       </Tooltip>
                       {latestUpload.uploadComment && (

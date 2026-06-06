@@ -730,11 +730,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
             <Typography variant="body2" fontWeight="bold">
               {instance.hostname}
             </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              
-            >
+            <Typography variant="caption" color="text.secondary">
               ID: {instance.instanceId}
             </Typography>
           </Box>

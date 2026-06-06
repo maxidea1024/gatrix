@@ -43,14 +43,23 @@ const knexConfig = {
       return [result[0].map(convertRow), result[1]];
     }
     if (Array.isArray(result)) return result.map(convertRow);
-    if (typeof result === 'object' && !(result instanceof Buffer)) return convertRow(result);
+    if (typeof result === 'object' && !(result instanceof Buffer))
+      return convertRow(result);
     return result;
   },
   log: {
-    warn(msg: string) { logger.warn(msg); },
-    error(msg: string) { logger.error(msg); },
-    deprecate(msg: string) { logger.warn(`[DEPRECATED] ${msg}`); },
-    debug(msg: string) { logger.debug(msg); },
+    warn(msg: string) {
+      logger.warn(msg);
+    },
+    error(msg: string) {
+      logger.error(msg);
+    },
+    deprecate(msg: string) {
+      logger.warn(`[DEPRECATED] ${msg}`);
+    },
+    debug(msg: string) {
+      logger.debug(msg);
+    },
   },
 };
 

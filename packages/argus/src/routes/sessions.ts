@@ -12,7 +12,7 @@ const SESSION_DEFAULTS = {
 };
 
 export default async function sessionsRoutes(app: FastifyInstance) {
-  // ?€?€ Session health overview ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
+  // ?ï¿½?ï¿½ Session health overview ?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½?ï¿½
   app.get(
     '/sessions/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -22,8 +22,11 @@ export default async function sessionsRoutes(app: FastifyInstance) {
       try {
         // Compute previous period range
         const ms: Record<string, number> = {
-          '1h': 3_600_000, '6h': 21_600_000, '24h': 86_400_000,
-          '7d': 604_800_000, '30d': 2_592_000_000,
+          '1h': 3_600_000,
+          '6h': 21_600_000,
+          '24h': 86_400_000,
+          '7d': 604_800_000,
+          '30d': 2_592_000_000,
         };
         const periodMs = ms[period] || 86_400_000;
         const now = Date.now();
@@ -35,27 +38,45 @@ export default async function sessionsRoutes(app: FastifyInstance) {
         const [batch, prevPeriod] = await Promise.all([
           optic.queryBatch({
             summary: {
-              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              ...SESSION_DEFAULTS,
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'count()', alias: 'total_sessions' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },
                 { field: "countIf(status = 'errored')", alias: 'errored' },
-                { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy' },
+                {
+                  field: "countIf(status IN ('ok', 'exited'))",
+                  alias: 'healthy',
+                },
                 { field: "countIf(status = 'abnormal')", alias: 'abnormal' },
-                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+                {
+                  field:
+                    "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)",
+                  alias: 'crash_free_rate',
+                },
                 { field: 'uniq(distinct_id)', alias: 'unique_users' },
                 { field: 'avg(duration)', alias: 'avg_duration' },
               ],
             },
 
             trend: {
-              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              ...SESSION_DEFAULTS,
+              projectId,
+              timeRange: { period },
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'total' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },
-                { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy' },
-                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+                {
+                  field: "countIf(status IN ('ok', 'exited'))",
+                  alias: 'healthy',
+                },
+                {
+                  field:
+                    "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)",
+                  alias: 'crash_free_rate',
+                },
               ],
               groupBy: ['$bucket'],
               orderBy: [{ field: 'hour', direction: 'ASC' }],
@@ -63,12 +84,18 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             },
 
             byRelease: {
-              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              ...SESSION_DEFAULTS,
+              projectId,
+              timeRange: { period },
               select: [
                 { field: 'release' },
                 { field: 'count()', alias: 'total' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },
-                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+                {
+                  field:
+                    "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)",
+                  alias: 'crash_free_rate',
+                },
                 { field: 'uniq(distinct_id)', alias: 'users' },
               ],
               conditions: [{ field: 'release', op: '!=', value: '' }],
@@ -78,10 +105,15 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             },
 
             statusTimeline: {
-              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              ...SESSION_DEFAULTS,
+              projectId,
+              timeRange: { period },
               select: [
                 { field: '$bucket', alias: 'hour' },
-                { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy' },
+                {
+                  field: "countIf(status IN ('ok', 'exited'))",
+                  alias: 'healthy',
+                },
                 { field: "countIf(status = 'errored')", alias: 'errored' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },
                 { field: "countIf(status = 'abnormal')", alias: 'abnormal' },
@@ -94,19 +126,34 @@ export default async function sessionsRoutes(app: FastifyInstance) {
 
           // Previous period for comparison
           optic.query({
-            ...SESSION_DEFAULTS, projectId, timeRange: prevRange,
+            ...SESSION_DEFAULTS,
+            projectId,
+            timeRange: prevRange,
             select: [
               { field: 'count()', alias: 'total_sessions' },
               { field: "countIf(status = 'crashed')", alias: 'crashed' },
-              { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+              {
+                field:
+                  "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)",
+                alias: 'crash_free_rate',
+              },
               { field: 'uniq(distinct_id)', alias: 'unique_users' },
             ],
           }),
         ]);
 
         // Duration distribution & browser/OS breakdown require complex multiIf ??        // these are best expressed as rawQuery since multiIf isn't part of the DSL
-        const bucket = getBucketingConfig(period, undefined, undefined, 'started');
-        const rawParams = { projectId, fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd };
+        const bucket = getBucketingConfig(
+          period,
+          undefined,
+          undefined,
+          'started'
+        );
+        const rawParams = {
+          projectId,
+          fillStart: bucket.queryParams.fillStart,
+          fillEnd: bucket.queryParams.fillEnd,
+        };
 
         const [durationDist, crashByBrowser, crashByOs] = await Promise.all([
           optic.rawQuery({
@@ -183,7 +230,12 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             status_timeline: batch.statusTimeline.data,
             crash_by_browser: crashByBrowser.data,
             crash_by_os: crashByOs.data,
-            previous_period: prevPeriod.data[0] || { total_sessions: 0, crashed: 0, crash_free_rate: 100, unique_users: 0 },
+            previous_period: prevPeriod.data[0] || {
+              total_sessions: 0,
+              crashed: 0,
+              crash_free_rate: 100,
+              unique_users: 0,
+            },
           },
         });
       } catch (error) {

@@ -14,7 +14,11 @@ interface HighlightTextProps {
  * Renders text with matching substrings highlighted.
  * Used across Argus issue lists, feedback lists, etc.
  */
-const HighlightText: React.FC<HighlightTextProps> = ({ text, highlight, isDark: isDarkProp }) => {
+const HighlightText: React.FC<HighlightTextProps> = ({
+  text,
+  highlight,
+  isDark: isDarkProp,
+}) => {
   const theme = useTheme();
   const isDark = isDarkProp ?? theme.palette.mode === 'dark';
 
@@ -31,7 +35,9 @@ const HighlightText: React.FC<HighlightTextProps> = ({ text, highlight, isDark: 
           <span
             key={i}
             style={{
-              backgroundColor: isDark ? 'rgba(255, 235, 59, 0.2)' : 'rgba(255, 235, 59, 0.4)',
+              backgroundColor: isDark
+                ? 'rgba(255, 235, 59, 0.2)'
+                : 'rgba(255, 235, 59, 0.4)',
               color: isDark ? '#ffd54f' : '#f57f17',
               borderRadius: '2px',
               padding: '0 2px',

@@ -780,7 +780,10 @@ const FeatureSegmentsPage: React.FC = () => {
                                         >
                                           {segment.segmentName}
                                         </Typography>
-                                        <CopyButton text={segment.segmentName} size={13} />
+                                        <CopyButton
+                                          text={segment.segmentName}
+                                          size={13}
+                                        />
                                       </Box>
                                       {segment.displayName &&
                                         segment.displayName !==

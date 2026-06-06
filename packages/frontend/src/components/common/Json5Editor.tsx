@@ -236,7 +236,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
         },
         '.cm-scroller': {
           overflow: 'auto',
-          },
+        },
         '.cm-content': {
           padding: '8px',
           color: isDark ? '#d4d4d4' : '#333333',

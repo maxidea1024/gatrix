@@ -1328,7 +1328,7 @@ const SystemConsolePage: React.FC = () => {
           borderRadius: 1,
           p: 1,
           minHeight: 0,
-          })}
+        })}
       >
         <div
           ref={containerRef as any}

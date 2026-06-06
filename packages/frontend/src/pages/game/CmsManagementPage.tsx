@@ -1618,10 +1618,7 @@ const CmsManagementPage: React.FC = () => {
                             />
                           </TableCell>
                           <TableCell>
-                            <Typography
-                              variant="caption"
-                              
-                            >
+                            <Typography variant="caption">
                               {table.contentHash?.slice(0, 8)}..
                             </Typography>
                           </TableCell>
@@ -3331,11 +3328,7 @@ const CmsManagementPage: React.FC = () => {
                 >
                   v{rollbackCurrentVersion}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  
-                >
+                <Typography variant="caption" color="text.secondary">
                   {rollbackTableName}
                 </Typography>
               </Box>
@@ -3380,11 +3373,7 @@ const CmsManagementPage: React.FC = () => {
                 >
                   v{rollbackVersion}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  
-                >
+                <Typography variant="caption" color="text.secondary">
                   {rollbackTableName}
                 </Typography>
               </Box>

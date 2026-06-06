@@ -134,11 +134,7 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({
                   type={fieldInfo.fieldType}
                   sx={{ fontSize: 18, color: 'primary.main' }}
                 />
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  
-                >
+                <Typography variant="subtitle2" fontWeight={600}>
                   {fieldInfo.fieldName}
                 </Typography>
               </Box>

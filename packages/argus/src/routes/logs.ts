@@ -9,8 +9,18 @@ import { CACHE, STREAMS, KNOWN_STREAMS } from '../config/redis-keys';
 const logger = createLogger('logs-api');
 
 const LOGS_ALLOWED_COLUMNS = new Set([
-  'log_id', 'trace_id', 'span_id', 'issue_id', 'timestamp', 'level', 
-  'logger_name', 'message', 'body', 'service', 'environment', 'release'
+  'log_id',
+  'trace_id',
+  'span_id',
+  'issue_id',
+  'timestamp',
+  'level',
+  'logger_name',
+  'message',
+  'body',
+  'service',
+  'environment',
+  'release',
 ]);
 
 // User-friendly aliases ??actual DB column names.
@@ -21,8 +31,7 @@ const LOGS_COLUMN_ALIASES: Record<string, string> = {
 };
 
 export default async function logsRoutes(app: FastifyInstance) {
-
-  // ?€?€?€ Browse Logs (independent explorer ??no trace_id required) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Browse Logs (independent explorer ??no trace_id required) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/browse',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -45,11 +54,14 @@ export default async function logsRoutes(app: FastifyInstance) {
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const conditions: string[] = ['project_id = {projectId:String}', timeCond];
-        const params: Record<string, string> = { 
-          projectId: String(projectId), 
-          fillStart: String(bucket.queryParams.fillStart), 
-          fillEnd: String(bucket.queryParams.fillEnd) 
+        const conditions: string[] = [
+          'project_id = {projectId:String}',
+          timeCond,
+        ];
+        const params: Record<string, string> = {
+          projectId: String(projectId),
+          fillStart: String(bucket.queryParams.fillStart),
+          fillEnd: String(bucket.queryParams.fillEnd),
         };
 
         if (cursor) {
@@ -59,15 +71,32 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
         if (level) {
           const levels = level.split(',');
-          conditions.push(`level IN (${levels.map((_, i) => `{level_${i}:String}`).join(', ')})`);
-          levels.forEach((l, i) => { params[`level_${i}`] = l.trim(); });
+          conditions.push(
+            `level IN (${levels.map((_, i) => `{level_${i}:String}`).join(', ')})`
+          );
+          levels.forEach((l, i) => {
+            params[`level_${i}`] = l.trim();
+          });
         }
-        if (service) { conditions.push('service = {service:String}'); params.service = service; }
-        if (environment) { conditions.push('environment = {environment:String}'); params.environment = environment; }
-        if (logger_name) { conditions.push('logger_name = {loggerName:String}'); params.loggerName = logger_name; }
+        if (service) {
+          conditions.push('service = {service:String}');
+          params.service = service;
+        }
+        if (environment) {
+          conditions.push('environment = {environment:String}');
+          params.environment = environment;
+        }
+        if (logger_name) {
+          conditions.push('logger_name = {loggerName:String}');
+          params.loggerName = logger_name;
+        }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+          const parser = new QueryParser(
+            LOGS_ALLOWED_COLUMNS,
+            new Set(),
+            LOGS_COLUMN_ALIASES
+          );
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -88,40 +117,58 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         return reply.send({
           data: result.data,
-          meta: { count: (result.data as any[]).length, hasMore: (result.data as any[]).length >= parseInt(limit, 10) },
+          meta: {
+            count: (result.data as any[]).length,
+            hasMore: (result.data as any[]).length >= parseInt(limit, 10),
+          },
         });
       } catch (error) {
-        logger.error('Failed to browse logs', { projectId, error: String(error) });
+        logger.error('Failed to browse logs', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to browse logs' });
       }
     }
   );
 
-  // ?€?€?€ Log Volume (histogram for chart) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Log Volume (histogram for chart) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', level, start, end, search } = request.query as Record<string, string>;
+      const {
+        period = '24h',
+        level,
+        start,
+        end,
+        search,
+      } = request.query as Record<string, string>;
 
       const bucket = getBucketingConfig(period, start, end);
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
-      const conditions: string[] = ['project_id = {projectId:String}', timeCond];
-      const params: Record<string, string> = { 
+      const conditions: string[] = [
+        'project_id = {projectId:String}',
+        timeCond,
+      ];
+      const params: Record<string, string> = {
         projectId: String(projectId),
         fillStart: String(bucket.queryParams.fillStart),
-        fillEnd: String(bucket.queryParams.fillEnd)
+        fillEnd: String(bucket.queryParams.fillEnd),
       };
 
       try {
-
         if (level) {
           conditions.push('level = {level:String}');
           params.level = level;
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+          const parser = new QueryParser(
+            LOGS_ALLOWED_COLUMNS,
+            new Set(),
+            LOGS_COLUMN_ALIASES
+          );
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -140,21 +187,29 @@ export default async function logsRoutes(app: FastifyInstance) {
         const result = await optic.rawQuery({ query: sql, params });
         return reply.send({ data: result.data });
       } catch (error) {
-        logger.error('Failed to get log volume', { projectId, error: String(error) });
+        logger.error('Failed to get log volume', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to get log volume' });
       }
     }
   );
 
-  // ?€?€?€ Log Facets (distinct values for filters) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Log Facets (distinct values for filters) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/facets',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', start, end } = request.query as Record<string, string>;
+      const {
+        period = '24h',
+        start,
+        end,
+      } = request.query as Record<string, string>;
 
       // Use a cache key based on period (custom start/end bypass cache)
-      const cacheKey = (!start && !end) ? CACHE.LOG_FACETS(String(projectId), period) : null;
+      const cacheKey =
+        !start && !end ? CACHE.LOG_FACETS(String(projectId), period) : null;
 
       // Check Redis cache first
       if (cacheKey) {
@@ -163,36 +218,40 @@ export default async function logsRoutes(app: FastifyInstance) {
           if (cached) {
             return reply.send({ data: JSON.parse(cached) });
           }
-        } catch { /* cache miss, proceed to ClickHouse */ }
+        } catch {
+          /* cache miss, proceed to ClickHouse */
+        }
       }
 
       const bucket = getBucketingConfig(period, start, end);
-      const qp: Record<string, any> = { 
+      const qp: Record<string, any> = {
         projectId: String(projectId),
         fillStart: bucket.queryParams.fillStart,
-        fillEnd: bucket.queryParams.fillEnd
+        fillEnd: bucket.queryParams.fillEnd,
       };
       const timeFilter = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const [levelsRes, servicesRes, envsRes, loggersRes] = await Promise.all([
-          optic.rawQuery({
-            query: `SELECT level, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} GROUP BY level ORDER BY count DESC`,
-            params: qp,
-          }),
-          optic.rawQuery({
-            query: `SELECT service, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND service != '' GROUP BY service ORDER BY count DESC LIMIT 20`,
-            params: qp,
-          }),
-          optic.rawQuery({
-            query: `SELECT environment, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND environment != '' GROUP BY environment ORDER BY count DESC LIMIT 10`,
-            params: qp,
-          }),
-          optic.rawQuery({
-            query: `SELECT logger_name, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND logger_name != '' GROUP BY logger_name ORDER BY count DESC LIMIT 20`,
-            params: qp,
-          }),
-        ]);
+        const [levelsRes, servicesRes, envsRes, loggersRes] = await Promise.all(
+          [
+            optic.rawQuery({
+              query: `SELECT level, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} GROUP BY level ORDER BY count DESC`,
+              params: qp,
+            }),
+            optic.rawQuery({
+              query: `SELECT service, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND service != '' GROUP BY service ORDER BY count DESC LIMIT 20`,
+              params: qp,
+            }),
+            optic.rawQuery({
+              query: `SELECT environment, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND environment != '' GROUP BY environment ORDER BY count DESC LIMIT 10`,
+              params: qp,
+            }),
+            optic.rawQuery({
+              query: `SELECT logger_name, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND logger_name != '' GROUP BY logger_name ORDER BY count DESC LIMIT 20`,
+              params: qp,
+            }),
+          ]
+        );
 
         const facetData = {
           levels: levelsRes.data || [],
@@ -203,18 +262,23 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         // Cache for 5 minutes (non-blocking)
         if (cacheKey) {
-          redis.set(cacheKey, JSON.stringify(facetData), 'EX', 300).catch(() => {});
+          redis
+            .set(cacheKey, JSON.stringify(facetData), 'EX', 300)
+            .catch(() => {});
         }
 
         return reply.send({ data: facetData });
       } catch (error) {
-        logger.error('Failed to get log facets', { projectId, error: String(error) });
+        logger.error('Failed to get log facets', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to get log facets' });
       }
     }
   );
 
-  // ?€?€?€ Log Aggregation (group by attribute) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Log Aggregation (group by attribute) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/aggregate',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -233,22 +297,41 @@ export default async function logsRoutes(app: FastifyInstance) {
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       // Only allow safe column names
-      const ALLOWED_GROUP = new Set(['level', 'service', 'environment', 'logger_name', 'release']);
+      const ALLOWED_GROUP = new Set([
+        'level',
+        'service',
+        'environment',
+        'logger_name',
+        'release',
+      ]);
       const safeGroup = ALLOWED_GROUP.has(groupBy) ? groupBy : 'level';
 
       try {
-        const conditions: string[] = ['project_id = {projectId:String}', timeCond];
-        const params: Record<string, string> = { 
+        const conditions: string[] = [
+          'project_id = {projectId:String}',
+          timeCond,
+        ];
+        const params: Record<string, string> = {
           projectId: String(projectId),
           fillStart: String(bucket.queryParams.fillStart),
-          fillEnd: String(bucket.queryParams.fillEnd)
+          fillEnd: String(bucket.queryParams.fillEnd),
         };
 
-        if (service) { conditions.push('service = {service:String}'); params.service = service; }
-        if (environment) { conditions.push('environment = {environment:String}'); params.environment = environment; }
+        if (service) {
+          conditions.push('service = {service:String}');
+          params.service = service;
+        }
+        if (environment) {
+          conditions.push('environment = {environment:String}');
+          params.environment = environment;
+        }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+          const parser = new QueryParser(
+            LOGS_ALLOWED_COLUMNS,
+            new Set(),
+            LOGS_COLUMN_ALIASES
+          );
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -273,8 +356,12 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         let timeSeries: any[] = [];
         if (top5.length > 0) {
-          const inList = top5.map((_: any, i: number) => `{g${i}:String}`).join(', ');
-          top5.forEach((v: string, i: number) => { params[`g${i}`] = v; });
+          const inList = top5
+            .map((_: any, i: number) => `{g${i}:String}`)
+            .join(', ');
+          top5.forEach((v: string, i: number) => {
+            params[`g${i}`] = v;
+          });
 
           const tsSql = `
             SELECT ${bucket.selectExpr} AS bucket, ${safeGroup} AS group_value, count() AS count
@@ -295,33 +382,59 @@ export default async function logsRoutes(app: FastifyInstance) {
           },
         });
       } catch (error) {
-        logger.error('Failed to aggregate logs', { projectId, error: String(error) });
+        logger.error('Failed to aggregate logs', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to aggregate logs' });
       }
     }
   );
 
-  // ?€?€?€ Get logs by trace_id (existing ??kept for issue detail) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Get logs by trace_id (existing ??kept for issue detail) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { trace_id, issue_id, level, search, limit = '100', order = 'ASC', cursor } = request.query as Record<string, string>;
+      const {
+        trace_id,
+        issue_id,
+        level,
+        search,
+        limit = '100',
+        order = 'ASC',
+        cursor,
+      } = request.query as Record<string, string>;
 
       if (!trace_id && !issue_id) {
-        return reply.code(400).send({ error: 'Either trace_id or issue_id is required' });
+        return reply
+          .code(400)
+          .send({ error: 'Either trace_id or issue_id is required' });
       }
 
       try {
         const conditions: string[] = ['project_id = {projectId:String}'];
         const params: Record<string, string> = { projectId: String(projectId) };
 
-        if (trace_id) { conditions.push('trace_id = {traceId:String}'); params.traceId = trace_id; }
-        if (issue_id) { conditions.push('issue_id = {issueId:UInt64}'); params.issueId = issue_id; }
-        if (level) { conditions.push('level = {level:String}'); params.level = level; }
-        
+        if (trace_id) {
+          conditions.push('trace_id = {traceId:String}');
+          params.traceId = trace_id;
+        }
+        if (issue_id) {
+          conditions.push('issue_id = {issueId:UInt64}');
+          params.issueId = issue_id;
+        }
+        if (level) {
+          conditions.push('level = {level:String}');
+          params.level = level;
+        }
+
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+          const parser = new QueryParser(
+            LOGS_ALLOWED_COLUMNS,
+            new Set(),
+            LOGS_COLUMN_ALIASES
+          );
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -345,15 +458,21 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         const result = await optic.rawQuery({ query: sql, params });
         const rows = result.data as any[];
-        return reply.send({ data: rows, meta: { count: rows.length, hasMore: rows.length >= parsedLimit } });
+        return reply.send({
+          data: rows,
+          meta: { count: rows.length, hasMore: rows.length >= parsedLimit },
+        });
       } catch (error) {
-        logger.error('Failed to query logs', { projectId, error: String(error) });
+        logger.error('Failed to query logs', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to query logs' });
       }
     }
   );
 
-  // ?€?€?€ Ingest logs (from SDK) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Ingest logs (from SDK) ?ï¿½?ï¿½?ï¿½
   app.post(
     '/:projectId/logs',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -390,35 +509,51 @@ export default async function logsRoutes(app: FastifyInstance) {
           };
           pipeline.xadd(
             streamKey,
-            'MAXLEN', '~', '500000',
+            'MAXLEN',
+            '~',
+            '500000',
             '*',
-            'data', JSON.stringify(row),
+            'data',
+            JSON.stringify(row)
           );
         }
 
         await pipeline.exec();
         return reply.code(202).send({ inserted: logs.length });
       } catch (error) {
-        logger.error('Failed to ingest logs', { projectId, error: String(error) });
+        logger.error('Failed to ingest logs', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to ingest logs' });
       }
     }
   );
 
-  // ?€?€?€ Log Patterns (cluster similar log messages) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Log Patterns (cluster similar log messages) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/patterns',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period = '24h', start, end, level, service, environment, search, limit = '50',
+        period = '24h',
+        start,
+        end,
+        level,
+        service,
+        environment,
+        search,
+        limit = '50',
       } = request.query as Record<string, string>;
 
       const bucket = getBucketingConfig(period, start, end);
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const conditions: string[] = ['project_id = {projectId:String}', timeCond];
+        const conditions: string[] = [
+          'project_id = {projectId:String}',
+          timeCond,
+        ];
         const params: Record<string, string> = {
           projectId: String(projectId),
           fillStart: String(bucket.queryParams.fillStart),
@@ -427,14 +562,28 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         if (level) {
           const levels = level.split(',');
-          conditions.push(`level IN (${levels.map((_, i) => `{plvl_${i}:String}`).join(', ')})`);
-          levels.forEach((l, i) => { params[`plvl_${i}`] = l.trim(); });
+          conditions.push(
+            `level IN (${levels.map((_, i) => `{plvl_${i}:String}`).join(', ')})`
+          );
+          levels.forEach((l, i) => {
+            params[`plvl_${i}`] = l.trim();
+          });
         }
-        if (service) { conditions.push('service = {pservice:String}'); params.pservice = service; }
-        if (environment) { conditions.push('environment = {penvironment:String}'); params.penvironment = environment; }
+        if (service) {
+          conditions.push('service = {pservice:String}');
+          params.pservice = service;
+        }
+        if (environment) {
+          conditions.push('environment = {penvironment:String}');
+          params.penvironment = environment;
+        }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+          const parser = new QueryParser(
+            LOGS_ALLOWED_COLUMNS,
+            new Set(),
+            LOGS_COLUMN_ALIASES
+          );
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -475,18 +624,26 @@ export default async function logsRoutes(app: FastifyInstance) {
         const result = await optic.rawQuery({ query: sql, params });
         return reply.send({ data: result.data });
       } catch (error) {
-        logger.error('Failed to get log patterns', { projectId, error: String(error) });
+        logger.error('Failed to get log patterns', {
+          projectId,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to get log patterns' });
       }
     }
   );
 
-  // ?€?€?€ Custom Attribute Facet (distinct values for a given attribute key) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Custom Attribute Facet (distinct values for a given attribute key) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/attribute-facet',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { key, period = '24h', start, end } = request.query as Record<string, string>;
+      const {
+        key,
+        period = '24h',
+        start,
+        end,
+      } = request.query as Record<string, string>;
 
       if (!key) {
         return reply.code(400).send({ error: 'key parameter is required' });
@@ -520,17 +677,24 @@ export default async function logsRoutes(app: FastifyInstance) {
         const result = await optic.rawQuery({ query: sql, params });
         return reply.send({ data: result.data });
       } catch (error) {
-        logger.error('Failed to get attribute facet', { projectId, key, error: String(error) });
+        logger.error('Failed to get attribute facet', {
+          projectId,
+          key,
+          error: String(error),
+        });
         return reply.code(500).send({ error: 'Failed to get attribute facet' });
       }
     }
   );
-  // ?€?€?€ Live Tail (SSE ??stream new logs in real-time) ?€?€?€
+  // ?ï¿½?ï¿½?ï¿½ Live Tail (SSE ??stream new logs in real-time) ?ï¿½?ï¿½?ï¿½
   app.get(
     '/:projectId/logs/live-tail',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { level, service, environment, search } = request.query as Record<string, string>;
+      const { level, service, environment, search } = request.query as Record<
+        string,
+        string
+      >;
 
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream',
@@ -542,7 +706,9 @@ export default async function logsRoutes(app: FastifyInstance) {
       let lastTimestamp = new Date().toISOString();
       let closed = false;
 
-      request.raw.on('close', () => { closed = true; });
+      request.raw.on('close', () => {
+        closed = true;
+      });
 
       const poll = async () => {
         if (closed) return;
@@ -554,19 +720,33 @@ export default async function logsRoutes(app: FastifyInstance) {
           ];
           const params: Record<string, string> = {
             projectId: String(projectId),
-            lastTs: lastTimestamp,
+            lastTs: String(lastTimestamp).replace('Z', '').replace('T', ' '),
           };
 
           if (level) {
             const levels = level.split(',');
-            conditions.push(`level IN (${levels.map((_, i) => `{llvl_${i}:String}`).join(', ')})`);
-            levels.forEach((l, i) => { params[`llvl_${i}`] = l.trim(); });
+            conditions.push(
+              `level IN (${levels.map((_, i) => `{llvl_${i}:String}`).join(', ')})`
+            );
+            levels.forEach((l, i) => {
+              params[`llvl_${i}`] = l.trim();
+            });
           }
-          if (service) { conditions.push('service = {lservice:String}'); params.lservice = service; }
-          if (environment) { conditions.push('environment = {lenvironment:String}'); params.lenvironment = environment; }
+          if (service) {
+            conditions.push('service = {lservice:String}');
+            params.lservice = service;
+          }
+          if (environment) {
+            conditions.push('environment = {lenvironment:String}');
+            params.lenvironment = environment;
+          }
 
           if (search && typeof search === 'string' && search.trim()) {
-            const parser = new QueryParser(LOGS_ALLOWED_COLUMNS, new Set(), LOGS_COLUMN_ALIASES);
+            const parser = new QueryParser(
+              LOGS_ALLOWED_COLUMNS,
+              new Set(),
+              LOGS_COLUMN_ALIASES
+            );
             const ast = parser.parse(search);
             if (ast) {
               const { where } = parser.generateSQL(ast, params);

@@ -141,9 +141,10 @@ const SurveyLogsPage: React.FC = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // Date Range State
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
 
   // active filters
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -329,8 +330,6 @@ const SurveyLogsPage: React.FC = () => {
     setColumns(defaultColumns);
     localStorage.setItem('surveyLogsColumns', JSON.stringify(defaultColumns));
   };
-
-
 
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters((prev) => [...prev, filter]);

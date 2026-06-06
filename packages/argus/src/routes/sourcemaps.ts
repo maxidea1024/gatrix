@@ -8,7 +8,9 @@ import fs from 'fs/promises';
 const logger = createLogger('sourcemaps-api');
 
 // Directory to store uploaded source maps
-const SOURCEMAP_DIR = process.env.ARGUS_SOURCEMAP_DIR || path.join(process.cwd(), 'data', 'sourcemaps');
+const SOURCEMAP_DIR =
+  process.env.ARGUS_SOURCEMAP_DIR ||
+  path.join(process.cwd(), 'data', 'sourcemaps');
 
 export default async function sourcemapsRoutes(app: FastifyInstance) {
   // Register multipart for file uploads (skip if already registered)
@@ -47,7 +49,9 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to list sourcemap releases' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to list sourcemap releases' });
       }
     }
   );
@@ -69,7 +73,8 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           if (part.type === 'field') {
             if (part.fieldname === 'release') release = String(part.value);
             if (part.fieldname === 'dist') dist = String(part.value);
-            if (part.fieldname === 'file_path') filePaths.push(String(part.value));
+            if (part.fieldname === 'file_path')
+              filePaths.push(String(part.value));
           } else if (part.type === 'file') {
             const buf = await part.toBuffer();
             files.push({
@@ -102,7 +107,9 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         if (existingRows.length > 0) {
           releaseId = existingRows[0].id;
           // Delete old files for this release
-          await db('g_argus_sourcemap_files').where('release_id', releaseId).del();
+          await db('g_argus_sourcemap_files')
+            .where('release_id', releaseId)
+            .del();
         } else {
           const [insertedId] = await db('g_argus_sourcemap_releases').insert({
             project_id: projectId,
@@ -114,7 +121,11 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         }
 
         // Save files to disk and create DB entries
-        const releaseDir = path.join(SOURCEMAP_DIR, String(projectId), String(releaseId));
+        const releaseDir = path.join(
+          SOURCEMAP_DIR,
+          String(projectId),
+          String(releaseId)
+        );
         await fs.mkdir(releaseDir, { recursive: true });
 
         // Save files to disk and collect DB entries
@@ -139,14 +150,30 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         // Single bulk INSERT for all sourcemap file records
         if (dbRows.length > 0) {
           await db('g_argus_sourcemap_files').insert(
-            dbRows.map(([release_id, project_id, file_path, file_name, sourcemap_path, file_size]) => ({
-              release_id, project_id, file_path, file_name, sourcemap_path, file_size,
-            }))
+            dbRows.map(
+              ([
+                release_id,
+                project_id,
+                file_path,
+                file_name,
+                sourcemap_path,
+                file_size,
+              ]) => ({
+                release_id,
+                project_id,
+                file_path,
+                file_name,
+                sourcemap_path,
+                file_size,
+              })
+            )
           );
         }
 
         // Update file count
-        await db('g_argus_sourcemap_releases').where('id', releaseId).update({ file_count: files.length });
+        await db('g_argus_sourcemap_releases')
+          .where('id', releaseId)
+          .update({ file_count: files.length });
 
         logger.info('Sourcemaps uploaded', {
           projectId,
@@ -179,17 +206,28 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
   app.delete(
     '/:projectId/sourcemaps/:releaseId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, releaseId } = request.params as { projectId: string; releaseId: string };
+      const { projectId, releaseId } = request.params as {
+        projectId: string;
+        releaseId: string;
+      };
 
       try {
         // Delete files from disk
-        const releaseDir = path.join(SOURCEMAP_DIR, String(projectId), String(releaseId));
+        const releaseDir = path.join(
+          SOURCEMAP_DIR,
+          String(projectId),
+          String(releaseId)
+        );
         try {
           await fs.rm(releaseDir, { recursive: true, force: true });
-        } catch { /* ignore if dir doesn't exist */ }
+        } catch {
+          /* ignore if dir doesn't exist */
+        }
 
         // Delete from DB (cascade deletes files)
-        await db('g_argus_sourcemap_releases').where({ id: releaseId, project_id: projectId }).del();
+        await db('g_argus_sourcemap_releases')
+          .where({ id: releaseId, project_id: projectId })
+          .del();
 
         return reply.send({ success: true });
       } catch (error) {
@@ -198,7 +236,9 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           releaseId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to delete sourcemap release' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to delete sourcemap release' });
       }
     }
   );
@@ -207,7 +247,10 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
   app.get(
     '/:projectId/sourcemaps/:releaseId/files',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, releaseId } = request.params as { projectId: string; releaseId: string };
+      const { projectId, releaseId } = request.params as {
+        projectId: string;
+        releaseId: string;
+      };
 
       try {
         const rows = await db('g_argus_sourcemap_files')
@@ -220,7 +263,9 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
           releaseId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to list sourcemap files' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to list sourcemap files' });
       }
     }
   );
@@ -238,7 +283,9 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
       };
 
       if (!release || !file_path) {
-        return reply.code(400).send({ error: 'release and file_path are required' });
+        return reply
+          .code(400)
+          .send({ error: 'release and file_path are required' });
       }
 
       try {
@@ -284,7 +331,10 @@ export default async function sourcemapsRoutes(app: FastifyInstance) {
         const fileBuffer = await fs.readFile(diskPath);
         return reply
           .header('Content-Type', 'application/octet-stream')
-          .header('Content-Disposition', `attachment; filename="${path.basename(diskPath)}"`)
+          .header(
+            'Content-Disposition',
+            `attachment; filename="${path.basename(diskPath)}"`
+          )
           .send(fileBuffer);
       } catch (error) {
         logger.error('Sourcemap lookup failed', {

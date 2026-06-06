@@ -10,7 +10,10 @@ import { useState, useCallback } from 'react';
  * const [collapsed, setCollapsed] = useLocalStorage('sidebar_collapsed', false);
  * const [pageSize, setPageSize] = useLocalStorage('page_size', 20);
  */
-export function useLocalStorage<T>(key: string, defaultValue: T): [T, (value: T | ((prev: T) => T)) => void] {
+export function useLocalStorage<T>(
+  key: string,
+  defaultValue: T
+): [T, (value: T | ((prev: T) => T)) => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = localStorage.getItem(key);
@@ -22,15 +25,17 @@ export function useLocalStorage<T>(key: string, defaultValue: T): [T, (value: T 
 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
-      setStoredValue(prev => {
+      setStoredValue((prev) => {
         const nextValue = value instanceof Function ? value(prev) : value;
         try {
           localStorage.setItem(key, JSON.stringify(nextValue));
-        } catch { /* quota exceeded or private browsing */ }
+        } catch {
+          /* quota exceeded or private browsing */
+        }
         return nextValue;
       });
     },
-    [key],
+    [key]
   );
 
   return [storedValue, setValue];

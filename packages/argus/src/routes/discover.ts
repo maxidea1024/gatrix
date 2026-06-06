@@ -9,16 +9,48 @@ const logger = createLogger('argus-discover');
 
 // Allowed columns for query safety
 const ALLOWED_COLUMNS = new Set([
-  'event_id', 'timestamp', 'platform', 'level', 'type', 'value',
-  'logger', 'transaction', 'server_name', 'release', 'dist',
-  'environment', 'http_url', 'browser_name', 'browser_version', 'os_name',
-  'os_version', 'device_name', 'device_family', 'issue_id', 'project_id',
-  'user_id', 'user_email', 'sdk_name', 'sdk_version',
-  'runtime_name', 'runtime_version', 'geo_country', 'http_method',
+  'event_id',
+  'timestamp',
+  'platform',
+  'level',
+  'type',
+  'value',
+  'logger',
+  'transaction',
+  'server_name',
+  'release',
+  'dist',
+  'environment',
+  'http_url',
+  'browser_name',
+  'browser_version',
+  'os_name',
+  'os_version',
+  'device_name',
+  'device_family',
+  'issue_id',
+  'project_id',
+  'user_id',
+  'user_email',
+  'sdk_name',
+  'sdk_version',
+  'runtime_name',
+  'runtime_version',
+  'geo_country',
+  'http_method',
 ]);
 
 const ALLOWED_AGGREGATES = new Set([
-  'count', 'uniq', 'min', 'max', 'avg', 'sum', 'p50', 'p75', 'p95', 'p99',
+  'count',
+  'uniq',
+  'min',
+  'max',
+  'avg',
+  'sum',
+  'p50',
+  'p75',
+  'p95',
+  'p99',
 ]);
 
 interface DiscoverQuery {
@@ -50,7 +82,7 @@ function parseField(field: string): { sql: string; alias: string } {
   // Equation pattern: equation|count() / uniq(user_id)
   if (expr.startsWith('equation|')) {
     const eq = expr.replace('equation|', '').trim();
-    
+
     // VERY simple sanitization: allow only numbers, basic math, allowed aggregates and parens
     // Sentry supports complex equations, we start with simple math.
     // e.g. count() / p50()
@@ -59,9 +91,10 @@ function parseField(field: string): { sql: string; alias: string } {
     const tokens = eq.split(/([\s\+\-\*\/\(\)])/);
     for (const t of tokens) {
       const trimmed = t.trim();
-      if (!trimmed || ['+', '-', '*', '/', '(', ')'].includes(trimmed)) continue;
+      if (!trimmed || ['+', '-', '*', '/', '(', ')'].includes(trimmed))
+        continue;
       if (!isNaN(Number(trimmed))) continue;
-      
+
       const aggMatch = trimmed.match(/^(\w+)\((\w*)\)$/);
       if (aggMatch) {
         const [, func, col] = aggMatch;
@@ -76,14 +109,20 @@ function parseField(field: string): { sql: string; alias: string } {
           sqlEq = sqlEq.replace(trimmed, `uniq(${col || '*'})`);
         } else if (['p50', 'p75', 'p95', 'p99'].includes(func.toLowerCase())) {
           const pct = parseInt(func.replace(/p/i, ''), 10);
-          sqlEq = sqlEq.replace(trimmed, `quantile(${pct / 100})(${col || 'timestamp'})`);
+          sqlEq = sqlEq.replace(
+            trimmed,
+            `quantile(${pct / 100})(${col || 'timestamp'})`
+          );
         }
         continue;
       }
       throw new Error(`Invalid token in equation: ${trimmed}`);
     }
-    
-    return { sql: `(${sqlEq})`, alias: customAlias || `eq_${Math.random().toString(36).substring(7)}` };
+
+    return {
+      sql: `(${sqlEq})`,
+      alias: customAlias || `eq_${Math.random().toString(36).substring(7)}`,
+    };
   }
 
   // Aggregate function pattern: func(column)
@@ -94,7 +133,7 @@ function parseField(field: string): { sql: string; alias: string } {
       throw new Error(`Disallowed aggregate: ${func}`);
     }
     const fn = func.toLowerCase();
-    
+
     let sql = '';
     let defaultAlias = '';
 
@@ -115,7 +154,7 @@ function parseField(field: string): { sql: string; alias: string } {
       sql = `${fn}(${safeCol})`;
       defaultAlias = `${fn}_${col || 'all'}`;
     }
-    
+
     return { sql, alias: customAlias || defaultAlias };
   }
 
@@ -126,7 +165,11 @@ function parseField(field: string): { sql: string; alias: string } {
   return { sql: expr, alias: customAlias || expr };
 }
 
-function buildTimeFilter(period?: string, start?: string, end?: string): string {
+function buildTimeFilter(
+  period?: string,
+  start?: string,
+  end?: string
+): string {
   if (start && end) {
     return `timestamp >= '${start}' AND timestamp <= '${end}'`;
   }
@@ -153,14 +196,26 @@ export default async function discoverRoutes(app: FastifyInstance) {
       const body = request.body as DiscoverQuery;
 
       try {
-        const { fields = ['count()'], groupBy, orderBy, limit = 50, offset = 0, period, start, end, conditions } = body;
+        const {
+          fields = ['count()'],
+          groupBy,
+          orderBy,
+          limit = 50,
+          offset = 0,
+          period,
+          start,
+          end,
+          conditions,
+        } = body;
 
         // Parse fields
         const parsedFields = fields.map(parseField);
-        const selectClause = parsedFields.map(f => `${f.sql} AS ${f.alias}`).join(', ');
+        const selectClause = parsedFields
+          .map((f) => `${f.sql} AS ${f.alias}`)
+          .join(', ');
 
         const queryParams: Record<string, string> = { projectId };
-        
+
         // Build query
         let query = `SELECT ${selectClause} FROM argus.errors WHERE project_id = {projectId:String}`;
         query += ` AND ${buildTimeFilter(period, start, end)}`;
@@ -179,11 +234,21 @@ export default async function discoverRoutes(app: FastifyInstance) {
         }
 
         // Group by ??auto-include non-aggregate fields
-        const nonAggFields = parsedFields.filter(f => f.sql === f.alias).map(f => f.alias);
-        const requestedGroup = (groupBy && groupBy.length > 0) ? groupBy.filter(c => ALLOWED_COLUMNS.has(c)) : [];
+        const nonAggFields = parsedFields
+          .filter((f) => f.sql === f.alias)
+          .map((f) => f.alias);
+        const requestedGroup =
+          groupBy && groupBy.length > 0
+            ? groupBy.filter((c) => ALLOWED_COLUMNS.has(c))
+            : [];
         // If there are aggregate fields AND plain columns, we must group by the plain columns
-        const hasAggregates = parsedFields.some(f => f.sql !== f.alias);
-        const effectiveGroupBy = [...new Set([...requestedGroup, ...(hasAggregates ? nonAggFields : [])])];
+        const hasAggregates = parsedFields.some((f) => f.sql !== f.alias);
+        const effectiveGroupBy = [
+          ...new Set([
+            ...requestedGroup,
+            ...(hasAggregates ? nonAggFields : []),
+          ]),
+        ];
         if (effectiveGroupBy.length > 0) {
           query += ` GROUP BY ${effectiveGroupBy.join(', ')}`;
         }
@@ -198,14 +263,14 @@ export default async function discoverRoutes(app: FastifyInstance) {
           if (orderMatch) {
             const [, desc, col] = orderMatch;
             // Allow ordering by alias or column
-            const validAlias = parsedFields.find(f => f.alias === col);
+            const validAlias = parsedFields.find((f) => f.alias === col);
             if (validAlias || ALLOWED_COLUMNS.has(col)) {
               query += ` ORDER BY ${col} ${desc === '-' ? 'DESC' : 'ASC'}`;
             }
           }
         } else if (groupBy && groupBy.length > 0) {
           // Default: order by first aggregate DESC
-          const firstAgg = parsedFields.find(f => f.alias !== f.sql);
+          const firstAgg = parsedFields.find((f) => f.alias !== f.sql);
           if (firstAgg) {
             query += ` ORDER BY ${firstAgg.alias} DESC`;
           }
@@ -216,7 +281,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
           query += ` OFFSET ${Number(offset)}`;
         }
 
-        logger.info('Discover query', { projectId, query: query.slice(0, 200) });
+        logger.info('Discover query', {
+          projectId,
+          query: query.slice(0, 200),
+        });
 
         const result = await optic.rawQuery({
           query,
@@ -226,7 +294,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
         return reply.send({
           data: result.data as any[],
           meta: {
-            fields: parsedFields.map(f => ({ name: f.alias, type: f.sql === f.alias ? 'column' : 'aggregate' })),
+            fields: parsedFields.map((f) => ({
+              name: f.alias,
+              type: f.sql === f.alias ? 'column' : 'aggregate',
+            })),
           },
         });
       } catch (error) {
@@ -374,9 +445,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
       try {
         const bucket = getBucketingConfig(period, start, end);
-        const timeFilter = start && end
-          ? `timestamp >= '${start}' AND timestamp <= '${end}'`
-          : `timestamp >= toDateTime(${bucket.queryParams.fillStart})`;
+        const timeFilter =
+          start && end
+            ? `timestamp >= '${start}' AND timestamp <= '${end}'`
+            : `timestamp >= toDateTime(${bucket.queryParams.fillStart})`;
 
         let query = `
           SELECT
@@ -386,7 +458,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
           FROM argus.errors
           WHERE project_id = {projectId:String}
         `;
-        
+
         query += ` AND ${timeFilter}`;
 
         const queryParams: Record<string, string> = { projectId };
@@ -431,7 +503,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { query_type } = request.query as { query_type?: string };
       try {
-        const query = db('g_argus_saved_queries').where('project_id', projectId);
+        const query = db('g_argus_saved_queries').where(
+          'project_id',
+          projectId
+        );
         if (query_type) {
           query.where('query_type', query_type);
         }
@@ -439,7 +514,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
         return reply.send({ data: rows });
       } catch (error: any) {
         // Table might not exist yet ??return empty gracefully
-        if (error?.code === 'ER_NO_SUCH_TABLE' || String(error?.message || '').includes("doesn't exist")) {
+        if (
+          error?.code === 'ER_NO_SUCH_TABLE' ||
+          String(error?.message || '').includes("doesn't exist")
+        ) {
           logger.warn('g_argus_saved_queries table not found, returning empty');
           return reply.send({ data: [] });
         }
@@ -457,7 +535,14 @@ export default async function discoverRoutes(app: FastifyInstance) {
     '/:projectId/discover/saved',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { name, description, query_config, display_type, is_global, query_type } = request.body as {
+      const {
+        name,
+        description,
+        query_config,
+        display_type,
+        is_global,
+        query_type,
+      } = request.body as {
         name: string;
         description?: string;
         query_config: Record<string, any>;
@@ -478,7 +563,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
           is_global: is_global ? 1 : 0,
           created_by: createdBy,
         });
-        return reply.code(201).send({ data: { id: insertId, name, query_type: query_type || 'discover' } });
+        return reply
+          .code(201)
+          .send({
+            data: { id: insertId, name, query_type: query_type || 'discover' },
+          });
       } catch (error) {
         logger.error('Failed to save query', {
           projectId,
@@ -493,24 +582,31 @@ export default async function discoverRoutes(app: FastifyInstance) {
   app.put(
     '/:projectId/discover/saved/:queryId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, queryId } = request.params as { projectId: string; queryId: string };
-      const { name, description, query_config, display_type, is_favorite } = request.body as {
-        name?: string;
-        description?: string;
-        query_config?: Record<string, any>;
-        display_type?: string;
-        is_favorite?: boolean;
+      const { projectId, queryId } = request.params as {
+        projectId: string;
+        queryId: string;
       };
+      const { name, description, query_config, display_type, is_favorite } =
+        request.body as {
+          name?: string;
+          description?: string;
+          query_config?: Record<string, any>;
+          display_type?: string;
+          is_favorite?: boolean;
+        };
 
       try {
         const updateObj: any = {};
         if (name !== undefined) updateObj.name = name;
         if (description !== undefined) updateObj.description = description;
-        if (query_config !== undefined) updateObj.query_config = JSON.stringify(query_config);
+        if (query_config !== undefined)
+          updateObj.query_config = JSON.stringify(query_config);
         if (display_type !== undefined) updateObj.display_type = display_type;
-        if (is_favorite !== undefined) updateObj.is_favorite = is_favorite ? 1 : 0;
+        if (is_favorite !== undefined)
+          updateObj.is_favorite = is_favorite ? 1 : 0;
 
-        if (Object.keys(updateObj).length === 0) return reply.code(400).send({ error: 'Nothing to update' });
+        if (Object.keys(updateObj).length === 0)
+          return reply.code(400).send({ error: 'Nothing to update' });
 
         await db('g_argus_saved_queries')
           .where({ id: queryId, project_id: projectId })
@@ -531,7 +627,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
   app.delete(
     '/:projectId/discover/saved/:queryId',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { projectId, queryId } = request.params as { projectId: string; queryId: string };
+      const { projectId, queryId } = request.params as {
+        projectId: string;
+        queryId: string;
+      };
       try {
         await db('g_argus_saved_queries')
           .where({ id: queryId, project_id: projectId })

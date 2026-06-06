@@ -16,7 +16,11 @@ import { rbacService } from '@/services/rbacService';
 
 // ==================== SWR Fetchers ====================
 
-const issueFetcher = async ([_, projectId, issueId]: [string, string, string]) => {
+const issueFetcher = async ([_, projectId, issueId]: [
+  string,
+  string,
+  string,
+]) => {
   return argusService.getIssueDetail(projectId, issueId);
 };
 
@@ -24,12 +28,24 @@ const membersFetcher = async ([_, projectId]: [string, string]) => {
   return rbacService.getProjectMembers(projectId);
 };
 
-const traceFetcher = async ([_, projectId, traceId]: [string, string, string]) => {
+const traceFetcher = async ([_, projectId, traceId]: [
+  string,
+  string,
+  string,
+]) => {
   return argusService.getTraceDetail(projectId, traceId);
 };
 
-const logsFetcher = async ([_, projectId, issueId]: [string, string, string]) => {
-  return argusService.getLogs(projectId, { issue_id: issueId, limit: 200, order: 'DESC' });
+const logsFetcher = async ([_, projectId, issueId]: [
+  string,
+  string,
+  string,
+]) => {
+  return argusService.getLogs(projectId, {
+    issue_id: issueId,
+    limit: 200,
+    order: 'DESC',
+  });
 };
 
 // ==================== Hook ====================
@@ -39,28 +55,26 @@ interface UseIssueDetailDataOptions {
   issueId: string | undefined;
 }
 
-export function useIssueDetailData({ projectId, issueId }: UseIssueDetailDataOptions) {
+export function useIssueDetailData({
+  projectId,
+  issueId,
+}: UseIssueDetailDataOptions) {
   // --- Issue Detail (SWR) ---
-  const issueKey = projectId && issueId ? ['argus-issue', projectId, issueId] : null;
+  const issueKey =
+    projectId && issueId ? ['argus-issue', projectId, issueId] : null;
   const {
     data: issue,
     error: issueError,
     isLoading: issueLoading,
     mutate: mutateIssue,
-  } = useSWR<ArgusIssueDetail>(
-    issueKey,
-    issueFetcher as any,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-    }
-  );
+  } = useSWR<ArgusIssueDetail>(issueKey, issueFetcher as any, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+  });
 
   // --- Project Members (SWR) ---
   const membersKey = projectId ? ['argus-members', projectId] : null;
-  const {
-    data: members = [],
-  } = useSWR<any[]>(
+  const { data: members = [] } = useSWR<any[]>(
     membersKey,
     membersFetcher as any,
     {
@@ -99,19 +113,22 @@ export function useIssueDetailData({ projectId, issueId }: UseIssueDetailDataOpt
 
 // ==================== Trace Hook ====================
 
-export function useTraceData(projectId: string | undefined, traceId: string | null, enabled: boolean) {
-  const traceKey = projectId && traceId && enabled ? ['argus-trace', projectId, traceId] : null;
+export function useTraceData(
+  projectId: string | undefined,
+  traceId: string | null,
+  enabled: boolean
+) {
+  const traceKey =
+    projectId && traceId && enabled
+      ? ['argus-trace', projectId, traceId]
+      : null;
   const {
     data: traceDetail,
     error: traceError,
     isLoading: traceLoading,
-  } = useSWR<ArgusTraceDetail>(
-    traceKey,
-    traceFetcher as any,
-    {
-      revalidateOnFocus: false,
-    }
-  );
+  } = useSWR<ArgusTraceDetail>(traceKey, traceFetcher as any, {
+    revalidateOnFocus: false,
+  });
 
   return {
     traceDetail: traceDetail ?? null,
@@ -120,23 +137,23 @@ export function useTraceData(projectId: string | undefined, traceId: string | nu
   };
 }
 
-
 // ==================== Logs Hook ====================
 
-export function useLogsData(projectId: string | undefined, issueId: string | undefined, enabled: boolean) {
-  const logsKey = projectId && issueId && enabled ? ['argus-logs', projectId, issueId] : null;
+export function useLogsData(
+  projectId: string | undefined,
+  issueId: string | undefined,
+  enabled: boolean
+) {
+  const logsKey =
+    projectId && issueId && enabled ? ['argus-logs', projectId, issueId] : null;
   const {
     data: logsResult,
     error: logsError,
     isLoading: logsLoading,
     mutate,
-  } = useSWR(
-    logsKey,
-    logsFetcher as any,
-    {
-      revalidateOnFocus: false,
-    }
-  );
+  } = useSWR(logsKey, logsFetcher as any, {
+    revalidateOnFocus: false,
+  });
 
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
@@ -144,7 +161,7 @@ export function useLogsData(projectId: string | undefined, issueId: string | und
     if (!projectId || !issueId || !logsResult) return;
     const currentData = (logsResult as any).data as ArgusLogEntry[];
     const lastLog = currentData[currentData.length - 1];
-    
+
     setIsFetchingMore(true);
     try {
       const moreLogs = await argusService.getLogs(projectId, {
@@ -170,7 +187,7 @@ export function useLogsData(projectId: string | undefined, issueId: string | und
   }, [projectId, issueId, logsResult, mutate]);
 
   return {
-    logs: (logsResult as any)?.data as ArgusLogEntry[] ?? [],
+    logs: ((logsResult as any)?.data as ArgusLogEntry[]) ?? [],
     logsHasMore: (logsResult as any)?.meta?.hasMore ?? false,
     logsLoading,
     logsError,

@@ -39,21 +39,50 @@ const IssueAssigneeMenu: React.FC<IssueAssigneeMenuProps> = ({
       anchorEl={anchor?.el}
       open={Boolean(anchor)}
       onClose={onClose}
-      slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 160, maxHeight: 300, boxShadow: '0 4px 20px rgba(0,0,0,0.12)' } } }}
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+            minWidth: 160,
+            maxHeight: 300,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+          },
+        },
+      }}
     >
       <MenuItem onClick={() => onAssign(anchor?.issue.id, '')}>
-        <ListItemIcon><PersonIcon sx={{ fontSize: 18 }} /></ListItemIcon>
-        <ListItemText primary={t('argus.issues.unassigned')} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+        <ListItemIcon>
+          <PersonIcon sx={{ fontSize: 18 }} />
+        </ListItemIcon>
+        <ListItemText
+          primary={t('argus.issues.unassigned')}
+          primaryTypographyProps={{ fontSize: '0.82rem' }}
+        />
       </MenuItem>
       <Divider />
-      {members.map(member => {
+      {members.map((member) => {
         const displayName = member.name || member.email || member.userId;
         return (
-          <MenuItem key={member.userId} onClick={() => onAssign(anchor?.issue?.id, displayName)}>
-            <Avatar sx={{ width: 20, height: 20, mr: 1, fontSize: '0.55rem', fontWeight: 700, backgroundColor: stringToColor(displayName) }}>
+          <MenuItem
+            key={member.userId}
+            onClick={() => onAssign(anchor?.issue?.id, displayName)}
+          >
+            <Avatar
+              sx={{
+                width: 20,
+                height: 20,
+                mr: 1,
+                fontSize: '0.55rem',
+                fontWeight: 700,
+                backgroundColor: stringToColor(displayName),
+              }}
+            >
               {getInitials(displayName)}
             </Avatar>
-            <ListItemText primary={displayName} primaryTypographyProps={{ fontSize: '0.82rem' }} />
+            <ListItemText
+              primary={displayName}
+              primaryTypographyProps={{ fontSize: '0.82rem' }}
+            />
           </MenuItem>
         );
       })}

@@ -26,7 +26,8 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Lock as LockIcon,FileCopy as DuplicateIcon,
+  Lock as LockIcon,
+  FileCopy as DuplicateIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -225,9 +226,7 @@ const KeyValuePage: React.FC = () => {
                 borderColor: 'divider',
               }}
             />
-            <Typography variant="body2" >
-              {item.varValue}
-            </Typography>
+            <Typography variant="body2">{item.varValue}</Typography>
           </Box>
         );
       case 'object':
@@ -246,11 +245,7 @@ const KeyValuePage: React.FC = () => {
           </Typography>
         );
       case 'string':
-        return (
-          <Typography variant="body2" >
-            "{item.varValue}"
-          </Typography>
-        );
+        return <Typography variant="body2">"{item.varValue}"</Typography>;
       default:
         return <Typography variant="body2">{item.varValue}</Typography>;
     }
@@ -333,7 +328,10 @@ const KeyValuePage: React.FC = () => {
                           >
                             {item.varKey.replace('kv:', '')}
                           </Typography>
-                          <CopyButton text={item.varKey.replace('kv:', '')} size={13} />
+                          <CopyButton
+                            text={item.varKey.replace('kv:', '')}
+                            size={13}
+                          />
                           {item.isSystemDefined && (
                             <Tooltip title={t('settings.kv.systemDefined')}>
                               <LockIcon fontSize="small" color="action" />

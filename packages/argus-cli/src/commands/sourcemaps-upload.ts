@@ -117,7 +117,9 @@ async function uploadSourcemaps(
   }
 
   console.log(
-    chalk.green(`\n✓ Uploaded ${files.length} files (${formatBytes(totalSize)})`)
+    chalk.green(
+      `\n✓ Uploaded ${files.length} files (${formatBytes(totalSize)})`
+    )
   );
   console.log(chalk.dim(`  Release: ${options.release}`));
   if (options.dist) console.log(chalk.dim(`  Dist: ${options.dist}`));

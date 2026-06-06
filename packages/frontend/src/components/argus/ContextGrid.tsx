@@ -7,11 +7,23 @@ interface ContextGridProps {
 }
 
 const ContextGrid: React.FC<ContextGridProps> = ({ items, isDark }) => (
-  <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px' }}>
+  <Box
+    sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px' }}
+  >
     {items.map((item, idx) => (
       <React.Fragment key={`${item.label}-${idx}`}>
-        <Typography variant="caption" sx={{ color: isDark ? '#666' : '#999', fontWeight: 500 }}>{item.label}</Typography>
-        <Typography variant="caption" sx={{ fontWeight: 500, fontSize: '0.78rem' }}>{item.value}</Typography>
+        <Typography
+          variant="caption"
+          sx={{ color: isDark ? '#666' : '#999', fontWeight: 500 }}
+        >
+          {item.label}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ fontWeight: 500, fontSize: '0.78rem' }}
+        >
+          {item.value}
+        </Typography>
       </React.Fragment>
     ))}
   </Box>

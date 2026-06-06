@@ -7,10 +7,7 @@ dotenv.config({ path: path.join(__dirname, '../../../../.env') });
 
 export const config = {
   // Server
-  port: parseInt(
-    process.env.ARGUS_API_PORT || '45300',
-    10
-  ),
+  port: parseInt(process.env.ARGUS_API_PORT || '45300', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   logLevel: process.env.LOG_LEVEL || 'info',
 
@@ -50,8 +47,7 @@ export const config = {
     accessKey: process.env.ARGUS_STORAGE_ACCESS_KEY || 'minioadmin',
     secretKey: process.env.ARGUS_STORAGE_SECRET_KEY || 'minioadmin',
     region: process.env.ARGUS_STORAGE_REGION || 'us-east-1',
-    forcePathStyle:
-      process.env.ARGUS_STORAGE_FORCE_PATH_STYLE !== 'false', // MinIO needs true
+    forcePathStyle: process.env.ARGUS_STORAGE_FORCE_PATH_STYLE !== 'false', // MinIO needs true
   },
 
   // Worker
@@ -68,19 +64,13 @@ export const config = {
       process.env.ARGUS_WORKER_SESSION_BATCH_SIZE || '500',
       10
     ),
-    concurrency: parseInt(
-      process.env.ARGUS_WORKER_CONCURRENCY || '5',
-      10
-    ),
+    concurrency: parseInt(process.env.ARGUS_WORKER_CONCURRENCY || '5', 10),
   },
 
   // Rate Limiting
   rateLimit: {
     max: parseInt(process.env.ARGUS_RATE_LIMIT_MAX || '1000', 10),
-    timeWindow: parseInt(
-      process.env.ARGUS_RATE_LIMIT_WINDOW || '60000',
-      10
-    ),
+    timeWindow: parseInt(process.env.ARGUS_RATE_LIMIT_WINDOW || '60000', 10),
   },
 
   // GeoIP
@@ -92,24 +82,18 @@ export const config = {
   // Retention
   retention: {
     errorDays: parseInt(process.env.ARGUS_RETENTION_ERROR_DAYS || '90', 10),
-    transactionDays: parseInt(
-      process.env.ARGUS_RETENTION_TXN_DAYS || '90',
-      10
-    ),
-    sessionDays: parseInt(
-      process.env.ARGUS_RETENTION_SESSION_DAYS || '90',
-      10
-    ),
-    metricDays: parseInt(
-      process.env.ARGUS_RETENTION_METRIC_DAYS || '90',
-      10
-    ),
+    transactionDays: parseInt(process.env.ARGUS_RETENTION_TXN_DAYS || '90', 10),
+    sessionDays: parseInt(process.env.ARGUS_RETENTION_SESSION_DAYS || '90', 10),
+    metricDays: parseInt(process.env.ARGUS_RETENTION_METRIC_DAYS || '90', 10),
   },
 
   // Symbolicator (source map / debug symbol resolution)
   symbolicator: {
     url: process.env.ARGUS_SYMBOLICATOR_URL || 'http://localhost:3021',
-    timeoutMs: parseInt(process.env.ARGUS_SYMBOLICATOR_TIMEOUT_MS || '30000', 10),
+    timeoutMs: parseInt(
+      process.env.ARGUS_SYMBOLICATOR_TIMEOUT_MS || '30000',
+      10
+    ),
     enabled: process.env.ARGUS_SYMBOLICATOR_ENABLED !== 'false',
   },
 };

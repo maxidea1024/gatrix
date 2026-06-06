@@ -1,4 +1,11 @@
-import { redis, mysqlPool, COUNTERS, BUFFERS, pipelineConfig, createLogger } from '@gatrix/argus';
+import {
+  redis,
+  mysqlPool,
+  COUNTERS,
+  BUFFERS,
+  pipelineConfig,
+  createLogger,
+} from '@gatrix/argus';
 
 const logger = createLogger('batch-flusher');
 
@@ -31,7 +38,8 @@ export class BatchFlusher {
   private alertHistoryTimer: ReturnType<typeof setInterval> | null = null;
 
   start(): void {
-    const { issueStatsIntervalMs, alertHistoryIntervalMs } = pipelineConfig.batchFlush;
+    const { issueStatsIntervalMs, alertHistoryIntervalMs } =
+      pipelineConfig.batchFlush;
 
     this.issueStatsTimer = setInterval(
       () => this.flushIssueStats(),
@@ -86,7 +94,11 @@ export class BatchFlusher {
       if (timesSeenKeys.length === 0 && lastSeenKeys.length === 0) return;
 
       // Parse and validate entries
-      const validTimesSeen: { issueId: number; increment: number; key: string }[] = [];
+      const validTimesSeen: {
+        issueId: number;
+        increment: number;
+        key: string;
+      }[] = [];
       for (const key of timesSeenKeys) {
         const issueId = parseInt(key.replace('issue:', ''), 10);
         const increment = parseInt(timesSeenEntries[key], 10);
@@ -95,12 +107,16 @@ export class BatchFlusher {
         }
       }
 
-      const validLastSeen: { issueId: number; dateStr: string; key: string }[] = [];
+      const validLastSeen: { issueId: number; dateStr: string; key: string }[] =
+        [];
       for (const key of lastSeenKeys) {
         const issueId = parseInt(key.replace('issue:', ''), 10);
         const timestampMs = parseInt(lastSeenEntries[key], 10);
         if (!isNaN(issueId) && timestampMs > 0) {
-          const dateStr = new Date(timestampMs).toISOString().slice(0, 19).replace('T', ' ');
+          const dateStr = new Date(timestampMs)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
           validLastSeen.push({ issueId, dateStr, key });
         }
       }
@@ -112,23 +128,27 @@ export class BatchFlusher {
       try {
         // Batch update times_seen using single CASE WHEN query
         if (validTimesSeen.length > 0) {
-          const caseWhen = validTimesSeen.map(() => 'WHEN id = ? THEN times_seen + ?').join(' ');
-          const ids = validTimesSeen.map(v => v.issueId);
+          const caseWhen = validTimesSeen
+            .map(() => 'WHEN id = ? THEN times_seen + ?')
+            .join(' ');
+          const ids = validTimesSeen.map((v) => v.issueId);
           const idPlaceholders = ids.map(() => '?').join(',');
           await connection.query(
             `UPDATE g_argus_issues SET times_seen = CASE ${caseWhen} ELSE times_seen END WHERE id IN (${idPlaceholders})`,
-            [...validTimesSeen.flatMap(v => [v.issueId, v.increment]), ...ids]
+            [...validTimesSeen.flatMap((v) => [v.issueId, v.increment]), ...ids]
           );
         }
 
         // Batch update last_seen using single CASE WHEN query
         if (validLastSeen.length > 0) {
-          const caseWhen = validLastSeen.map(() => 'WHEN id = ? THEN ?').join(' ');
-          const ids = validLastSeen.map(v => v.issueId);
+          const caseWhen = validLastSeen
+            .map(() => 'WHEN id = ? THEN ?')
+            .join(' ');
+          const ids = validLastSeen.map((v) => v.issueId);
           const idPlaceholders = ids.map(() => '?').join(',');
           await connection.query(
             `UPDATE g_argus_issues SET last_seen = CASE ${caseWhen} ELSE last_seen END WHERE id IN (${idPlaceholders})`,
-            [...validLastSeen.flatMap(v => [v.issueId, v.dateStr]), ...ids]
+            [...validLastSeen.flatMap((v) => [v.issueId, v.dateStr]), ...ids]
           );
         }
 
@@ -148,7 +168,11 @@ export class BatchFlusher {
         });
       } catch (mysqlError) {
         // MySQL failed — do NOT clear Redis. Values will be retried on next cycle.
-        try { await connection.rollback(); } catch { /* ignore rollback errors */ }
+        try {
+          await connection.rollback();
+        } catch {
+          /* ignore rollback errors */
+        }
         throw mysqlError;
       } finally {
         connection.release();
@@ -169,11 +193,11 @@ export class BatchFlusher {
   private async flushAlertHistory(): Promise<void> {
     try {
       // Atomic drain: read all + trim in one Lua call
-      const records = await redis.eval(
+      const records = (await redis.eval(
         ATOMIC_DRAIN_SCRIPT,
         1,
         BUFFERS.ALERT_HISTORY
-      ) as string[];
+      )) as string[];
 
       if (!records || records.length === 0) return;
 
@@ -214,10 +238,16 @@ export class BatchFlusher {
             pushPipeline.rpush(BUFFERS.ALERT_HISTORY, raw);
           }
           await pushPipeline.exec();
-          logger.error('Alert history MySQL insert failed, pushed back to Redis for retry', {
-            count: records.length,
-            error: mysqlError instanceof Error ? mysqlError.message : String(mysqlError),
-          });
+          logger.error(
+            'Alert history MySQL insert failed, pushed back to Redis for retry',
+            {
+              count: records.length,
+              error:
+                mysqlError instanceof Error
+                  ? mysqlError.message
+                  : String(mysqlError),
+            }
+          );
         }
       }
     } catch (error) {

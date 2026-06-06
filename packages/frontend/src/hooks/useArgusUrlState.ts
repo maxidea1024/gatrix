@@ -44,8 +44,11 @@ export type UrlState<T extends Record<string, ParamDef>> = {
  * ```
  */
 export function useArgusUrlState<T extends Record<string, ParamDef>>(
-  paramDefs: T,
-): [UrlState<T>, (updates: Partial<Record<keyof T, string | string[]>>) => void] {
+  paramDefs: T
+): [
+  UrlState<T>,
+  (updates: Partial<Record<keyof T, string | string[]>>) => void,
+] {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const defsRef = useRef(paramDefs);
@@ -59,7 +62,8 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
 
       if (urlValue !== null) {
         // URL has the value
-        result[name] = def.type === 'array' ? urlValue.split(',').filter(Boolean) : urlValue;
+        result[name] =
+          def.type === 'array' ? urlValue.split(',').filter(Boolean) : urlValue;
       } else {
         // Fallback: localStorage > default
         let fallback = def.default;
@@ -67,7 +71,8 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
           const stored = localStorage.getItem(def.storageKey);
           if (stored) fallback = stored;
         }
-        result[name] = def.type === 'array' ? fallback.split(',').filter(Boolean) : fallback;
+        result[name] =
+          def.type === 'array' ? fallback.split(',').filter(Boolean) : fallback;
       }
     }
     return result as UrlState<T>;
@@ -91,7 +96,9 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
             if (def.pushHistory) shouldPush = true;
 
             // Serialize value
-            const serialized = Array.isArray(value) ? value.join(',') : (value as string);
+            const serialized = Array.isArray(value)
+              ? value.join(',')
+              : (value as string);
 
             // If value equals default and there's no storageKey reason to keep it, remove from URL
             if (serialized === def.default || serialized === '') {
@@ -108,10 +115,10 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
 
           return next;
         },
-        { replace: !shouldPush, state: location.state },
+        { replace: !shouldPush, state: location.state }
       );
     },
-    [setSearchParams, location.state],
+    [setSearchParams, location.state]
   );
 
   return [state, setState];

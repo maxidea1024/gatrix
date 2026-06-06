@@ -1,5 +1,12 @@
 import Redis from 'ioredis';
-import { config, createLogger, ArgusMetricEvent, KNOWN_STREAMS, CONSUMER_GROUPS, pipelineConfig } from '@gatrix/argus';
+import {
+  config,
+  createLogger,
+  ArgusMetricEvent,
+  KNOWN_STREAMS,
+  CONSUMER_GROUPS,
+  pipelineConfig,
+} from '@gatrix/argus';
 import { optic } from '@gatrix/argus-optic';
 
 const logger = createLogger('metric-worker');
@@ -86,7 +93,13 @@ export class MetricWorker {
     for (const key of keys) {
       if (!this.knownStreams.has(key)) {
         try {
-          await this.redis.xgroup('CREATE', key, CONSUMER_GROUP, '0', 'MKSTREAM');
+          await this.redis.xgroup(
+            'CREATE',
+            key,
+            CONSUMER_GROUP,
+            '0',
+            'MKSTREAM'
+          );
           logger.info('Consumer group created', { stream: key });
         } catch (error: any) {
           if (!error.message?.includes('BUSYGROUP')) {
@@ -131,7 +144,9 @@ export class MetricWorker {
             continue;
           }
 
-          const rawEvent = JSON.parse(fields[dataIndex + 1]) as ArgusMetricEvent & {
+          const rawEvent = JSON.parse(
+            fields[dataIndex + 1]
+          ) as ArgusMetricEvent & {
             project_id: string;
           };
 
@@ -168,7 +183,9 @@ export class MetricWorker {
     }
   }
 
-  private normalize(event: ArgusMetricEvent & { project_id: string }): NormalizedMetric {
+  private normalize(
+    event: ArgusMetricEvent & { project_id: string }
+  ): NormalizedMetric {
     const value = event.value;
 
     // Dispatch value into the correct column based on metric_type

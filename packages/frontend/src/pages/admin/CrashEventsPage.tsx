@@ -96,7 +96,10 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import DateRangeSelector, { DateRangeValue, dateRangeToDatePair } from '../../components/common/DateRangeSelector';
+import DateRangeSelector, {
+  DateRangeValue,
+  dateRangeToDatePair,
+} from '../../components/common/DateRangeSelector';
 import { usePageState } from '../../hooks/usePageState';
 import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
@@ -208,9 +211,10 @@ const CrashEventsPage: React.FC = () => {
   const [total, setTotal] = useState(0);
 
   // Date range state
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    () => ({ type: 'preset', preset: '7d' })
-  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
+    type: 'preset',
+    preset: '7d',
+  }));
 
   // Search state - restore from pageState.filters
   const [searchTerm, setSearchTerm] = useState<string>(
@@ -1332,13 +1336,13 @@ const CrashEventsPage: React.FC = () => {
                                                 justifyContent: 'space-between',
                                               }}
                                             >
-                                              <Typography
-                                                variant="body2"
-                                                
-                                              >
+                                              <Typography variant="body2">
                                                 {event.id}
                                               </Typography>
-                                              <CopyButton text={event.id} size={13} />
+                                              <CopyButton
+                                                text={event.id}
+                                                size={13}
+                                              />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1356,7 +1360,9 @@ const CrashEventsPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Typography variant="body2">
-                                              {formatDateTimeDetailed(event.createdAt)}
+                                              {formatDateTimeDetailed(
+                                                event.createdAt
+                                              )}
                                             </Typography>
                                           </TableCell>
                                         </TableRow>
@@ -1388,7 +1394,10 @@ const CrashEventsPage: React.FC = () => {
                                                 color="primary"
                                                 variant="outlined"
                                               />
-                                              <CopyButton text={event.platform} size={13} />
+                                              <CopyButton
+                                                text={event.platform}
+                                                size={13}
+                                              />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1422,7 +1431,10 @@ const CrashEventsPage: React.FC = () => {
                                                 color="secondary"
                                                 variant="outlined"
                                               />
-                                              <CopyButton text={event.environmentId} size={13} />
+                                              <CopyButton
+                                                text={event.environmentId}
+                                                size={13}
+                                              />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1490,7 +1502,10 @@ const CrashEventsPage: React.FC = () => {
                                                 color="info"
                                                 variant="outlined"
                                               />
-                                              <CopyButton text={event.branch} size={13} />
+                                              <CopyButton
+                                                text={event.branch}
+                                                size={13}
+                                              />
                                             </Box>
                                           </TableCell>
                                         </TableRow>
@@ -1520,7 +1535,10 @@ const CrashEventsPage: React.FC = () => {
                                                 variant="outlined"
                                               />
                                               {event.appVersion && (
-                                                <CopyButton text={event.appVersion!} size={13} />
+                                                <CopyButton
+                                                  text={event.appVersion!}
+                                                  size={13}
+                                                />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -1551,7 +1569,10 @@ const CrashEventsPage: React.FC = () => {
                                                 variant="outlined"
                                               />
                                               {event.resVersion && (
-                                                <CopyButton text={event.resVersion!} size={13} />
+                                                <CopyButton
+                                                  text={event.resVersion!}
+                                                  size={13}
+                                                />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -1581,7 +1602,10 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.accountId}
                                                 </Typography>
-                                                <CopyButton text={String(event.accountId)} size={13} />
+                                                <CopyButton
+                                                  text={String(event.accountId)}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1611,7 +1635,12 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.characterId}
                                                 </Typography>
-                                                <CopyButton text={String(event.characterId)} size={13} />
+                                                <CopyButton
+                                                  text={String(
+                                                    event.characterId
+                                                  )}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1641,7 +1670,12 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.gameUserId}
                                                 </Typography>
-                                                <CopyButton text={String(event.gameUserId)} size={13} />
+                                                <CopyButton
+                                                  text={String(
+                                                    event.gameUserId
+                                                  )}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1671,7 +1705,10 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.userName}
                                                 </Typography>
-                                                <CopyButton text={event.userName!} size={13} />
+                                                <CopyButton
+                                                  text={event.userName!}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1701,9 +1738,12 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.gameServerId}
                                                 </Typography>
-                                                <CopyButton text={String(
-                                                        event.gameServerId
-                                                      )} size={13} />
+                                                <CopyButton
+                                                  text={String(
+                                                    event.gameServerId
+                                                  )}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1733,7 +1773,10 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.channel}
                                                 </Typography>
-                                                <CopyButton text={event.channel!} size={13} />
+                                                <CopyButton
+                                                  text={event.channel!}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1763,7 +1806,10 @@ const CrashEventsPage: React.FC = () => {
                                                 <Typography variant="body2">
                                                   {event.subchannel}
                                                 </Typography>
-                                                <CopyButton text={event.subchannel!} size={13} />
+                                                <CopyButton
+                                                  text={event.subchannel!}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1810,14 +1856,14 @@ const CrashEventsPage: React.FC = () => {
                                                 justifyContent: 'space-between',
                                               }}
                                             >
-                                              <Typography
-                                                variant="body2"
-                                                
-                                              >
+                                              <Typography variant="body2">
                                                 {event.crashEventIp || '-'}
                                               </Typography>
                                               {event.crashEventIp && (
-                                                <CopyButton text={event.crashEventIp!} size={13} />
+                                                <CopyButton
+                                                  text={event.crashEventIp!}
+                                                  size={13}
+                                                />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -1853,7 +1899,12 @@ const CrashEventsPage: React.FC = () => {
                                                   '-'}
                                               </Typography>
                                               {event.crashEventUserAgent && (
-                                                <CopyButton text={event.crashEventUserAgent!} size={13} />
+                                                <CopyButton
+                                                  text={
+                                                    event.crashEventUserAgent!
+                                                  }
+                                                  size={13}
+                                                />
                                               )}
                                             </Box>
                                           </TableCell>
@@ -1889,7 +1940,12 @@ const CrashEventsPage: React.FC = () => {
                                                 >
                                                   {(event as any).firstLine}
                                                 </Typography>
-                                                <CopyButton text={(event as any).firstLine!} size={13} />
+                                                <CopyButton
+                                                  text={
+                                                    (event as any).firstLine!
+                                                  }
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>
@@ -1928,7 +1984,10 @@ const CrashEventsPage: React.FC = () => {
                                                 >
                                                   {event.userMessage}
                                                 </Typography>
-                                                <CopyButton text={event.userMessage!} size={13} />
+                                                <CopyButton
+                                                  text={event.userMessage!}
+                                                  size={13}
+                                                />
                                               </Box>
                                             </TableCell>
                                           </TableRow>

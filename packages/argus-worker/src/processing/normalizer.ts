@@ -77,9 +77,15 @@ export function normalizeErrorEvent(
   const sdk = event.sdk || { name: '', version: '' };
 
   const osCtx = contexts.os as { name?: string; version?: string } | undefined;
-  const browserCtx = contexts.browser as { name?: string; version?: string } | undefined;
-  const deviceCtx = contexts.device as { name?: string; family?: string } | undefined;
-  const runtimeCtx = contexts.runtime as { name?: string; version?: string } | undefined;
+  const browserCtx = contexts.browser as
+    | { name?: string; version?: string }
+    | undefined;
+  const deviceCtx = contexts.device as
+    | { name?: string; family?: string }
+    | undefined;
+  const runtimeCtx = contexts.runtime as
+    | { name?: string; version?: string }
+    | undefined;
 
   const normalized = {
     event_id: event.event_id,
@@ -97,7 +103,9 @@ export function normalizeErrorEvent(
     fingerprint: event.fingerprint || [],
 
     exception: JSON.stringify(event.exception || {}),
-    stacktrace_frames: JSON.stringify(event.exception?.stacktrace?.frames || []),
+    stacktrace_frames: JSON.stringify(
+      event.exception?.stacktrace?.frames || []
+    ),
     breadcrumbs: JSON.stringify(event.breadcrumbs || []),
 
     user_id: user.id || '',

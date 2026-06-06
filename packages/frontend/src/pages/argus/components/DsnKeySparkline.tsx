@@ -13,7 +13,14 @@ import {
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusDsnKeyStatsPoint } from '@/services/argusService';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, ChartTooltip);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  ChartTooltip
+);
 
 interface DsnKeySparklineProps {
   projectId: number | string;
@@ -30,7 +37,10 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
 }) => {
   const { t } = useTranslation();
   const [data, setData] = useState<ArgusDsnKeyStatsPoint[] | null>(null);
-  const [totals, setTotals] = useState<{ errors: number; transactions: number } | null>(null);
+  const [totals, setTotals] = useState<{
+    errors: number;
+    transactions: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,8 +72,19 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
 
   if (!isActive) {
     return (
-      <Box sx={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+      <Box
+        sx={{
+          height: 48,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant="caption"
+          color="text.disabled"
+          sx={{ fontSize: '0.7rem' }}
+        >
           {t('argus.settings.dsnKeyInactiveNoStats')}
         </Typography>
       </Box>
@@ -71,13 +92,26 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
   }
 
   if (loading) {
-    return <Skeleton variant="rectangular" height={48} sx={{ borderRadius: 1 }} />;
+    return (
+      <Skeleton variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
+    );
   }
 
   if (!data || data.length === 0) {
     return (
-      <Box sx={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+      <Box
+        sx={{
+          height: 48,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant="caption"
+          color="text.disabled"
+          sx={{ fontSize: '0.7rem' }}
+        >
           {t('argus.settings.dsnKeyNoData')}
         </Typography>
       </Box>
@@ -163,13 +197,23 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
       </Box>
       {totals && (
         <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
-          <Typography variant="caption" sx={{ fontSize: '0.65rem', color: errColor, fontWeight: 600 }}>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '0.65rem', color: errColor, fontWeight: 600 }}
+          >
             Errors: {totals.errors.toLocaleString()}
           </Typography>
-          <Typography variant="caption" sx={{ fontSize: '0.65rem', color: txnColor, fontWeight: 600 }}>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '0.65rem', color: txnColor, fontWeight: 600 }}
+          >
             Txns: {totals.transactions.toLocaleString()}
           </Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={{ fontSize: '0.65rem' }}
+          >
             {t('argus.settings.dsnKeyStatsPeriod')}
           </Typography>
         </Box>

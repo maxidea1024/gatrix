@@ -1485,7 +1485,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                   }
                   style={{ width: 50, height: 40, cursor: 'pointer' }}
                 />
-                <Typography variant="body2" >
+                <Typography variant="body2">
                   {editEnv.color || '#2e7d32'}
                 </Typography>
               </Box>

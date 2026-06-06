@@ -5,7 +5,7 @@ import { DsnAuthResult } from '../middleware/dsn-auth';
 const logger = createLogger('dsn-store');
 
 interface StoredDsn {
-  projectId: string;         // gatrix project ID (ULID)
+  projectId: string; // gatrix project ID (ULID)
   internalProjectId: number; // MySQL project row ID
   dsnKeyId: number;
   label: string;

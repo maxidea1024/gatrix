@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  SxProps,
-  Theme,
-  keyframes,
-} from '@mui/material';
+import { Box, SxProps, Theme, keyframes } from '@mui/material';
 import { DeferredComponent } from './DeferredComponent';
 import LottieLoader from './LottieLoader';
 

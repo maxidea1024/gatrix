@@ -762,8 +762,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   '& .ql-font-serif': {
                     fontFamily: 'Georgia, Times New Roman, serif',
                   },
-                  '& .ql-font-monospace': {
-                    },
+                  '& .ql-font-monospace': {},
                   // Quill editor font sizes
                   '& .ql-size-small': {
                     fontSize: '0.75em',

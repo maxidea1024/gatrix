@@ -66,7 +66,12 @@ const ArgusSparkline: React.FC<SparklineProps> = ({
   const resolvedFill = fillColor || `${color}30`;
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block', flexShrink: 0 }}>
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ display: 'block', flexShrink: 0 }}
+    >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity={0.3} />
@@ -74,7 +79,14 @@ const ArgusSparkline: React.FC<SparklineProps> = ({
         </linearGradient>
       </defs>
       <path d={areaPath} fill={`url(#${gradientId})`} />
-      <path d={path} fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       {showDot && lastPoint && (
         <circle cx={lastPoint.x} cy={lastPoint.y} r={2} fill={color} />
       )}

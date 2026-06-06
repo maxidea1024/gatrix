@@ -47,9 +47,20 @@ export const PLATFORM_OPTIONS = [
   { id: 'electron', label: 'Electron', category: 'Desktop/Game' },
 ] as const;
 
-export const PLATFORM_CATEGORIES = [...new Set(PLATFORM_OPTIONS.map(p => p.category))];
+export const PLATFORM_CATEGORIES = [
+  ...new Set(PLATFORM_OPTIONS.map((p) => p.category)),
+];
 
-export type SectionId = 'general' | 'sampling' | 'dsn-keys' | 'sdk-setup' | 'source-maps' | 'integrations' | 'notifications' | 'issue-trackers' | 'ownership';
+export type SectionId =
+  | 'general'
+  | 'sampling'
+  | 'dsn-keys'
+  | 'sdk-setup'
+  | 'source-maps'
+  | 'integrations'
+  | 'notifications'
+  | 'issue-trackers'
+  | 'ownership';
 
 export interface NavItem {
   id: SectionId;
@@ -64,24 +75,63 @@ export interface NavGroup {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    labelKey: 'argus.settings.groupProject', items: [
-      { id: 'general', labelKey: 'argus.settings.general', icon: <SettingsIcon sx={{ fontSize: 18 }} /> },
-      { id: 'sampling', labelKey: 'argus.settings.samplingQuotas', icon: <TuneIcon sx={{ fontSize: 18 }} /> },
+    labelKey: 'argus.settings.groupProject',
+    items: [
+      {
+        id: 'general',
+        labelKey: 'argus.settings.general',
+        icon: <SettingsIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'sampling',
+        labelKey: 'argus.settings.samplingQuotas',
+        icon: <TuneIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
-    labelKey: 'argus.settings.groupSdk', items: [
-      { id: 'dsn-keys', labelKey: 'argus.settings.dsnKeys', icon: <KeyIcon sx={{ fontSize: 18 }} /> },
-      { id: 'sdk-setup', labelKey: 'argus.settings.sdkSetup', icon: <CodeIcon sx={{ fontSize: 18 }} /> },
-      { id: 'source-maps', labelKey: 'argus.settings.sourceMaps', icon: <UploadIcon sx={{ fontSize: 18 }} /> },
+    labelKey: 'argus.settings.groupSdk',
+    items: [
+      {
+        id: 'dsn-keys',
+        labelKey: 'argus.settings.dsnKeys',
+        icon: <KeyIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'sdk-setup',
+        labelKey: 'argus.settings.sdkSetup',
+        icon: <CodeIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'source-maps',
+        labelKey: 'argus.settings.sourceMaps',
+        icon: <UploadIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
-    labelKey: 'argus.settings.groupIntegrations', items: [
-      { id: 'integrations', labelKey: 'argus.settings.integrations', icon: <GitHubIcon sx={{ fontSize: 18 }} /> },
-      { id: 'notifications', labelKey: 'argus.settings.notifications', icon: <NotificationsIcon sx={{ fontSize: 18 }} /> },
-      { id: 'issue-trackers', labelKey: 'argus.settings.issueTrackers', icon: <BugIcon sx={{ fontSize: 18 }} /> },
-      { id: 'ownership', labelKey: 'argus.settings.ownership', icon: <SecurityIcon sx={{ fontSize: 18 }} /> },
+    labelKey: 'argus.settings.groupIntegrations',
+    items: [
+      {
+        id: 'integrations',
+        labelKey: 'argus.settings.integrations',
+        icon: <GitHubIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'notifications',
+        labelKey: 'argus.settings.notifications',
+        icon: <NotificationsIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'issue-trackers',
+        labelKey: 'argus.settings.issueTrackers',
+        icon: <BugIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'ownership',
+        labelKey: 'argus.settings.ownership',
+        icon: <SecurityIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
 ];

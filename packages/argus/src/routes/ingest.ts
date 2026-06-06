@@ -15,11 +15,12 @@ const errorQueue = new Queue({ redis, namespace: QUEUES.ERROR_PROCESSING });
 const txnQueue = new Queue({ redis, namespace: QUEUES.TRANSACTION_PROCESSING });
 
 // Event types that still use Redis Streams (no ordering requirement)
-const STREAM_EVENT_TYPES: Record<string, { stream: string; knownSet: string }> = {
-  session: { stream: STREAMS.SESSIONS, knownSet: KNOWN_STREAMS.SESSIONS },
-  feedback: { stream: STREAMS.FEEDBACK, knownSet: KNOWN_STREAMS.FEEDBACK },
-  metric: { stream: STREAMS.METRICS, knownSet: KNOWN_STREAMS.METRICS },
-};
+const STREAM_EVENT_TYPES: Record<string, { stream: string; knownSet: string }> =
+  {
+    session: { stream: STREAMS.SESSIONS, knownSet: KNOWN_STREAMS.SESSIONS },
+    feedback: { stream: STREAMS.FEEDBACK, knownSet: KNOWN_STREAMS.FEEDBACK },
+    metric: { stream: STREAMS.METRICS, knownSet: KNOWN_STREAMS.METRICS },
+  };
 
 export default async function ingestRoutes(app: FastifyInstance) {
   // Single event ingest
@@ -82,7 +83,12 @@ export default async function ingestRoutes(app: FastifyInstance) {
 
       try {
         // Separate events by routing path
-        const streamEvents: { type: string; data: string; streamKey: string; knownSet: string }[] = [];
+        const streamEvents: {
+          type: string;
+          data: string;
+          streamKey: string;
+          knownSet: string;
+        }[] = [];
         const groupmqErrors: { groupId: string; data: string }[] = [];
         const groupmqTxns: { groupId: string; data: string }[] = [];
 
@@ -106,7 +112,10 @@ export default async function ingestRoutes(app: FastifyInstance) {
           } else {
             const streamConfig = STREAM_EVENT_TYPES[event.type];
             if (streamConfig) {
-              const streamKey = STREAMS.streamKey(streamConfig.stream, auth.projectId);
+              const streamKey = STREAMS.streamKey(
+                streamConfig.stream,
+                auth.projectId
+              );
               streamEvents.push({
                 type: event.type,
                 data: serialized,
@@ -114,7 +123,9 @@ export default async function ingestRoutes(app: FastifyInstance) {
                 knownSet: streamConfig.knownSet,
               });
             } else {
-              logger.warn('Unknown event type in batch, skipping', { eventType: event.type });
+              logger.warn('Unknown event type in batch, skipping', {
+                eventType: event.type,
+              });
             }
           }
         }
@@ -136,9 +147,12 @@ export default async function ingestRoutes(app: FastifyInstance) {
           for (const se of streamEvents) {
             pipeline.xadd(
               se.streamKey,
-              'MAXLEN', '~', '500000',
+              'MAXLEN',
+              '~',
+              '500000',
               '*',
-              'data', se.data,
+              'data',
+              se.data
             );
             knownSetsToUpdate.add(`${se.knownSet}|${se.streamKey}`);
           }
@@ -185,7 +199,10 @@ export default async function ingestRoutes(app: FastifyInstance) {
  * - error/transaction → GroupMQ (per-project FIFO)
  * - session/feedback/metric → Redis Stream (no ordering needed)
  */
-async function enqueueEvent(projectId: string, event: ArgusEvent): Promise<void> {
+async function enqueueEvent(
+  projectId: string,
+  event: ArgusEvent
+): Promise<void> {
   const serialized = JSON.stringify({
     ...event,
     project_id: String(projectId),
@@ -208,12 +225,7 @@ async function enqueueEvent(projectId: string, event: ArgusEvent): Promise<void>
     // Register stream key + enqueue atomically via pipeline
     const pipeline = redis.pipeline();
     pipeline.sadd(streamConfig.knownSet, streamKey);
-    pipeline.xadd(
-      streamKey,
-      'MAXLEN', '~', '500000',
-      '*',
-      'data', serialized,
-    );
+    pipeline.xadd(streamKey, 'MAXLEN', '~', '500000', '*', 'data', serialized);
     await pipeline.exec();
   }
 

@@ -2736,7 +2736,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                                         sx={{
                                           fontSize: '0.65rem',
                                           color: 'text.secondary',
-                                          }}
+                                        }}
                                       >
                                         {k}:{' '}
                                         {typeof v === 'number'
@@ -3413,10 +3413,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     >
                       {service.hostname}
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ opacity: 0.7 }}
-                    >
+                    <Typography variant="caption" sx={{ opacity: 0.7 }}>
                       {service.externalAddress}
                     </Typography>
                   </Box>
@@ -3983,7 +3980,7 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                           sx={{
                             fontSize: '0.8rem',
                             height: 24,
-                            }}
+                          }}
                         />
                       ))}
                     </Box>
@@ -4655,7 +4652,10 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         >
                           {item.internalIp || '-'}
                         </Typography>
-                        <CopyButton text={item.internalIp as string} size={13} />
+                        <CopyButton
+                          text={item.internalIp as string}
+                          size={13}
+                        />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -4675,7 +4675,10 @@ const ServerListPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                         >
                           {item.healthPort || '-'}
                         </Typography>
-                        <CopyButton text={String(item.healthPort) as string} size={13} />
+                        <CopyButton
+                          text={String(item.healthPort) as string}
+                          size={13}
+                        />
                       </Box>
                     </TableCell>
                     <TableCell>
