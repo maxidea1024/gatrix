@@ -1,7 +1,9 @@
 import { mysqlPool } from '../config/mysql';
+import { redis } from '../config/redis';
 import { createLogger } from './logger';
 import { IssueGroupResult } from '../processing/issue-grouper';
 import { alertRuleStore } from './alert-rule-store';
+import { BUFFERS } from '../config/redis-keys';
 import {
   getEventCountInWindow as redisEventCount,
   getUniqueUserCount as redisUserCount,
@@ -59,22 +61,20 @@ export async function evaluateFeedbackAlerts(
 
         const actions = parseJSON(rule.actions);
         const actionResults = await fireActions(actions, rule, feedback);
-        const worstStatus = actionResults.length > 0 && actionResults.some((r: any) => r.status === 'failed') ? 'failed' : 'success';
-        const responseBodies = actionResults.map((r: any) => r.response_body).filter(Boolean).join('\\n');
 
         const triggerReason = `New feedback from ${feedback.name || feedback.email || 'anonymous'}: "${truncate(feedback.message, 100)}"`;
 
-        // Record alert history
-        await mysqlPool.query(
-          `INSERT INTO g_argus_alert_history (project_id, rule_id, message, triggered_at, status, response_body)
-           VALUES (?, ?, ?, UTC_TIMESTAMP(), ?, ?)`,
-          [
-            rule.project_id,
-            rule.id,
-            triggerReason,
-            worstStatus,
-            truncate(responseBodies, 5000) || null,
-          ]
+        // Buffer alert history record to Redis (BatchFlusher will bulk-insert to MySQL)
+        await redis.rpush(
+          BUFFERS.ALERT_HISTORY,
+          JSON.stringify({
+            rule_id: rule.id,
+            project_id: rule.project_id,
+            issue_id: null,
+            event_id: null,
+            trigger_reason: triggerReason,
+            notified_channels: JSON.stringify(actionResults.map((r: any) => r.channel || 'unknown')),
+          })
         );
 
         // Update last_triggered_at
@@ -226,14 +226,18 @@ export async function evaluateErrorAlerts(
         // Fire actions
         const actions = parseJSON(rule.actions);
         const actionResults = await fireActionsForError(actions, rule, event, triggerReason);
-        const worstStatus = actionResults.length > 0 && actionResults.some((r: any) => r.status === 'failed') ? 'failed' : 'success';
-        const responseBodies = actionResults.map((r: any) => r.response_body).filter(Boolean).join('\\n');
 
-        // Record alert history
-        await mysqlPool.query(
-          `INSERT INTO g_argus_alert_history (project_id, rule_id, issue_id, message, triggered_at, status, response_body)
-           VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), ?, ?)`,
-          [rule.project_id, rule.id, event.issue_id, truncate(triggerReason, 500), worstStatus, truncate(responseBodies, 5000) || null]
+        // Buffer alert history record to Redis (BatchFlusher will bulk-insert to MySQL)
+        await redis.rpush(
+          BUFFERS.ALERT_HISTORY,
+          JSON.stringify({
+            rule_id: rule.id,
+            project_id: rule.project_id,
+            issue_id: event.issue_id,
+            event_id: event.event_id,
+            trigger_reason: truncate(triggerReason, 500),
+            notified_channels: JSON.stringify(actionResults.map((r: any) => r.channel || 'unknown')),
+          })
         );
 
         // Update last_triggered_at
