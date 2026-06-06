@@ -162,30 +162,30 @@ export default async function integrationsRoutes(app: FastifyInstance) {
       }
 
       try {
-        let inserted = 0;
+        // Build bulk values array (single query instead of N queries)
+        const values: any[][] = [];
         for (const c of commits) {
-          try {
-            await mysqlPool.execute(
-              `INSERT INTO g_argus_commits
-               (project_id, commit_hash, author_name, author_email, message, timestamp, release_version, files_changed, additions, deletions)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-               ON DUPLICATE KEY UPDATE
-               message = VALUES(message), release_version = COALESCE(VALUES(release_version), release_version)`,
-              [
-                projectId, c.commit_hash,
-                c.author_name || null, c.author_email || null,
-                c.message || null, c.timestamp || null,
-                c.release_version || null,
-                c.files_changed ? JSON.stringify(c.files_changed) : null,
-                c.additions || 0, c.deletions || 0,
-              ]
-            );
-            inserted++;
-          } catch (err) {
-            // Skip individual failures (e.g. duplicates)
-          }
+          values.push([
+            projectId, c.commit_hash,
+            c.author_name || null, c.author_email || null,
+            c.message || null, c.timestamp || null,
+            c.release_version || null,
+            c.files_changed ? JSON.stringify(c.files_changed) : null,
+            c.additions || 0, c.deletions || 0,
+          ]);
         }
-        return reply.send({ data: { inserted } });
+
+        const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        await mysqlPool.query(
+          `INSERT INTO g_argus_commits
+           (project_id, commit_hash, author_name, author_email, message, timestamp, release_version, files_changed, additions, deletions)
+           VALUES ${placeholders}
+           ON DUPLICATE KEY UPDATE
+           message = VALUES(message), release_version = COALESCE(VALUES(release_version), release_version)`,
+          values.flat()
+        );
+
+        return reply.send({ data: { inserted: commits.length } });
       } catch (error) {
         logger.error('Failed to ingest commits', { projectId, error: error instanceof Error ? error.message : String(error) });
         return reply.code(500).send({ error: 'Failed to ingest commits' });

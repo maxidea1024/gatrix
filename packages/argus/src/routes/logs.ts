@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
@@ -13,7 +13,7 @@ const LOGS_ALLOWED_COLUMNS = new Set([
   'logger_name', 'message', 'body', 'service', 'environment', 'release'
 ]);
 
-// User-friendly aliases â†’ actual DB column names.
+// User-friendly aliases ??actual DB column names.
 // The UI displays "severity" but the DB column is "level".
 const LOGS_COLUMN_ALIASES: Record<string, string> = {
   severity: 'level',
@@ -22,7 +22,7 @@ const LOGS_COLUMN_ALIASES: Record<string, string> = {
 
 export default async function logsRoutes(app: FastifyInstance) {
 
-  // â”€â”€â”€ Browse Logs (independent explorer â€” no trace_id required) â”€â”€â”€
+  // ?€?€?€ Browse Logs (independent explorer ??no trace_id required) ?€?€?€
   app.get(
     '/:projectId/logs/browse',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -84,12 +84,11 @@ export default async function logsRoutes(app: FastifyInstance) {
         `;
         params.limit = String(Math.min(parseInt(limit, 10), 1000));
 
-        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
-        const rows = await result.json();
+        const result = await optic.rawQuery({ query: sql, params });
 
         return reply.send({
-          data: rows,
-          meta: { count: (rows as any[]).length, hasMore: (rows as any[]).length >= parseInt(limit, 10) },
+          data: result.data,
+          meta: { count: (result.data as any[]).length, hasMore: (result.data as any[]).length >= parseInt(limit, 10) },
         });
       } catch (error) {
         logger.error('Failed to browse logs', { projectId, error: String(error) });
@@ -98,7 +97,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Log Volume (histogram for chart) â”€â”€â”€
+  // ?€?€?€ Log Volume (histogram for chart) ?€?€?€
   app.get(
     '/:projectId/logs/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -138,9 +137,8 @@ export default async function logsRoutes(app: FastifyInstance) {
           ORDER BY bucket ASC
         `;
 
-        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
-        const rows = await result.json();
-        return reply.send({ data: rows });
+        const result = await optic.rawQuery({ query: sql, params });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get log volume', { projectId, error: String(error) });
         return reply.code(500).send({ error: 'Failed to get log volume' });
@@ -148,7 +146,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Log Facets (distinct values for filters) â”€â”€â”€
+  // ?€?€?€ Log Facets (distinct values for filters) ?€?€?€
   app.get(
     '/:projectId/logs/facets',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -178,33 +176,29 @@ export default async function logsRoutes(app: FastifyInstance) {
 
       try {
         const [levelsRes, servicesRes, envsRes, loggersRes] = await Promise.all([
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT level, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} GROUP BY level ORDER BY count DESC`,
-            query_params: qp,
+            params: qp,
           }),
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT service, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND service != '' GROUP BY service ORDER BY count DESC LIMIT 20`,
-            query_params: qp,
+            params: qp,
           }),
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT environment, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND environment != '' GROUP BY environment ORDER BY count DESC LIMIT 10`,
-            query_params: qp,
+            params: qp,
           }),
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT logger_name, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND logger_name != '' GROUP BY logger_name ORDER BY count DESC LIMIT 20`,
-            query_params: qp,
+            params: qp,
           }),
-        ]);
-
-        const [levels, services, envs, loggers] = await Promise.all([
-          levelsRes.json(), servicesRes.json(), envsRes.json(), loggersRes.json(),
         ]);
 
         const facetData = {
-          levels: (levels as any).data || [],
-          services: (services as any).data || [],
-          environments: (envs as any).data || [],
-          loggers: (loggers as any).data || [],
+          levels: levelsRes.data || [],
+          services: servicesRes.data || [],
+          environments: envsRes.data || [],
+          loggers: loggersRes.data || [],
         };
 
         // Cache for 5 minutes (non-blocking)
@@ -220,7 +214,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Log Aggregation (group by attribute) â”€â”€â”€
+  // ?€?€?€ Log Aggregation (group by attribute) ?€?€?€
   app.get(
     '/:projectId/logs/aggregate',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -271,8 +265,8 @@ export default async function logsRoutes(app: FastifyInstance) {
           ORDER BY count DESC
           LIMIT 20
         `;
-        const topResult = await clickhouse.query({ query: topSql, query_params: params, format: 'JSONEachRow' });
-        const topValues = await topResult.json() as any[];
+        const topResult = await optic.rawQuery({ query: topSql, params });
+        const topValues = topResult.data as any[];
 
         // 2) Time series per group value (top 5)
         const top5 = topValues.slice(0, 5).map((r: any) => r.group_value);
@@ -289,8 +283,8 @@ export default async function logsRoutes(app: FastifyInstance) {
             GROUP BY bucket, group_value
             ORDER BY bucket ASC
           `;
-          const tsResult = await clickhouse.query({ query: tsSql, query_params: params, format: 'JSONEachRow' });
-          timeSeries = await tsResult.json() as any[];
+          const tsResult = await optic.rawQuery({ query: tsSql, params });
+          timeSeries = tsResult.data as any[];
         }
 
         return reply.send({
@@ -307,7 +301,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Get logs by trace_id (existing â€” kept for issue detail) â”€â”€â”€
+  // ?€?€?€ Get logs by trace_id (existing ??kept for issue detail) ?€?€?€
   app.get(
     '/:projectId/logs',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -349,8 +343,8 @@ export default async function logsRoutes(app: FastifyInstance) {
         `;
         params.limit = String(parsedLimit);
 
-        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
-        const rows = await result.json() as any[];
+        const result = await optic.rawQuery({ query: sql, params });
+        const rows = result.data as any[];
         return reply.send({ data: rows, meta: { count: rows.length, hasMore: rows.length >= parsedLimit } });
       } catch (error) {
         logger.error('Failed to query logs', { projectId, error: String(error) });
@@ -359,7 +353,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Ingest logs (from SDK) â”€â”€â”€
+  // ?€?€?€ Ingest logs (from SDK) ?€?€?€
   app.post(
     '/:projectId/logs',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -411,7 +405,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Log Patterns (cluster similar log messages) â”€â”€â”€
+  // ?€?€?€ Log Patterns (cluster similar log messages) ?€?€?€
   app.get(
     '/:projectId/logs/patterns',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -478,9 +472,8 @@ export default async function logsRoutes(app: FastifyInstance) {
         `;
         params.patternLimit = String(Math.min(parseInt(limit, 10), 200));
 
-        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
-        const rows = await result.json();
-        return reply.send({ data: rows });
+        const result = await optic.rawQuery({ query: sql, params });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get log patterns', { projectId, error: String(error) });
         return reply.code(500).send({ error: 'Failed to get log patterns' });
@@ -488,7 +481,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Custom Attribute Facet (distinct values for a given attribute key) â”€â”€â”€
+  // ?€?€?€ Custom Attribute Facet (distinct values for a given attribute key) ?€?€?€
   app.get(
     '/:projectId/logs/attribute-facet',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -524,16 +517,15 @@ export default async function logsRoutes(app: FastifyInstance) {
           LIMIT 30
         `;
 
-        const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
-        const rows = await result.json();
-        return reply.send({ data: rows });
+        const result = await optic.rawQuery({ query: sql, params });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get attribute facet', { projectId, key, error: String(error) });
         return reply.code(500).send({ error: 'Failed to get attribute facet' });
       }
     }
   );
-  // â”€â”€â”€ Live Tail (SSE â€” stream new logs in real-time) â”€â”€â”€
+  // ?€?€?€ Live Tail (SSE ??stream new logs in real-time) ?€?€?€
   app.get(
     '/:projectId/logs/live-tail',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -590,8 +582,8 @@ export default async function logsRoutes(app: FastifyInstance) {
             LIMIT 50
           `;
 
-          const result = await clickhouse.query({ query: sql, query_params: params, format: 'JSONEachRow' });
-          const rows = await result.json() as any[];
+          const result = await optic.rawQuery({ query: sql, params });
+          const rows = result.data as any[];
 
           if (rows.length > 0) {
             lastTimestamp = rows[rows.length - 1].timestamp;

@@ -1,79 +1,115 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('sessions-api');
 
+/** Shared session query defaults */
+const SESSION_DEFAULTS = {
+  dataset: 'sessions' as const,
+  timestampField: 'started',
+};
+
 export default async function sessionsRoutes(app: FastifyInstance) {
-  // Session health overview
+  // ?€?€ Session health overview ?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€?€
   app.get(
     '/sessions/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h' } = request.query as { period?: string };
-      
-      const bucket = getBucketingConfig(period, undefined, undefined, 'started');
-      const qp = { projectId: String(projectId), ...bucket.queryParams };
-      const timeCond = `started >= toDateTime({fillStart:UInt32}) AND started <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const [
-          summaryResult,
-          trendResult,
-          releaseResult,
-          durationDistResult,
-          statusTimelineResult,
-          crashByBrowserResult,
-          crashByOsResult,
-          prevPeriodResult,
-        ] = await Promise.all([
-          // Summary stats
-          clickhouse.query({
-            query: `SELECT
-              count() AS total_sessions,
-              countIf(status = 'crashed') AS crashed,
-              countIf(status = 'errored') AS errored,
-              countIf(status IN ('ok', 'exited')) AS healthy,
-              countIf(status = 'abnormal') AS abnormal,
-              if(total_sessions > 0, (1 - crashed / total_sessions) * 100, 100) AS crash_free_rate,
-              uniq(distinct_id) AS unique_users,
-              avg(duration) AS avg_duration
-            FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond}`,
-            query_params: qp,
+        // Compute previous period range
+        const ms: Record<string, number> = {
+          '1h': 3_600_000, '6h': 21_600_000, '24h': 86_400_000,
+          '7d': 604_800_000, '30d': 2_592_000_000,
+        };
+        const periodMs = ms[period] || 86_400_000;
+        const now = Date.now();
+        const prevRange = {
+          start: new Date(now - 2 * periodMs).toISOString(),
+          end: new Date(now - periodMs).toISOString(),
+        };
+
+        const [batch, prevPeriod] = await Promise.all([
+          optic.queryBatch({
+            summary: {
+              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              select: [
+                { field: 'count()', alias: 'total_sessions' },
+                { field: "countIf(status = 'crashed')", alias: 'crashed' },
+                { field: "countIf(status = 'errored')", alias: 'errored' },
+                { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy' },
+                { field: "countIf(status = 'abnormal')", alias: 'abnormal' },
+                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+                { field: 'uniq(distinct_id)', alias: 'unique_users' },
+                { field: 'avg(duration)', alias: 'avg_duration' },
+              ],
+            },
+
+            trend: {
+              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              select: [
+                { field: '$bucket', alias: 'hour' },
+                { field: 'count()', alias: 'total' },
+                { field: "countIf(status = 'crashed')", alias: 'crashed' },
+                { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy' },
+                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+              ],
+              groupBy: ['$bucket'],
+              orderBy: [{ field: 'hour', direction: 'ASC' }],
+              withFill: true,
+            },
+
+            byRelease: {
+              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              select: [
+                { field: 'release' },
+                { field: 'count()', alias: 'total' },
+                { field: "countIf(status = 'crashed')", alias: 'crashed' },
+                { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+                { field: 'uniq(distinct_id)', alias: 'users' },
+              ],
+              conditions: [{ field: 'release', op: '!=', value: '' }],
+              groupBy: ['release'],
+              orderBy: [{ field: 'total', direction: 'DESC' }],
+              limit: 10,
+            },
+
+            statusTimeline: {
+              ...SESSION_DEFAULTS, projectId, timeRange: { period },
+              select: [
+                { field: '$bucket', alias: 'hour' },
+                { field: "countIf(status IN ('ok', 'exited'))", alias: 'healthy' },
+                { field: "countIf(status = 'errored')", alias: 'errored' },
+                { field: "countIf(status = 'crashed')", alias: 'crashed' },
+                { field: "countIf(status = 'abnormal')", alias: 'abnormal' },
+              ],
+              groupBy: ['$bucket'],
+              orderBy: [{ field: 'hour', direction: 'ASC' }],
+              withFill: true,
+            },
           }),
 
-          // Hourly trend
-          clickhouse.query({
-            query: `SELECT
-              ${bucket.selectExpr} AS hour,
-              count() AS total,
-              countIf(status = 'crashed') AS crashed,
-              countIf(status IN ('ok', 'exited')) AS healthy,
-              if(total > 0, (1 - crashed / total) * 100, 100) AS crash_free_rate
-            FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond}
-            GROUP BY hour ORDER BY hour ${bucket.fillExpr}`,
-            query_params: qp,
+          // Previous period for comparison
+          optic.query({
+            ...SESSION_DEFAULTS, projectId, timeRange: prevRange,
+            select: [
+              { field: 'count()', alias: 'total_sessions' },
+              { field: "countIf(status = 'crashed')", alias: 'crashed' },
+              { field: "if(count() > 0, (1 - countIf(status = 'crashed') / count()) * 100, 100)", alias: 'crash_free_rate' },
+              { field: 'uniq(distinct_id)', alias: 'unique_users' },
+            ],
           }),
+        ]);
 
-          // By release
-          clickhouse.query({
-            query: `SELECT
-              release,
-              count() AS total,
-              countIf(status = 'crashed') AS crashed,
-              if(total > 0, (1 - crashed / total) * 100, 100) AS crash_free_rate,
-              uniq(distinct_id) AS users
-            FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond} AND release != ''
-            GROUP BY release ORDER BY total DESC LIMIT 10`,
-            query_params: qp,
-          }),
+        // Duration distribution & browser/OS breakdown require complex multiIf ??        // these are best expressed as rawQuery since multiIf isn't part of the DSL
+        const bucket = getBucketingConfig(period, undefined, undefined, 'started');
+        const rawParams = { projectId, fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd };
 
-          // NEW: Duration distribution
-          clickhouse.query({
+        const [durationDist, crashByBrowser, crashByOs] = await Promise.all([
+          optic.rawQuery({
             query: `SELECT
               multiIf(
                 duration < 5000, '<5s',
@@ -86,27 +122,14 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               ) AS bucket,
               count() AS count
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond}
+            WHERE project_id = {projectId:String}
+              AND started >= toDateTime({fillStart:UInt32})
+              AND started <= toDateTime({fillEnd:UInt32})
             GROUP BY bucket ORDER BY min(duration)`,
-            query_params: qp,
+            params: rawParams,
           }),
 
-          // NEW: Status timeline (stacked area data)
-          clickhouse.query({
-            query: `SELECT
-              ${bucket.selectExpr} AS hour,
-              countIf(status IN ('ok', 'exited')) AS healthy,
-              countIf(status = 'errored') AS errored,
-              countIf(status = 'crashed') AS crashed,
-              countIf(status = 'abnormal') AS abnormal
-            FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond}
-            GROUP BY hour ORDER BY hour ${bucket.fillExpr}`,
-            query_params: qp,
-          }),
-
-          // NEW: Crashes by browser (extract from user_agent)
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT
               multiIf(
                 user_agent ILIKE '%Chrome%' AND user_agent NOT ILIKE '%Edg%', 'Chrome',
@@ -121,13 +144,14 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               countIf(status = 'crashed') AS crashed,
               if(total > 0, crashed / total * 100, 0) AS crash_rate
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond}
+            WHERE project_id = {projectId:String}
+              AND started >= toDateTime({fillStart:UInt32})
+              AND started <= toDateTime({fillEnd:UInt32})
             GROUP BY browser ORDER BY total DESC LIMIT 8`,
-            query_params: qp,
+            params: rawParams,
           }),
 
-          // NEW: Crashes by OS (extract from user_agent)
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT
               multiIf(
                 user_agent ILIKE '%Windows%', 'Windows',
@@ -142,48 +166,24 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               countIf(status = 'crashed') AS crashed,
               if(total > 0, crashed / total * 100, 0) AS crash_rate
             FROM argus.sessions
-            WHERE project_id = {projectId:String} AND ${timeCond}
-            GROUP BY os ORDER BY total DESC LIMIT 8`,
-            query_params: qp,
-          }),
-
-          // NEW: Previous period comparison
-          clickhouse.query({
-            query: `SELECT
-              count() AS total_sessions,
-              countIf(status = 'crashed') AS crashed,
-              if(total_sessions > 0, (1 - crashed / total_sessions) * 100, 100) AS crash_free_rate,
-              uniq(distinct_id) AS unique_users
-            FROM argus.sessions
             WHERE project_id = {projectId:String}
-              AND started >= toDateTime({fillStart:UInt32}) - (toDateTime({fillEnd:UInt32}) - toDateTime({fillStart:UInt32}))
-              AND started < toDateTime({fillStart:UInt32})`,
-            query_params: qp,
+              AND started >= toDateTime({fillStart:UInt32})
+              AND started <= toDateTime({fillEnd:UInt32})
+            GROUP BY os ORDER BY total DESC LIMIT 8`,
+            params: rawParams,
           }),
         ]);
 
-        const [summary, trend, byRelease, durationDist, statusTimeline, crashByBrowser, crashByOs, prevPeriod] =
-          await Promise.all([
-            summaryResult.json(),
-            trendResult.json(),
-            releaseResult.json(),
-            durationDistResult.json(),
-            statusTimelineResult.json(),
-            crashByBrowserResult.json(),
-            crashByOsResult.json(),
-            prevPeriodResult.json(),
-          ]);
-
         return reply.send({
           data: {
-            summary: (summary.data as any[])?.[0] || {},
-            trend: trend.data || [],
-            by_release: byRelease.data || [],
-            duration_distribution: durationDist.data || [],
-            status_timeline: statusTimeline.data || [],
-            crash_by_browser: crashByBrowser.data || [],
-            crash_by_os: crashByOs.data || [],
-            previous_period: (prevPeriod.data as any[])?.[0] || { total_sessions: 0, crashed: 0, crash_free_rate: 100, unique_users: 0 },
+            summary: batch.summary.data[0] || {},
+            trend: batch.trend.data,
+            by_release: batch.byRelease.data,
+            duration_distribution: durationDist.data,
+            status_timeline: batch.statusTimeline.data,
+            crash_by_browser: crashByBrowser.data,
+            crash_by_os: crashByOs.data,
+            previous_period: prevPeriod.data[0] || { total_sessions: 0, crashed: 0, crash_free_rate: 100, unique_users: 0 },
           },
         });
       } catch (error) {

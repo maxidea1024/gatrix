@@ -1607,6 +1607,42 @@ class ArgusService {
     await argusApi.delete(`${ARGUS_BASE}/projects/${projectId}/crons/${monitorId}`);
   }
 
+  async getCronCheckins(
+    projectId: number | string,
+    monitorId: string,
+    params?: { limit?: number; offset?: number }
+  ): Promise<{ data: any[]; total: number }> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/crons/${monitorId}/checkins`,
+      { params }
+    );
+    return { data: response.data?.data || [], total: response.data?.total || 0 };
+  }
+
+  async sendCronTestCheckin(
+    projectId: number | string,
+    monitorId: string,
+    status: 'ok' | 'error' = 'ok'
+  ): Promise<{ checkin_id: string; status: string }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/crons/${monitorId}/test-checkin`,
+      { status }
+    );
+    return response.data?.data || response.data;
+  }
+
+  async getUptimeCheckins(
+    projectId: number | string,
+    monitorId: string,
+    params?: { limit?: number; offset?: number }
+  ): Promise<{ data: any[]; total: number }> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/uptime/${monitorId}/checkins`,
+      { params }
+    );
+    return { data: response.data?.data || [], total: response.data?.total || 0 };
+  }
+
   // --- Uptime ---
 
   async getUptimes(projectId: number | string): Promise<any[]> {

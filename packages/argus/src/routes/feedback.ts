@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { mysqlPool } from '../config/mysql';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
@@ -90,14 +90,12 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         const whereBase = `${baseConditionNoStatus} ${statusClause}`;
 
         const [countResult, itemsResult, trendResult, summaryResult] = await Promise.all([
-          // Total count
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT count() AS total FROM argus.user_feedback WHERE ${whereBase}`,
-            query_params: qp,
+            params: qp,
           }),
 
-          // Paginated items
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT
               feedback_id, event_id, email, name, message, contact_email,
               timestamp AS submitted_at, url,
@@ -109,22 +107,20 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             WHERE ${whereBase}
             ORDER BY ${orderBy}
             LIMIT {limit:UInt32} OFFSET {offset:UInt32}`,
-            query_params: qp,
+            params: qp,
           }),
 
-          // Trend (daily count)
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT
               ${bucket.selectExpr} AS day,
               count() AS count
             FROM argus.user_feedback
             WHERE ${whereBase}
             GROUP BY day ORDER BY day ${bucket.fillExpr}`,
-            query_params: qp,
+            params: qp,
           }),
 
-          // Summary stats
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT
               count() AS total_feedback,
               uniq(email) AS unique_users,
@@ -143,16 +139,14 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               countIf(category = 'question') AS category_question
             FROM argus.user_feedback
             WHERE ${baseConditionNoStatus}`,
-            query_params: qp,
+            params: qp,
           }),
         ]);
 
-        const [countData, itemsData, trendData, summaryData] = await Promise.all([
-          countResult.json(),
-          itemsResult.json(),
-          trendResult.json(),
-          summaryResult.json(),
-        ]);
+        const countData = countResult;
+        const itemsData = itemsResult;
+        const trendData = trendResult;
+        const summaryData = summaryResult;
 
         // Enrich items with issue info via event_id + manual links
         const items = (itemsData.data || []) as any[];
@@ -181,14 +175,13 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         // Auto-detected links via event_id
         if (eventIds.length > 0) {
           try {
-            const issueResultCH = await clickhouse.query({
+            const issueResultCH = await optic.rawQuery({
               query: `SELECT event_id, issue_id FROM argus.errors
                 WHERE project_id = {projectId:String} AND event_id IN ({eventIds:Array(String)})`,
-              query_params: { projectId: String(projectId), eventIds },
+              params: { projectId: String(projectId), eventIds },
             });
-            const issueDataCH = await issueResultCH.json();
             const eventToIssueId: Record<string, number> = {};
-            for (const row of (issueDataCH.data || []) as any[]) {
+            for (const row of (issueResultCH.data || []) as any[]) {
               eventToIssueId[row.event_id] = Number(row.issue_id);
             }
 
@@ -297,16 +290,15 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         }
 
         // 2) Fetch feedback details from ClickHouse
-        const result = await clickhouse.query({
+        const result = await optic.rawQuery({
           query: `SELECT * FROM argus.user_feedback
             WHERE project_id = {projectId:String}
               AND feedback_id IN ({feedbackIds:Array(String)})
             ORDER BY timestamp DESC`,
-          query_params: { projectId: String(projectId), feedbackIds },
+          params: { projectId: String(projectId), feedbackIds },
         });
-        const data = await result.json();
 
-        return reply.send({ data: data.data || [] });
+        return reply.send({ data: result.data || [] });
       } catch (error) {
         logger.error('Failed to get feedbacks by issue', {
           projectId, issueId,
@@ -351,10 +343,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           return reply.code(400).send({ error: 'No fields to update' });
         }
 
-        await clickhouse.command({
+        await optic.command({
           query: `ALTER TABLE argus.user_feedback UPDATE ${setClauses.join(', ')}
             WHERE project_id = {projectId:String} AND feedback_id = {feedbackId:String}`,
-          query_params: params,
+          params: params,
         });
 
         // Record activity
@@ -433,10 +425,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             return reply.code(400).send({ error: 'Invalid action' });
         }
 
-        await clickhouse.command({
+        await optic.command({
           query: `ALTER TABLE argus.user_feedback UPDATE ${setClauses}
             WHERE project_id = {projectId:String} AND feedback_id IN ({ids:Array(String)})`,
-          query_params: params,
+          params: params,
         });
 
         return reply.send({ success: true, affected: body.feedback_ids.length });
@@ -476,11 +468,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         if (urls.length > 0) {
           // Append to existing attachments array
           const urlValues = urls.map(u => `'${u}'`).join(', ');
-          await clickhouse.command({
+          await optic.command({
             query: `ALTER TABLE argus.user_feedback UPDATE
               attachments = arrayConcat(attachments, [${urlValues}])
               WHERE project_id = {projectId:String} AND feedback_id = {feedbackId:String}`,
-            query_params: { projectId: String(projectId), feedbackId },
+            params: { projectId: String(projectId), feedbackId },
           });
         }
 
@@ -492,7 +484,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Spam Filter Keywords CRUD â”€â”€â”€
+  // ?€?€?€ Spam Filter Keywords CRUD ?€?€?€
 
   // Get spam keywords for a project
   app.get(
@@ -609,26 +601,24 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         const whereClause = conditions.join(' OR ');
 
         // Count matches first
-        const countResult = await clickhouse.query({
+        const countResult = await optic.rawQuery({
           query: `SELECT count() as cnt FROM argus.user_feedback
                   WHERE project_id = {projectId:String}
                   AND status = 'unresolved'
                   AND (${whereClause})`,
-          query_params: { projectId: String(projectId) },
-          format: 'JSONEachRow',
+          params: { projectId: String(projectId) },
         });
-        const countRows = await countResult.json() as any[];
-        const matchedCount = Number(countRows[0]?.cnt || 0);
+        const matchedCount = Number((countResult.data as any[])?.[0]?.cnt || 0);
 
         if (matchedCount > 0) {
           // Update matched feedback to spam
-          await clickhouse.command({
+          await optic.command({
             query: `ALTER TABLE argus.user_feedback UPDATE
                     status = 'spam', is_spam = 1
                     WHERE project_id = {projectId:String}
                     AND status = 'unresolved'
                     AND (${whereClause})`,
-            query_params: { projectId: String(projectId) },
+            params: { projectId: String(projectId) },
           });
         }
 
@@ -641,7 +631,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Feedback Filter Options â”€â”€â”€
+  // ?€?€?€ Feedback Filter Options ?€?€?€
 
   // Get distinct filter values for feedback
   app.get(
@@ -660,42 +650,38 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
       try {
         const [envResult, browserResult, osResult, assignedResult] = await Promise.all([
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT DISTINCT environment FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND environment != '' ORDER BY environment`,
-            query_params: qp,
+            params: qp,
           }),
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT DISTINCT browser FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND browser != '' ORDER BY browser`,
-            query_params: qp,
+            params: qp,
           }),
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT DISTINCT os FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND os != '' ORDER BY os`,
-            query_params: qp,
+            params: qp,
           }),
-          clickhouse.query({
+          optic.rawQuery({
             query: `SELECT DISTINCT assigned_to FROM argus.user_feedback
               WHERE project_id = {projectId:String} AND ${timeCond}
               AND assigned_to != '' ORDER BY assigned_to`,
-            query_params: qp,
+            params: qp,
           }),
-        ]);
-
-        const [envData, browserData, osData, assignedData] = await Promise.all([
-          envResult.json(), browserResult.json(), osResult.json(), assignedResult.json(),
         ]);
 
         return reply.send({
           data: {
-            environments: ((envData.data || []) as any[]).map((r: any) => r.environment),
-            browsers: ((browserData.data || []) as any[]).map((r: any) => r.browser),
-            os: ((osData.data || []) as any[]).map((r: any) => r.os),
-            assigned: ((assignedData.data || []) as any[]).map((r: any) => r.assigned_to),
+            environments: ((envResult.data || []) as any[]).map((r: any) => r.environment),
+            browsers: ((browserResult.data || []) as any[]).map((r: any) => r.browser),
+            os: ((osResult.data || []) as any[]).map((r: any) => r.os),
+            assigned: ((assignedResult.data || []) as any[]).map((r: any) => r.assigned_to),
           },
         });
       } catch (error) {
@@ -708,7 +694,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Mark Feedback as Read â”€â”€â”€
+  // ?€?€?€ Mark Feedback as Read ?€?€?€
 
   app.post(
     '/feedback/:projectId/mark-read',
@@ -721,10 +707,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       }
 
       try {
-        await clickhouse.command({
+        await optic.command({
           query: `ALTER TABLE argus.user_feedback UPDATE is_read = 1
             WHERE project_id = {projectId:String} AND feedback_id IN ({ids:Array(String)})`,
-          query_params: { projectId: String(projectId), ids: feedback_ids },
+          params: { projectId: String(projectId), ids: feedback_ids },
         });
         return reply.send({ success: true });
       } catch (error) {
@@ -737,7 +723,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Feedback Activity History â”€â”€â”€
+  // ?€?€?€ Feedback Activity History ?€?€?€
 
   app.get(
     '/feedback/:projectId/:feedbackId/activity',
@@ -767,7 +753,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Add Comment to Feedback â”€â”€â”€
+  // ?€?€?€ Add Comment to Feedback ?€?€?€
 
   app.post(
     '/feedback/:projectId/:feedbackId/comment',
@@ -796,7 +782,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Link / Unlink Issue to Feedback â”€â”€â”€
+  // ?€?€?€ Link / Unlink Issue to Feedback ?€?€?€
 
   app.patch(
     '/feedback/:projectId/:feedbackId/link-issue',

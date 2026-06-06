@@ -1,8 +1,10 @@
 /**
  * ArgusCronsPage — Sentry-style Cron Monitoring.
  *
- * Displays scheduled job monitors with status, last check-in,
- * next expected check-in, and failure history.
+ * List view + Detail drawer with:
+ *   - Checkin history table
+ *   - SDK integration guide (curl examples)
+ *   - Manual test checkin button
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
@@ -11,6 +13,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Table, TableHead, TableRow, TableCell, TableBody,
   Select, MenuItem, FormControl, InputLabel,
+  Drawer, Tabs, Tab, Divider,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -22,6 +25,11 @@ import {
   Pause as PausedIcon,
   Refresh as RefreshIcon,
   Delete as DeleteIcon,
+  Close as CloseIcon,
+  PlayArrow as TestIcon,
+  Code as CodeIcon,
+  History as HistoryIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -46,7 +54,21 @@ interface CronMonitor {
   environment: string;
   checkin_margin: number;
   max_runtime: number;
+  timezone?: string;
+  failure_issue_threshold?: number;
+  recovery_threshold?: number;
+  is_muted?: boolean;
   created_at: string;
+}
+
+interface CronCheckin {
+  id: number;
+  checkin_id: string;
+  status: string;
+  duration: number | null;
+  environment: string;
+  created_at: string;
+  expected_time: string | null;
 }
 
 function formatRelativeTime(isoStr: string | null, t: any): string {
@@ -59,6 +81,11 @@ function formatRelativeTime(isoStr: string | null, t: any): string {
   if (absDiff < 3600000) return `${prefix}${Math.floor(absDiff / 60000)}${t('common.time.m', 'm')}${suffix}`;
   if (absDiff < 86400000) return `${prefix}${Math.floor(absDiff / 3600000)}${t('common.time.h', 'h')}${suffix}`;
   return `${prefix}${Math.floor(absDiff / 86400000)}${t('common.time.d', 'd')}${suffix}`;
+}
+
+function formatDateTime(isoStr: string | null): string {
+  if (!isoStr) return '-';
+  return new Date(isoStr).toLocaleString();
 }
 
 const ArgusCronsPage: React.FC = () => {
@@ -96,6 +123,14 @@ const ArgusCronsPage: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState({ name: false, schedule_value: false });
 
+  // Detail Drawer State
+  const [selectedMonitor, setSelectedMonitor] = useState<CronMonitor | null>(null);
+  const [detailTab, setDetailTab] = useState(0);
+  const [checkins, setCheckins] = useState<CronCheckin[]>([]);
+  const [checkinsLoading, setCheckinsLoading] = useState(false);
+  const [checkinsTotal, setCheckinsTotal] = useState(0);
+  const [testingSending, setTestingSending] = useState(false);
+
   const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactElement; label: string }> = {
     ok: { color: '#4caf50', icon: <HealthyIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.ok', 'Healthy') },
     error: { color: '#f44336', icon: <ErrorIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.error', 'Error') },
@@ -103,6 +138,7 @@ const ArgusCronsPage: React.FC = () => {
     timeout: { color: '#ff5722', icon: <ScheduleIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.timeout', 'Timeout') },
     disabled: { color: '#9e9e9e', icon: <PausedIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.disabled', 'Disabled') },
     active: { color: '#2196f3', icon: <HealthyIcon sx={{ fontSize: 16 }} />, label: t('argus.crons.status.active', 'Active') },
+    in_progress: { color: '#2196f3', icon: <ScheduleIcon sx={{ fontSize: 16 }} />, label: 'In Progress' },
   };
 
   const fetchMonitors = useCallback(async () => {
@@ -119,6 +155,47 @@ const ArgusCronsPage: React.FC = () => {
   }, [projectId, enqueueSnackbar, t]);
 
   useEffect(() => { fetchMonitors(); }, [fetchMonitors]);
+
+  const fetchCheckins = useCallback(async (monitorId: string) => {
+    setCheckinsLoading(true);
+    try {
+      const result = await argusService.getCronCheckins(projectId, monitorId, { limit: 50 });
+      setCheckins(result.data);
+      setCheckinsTotal(result.total);
+    } catch (error) {
+      console.error('Failed to load checkins', error);
+    } finally {
+      setCheckinsLoading(false);
+    }
+  }, [projectId]);
+
+  const handleOpenDetail = (monitor: CronMonitor) => {
+    setSelectedMonitor(monitor);
+    setDetailTab(0);
+    fetchCheckins(monitor.id);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedMonitor(null);
+    setCheckins([]);
+  };
+
+  const handleSendTestCheckin = async (status: 'ok' | 'error' = 'ok') => {
+    if (!selectedMonitor) return;
+    setTestingSending(true);
+    try {
+      await argusService.sendCronTestCheckin(projectId, selectedMonitor.id, status);
+      enqueueSnackbar(t('argus.crons.testSuccess', 'Test check-in sent!'), { variant: 'success' });
+      // Refresh checkins and monitors
+      fetchCheckins(selectedMonitor.id);
+      fetchMonitors();
+    } catch (error) {
+      console.error('Test checkin failed', error);
+      enqueueSnackbar(t('argus.crons.testFailed', 'Failed to send test check-in'), { variant: 'error' });
+    } finally {
+      setTestingSending(false);
+    }
+  };
 
   const handleCreate = async () => {
     const errors = {
@@ -155,11 +232,17 @@ const ArgusCronsPage: React.FC = () => {
     try {
       await argusService.deleteCron(projectId, id);
       setMonitors(prev => prev.filter(m => m.id !== id));
+      if (selectedMonitor?.id === id) handleCloseDetail();
       enqueueSnackbar(t('common.deleteSuccess', 'Deleted successfully'), { variant: 'success' });
     } catch (error) {
       console.error('Delete failed', error);
       enqueueSnackbar(t('common.deleteFailed', 'Failed to delete'), { variant: 'error' });
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    enqueueSnackbar(t('common.copied', 'Copied!'), { variant: 'success' });
   };
 
   const filtered = monitors.filter(m => {
@@ -175,6 +258,9 @@ const ArgusCronsPage: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
+  // Build the API endpoint URL for SDK guide
+  const argusApiBase = `${window.location.origin}/argus/api`;
+
   return (
     <Box>
       <PageHeader
@@ -189,7 +275,7 @@ const ArgusCronsPage: React.FC = () => {
 
       {/* Status Summary */}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+        {Object.entries(STATUS_CONFIG).filter(([key]) => key !== 'in_progress').map(([key, cfg]) => (
           <Chip
             key={key}
             icon={cfg.icon}
@@ -289,6 +375,7 @@ const ArgusCronsPage: React.FC = () => {
                   <TableRow
                     key={monitor.id}
                     hover
+                    onClick={() => handleOpenDetail(monitor)}
                     sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
                   >
                     <TableCell>
@@ -435,8 +522,268 @@ const ArgusCronsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Detail Drawer */}
+      <Drawer
+        anchor="right"
+        open={!!selectedMonitor}
+        onClose={handleCloseDetail}
+        PaperProps={{
+          sx: {
+            width: { xs: '100%', sm: 560 },
+            borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          },
+        }}
+      >
+        {selectedMonitor && (
+          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* Drawer Header */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, py: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+              <Box>
+                <Typography sx={{ fontSize: '1rem', fontWeight: 700 }}>{selectedMonitor.name}</Typography>
+                <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', fontFamily: 'monospace' }}>{selectedMonitor.slug}</Typography>
+              </Box>
+              <IconButton onClick={handleCloseDetail} size="small">
+                <CloseIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Box>
+
+            {/* Monitor Summary */}
+            <Box sx={{ px: 2.5, py: 1.5, display: 'flex', gap: 2, flexWrap: 'wrap', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
+              {(() => {
+                const s = selectedMonitor.last_status || selectedMonitor.status || 'active';
+                const cfg = STATUS_CONFIG[s] || STATUS_CONFIG.active;
+                return (
+                  <Chip icon={cfg.icon} label={cfg.label} size="small" sx={{
+                    height: 22, fontSize: '0.68rem', fontWeight: 700,
+                    backgroundColor: alpha(cfg.color, 0.1), color: cfg.color,
+                    '& .MuiChip-icon': { color: cfg.color },
+                  }} />
+                );
+              })()}
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {t('argus.crons.schedule', 'Schedule')}: <strong>{selectedMonitor.schedule_value}</strong>
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {t('argus.crons.lastCheckin', 'Last')}: <strong>{formatRelativeTime(selectedMonitor.last_checkin_at, t)}</strong>
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {t('argus.crons.nextExpected', 'Next')}: <strong>{formatRelativeTime(selectedMonitor.next_checkin_at, t)}</strong>
+              </Typography>
+            </Box>
+
+            {/* Tabs */}
+            <Tabs
+              value={detailTab}
+              onChange={(_, v) => setDetailTab(v)}
+              sx={{ px: 2.5, minHeight: 36, '& .MuiTab-root': { minHeight: 36, fontSize: '0.75rem', textTransform: 'none', fontWeight: 600 } }}
+            >
+              <Tab icon={<HistoryIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={t('argus.crons.checkinHistory', 'Check-in History')} />
+              <Tab icon={<CodeIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={t('argus.crons.sdkGuide', 'SDK Guide')} />
+            </Tabs>
+            <Divider />
+
+            {/* Tab Content */}
+            <Box sx={{ flex: 1, overflow: 'auto', px: 2.5, py: 2 }}>
+              {detailTab === 0 && (
+                <Box>
+                  {/* Test Checkin Buttons */}
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="success"
+                      startIcon={<TestIcon />}
+                      onClick={() => handleSendTestCheckin('ok')}
+                      disabled={testingSending}
+                      sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '8px' }}
+                    >
+                      {t('argus.crons.sendTestOk', 'Send OK')}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="error"
+                      startIcon={<ErrorIcon sx={{ fontSize: 14 }} />}
+                      onClick={() => handleSendTestCheckin('error')}
+                      disabled={testingSending}
+                      sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '8px' }}
+                    >
+                      {t('argus.crons.sendTestError', 'Send Error')}
+                    </Button>
+                    <Box sx={{ flex: 1 }} />
+                    <Typography variant="caption" sx={{ color: 'text.disabled', alignSelf: 'center' }}>
+                      {checkinsTotal} {t('argus.crons.totalCheckins', 'check-ins')}
+                    </Typography>
+                  </Box>
+
+                  {/* Checkin History Table */}
+                  {checkinsLoading ? (
+                    <Box>{[...Array(5)].map((_, i) => <Skeleton key={i} height={36} sx={{ mb: 0.5 }} />)}</Box>
+                  ) : checkins.length === 0 ? (
+                    <Box sx={{
+                      py: 6, textAlign: 'center',
+                      color: 'text.disabled',
+                      border: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                      borderRadius: 2,
+                    }}>
+                      <HistoryIcon sx={{ fontSize: 40, mb: 1, opacity: 0.3 }} />
+                      <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, mb: 0.5 }}>
+                        {t('argus.crons.noCheckins', 'No check-in history')}
+                      </Typography>
+                      <Typography sx={{ fontSize: '0.72rem' }}>
+                        {t('argus.crons.noCheckinsHint', 'Use the SDK Guide tab to learn how to send check-ins from your application.')}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Table size="small" sx={{ '& td, & th': { fontSize: '0.72rem', py: 0.75 } }}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700 }}>{t('argus.crons.status', 'Status')}</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>{t('argus.crons.duration', 'Duration')}</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>{t('argus.crons.timestamp', 'Timestamp')}</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>{t('argus.crons.environment', 'Env')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {checkins.map((ci) => {
+                          const ciCfg = STATUS_CONFIG[ci.status] || STATUS_CONFIG.active;
+                          return (
+                            <TableRow key={ci.id}>
+                              <TableCell>
+                                <Chip
+                                  icon={ciCfg.icon}
+                                  label={ciCfg.label}
+                                  size="small"
+                                  sx={{
+                                    height: 20, fontSize: '0.62rem', fontWeight: 700,
+                                    backgroundColor: alpha(ciCfg.color, 0.1), color: ciCfg.color,
+                                    '& .MuiChip-icon': { color: ciCfg.color, fontSize: 12 },
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell>{ci.duration != null ? `${ci.duration}ms` : '-'}</TableCell>
+                              <TableCell>{formatDateTime(ci.created_at)}</TableCell>
+                              <TableCell>{ci.environment}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  )}
+                </Box>
+              )}
+
+              {detailTab === 1 && (
+                <Box>
+                  {/* SDK Integration Guide */}
+                  <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, mb: 1.5 }}>
+                    {t('argus.crons.sdkGuideTitle', 'How to send check-ins')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
+                    {t('argus.crons.sdkGuideDesc', 'Your cron job must send HTTP check-ins to Argus at the start and end of each execution. If no check-in arrives by the expected time, the monitor will be marked as "missed" and an issue will be created.')}
+                  </Typography>
+
+                  {/* Endpoint */}
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, mb: 0.5, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    Endpoint
+                  </Typography>
+                  <CodeBlock
+                    code={`POST ${argusApiBase}/projects/${projectId}/crons/${selectedMonitor.slug}/checkin`}
+                    onCopy={copyToClipboard}
+                    isDark={isDark}
+                  />
+
+                  {/* Simple OK checkin */}
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, mb: 0.5, mt: 2.5, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {t('argus.crons.simpleCheckin', '1. Simple Check-in (job completed)')}
+                  </Typography>
+                  <CodeBlock
+                    code={`curl -X POST "${argusApiBase}/projects/${projectId}/crons/${selectedMonitor.slug}/checkin" \\
+  -H "Content-Type: application/json" \\
+  -d '{"status": "ok"}'`}
+                    onCopy={copyToClipboard}
+                    isDark={isDark}
+                  />
+
+                  {/* Wrapping a job */}
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, mb: 0.5, mt: 2.5, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {t('argus.crons.wrappedCheckin', '2. Wrapping a job (start + finish)')}
+                  </Typography>
+                  <CodeBlock
+                    code={`# Step 1: Mark job as in_progress (returns check_in_id)
+CHECK_IN_ID=$(curl -s -X POST "${argusApiBase}/projects/${projectId}/crons/${selectedMonitor.slug}/checkin" \\
+  -H "Content-Type: application/json" \\
+  -d '{"status": "in_progress"}' | jq -r '.checkin_id')
+
+# Step 2: Run your actual job
+./my-backup-script.sh
+
+# Step 3: Report result
+if [ $? -eq 0 ]; then
+  curl -X POST "${argusApiBase}/projects/${projectId}/crons/${selectedMonitor.slug}/checkin" \\
+    -H "Content-Type: application/json" \\
+    -d "{\\"status\\": \\"ok\\", \\"check_in_id\\": \\"$CHECK_IN_ID\\"}"
+else
+  curl -X POST "${argusApiBase}/projects/${projectId}/crons/${selectedMonitor.slug}/checkin" \\
+    -H "Content-Type: application/json" \\
+    -d "{\\"status\\": \\"error\\", \\"check_in_id\\": \\"$CHECK_IN_ID\\"}"
+fi`}
+                    onCopy={copyToClipboard}
+                    isDark={isDark}
+                  />
+
+                  {/* Status values */}
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, mb: 0.5, mt: 2.5, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {t('argus.crons.statusValues', 'Status Values')}
+                  </Typography>
+                  <Box sx={{
+                    p: 1.5, borderRadius: 1.5,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                    fontSize: '0.72rem', lineHeight: 1.8,
+                  }}>
+                    <Box><code style={{ color: '#4caf50' }}>ok</code> — {t('argus.crons.statusOkDesc', 'Job completed successfully')}</Box>
+                    <Box><code style={{ color: '#f44336' }}>error</code> — {t('argus.crons.statusErrorDesc', 'Job failed')}</Box>
+                    <Box><code style={{ color: '#2196f3' }}>in_progress</code> — {t('argus.crons.statusInProgressDesc', 'Job started (will timeout if no follow-up)')}</Box>
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        )}
+      </Drawer>
     </Box>
   );
 };
+
+/** Reusable code block with copy button */
+function CodeBlock({ code, onCopy, isDark }: { code: string; onCopy: (text: string) => void; isDark: boolean }) {
+  return (
+    <Box sx={{
+      position: 'relative',
+      p: 1.5, borderRadius: 1.5,
+      backgroundColor: isDark ? 'rgba(0,0,0,0.4)' : '#1e1e2e',
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.1)'}`,
+      fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+      fontSize: '0.68rem', lineHeight: 1.7,
+      color: '#e0e0e0', overflowX: 'auto',
+      whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+    }}>
+      <IconButton
+        size="small"
+        onClick={() => onCopy(code)}
+        sx={{
+          position: 'absolute', top: 4, right: 4,
+          color: 'rgba(255,255,255,0.4)',
+          '&:hover': { color: 'rgba(255,255,255,0.8)' },
+        }}
+      >
+        <CopyIcon sx={{ fontSize: 14 }} />
+      </IconButton>
+      {code}
+    </Box>
+  );
+}
 
 export default ArgusCronsPage;

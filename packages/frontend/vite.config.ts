@@ -297,6 +297,7 @@ export default defineConfig({
   // "multiple instances of @codemirror/state" runtime errors
   optimizeDeps: {
     include: [
+      'swr',
       'codemirror',
       '@codemirror/state',
       '@codemirror/view',

@@ -1,9 +1,6 @@
 import { createApp } from './app';
 import { config } from './config';
-import {
-  testClickHouseConnection,
-  initClickHouseDatabase,
-} from './config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { testMySQLConnection } from './config/mysql';
 import { ensureStorageBucket } from './config/minio';
 import { createLogger } from './utils/logger';
@@ -17,12 +14,12 @@ async function start() {
 
     // Initialize ClickHouse database
     logger.info('Initializing ClickHouse database...');
-    await initClickHouseDatabase();
+    await optic.initDatabase();
 
     // Test database connections
     logger.info('Testing database connections...');
 
-    const clickhouseOk = await testClickHouseConnection();
+    const clickhouseOk = await optic.testConnection();
     if (!clickhouseOk) {
       throw new Error('ClickHouse connection failed');
     }

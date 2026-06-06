@@ -2,9 +2,9 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
 import { mysqlPool } from '../config/mysql';
 import { redis } from '../config/redis';
-import { clickhouse } from '../config/clickhouse';
-import { createLogger } from '../utils/logger';
+import { optic } from '@gatrix/argus-optic';
 import { getBucketingConfig } from '../utils/timeBucket';
+import { createLogger } from '../utils/logger';
 import { ConfigBroadcaster } from '../utils/config-broadcaster';
 import { CONFIG_TYPES } from '../config/redis-keys';
 
@@ -384,26 +384,20 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h' } = request.query as { period?: string };
 
-      const bucket = getBucketingConfig(period);
-
       try {
-        const result = await clickhouse.query({
-          query: `
-            SELECT
-              ${bucket.selectExpr} AS hour,
-              count() AS event_count,
-              uniq(user_id) AS affected_users
-            FROM argus.errors
-            WHERE project_id = {projectId:String}
-              AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
-            GROUP BY hour
-            ORDER BY hour ${bucket.fillExpr}
-          `,
-          query_params: { projectId: String(projectId), fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd },
+        const result = await optic.query({
+          dataset: 'errors', projectId, timeRange: { period },
+          select: [
+            { field: '$bucket', alias: 'hour' },
+            { field: 'count()', alias: 'event_count' },
+            { field: 'uniq(user_id)', alias: 'affected_users' },
+          ],
+          groupBy: ['$bucket'],
+          orderBy: [{ field: 'hour', direction: 'ASC' }],
+          withFill: true,
         });
 
-        const stats = await result.json();
-        return reply.send({ data: stats.data });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get project stats', {
           projectId,
@@ -425,42 +419,38 @@ export default async function projectsRoutes(app: FastifyInstance) {
       const { period = '7d' } = request.query as { period?: string };
 
       const bucket = getBucketingConfig(period);
+      const rawParams = {
+        projectId: String(projectId),
+        dsnKeyId: Number(keyId),
+        fillStart: bucket.queryParams.fillStart,
+        fillEnd: bucket.queryParams.fillEnd,
+      };
 
       try {
-        // Query errors
-        const errorsResult = await clickhouse.query({
-          query: `
-            SELECT
-              ${bucket.selectExpr} AS ts,
-              count() AS accepted
-            FROM argus.errors
-            WHERE project_id = {projectId:String}
-              AND dsn_key_id = {dsnKeyId:UInt32}
-              AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
-            GROUP BY ts
-            ORDER BY ts ${bucket.fillExpr}
-          `,
-          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId), fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd },
-        });
+        // dsn_key_id filter is not a standard DSL field, use rawQuery
+        const [errorsResult, txnResult] = await Promise.all([
+          optic.rawQuery({
+            query: `SELECT ${bucket.selectExpr} AS ts, count() AS accepted
+              FROM argus.errors
+              WHERE project_id = {projectId:String}
+                AND dsn_key_id = {dsnKeyId:UInt32}
+                AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
+              GROUP BY ts ORDER BY ts ${bucket.fillExpr}`,
+            params: rawParams,
+          }),
+          optic.rawQuery({
+            query: `SELECT ${bucket.selectExpr} AS ts, count() AS accepted
+              FROM argus.transactions
+              WHERE project_id = {projectId:String}
+                AND dsn_key_id = {dsnKeyId:UInt32}
+                AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
+              GROUP BY ts ORDER BY ts ${bucket.fillExpr}`,
+            params: rawParams,
+          }),
+        ]);
 
-        // Query transactions
-        const txnResult = await clickhouse.query({
-          query: `
-            SELECT
-              ${bucket.selectExpr} AS ts,
-              count() AS accepted
-            FROM argus.transactions
-            WHERE project_id = {projectId:String}
-              AND dsn_key_id = {dsnKeyId:UInt32}
-              AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})
-            GROUP BY ts
-            ORDER BY ts ${bucket.fillExpr}
-          `,
-          query_params: { projectId: String(projectId), dsnKeyId: Number(keyId), fillStart: bucket.queryParams.fillStart, fillEnd: bucket.queryParams.fillEnd },
-        });
-
-        const errors = (await errorsResult.json()).data as { ts: string; accepted: string }[];
-        const transactions = (await txnResult.json()).data as { ts: string; accepted: string }[];
+        const errors = errorsResult.data as { ts: string; accepted: string }[];
+        const transactions = txnResult.data as { ts: string; accepted: string }[];
 
         // Merge into unified timeline
         const timeMap = new Map<string, { errors: number; transactions: number }>();

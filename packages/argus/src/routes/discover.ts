@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { mysqlPool } from '../config/mysql';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
@@ -178,7 +178,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
           }
         }
 
-        // Group by — auto-include non-aggregate fields
+        // Group by ??auto-include non-aggregate fields
         const nonAggFields = parsedFields.filter(f => f.sql === f.alias).map(f => f.alias);
         const requestedGroup = (groupBy && groupBy.length > 0) ? groupBy.filter(c => ALLOWED_COLUMNS.has(c)) : [];
         // If there are aggregate fields AND plain columns, we must group by the plain columns
@@ -218,15 +218,13 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         logger.info('Discover query', { projectId, query: query.slice(0, 200) });
 
-        const result = await clickhouse.query({
+        const result = await optic.rawQuery({
           query,
-          query_params: queryParams,
-          format: 'JSONEachRow',
+          params: queryParams,
         });
-        const data = await result.json();
 
         return reply.send({
-          data: data as any[],
+          data: result.data as any[],
           meta: {
             fields: parsedFields.map(f => ({ name: f.alias, type: f.sql === f.alias ? 'column' : 'aggregate' })),
           },
@@ -251,7 +249,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
       try {
         // Get distinct values for key columns
-        const result = await clickhouse.query({
+        const result = await optic.rawQuery({
           query: `
             SELECT
               uniq(level) as level_count,
@@ -264,13 +262,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
             WHERE project_id = {projectId:String}
               AND timestamp >= now() - INTERVAL 30 DAY
           `,
-          query_params: { projectId },
-          format: 'JSONEachRow',
+          params: { projectId },
         });
-        const stats = (await result.json() as any[])?.[0] || {};
+        const stats = (result.data as any[])?.[0] || {};
 
-        // Get distinct values for each tag
-        const tagsResult = await clickhouse.query({
+        const tagsResult = await optic.rawQuery({
           query: `
             SELECT 'level' AS tag, level AS value, count() AS cnt
             FROM argus.errors
@@ -340,10 +336,9 @@ export default async function discoverRoutes(app: FastifyInstance) {
             WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND device_name != ''
             GROUP BY device_name ORDER BY cnt DESC LIMIT 20
           `,
-          query_params: { projectId },
-          format: 'JSONEachRow',
+          params: { projectId },
         });
-        const tagValues = await tagsResult.json() as any[];
+        const tagValues = tagsResult.data as any[];
 
         // Group by tag
         const tagMap: Record<string, { value: string; count: number }[]> = {};
@@ -411,14 +406,12 @@ export default async function discoverRoutes(app: FastifyInstance) {
           ORDER BY hour ASC
         `;
 
-        const result = await clickhouse.query({
+        const result = await optic.rawQuery({
           query,
-          query_params: queryParams,
-          format: 'JSONEachRow',
+          params: queryParams,
         });
-        const data = await result.json();
 
-        return reply.send({ data });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get discover volume', {
           projectId,
@@ -451,7 +444,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
         const [rows] = await mysqlPool.execute(sql, params);
         return reply.send({ data: rows });
       } catch (error: any) {
-        // Table might not exist yet — return empty gracefully
+        // Table might not exist yet ??return empty gracefully
         if (error?.code === 'ER_NO_SUCH_TABLE' || String(error?.message || '').includes("doesn't exist")) {
           logger.warn('g_argus_saved_queries table not found, returning empty');
           return reply.send({ data: [] });

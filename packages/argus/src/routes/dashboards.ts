@@ -1,12 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { mysqlPool } from '../config/mysql';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
 import { getBucketingConfig } from '../utils/timeBucket';
 
 const logger = createLogger('argus-dashboards');
 
-/* â”€â”€â”€ Dashboard Presets â”€â”€â”€ */
+/* ?€?€?€ Dashboard Presets ?€?€?€ */
 
 interface DashboardPreset {
   id: string;
@@ -152,11 +152,11 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
   },
 ];
 
-/* â”€â”€â”€ Routes â”€â”€â”€ */
+/* ?€?€?€ Routes ?€?€?€ */
 
 export default async function dashboardRoutes(app: FastifyInstance) {
 
-  // â”€â”€â”€ Get Presets â”€â”€â”€
+  // ?€?€?€ Get Presets ?€?€?€
   app.get(
     '/:projectId/dashboards/presets',
     async (_request: FastifyRequest, reply: FastifyReply) => {
@@ -171,7 +171,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Get Single Preset â”€â”€â”€
+  // ?€?€?€ Get Single Preset ?€?€?€
   app.get(
     '/:projectId/dashboards/presets/:presetId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -182,7 +182,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ List Dashboards â”€â”€â”€
+  // ?€?€?€ List Dashboards ?€?€?€
   app.get(
     '/:projectId/dashboards',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -201,7 +201,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Get Single Dashboard â”€â”€â”€
+  // ?€?€?€ Get Single Dashboard ?€?€?€
   app.get(
     '/:projectId/dashboards/:dashboardId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -223,7 +223,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Create Dashboard â”€â”€â”€
+  // ?€?€?€ Create Dashboard ?€?€?€
   app.post(
     '/:projectId/dashboards',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -257,7 +257,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Update Dashboard â”€â”€â”€
+  // ?€?€?€ Update Dashboard ?€?€?€
   app.put(
     '/:projectId/dashboards/:dashboardId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -289,7 +289,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Delete Dashboard â”€â”€â”€
+  // ?€?€?€ Delete Dashboard ?€?€?€
   app.delete(
     '/:projectId/dashboards/:dashboardId',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -307,7 +307,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     }
   );
 
-  // â”€â”€â”€ Execute Widget Query â”€â”€â”€
+  // ?€?€?€ Execute Widget Query ?€?€?€
   app.post(
     '/:projectId/dashboards/widget-query',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -377,17 +377,16 @@ export default async function dashboardRoutes(app: FastifyInstance) {
 
         sql += ` LIMIT ${Math.min(limit, 1000)}`;
 
-        const result = await clickhouse.query({ 
+        const result = await optic.rawQuery({ 
           query: sql, 
-          query_params: { 
+          params: { 
             projectId: String(projectId),
             fillStart: bucket.queryParams.fillStart,
             fillEnd: bucket.queryParams.fillEnd
           } 
         });
-        const json = await result.json();
 
-        return reply.send({ data: json.data || [] });
+        return reply.send({ data: result.data || [] });
       } catch (error) {
         logger.error('Widget query failed', { projectId, error: String(error) });
         return reply.code(500).send({ error: 'Widget query failed' });

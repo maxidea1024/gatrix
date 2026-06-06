@@ -1,16 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
-import { getBucketingConfig } from '../utils/timeBucket';
+import { Condition } from '@gatrix/argus-optic';
 
 const logger = createLogger('traces-api');
 
-
-
 export default async function tracesRoutes(app: FastifyInstance) {
-  // ────────────────────────────────────────────────
-  // Span search — query individual spans (Explore → Spans tab)
-  // ────────────────────────────────────────────────
+  // ?�?� Span search ??query individual spans ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
   app.get(
     '/traces/:projectId/spans',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -23,71 +19,43 @@ export default async function tracesRoutes(app: FastifyInstance) {
         limit?: string; orderBy?: string; start?: string; end?: string;
       };
 
-      const bucket = getBucketingConfig(period, start, end);
-      const timeFilter = start && end
-        ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= toDateTime({fillStart:UInt32})`;
+      const conditions: Condition[] = [];
+      if (search) conditions.push({ field: 'description', op: 'ILIKE', value: `%${search}%` });
+      if (op) conditions.push({ field: 'op', op: '=', value: op });
+      if (status) conditions.push({ field: 'status', op: '=', value: status });
 
-      const conditions: string[] = [
-        `project_id = {projectId:String}`,
-        timeFilter,
-      ];
-      if (search) conditions.push(`description ILIKE {search:String}`);
-      if (op) conditions.push(`op = {op:String}`);
-      if (status) conditions.push(`status = {status:String}`);
-
-      const orderDir = orderBy.startsWith('-') ? 'DESC' : 'ASC';
+      const orderDir = orderBy.startsWith('-') ? 'DESC' as const : 'ASC' as const;
       const orderCol = orderBy.replace(/^-/, '');
       const safeOrderCol = ['duration', 'timestamp', 'op', 'status'].includes(orderCol)
         ? orderCol : 'duration';
 
       try {
-        const result = await clickhouse.query({
-          query: `
-            SELECT
-              span_id,
-              trace_id,
-              parent_span_id,
-              transaction_id,
-              op,
-              description,
-              status,
-              action,
-              domain,
-              timestamp,
-              start_timestamp,
-              duration,
-              tags
-            FROM argus.spans
-            WHERE ${conditions.join(' AND ')}
-            ORDER BY ${safeOrderCol} ${orderDir}
-            LIMIT {limit:UInt32}
-          `,
-          query_params: {
-            projectId: String(projectId),
-            limit: parseInt(limit, 10),
-            ...(search ? { search: `%${search}%` } : {}),
-            ...(op ? { op } : {}),
-            ...(status ? { status } : {}),
-            ...(start && end ? { start, end } : {}),
-            ...bucket.queryParams,
-          },
+        const result = await optic.query({
+          dataset: 'spans', projectId,
+          timeRange: start && end ? { start, end } : { period },
+          select: [
+            { field: 'span_id' }, { field: 'trace_id' }, { field: 'parent_span_id' },
+            { field: 'transaction_id' }, { field: 'op' }, { field: 'description' },
+            { field: 'status' }, { field: 'action' }, { field: 'domain' },
+            { field: 'timestamp' }, { field: 'start_timestamp' }, { field: 'duration' },
+            { field: 'tags' },
+          ],
+          conditions,
+          orderBy: [{ field: safeOrderCol, direction: orderDir }],
+          limit: parseInt(limit, 10),
         });
-        const data = await result.json();
-        return reply.send({ data: data.data || [] });
+
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to search spans', {
-          projectId,
-          error: error instanceof Error ? error.message : String(error),
+          projectId, error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to search spans' });
       }
     }
   );
 
-  // ────────────────────────────────────────────────
-  // Trace samples — group by trace_id, show root span info
-  // ────────────────────────────────────────────────
+  // ?�?� Trace samples ??group by trace_id ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
   app.get(
     '/traces/:projectId/samples',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -95,63 +63,44 @@ export default async function tracesRoutes(app: FastifyInstance) {
       const {
         period = '24h', search, limit = '25', start, end,
       } = request.query as {
-        period?: string; search?: string; limit?: string;
-        start?: string; end?: string;
+        period?: string; search?: string; limit?: string; start?: string; end?: string;
       };
 
-      const bucket = getBucketingConfig(period, start, end);
-      const timeFilter = start && end
-        ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= toDateTime({fillStart:UInt32})`;
-
-      const conditions: string[] = [
-        `project_id = {projectId:String}`,
-        timeFilter,
-      ];
-      if (search) conditions.push(`description ILIKE {search:String}`);
+      const conditions: Condition[] = [];
+      if (search) conditions.push({ field: 'description', op: 'ILIKE', value: `%${search}%` });
 
       try {
-        const result = await clickhouse.query({
-          query: `
-            SELECT
-              trace_id,
-              min(timestamp) AS start_time,
-              max(timestamp) AS end_time,
-              count() AS span_count,
-              sum(duration) AS total_duration,
-              max(duration) AS max_span_duration,
-              groupArray(DISTINCT op) AS operations,
-              any(description) AS root_description,
-              countIf(status != 'ok' AND status != '') AS error_count
-            FROM argus.spans
-            WHERE ${conditions.join(' AND ')}
-            GROUP BY trace_id
-            ORDER BY start_time DESC
-            LIMIT {limit:UInt32}
-          `,
-          query_params: {
-            projectId: String(projectId),
-            limit: parseInt(limit, 10),
-            ...(search ? { search: `%${search}%` } : {}),
-            ...(start && end ? { start, end } : {}),
-            ...bucket.queryParams,
-          },
+        const result = await optic.query({
+          dataset: 'spans', projectId,
+          timeRange: start && end ? { start, end } : { period },
+          select: [
+            { field: 'trace_id' },
+            { field: 'min(timestamp)', alias: 'start_time' },
+            { field: 'max(timestamp)', alias: 'end_time' },
+            { field: 'count()', alias: 'span_count' },
+            { field: 'sum(duration)', alias: 'total_duration' },
+            { field: 'max(duration)', alias: 'max_span_duration' },
+            { field: 'groupArray(DISTINCT op)', alias: 'operations' },
+            { field: 'any(description)', alias: 'root_description' },
+            { field: "countIf(status != 'ok' AND status != '')", alias: 'error_count' },
+          ],
+          conditions,
+          groupBy: ['trace_id'],
+          orderBy: [{ field: 'start_time', direction: 'DESC' }],
+          limit: parseInt(limit, 10),
         });
-        const data = await result.json();
-        return reply.send({ data: data.data || [] });
+
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get trace samples', {
-          projectId,
-          error: error instanceof Error ? error.message : String(error),
+          projectId, error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get trace samples' });
       }
     }
   );
 
-  // ────────────────────────────────────────────────
-  // Span aggregation — group by op/status/domain
-  // ────────────────────────────────────────────────
+  // ?�?� Span aggregation ??group by op/status/domain ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
   app.get(
     '/traces/:projectId/aggregate',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -164,151 +113,114 @@ export default async function tracesRoutes(app: FastifyInstance) {
 
       const safeGroupBy = ['op', 'status', 'domain', 'action'].includes(groupBy)
         ? groupBy : 'op';
-
-      const bucket = getBucketingConfig(period, start, end);
-      const timeFilter = start && end
-        ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= toDateTime({fillStart:UInt32})`;
+      const timeRange = start && end ? { start, end } : { period };
 
       try {
-        // Top values
-        const topResult = await clickhouse.query({
-          query: `
-            SELECT
-              ${safeGroupBy} AS group_value,
-              count() AS count,
-              avg(duration) AS avg_duration,
-              quantile(0.95)(duration) AS p95_duration
-            FROM argus.spans
-            WHERE project_id = {projectId:String}
-              AND ${timeFilter}
-            GROUP BY ${safeGroupBy}
-            ORDER BY count DESC
-            LIMIT 20
-          `,
-          query_params: {
-            projectId: String(projectId),
-            ...(start && end ? { start, end } : {}),
-            ...bucket.queryParams,
+        const batch = await optic.queryBatch({
+          topValues: {
+            dataset: 'spans', projectId, timeRange,
+            select: [
+              { field: safeGroupBy, alias: 'group_value' },
+              { field: 'count()', alias: 'count' },
+              { field: 'avg(duration)', alias: 'avg_duration' },
+              { field: 'p95(duration)', alias: 'p95_duration' },
+            ],
+            groupBy: [safeGroupBy],
+            orderBy: [{ field: 'count', direction: 'DESC' }],
+            limit: 20,
           },
-        });
-        const topData = await topResult.json();
 
-        const tsResult = await clickhouse.query({
-          query: `
-            SELECT
-              ${bucket.selectExpr} AS hour,
-              ${safeGroupBy} AS group_value,
-              count() AS count
-            FROM argus.spans
-            WHERE project_id = {projectId:String}
-              AND ${timeFilter}
-            GROUP BY hour, ${safeGroupBy}
-            ORDER BY hour, count DESC
-          `,
-          query_params: {
-            projectId: String(projectId),
-            ...(start && end ? { start, end } : {}),
-            ...bucket.queryParams,
+          timeSeries: {
+            dataset: 'spans', projectId, timeRange,
+            select: [
+              { field: '$bucket', alias: 'hour' },
+              { field: safeGroupBy, alias: 'group_value' },
+              { field: 'count()', alias: 'count' },
+            ],
+            groupBy: ['$bucket', safeGroupBy],
+            orderBy: [
+              { field: 'hour', direction: 'ASC' },
+              { field: 'count', direction: 'DESC' },
+            ],
           },
         });
-        const tsData = await tsResult.json();
 
         return reply.send({
           data: {
             groupBy: safeGroupBy,
-            topValues: topData.data || [],
-            timeSeries: tsData.data || [],
+            topValues: batch.topValues.data,
+            timeSeries: batch.timeSeries.data,
           },
         });
       } catch (error) {
         logger.error('Failed to get span aggregates', {
-          projectId,
-          error: error instanceof Error ? error.message : String(error),
+          projectId, error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get span aggregates' });
       }
     }
   );
 
-  // ────────────────────────────────────────────────
-  // Span tags — available filter facets
-  // ────────────────────────────────────────────────
+  // ?�?� Span tags ??available filter facets ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
   app.get(
     '/traces/:projectId/tags',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const { period = '24h' } = request.query as { period?: string };
-      const bucket = getBucketingConfig(period);
 
       try {
-        // Get distinct op values
-        const opsResult = await clickhouse.query({
-          query: `
-            SELECT op AS value, count() AS count
-            FROM argus.spans
-            WHERE project_id = {projectId:String}
-              AND timestamp >= toDateTime({fillStart:UInt32})
-            GROUP BY op
-            ORDER BY count DESC
-            LIMIT 30
-          `,
-          query_params: { projectId: String(projectId), ...bucket.queryParams },
+        const batch = await optic.queryBatch({
+          ops: {
+            dataset: 'spans', projectId, timeRange: { period },
+            select: [
+              { field: 'op', alias: 'value' },
+              { field: 'count()', alias: 'count' },
+            ],
+            groupBy: ['op'],
+            orderBy: [{ field: 'count', direction: 'DESC' }],
+            limit: 30,
+          },
+          statuses: {
+            dataset: 'spans', projectId, timeRange: { period },
+            select: [
+              { field: 'status', alias: 'value' },
+              { field: 'count()', alias: 'count' },
+            ],
+            conditions: [{ field: 'status', op: '!=', value: '' }],
+            groupBy: ['status'],
+            orderBy: [{ field: 'count', direction: 'DESC' }],
+            limit: 20,
+          },
+          domains: {
+            dataset: 'spans', projectId, timeRange: { period },
+            select: [
+              { field: 'domain', alias: 'value' },
+              { field: 'count()', alias: 'count' },
+            ],
+            conditions: [{ field: 'domain', op: '!=', value: '' }],
+            groupBy: ['domain'],
+            orderBy: [{ field: 'count', direction: 'DESC' }],
+            limit: 20,
+          },
         });
-        const opsData = await opsResult.json();
-
-        // Get distinct status values
-        const statusResult = await clickhouse.query({
-          query: `
-            SELECT status AS value, count() AS count
-            FROM argus.spans
-            WHERE project_id = {projectId:String}
-              AND timestamp >= toDateTime({fillStart:UInt32})
-              AND status != ''
-            GROUP BY status
-            ORDER BY count DESC
-            LIMIT 20
-          `,
-          query_params: { projectId: String(projectId), ...bucket.queryParams },
-        });
-        const statusData = await statusResult.json();
-
-        // Get distinct domain values
-        const domainResult = await clickhouse.query({
-          query: `
-            SELECT domain AS value, count() AS count
-            FROM argus.spans
-            WHERE project_id = {projectId:String}
-              AND timestamp >= toDateTime({fillStart:UInt32})
-              AND domain != ''
-            GROUP BY domain
-            ORDER BY count DESC
-            LIMIT 20
-          `,
-          query_params: { projectId: String(projectId), ...bucket.queryParams },
-        });
-        const domainData = await domainResult.json();
 
         return reply.send({
           data: {
-            op: opsData.data || [],
-            status: statusData.data || [],
-            domain: domainData.data || [],
+            op: batch.ops.data,
+            status: batch.statuses.data,
+            domain: batch.domains.data,
           },
         });
       } catch (error) {
         logger.error('Failed to get span tags', {
-          projectId,
-          error: error instanceof Error ? error.message : String(error),
+          projectId, error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get span tags' });
       }
     }
   );
 
-  // ────────────────────────────────────────────────
-  // Span volume — time series for chart
-  // ────────────────────────────────────────────────
+  // ?�?� Span volume ??time series for chart ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
   app.get(
     '/traces/:projectId/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -319,42 +231,27 @@ export default async function tracesRoutes(app: FastifyInstance) {
         period?: string; search?: string; start?: string; end?: string;
       };
 
-      const bucket = getBucketingConfig(period, start, end);
-      const timeFilter = start && end
-        ? `timestamp >= {start:String} AND timestamp <= {end:String}`
-        : `timestamp >= toDateTime({fillStart:UInt32})`;
-
-      const conditions: string[] = [
-        `project_id = {projectId:String}`,
-        timeFilter,
-      ];
-      if (search) conditions.push(`description ILIKE {search:String}`);
+      const conditions: Condition[] = [];
+      if (search) conditions.push({ field: 'description', op: 'ILIKE', value: `%${search}%` });
 
       try {
-        const result = await clickhouse.query({
-          query: `
-            SELECT
-              ${bucket.selectExpr} AS hour,
-              op,
-              count() AS count
-            FROM argus.spans
-            WHERE ${conditions.join(' AND ')}
-            GROUP BY hour, op
-            ORDER BY hour
-          `,
-          query_params: {
-            projectId: String(projectId),
-            ...(search ? { search: `%${search}%` } : {}),
-            ...(start && end ? { start, end } : {}),
-            ...bucket.queryParams,
-          },
+        const result = await optic.query({
+          dataset: 'spans', projectId,
+          timeRange: start && end ? { start, end } : { period },
+          select: [
+            { field: '$bucket', alias: 'hour' },
+            { field: 'op' },
+            { field: 'count()', alias: 'count' },
+          ],
+          conditions,
+          groupBy: ['$bucket', 'op'],
+          orderBy: [{ field: 'hour', direction: 'ASC' }],
         });
-        const data = await result.json();
-        return reply.send({ data: data.data || [] });
+
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get span volume', {
-          projectId,
-          error: error instanceof Error ? error.message : String(error),
+          projectId, error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get span volume' });
       }

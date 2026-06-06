@@ -2,7 +2,6 @@ import * as jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { mysqlPool } from '../config/mysql';
 
-
 export class GithubAppService {
   private static async getAppCredentials(): Promise<{ app_id: string; private_key: string } | null> {
     const [rows] = await mysqlPool.execute(
@@ -18,7 +17,7 @@ export class GithubAppService {
     if (!creds || !creds.app_id || !creds.private_key) {
       throw new Error('GitHub App credentials not configured');
     }
-    
+
     const now = Math.floor(Date.now() / 1000);
     const payload = {
       iat: now - 60, // Issued 60 seconds in the past to allow for clock drift

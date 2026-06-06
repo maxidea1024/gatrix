@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { mysqlPool } from '../config/mysql';
-import { clickhouse } from '../config/clickhouse';
+import { optic } from '@gatrix/argus-optic';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { ConfigBroadcaster } from '../utils/config-broadcaster';
@@ -8,8 +8,6 @@ import { CONFIG_TYPES } from '../config/redis-keys';
 
 const logger = createLogger('issues-api');
 const broadcaster = new ConfigBroadcaster(redis);
-
-
 
 export default async function issuesRoutes(app: FastifyInstance) {
   // Issue volume chart data (daily error counts)
@@ -47,14 +45,14 @@ export default async function issuesRoutes(app: FastifyInstance) {
         else if (deltaSeconds <= 7 * 86400) interval = '4 HOUR';
         else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';
 
-        const qp: Record<string, any> = { 
+        const qp: Record<string, any> = {
           projectId: String(projectId),
           fillStart: Math.floor(startDt.getTime() / 1000),
           fillEnd: Math.floor(endDt.getTime() / 1000),
         };
 
         const conditions = [
-          `project_id = {projectId:String}`, 
+          `project_id = {projectId:String}`,
           `timestamp >= toDateTime({fillStart:UInt32})`,
           `timestamp <= toDateTime({fillEnd:UInt32})`
         ];
@@ -91,7 +89,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           qp.os = os;
         }
 
-        // Text query filter — search in title/culprit by matching issue_ids from MySQL
+        // Text query filter ??search in title/culprit by matching issue_ids from MySQL
         if (query) {
           try {
             const [queryRows] = await mysqlPool.query(
@@ -106,7 +104,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           } catch { /* ignore query filter errors */ }
         }
 
-        const result = await clickhouse.query({
+        const result = await optic.rawQuery({
           query: `
             SELECT
               toStartOfInterval(timestamp, INTERVAL ${interval}) AS day,
@@ -121,10 +119,9 @@ export default async function issuesRoutes(app: FastifyInstance) {
               TO toDateTime({fillEnd:UInt32})
               STEP INTERVAL ${interval}
           `,
-          query_params: qp,
+          params: qp,
         });
-        const data = await result.json<any>();
-        return reply.send({ data: data.data || [] });
+        return reply.send({ data: result.data || [] });
       } catch (error) {
         logger.error('Failed to get issue volume', { projectId, error: String(error) });
         return reply.code(500).send({ error: 'Failed to get issue volume' });
@@ -155,8 +152,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       } = request.query as Record<string, string>;
 
       try {
-
-
         // Resolve issue_ids from ClickHouse when contextual or time filters are set
         let issueIdFilter: number[] | null = null;
         const hasContextFilter = !!(environment || browser || os);
@@ -196,12 +191,11 @@ export default async function issuesRoutes(app: FastifyInstance) {
             }
           }
 
-          const chResult = await clickhouse.query({
+          const chResult = await optic.rawQuery({
             query: `SELECT DISTINCT issue_id FROM argus.errors WHERE ${conditions.join(' AND ')} LIMIT 10000`,
-            query_params: qp,
+            params: qp,
           });
-          const chRows = await chResult.json<{ data: { issue_id: string }[] }>();
-          issueIdFilter = (chRows.data || []).map((r: any) => Number(r.issue_id));
+          issueIdFilter = (chResult.data || []).map((r: any) => Number(r.issue_id));
 
           // If no matching issues found, return empty
           if (issueIdFilter.length === 0) {
@@ -265,7 +259,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
         let sparklineMap = new Map<number, number[]>();
         if (issueIds.length > 0) {
           try {
-            const sparkResult = await clickhouse.query({
+            const sparkResult = await optic.rawQuery({
               query: `
                 SELECT issue_id, toStartOfHour(timestamp) as hour, count() as cnt
                 FROM argus.errors
@@ -275,11 +269,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
                 GROUP BY issue_id, hour
                 ORDER BY issue_id, hour
               `,
-              query_params: { projectId: String(projectId) },
+              params: { projectId: String(projectId) },
             });
-            const sparkData = await sparkResult.json<any>();
             // Build 24-slot arrays (one per hour)
-            for (const row of (sparkData.data || [])) {
+            for (const row of (sparkResult.data || []) as any[]) {
               const id = Number(row.issue_id);
               if (!sparklineMap.has(id)) sparklineMap.set(id, new Array(24).fill(0));
               const hourDate = new Date(row.hour);
@@ -348,8 +341,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-
-
         // Generate a fingerprint from title
         const crypto = require('crypto');
         const fingerprint = crypto.createHash('md5').update(body.title).digest('hex');
@@ -422,7 +413,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
               trackerId: body.tracker_id,
               error: (trackerError as Error).message,
             });
-            // Don't fail the whole request — internal issue was already created
+            // Don't fail the whole request ??internal issue was already created
           }
         }
 
@@ -453,8 +444,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-
-
         const [rows] = await mysqlPool.query(
           'SELECT * FROM g_argus_issues WHERE id = ? AND project_id = ?',
           [issueId, projectId]
@@ -467,32 +456,45 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
         const issue = results[0];
 
-        // Fetch latest event from ClickHouse for stacktrace / breadcrumbs
+        // Fetch latest event and counts from ClickHouse in parallel
         try {
-          const latestEventResult = await clickhouse.query({
-            query: `
-              SELECT
-                event_id, timestamp, platform, level, type, value, mechanism,
-                exception, stacktrace_frames, breadcrumbs,
-                user_id, user_email, user_ip, user_name,
-                environment, release, transaction,
-                os_name, os_version, browser_name, browser_version,
-                device_name, device_family, runtime_name, runtime_version,
-                sdk_name, sdk_version, tags, extra, contexts,
-                http_method, http_url
-              FROM argus.errors
-              WHERE project_id = {projectId:String}
-                AND issue_id = {issueId:UInt64}
-              ORDER BY timestamp DESC
-              LIMIT 1
-            `,
-            query_params: {
-              projectId: String(projectId),
-              issueId: parseInt(issueId, 10),
-            },
-          });
-          const eventData = await latestEventResult.json();
-          const latestEvent = (eventData.data as any[])?.[0];
+          const chParams = {
+            projectId: String(projectId),
+            issueId: parseInt(issueId, 10),
+          };
+
+          const [latestEventResult, countResult] = await Promise.all([
+            optic.rawQuery({
+              query: `
+                SELECT
+                  event_id, timestamp, platform, level, type, value, mechanism,
+                  exception, stacktrace_frames, breadcrumbs,
+                  user_id, user_email, user_ip, user_name,
+                  environment, release, transaction,
+                  os_name, os_version, browser_name, browser_version,
+                  device_name, device_family, runtime_name, runtime_version,
+                  sdk_name, sdk_version, tags, extra, contexts,
+                  http_method, http_url
+                FROM argus.errors
+                WHERE project_id = {projectId:String}
+                  AND issue_id = {issueId:UInt64}
+                ORDER BY timestamp DESC
+                LIMIT 1
+              `,
+              params: chParams,
+            }),
+            optic.rawQuery({
+              query: `
+                SELECT count() as event_count, uniq(user_id) as user_count
+                FROM argus.errors
+                WHERE project_id = {projectId:String}
+                  AND issue_id = {issueId:UInt64}
+              `,
+              params: chParams,
+            }),
+          ]);
+
+          const latestEvent = (latestEventResult.data as any[])?.[0];
 
           if (latestEvent) {
             // Parse JSON strings back to objects for the frontend
@@ -524,21 +526,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
             };
           }
 
-          // Fetch event count and user count
-          const countResult = await clickhouse.query({
-            query: `
-              SELECT count() as event_count, uniq(user_id) as user_count
-              FROM argus.errors
-              WHERE project_id = {projectId:String}
-                AND issue_id = {issueId:UInt64}
-            `,
-            query_params: {
-              projectId: String(projectId),
-              issueId: parseInt(issueId, 10),
-            },
-          });
-          const countData = await countResult.json();
-          const counts = (countData.data as any[])?.[0];
+          const counts = (countResult.data as any[])?.[0];
           if (counts) {
             issue.event_count = parseInt(counts.event_count, 10);
             issue.user_count = parseInt(counts.user_count, 10);
@@ -548,7 +536,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
             issueId,
             error: chError instanceof Error ? chError.message : String(chError),
           });
-          // Continue without latest_event — MySQL data is still returned
+          // Continue without latest_event ??MySQL data is still returned
         }
 
         return reply.send({ data: issue });
@@ -574,27 +562,30 @@ export default async function issuesRoutes(app: FastifyInstance) {
       const { limit = '20', offset = '0' } = request.query as Record<string, string>;
 
       try {
-        const result = await clickhouse.query({
-          query: `
-            SELECT *
-            FROM argus.errors
-            WHERE project_id = {projectId:String}
-              AND issue_id = {issueId:UInt64}
-            ORDER BY timestamp DESC
-            LIMIT {limit:UInt32}
-            OFFSET {offset:UInt32}
-          `,
-          query_params: {
-            projectId: String(projectId),
-            issueId: parseInt(issueId, 10),
-            limit: parseInt(limit, 10),
-            offset: parseInt(offset, 10),
-          },
+        const result = await optic.query({
+          dataset: 'errors', projectId,
+          timeRange: { period: '90d' },
+          select: [
+            { field: 'event_id' }, { field: 'timestamp' }, { field: 'platform' },
+            { field: 'level' }, { field: 'type' }, { field: 'value' },
+            { field: 'mechanism' }, { field: 'exception' }, { field: 'stacktrace_frames' },
+            { field: 'breadcrumbs' }, { field: 'user_id' }, { field: 'user_email' },
+            { field: 'user_ip' }, { field: 'user_name' }, { field: 'environment' },
+            { field: 'release' }, { field: 'transaction' }, { field: 'os_name' },
+            { field: 'os_version' }, { field: 'browser_name' }, { field: 'browser_version' },
+            { field: 'device_name' }, { field: 'device_family' }, { field: 'runtime_name' },
+            { field: 'runtime_version' }, { field: 'sdk_name' }, { field: 'sdk_version' },
+            { field: 'tags' }, { field: 'extra' }, { field: 'contexts' },
+            { field: 'http_method' }, { field: 'http_url' }, { field: 'is_handled' },
+            { field: 'fingerprint' }, { field: 'issue_id' },
+          ],
+          conditions: [{ field: 'issue_id', op: '=', value: parseInt(issueId, 10) }],
+          orderBy: [{ field: 'timestamp', direction: 'DESC' }],
+          limit: parseInt(limit, 10),
+          offset: parseInt(offset, 10),
         });
 
-        const events = await result.json();
-
-        return reply.send({ data: events.data });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get issue events', {
           projectId,
@@ -631,7 +622,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
       else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';
 
       try {
-        const result = await clickhouse.query({
+        const result = await optic.rawQuery({
           query: `
             SELECT
               toStartOfInterval(timestamp, INTERVAL ${interval}) AS timestamp,
@@ -649,7 +640,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
               TO toDateTime({fillEnd:UInt32})
               STEP INTERVAL ${interval}
           `,
-          query_params: {
+          params: {
             projectId: String(projectId),
             issueId: parseInt(issueId, 10),
             fillStart: Math.floor(startDt.getTime() / 1000),
@@ -657,9 +648,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           },
         });
 
-        const stats = await result.json();
-
-        return reply.send({ data: stats.data });
+        return reply.send({ data: result.data });
       } catch (error) {
         logger.error('Failed to get issue stats', {
           projectId,
@@ -681,42 +670,52 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-        // Column mapping: display key -> actual ClickHouse column name
-        const tagColumns: { key: string; column: string }[] = [
-          { key: 'browser', column: 'browser_name' },
-          { key: 'os', column: 'os_name' },
-          { key: 'level', column: 'level' },
-          { key: 'environment', column: 'environment' },
-          { key: 'release', column: 'release' },
-          { key: 'url', column: 'http_url' },
-        ];
-
-        const tagQueries = tagColumns.map(async ({ key, column }) => {
-          const result = await clickhouse.query({
-            query: `
-              SELECT ${column} AS value, count() AS cnt
-              FROM argus.errors
-              WHERE project_id = {projectId:String}
-                AND issue_id = {issueId:UInt64}
-                AND ${column} != ''
-              GROUP BY ${column}
-              ORDER BY cnt DESC
-              LIMIT 10
-            `,
-            query_params: { projectId: String(projectId), issueId: parseInt(issueId, 10) },
-            format: 'JSONEachRow',
-          });
-          const data = await result.json() as any[];
-          return {
-            key,
-            totalValues: data.length,
-            topValues: data.map(r => ({ value: r.value, count: Number(r.cnt) })),
-          };
+        // Single UNION ALL query instead of 6 individual queries
+        const chParams = { projectId: String(projectId), issueId: parseInt(issueId, 10) };
+        const result = await optic.rawQuery({
+          query: `
+            SELECT 'browser' AS key, browser_name AS value, count() AS cnt
+            FROM argus.errors WHERE project_id = {projectId:String} AND issue_id = {issueId:UInt64} AND browser_name != ''
+            GROUP BY browser_name ORDER BY cnt DESC LIMIT 10
+            UNION ALL
+            SELECT 'os' AS key, os_name AS value, count() AS cnt
+            FROM argus.errors WHERE project_id = {projectId:String} AND issue_id = {issueId:UInt64} AND os_name != ''
+            GROUP BY os_name ORDER BY cnt DESC LIMIT 10
+            UNION ALL
+            SELECT 'level' AS key, level AS value, count() AS cnt
+            FROM argus.errors WHERE project_id = {projectId:String} AND issue_id = {issueId:UInt64} AND level != ''
+            GROUP BY level ORDER BY cnt DESC LIMIT 10
+            UNION ALL
+            SELECT 'environment' AS key, environment AS value, count() AS cnt
+            FROM argus.errors WHERE project_id = {projectId:String} AND issue_id = {issueId:UInt64} AND environment != ''
+            GROUP BY environment ORDER BY cnt DESC LIMIT 10
+            UNION ALL
+            SELECT 'release' AS key, release AS value, count() AS cnt
+            FROM argus.errors WHERE project_id = {projectId:String} AND issue_id = {issueId:UInt64} AND release != ''
+            GROUP BY release ORDER BY cnt DESC LIMIT 10
+            UNION ALL
+            SELECT 'url' AS key, http_url AS value, count() AS cnt
+            FROM argus.errors WHERE project_id = {projectId:String} AND issue_id = {issueId:UInt64} AND http_url != ''
+            GROUP BY http_url ORDER BY cnt DESC LIMIT 10
+          `,
+          params: chParams,
         });
+        const rows = result.data as any[];
 
-        const tags = await Promise.all(tagQueries);
-        // Filter out tags with no values
-        const filtered = tags.filter(t => t.topValues.length > 0);
+        // Group results by key
+        const tagMap = new Map<string, { value: string; count: number }[]>();
+        for (const row of rows) {
+          if (!tagMap.has(row.key)) tagMap.set(row.key, []);
+          tagMap.get(row.key)!.push({ value: row.value, count: Number(row.cnt) });
+        }
+
+        const filtered = Array.from(tagMap.entries())
+          .filter(([, values]) => values.length > 0)
+          .map(([key, topValues]) => ({
+            key,
+            totalValues: topValues.length,
+            topValues,
+          }));
 
         return reply.send({ data: filtered });
       } catch (error) {
@@ -746,8 +745,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-
-
         const updates: string[] = [];
         const params: any[] = [];
 
@@ -847,8 +844,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-
-
         const updates: string[] = [];
         const params: any[] = [];
 
@@ -919,11 +914,9 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
       const connection = await mysqlPool.getConnection();
       try {
-
-
         await connection.beginTransaction();
 
-        // Get all issues sorted by times_seen DESC — the most seen one becomes primary
+        // Get all issues sorted by times_seen DESC ??the most seen one becomes primary
         const [rows] = await connection.query(
           `SELECT id, times_seen, first_seen, last_seen, primary_hash
            FROM g_argus_issues
@@ -1001,8 +994,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
 
       try {
-
-
         const { limit, offset } = request.query as Record<string, string>;
         const limitVal = limit ? parseInt(limit, 10) : 50;
         const offsetVal = offset ? parseInt(offset, 10) : 0;
@@ -1041,8 +1032,6 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-
-
         await mysqlPool.query(
           `INSERT INTO g_argus_issue_activity (project_id, issue_id, user_name, action, data) VALUES (?, ?, ?, 'comment', ?)`,
           [projectId, issueId, userName, JSON.stringify({ text: text.trim() })]
