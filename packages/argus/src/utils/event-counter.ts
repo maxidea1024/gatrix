@@ -41,7 +41,8 @@ export async function recordEventForIssue(
     const userKey = COUNTERS.USER_COUNT(projectId, issueId);
     const projectKey = COUNTERS.PROJECT_EVENT_COUNT(projectId);
 
-    // Event count: Sorted Set with timestamp as score + TTL
+    // Event count: Sorted Set with timestamp as score.
+    // Idempotent by design: same eventId on retry updates score only (no double-counting).
     pipeline.zadd(eventKey, now.toString(), eventId);
     pipeline.expire(eventKey, COUNTER_TTL_SEC);
 

@@ -170,8 +170,14 @@ export class ErrorWorker {
   }
 
   /**
+   * Maximum number of buffered error records before dropping.
+   * Prevents OOM when ClickHouse is unavailable for extended periods.
+   */
+  private readonly MAX_BUFFER_SIZE = 50_000;
+
+  /**
    * Flush the accumulated ClickHouse buffer.
-   * On failure, records are returned to the buffer for the next attempt.
+   * On failure, records are returned to the buffer (capped at MAX_BUFFER_SIZE).
    */
   private async flushClickHouse(): Promise<void> {
     if (this.chBuffer.length === 0) return;
@@ -187,12 +193,28 @@ export class ErrorWorker {
 
       logger.info('ClickHouse batch flushed', { count: batch.length });
     } catch (error) {
-      // Put records back for retry on next flush cycle
-      this.chBuffer.unshift(...batch);
       logger.error('ClickHouse flush failed, will retry', {
         count: batch.length,
         error: error instanceof Error ? error.message : String(error),
       });
+
+      // Put failed records back for retry, but cap total buffer size
+      const spaceAvailable = this.MAX_BUFFER_SIZE - this.chBuffer.length;
+      if (spaceAvailable >= batch.length) {
+        this.chBuffer = batch.concat(this.chBuffer);
+      } else if (spaceAvailable > 0) {
+        const kept = batch.slice(batch.length - spaceAvailable);
+        this.chBuffer = kept.concat(this.chBuffer);
+        logger.warn('Error buffer overflow, dropped oldest entries', {
+          dropped: batch.length - spaceAvailable,
+          bufferSize: this.chBuffer.length,
+        });
+      } else {
+        logger.warn('Error buffer full, dropped entire failed batch', {
+          dropped: batch.length,
+          bufferSize: this.chBuffer.length,
+        });
+      }
     }
   }
 }

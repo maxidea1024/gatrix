@@ -2,7 +2,7 @@ import { mysqlPool } from '../config/mysql';
 import { clickhouse } from '../config/clickhouse';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
-import { CACHE } from '../config/redis-keys';
+import { CACHE, COUNTERS } from '../config/redis-keys';
 import { pipelineConfig } from '../config/pipeline-config';
 
 const logger = createLogger('cron-supervisor-worker');
@@ -191,14 +191,21 @@ export class CronSupervisorWorker {
       return;
     }
 
+    // Atomic short_id via Redis (consistent with issue-grouper)
+    const nextShortId = await redis.hincrby(
+      COUNTERS.ISSUE_SHORT_ID(monitor.project_id),
+      'seq',
+      1
+    );
+
     await mysqlPool.query(
-      `INSERT INTO g_argus_issues (
+      `INSERT IGNORE INTO g_argus_issues (
         project_id, short_id, title, culprit, type, level, platform, 
         primary_hash, first_seen, last_seen
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
       [
         monitor.project_id,
-        Math.floor(Math.random() * 10000), 
+        nextShortId,
         `Cron Monitor Missed Check-in: ${monitor.name}`,
         monitor.slug,
         'cron_error',
