@@ -15,6 +15,7 @@ export interface LogVolumeChartProps {
   isDark: boolean;
   period: string;
   onZoom?: (start: string, end: string) => void;
+  isDragging?: boolean;
 }
 
 /**
@@ -49,7 +50,7 @@ function getSeverityColor(level: string): string {
 }
 
 const LogVolumeChart = React.memo<LogVolumeChartProps>(
-  ({ data, isDark, period, onZoom }) => {
+  ({ data, isDark, period, onZoom, isDragging }) => {
     const { t, i18n } = useTranslation();
 
     const { chartConfig, buckets } = useMemo(() => {
@@ -153,6 +154,29 @@ const LogVolumeChart = React.memo<LogVolumeChartProps>(
         onZoom(startDate.toISOString(), endDate.toISOString());
       }
     };
+
+    if (isDragging) {
+      return (
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 2,
+            p: 2,
+            height: 172,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+            border: `1px dashed ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body2" sx={{ color: 'text.disabled', fontStyle: 'italic', fontWeight: 600 }}>
+            {t('argus.logs.chartResizing', 'Adjusting chart size...')}
+          </Typography>
+        </Paper>
+      );
+    }
 
     if (!chartConfig)
       return (

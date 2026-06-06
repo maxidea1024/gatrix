@@ -427,4 +427,4 @@ const LogsTablePanel: React.FC<LogsTablePanelProps> = ({
   );
 };
 
-export default LogsTablePanel;
+export default React.memo(LogsTablePanel);

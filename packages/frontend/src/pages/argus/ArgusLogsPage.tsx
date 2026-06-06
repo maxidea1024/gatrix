@@ -420,6 +420,7 @@ const ArgusLogsPage: React.FC = () => {
               isDark={isDark}
               period={currentPeriod}
               onZoom={handleZoom}
+              isDragging={isPanelDragging || isFacetDragging}
             />
           </Box>
 
