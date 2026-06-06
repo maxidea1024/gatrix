@@ -110,8 +110,14 @@ export class TransactionWorker {
   }
 
   /**
+   * Maximum number of buffered records per buffer before dropping.
+   * Prevents OOM when ClickHouse is unavailable for extended periods.
+   */
+  private readonly MAX_BUFFER_SIZE = 50_000;
+
+  /**
    * Flush both transaction and span buffers to ClickHouse.
-   * On failure, records are returned to buffers for the next attempt.
+   * On failure, records are returned to buffers (capped at MAX_BUFFER_SIZE).
    */
   private async flushClickHouse(): Promise<void> {
     const txnBatch = this.txnBuffer.splice(0);
@@ -148,13 +154,33 @@ export class TransactionWorker {
 
       await Promise.all(promises);
     } catch (error) {
-      // Put records back for retry
-      this.txnBuffer.unshift(...txnBatch);
-      this.spanBuffer.unshift(...spanBatch);
       logger.error('ClickHouse flush failed, will retry', {
         txnCount: txnBatch.length,
         spanCount: spanBatch.length,
         error: error instanceof Error ? error.message : String(error),
+      });
+
+      // Put failed records back for retry, but cap total buffer size
+      this.returnToBuffer(this.txnBuffer, txnBatch, 'transaction');
+      this.returnToBuffer(this.spanBuffer, spanBatch, 'span');
+    }
+  }
+
+  private returnToBuffer<T>(buffer: T[], batch: T[], label: string): void {
+    const spaceAvailable = this.MAX_BUFFER_SIZE - buffer.length;
+    if (spaceAvailable >= batch.length) {
+      buffer.unshift(...batch);
+    } else if (spaceAvailable > 0) {
+      const kept = batch.slice(batch.length - spaceAvailable);
+      buffer.unshift(...kept);
+      logger.warn(`${label} buffer overflow, dropped oldest entries`, {
+        dropped: batch.length - spaceAvailable,
+        bufferSize: buffer.length,
+      });
+    } else {
+      logger.warn(`${label} buffer full, dropped entire failed batch`, {
+        dropped: batch.length,
+        bufferSize: buffer.length,
       });
     }
   }
