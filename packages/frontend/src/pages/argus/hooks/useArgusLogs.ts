@@ -488,8 +488,9 @@ export function useArgusLogs() {
       } finally {
         setLoading(false);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [projectId, filters, searchDebounce, buildSearchWithFilters, setUrlState]
+    [projectId, filters, searchDebounce, activeFilters]
   );
 
   const fetchFacets = useCallback(async () => {
