@@ -26,7 +26,7 @@ interface FeedbackData {
 
 interface AlertRule {
   id: number;
-  project_id: number;
+  project_id: string;
   name: string;
   conditions: string;
   actions: string;
@@ -48,7 +48,7 @@ export async function evaluateFeedbackAlerts(
   try {
     // Fetch enabled rules with 'new_feedback' conditions from in-memory store
     const rules = alertRuleStore.getRulesWithCondition(
-      parseInt(String(feedback.project_id), 10),
+      feedback.project_id,
       ['new_feedback']
     ) as AlertRule[];
 
@@ -134,7 +134,7 @@ export async function evaluateErrorAlerts(
   try {
     // Fetch enabled rules with error-related conditions from in-memory store
     const rules = alertRuleStore.getRulesWithCondition(
-      event.internal_project_id,
+      event.project_id,
       ['new_issue', 'regression', 'event_frequency', 'user_count', 'project_error_rate', 'high_priority_issue', 'property_match']
     ) as AlertRule[];
     if (rules.length === 0) return;

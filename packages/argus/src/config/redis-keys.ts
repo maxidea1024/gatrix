@@ -102,7 +102,7 @@ export const COUNTERS = {
   ISSUE_TIMES_SEEN: 'argus:issue-times-seen',
 
   /** Hash: atomic short_id counter per project */
-  ISSUE_SHORT_ID: (projectId: number) =>
+  ISSUE_SHORT_ID: (projectId: string) =>
     `argus:issue-counter:${projectId}`,
 } as const;
 

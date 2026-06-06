@@ -3,18 +3,19 @@ import { config } from '../config';
 import { CHANNELS, CONFIG_TYPES } from '../config/redis-keys';
 import { createLogger } from './logger';
 import { issueLookupCache } from '../processing/issue-cache';
+import { alertRuleStore } from './alert-rule-store';
+import { dsnStore } from './dsn-store';
 
 const logger = createLogger('config-subscriber');
 
 /**
  * Central subscriber for config change notifications in the worker process.
  *
- * Coordinates cache invalidation across all in-memory stores when the
- * API broadcasts changes via Redis Pub/Sub.
- *
- * Note: AlertRuleStore and DsnStore each manage their own subscriptions.
- * This subscriber handles issue-level invalidation (status changes)
- * that affect IssueLookupCache.
+ * Coordinates cache invalidation across ALL in-memory stores via a single
+ * Redis Pub/Sub connection (instead of per-store connections):
+ * - AlertRuleStore: reloads project-specific or all rules
+ * - DsnStore: reloads all DSN keys
+ * - IssueLookupCache: invalidates by issue or project
  */
 export class ConfigSubscriber {
   private subscriber: Redis | null = null;
@@ -29,11 +30,24 @@ export class ConfigSubscriber {
     });
 
     await this.subscriber.subscribe(CHANNELS.CONFIG_CHANGED);
-    this.subscriber.on('message', (_channel: string, message: string) => {
+    this.subscriber.on('message', async (_channel: string, message: string) => {
       try {
         const payload = JSON.parse(message);
 
         switch (payload.type) {
+          case CONFIG_TYPES.ALERT_RULES:
+            if (payload.projectId) {
+              await alertRuleStore.reloadProject(payload.projectId);
+            } else {
+              await alertRuleStore.reloadAll();
+            }
+            break;
+
+          case CONFIG_TYPES.DSN_KEYS:
+            await dsnStore.loadAll();
+            logger.debug('DSN keys reloaded via Pub/Sub', { count: 'reloaded' });
+            break;
+
           case CONFIG_TYPES.ISSUE_STATUS:
             if (payload.issueId) {
               issueLookupCache.invalidateByIssueId(payload.issueId);
@@ -47,8 +61,6 @@ export class ConfigSubscriber {
               logger.debug('Project issue cache invalidated', { projectId: payload.projectId });
             }
             break;
-
-          // AlertRuleStore and DsnStore handle their own types
         }
       } catch (e) {
         logger.warn('Failed to process config change in subscriber', {
@@ -57,7 +69,7 @@ export class ConfigSubscriber {
       }
     });
 
-    logger.info('ConfigSubscriber initialized');
+    logger.info('ConfigSubscriber initialized (unified Pub/Sub handler)');
   }
 
   async close(): Promise<void> {

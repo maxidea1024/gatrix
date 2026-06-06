@@ -9,7 +9,6 @@ interface CachedIssue {
 /**
  * Maximum number of entries in the issue lookup cache.
  * Prevents unbounded memory growth during long-running worker processes.
- * When the limit is reached, the oldest entry (by Map insertion order) is evicted.
  */
 const MAX_CACHE_SIZE = 100_000;
 
@@ -29,11 +28,11 @@ export class IssueLookupCache {
   /** Map<"projectId:primaryHash", CachedIssue> */
   private cache: Map<string, CachedIssue> = new Map();
 
-  private key(projectId: number, primaryHash: string): string {
+  private key(projectId: string, primaryHash: string): string {
     return `${projectId}:${primaryHash}`;
   }
 
-  get(projectId: number, primaryHash: string): CachedIssue | null {
+  get(projectId: string, primaryHash: string): CachedIssue | null {
     const k = this.key(projectId, primaryHash);
     const entry = this.cache.get(k);
     if (!entry) return null;
@@ -44,7 +43,7 @@ export class IssueLookupCache {
     return entry;
   }
 
-  set(projectId: number, primaryHash: string, issue: CachedIssue): void {
+  set(projectId: string, primaryHash: string, issue: CachedIssue): void {
     const k = this.key(projectId, primaryHash);
 
     // If already exists, delete first to update insertion order
@@ -81,9 +80,8 @@ export class IssueLookupCache {
 
   /**
    * Invalidate all entries for a project.
-   * Accepts both string and number projectId for compatibility with route params.
    */
-  invalidateByProjectId(projectId: string | number): void {
+  invalidateByProjectId(projectId: string): void {
     const prefix = `${projectId}:`;
     for (const key of this.cache.keys()) {
       if (key.startsWith(prefix)) {

@@ -31,9 +31,9 @@ export async function groupIntoIssue(
   fingerprint: string[]
 ): Promise<IssueGroupResult> {
   // 1. Check in-memory cache first (O(1) lookup)
-  const cached = issueLookupCache.get(internalProjectId, primaryHash);
+  const cached = issueLookupCache.get(projectId, primaryHash);
   if (cached) {
-    return handleExistingIssue(cached.issueId, cached.status, cached.substatus, internalProjectId, primaryHash, event);
+    return handleExistingIssue(cached.issueId, cached.status, cached.substatus, projectId, primaryHash, event);
   }
 
   // 2. Cache miss → plain SELECT (no FOR UPDATE, no connection.getConnection())
@@ -49,13 +49,13 @@ export async function groupIntoIssue(
     const issue = rows[0];
 
     // Populate cache for next time
-    issueLookupCache.set(internalProjectId, primaryHash, {
+    issueLookupCache.set(projectId, primaryHash, {
       issueId: issue.id,
       status: issue.status,
       substatus: issue.substatus || null,
     });
 
-    return handleExistingIssue(issue.id, issue.status, issue.substatus, internalProjectId, primaryHash, event);
+    return handleExistingIssue(issue.id, issue.status, issue.substatus, projectId, primaryHash, event);
   }
 
   // 3. New issue — create with Redis-based short_id
@@ -70,7 +70,7 @@ async function handleExistingIssue(
   issueId: number,
   status: string,
   _substatus: string | null,
-  internalProjectId: number,
+  projectId: string,
   primaryHash: string,
   event: ArgusErrorEvent
 ): Promise<IssueGroupResult> {
@@ -94,7 +94,7 @@ async function handleExistingIssue(
     );
 
     // Update cache with new status
-    issueLookupCache.set(internalProjectId, primaryHash, {
+    issueLookupCache.set(projectId, primaryHash, {
       issueId,
       status: 'unresolved',
       substatus: 'regressed',
@@ -130,7 +130,7 @@ async function createNewIssue(
 ): Promise<IssueGroupResult> {
   // Atomic increment — no race condition possible
   const nextShortId = await redis.hincrby(
-    COUNTERS.ISSUE_SHORT_ID(internalProjectId),
+    COUNTERS.ISSUE_SHORT_ID(projectId),
     'seq',
     1
   );
@@ -169,19 +169,19 @@ async function createNewIssue(
     );
     const existing = (rows as any[])[0];
     if (existing) {
-      issueLookupCache.set(internalProjectId, primaryHash, {
+      issueLookupCache.set(projectId, primaryHash, {
         issueId: existing.id,
         status: existing.status,
         substatus: existing.substatus || null,
       });
-      return handleExistingIssue(existing.id, existing.status, existing.substatus, internalProjectId, primaryHash, event);
+      return handleExistingIssue(existing.id, existing.status, existing.substatus, projectId, primaryHash, event);
     }
     // Extremely rare: IGNORE triggered but row not found — log and re-throw
     throw new Error(`INSERT IGNORE returned 0 but no existing issue found for hash ${primaryHash}`);
   }
 
   // Populate cache immediately
-  issueLookupCache.set(internalProjectId, primaryHash, {
+  issueLookupCache.set(projectId, primaryHash, {
     issueId,
     status: 'unresolved',
     substatus: null,

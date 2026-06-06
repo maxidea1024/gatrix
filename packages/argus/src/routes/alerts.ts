@@ -89,7 +89,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         const insertId = (result as any).insertId;
 
         // Notify workers to reload alert rules for this project
-        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId: parseInt(projectId, 10) });
+        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId });
 
         return reply.code(201).send({ data: { id: insertId } });
       } catch (error) {
@@ -152,7 +152,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         );
 
         // Notify workers to reload alert rules for this project
-        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId: parseInt(projectId, 10) });
+        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId });
 
         return reply.send({ success: true });
       } catch (error) {
@@ -178,7 +178,7 @@ export default async function alertsRoutes(app: FastifyInstance) {
         );
 
         // Notify workers to reload alert rules for this project
-        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId: parseInt(projectId, 10) });
+        await broadcaster.publish({ type: CONFIG_TYPES.ALERT_RULES, projectId });
 
         return reply.send({ success: true });
       } catch (error) {

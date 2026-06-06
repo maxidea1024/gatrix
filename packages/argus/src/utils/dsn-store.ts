@@ -1,8 +1,5 @@
 import { mysqlPool } from '../config/mysql';
 import { createLogger } from './logger';
-import { CHANNELS, CONFIG_TYPES } from '../config/redis-keys';
-import Redis from 'ioredis';
-import { config } from '../config';
 import { DsnAuthResult } from '../middleware/dsn-auth';
 
 const logger = createLogger('dsn-store');
@@ -24,44 +21,21 @@ interface StoredDsn {
  *
  * Strategy:
  * - Load all active DSN keys on worker/API startup.
- * - Subscribe to Pub/Sub for instant invalidation on DSN CRUD.
+ * - ConfigSubscriber handles Pub/Sub dispatch for cache invalidation
+ *   (single shared Redis connection instead of per-store connections).
  * - No TTL, no Redis cache — pure in-memory O(1) lookup.
  *
  * Eliminates per-request Redis GET + MySQL fallback chain.
  */
 export class DsnStore {
   private dsnMap: Map<string, StoredDsn> = new Map(); // publicKey → StoredDsn
-  private subscriber: Redis | null = null;
 
   /**
-   * Initialize store: load all DSN keys, then subscribe to Pub/Sub.
+   * Initialize store: load all DSN keys from MySQL.
+   * Pub/Sub subscription is handled by ConfigSubscriber (single connection).
    */
   async init(): Promise<void> {
     await this.loadAll();
-
-    this.subscriber = new Redis({
-      host: config.redis.host,
-      port: config.redis.port,
-      password: config.redis.password || undefined,
-      db: config.redis.db,
-      maxRetriesPerRequest: null,
-    });
-
-    await this.subscriber.subscribe(CHANNELS.CONFIG_CHANGED);
-    this.subscriber.on('message', async (_channel: string, message: string) => {
-      try {
-        const { type } = JSON.parse(message);
-        if (type === CONFIG_TYPES.DSN_KEYS) {
-          await this.loadAll();
-          logger.info('DSN keys reloaded via Pub/Sub', { count: this.dsnMap.size });
-        }
-      } catch (e) {
-        logger.warn('Failed to process DSN config change', {
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-    });
-
     logger.info('DsnStore initialized', { dsnKeyCount: this.dsnMap.size });
   }
 
@@ -93,6 +67,7 @@ export class DsnStore {
   /**
    * Reload all active DSN keys from MySQL.
    * Builds a new Map and swaps atomically to prevent empty-window during reload.
+   * Called by ConfigSubscriber on Pub/Sub notification.
    */
   async loadAll(): Promise<void> {
     const [rows] = await mysqlPool.query(`
@@ -123,10 +98,7 @@ export class DsnStore {
   }
 
   async close(): Promise<void> {
-    if (this.subscriber) {
-      await this.subscriber.quit();
-      this.subscriber = null;
-    }
+    // No-op: Pub/Sub is managed by ConfigSubscriber
   }
 }
 

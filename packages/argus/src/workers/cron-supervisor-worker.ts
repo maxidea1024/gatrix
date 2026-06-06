@@ -97,14 +97,28 @@ export class CronSupervisorWorker {
         [hours]
       );
 
+      // Circuit breaker: stop after consecutive failures (e.g. ClickHouse down)
+      const MAX_CONSECUTIVE_FAILURES = 3;
+      let consecutiveFailures = 0;
+
       for (const project of projects) {
         try {
           await this.refreshProjectDiscoverTags(project.gatrix_project_id);
+          consecutiveFailures = 0; // Reset on success
         } catch (e) {
+          consecutiveFailures++;
           logger.warn('Failed to refresh discover cache for project', {
             projectId: project.gatrix_project_id,
             error: e instanceof Error ? e.message : String(e),
           });
+
+          if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+            logger.error('Discover cache refresh aborted: too many consecutive failures', {
+              failures: consecutiveFailures,
+              remainingProjects: projects.length,
+            });
+            break;
+          }
         }
       }
 

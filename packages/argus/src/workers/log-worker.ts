@@ -129,6 +129,12 @@ export class LogWorker {
   }
 
   /**
+   * Maximum number of buffered log entries before dropping.
+   * Prevents OOM when ClickHouse is unavailable for extended periods.
+   */
+  private readonly MAX_BUFFER_SIZE = 50_000;
+
+  /**
    * Batch insert buffered logs into ClickHouse.
    */
   private async flushBuffer(): Promise<void> {
@@ -149,8 +155,26 @@ export class LogWorker {
         error: error instanceof Error ? error.message : String(error),
       });
 
-      // Put failed records back at the front of the buffer for retry
-      this.chBuffer.unshift(...batch);
+      // Put failed records back for retry, but cap total buffer size
+      const spaceAvailable = this.MAX_BUFFER_SIZE - this.chBuffer.length;
+      if (spaceAvailable >= batch.length) {
+        // Enough room — prepend all failed records
+        this.chBuffer = batch.concat(this.chBuffer);
+      } else if (spaceAvailable > 0) {
+        // Partial room — keep only the newest records from the failed batch
+        const kept = batch.slice(batch.length - spaceAvailable);
+        this.chBuffer = kept.concat(this.chBuffer);
+        logger.warn('Log buffer overflow, dropped oldest entries', {
+          dropped: batch.length - spaceAvailable,
+          bufferSize: this.chBuffer.length,
+        });
+      } else {
+        // No room at all — drop the entire failed batch
+        logger.warn('Log buffer full, dropped entire failed batch', {
+          dropped: batch.length,
+          bufferSize: this.chBuffer.length,
+        });
+      }
     }
   }
 
