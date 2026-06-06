@@ -485,11 +485,7 @@ const ArgusLogsPage: React.FC = () => {
                 minHeight: 0,
                 width: '100%',
                 ...(!logsFullscreen && {
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-                  borderRadius: 2,
-                  bgcolor: isDark
-                    ? 'rgba(0, 0, 0, 0.12)'
-                    : 'rgba(255, 255, 255, 0.5)',
+                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
                 }),
               }}
             >
