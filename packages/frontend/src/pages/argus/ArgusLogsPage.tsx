@@ -414,7 +414,7 @@ const ArgusLogsPage: React.FC = () => {
           }}
         >
           {/* Volume Chart - fixed at top */}
-          <Box sx={{ flexShrink: 0, pt: 3, pb: 1, px: 2 }}>
+          <Box sx={{ flexShrink: 0, pt: 2, pb: 1, px: 2 }}>
             <LogVolumeChart
               data={volume}
               isDark={isDark}
