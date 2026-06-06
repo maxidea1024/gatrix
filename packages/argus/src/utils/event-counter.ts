@@ -5,6 +5,12 @@ import { createLogger } from './logger';
 const logger = createLogger('event-counter');
 
 /**
+ * Default TTL (seconds) for event counter sorted sets and HLL keys.
+ * Entries older than this are automatically expired by Redis.
+ */
+const COUNTER_TTL_SEC = 86400; // 24 hours
+
+/**
  * Redis-based event counting for alert evaluation.
  *
  * Replaces ClickHouse COUNT queries with O(1) Redis operations:
@@ -14,7 +20,7 @@ const logger = createLogger('event-counter');
  *   → PFCOUNT for approximate unique user counts
  * - Project-level: INCR on a simple counter
  *
- * Cleanup: Expired entries are removed periodically by BatchFlusher.
+ * All keys have TTL set to prevent unbounded Redis memory growth.
  */
 
 /**
@@ -31,20 +37,23 @@ export async function recordEventForIssue(
     const now = Date.now();
     const pipeline = redis.pipeline();
 
-    // Event count: Sorted Set with timestamp as score
-    pipeline.zadd(
-      COUNTERS.EVENT_COUNT(projectId, issueId),
-      now.toString(),
-      eventId
-    );
+    const eventKey = COUNTERS.EVENT_COUNT(projectId, issueId);
+    const userKey = COUNTERS.USER_COUNT(projectId, issueId);
+    const projectKey = COUNTERS.PROJECT_EVENT_COUNT(projectId);
 
-    // Unique user count: HyperLogLog (only if userId is available)
+    // Event count: Sorted Set with timestamp as score + TTL
+    pipeline.zadd(eventKey, now.toString(), eventId);
+    pipeline.expire(eventKey, COUNTER_TTL_SEC);
+
+    // Unique user count: HyperLogLog + TTL (only if userId is available)
     if (userId) {
-      pipeline.pfadd(COUNTERS.USER_COUNT(projectId, issueId), userId);
+      pipeline.pfadd(userKey, userId);
+      pipeline.expire(userKey, COUNTER_TTL_SEC);
     }
 
-    // Project-level event counter
-    pipeline.incr(COUNTERS.PROJECT_EVENT_COUNT(projectId));
+    // Project-level event counter + TTL
+    pipeline.incr(projectKey);
+    pipeline.expire(projectKey, COUNTER_TTL_SEC);
 
     await pipeline.exec();
   } catch (e) {
@@ -119,11 +128,41 @@ export async function getProjectEventCount(projectId: string): Promise<number> {
 
 /**
  * Clean up expired entries from event count sorted sets.
- * Called periodically by BatchFlusher.
+ * Removes entries older than maxAgeMs from all known counter keys.
+ *
+ * Called periodically by BatchFlusher. Since each key already has a TTL,
+ * this is mainly a memory optimization to trim old entries from
+ * still-active sorted sets.
  */
 export async function cleanupExpiredCounters(maxAgeMs: number): Promise<void> {
-  // This is a placeholder — in production, you'd iterate over
-  // known projects/issues and ZREMRANGEBYSCORE.
-  // For now, the sorted sets auto-expire via Redis memory policies.
-  logger.debug('Counter cleanup triggered', { maxAgeMs });
+  try {
+    const cutoff = Date.now() - maxAgeMs;
+    // Scan for event counter keys using a cursor-based approach
+    let cursor = '0';
+    let cleaned = 0;
+
+    do {
+      const [nextCursor, keys] = await redis.scan(
+        cursor,
+        'MATCH', 'argus:evt-count:*',
+        'COUNT', '100'
+      );
+      cursor = nextCursor;
+
+      if (keys.length > 0) {
+        const pipeline = redis.pipeline();
+        for (const key of keys) {
+          pipeline.zremrangebyscore(key, '-inf', cutoff);
+        }
+        await pipeline.exec();
+        cleaned += keys.length;
+      }
+    } while (cursor !== '0');
+
+    logger.debug('Counter cleanup complete', { keysScanned: cleaned, maxAgeMs });
+  } catch (e) {
+    logger.warn('Counter cleanup failed', {
+      error: e instanceof Error ? e.message : String(e),
+    });
+  }
 }

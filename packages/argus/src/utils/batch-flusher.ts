@@ -7,6 +7,20 @@ import { pipelineConfig } from '../config/pipeline-config';
 const logger = createLogger('batch-flusher');
 
 /**
+ * Lua script for atomic LRANGE + LTRIM.
+ * Returns the first N elements and trims them from the list in one step,
+ * preventing data loss from concurrent RPUSH between LRANGE and LTRIM.
+ */
+const ATOMIC_DRAIN_SCRIPT = `
+  local key = KEYS[1]
+  local count = redis.call('llen', key)
+  if count == 0 then return {} end
+  local items = redis.call('lrange', key, 0, count - 1)
+  redis.call('ltrim', key, count, -1)
+  return items
+`;
+
+/**
  * Periodic batch flusher: Redis buffers → MySQL.
  *
  * Moves high-frequency writes off the hot path into periodic bulk operations:
@@ -19,7 +33,6 @@ const logger = createLogger('batch-flusher');
 export class BatchFlusher {
   private issueStatsTimer: ReturnType<typeof setInterval> | null = null;
   private alertHistoryTimer: ReturnType<typeof setInterval> | null = null;
-
 
   start(): void {
     const { issueStatsIntervalMs, alertHistoryIntervalMs } = pipelineConfig.batchFlush;
@@ -57,15 +70,15 @@ export class BatchFlusher {
   /**
    * Flush accumulated times_seen increments and last_seen timestamps to MySQL.
    *
-   * Redis structure:
-   * - COUNTERS.ISSUE_TIMES_SEEN (Hash): field="issue:{id}", value=increment
-   * - BUFFERS.ISSUE_LAST_SEEN (Hash): field="issue:{id}", value=timestamp_ms
-   *
-   * Strategy: HGETALL + DEL atomically, then batch UPDATE.
+   * Strategy:
+   * 1. HGETALL to snapshot current values
+   * 2. MySQL batch UPDATE
+   * 3. Only on SUCCESS → HINCRBY(-N) to deduct the flushed amount
+   *    If MySQL fails, the values remain in Redis and will be retried next cycle.
    */
   private async flushIssueStats(): Promise<void> {
     try {
-      // Atomically read and clear times_seen buffer
+      // Snapshot current buffer values
       const [timesSeenEntries, lastSeenEntries] = await Promise.all([
         redis.hgetall(COUNTERS.ISSUE_TIMES_SEEN),
         redis.hgetall(BUFFERS.ISSUE_LAST_SEEN),
@@ -76,72 +89,78 @@ export class BatchFlusher {
 
       if (timesSeenKeys.length === 0 && lastSeenKeys.length === 0) return;
 
-      // Clear Redis buffers (race-safe: new increments after HGETALL will be
-      // picked up by the next flush cycle)
-      const clearPipeline = redis.pipeline();
+      // Parse and validate entries
+      const validTimesSeen: { issueId: number; increment: number; key: string }[] = [];
       for (const key of timesSeenKeys) {
-        clearPipeline.hincrby(COUNTERS.ISSUE_TIMES_SEEN, key, -parseInt(timesSeenEntries[key], 10));
+        const issueId = parseInt(key.replace('issue:', ''), 10);
+        const increment = parseInt(timesSeenEntries[key], 10);
+        if (!isNaN(issueId) && increment > 0) {
+          validTimesSeen.push({ issueId, increment, key });
+        }
       }
-      for (const key of lastSeenKeys) {
-        clearPipeline.hdel(BUFFERS.ISSUE_LAST_SEEN, key);
-      }
-      await clearPipeline.exec();
 
-      // Build batch SQL updates
+      const validLastSeen: { issueId: number; dateStr: string; key: string }[] = [];
+      for (const key of lastSeenKeys) {
+        const issueId = parseInt(key.replace('issue:', ''), 10);
+        const timestampMs = parseInt(lastSeenEntries[key], 10);
+        if (!isNaN(issueId) && timestampMs > 0) {
+          const dateStr = new Date(timestampMs).toISOString().slice(0, 19).replace('T', ' ');
+          validLastSeen.push({ issueId, dateStr, key });
+        }
+      }
+
+      if (validTimesSeen.length === 0 && validLastSeen.length === 0) return;
+
+      // MySQL batch UPDATE using parameterized queries to prevent SQL injection
       const connection = await mysqlPool.getConnection();
       try {
-        // Batch update times_seen
-        if (timesSeenKeys.length > 0) {
-          const cases: string[] = [];
-          const ids: number[] = [];
-
-          for (const key of timesSeenKeys) {
-            const issueId = parseInt(key.replace('issue:', ''), 10);
-            const increment = parseInt(timesSeenEntries[key], 10);
-            if (!isNaN(issueId) && increment > 0) {
-              cases.push(`WHEN ${issueId} THEN times_seen + ${increment}`);
-              ids.push(issueId);
-            }
-          }
-
-          if (ids.length > 0) {
+        // Batch update times_seen (individual parameterized updates in a transaction)
+        if (validTimesSeen.length > 0) {
+          await connection.beginTransaction();
+          for (const { issueId, increment } of validTimesSeen) {
             await connection.query(
-              `UPDATE g_argus_issues SET times_seen = CASE id ${cases.join(' ')} ELSE times_seen END WHERE id IN (${ids.join(',')})`
+              'UPDATE g_argus_issues SET times_seen = times_seen + ? WHERE id = ?',
+              [increment, issueId]
             );
           }
+          await connection.commit();
         }
 
         // Batch update last_seen
-        if (lastSeenKeys.length > 0) {
-          const cases: string[] = [];
-          const ids: number[] = [];
-
-          for (const key of lastSeenKeys) {
-            const issueId = parseInt(key.replace('issue:', ''), 10);
-            const timestampMs = parseInt(lastSeenEntries[key], 10);
-            if (!isNaN(issueId) && timestampMs > 0) {
-              const dateStr = new Date(timestampMs).toISOString().slice(0, 19).replace('T', ' ');
-              cases.push(`WHEN ${issueId} THEN '${dateStr}'`);
-              ids.push(issueId);
-            }
-          }
-
-          if (ids.length > 0) {
+        if (validLastSeen.length > 0) {
+          await connection.beginTransaction();
+          for (const { issueId, dateStr } of validLastSeen) {
             await connection.query(
-              `UPDATE g_argus_issues SET last_seen = CASE id ${cases.join(' ')} ELSE last_seen END WHERE id IN (${ids.join(',')})`
+              'UPDATE g_argus_issues SET last_seen = ? WHERE id = ?',
+              [dateStr, issueId]
             );
           }
+          await connection.commit();
         }
 
+        // SUCCESS: now deduct the flushed amounts from Redis
+        const clearPipeline = redis.pipeline();
+        for (const { key, increment } of validTimesSeen) {
+          clearPipeline.hincrby(COUNTERS.ISSUE_TIMES_SEEN, key, -increment);
+        }
+        for (const { key } of validLastSeen) {
+          clearPipeline.hdel(BUFFERS.ISSUE_LAST_SEEN, key);
+        }
+        await clearPipeline.exec();
+
         logger.info('Issue stats flushed', {
-          timesSeenCount: timesSeenKeys.length,
-          lastSeenCount: lastSeenKeys.length,
+          timesSeenCount: validTimesSeen.length,
+          lastSeenCount: validLastSeen.length,
         });
+      } catch (mysqlError) {
+        // MySQL failed — do NOT clear Redis. Values will be retried on next cycle.
+        try { await connection.rollback(); } catch { /* ignore rollback errors */ }
+        throw mysqlError;
       } finally {
         connection.release();
       }
     } catch (error) {
-      logger.error('Issue stats flush failed', {
+      logger.error('Issue stats flush failed (will retry next cycle)', {
         error: error instanceof Error ? error.message : String(error),
       });
     }
@@ -150,19 +169,19 @@ export class BatchFlusher {
   /**
    * Flush accumulated alert history records from Redis to MySQL.
    *
-   * Redis structure:
-   * - BUFFERS.ALERT_HISTORY (List): each entry is a JSON-stringified alert record
-   *
-   * Strategy: LRANGE + LTRIM atomically, then batch INSERT.
+   * Uses a Lua script to atomically LRANGE + LTRIM, preventing data loss
+   * when new RPUSH commands arrive between the read and trim operations.
    */
   private async flushAlertHistory(): Promise<void> {
     try {
-      // Read all buffered records
-      const records = await redis.lrange(BUFFERS.ALERT_HISTORY, 0, -1);
-      if (records.length === 0) return;
+      // Atomic drain: read all + trim in one Lua call
+      const records = await redis.eval(
+        ATOMIC_DRAIN_SCRIPT,
+        1,
+        BUFFERS.ALERT_HISTORY
+      ) as string[];
 
-      // Trim the list (new entries after LRANGE will remain)
-      await redis.ltrim(BUFFERS.ALERT_HISTORY, records.length, -1);
+      if (!records || records.length === 0) return;
 
       // Parse and batch insert
       const values: any[][] = [];
@@ -186,14 +205,26 @@ export class BatchFlusher {
         const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
         const flat = values.flat();
 
-        await mysqlPool.query(
-          `INSERT INTO g_argus_alert_history
-           (rule_id, project_id, issue_id, event_id, trigger_reason, notified_channels)
-           VALUES ${placeholders}`,
-          flat
-        );
-
-        logger.info('Alert history flushed', { count: values.length });
+        try {
+          await mysqlPool.query(
+            `INSERT INTO g_argus_alert_history
+             (rule_id, project_id, issue_id, event_id, trigger_reason, notified_channels)
+             VALUES ${placeholders}`,
+            flat
+          );
+          logger.info('Alert history flushed', { count: values.length });
+        } catch (mysqlError) {
+          // MySQL INSERT failed — push records back to Redis for retry
+          const pushPipeline = redis.pipeline();
+          for (const raw of records) {
+            pushPipeline.rpush(BUFFERS.ALERT_HISTORY, raw);
+          }
+          await pushPipeline.exec();
+          logger.error('Alert history MySQL insert failed, pushed back to Redis for retry', {
+            count: records.length,
+            error: mysqlError instanceof Error ? mysqlError.message : String(mysqlError),
+          });
+        }
       }
     } catch (error) {
       logger.error('Alert history flush failed', {

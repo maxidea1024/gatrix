@@ -119,6 +119,7 @@ async function handleExistingIssue(
 
 /**
  * Create a new issue with atomically-assigned short_id from Redis.
+ * Uses INSERT IGNORE to safely handle duplicates on worker restart/retry.
  */
 async function createNewIssue(
   internalProjectId: number,
@@ -138,7 +139,7 @@ async function createNewIssue(
   const culprit = buildCulprit(event);
 
   const [insertResult] = await mysqlPool.query(
-    `INSERT INTO g_argus_issues
+    `INSERT IGNORE INTO g_argus_issues
      (project_id, short_id, title, culprit, type, level, platform,
       primary_hash, fingerprint, first_seen, last_seen, times_seen,
       first_release, last_release, status, priority)
@@ -158,6 +159,26 @@ async function createNewIssue(
   );
 
   const issueId = (insertResult as any).insertId;
+
+  // INSERT IGNORE returns insertId=0 when the row already exists (duplicate primary_hash).
+  // Fall back to SELECT and treat as existing issue.
+  if (issueId === 0) {
+    const [rows] = await mysqlPool.query(
+      'SELECT id, status, substatus FROM g_argus_issues WHERE project_id = ? AND primary_hash = ?',
+      [internalProjectId, primaryHash]
+    );
+    const existing = (rows as any[])[0];
+    if (existing) {
+      issueLookupCache.set(internalProjectId, primaryHash, {
+        issueId: existing.id,
+        status: existing.status,
+        substatus: existing.substatus || null,
+      });
+      return handleExistingIssue(existing.id, existing.status, existing.substatus, internalProjectId, primaryHash, event);
+    }
+    // Extremely rare: IGNORE triggered but row not found — log and re-throw
+    throw new Error(`INSERT IGNORE returned 0 but no existing issue found for hash ${primaryHash}`);
+  }
 
   // Populate cache immediately
   issueLookupCache.set(internalProjectId, primaryHash, {

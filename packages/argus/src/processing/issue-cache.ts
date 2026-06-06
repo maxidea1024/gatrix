@@ -7,6 +7,13 @@ interface CachedIssue {
 }
 
 /**
+ * Maximum number of entries in the issue lookup cache.
+ * Prevents unbounded memory growth during long-running worker processes.
+ * When the limit is reached, the oldest entry (by Map insertion order) is evicted.
+ */
+const MAX_CACHE_SIZE = 100_000;
+
+/**
  * In-memory cache for issue lookups by (projectId, primaryHash).
  *
  * Why this works:
@@ -16,6 +23,7 @@ interface CachedIssue {
  * - Cache miss falls through to a plain SELECT (no lock).
  * - Invalidation is triggered via Pub/Sub when issue status changes
  *   (resolve, unresolve, ignore) from the API.
+ * - Size is capped at MAX_CACHE_SIZE to prevent OOM in long-running processes.
  */
 export class IssueLookupCache {
   /** Map<"projectId:primaryHash", CachedIssue> */
@@ -26,11 +34,35 @@ export class IssueLookupCache {
   }
 
   get(projectId: number, primaryHash: string): CachedIssue | null {
-    return this.cache.get(this.key(projectId, primaryHash)) || null;
+    const k = this.key(projectId, primaryHash);
+    const entry = this.cache.get(k);
+    if (!entry) return null;
+
+    // Move to end (most recently accessed) for LRU behavior
+    this.cache.delete(k);
+    this.cache.set(k, entry);
+    return entry;
   }
 
   set(projectId: number, primaryHash: string, issue: CachedIssue): void {
-    this.cache.set(this.key(projectId, primaryHash), issue);
+    const k = this.key(projectId, primaryHash);
+
+    // If already exists, delete first to update insertion order
+    if (this.cache.has(k)) {
+      this.cache.delete(k);
+    }
+
+    // Evict oldest entries if at capacity
+    while (this.cache.size >= MAX_CACHE_SIZE) {
+      const oldest = this.cache.keys().next().value;
+      if (oldest !== undefined) {
+        this.cache.delete(oldest);
+      } else {
+        break;
+      }
+    }
+
+    this.cache.set(k, issue);
   }
 
   /**
@@ -48,9 +80,10 @@ export class IssueLookupCache {
   }
 
   /**
-   * Invalidate all entries for a project (e.g., project deletion).
+   * Invalidate all entries for a project.
+   * Accepts both string and number projectId for compatibility with route params.
    */
-  invalidateByProjectId(projectId: number): void {
+  invalidateByProjectId(projectId: string | number): void {
     const prefix = `${projectId}:`;
     for (const key of this.cache.keys()) {
       if (key.startsWith(prefix)) {

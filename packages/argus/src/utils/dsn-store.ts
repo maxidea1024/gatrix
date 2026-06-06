@@ -92,6 +92,7 @@ export class DsnStore {
 
   /**
    * Reload all active DSN keys from MySQL.
+   * Builds a new Map and swaps atomically to prevent empty-window during reload.
    */
   async loadAll(): Promise<void> {
     const [rows] = await mysqlPool.query(`
@@ -101,9 +102,10 @@ export class DsnStore {
       WHERE dk.is_active = 1
     `);
 
-    this.dsnMap.clear();
+    // Build new map first, then swap atomically
+    const newMap = new Map<string, StoredDsn>();
     for (const row of rows as any[]) {
-      this.dsnMap.set(row.public_key, {
+      newMap.set(row.public_key, {
         projectId: row.gatrix_project_id,
         internalProjectId: row.internal_project_id,
         dsnKeyId: row.id,
@@ -115,6 +117,9 @@ export class DsnStore {
         rateLimitCount: row.rate_limit_count || 0,
       });
     }
+
+    // Atomic swap — no empty window
+    this.dsnMap = newMap;
   }
 
   async close(): Promise<void> {
