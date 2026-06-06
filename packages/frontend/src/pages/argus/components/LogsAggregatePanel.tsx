@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Paper,
   FormControl,
   Select,
   MenuItem,
@@ -11,7 +10,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  useTheme,
   alpha,
 } from '@mui/material';
 import { ViewColumn as ViewIcon } from '@mui/icons-material';
@@ -53,7 +51,6 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
   onGroupByChange,
   onAddFilter,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation();
 
   if (!aggLoading && (!aggData || aggData.topValues.length === 0)) {
@@ -71,12 +68,12 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
   }
 
   return (
-    <Paper
-      elevation={0}
+    <Box
       sx={{
-        borderRadius: 2,
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
         overflow: 'hidden',
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
       }}
     >
       {/* Toolbar */}
@@ -389,7 +386,7 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
           </Box>
         )}
       </PageContentLoader>
-    </Paper>
+    </Box>
   );
 };
 
