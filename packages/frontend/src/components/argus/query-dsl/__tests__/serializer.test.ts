@@ -31,29 +31,41 @@ describe('Serializer', () => {
 
   describe('function operators', () => {
     it('should serialize contains', () => {
-      expect(serialize('message:contains("timeout")')).toBe('message.contains:"timeout"');
+      expect(serialize('message:contains("timeout")')).toBe(
+        'message.contains:"timeout"'
+      );
     });
 
     it('should serialize startsWith', () => {
-      expect(serialize('message:startsWith("net")')).toBe('message.starts_with:"net"');
+      expect(serialize('message:startsWith("net")')).toBe(
+        'message.starts_with:"net"'
+      );
     });
 
     it('should serialize endsWith', () => {
-      expect(serialize('message:endsWith("error")')).toBe('message.ends_with:"error"');
+      expect(serialize('message:endsWith("error")')).toBe(
+        'message.ends_with:"error"'
+      );
     });
 
     it('should serialize before', () => {
-      expect(serialize('timestamp:before("2025-01-01")')).toBe('timestamp.before:"2025-01-01"');
+      expect(serialize('timestamp:before("2025-01-01")')).toBe(
+        'timestamp.before:"2025-01-01"'
+      );
     });
 
     it('should serialize after with relative time', () => {
-      expect(serialize('timestamp:after("now-1h")')).toBe('timestamp.after:"now-1h"');
+      expect(serialize('timestamp:after("now-1h")')).toBe(
+        'timestamp.after:"now-1h"'
+      );
     });
   });
 
   describe('IN operator', () => {
     it('should serialize in() as OR chain', () => {
-      expect(serialize('country:in("KR", "JP")')).toBe('(country:"KR" OR country:"JP")');
+      expect(serialize('country:in("KR", "JP")')).toBe(
+        '(country:"KR" OR country:"JP")'
+      );
     });
 
     it('should serialize single-value in() without parens', () => {
@@ -63,11 +75,15 @@ describe('Serializer', () => {
 
   describe('logical operators', () => {
     it('should serialize AND', () => {
-      expect(serialize('country:KR and level:error')).toBe('country:KR AND level:error');
+      expect(serialize('country:KR and level:error')).toBe(
+        'country:KR AND level:error'
+      );
     });
 
     it('should serialize OR', () => {
-      expect(serialize('country:KR or country:JP')).toBe('country:KR OR country:JP');
+      expect(serialize('country:KR or country:JP')).toBe(
+        'country:KR OR country:JP'
+      );
     });
 
     it('should serialize NOT', () => {
@@ -93,7 +109,9 @@ describe('Serializer', () => {
     });
 
     it('should convert quoted free text', () => {
-      expect(serialize('"network error"')).toBe('message.contains:"network error"');
+      expect(serialize('"network error"')).toBe(
+        'message.contains:"network error"'
+      );
     });
   });
 

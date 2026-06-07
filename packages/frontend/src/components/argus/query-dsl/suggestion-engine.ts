@@ -26,14 +26,19 @@ export function getSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  maxSuggestions: number = DEFAULT_MAX_SUGGESTIONS,
+  maxSuggestions: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   switch (context.type) {
     case 'FIELD':
       return getFieldSuggestions(context, domain, facets, maxSuggestions);
     case 'OPERATOR':
       // Spec 10.6 Rule 1: EXPECT_OPERATOR_OR_VALUE → show operators AND values
-      return getOperatorAndValueSuggestions(context, domain, facets, maxSuggestions);
+      return getOperatorAndValueSuggestions(
+        context,
+        domain,
+        facets,
+        maxSuggestions
+      );
     case 'VALUE':
       return getValueSuggestions(context, domain, facets, maxSuggestions);
     case 'LOGICAL_OPERATOR':
@@ -51,7 +56,7 @@ export function getSuggestions(
 export function applyCompletion(
   input: string,
   context: CursorContext,
-  item: SuggestionItem,
+  item: SuggestionItem
 ): { text: string; cursorOffset: number } {
   const before = input.slice(0, context.tokenStart);
   const after = input.slice(context.tokenEnd);
@@ -101,7 +106,7 @@ function getFieldSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  max: number = DEFAULT_MAX_SUGGESTIONS,
+  max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   const fields = getFieldsForDomain(domain);
   const prefix = context.prefix.toLowerCase();
@@ -131,22 +136,18 @@ function getFieldSuggestions(
   // Smart suggestions: when user types free text, suggest message:contains("X") and message:"X"
   if (prefix !== '' && !prefix.includes(':')) {
     const escapedPrefix = prefix.replace(/"/g, '\\"');
-    results.unshift(
-      {
-        label: `message is ${prefix}`,
-        insertText: `message:"${escapedPrefix}"`,
-        category: 'value',
-        description: 'dsl.smart.messageIs',
-      },
-    );
-    results.unshift(
-      {
-        label: `message contains ${prefix}`,
-        insertText: `message:contains("${escapedPrefix}")`,
-        category: 'value',
-        description: 'dsl.smart.messageContains',
-      },
-    );
+    results.unshift({
+      label: `message is ${prefix}`,
+      insertText: `message:"${escapedPrefix}"`,
+      category: 'value',
+      description: 'dsl.smart.messageIs',
+    });
+    results.unshift({
+      label: `message contains ${prefix}`,
+      insertText: `message:contains("${escapedPrefix}")`,
+      category: 'value',
+      description: 'dsl.smart.messageContains',
+    });
   }
 
   // Suggest '(' when user is just starting a new token
@@ -169,21 +170,23 @@ function getOperatorAndValueSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  max: number = DEFAULT_MAX_SUGGESTIONS,
+  max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   if (!context.field) return [];
 
   const field = getFieldByKey(context.field, domain);
   // For dynamic facet fields not in registry, create a virtual string field
-  const effectiveField = field ?? {
-    key: context.field,
-    label: context.field,
-    type: 'string',
-    category: 'log',
-    operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'],
-    searchable: true,
-    description: '',
-  } as QueryField;
+  const effectiveField =
+    field ??
+    ({
+      key: context.field,
+      label: context.field,
+      type: 'string',
+      category: 'log',
+      operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'],
+      searchable: true,
+      description: '',
+    } as QueryField);
 
   const prefix = context.prefix.toLowerCase();
   const suggestions: SuggestionItem[] = [];
@@ -194,8 +197,13 @@ function getOperatorAndValueSuggestions(
     const label = getOpLabel(op, effectiveField.type);
     const labelLower = label.toLowerCase();
     const opLower = op.toLowerCase();
-    
-    if (prefix === '' || labelLower.startsWith(prefix) || opLower.startsWith(prefix) || op.startsWith(prefix)) {
+
+    if (
+      prefix === '' ||
+      labelLower.startsWith(prefix) ||
+      opLower.startsWith(prefix) ||
+      op.startsWith(prefix)
+    ) {
       suggestions.push({
         label: op,
         insertText: formatOperatorInsert(op),
@@ -207,7 +215,14 @@ function getOperatorAndValueSuggestions(
   }
 
   // ── Values (from facets and type-specific) ──
-  const valueSuggestions = buildValueSuggestions(effectiveField, context.field, '=', prefix, facets, max);
+  const valueSuggestions = buildValueSuggestions(
+    effectiveField,
+    context.field,
+    '=',
+    prefix,
+    facets,
+    max
+  );
   suggestions.push(...valueSuggestions);
 
   return suggestions.slice(0, max);
@@ -217,32 +232,53 @@ function getValueSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  max: number = DEFAULT_MAX_SUGGESTIONS,
+  max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   if (!context.field) return [];
 
   const field = getFieldByKey(context.field, domain);
-  const effectiveField = field ?? {
-    key: context.field,
-    label: context.field,
-    type: 'string',
-    category: 'log',
-    operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'],
-    searchable: true,
-    description: '',
-  } as QueryField;
+  const effectiveField =
+    field ??
+    ({
+      key: context.field,
+      label: context.field,
+      type: 'string',
+      category: 'log',
+      operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'],
+      searchable: true,
+      description: '',
+    } as QueryField);
 
   const prefix = context.prefix.toLowerCase();
   const operator = context.operator ?? '=';
 
-  return buildValueSuggestions(effectiveField, context.field, operator, prefix, facets, max);
+  return buildValueSuggestions(
+    effectiveField,
+    context.field,
+    operator,
+    prefix,
+    facets,
+    max
+  );
 }
 
 function getLogicalSuggestions(max: number): SuggestionItem[] {
   return [
-    { label: 'AND', category: 'logical' as SuggestionCategory, fieldCategory: 'logic' },
-    { label: 'OR', category: 'logical' as SuggestionCategory, fieldCategory: 'logic' },
-    { label: ')', category: 'paren' as SuggestionCategory, fieldCategory: 'logic' },
+    {
+      label: 'AND',
+      category: 'logical' as SuggestionCategory,
+      fieldCategory: 'logic',
+    },
+    {
+      label: 'OR',
+      category: 'logical' as SuggestionCategory,
+      fieldCategory: 'logic',
+    },
+    {
+      label: ')',
+      category: 'paren' as SuggestionCategory,
+      fieldCategory: 'logic',
+    },
   ].slice(0, max);
 }
 
@@ -254,7 +290,7 @@ function buildValueSuggestions(
   operator: string,
   prefix: string,
   facets?: Map<string, string[]>,
-  max: number = DEFAULT_MAX_SUGGESTIONS,
+  max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   const suggestions: SuggestionItem[] = [];
   const seen = new Set<string>();
@@ -330,7 +366,14 @@ function formatOperatorInsert(op: string): string {
   if (op === '=') {
     return '""';
   }
-  const funcOps = ['contains', 'startsWith', 'endsWith', 'before', 'after', 'in'];
+  const funcOps = [
+    'contains',
+    'startsWith',
+    'endsWith',
+    'before',
+    'after',
+    'in',
+  ];
   if (funcOps.includes(op)) {
     // Insert full structure: contains("") — cursor goes between quotes
     return `${op}("")`;
@@ -348,16 +391,21 @@ function getOperatorDescriptionKey(op: string): string {
     '>=': 'dsl.op.greaterOrEqual',
     '<': 'dsl.op.lessThan',
     '<=': 'dsl.op.lessOrEqual',
-    'contains': 'dsl.op.contains',
-    'startsWith': 'dsl.op.startsWith',
-    'endsWith': 'dsl.op.endsWith',
-    'before': 'dsl.op.before',
-    'after': 'dsl.op.after',
-    'in': 'dsl.op.in',
+    contains: 'dsl.op.contains',
+    startsWith: 'dsl.op.startsWith',
+    endsWith: 'dsl.op.endsWith',
+    before: 'dsl.op.before',
+    after: 'dsl.op.after',
+    in: 'dsl.op.in',
   };
   return keys[op] ?? op;
 }
 
 function needsQuoting(value: string): boolean {
-  return value.includes(' ') || value.includes('"') || value.includes('(') || value.includes(')');
+  return (
+    value.includes(' ') ||
+    value.includes('"') ||
+    value.includes('(') ||
+    value.includes(')')
+  );
 }

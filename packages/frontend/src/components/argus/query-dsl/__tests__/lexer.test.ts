@@ -199,7 +199,6 @@ describe('Lexer', () => {
       ]);
     });
 
-
     it('should NOT treat function keywords as operators outside colon context', () => {
       // `contains:value` → FIELD("contains"), COLON, STRING("value")
       expect(tv('contains:value')).toEqual([
@@ -386,9 +385,7 @@ describe('Lexer', () => {
     });
 
     it('should handle free text (field without colon)', () => {
-      expect(tv('timeout')).toEqual([
-        [TokenType.FIELD, 'timeout'],
-      ]);
+      expect(tv('timeout')).toEqual([[TokenType.FIELD, 'timeout']]);
     });
 
     it('should handle complex query', () => {
@@ -397,16 +394,27 @@ describe('Lexer', () => {
       );
       expect(result).toEqual([
         TokenType.LPAREN,
-        TokenType.FIELD, TokenType.COLON, TokenType.STRING,
+        TokenType.FIELD,
+        TokenType.COLON,
+        TokenType.STRING,
         TokenType.OR,
-        TokenType.FIELD, TokenType.COLON, TokenType.STRING,
+        TokenType.FIELD,
+        TokenType.COLON,
+        TokenType.STRING,
         TokenType.RPAREN,
         TokenType.AND,
-        TokenType.FIELD, TokenType.COLON, TokenType.NE, TokenType.STRING,
+        TokenType.FIELD,
+        TokenType.COLON,
+        TokenType.NE,
+        TokenType.STRING,
         TokenType.AND,
         TokenType.BANG,
-        TokenType.FIELD, TokenType.COLON, TokenType.CONTAINS,
-        TokenType.LPAREN, TokenType.STRING, TokenType.RPAREN,
+        TokenType.FIELD,
+        TokenType.COLON,
+        TokenType.CONTAINS,
+        TokenType.LPAREN,
+        TokenType.STRING,
+        TokenType.RPAREN,
       ]);
     });
 

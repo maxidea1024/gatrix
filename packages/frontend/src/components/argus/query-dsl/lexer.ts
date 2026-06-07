@@ -123,7 +123,13 @@ class Lexer {
       }
 
       // Word: identifier, keyword, number, boolean, string value, or function op starting with !
-      if (this.isIdentifierStart(ch) || this.isDigit(ch) || ch === '-' || ch === '.' || (this.afterColon && ch === '!')) {
+      if (
+        this.isIdentifierStart(ch) ||
+        this.isDigit(ch) ||
+        ch === '-' ||
+        ch === '.' ||
+        (this.afterColon && ch === '!')
+      ) {
         this.readWord();
         continue;
       }
@@ -225,7 +231,14 @@ class Lexer {
     let word = '';
     while (this.pos < this.input.length) {
       const ch = this.input[this.pos];
-      if (this.isWhitespace(ch) || ch === ')' || ch === '(' || ch === '"' || ch === ',' || ch === ':') {
+      if (
+        this.isWhitespace(ch) ||
+        ch === ')' ||
+        ch === '(' ||
+        ch === '"' ||
+        ch === ',' ||
+        ch === ':'
+      ) {
         break;
       }
       word += ch;
@@ -247,7 +260,14 @@ class Lexer {
     if (this.isDigit(startCh) || startCh === '-' || startCh === '.') {
       while (this.pos < this.input.length) {
         const ch = this.input[this.pos];
-        if (this.isWhitespace(ch) || ch === ')' || ch === '(' || ch === '"' || ch === ',' || ch === ':') {
+        if (
+          this.isWhitespace(ch) ||
+          ch === ')' ||
+          ch === '(' ||
+          ch === '"' ||
+          ch === ',' ||
+          ch === ':'
+        ) {
           break;
         }
         word += ch;
@@ -319,7 +339,11 @@ class Lexer {
    * Checks: is it a keyword? Or a field?
    * Lookahead: if colon follows, it's a FIELD (even if it matches a keyword).
    */
-  private emitFieldOrKeywordToken(word: string, start: number, end: number): void {
+  private emitFieldOrKeywordToken(
+    word: string,
+    start: number,
+    end: number
+  ): void {
     const lower = word.toLowerCase();
 
     // Lookahead: if ':' follows (possibly with whitespace), treat as FIELD
@@ -382,7 +406,10 @@ class Lexer {
   }
 
   private skipWhitespace(): void {
-    while (this.pos < this.input.length && this.isWhitespace(this.input[this.pos])) {
+    while (
+      this.pos < this.input.length &&
+      this.isWhitespace(this.input[this.pos])
+    ) {
       this.pos++;
     }
   }

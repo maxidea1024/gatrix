@@ -586,8 +586,6 @@ const ArgusDiscoverPage: React.FC = () => {
     }
   }, [urlState.queryId, savedQueries, currentQueryId]);
 
-
-
   // ─── Tag/schema data ───
   const [facets, setFacets] = useState<Record<string, any[]>>({});
   const [availableColumns, setAvailableColumns] = useState<string[]>([]);

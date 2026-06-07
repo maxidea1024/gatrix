@@ -6,29 +6,55 @@ describe('Parser', () => {
     it('should parse simple field:value', () => {
       const { ast, errors } = parse('country:KR');
       expect(errors).toHaveLength(0);
-      expect(ast).toMatchObject({ type: 'Filter', field: 'country', operator: '=', value: 'KR' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'country',
+        operator: '=',
+        value: 'KR',
+      });
     });
 
     it('should parse quoted string value', () => {
       const { ast } = parse('message:"hello world"');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'message', operator: '=', value: 'hello world', quoted: true });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'message',
+        operator: '=',
+        value: 'hello world',
+        quoted: true,
+      });
     });
 
     it('should parse number value', () => {
       const { ast } = parse('level:100');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'level', operator: '=', value: 100 });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'level',
+        operator: '=',
+        value: 100,
+      });
     });
 
     it('should parse boolean value', () => {
       const { ast } = parse('handled:true');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'handled', operator: '=', value: true });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'handled',
+        operator: '=',
+        value: true,
+      });
     });
   });
 
   describe('comparison operators', () => {
     it('should parse !=', () => {
       const { ast } = parse('country:!=CN');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'country', operator: '!=', value: 'CN' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'country',
+        operator: '!=',
+        value: 'CN',
+      });
     });
 
     it('should parse >', () => {
@@ -55,18 +81,30 @@ describe('Parser', () => {
   describe('function operators', () => {
     it('should parse contains()', () => {
       const { ast } = parse('message:contains("timeout")');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'message', operator: 'contains', value: 'timeout', funcOp: 'contains' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'message',
+        operator: 'contains',
+        value: 'timeout',
+        funcOp: 'contains',
+      });
     });
 
     it('should parse startsWith()', () => {
       const { ast } = parse('message:startsWith("net")');
-      expect(ast).toMatchObject({ type: 'Filter', operator: 'startsWith', value: 'net' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        operator: 'startsWith',
+        value: 'net',
+      });
     });
 
     it('should parse in() with multiple values', () => {
       const { ast } = parse('country:in("KR", "JP", "US")');
       expect(ast).toMatchObject({
-        type: 'Filter', field: 'country', operator: 'in',
+        type: 'Filter',
+        field: 'country',
+        operator: 'in',
         values: ['KR', 'JP', 'US'],
       });
     });
@@ -76,7 +114,8 @@ describe('Parser', () => {
     it('should parse AND', () => {
       const { ast } = parse('country:KR and level:error');
       expect(ast).toMatchObject({
-        type: 'Binary', operator: 'and',
+        type: 'Binary',
+        operator: 'and',
         left: { type: 'Filter', field: 'country' },
         right: { type: 'Filter', field: 'level' },
       });
@@ -85,7 +124,8 @@ describe('Parser', () => {
     it('should parse OR', () => {
       const { ast } = parse('country:KR or country:JP');
       expect(ast).toMatchObject({
-        type: 'Binary', operator: 'or',
+        type: 'Binary',
+        operator: 'or',
         left: { type: 'Filter', value: 'KR' },
         right: { type: 'Filter', value: 'JP' },
       });
@@ -94,7 +134,8 @@ describe('Parser', () => {
     it('should parse NOT', () => {
       const { ast } = parse('not country:CN');
       expect(ast).toMatchObject({
-        type: 'Not', usedBang: false,
+        type: 'Not',
+        usedBang: false,
         expression: { type: 'Filter', field: 'country', value: 'CN' },
       });
     });
@@ -102,7 +143,8 @@ describe('Parser', () => {
     it('should parse BANG (!)', () => {
       const { ast } = parse('!country:CN');
       expect(ast).toMatchObject({
-        type: 'Not', usedBang: true,
+        type: 'Not',
+        usedBang: true,
         expression: { type: 'Filter', field: 'country' },
       });
     });
@@ -111,10 +153,12 @@ describe('Parser', () => {
       // a:1 or b:2 and not c:3  →  a:1 or (b:2 and (not c:3))
       const { ast } = parse('a:1 or b:2 and not c:3');
       expect(ast).toMatchObject({
-        type: 'Binary', operator: 'or',
+        type: 'Binary',
+        operator: 'or',
         left: { type: 'Filter', field: 'a' },
         right: {
-          type: 'Binary', operator: 'and',
+          type: 'Binary',
+          operator: 'and',
           left: { type: 'Filter', field: 'b' },
           right: { type: 'Not', expression: { type: 'Filter', field: 'c' } },
         },
@@ -126,7 +170,8 @@ describe('Parser', () => {
     it('should parse parenthesized expression', () => {
       const { ast } = parse('(country:KR or country:JP) and level:error');
       expect(ast).toMatchObject({
-        type: 'Binary', operator: 'and',
+        type: 'Binary',
+        operator: 'and',
         left: {
           type: 'Group',
           expression: { type: 'Binary', operator: 'or' },
@@ -138,8 +183,12 @@ describe('Parser', () => {
     it('should parse !(expr)', () => {
       const { ast } = parse('!(country:KR)');
       expect(ast).toMatchObject({
-        type: 'Not', usedBang: true,
-        expression: { type: 'Group', expression: { type: 'Filter', field: 'country' } },
+        type: 'Not',
+        usedBang: true,
+        expression: {
+          type: 'Group',
+          expression: { type: 'Filter', field: 'country' },
+        },
       });
     });
   });
@@ -147,18 +196,27 @@ describe('Parser', () => {
   describe('free text', () => {
     it('should parse standalone word as FreeText', () => {
       const { ast } = parse('timeout');
-      expect(ast).toMatchObject({ type: 'FreeText', value: 'timeout', quoted: false });
+      expect(ast).toMatchObject({
+        type: 'FreeText',
+        value: 'timeout',
+        quoted: false,
+      });
     });
 
     it('should parse quoted free text', () => {
       const { ast } = parse('"network error"');
-      expect(ast).toMatchObject({ type: 'FreeText', value: 'network error', quoted: true });
+      expect(ast).toMatchObject({
+        type: 'FreeText',
+        value: 'network error',
+        quoted: true,
+      });
     });
 
     it('should parse free text mixed with filter', () => {
       const { ast } = parse('timeout and country:KR');
       expect(ast).toMatchObject({
-        type: 'Binary', operator: 'and',
+        type: 'Binary',
+        operator: 'and',
         left: { type: 'FreeText', value: 'timeout' },
         right: { type: 'Filter', field: 'country' },
       });
@@ -197,7 +255,11 @@ describe('Parser', () => {
     it('should detect incomplete function', () => {
       // `message:contains(` — has `(` so contains is recognized as function
       const { errors } = parse('message:contains(');
-      expect(errors.some((e) => e.type === 'INCOMPLETE_FUNCTION' || e.type === 'UNCLOSED_PAREN')).toBe(true);
+      expect(
+        errors.some(
+          (e) => e.type === 'INCOMPLETE_FUNCTION' || e.type === 'UNCLOSED_PAREN'
+        )
+      ).toBe(true);
     });
 
     it('should still return AST on errors', () => {

@@ -175,11 +175,9 @@ export default async function globalIntegrationsRoutes(app: FastifyInstance) {
         logger.error('GitHub app test failed', {
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({
-            error: 'Failed to test GitHub App (invalid private key format?)',
-          });
+        return reply.code(500).send({
+          error: 'Failed to test GitHub App (invalid private key format?)',
+        });
       }
     }
   );

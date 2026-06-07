@@ -12,7 +12,7 @@ import type { Token } from './types';
  */
 export function resolveEditorState(
   tokens: Token[],
-  cursorOffset: number,
+  cursorOffset: number
 ): EditorState {
   let state = EditorState.EXPECT_FIELD;
   let parenDepth = 0;
@@ -25,8 +25,10 @@ export function resolveEditorState(
       case TokenType.FIELD:
         if (state === EditorState.EXPECT_FIELD) {
           state = EditorState.EXPECT_COLON;
-        } else if (state === EditorState.EXPECT_OPERATOR_OR_VALUE ||
-                   state === EditorState.EXPECT_VALUE) {
+        } else if (
+          state === EditorState.EXPECT_OPERATOR_OR_VALUE ||
+          state === EditorState.EXPECT_VALUE
+        ) {
           state = EditorState.EXPECT_LOGICAL_OPERATOR;
         }
         break;
@@ -60,8 +62,10 @@ export function resolveEditorState(
       case TokenType.STRING:
       case TokenType.NUMBER:
       case TokenType.BOOLEAN:
-        if (state === EditorState.EXPECT_OPERATOR_OR_VALUE ||
-            state === EditorState.EXPECT_VALUE) {
+        if (
+          state === EditorState.EXPECT_OPERATOR_OR_VALUE ||
+          state === EditorState.EXPECT_VALUE
+        ) {
           state = EditorState.EXPECT_LOGICAL_OPERATOR;
         }
         break;
@@ -140,10 +144,16 @@ function isInsideQuotedString(tokens: Token[], cursorOffset: number): boolean {
  * Check if cursor is inside function parentheses (e.g., contains(...)).
  * Tracks LPAREN after function operator tokens.
  */
-function isInsideFunctionParens(tokens: Token[], cursorOffset: number): boolean {
+function isInsideFunctionParens(
+  tokens: Token[],
+  cursorOffset: number
+): boolean {
   const funcOps = new Set([
-    TokenType.CONTAINS, TokenType.STARTS_WITH, TokenType.ENDS_WITH,
-    TokenType.BEFORE, TokenType.AFTER,
+    TokenType.CONTAINS,
+    TokenType.STARTS_WITH,
+    TokenType.ENDS_WITH,
+    TokenType.BEFORE,
+    TokenType.AFTER,
   ]);
 
   let afterFuncOp = false;

@@ -30,7 +30,10 @@ interface FilterTokenChipProps {
   chip: FilterChip;
   domain: QueryDomain;
   facets?: Map<string, string[]>;
-  onUpdate: (chipId: string, updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value'>>) => void;
+  onUpdate: (
+    chipId: string,
+    updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value'>>
+  ) => void;
   onDelete: (chipId: string) => void;
   /** Called when chip editing starts (true) or ends (false) */
   onEditToggle?: (editing: boolean) => void;
@@ -49,7 +52,9 @@ export function FilterTokenChip({
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
-  const [editingPart, setEditingPart] = useState<'field' | 'operator' | 'value' | null>(null);
+  const [editingPart, setEditingPart] = useState<
+    'field' | 'operator' | 'value' | null
+  >(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [valueInput, setValueInput] = useState(chip.value);
 
@@ -57,7 +62,10 @@ export function FilterTokenChip({
   const fieldType = field?.type ?? 'string';
   const opLabel = getOpLabel(chip.operator, fieldType);
 
-  const handlePartClick = (part: 'field' | 'operator' | 'value', el: HTMLElement) => {
+  const handlePartClick = (
+    part: 'field' | 'operator' | 'value',
+    el: HTMLElement
+  ) => {
     // Toggle: clicking the same part again closes the popover
     if (editingPart === part) {
       handleClose();
@@ -82,7 +90,9 @@ export function FilterTokenChip({
     const newFieldMeta = getFieldByKey(newField, domain);
     const newOps = newFieldMeta?.operators ?? ['='];
     // Reset operator if current one isn't valid for new field
-    const validOp = newOps.includes(chip.operator as QueryOperator) ? chip.operator as QueryOperator : '=' as QueryOperator;
+    const validOp = newOps.includes(chip.operator as QueryOperator)
+      ? (chip.operator as QueryOperator)
+      : ('=' as QueryOperator);
     onUpdate(chip.id, { field: newField, operator: validOp });
     handleClose();
   };
@@ -109,11 +119,18 @@ export function FilterTokenChip({
     borderRadius: '3px',
     fontSize: '0.8rem',
     fontWeight: type === 'field' ? 600 : 400,
-    color: type === 'field'
-      ? (isDark ? '#c4b5fd' : '#7c3aed')
-      : type === 'operator'
-        ? (isDark ? '#94a3b8' : '#64748b')
-        : (isDark ? '#fbbf24' : '#d97706'),
+    color:
+      type === 'field'
+        ? isDark
+          ? '#c4b5fd'
+          : '#7c3aed'
+        : type === 'operator'
+          ? isDark
+            ? '#94a3b8'
+            : '#64748b'
+          : isDark
+            ? '#fbbf24'
+            : '#d97706',
     '&:hover': {
       backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
     },
@@ -147,7 +164,9 @@ export function FilterTokenChip({
         <Box
           component="span"
           sx={partStyle('field')}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) => handlePartClick('field', e.currentTarget)}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            handlePartClick('field', e.currentTarget)
+          }
         >
           {chip.field}
         </Box>
@@ -156,7 +175,9 @@ export function FilterTokenChip({
         <Box
           component="span"
           sx={partStyle('operator')}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) => handlePartClick('operator', e.currentTarget)}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            handlePartClick('operator', e.currentTarget)
+          }
         >
           {opLabel}
         </Box>
@@ -172,15 +193,27 @@ export function FilterTokenChip({
             maxWidth: 200,
             minWidth: 0,
           }}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) => handlePartClick('value', e.currentTarget)}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            handlePartClick('value', e.currentTarget)
+          }
         >
-          {chip.value || <Typography component="span" sx={{ opacity: 0.4, fontSize: '0.8rem' }}>...</Typography>}
+          {chip.value || (
+            <Typography
+              component="span"
+              sx={{ opacity: 0.4, fontSize: '0.8rem' }}
+            >
+              ...
+            </Typography>
+          )}
         </Box>
 
         {/* Delete button */}
         <IconButton
           size="small"
-          onClick={(e) => { e.stopPropagation(); onDelete(chip.id); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(chip.id);
+          }}
           sx={{
             p: 0.25,
             ml: 0.25,
@@ -274,13 +307,18 @@ function FieldMenu({
             px: 1.5,
             fontSize: '0.8rem',
             '&.Mui-selected': {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)',
             },
           }}
         >
           <ListItemText
             primary={f.key}
-            primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: f.key === currentField ? 600 : 400 }}
+            primaryTypographyProps={{
+              fontSize: '0.8rem',
+              fontWeight: f.key === currentField ? 600 : 400,
+            }}
           />
           {f.key === currentField && (
             <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
@@ -319,13 +357,18 @@ function OperatorMenu({
             py: 0.5,
             px: 1.5,
             '&.Mui-selected': {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)',
             },
           }}
         >
           <ListItemText
             primary={label}
-            primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: op === currentOperator ? 600 : 400 }}
+            primaryTypographyProps={{
+              fontSize: '0.8rem',
+              fontWeight: op === currentOperator ? 600 : 400,
+            }}
           />
           {op === currentOperator && (
             <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
@@ -360,9 +403,12 @@ function ValueEditor({
   const facetValues = facets?.get(chip.field) ?? [];
 
   // When popover opens, show all values. Once user types, filter by input.
-  const filtered = isDirty && valueInput !== ''
-    ? facetValues.filter((v) => v.toLowerCase().includes(valueInput.toLowerCase()))
-    : facetValues;
+  const filtered =
+    isDirty && valueInput !== ''
+      ? facetValues.filter((v) =>
+          v.toLowerCase().includes(valueInput.toLowerCase())
+        )
+      : facetValues;
 
   // Sort: current value first, then rest alphabetically
   const sorted = [...filtered].sort((a, b) => {
@@ -371,7 +417,9 @@ function ValueEditor({
     return a.localeCompare(b);
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setValueInput(e.target.value);
     setIsDirty(true);
   };
@@ -389,7 +437,13 @@ function ValueEditor({
 
   return (
     <Box sx={{ minWidth: 200 }}>
-      <Box sx={{ px: 1, py: 0.75, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}` }}>
+      <Box
+        sx={{
+          px: 1,
+          py: 0.75,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        }}
+      >
         <InputBase
           ref={inputRef}
           value={valueInput}
@@ -417,7 +471,9 @@ function ValueEditor({
                   py: 0.25,
                   px: 1.5,
                   '&.Mui-selected': {
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                    backgroundColor: isDark
+                      ? 'rgba(255,255,255,0.06)'
+                      : 'rgba(0,0,0,0.04)',
                   },
                 }}
               >
@@ -429,7 +485,9 @@ function ValueEditor({
                   }}
                 />
                 {isCurrent && (
-                  <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+                  <CheckIcon
+                    sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                  />
                 )}
               </ListItemButton>
             );

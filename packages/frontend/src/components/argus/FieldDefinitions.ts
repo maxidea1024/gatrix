@@ -9,7 +9,13 @@
 // ─── Types ───────────────────────────────────────────────────────────────
 
 export type FieldType = 'string' | 'number' | 'date' | 'boolean';
-export type FieldCategory = 'log' | 'resource' | 'trace' | 'event' | 'user' | 'custom';
+export type FieldCategory =
+  | 'log'
+  | 'resource'
+  | 'trace'
+  | 'event'
+  | 'user'
+  | 'custom';
 
 export interface Operator {
   /** Internal value sent to backend (e.g. 'is', 'contains', 'starts_with') */
@@ -34,31 +40,126 @@ export interface FieldDefinition {
 
 export const OPERATORS_BY_TYPE: Record<FieldType, Operator[]> = {
   string: [
-    { value: 'is',           label: 'argus.search.op.is',           shortLabel: 'is',           queryFormat: 'colon' },
-    { value: 'is_not',       label: 'argus.search.op.isNot',        shortLabel: '≠',            queryFormat: 'negated' },
-    { value: 'contains',     label: 'argus.search.op.contains',     shortLabel: 'contains',     queryFormat: 'dot' },
-    { value: 'not_contains', label: 'argus.search.op.notContains',  shortLabel: '!contains',    queryFormat: 'dot' },
-    { value: 'starts_with',  label: 'argus.search.op.startsWith',   shortLabel: 'starts',       queryFormat: 'dot' },
-    { value: 'ends_with',    label: 'argus.search.op.endsWith',     shortLabel: 'ends',         queryFormat: 'dot' },
+    {
+      value: 'is',
+      label: 'argus.search.op.is',
+      shortLabel: 'is',
+      queryFormat: 'colon',
+    },
+    {
+      value: 'is_not',
+      label: 'argus.search.op.isNot',
+      shortLabel: '≠',
+      queryFormat: 'negated',
+    },
+    {
+      value: 'contains',
+      label: 'argus.search.op.contains',
+      shortLabel: 'contains',
+      queryFormat: 'dot',
+    },
+    {
+      value: 'not_contains',
+      label: 'argus.search.op.notContains',
+      shortLabel: '!contains',
+      queryFormat: 'dot',
+    },
+    {
+      value: 'starts_with',
+      label: 'argus.search.op.startsWith',
+      shortLabel: 'starts',
+      queryFormat: 'dot',
+    },
+    {
+      value: 'ends_with',
+      label: 'argus.search.op.endsWith',
+      shortLabel: 'ends',
+      queryFormat: 'dot',
+    },
   ],
   number: [
-    { value: 'is',  label: 'argus.search.op.equal',        shortLabel: '=',  queryFormat: 'colon' },
-    { value: '!=',  label: 'argus.search.op.notEqual',      shortLabel: '≠',  queryFormat: 'negated' },
-    { value: '>',   label: 'argus.search.op.greaterThan',   shortLabel: '>',  queryFormat: 'colon' },
-    { value: '>=',  label: 'argus.search.op.greaterEqual',  shortLabel: '≥',  queryFormat: 'colon' },
-    { value: '<',   label: 'argus.search.op.lessThan',      shortLabel: '<',  queryFormat: 'colon' },
-    { value: '<=',  label: 'argus.search.op.lessEqual',     shortLabel: '≤',  queryFormat: 'colon' },
+    {
+      value: 'is',
+      label: 'argus.search.op.equal',
+      shortLabel: '=',
+      queryFormat: 'colon',
+    },
+    {
+      value: '!=',
+      label: 'argus.search.op.notEqual',
+      shortLabel: '≠',
+      queryFormat: 'negated',
+    },
+    {
+      value: '>',
+      label: 'argus.search.op.greaterThan',
+      shortLabel: '>',
+      queryFormat: 'colon',
+    },
+    {
+      value: '>=',
+      label: 'argus.search.op.greaterEqual',
+      shortLabel: '≥',
+      queryFormat: 'colon',
+    },
+    {
+      value: '<',
+      label: 'argus.search.op.lessThan',
+      shortLabel: '<',
+      queryFormat: 'colon',
+    },
+    {
+      value: '<=',
+      label: 'argus.search.op.lessEqual',
+      shortLabel: '≤',
+      queryFormat: 'colon',
+    },
   ],
   date: [
-    { value: 'is',    label: 'argus.search.op.is',          shortLabel: 'is',     queryFormat: 'colon' },
-    { value: '>',     label: 'argus.search.op.after',        shortLabel: 'after',  queryFormat: 'colon' },
-    { value: '<',     label: 'argus.search.op.before',       shortLabel: 'before', queryFormat: 'colon' },
-    { value: '>=',    label: 'argus.search.op.onOrAfter',    shortLabel: '≥',      queryFormat: 'colon' },
-    { value: '<=',    label: 'argus.search.op.onOrBefore',   shortLabel: '≤',      queryFormat: 'colon' },
+    {
+      value: 'is',
+      label: 'argus.search.op.is',
+      shortLabel: 'is',
+      queryFormat: 'colon',
+    },
+    {
+      value: '>',
+      label: 'argus.search.op.after',
+      shortLabel: 'after',
+      queryFormat: 'colon',
+    },
+    {
+      value: '<',
+      label: 'argus.search.op.before',
+      shortLabel: 'before',
+      queryFormat: 'colon',
+    },
+    {
+      value: '>=',
+      label: 'argus.search.op.onOrAfter',
+      shortLabel: '≥',
+      queryFormat: 'colon',
+    },
+    {
+      value: '<=',
+      label: 'argus.search.op.onOrBefore',
+      shortLabel: '≤',
+      queryFormat: 'colon',
+    },
   ],
   boolean: [
-    { value: 'is',     label: 'argus.search.op.is',     shortLabel: 'is', queryFormat: 'colon' },
-    { value: 'is_not', label: 'argus.search.op.isNot',  shortLabel: '≠',  queryFormat: 'negated' },
+    {
+      value: 'is',
+      label: 'argus.search.op.is',
+      shortLabel: 'is',
+      queryFormat: 'colon',
+    },
+    {
+      value: 'is_not',
+      label: 'argus.search.op.isNot',
+      shortLabel: '≠',
+      queryFormat: 'negated',
+    },
   ],
 };
 
@@ -66,53 +167,155 @@ export const OPERATORS_BY_TYPE: Record<FieldType, Operator[]> = {
 
 export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
   // Log fields
-  level:        { type: 'string',  category: 'log',      description: 'argus.search.field.level' },
-  severity:     { type: 'string',  category: 'log',      description: 'argus.search.field.severity', aliasFor: 'level' },
-  message:      { type: 'string',  category: 'log',      description: 'argus.search.field.message' },
-  body:         { type: 'string',  category: 'log',      description: 'argus.search.field.body' },
-  logger_name:  { type: 'string',  category: 'log',      description: 'argus.search.field.loggerName' },
-  logger:       { type: 'string',  category: 'log',      description: 'argus.search.field.logger', aliasFor: 'logger_name' },
-  timestamp:    { type: 'date',    category: 'log',      description: 'argus.search.field.timestamp' },
+  level: {
+    type: 'string',
+    category: 'log',
+    description: 'argus.search.field.level',
+  },
+  severity: {
+    type: 'string',
+    category: 'log',
+    description: 'argus.search.field.severity',
+    aliasFor: 'level',
+  },
+  message: {
+    type: 'string',
+    category: 'log',
+    description: 'argus.search.field.message',
+  },
+  body: {
+    type: 'string',
+    category: 'log',
+    description: 'argus.search.field.body',
+  },
+  logger_name: {
+    type: 'string',
+    category: 'log',
+    description: 'argus.search.field.loggerName',
+  },
+  logger: {
+    type: 'string',
+    category: 'log',
+    description: 'argus.search.field.logger',
+    aliasFor: 'logger_name',
+  },
+  timestamp: {
+    type: 'date',
+    category: 'log',
+    description: 'argus.search.field.timestamp',
+  },
 
   // Resource fields
-  service:      { type: 'string',  category: 'resource', description: 'argus.search.field.service' },
-  environment:  { type: 'string',  category: 'resource', description: 'argus.search.field.environment' },
-  release:      { type: 'string',  category: 'resource', description: 'argus.search.field.release' },
+  service: {
+    type: 'string',
+    category: 'resource',
+    description: 'argus.search.field.service',
+  },
+  environment: {
+    type: 'string',
+    category: 'resource',
+    description: 'argus.search.field.environment',
+  },
+  release: {
+    type: 'string',
+    category: 'resource',
+    description: 'argus.search.field.release',
+  },
 
   // Trace fields
-  trace_id:     { type: 'string',  category: 'trace',    description: 'argus.search.field.traceId' },
-  span_id:      { type: 'string',  category: 'trace',    description: 'argus.search.field.spanId' },
-  log_id:       { type: 'string',  category: 'trace',    description: 'argus.search.field.logId' },
-  issue_id:     { type: 'number',  category: 'trace',    description: 'argus.search.field.issueId' },
+  trace_id: {
+    type: 'string',
+    category: 'trace',
+    description: 'argus.search.field.traceId',
+  },
+  span_id: {
+    type: 'string',
+    category: 'trace',
+    description: 'argus.search.field.spanId',
+  },
+  log_id: {
+    type: 'string',
+    category: 'trace',
+    description: 'argus.search.field.logId',
+  },
+  issue_id: {
+    type: 'number',
+    category: 'trace',
+    description: 'argus.search.field.issueId',
+  },
 
   // Event fields (for Issues/Discover)
-  type:         { type: 'string',  category: 'event',    description: 'argus.search.field.type' },
-  value:        { type: 'string',  category: 'event',    description: 'argus.search.field.value' },
-  transaction:  { type: 'string',  category: 'event',    description: 'argus.search.field.transaction' },
-  platform:     { type: 'string',  category: 'event',    description: 'argus.search.field.platform' },
-  status:       { type: 'string',  category: 'event',    description: 'argus.search.field.status' },
-  priority:     { type: 'string',  category: 'event',    description: 'argus.search.field.priority' },
-  assigned_to:  { type: 'string',  category: 'event',    description: 'argus.search.field.assignedTo' },
+  type: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.type',
+  },
+  value: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.value',
+  },
+  transaction: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.transaction',
+  },
+  platform: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.platform',
+  },
+  status: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.status',
+  },
+  priority: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.priority',
+  },
+  assigned_to: {
+    type: 'string',
+    category: 'event',
+    description: 'argus.search.field.assignedTo',
+  },
 
   // User fields
-  browser:      { type: 'string',  category: 'user',     description: 'argus.search.field.browser' },
-  os:           { type: 'string',  category: 'user',     description: 'argus.search.field.os' },
-  device:       { type: 'string',  category: 'user',     description: 'argus.search.field.device' },
-  url:          { type: 'string',  category: 'user',     description: 'argus.search.field.url' },
+  browser: {
+    type: 'string',
+    category: 'user',
+    description: 'argus.search.field.browser',
+  },
+  os: {
+    type: 'string',
+    category: 'user',
+    description: 'argus.search.field.os',
+  },
+  device: {
+    type: 'string',
+    category: 'user',
+    description: 'argus.search.field.device',
+  },
+  url: {
+    type: 'string',
+    category: 'user',
+    description: 'argus.search.field.url',
+  },
 
   // Special
-  age:          { type: 'date',    category: 'log',      description: 'argus.search.field.age' },
+  age: { type: 'date', category: 'log', description: 'argus.search.field.age' },
 };
 
 // ─── Category Labels ─────────────────────────────────────────────────────
 
 export const CATEGORY_LABELS: Record<FieldCategory, string> = {
-  log:      'argus.search.category.log',
+  log: 'argus.search.category.log',
   resource: 'argus.search.category.resource',
-  trace:    'argus.search.category.trace',
-  event:    'argus.search.category.event',
-  user:     'argus.search.category.user',
-  custom:   'argus.search.category.custom',
+  trace: 'argus.search.category.trace',
+  event: 'argus.search.category.event',
+  user: 'argus.search.category.user',
+  custom: 'argus.search.category.custom',
 };
 
 // ─── Helper Functions ────────────────────────────────────────────────────
@@ -122,11 +325,13 @@ export const CATEGORY_LABELS: Record<FieldCategory, string> = {
  * Returns a default 'string' definition for unknown fields.
  */
 export function getFieldDef(fieldName: string): FieldDefinition {
-  return FIELD_DEFINITIONS[fieldName] || {
-    type: 'string' as FieldType,
-    category: 'custom' as FieldCategory,
-    description: fieldName,
-  };
+  return (
+    FIELD_DEFINITIONS[fieldName] || {
+      type: 'string' as FieldType,
+      category: 'custom' as FieldCategory,
+      description: fieldName,
+    }
+  );
 }
 
 /**
@@ -162,7 +367,8 @@ export function buildQueryToken(
     return `${field}:"${value}"`;
   }
 
-  const quotedVal = value.includes(' ') || value.length === 0 ? `"${value}"` : `"${value}"`;
+  const quotedVal =
+    value.includes(' ') || value.length === 0 ? `"${value}"` : `"${value}"`;
 
   switch (op.queryFormat) {
     case 'colon':

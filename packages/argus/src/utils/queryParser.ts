@@ -411,7 +411,12 @@ export class QueryParser {
 
       // ── Extract compound operator from dot-notation ──
       // Supported: .contains, .not_contains, .starts_with, .ends_with
-      const COMPOUND_OPS = ['contains', 'not_contains', 'starts_with', 'ends_with'];
+      const COMPOUND_OPS = [
+        'contains',
+        'not_contains',
+        'starts_with',
+        'ends_with',
+      ];
       let compoundOp: string | null = null;
       const dotIdx = key.lastIndexOf('.');
       if (dotIdx > 0) {
@@ -430,10 +435,18 @@ export class QueryParser {
         // Apply compound operator — override the parsed op
         if (compoundOp) {
           switch (compoundOp) {
-            case 'contains':     op = 'CONTAINS'; break;
-            case 'not_contains': op = 'NOT_CONTAINS'; break;
-            case 'starts_with':  op = 'STARTS_WITH'; break;
-            case 'ends_with':    op = 'ENDS_WITH'; break;
+            case 'contains':
+              op = 'CONTAINS';
+              break;
+            case 'not_contains':
+              op = 'NOT_CONTAINS';
+              break;
+            case 'starts_with':
+              op = 'STARTS_WITH';
+              break;
+            case 'ends_with':
+              op = 'ENDS_WITH';
+              break;
           }
         }
 
@@ -659,7 +672,7 @@ export class QueryParser {
         } else if (key === 'event.timestamp' || key === 'timestamp') {
           const valStr = String(n.value);
           const nowMatch = valStr.match(/^(?:now)?([+-])(\d+)(h|d|w|m)$/);
-          
+
           if (nowMatch) {
             const sign = nowMatch[1];
             const num = nowMatch[2];
@@ -667,13 +680,13 @@ export class QueryParser {
             if (nowMatch[3] === 'd') unit = 'DAY';
             else if (nowMatch[3] === 'w') unit = 'WEEK';
             else if (nowMatch[3] === 'm') unit = 'MINUTE';
-            
+
             return {
               w: `timestamp ${op} now() ${sign} INTERVAL ${num} ${unit}`,
               h: '',
             };
           }
-          
+
           const pName = `ts_${Math.random().toString(36).substring(7)}`;
           params[pName] = valStr;
           return {

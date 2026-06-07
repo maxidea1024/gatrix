@@ -23,7 +23,7 @@ import { resolveEditorState } from './editor-fsm';
 export function resolveCursorContext(
   input: string,
   cursorOffset: number,
-  tokens: Token[],
+  tokens: Token[]
 ): CursorContext {
   const editorState = resolveEditorState(tokens, cursorOffset);
 
@@ -56,21 +56,33 @@ export function resolveCursorContext(
     if (t.start >= cursorOffset) continue;
 
     // Stop at logical operators or parens
-    if (t.type === TokenType.AND || t.type === TokenType.OR ||
-        t.type === TokenType.NOT || t.type === TokenType.BANG ||
-        t.type === TokenType.LPAREN) {
+    if (
+      t.type === TokenType.AND ||
+      t.type === TokenType.OR ||
+      t.type === TokenType.NOT ||
+      t.type === TokenType.BANG ||
+      t.type === TokenType.LPAREN
+    ) {
       break;
     }
 
     // Found comparison/function operator
-    if (t.type === TokenType.NE || t.type === TokenType.GT ||
-        t.type === TokenType.GTE || t.type === TokenType.LT ||
-        t.type === TokenType.LTE) {
+    if (
+      t.type === TokenType.NE ||
+      t.type === TokenType.GT ||
+      t.type === TokenType.GTE ||
+      t.type === TokenType.LT ||
+      t.type === TokenType.LTE
+    ) {
       operator = t.value;
     }
-    if (t.type === TokenType.CONTAINS || t.type === TokenType.STARTS_WITH ||
-        t.type === TokenType.ENDS_WITH || t.type === TokenType.BEFORE ||
-        t.type === TokenType.AFTER) {
+    if (
+      t.type === TokenType.CONTAINS ||
+      t.type === TokenType.STARTS_WITH ||
+      t.type === TokenType.ENDS_WITH ||
+      t.type === TokenType.BEFORE ||
+      t.type === TokenType.AFTER
+    ) {
       operator = t.value;
     }
 
@@ -91,17 +103,34 @@ export function resolveCursorContext(
   // When the cursor is right after one of these, the user is starting fresh input.
   const nonPrefixTokens = new Set([
     // Structural
-    TokenType.COLON, TokenType.LPAREN, TokenType.RPAREN, TokenType.COMMA,
+    TokenType.COLON,
+    TokenType.LPAREN,
+    TokenType.RPAREN,
+    TokenType.COMMA,
     // Comparison operators
-    TokenType.NE, TokenType.GT, TokenType.GTE, TokenType.LT, TokenType.LTE,
+    TokenType.NE,
+    TokenType.GT,
+    TokenType.GTE,
+    TokenType.LT,
+    TokenType.LTE,
     // Function operators
-    TokenType.CONTAINS, TokenType.STARTS_WITH, TokenType.ENDS_WITH,
-    TokenType.BEFORE, TokenType.AFTER,
+    TokenType.CONTAINS,
+    TokenType.STARTS_WITH,
+    TokenType.ENDS_WITH,
+    TokenType.BEFORE,
+    TokenType.AFTER,
     // Logical operators
-    TokenType.AND, TokenType.OR, TokenType.NOT, TokenType.BANG,
+    TokenType.AND,
+    TokenType.OR,
+    TokenType.NOT,
+    TokenType.BANG,
   ]);
 
-  if (currentToken && currentToken.start < cursorOffset && !nonPrefixTokens.has(currentToken.type)) {
+  if (
+    currentToken &&
+    currentToken.start < cursorOffset &&
+    !nonPrefixTokens.has(currentToken.type)
+  ) {
     prefix = input.slice(currentToken.start, cursorOffset);
     tokenStart = currentToken.start;
     tokenEnd = currentToken.end;
@@ -142,7 +171,11 @@ export function resolveCursorContext(
     case EditorState.EXPECT_LOGICAL_OPERATOR:
       // Only show logical operators if there's a space gap between cursor and previous token.
       // If cursor is right at the end of a value token (no space), user is still typing the value.
-      if (prevToken && cursorOffset === prevToken.end && !nonPrefixTokens.has(prevToken.type)) {
+      if (
+        prevToken &&
+        cursorOffset === prevToken.end &&
+        !nonPrefixTokens.has(prevToken.type)
+      ) {
         type = 'VALUE';
         operator = '=';
         // Re-derive prefix from the previous token
@@ -179,8 +212,16 @@ export function resolveCursorContext(
 function isOperatorPrefix(prefix: string): boolean {
   const p = prefix.toLowerCase();
   // Comparison operators
-  if (p === '!' || p === '!=' || p === '>' || p === '>=' || p === '<' || p === '<=') return true;
+  if (
+    p === '!' ||
+    p === '!=' ||
+    p === '>' ||
+    p === '>=' ||
+    p === '<' ||
+    p === '<='
+  )
+    return true;
   // Function operator prefixes
   const funcOps = ['contains', 'startswith', 'endswith', 'before', 'after'];
-  return funcOps.some(op => op.startsWith(p));
+  return funcOps.some((op) => op.startsWith(p));
 }

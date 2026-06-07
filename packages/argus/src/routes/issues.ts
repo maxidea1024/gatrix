@@ -460,12 +460,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
               externalKey = externalResult.key;
 
               // Store external link on the issue
-              await db('g_argus_issues')
-                .where('id', insertId)
-                .update({
-                  external_url: externalUrl,
-                  external_key: externalKey,
-                });
+              await db('g_argus_issues').where('id', insertId).update({
+                external_url: externalUrl,
+                external_key: externalKey,
+              });
 
               logger.info('External issue created', {
                 issueId: insertId,
@@ -1075,13 +1073,11 @@ export default async function issuesRoutes(app: FastifyInstance) {
           );
 
           // Update primary issue
-          await trx('g_argus_issues')
-            .where('id', primary.id)
-            .update({
-              times_seen: totalTimesSeen,
-              first_seen: earliestFirstSeen,
-              last_seen: latestLastSeen,
-            });
+          await trx('g_argus_issues').where('id', primary.id).update({
+            times_seen: totalTimesSeen,
+            first_seen: earliestFirstSeen,
+            last_seen: latestLastSeen,
+          });
 
           // Mark merged issues as "merged" status with reference to primary
           await trx('g_argus_issues')

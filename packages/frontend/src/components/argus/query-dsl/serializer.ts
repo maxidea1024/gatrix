@@ -99,5 +99,10 @@ function escapeString(s: string): string {
 }
 
 function needsQuoting(value: string): boolean {
-  return value.includes(' ') || value.includes('"') || value.includes('(') || value.includes(')');
+  return (
+    value.includes(' ') ||
+    value.includes('"') ||
+    value.includes('(') ||
+    value.includes(')')
+  );
 }

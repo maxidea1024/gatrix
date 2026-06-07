@@ -360,11 +360,9 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           description: description || '',
           widgets_config: JSON.stringify(widgets),
         });
-        return reply
-          .code(201)
-          .send({
-            data: { id: insertId, title, description, widgets_config: widgets },
-          });
+        return reply.code(201).send({
+          data: { id: insertId, title, description, widgets_config: widgets },
+        });
       } catch (error) {
         logger.error('Failed to create dashboard', {
           projectId,
