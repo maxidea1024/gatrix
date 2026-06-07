@@ -171,7 +171,14 @@ const LogVolumeChart = React.memo<LogVolumeChartProps>(
             borderRadius: 2,
           }}
         >
-          <Typography variant="body2" sx={{ color: 'text.disabled', fontStyle: 'italic', fontWeight: 600 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.disabled',
+              fontStyle: 'italic',
+              fontWeight: 600,
+            }}
+          >
             {t('argus.logs.chartResizing', 'Adjusting chart size...')}
           </Typography>
         </Paper>

@@ -293,8 +293,6 @@ class Parser {
       if (this.current().type === TokenType.LPAREN) {
         this.advance(); // consume (
 
-
-
         // Single arg function: contains("..."), before("..."), etc.
         const valueToken = this.current();
         let value: string | number | boolean = '';
@@ -314,7 +312,10 @@ class Parser {
           this.advance();
         }
 
-        let end = this.pos < this.tokens.length ? this.tokens[this.pos - 1].end : valueToken.end;
+        let end =
+          this.pos < this.tokens.length
+            ? this.tokens[this.pos - 1].end
+            : valueToken.end;
 
         if (this.current().type === TokenType.RPAREN) {
           end = this.current().end;
@@ -357,7 +358,7 @@ class Parser {
 
   private parseFilterValue(
     fieldToken: Token,
-    operator: QueryOperator,
+    operator: QueryOperator
   ): FilterExpression {
     const tok = this.current();
     let value: string | number | boolean;
@@ -375,12 +376,21 @@ class Parser {
     } else if (tok.type === TokenType.BOOLEAN) {
       value = tok.value === 'true';
       this.advance();
-    } else if (tok.type === TokenType.EOF || tok.type === TokenType.AND ||
-               tok.type === TokenType.OR || tok.type === TokenType.RPAREN) {
+    } else if (
+      tok.type === TokenType.EOF ||
+      tok.type === TokenType.AND ||
+      tok.type === TokenType.OR ||
+      tok.type === TokenType.RPAREN
+    ) {
       // Incomplete filter: field: or field:> (no value)
-      this.addError('INCOMPLETE_FILTER', fieldToken.start, this.tokens[this.pos - 1].end, {
-        field: fieldToken.value,
-      });
+      this.addError(
+        'INCOMPLETE_FILTER',
+        fieldToken.start,
+        this.tokens[this.pos - 1].end,
+        {
+          field: fieldToken.value,
+        }
+      );
       return {
         type: 'Filter',
         field: fieldToken.value,
@@ -407,17 +417,17 @@ class Parser {
     };
   }
 
-
-
   // ─── Helpers ───────────────────────────────────────────────────────
 
   private current(): Token {
-    return this.tokens[this.pos] ?? {
-      type: TokenType.EOF,
-      value: '',
-      start: this.input.length,
-      end: this.input.length,
-    };
+    return (
+      this.tokens[this.pos] ?? {
+        type: TokenType.EOF,
+        value: '',
+        start: this.input.length,
+        end: this.input.length,
+      }
+    );
   }
 
   private peek(): Token | undefined {
@@ -448,7 +458,7 @@ class Parser {
     type: ValidationError['type'],
     start: number,
     end: number,
-    params: Record<string, string>,
+    params: Record<string, string>
   ): void {
     const typeKey = type.replace(/([A-Z])/g, (m) => m.toLowerCase());
     this.errors.push({
@@ -458,7 +468,14 @@ class Parser {
       params,
       start,
       end,
-      severity: ['INCOMPLETE_FILTER', 'INCOMPLETE_FUNCTION', 'DANGLING_OPERATOR', 'UNKNOWN_FIELD'].includes(type) ? 'warning' : 'error',
+      severity: [
+        'INCOMPLETE_FILTER',
+        'INCOMPLETE_FUNCTION',
+        'DANGLING_OPERATOR',
+        'UNKNOWN_FIELD',
+      ].includes(type)
+        ? 'warning'
+        : 'error',
     });
   }
 }
@@ -470,7 +487,9 @@ function camelToSnake(s: string): string {
   return s
     .split('_')
     .map((part, i) =>
-      i === 0 ? part.toLowerCase() : part.charAt(0) + part.slice(1).toLowerCase(),
+      i === 0
+        ? part.toLowerCase()
+        : part.charAt(0) + part.slice(1).toLowerCase()
     )
     .join('');
 }

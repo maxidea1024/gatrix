@@ -9,7 +9,11 @@ import React from 'react';
 import { Box, alpha, useTheme } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import type { SearchToken } from './useSearchQueryState';
-import { getFieldDef, getOperatorsForField, type Operator } from '../FieldDefinitions';
+import {
+  getFieldDef,
+  getOperatorsForField,
+  type Operator,
+} from '../FieldDefinitions';
 
 interface TokenChipProps {
   token: SearchToken;
@@ -78,7 +82,10 @@ export const TokenChip: React.FC<TokenChipProps> = ({
         {token.raw}
         <CloseIcon
           sx={{ fontSize: 12, ml: 0.3, cursor: 'pointer', opacity: 0.5 }}
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
         />
       </Box>
     );
@@ -132,8 +139,12 @@ export const TokenChip: React.FC<TokenChipProps> = ({
           0.2
         )}`,
         color: isDark
-          ? (isHasFilter ? theme.palette.success.light : baseColor.light)
-          : (isHasFilter ? theme.palette.success.dark : baseColor.dark),
+          ? isHasFilter
+            ? theme.palette.success.light
+            : baseColor.light
+          : isHasFilter
+            ? theme.palette.success.dark
+            : baseColor.dark,
         flexShrink: 0,
         userSelect: 'none',
         transition: 'all 0.15s',
@@ -142,7 +153,10 @@ export const TokenChip: React.FC<TokenChipProps> = ({
       {/* Field */}
       <Box
         component="span"
-        onClick={(e: React.MouseEvent) => { e.stopPropagation(); onClickPart('field'); }}
+        onClick={(e: React.MouseEvent) => {
+          e.stopPropagation();
+          onClickPart('field');
+        }}
         sx={partSx('field')}
       >
         {token.negated && '!'}
@@ -153,7 +167,10 @@ export const TokenChip: React.FC<TokenChipProps> = ({
       {!isHasFilter && (
         <Box
           component="span"
-          onClick={(e: React.MouseEvent) => { e.stopPropagation(); onClickPart('operator'); }}
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            onClickPart('operator');
+          }}
           sx={{
             ...partSx('operator'),
             opacity: 0.7,
@@ -168,7 +185,10 @@ export const TokenChip: React.FC<TokenChipProps> = ({
       {/* Value */}
       <Box
         component="span"
-        onClick={(e: React.MouseEvent) => { e.stopPropagation(); onClickPart('value'); }}
+        onClick={(e: React.MouseEvent) => {
+          e.stopPropagation();
+          onClickPart('value');
+        }}
         sx={{
           ...partSx('value'),
           fontWeight: 600,
@@ -187,7 +207,10 @@ export const TokenChip: React.FC<TokenChipProps> = ({
           '&:hover': { opacity: 1 },
           transition: 'opacity 0.15s',
         }}
-        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
       />
     </Box>
   );

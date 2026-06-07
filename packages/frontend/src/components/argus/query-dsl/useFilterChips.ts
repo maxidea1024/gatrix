@@ -26,7 +26,6 @@ export interface FilterChip {
   value?: string;
   /** Whether the value was quoted */
   quoted?: boolean;
-
 }
 
 let _chipIdCounter = 0;
@@ -50,10 +49,7 @@ export function astToChips(ast: Expression | null): FilterChip[] {
   return chips;
 }
 
-function collectChips(
-  node: Expression,
-  chips: FilterChip[],
-): void {
+function collectChips(node: Expression, chips: FilterChip[]): void {
   switch (node.type) {
     case 'Filter':
       chips.push(filterToChip(node));
@@ -98,7 +94,11 @@ function collectChips(
     case 'Partial':
       // Support building logical operators/parens sequentially chip-by-chip
       if (node.raw.toUpperCase() === 'AND' || node.raw.toUpperCase() === 'OR') {
-        chips.push({ id: nextChipId(), type: 'logical', label: node.raw.toUpperCase() });
+        chips.push({
+          id: nextChipId(),
+          type: 'logical',
+          label: node.raw.toUpperCase(),
+        });
       } else if (node.raw === '(' || node.raw === ')') {
         chips.push({ id: nextChipId(), type: 'paren', label: node.raw });
       }
@@ -119,10 +119,14 @@ function filterToChip(node: FilterExpression): FilterChip {
 
 function negateOperator(op: QueryOperator): QueryOperator {
   switch (op) {
-    case '=': return '!=';
-    case '!=': return '=';
-    case 'contains': return 'contains'; // no negated form in our DSL yet
-    default: return op;
+    case '=':
+      return '!=';
+    case '!=':
+      return '=';
+    case 'contains':
+      return 'contains'; // no negated form in our DSL yet
+    default:
+      return op;
   }
 }
 
@@ -134,34 +138,46 @@ function negateOperator(op: QueryOperator): QueryOperator {
 export function chipsToQuery(chips: FilterChip[]): string {
   if (chips.length === 0) return '';
   const parts: string[] = [];
-  
+
   for (let i = 0; i < chips.length; i++) {
     const chip = chips[i];
-    
+
     if (chip.type === 'logical') {
       parts.push(` ${chip.label} `);
     } else if (chip.type === 'paren') {
       if (chip.label === '(') {
-        if (i > 0 && chips[i - 1].label !== '(' && chips[i - 1].type !== 'logical') {
+        if (
+          i > 0 &&
+          chips[i - 1].label !== '(' &&
+          chips[i - 1].type !== 'logical'
+        ) {
           parts.push(' ');
         }
         parts.push('(');
       } else {
         parts.push(')');
-        if (i < chips.length - 1 && chips[i + 1].type !== 'logical' && chips[i + 1].label !== ')') {
+        if (
+          i < chips.length - 1 &&
+          chips[i + 1].type !== 'logical' &&
+          chips[i + 1].label !== ')'
+        ) {
           parts.push(' ');
         }
       }
     } else {
       // filter chip
-      if (i > 0 && chips[i - 1].type !== 'logical' && chips[i - 1].label !== '(') {
+      if (
+        i > 0 &&
+        chips[i - 1].type !== 'logical' &&
+        chips[i - 1].label !== '('
+      ) {
         // implicitly insert space (AND) if not preceded by logical or (
         parts.push(' ');
       }
       parts.push(chipToQueryPart(chip));
     }
   }
-  
+
   return parts.join('').replace(/\s+/g, ' ').trim();
 }
 
@@ -173,7 +189,11 @@ function chipToQueryPart(chip: FilterChip): string {
   const quoted = chip.quoted ?? false;
 
   // Function operators: field:op("value")
-  if (['contains', 'startsWith', 'endsWith', 'before', 'after'].includes(operator as string)) {
+  if (
+    ['contains', 'startsWith', 'endsWith', 'before', 'after'].includes(
+      operator as string
+    )
+  ) {
     return `${field}:${operator}("${escapeQuotes(value)}")`;
   }
 

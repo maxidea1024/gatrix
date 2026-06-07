@@ -53,7 +53,11 @@ type Action =
   | { type: 'UPDATE_TOKEN'; id: string; updates: Partial<SearchToken> }
   | { type: 'DELETE_TOKEN'; id: string }
   | { type: 'SET_COMPOSING'; text: string }
-  | { type: 'START_EDITING'; tokenId: string; part: 'field' | 'operator' | 'value' }
+  | {
+      type: 'START_EDITING';
+      tokenId: string;
+      part: 'field' | 'operator' | 'value';
+    }
   | { type: 'STOP_EDITING' }
   | { type: 'COMMIT' }
   | { type: 'CLEAR' };
@@ -100,7 +104,10 @@ export function serializeToken(token: SearchToken): string {
 }
 
 /** Serialize all tokens + composing text to a full query string */
-function buildQueryString(tokens: SearchToken[], composingText: string): string {
+function buildQueryString(
+  tokens: SearchToken[],
+  composingText: string
+): string {
   const parts = tokens.map((t) => t.raw);
   if (composingText.trim()) parts.push(composingText.trim());
   return parts.join(' ');
@@ -209,7 +216,11 @@ function reducer(state: SearchQueryState, action: Action): SearchQueryState {
     case 'INIT': {
       const tokens = parseQueryToTokens(action.query);
       const query = buildQueryString(tokens, '');
-      console.log('[SQ] 🔄 INIT dispatch', { query: action.query, tokenCount: tokens.length, tokens: tokens.map(t => t.raw) });
+      console.log('[SQ] 🔄 INIT dispatch', {
+        query: action.query,
+        tokenCount: tokens.length,
+        tokens: tokens.map((t) => t.raw),
+      });
       return {
         tokens,
         query,
@@ -224,7 +235,10 @@ function reducer(state: SearchQueryState, action: Action): SearchQueryState {
       const newToken = { ...action.token, raw: serializeToken(action.token) };
       const tokens = [...state.tokens, newToken];
       const query = buildQueryString(tokens, '');
-      console.log('[SQ] ➕ ADD_TOKEN', { raw: newToken.raw, totalTokens: tokens.length });
+      console.log('[SQ] ➕ ADD_TOKEN', {
+        raw: newToken.raw,
+        totalTokens: tokens.length,
+      });
       return {
         ...state,
         tokens,
@@ -253,8 +267,10 @@ function reducer(state: SearchQueryState, action: Action): SearchQueryState {
         ...state,
         tokens,
         query,
-        editingTokenId: state.editingTokenId === action.id ? null : state.editingTokenId,
-        editingPart: state.editingTokenId === action.id ? null : state.editingPart,
+        editingTokenId:
+          state.editingTokenId === action.id ? null : state.editingTokenId,
+        editingPart:
+          state.editingTokenId === action.id ? null : state.editingPart,
       };
     }
 
@@ -290,7 +306,11 @@ function reducer(state: SearchQueryState, action: Action): SearchQueryState {
         };
       });
       const committedQuery = buildQueryString(finalTokens, '');
-      console.log('[SQ] ✅ COMMIT', { committedQuery, tokenCount: finalTokens.length, tokens: finalTokens.map(t => t.raw) });
+      console.log('[SQ] ✅ COMMIT', {
+        committedQuery,
+        tokenCount: finalTokens.length,
+        tokens: finalTokens.map((t) => t.raw),
+      });
       return {
         ...state,
         tokens: finalTokens,
@@ -326,9 +346,15 @@ interface UseSearchQueryStateOptions {
   onSearch: (query: string) => void;
 }
 
-export function useSearchQueryState({ initialQuery, onSearch }: UseSearchQueryStateOptions) {
+export function useSearchQueryState({
+  initialQuery,
+  onSearch,
+}: UseSearchQueryStateOptions) {
   const initialTokens = useMemo(() => parseQueryToTokens(initialQuery), []);
-  const initialQueryStr = useMemo(() => buildQueryString(initialTokens, ''), []);
+  const initialQueryStr = useMemo(
+    () => buildQueryString(initialTokens, ''),
+    []
+  );
 
   const [state, dispatch] = useReducer(reducer, {
     tokens: initialTokens,
@@ -350,15 +376,23 @@ export function useSearchQueryState({ initialQuery, onSearch }: UseSearchQuerySt
   useEffect(() => {
     if (initialQuery !== lastExternalQueryRef.current) {
       lastExternalQueryRef.current = initialQuery;
-      
+
       // If there's a pending self-commit, skip INIT (our own query echoing back from URL)
       if (commitCounterRef.current > lastInitCounterRef.current) {
-        console.log('[SQ] ⏭️ INIT skipped (self-commit echo)', { initialQuery, commitCounter: commitCounterRef.current, initCounter: lastInitCounterRef.current });
+        console.log('[SQ] ⏭️ INIT skipped (self-commit echo)', {
+          initialQuery,
+          commitCounter: commitCounterRef.current,
+          initCounter: lastInitCounterRef.current,
+        });
         lastInitCounterRef.current = commitCounterRef.current;
         return;
       }
-      
-      console.log('[SQ] 🔄 INIT triggered (external change)', { initialQuery, commitCounter: commitCounterRef.current, initCounter: lastInitCounterRef.current });
+
+      console.log('[SQ] 🔄 INIT triggered (external change)', {
+        initialQuery,
+        commitCounter: commitCounterRef.current,
+        initCounter: lastInitCounterRef.current,
+      });
       dispatch({ type: 'INIT', query: initialQuery });
     }
   }, [initialQuery]);
@@ -377,27 +411,36 @@ export function useSearchQueryState({ initialQuery, onSearch }: UseSearchQuerySt
       lastExternalQueryRef.current = state.committedQuery;
       // Increment counter so next initialQuery change from URL echo is skipped
       commitCounterRef.current++;
-      console.log('[SQ] 📤 onSearch fired', { committedQuery: state.committedQuery, commitCounter: commitCounterRef.current });
+      console.log('[SQ] 📤 onSearch fired', {
+        committedQuery: state.committedQuery,
+        commitCounter: commitCounterRef.current,
+      });
       onSearch(state.committedQuery);
     }
   }, [state.committedQuery, onSearch]);
 
   // ─── Convenience methods ───
 
-  const addToken = useCallback((token: Omit<SearchToken, 'id' | 'raw'> & { raw?: string }) => {
-    const id = generateTokenId();
-    const fullToken: SearchToken = {
-      ...token,
-      id,
-      raw: token.raw || '',
-    };
-    fullToken.raw = serializeToken(fullToken);
-    dispatch({ type: 'ADD_TOKEN', token: fullToken });
-  }, []);
+  const addToken = useCallback(
+    (token: Omit<SearchToken, 'id' | 'raw'> & { raw?: string }) => {
+      const id = generateTokenId();
+      const fullToken: SearchToken = {
+        ...token,
+        id,
+        raw: token.raw || '',
+      };
+      fullToken.raw = serializeToken(fullToken);
+      dispatch({ type: 'ADD_TOKEN', token: fullToken });
+    },
+    []
+  );
 
-  const updateToken = useCallback((id: string, updates: Partial<SearchToken>) => {
-    dispatch({ type: 'UPDATE_TOKEN', id, updates });
-  }, []);
+  const updateToken = useCallback(
+    (id: string, updates: Partial<SearchToken>) => {
+      dispatch({ type: 'UPDATE_TOKEN', id, updates });
+    },
+    []
+  );
 
   const deleteToken = useCallback((id: string) => {
     dispatch({ type: 'DELETE_TOKEN', id });
@@ -407,9 +450,12 @@ export function useSearchQueryState({ initialQuery, onSearch }: UseSearchQuerySt
     dispatch({ type: 'SET_COMPOSING', text });
   }, []);
 
-  const startEditing = useCallback((tokenId: string, part: 'field' | 'operator' | 'value') => {
-    dispatch({ type: 'START_EDITING', tokenId, part });
-  }, []);
+  const startEditing = useCallback(
+    (tokenId: string, part: 'field' | 'operator' | 'value') => {
+      dispatch({ type: 'START_EDITING', tokenId, part });
+    },
+    []
+  );
 
   const stopEditing = useCallback(() => {
     dispatch({ type: 'STOP_EDITING' });
@@ -446,10 +492,13 @@ export function useSearchQueryState({ initialQuery, onSearch }: UseSearchQuerySt
   }, []);
 
   /** Update token + immediately commit */
-  const updateTokenAndCommit = useCallback((id: string, updates: Partial<SearchToken>) => {
-    dispatch({ type: 'UPDATE_TOKEN', id, updates });
-    dispatch({ type: 'COMMIT' });
-  }, []);
+  const updateTokenAndCommit = useCallback(
+    (id: string, updates: Partial<SearchToken>) => {
+      dispatch({ type: 'UPDATE_TOKEN', id, updates });
+      dispatch({ type: 'COMMIT' });
+    },
+    []
+  );
 
   /** Commit composing text as a message filter if it's plain text */
   const commitComposing = useCallback(() => {

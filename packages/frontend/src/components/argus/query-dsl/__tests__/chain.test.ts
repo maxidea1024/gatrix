@@ -4,7 +4,11 @@
 import { describe, it, expect } from 'vitest';
 import { tokenize } from '../lexer';
 import { resolveCursorContext } from '../cursor-context';
-import { getSuggestions, applyCompletion, shouldKeepDropdownOpen } from '../suggestion-engine';
+import {
+  getSuggestions,
+  applyCompletion,
+  shouldKeepDropdownOpen,
+} from '../suggestion-engine';
 
 function pipeline(input: string, cursor?: number) {
   const c = cursor ?? input.length;
@@ -17,9 +21,9 @@ function pipeline(input: string, cursor?: number) {
 describe('Chained autocomplete: empty → level → info', () => {
   it('Step 1: empty → select "level" field', () => {
     const { ctx, suggestions } = pipeline('', 0);
-    const level = suggestions.find(s => s.label === 'level');
+    const level = suggestions.find((s) => s.label === 'level');
     expect(level).toBeDefined();
-    
+
     const result = applyCompletion('', ctx, level!);
     console.log('Step 1 result:', result);
     expect(result.text).toBe('level:');
@@ -30,11 +34,14 @@ describe('Chained autocomplete: empty → level → info', () => {
     // Simulating state AFTER Step 1
     const { ctx, suggestions } = pipeline('level:', 6);
     console.log('Step 2 context:', JSON.stringify(ctx));
-    console.log('Step 2 suggestions:', suggestions.map(s => `[${s.category}] ${s.label}`));
-    
-    const info = suggestions.find(s => s.label === 'info');
+    console.log(
+      'Step 2 suggestions:',
+      suggestions.map((s) => `[${s.category}] ${s.label}`)
+    );
+
+    const info = suggestions.find((s) => s.label === 'info');
     expect(info).toBeDefined();
-    
+
     const result = applyCompletion('level:', ctx, info!);
     console.log('Step 2 result:', result);
     expect(result.text).toBe('level:info');
@@ -44,49 +51,52 @@ describe('Chained autocomplete: empty → level → info', () => {
   it('Full chain: empty → level → info produces "level:info"', () => {
     // Step 1
     let { ctx, suggestions } = pipeline('', 0);
-    const level = suggestions.find(s => s.label === 'level')!;
+    const level = suggestions.find((s) => s.label === 'level')!;
     let result = applyCompletion('', ctx, level);
-    
+
     // Step 2: re-compute context with new text
     ({ ctx, suggestions } = pipeline(result.text, result.cursorOffset));
-    const info = suggestions.find(s => s.label === 'info')!;
+    const info = suggestions.find((s) => s.label === 'info')!;
     result = applyCompletion(result.text, ctx, info);
-    
+
     console.log('FINAL:', result);
     expect(result.text).toBe('level:info');
   });
 
   it('Full chain: empty → level → != → error', () => {
     let { ctx, suggestions } = pipeline('', 0);
-    const level = suggestions.find(s => s.label === 'level')!;
+    const level = suggestions.find((s) => s.label === 'level')!;
     let result = applyCompletion('', ctx, level);
 
     ({ ctx, suggestions } = pipeline(result.text, result.cursorOffset));
-    const ne = suggestions.find(s => s.label === '!=')!;
+    const ne = suggestions.find((s) => s.label === '!=')!;
     result = applyCompletion(result.text, ctx, ne);
 
     ({ ctx, suggestions } = pipeline(result.text, result.cursorOffset));
     console.log('After !=:', result.text, 'context:', JSON.stringify(ctx));
-    console.log('After != suggestions:', suggestions.map(s => `[${s.category}] ${s.label}`));
-    
-    const error = suggestions.find(s => s.label === 'error')!;
+    console.log(
+      'After != suggestions:',
+      suggestions.map((s) => `[${s.category}] ${s.label}`)
+    );
+
+    const error = suggestions.find((s) => s.label === 'error')!;
     result = applyCompletion(result.text, ctx, error);
-    
+
     console.log('FINAL:', result);
     expect(result.text).toBe('level:!=error');
   });
 
   it('Full chain: level:info → and → message → contains', () => {
     let { ctx, suggestions } = pipeline('level:info', 10);
-    
+
     // Space then logical
     ({ ctx, suggestions } = pipeline('level:info ', 11));
-    const andItem = suggestions.find(s => s.label === 'and')!;
+    const andItem = suggestions.find((s) => s.label === 'and')!;
     let result = applyCompletion('level:info ', ctx, andItem);
     console.log('After and:', result);
 
     ({ ctx, suggestions } = pipeline(result.text, result.cursorOffset));
-    const msg = suggestions.find(s => s.label === 'message')!;
+    const msg = suggestions.find((s) => s.label === 'message')!;
     result = applyCompletion(result.text, ctx, msg);
     console.log('After message:', result);
     expect(result.text).toBe('level:info and message:');

@@ -563,11 +563,9 @@ export default async function discoverRoutes(app: FastifyInstance) {
           is_global: is_global ? 1 : 0,
           created_by: createdBy,
         });
-        return reply
-          .code(201)
-          .send({
-            data: { id: insertId, name, query_type: query_type || 'discover' },
-          });
+        return reply.code(201).send({
+          data: { id: insertId, name, query_type: query_type || 'discover' },
+        });
       } catch (error) {
         logger.error('Failed to save query', {
           projectId,

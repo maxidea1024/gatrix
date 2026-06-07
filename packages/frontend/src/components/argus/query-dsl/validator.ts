@@ -20,7 +20,7 @@ import { getFieldByKey, resolveAlias } from './fields';
  */
 export function validate(
   ast: Expression | null,
-  domain: QueryDomain,
+  domain: QueryDomain
 ): ValidationError[] {
   if (!ast) return [];
   const errors: ValidationError[] = [];
@@ -33,7 +33,7 @@ export function validate(
 function validateNode(
   node: Expression,
   domain: QueryDomain,
-  errors: ValidationError[],
+  errors: ValidationError[]
 ): void {
   switch (node.type) {
     case 'Filter':
@@ -61,7 +61,7 @@ function validateNode(
 function validateFilter(
   node: Expression & { type: 'Filter' },
   domain: QueryDomain,
-  errors: ValidationError[],
+  errors: ValidationError[]
 ): void {
   const resolvedKey = resolveAlias(node.field, domain);
   const field = getFieldByKey(resolvedKey, domain);
@@ -97,7 +97,14 @@ function validateFilter(
   }
 
   // Check value type compatibility
-  validateValueType(node.field, field.type, node.value, node.start, node.end, errors);
+  validateValueType(
+    node.field,
+    field.type,
+    node.value,
+    node.start,
+    node.end,
+    errors
+  );
 }
 
 function validateValueType(
@@ -106,7 +113,7 @@ function validateValueType(
   value: string | number | boolean,
   start: number,
   end: number,
-  errors: ValidationError[],
+  errors: ValidationError[]
 ): void {
   switch (expectedType) {
     case 'number':
@@ -124,7 +131,12 @@ function validateValueType(
       }
       break;
     case 'boolean':
-      if (typeof value === 'string' && value !== 'true' && value !== 'false' && value !== '') {
+      if (
+        typeof value === 'string' &&
+        value !== 'true' &&
+        value !== 'false' &&
+        value !== ''
+      ) {
         errors.push({
           type: 'INVALID_VALUE_TYPE',
           messageKey: 'dsl.error.invalidValueType',

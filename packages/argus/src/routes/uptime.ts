@@ -64,12 +64,10 @@ export default async function uptimeRoutes(app: FastifyInstance) {
       } = request.body;
 
       if (!name || !url) {
-        return reply
-          .code(400)
-          .send({
-            success: false,
-            error: 'Missing required fields (name, url)',
-          });
+        return reply.code(400).send({
+          success: false,
+          error: 'Missing required fields (name, url)',
+        });
       }
 
       // Validate interval

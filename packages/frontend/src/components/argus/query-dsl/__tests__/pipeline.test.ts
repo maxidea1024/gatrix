@@ -4,7 +4,11 @@
 import { describe, it, expect } from 'vitest';
 import { tokenize } from '../lexer';
 import { resolveCursorContext } from '../cursor-context';
-import { getSuggestions, applyCompletion, shouldKeepDropdownOpen } from '../suggestion-engine';
+import {
+  getSuggestions,
+  applyCompletion,
+  shouldKeepDropdownOpen,
+} from '../suggestion-engine';
 import type { CursorContext, SuggestionItem } from '../types';
 
 const MOCK_FACETS = new Map<string, string[]>([
@@ -13,7 +17,11 @@ const MOCK_FACETS = new Map<string, string[]>([
   ['service', ['web', 'api', 'worker']],
 ]);
 
-function pipeline(input: string, cursor?: number, facets?: Map<string, string[]>) {
+function pipeline(
+  input: string,
+  cursor?: number,
+  facets?: Map<string, string[]>
+) {
   const c = cursor ?? input.length;
   const tokens = tokenize(input);
   const ctx = resolveCursorContext(input, c, tokens);
@@ -107,55 +115,55 @@ describe('Spec 11.1: Suggestions per context', () => {
   it('FIELD context → field list', () => {
     const { suggestions } = pipeline('');
     expect(suggestions.length).toBeGreaterThan(0);
-    expect(suggestions.every(s => s.category === 'field')).toBe(true);
+    expect(suggestions.every((s) => s.category === 'field')).toBe(true);
   });
 
   it('FIELD context with prefix → filtered', () => {
     const { suggestions } = pipeline('lev');
-    expect(suggestions.some(s => s.label === 'level')).toBe(true);
-    expect(suggestions.every(s => s.label.startsWith('lev'))).toBe(true);
+    expect(suggestions.some((s) => s.label === 'level')).toBe(true);
+    expect(suggestions.every((s) => s.label.startsWith('lev'))).toBe(true);
   });
 
   it('OPERATOR context (level:) → operators + values from facets', () => {
     const { suggestions } = pipeline('level:', undefined, MOCK_FACETS);
-    const cats = new Set(suggestions.map(s => s.category));
+    const cats = new Set(suggestions.map((s) => s.category));
     expect(cats.has('operator')).toBe(true);
     expect(cats.has('value')).toBe(true);
-    expect(suggestions.some(s => s.label === '!=')).toBe(true);
-    expect(suggestions.some(s => s.label === '=')).toBe(false);
-    expect(suggestions.some(s => s.label === 'info')).toBe(true);
-    expect(suggestions.some(s => s.label === 'error')).toBe(true);
+    expect(suggestions.some((s) => s.label === '!=')).toBe(true);
+    expect(suggestions.some((s) => s.label === '=')).toBe(false);
+    expect(suggestions.some((s) => s.label === 'info')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'error')).toBe(true);
   });
 
   it('OPERATOR context (message:) → contains, startsWith, etc.', () => {
     const { suggestions } = pipeline('message:');
-    expect(suggestions.some(s => s.label === 'contains')).toBe(true);
-    expect(suggestions.some(s => s.label === 'startsWith')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'contains')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'startsWith')).toBe(true);
   });
 
   it('VALUE context (level:!=) → values from facets', () => {
     const { suggestions } = pipeline('level:!=', undefined, MOCK_FACETS);
-    expect(suggestions.some(s => s.label === 'debug')).toBe(true);
-    expect(suggestions.some(s => s.label === 'error')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'debug')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'error')).toBe(true);
   });
 
   it('VALUE context (level:!=err) → filtered facet values', () => {
     const { suggestions } = pipeline('level:!=err', undefined, MOCK_FACETS);
-    expect(suggestions.some(s => s.label === 'error')).toBe(true);
-    expect(suggestions.every(s => s.label.startsWith('err'))).toBe(true);
+    expect(suggestions.some((s) => s.label === 'error')).toBe(true);
+    expect(suggestions.every((s) => s.label.startsWith('err'))).toBe(true);
   });
 
   it('LOGICAL_OPERATOR context → and, or', () => {
     const { suggestions } = pipeline('level:error ');
-    expect(suggestions.some(s => s.label === 'and')).toBe(true);
-    expect(suggestions.some(s => s.label === 'or')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'and')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'or')).toBe(true);
   });
 
   it('environment: → facet values', () => {
     const { suggestions } = pipeline('environment:', undefined, MOCK_FACETS);
-    expect(suggestions.some(s => s.label === 'production')).toBe(true);
-    expect(suggestions.some(s => s.label === 'staging')).toBe(true);
-    expect(suggestions.some(s => s.label === 'development')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'production')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'staging')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'development')).toBe(true);
   });
 });
 
@@ -165,7 +173,7 @@ describe('Spec 10: Autocomplete rules', () => {
   // Rule 2: field → auto colon
   it('Rule 2: field completion adds colon', () => {
     const { ctx, suggestions } = pipeline('le');
-    const level = suggestions.find(s => s.label === 'level');
+    const level = suggestions.find((s) => s.label === 'level');
     expect(level).toBeDefined();
     const result = applyCompletion('le', ctx, level!);
     expect(result.text).toBe('level:');
@@ -175,7 +183,7 @@ describe('Spec 10: Autocomplete rules', () => {
   // Rule 5: logical op adds space
   it('Rule 5: logical op adds trailing space', () => {
     const { ctx, suggestions } = pipeline('level:error ');
-    const andItem = suggestions.find(s => s.label === 'and');
+    const andItem = suggestions.find((s) => s.label === 'and');
     expect(andItem).toBeDefined();
     const result = applyCompletion('level:error ', ctx, andItem!);
     expect(result.text.endsWith('and ')).toBe(true);

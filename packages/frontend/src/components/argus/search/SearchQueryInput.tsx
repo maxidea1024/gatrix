@@ -10,12 +10,7 @@
  *   - Each chip is independently editable (click to change field/operator/value)
  */
 
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import {
   Box,
   InputBase,
@@ -23,10 +18,7 @@ import {
   useTheme,
   ClickAwayListener,
 } from '@mui/material';
-import {
-  Search as SearchIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 import { useSearchQueryState } from './useSearchQueryState';
@@ -95,7 +87,7 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
   const fields = useMemo(() => {
     // If parent explicitly passed fields, ONLY use those fields!
     if (fieldsProp && fieldsProp.length > 0) return fieldsProp;
-    
+
     // Otherwise, merge backend facets with all predefined UI fields
     const predefinedKeys = Object.keys(FIELD_DEFINITIONS);
     return Array.from(new Set([...Object.keys(facets), ...predefinedKeys]));
@@ -132,7 +124,9 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
       setComposing(e.target.value);
       // Re-open dropdown when user starts typing
       if (!open) {
-        console.log('[UI] ⌨️ typing reopens dropdown', { text: e.target.value });
+        console.log('[UI] ⌨️ typing reopens dropdown', {
+          text: e.target.value,
+        });
         setOpen(true);
       }
     },
@@ -142,10 +136,16 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       // Backspace on empty composing → delete last token (no search)
-      if (e.key === 'Backspace' && state.composingText === '' && state.tokens.length > 0) {
+      if (
+        e.key === 'Backspace' &&
+        state.composingText === '' &&
+        state.tokens.length > 0
+      ) {
         e.preventDefault();
         const lastToken = state.tokens[state.tokens.length - 1];
-        console.log('[UI] ⌫ Backspace delete last token', { raw: lastToken.raw });
+        console.log('[UI] ⌫ Backspace delete last token', {
+          raw: lastToken.raw,
+        });
         deleteToken(lastToken.id);
         return;
       }
@@ -159,7 +159,10 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
       // Enter → commit + search
       if (e.key === 'Enter') {
         e.preventDefault();
-        console.log('[UI] ⏎ Enter → commitComposing + search', { composingText: state.composingText, tokenCount: state.tokens.length });
+        console.log('[UI] ⏎ Enter → commitComposing + search', {
+          composingText: state.composingText,
+          tokenCount: state.tokens.length,
+        });
         commitComposing();
         setOpen(false);
         inputRef.current?.blur();
@@ -174,24 +177,43 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
         stopEditing();
       }
     },
-    [state.composingText, state.tokens, deleteToken, commitComposing, stopEditing, setComposing]
+    [
+      state.composingText,
+      state.tokens,
+      deleteToken,
+      commitComposing,
+      stopEditing,
+      setComposing,
+    ]
   );
 
   const handleAutocompleteSelect = useCallback(
     (selection: AutocompleteSelection) => {
-      console.log('[UI] 🎯 autocomplete select', { selection, editingTokenId: state.editingTokenId, editingPart: state.editingPart });
+      console.log('[UI] 🎯 autocomplete select', {
+        selection,
+        editingTokenId: state.editingTokenId,
+        editingPart: state.editingPart,
+      });
       if (state.editingTokenId && state.editingPart) {
         // Partial edit: only update the part being edited (no search)
         const updates: Record<string, string> = {};
         if (state.editingPart === 'field') updates.field = selection.field;
-        else if (state.editingPart === 'operator') updates.operator = selection.operator;
+        else if (state.editingPart === 'operator')
+          updates.operator = selection.operator;
         else if (state.editingPart === 'value') updates.value = selection.value;
-        console.log('[UI] ✏️ edit chip part', { tokenId: state.editingTokenId, updates });
+        console.log('[UI] ✏️ edit chip part', {
+          tokenId: state.editingTokenId,
+          updates,
+        });
         updateToken(state.editingTokenId, updates);
         stopEditing();
       } else {
         // New chip (no search — search happens on Enter)
-        console.log('[UI] ➕ new chip (no search)', { field: selection.field, operator: selection.operator, value: selection.value });
+        console.log('[UI] ➕ new chip (no search)', {
+          field: selection.field,
+          operator: selection.operator,
+          value: selection.value,
+        });
         addToken({
           type: 'filter',
           field: selection.field,
@@ -204,7 +226,14 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
       console.log('[UI] 🚪 close dropdown after select');
       setOpen(false);
     },
-    [state.editingTokenId, state.editingPart, addToken, updateToken, stopEditing, setComposing]
+    [
+      state.editingTokenId,
+      state.editingPart,
+      addToken,
+      updateToken,
+      stopEditing,
+      setComposing,
+    ]
   );
 
   const handleChipClickPart = useCallback(
@@ -217,7 +246,11 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
         } else if (part === 'operator') {
           autocompleteRef.current.setEditState('operator', token.field);
         } else if (part === 'value') {
-          autocompleteRef.current.setEditState('value', token.field, token.operator);
+          autocompleteRef.current.setEditState(
+            'value',
+            token.field,
+            token.operator
+          );
         }
       }
       setOpen(true);
@@ -253,13 +286,17 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
 
   // ─── Render ───
 
-  const hasContent = state.tokens.length > 0 || state.composingText.trim().length > 0;
+  const hasContent =
+    state.tokens.length > 0 || state.composingText.trim().length > 0;
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
       <Box
         ref={containerRef}
-        onClick={() => { inputRef.current?.focus(); setOpen(true); }}
+        onClick={() => {
+          inputRef.current?.focus();
+          setOpen(true);
+        }}
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -283,22 +320,26 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
           },
         }}
       >
-        <SearchIcon sx={{ fontSize: 14, color: 'text.disabled', flexShrink: 0 }} />
+        <SearchIcon
+          sx={{ fontSize: 14, color: 'text.disabled', flexShrink: 0 }}
+        />
 
         {/* Committed token chips */}
         {state.tokens.map((token) => (
           <TokenChip
-          key={token.id}
-          token={token}
-          isEditing={state.editingTokenId === token.id}
-          editingPart={state.editingTokenId === token.id ? state.editingPart : null}
-          isDark={isDark}
-          onClickPart={(part) => handleChipClickPart(token.id, part)}
-          onDelete={() => handleChipDelete(token.id)}
-        />
-      ))}
+            key={token.id}
+            token={token}
+            isEditing={state.editingTokenId === token.id}
+            editingPart={
+              state.editingTokenId === token.id ? state.editingPart : null
+            }
+            isDark={isDark}
+            onClickPart={(part) => handleChipClickPart(token.id, part)}
+            onDelete={() => handleChipDelete(token.id)}
+          />
+        ))}
 
-      {/* Composing input */}
+        {/* Composing input */}
         <InputBase
           inputRef={inputRef}
           value={state.composingText}
@@ -306,36 +347,44 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           placeholder={
-          state.tokens.length === 0
-            ? placeholder || t(
-                'argus.search.placeholder',
-                'Search by field:value or type to search messages...'
-              )
-            : ''
-        }
-        spellCheck={false}
-        autoComplete="off"
-        sx={{
-          flex: 1,
-          minWidth: 60,
-          '& input': {
-            padding: '2px 0',
-            fontSize: '0.8rem',
-            fontWeight: 500,
-            fontFamily: 'inherit',
-            '&::placeholder': { fontSize: '0.75rem', opacity: 0.5 },
-          },
-        }}
-      />
+            state.tokens.length === 0
+              ? placeholder ||
+                t(
+                  'argus.search.placeholder',
+                  'Search by field:value or type to search messages...'
+                )
+              : ''
+          }
+          spellCheck={false}
+          autoComplete="off"
+          sx={{
+            flex: 1,
+            minWidth: 60,
+            '& input': {
+              padding: '2px 0',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              fontFamily: 'inherit',
+              '&::placeholder': { fontSize: '0.75rem', opacity: 0.5 },
+            },
+          }}
+        />
 
-      {/* Clear button */}
-      {hasContent && (
-        <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleClear(); }} sx={{ p: 0.2, flexShrink: 0 }}>
-          <CloseIcon sx={{ fontSize: 14 }} />
-        </IconButton>
-      )}
+        {/* Clear button */}
+        {hasContent && (
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClear();
+            }}
+            sx={{ p: 0.2, flexShrink: 0 }}
+          >
+            <CloseIcon sx={{ fontSize: 14 }} />
+          </IconButton>
+        )}
 
-      {/* Autocomplete dropdown */}
+        {/* Autocomplete dropdown */}
         <SearchAutocompleteDropdown
           ref={autocompleteRef}
           composingText={state.composingText}
@@ -346,9 +395,11 @@ export const SearchQueryInput: React.FC<SearchQueryInputProps> = ({
           isDark={isDark}
           onSelect={handleAutocompleteSelect}
           onSelectField={(field) => setComposing(field + ':')}
-          onSelectOperator={() => {/* keep composing as field: prefix */}}
+          onSelectOperator={() => {
+            /* keep composing as field: prefix */
+          }}
           hasExplicitFields={!!(fieldsProp && fieldsProp.length > 0)}
-          editingPart={state.editingTokenId ? (state.editingPart || null) : null}
+          editingPart={state.editingTokenId ? state.editingPart || null : null}
           hasTokens={state.tokens.length > 0}
         />
       </Box>

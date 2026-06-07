@@ -14,11 +14,11 @@ export const OP_LABELS: Record<string, string> = {
   '>=': '>=',
   '<': '<',
   '<=': '<=',
-  'contains': 'contains',
+  contains: 'contains',
   '!contains': 'does not contain',
-  'startsWith': 'starts with',
+  startsWith: 'starts with',
   '!startsWith': 'does not start with',
-  'endsWith': 'ends with',
+  endsWith: 'ends with',
   '!endsWith': 'does not end with',
 };
 
@@ -30,8 +30,8 @@ export const DATE_OP_LABELS: Record<string, string> = {
   '>=': 'is on or after',
   '<': 'is before',
   '<=': 'is on or before',
-  'before': 'is before',
-  'after': 'is after',
+  before: 'is before',
+  after: 'is after',
 };
 
 // ─── Reverse lookup (label → operator) ───────────────────────────────────────
@@ -78,7 +78,7 @@ export function getOpFromLabel(label: string, fieldType: string): string {
  */
 export function getOperatorOptions(
   operators: QueryOperator[],
-  fieldType: string,
+  fieldType: string
 ): { op: string; label: string }[] {
   return operators.map((op) => ({
     op,

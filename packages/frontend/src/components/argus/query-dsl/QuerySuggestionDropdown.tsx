@@ -9,7 +9,15 @@
  *   - Keyboard hints footer
  */
 
-import React, { useRef, useEffect, useState, useCallback, useMemo, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { Box, Typography, IconButton, Checkbox } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -57,33 +65,39 @@ interface TabConfig {
 
 const CATEGORY_COLORS: Record<string, string> = {
   // Field domain categories
-  log:       '#7c8aff',
-  resource:  '#6ec87a',
-  trace:     '#e6994a',
-  event:     '#d97ce6',
-  user:      '#4fc3f7',
+  log: '#7c8aff',
+  resource: '#6ec87a',
+  trace: '#e6994a',
+  event: '#d97ce6',
+  user: '#4fc3f7',
   attribute: '#90a4ae',
   // Suggestion categories (fallback)
-  field:     '#7c8aff',
-  operator:  '#e6994a',
-  value:     '#6ec87a',
-  logical:   '#b07adb',
+  field: '#7c8aff',
+  operator: '#e6994a',
+  value: '#6ec87a',
+  logical: '#b07adb',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle, QuerySuggestionDropdownProps>(function QuerySuggestionDropdown({
-  suggestions,
-  selectedIndex,
-  onSelect,
-  onSelectedIndexChange,
-  isDark,
-  inputPrefix = '',
-  recentSearches = [],
-  onSelectRecent,
-  onRemoveRecent,
-  onSelectMultiple,
-}, ref) {
+export const QuerySuggestionDropdown = forwardRef<
+  QuerySuggestionDropdownHandle,
+  QuerySuggestionDropdownProps
+>(function QuerySuggestionDropdown(
+  {
+    suggestions,
+    selectedIndex,
+    onSelect,
+    onSelectedIndexChange,
+    isDark,
+    inputPrefix = '',
+    recentSearches = [],
+    onSelectRecent,
+    onRemoveRecent,
+    onSelectMultiple,
+  },
+  ref
+) {
   const { t } = useTranslation();
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -116,29 +130,45 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
   const hasRecent = recentSearches.length > 0;
 
   // Domain-aware tab labels
-  const FIELD_CAT_TABS: Record<string, { i18nKey: string; fallback: string }> = {
-    log:       { i18nKey: 'dsl.tab.logs',       fallback: 'Logs' },
-    resource:  { i18nKey: 'dsl.tab.resource',    fallback: 'Resource' },
-    trace:     { i18nKey: 'dsl.tab.trace',       fallback: 'Trace' },
-    event:     { i18nKey: 'dsl.tab.event',       fallback: 'Event' },
-    user:      { i18nKey: 'dsl.tab.user',        fallback: 'User' },
-    attribute: { i18nKey: 'dsl.tab.attributes',  fallback: 'Attributes' },
-    logic:     { i18nKey: 'dsl.tab.logic',       fallback: 'Logic' },
-  };
+  const FIELD_CAT_TABS: Record<string, { i18nKey: string; fallback: string }> =
+    {
+      log: { i18nKey: 'dsl.tab.logs', fallback: 'Logs' },
+      resource: { i18nKey: 'dsl.tab.resource', fallback: 'Resource' },
+      trace: { i18nKey: 'dsl.tab.trace', fallback: 'Trace' },
+      event: { i18nKey: 'dsl.tab.event', fallback: 'Event' },
+      user: { i18nKey: 'dsl.tab.user', fallback: 'User' },
+      attribute: { i18nKey: 'dsl.tab.attributes', fallback: 'Attributes' },
+      logic: { i18nKey: 'dsl.tab.logic', fallback: 'Logic' },
+    };
 
   const availableTabs = useMemo(() => {
     const tabs: TabConfig[] = [];
 
     if (hasRecent) {
-      tabs.push({ key: 'recent', i18nKey: 'dsl.tab.recent', fallback: 'Recent' });
+      tabs.push({
+        key: 'recent',
+        i18nKey: 'dsl.tab.recent',
+        fallback: 'Recent',
+      });
     }
     tabs.push({ key: 'all', i18nKey: 'dsl.tab.all', fallback: 'All' });
 
     // Add tabs for each field category present in suggestions
-    const catOrder = ['log', 'resource', 'trace', 'event', 'user', 'attribute', 'logic'];
+    const catOrder = [
+      'log',
+      'resource',
+      'trace',
+      'event',
+      'user',
+      'attribute',
+      'logic',
+    ];
     for (const cat of catOrder) {
       if (fieldCategories.has(cat)) {
-        const meta = FIELD_CAT_TABS[cat] ?? { i18nKey: `dsl.tab.${cat}`, fallback: cat };
+        const meta = FIELD_CAT_TABS[cat] ?? {
+          i18nKey: `dsl.tab.${cat}`,
+          fallback: cat,
+        };
         tabs.push({ key: cat, ...meta });
       }
     }
@@ -158,26 +188,30 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
   }, [showTabs]);
 
   // Expose tab navigation to parent (for Left/Right arrow keys)
-  useImperativeHandle(ref, () => ({
-    nextTab: () => {
-      if (!showTabs || availableTabs.length <= 1) return;
-      setActiveTab((curr) => {
-        const idx = availableTabs.findIndex((t) => t.key === curr);
-        const next = (idx + 1) % availableTabs.length;
-        return availableTabs[next].key;
-      });
-      onSelectedIndexChange?.(-1);
-    },
-    prevTab: () => {
-      if (!showTabs || availableTabs.length <= 1) return;
-      setActiveTab((curr) => {
-        const idx = availableTabs.findIndex((t) => t.key === curr);
-        const prev = (idx - 1 + availableTabs.length) % availableTabs.length;
-        return availableTabs[prev].key;
-      });
-      onSelectedIndexChange?.(-1);
-    },
-  }), [showTabs, availableTabs, onSelectedIndexChange]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      nextTab: () => {
+        if (!showTabs || availableTabs.length <= 1) return;
+        setActiveTab((curr) => {
+          const idx = availableTabs.findIndex((t) => t.key === curr);
+          const next = (idx + 1) % availableTabs.length;
+          return availableTabs[next].key;
+        });
+        onSelectedIndexChange?.(-1);
+      },
+      prevTab: () => {
+        if (!showTabs || availableTabs.length <= 1) return;
+        setActiveTab((curr) => {
+          const idx = availableTabs.findIndex((t) => t.key === curr);
+          const prev = (idx - 1 + availableTabs.length) % availableTabs.length;
+          return availableTabs[prev].key;
+        });
+        onSelectedIndexChange?.(-1);
+      },
+    }),
+    [showTabs, availableTabs, onSelectedIndexChange]
+  );
 
   // Reset tab when available tabs change
   useEffect(() => {
@@ -231,8 +265,6 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
     return map;
   }, [filteredSuggestions]);
 
-
-
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const isRecentTab = activeTab === 'recent';
@@ -240,7 +272,8 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
 
   // Do not render the popover at all if there's nothing to show
   if (!showTabs && filteredSuggestions.length === 0) return null;
-  if (showTabs && suggestions.length === 0 && recentSearches.length === 0) return null;
+  if (showTabs && suggestions.length === 0 && recentSearches.length === 0)
+    return null;
 
   return (
     <Box
@@ -289,8 +322,12 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
                   fontSize: '11px',
                   fontWeight: isActive ? 600 : 400,
                   color: isActive
-                    ? isDark ? '#e0e0e0' : '#1a1a1a'
-                    : isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
+                    ? isDark
+                      ? '#e0e0e0'
+                      : '#1a1a1a'
+                    : isDark
+                      ? 'rgba(255,255,255,0.4)'
+                      : 'rgba(0,0,0,0.4)',
                   borderBottom: isActive
                     ? `2px solid ${isDark ? '#7c8aff' : '#5c6bc0'}`
                     : '2px solid transparent',
@@ -309,7 +346,9 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
                   component="span"
                   sx={{
                     fontSize: '9px',
-                    color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)',
+                    color: isDark
+                      ? 'rgba(255,255,255,0.25)'
+                      : 'rgba(0,0,0,0.25)',
                     fontWeight: 400,
                   }}
                 >
@@ -335,7 +374,8 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
           recentSearches.length === 0 ? (
             <Typography
               sx={{
-                px: 1.5, py: 1,
+                px: 1.5,
+                py: 1,
                 fontSize: '11px',
                 color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
                 textAlign: 'center',
@@ -363,7 +403,9 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
                     py: '4px',
                     cursor: 'pointer',
                     backgroundColor: isSelected
-                      ? isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'
+                      ? isDark
+                        ? 'rgba(255,255,255,0.08)'
+                        : 'rgba(0,0,0,0.05)'
                       : 'transparent',
                     '&:hover': {
                       backgroundColor: isDark
@@ -382,7 +424,9 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
                   <Typography
                     sx={{
                       fontSize: '11px',
-                      color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)',
+                      color: isDark
+                        ? 'rgba(255,255,255,0.25)'
+                        : 'rgba(0,0,0,0.25)',
                       flexShrink: 0,
                       lineHeight: 1,
                     }}
@@ -420,123 +464,140 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
                       flexShrink: 0,
                     }}
                   >
-                    <CloseIcon sx={{ fontSize: 12, color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }} />
+                    <CloseIcon
+                      sx={{
+                        fontSize: 12,
+                        color: isDark
+                          ? 'rgba(255,255,255,0.3)'
+                          : 'rgba(0,0,0,0.3)',
+                      }}
+                    />
                   </IconButton>
                 </Box>
               );
             })
           )
+        ) : /* ── Suggestion List ── */
+        filteredSuggestions.length === 0 ? (
+          <Typography
+            sx={{
+              px: 1.5,
+              py: 1,
+              fontSize: '11px',
+              color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+              textAlign: 'center',
+            }}
+          >
+            {t('dsl.noSuggestions', 'No suggestions')}
+          </Typography>
         ) : (
-          /* ── Suggestion List ── */
-          filteredSuggestions.length === 0 ? (
-            <Typography
-              sx={{
-                px: 1.5, py: 1,
-                fontSize: '11px',
-                color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
-                textAlign: 'center',
-              }}
-            >
-              {t('dsl.noSuggestions', 'No suggestions')}
-            </Typography>
-          ) : (
-            Array.from(grouped.entries()).map(([category, items]) => (
-              <Box key={category}>
-                {showTabs && activeTab === 'all' && grouped.size > 1 && (
-                  <Typography
+          Array.from(grouped.entries()).map(([category, items]) => (
+            <Box key={category}>
+              {showTabs && activeTab === 'all' && grouped.size > 1 && (
+                <Typography
+                  sx={{
+                    px: 1,
+                    py: '2px',
+                    mt: flatIndex > 0 ? '2px' : 0,
+                    display: 'block',
+                    color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+                    fontSize: '9px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    userSelect: 'none',
+                  }}
+                >
+                  {t(`dsl.category.${category}`, category)}
+                </Typography>
+              )}
+
+              {items.map((item) => {
+                const idx = flatIndex++;
+                const isSelected = idx === selectedIndex;
+                const isValue =
+                  item.category === 'value' &&
+                  !item.description?.startsWith('dsl.smart.');
+
+                return (
+                  <Box
+                    key={`${category}-${item.label}`}
+                    data-suggestion-item
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onSelect(item);
+                    }}
                     sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
                       px: 1,
                       py: '2px',
-                      mt: flatIndex > 0 ? '2px' : 0,
-                      display: 'block',
-                      color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
-                      fontSize: '9px',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      userSelect: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: isSelected
+                        ? isDark
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(0,0,0,0.05)'
+                        : 'transparent',
+                      '&:hover': {
+                        backgroundColor: isDark
+                          ? 'rgba(255,255,255,0.06)'
+                          : 'rgba(0,0,0,0.04)',
+                      },
+                      borderRadius: '4px',
+                      mx: '3px',
                     }}
                   >
-                    {t(`dsl.category.${category}`, category)}
-                  </Typography>
-                )}
-
-                {items.map((item) => {
-                  const idx = flatIndex++;
-                  const isSelected = idx === selectedIndex;
-                  const isValue = item.category === 'value' && !item.description?.startsWith('dsl.smart.');
-
-                  return (
-                    <Box
-                      key={`${category}-${item.label}`}
-                      data-suggestion-item
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        onSelect(item);
-                      }}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.75,
-                        px: 1,
-                        py: '2px',
-                        cursor: 'pointer',
-                        backgroundColor: isSelected
-                          ? isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'
-                          : 'transparent',
-                        '&:hover': {
-                          backgroundColor: isDark
-                            ? 'rgba(255,255,255,0.06)'
-                            : 'rgba(0,0,0,0.04)',
-                        },
-                        borderRadius: '4px',
-                        mx: '3px',
-                      }}
-                    >
-                      {/* Category dot */}
-                      {isValue ? (
-                        <Box sx={{ width: 14, height: 14, flexShrink: 0 }} />
-                      ) : (
-                        <Box
-                          sx={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: '50%',
-                            backgroundColor: CATEGORY_COLORS[item.fieldCategory ?? item.category] ?? '#90a4ae',
-                            opacity: 0.7,
-                            flexShrink: 0,
-                            ml: '4px',
-                          }}
-                        />
-                      )}
-
-                      {/* Label — smart rendering for composite suggestions */}
+                    {/* Category dot */}
+                    {isValue ? (
+                      <Box sx={{ width: 14, height: 14, flexShrink: 0 }} />
+                    ) : (
                       <Box
                         sx={{
-                          fontSize: '12px',
-                          fontFamily: '"JetBrains Mono", monospace',
-                          fontWeight: 500,
-                          color: isDark ? '#d4d4d4' : '#1a1a1a',
-                          flex: 1,
-                          minWidth: 0,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          lineHeight: 1.4,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor:
+                            CATEGORY_COLORS[
+                              item.fieldCategory ?? item.category
+                            ] ?? '#90a4ae',
+                          opacity: 0.7,
+                          flexShrink: 0,
+                          ml: '4px',
                         }}
-                      >
-                        {renderSuggestionLabel(item, isDark)}
-                      </Box>
+                      />
+                    )}
 
-                      {/* Description or field type — hide for smart suggestions */}
-                      {(item.description || item.fieldType) && !item.description?.startsWith('dsl.smart.') && (
+                    {/* Label — smart rendering for composite suggestions */}
+                    <Box
+                      sx={{
+                        fontSize: '12px',
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontWeight: 500,
+                        color: isDark ? '#d4d4d4' : '#1a1a1a',
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        lineHeight: 1.4,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      {renderSuggestionLabel(item, isDark)}
+                    </Box>
+
+                    {/* Description or field type — hide for smart suggestions */}
+                    {(item.description || item.fieldType) &&
+                      !item.description?.startsWith('dsl.smart.') && (
                         <Typography
                           sx={{
                             fontSize: '10px',
-                            color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.3)',
+                            color: isDark
+                              ? 'rgba(255,255,255,0.25)'
+                              : 'rgba(0,0,0,0.3)',
                             fontFamily: 'inherit',
                             flexShrink: 0,
                             lineHeight: 1,
@@ -547,12 +608,11 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
                             : item.fieldType}
                         </Typography>
                       )}
-                    </Box>
-                  );
-                })}
-              </Box>
-            ))
-          )
+                  </Box>
+                );
+              })}
+            </Box>
+          ))
         )}
       </Box>
 
@@ -571,39 +631,44 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
         <Box sx={{ flex: 1 }} />
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           {[
-          { keys: '↑↓', label: t('dsl.hint.navigate', 'navigate') },
-          { keys: '←→', label: t('dsl.hint.switchTab', 'tab') },
-          { keys: 'Tab', label: t('dsl.hint.select', 'select') },
-          { keys: 'Esc', label: t('dsl.hint.close', 'close') },
-        ].map(({ keys, label }) => (
-          <Box key={keys} sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <Typography
-              component="span"
-              sx={{
-                fontSize: '11px',
-                fontFamily: '"JetBrains Mono", monospace',
-                color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-                px: '4px',
-                py: '1px',
-                borderRadius: '3px',
-                lineHeight: 1.3,
-              }}
+            { keys: '↑↓', label: t('dsl.hint.navigate', 'navigate') },
+            { keys: '←→', label: t('dsl.hint.switchTab', 'tab') },
+            { keys: 'Tab', label: t('dsl.hint.select', 'select') },
+            { keys: 'Esc', label: t('dsl.hint.close', 'close') },
+          ].map(({ keys, label }) => (
+            <Box
+              key={keys}
+              sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
             >
-              {keys}
-            </Typography>
-            <Typography
-              component="span"
-              sx={{
-                fontSize: '11px',
-                color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)',
-                lineHeight: 1.3,
-              }}
-            >
-              {label}
-            </Typography>
-          </Box>
-        ))}
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: '11px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.05)',
+                  px: '4px',
+                  py: '1px',
+                  borderRadius: '3px',
+                  lineHeight: 1.3,
+                }}
+              >
+                {keys}
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: '11px',
+                  color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)',
+                  lineHeight: 1.3,
+                }}
+              >
+                {label}
+              </Typography>
+            </Box>
+          ))}
         </Box>
       </Box>
     </Box>
@@ -617,29 +682,40 @@ export const QuerySuggestionDropdown = forwardRef<QuerySuggestionDropdownHandle,
  * For "message contains X" / "message is X" style suggestions, split into
  * colored parts: [field] [operator] [value].
  */
-function renderSuggestionLabel(item: SuggestionItem, isDark: boolean): React.ReactNode {
+function renderSuggestionLabel(
+  item: SuggestionItem,
+  isDark: boolean
+): React.ReactNode {
   // Smart suggestions: "message contains X" or "message is X"
-  const smartMatch = item.label.match(/^(\w+)\s+(contains|is|startsWith|endsWith)\s+(.+)$/);
+  const smartMatch = item.label.match(
+    /^(\w+)\s+(contains|is|startsWith|endsWith)\s+(.+)$/
+  );
   if (smartMatch) {
     const [, field, op, value] = smartMatch;
     return (
       <>
-        <span style={{
-          color: isDark ? '#7c8aff' : '#5c6bc0',
-          fontWeight: 600,
-        }}>
+        <span
+          style={{
+            color: isDark ? '#7c8aff' : '#5c6bc0',
+            fontWeight: 600,
+          }}
+        >
           {field}
         </span>
-        <span style={{
-          color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-          fontWeight: 400,
-        }}>
+        <span
+          style={{
+            color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
+            fontWeight: 400,
+          }}
+        >
           {op}
         </span>
-        <span style={{
-          color: isDark ? '#e6994a' : '#e65100',
-          fontWeight: 500,
-        }}>
+        <span
+          style={{
+            color: isDark ? '#e6994a' : '#e65100',
+            fontWeight: 500,
+          }}
+        >
           {value}
         </span>
       </>
@@ -682,7 +758,7 @@ function formatRecentQuery(query: string, isDark: boolean): React.ReactNode[] {
           }}
         >
           {part.toUpperCase()}
-        </Typography>,
+        </Typography>
       );
     } else {
       nodes.push(
@@ -695,7 +771,9 @@ function formatRecentQuery(query: string, isDark: boolean): React.ReactNode[] {
             px: '5px',
             py: '1px',
             borderRadius: '3px',
-            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.05)',
             fontSize: '11px',
             fontFamily: '"JetBrains Mono", monospace',
             color: isDark ? '#c0c0c0' : '#333',
@@ -704,7 +782,7 @@ function formatRecentQuery(query: string, isDark: boolean): React.ReactNode[] {
           }}
         >
           {formatChipParts(part, isDark)}
-        </Box>,
+        </Box>
       );
     }
   }
@@ -732,12 +810,15 @@ function formatChipParts(expr: string, isDark: boolean): React.ReactNode {
       <span style={{ color: isDark ? '#7c8aff' : '#5c6bc0', fontWeight: 600 }}>
         {field}
       </span>
-      <span style={{ color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)', margin: '0 1px' }}>
+      <span
+        style={{
+          color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+          margin: '0 1px',
+        }}
+      >
         :
       </span>
-      <span style={{ color: isDark ? '#6ec87a' : '#2e7d32' }}>
-        {rest}
-      </span>
+      <span style={{ color: isDark ? '#6ec87a' : '#2e7d32' }}>{rest}</span>
     </>
   );
 }

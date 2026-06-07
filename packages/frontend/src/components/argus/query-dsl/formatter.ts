@@ -34,7 +34,7 @@ export function formatQuery(ast: Expression | null): string {
 export function renderTokensToSpans(
   input: string,
   tokens: Token[],
-  errors: ValidationError[] = [],
+  errors: ValidationError[] = []
 ): TokenSpan[] {
   const spans: TokenSpan[] = [];
   let lastEnd = 0;
@@ -62,7 +62,7 @@ export function renderTokensToSpans(
 
     // Check if this token overlaps with any error
     const error = errors.find(
-      (e) => e.start <= token.start && e.end >= token.end,
+      (e) => e.start <= token.start && e.end >= token.end
     );
     if (error) {
       span.className += ` token-${error.severity}`;
@@ -104,7 +104,7 @@ function formatNode(node: Expression): string {
     case 'FreeText':
       return node.quoted ? `"${node.value}"` : node.value;
     case 'Binary':
-      return node.implicit 
+      return node.implicit
         ? `${formatNode(node.left)} ${formatNode(node.right)}`
         : `${formatNode(node.left)} ${node.operator} ${formatNode(node.right)}`;
     case 'Not':
@@ -121,7 +121,8 @@ function formatNode(node: Expression): string {
 }
 
 function formatValue(value: string | number | boolean): string {
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (typeof value === 'number' || typeof value === 'boolean')
+    return String(value);
   if (value.includes(' ')) return `"${value}"`;
   return value;
 }

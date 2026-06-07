@@ -497,10 +497,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         display_type: 'table',
         query_type: 'traces',
       });
-      const updated = await argusService.listSavedQueries(
-        projectId,
-        'traces'
-      );
+      const updated = await argusService.listSavedQueries(projectId, 'traces');
       setSavedQueries(updated);
       setQueryName(saveName.trim());
       if (res.id) setCurrentQueryId(res.id);

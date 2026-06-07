@@ -1722,7 +1722,13 @@ class ArgusService {
   async getAttributeKeys(
     projectId: number | string,
     params?: { period?: string; start?: string; end?: string; limit?: number }
-  ): Promise<{ key: string; count: number; values: { attr_value: string; count: string }[] }[]> {
+  ): Promise<
+    {
+      key: string;
+      count: number;
+      values: { attr_value: string; count: string }[];
+    }[]
+  > {
     // Temporarily disabled to prevent 404 console errors since backend doesn't support this yet
     return Promise.resolve([]);
   }
@@ -2078,9 +2084,7 @@ class ArgusService {
     );
   }
 
-  async testSlackConnection(
-    botToken: string
-  ): Promise<{
+  async testSlackConnection(botToken: string): Promise<{
     ok: boolean;
     team?: string;
     user?: string;

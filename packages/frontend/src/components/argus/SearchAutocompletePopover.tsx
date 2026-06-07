@@ -46,7 +46,13 @@ export interface SearchAutocompletePopoverHandle {
 /* ─── Item types for flat list ─── */
 interface AutocompleteItem {
   key: string;
-  type: 'recent' | 'syntax' | 'field' | 'value' | 'has-field' | 'message-suggestion';
+  type:
+    | 'recent'
+    | 'syntax'
+    | 'field'
+    | 'value'
+    | 'has-field'
+    | 'message-suggestion';
   label: string;
   action: () => void;
   fieldKey?: string;
@@ -610,7 +616,14 @@ const SearchAutocompletePopover = forwardRef<
               renderItemBox(
                 item,
                 idx,
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, width: '100%' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    width: '100%',
+                  }}
+                >
                   <Typography
                     sx={{
                       fontSize: '0.78rem',
@@ -619,10 +632,14 @@ const SearchAutocompletePopover = forwardRef<
                       flex: 1,
                     }}
                   >
-                    <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>
+                    <span
+                      style={{
+                        color: theme.palette.primary.main,
+                        fontWeight: 600,
+                      }}
+                    >
                       message
-                    </span>
-                    {' '}
+                    </span>{' '}
                     <span style={{ opacity: 0.7 }}>
                       {item.label.replace('message ', '')}
                     </span>

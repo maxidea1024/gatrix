@@ -370,50 +370,59 @@ export function useArgusLogs() {
   // Discovered attribute facets from backend API (time-period only, no search filter)
   const [discoveredFacets, setDiscoveredFacets] = useState<FacetGroup[]>([]);
 
-  const mappedFacets = useMemo(
-    () => {
-      const result: Record<string, { value: string; count: number }[]> = {};
+  const mappedFacets = useMemo(() => {
+    const result: Record<string, { value: string; count: number }[]> = {};
 
-      // Base facets from getLogFacets API
-      if (facets.levels?.length) {
-        const vals = facets.levels.map((l) => ({ value: l.level, count: Number(l.count) }));
-        result.severity = vals;
-        result.level = vals;
-      }
-      if (facets.services?.length) {
-        const vals = facets.services.map((s) => ({ value: s.service, count: Number(s.count) }));
-        result.service = vals;
-      }
-      if (facets.environments?.length) {
-        const vals = facets.environments.map((e) => ({ value: e.environment, count: Number(e.count) }));
-        result.environment = vals;
-      }
-      if (facets.loggers?.length) {
-        const vals = facets.loggers.map((l) => ({ value: l.logger_name, count: Number(l.count) }));
-        result.logger = vals;
-        result.logger_name = vals;
-      }
+    // Base facets from getLogFacets API
+    if (facets.levels?.length) {
+      const vals = facets.levels.map((l) => ({
+        value: l.level,
+        count: Number(l.count),
+      }));
+      result.severity = vals;
+      result.level = vals;
+    }
+    if (facets.services?.length) {
+      const vals = facets.services.map((s) => ({
+        value: s.service,
+        count: Number(s.count),
+      }));
+      result.service = vals;
+    }
+    if (facets.environments?.length) {
+      const vals = facets.environments.map((e) => ({
+        value: e.environment,
+        count: Number(e.count),
+      }));
+      result.environment = vals;
+    }
+    if (facets.loggers?.length) {
+      const vals = facets.loggers.map((l) => ({
+        value: l.logger_name,
+        count: Number(l.count),
+      }));
+      result.logger = vals;
+      result.logger_name = vals;
+    }
 
-      // Discovered facets from log attributes
-      for (const df of discoveredFacets) {
-        const key = df.label;
-        if (!result[key]) {
-          result[key] = df.values;
-        }
+    // Discovered facets from log attributes
+    for (const df of discoveredFacets) {
+      const key = df.label;
+      if (!result[key]) {
+        result[key] = df.values;
       }
+    }
 
-      // Custom facets from user-defined attribute keys
-      for (const cf of customFacetData) {
-        const key = cf.label;
-        if (!result[key]) {
-          result[key] = cf.values;
-        }
+    // Custom facets from user-defined attribute keys
+    for (const cf of customFacetData) {
+      const key = cf.label;
+      if (!result[key]) {
+        result[key] = cf.values;
       }
+    }
 
-      return result;
-    },
-    [facets, discoveredFacets, customFacetData]
-  );
+    return result;
+  }, [facets, discoveredFacets, customFacetData]);
 
   // Build facet groups for the sidebar component
   const facetGroups: FacetGroup[] = useMemo(
@@ -507,17 +516,28 @@ export function useArgusLogs() {
           apiParams.start,
           apiParams.end
         ),
-        argusService.getAttributeKeys(projectId, {
-          period: periodParam,
-          start: apiParams.start,
-          end: apiParams.end,
-          limit: 30,
-        }).catch(() => [] as { key: string; count: number; values: { attr_value: string; count: string }[] }[]),
-        argusService.getAttributeFacet(projectId, 'message', {
-          period: periodParam,
-          start: apiParams.start,
-          end: apiParams.end,
-        }).catch(() => []),
+        argusService
+          .getAttributeKeys(projectId, {
+            period: periodParam,
+            start: apiParams.start,
+            end: apiParams.end,
+            limit: 30,
+          })
+          .catch(
+            () =>
+              [] as {
+                key: string;
+                count: number;
+                values: { attr_value: string; count: string }[];
+              }[]
+          ),
+        argusService
+          .getAttributeFacet(projectId, 'message', {
+            period: periodParam,
+            start: apiParams.start,
+            end: apiParams.end,
+          })
+          .catch(() => []),
       ]);
 
       setFacets(facetData);
@@ -537,7 +557,10 @@ export function useArgusLogs() {
         discovered.push({
           key: 'discovered.message',
           label: 'message',
-          values: messageFacet.map(m => ({ value: m.attr_value, count: Number(m.count) })),
+          values: messageFacet.map((m) => ({
+            value: m.attr_value,
+            count: Number(m.count),
+          })),
         });
       }
 

@@ -18,11 +18,11 @@ export enum TokenType {
   RPAREN = 'RPAREN',
 
   // === Comparison Operators (after colon) ===
-  NE = 'NE',     // !=
-  GT = 'GT',     // >
-  GTE = 'GTE',   // >=
-  LT = 'LT',     // <
-  LTE = 'LTE',   // <=
+  NE = 'NE', // !=
+  GT = 'GT', // >
+  GTE = 'GTE', // >=
+  LT = 'LT', // <
+  LTE = 'LTE', // <=
 
   // === Function Operators (identifiers after colon) ===
   CONTAINS = 'CONTAINS',
@@ -38,10 +38,10 @@ export enum TokenType {
   AND = 'AND',
   OR = 'OR',
   NOT = 'NOT',
-  BANG = 'BANG',  // ! (NOT의 축약형, != 와 구분)
+  BANG = 'BANG', // ! (NOT의 축약형, != 와 구분)
 
   // === Special ===
-  COMMA = 'COMMA',  // , (function argument separator)
+  COMMA = 'COMMA', // , (function argument separator)
   EOF = 'EOF',
   ERROR = 'ERROR',
 }
@@ -49,8 +49,8 @@ export enum TokenType {
 export interface Token {
   type: TokenType;
   value: string;
-  start: number;  // 0-indexed character offset (inclusive)
-  end: number;    // 0-indexed character offset (exclusive)
+  start: number; // 0-indexed character offset (inclusive)
+  end: number; // 0-indexed character offset (exclusive)
 }
 
 // ─── AST Nodes ───────────────────────────────────────────────────────────────
@@ -192,13 +192,13 @@ export type FieldCategory =
 
 export interface QueryField {
   key: string;
-  label: string;        // i18n key for display label
+  label: string; // i18n key for display label
   type: FieldType;
   searchable: boolean;
   operators: QueryOperator[];
   autocompleteProvider?: string;
   category: FieldCategory;
-  description: string;  // i18n key for field description
+  description: string; // i18n key for field description
 }
 
 // ─── Domain Presets ──────────────────────────────────────────────────────────
@@ -252,7 +252,12 @@ export interface CursorContext {
 
 // ─── Suggestion ──────────────────────────────────────────────────────────────
 
-export type SuggestionCategory = 'field' | 'operator' | 'value' | 'logical' | 'paren';
+export type SuggestionCategory =
+  | 'field'
+  | 'operator'
+  | 'value'
+  | 'logical'
+  | 'paren';
 
 /** @deprecated Use SuggestionCategory instead */
 export type SuggestionType = SuggestionCategory;
@@ -265,7 +270,7 @@ export interface SuggestionItem {
   fieldType?: FieldType;
   /** Field domain category (log, resource, trace, etc.) for tab grouping */
   fieldCategory?: string;
-  count?: number;       // facet count
+  count?: number; // facet count
 }
 
 export interface SuggestionResult {

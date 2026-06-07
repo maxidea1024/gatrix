@@ -9,7 +9,14 @@ import {
   PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip as ChartTooltip,
+  Legend,
+} from 'chart.js';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
@@ -317,43 +324,49 @@ const ArgusLogsPage: React.FC = () => {
         onRefresh={fetchAll}
         loading={loading}
         hideFilters={['browser', 'os']}
-        extraControls={
-          (() => {
-            const dslQueryRef = { current: search };
-            return (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>
-                <QueryDSLEditor
-                  domain="logs"
-                  initialQuery={search}
-                  onSearch={handleSearchSubmit}
-                  onChange={(q) => {
-                    dslQueryRef.current = q;
-                    // Sync to URL so chip state survives refresh
-                    setUrlState({ q });
-                  }}
-                  facets={mappedFacets}
-                />
-                <IconButton
-                  size="small"
-                  onClick={() => handleSearchSubmit(dslQueryRef.current)}
-                  sx={{
-                    flexShrink: 0,
-                    width: 26,
-                    height: 26,
-                    borderRadius: '6px',
-                    color: 'primary.main',
-                    border: '1px solid',
-                    borderColor: 'primary.main',
-                    '&:hover': { backgroundColor: 'primary.main', color: '#fff' },
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <PlayArrowIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Box>
-            );
-          })()
-        }
+        extraControls={(() => {
+          const dslQueryRef = { current: search };
+          return (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              <QueryDSLEditor
+                domain="logs"
+                initialQuery={search}
+                onSearch={handleSearchSubmit}
+                onChange={(q) => {
+                  dslQueryRef.current = q;
+                  // Sync to URL so chip state survives refresh
+                  setUrlState({ q });
+                }}
+                facets={mappedFacets}
+              />
+              <IconButton
+                size="small"
+                onClick={() => handleSearchSubmit(dslQueryRef.current)}
+                sx={{
+                  flexShrink: 0,
+                  width: 26,
+                  height: 26,
+                  borderRadius: '6px',
+                  color: 'primary.main',
+                  border: '1px solid',
+                  borderColor: 'primary.main',
+                  '&:hover': { backgroundColor: 'primary.main', color: '#fff' },
+                  transition: 'all 0.15s',
+                }}
+              >
+                <PlayArrowIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Box>
+          );
+        })()}
       />
 
       {/* ── Active Filter Chips ── */}

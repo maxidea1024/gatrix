@@ -96,11 +96,9 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       };
 
       if (!body.provider || !body.name || !body.api_url || !body.api_token) {
-        return reply
-          .code(400)
-          .send({
-            error: 'provider, name, api_url, and api_token are required',
-          });
+        return reply.code(400).send({
+          error: 'provider, name, api_url, and api_token are required',
+        });
       }
 
       try {
@@ -350,11 +348,9 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
           trackerId,
           error: (error as Error).message,
         });
-        return reply
-          .code(500)
-          .send({
-            error: `Failed to create issue: ${(error as Error).message}`,
-          });
+        return reply.code(500).send({
+          error: `Failed to create issue: ${(error as Error).message}`,
+        });
       }
     }
   );

@@ -341,8 +341,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     fetchMembers();
   }, [projectId]);
 
-
-
   // ─── Fetch issues ──────────────────────────────────────────────
   /** Merge search text + active chip filters into a single query string */
   const buildSearchWithFilters = useCallback((): string | undefined => {

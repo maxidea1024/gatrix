@@ -237,7 +237,10 @@ export const ArgusSearchInput: React.FC<{
     const needsTrailingSpace = !replacement.endsWith(':');
     let newRemainder: string;
     if (needsTrailingSpace) {
-      newRemainder = before + replacement + (after.startsWith(' ') ? after : (after ? ' ' + after : ''));
+      newRemainder =
+        before +
+        replacement +
+        (after.startsWith(' ') ? after : after ? ' ' + after : '');
     } else {
       newRemainder = before + replacement + after;
     }
@@ -248,7 +251,8 @@ export const ArgusSearchInput: React.FC<{
 
     if (moveCursorToEnd) {
       // Calculate cursor position within the NEW remainder after re-parse
-      const cursorTarget = (before + replacement).length + (needsTrailingSpace && !after ? 0 : 0);
+      const cursorTarget =
+        (before + replacement).length + (needsTrailingSpace && !after ? 0 : 0);
       requestAnimationFrame(() => {
         if (inputRef.current) {
           inputRef.current.focus();
@@ -532,7 +536,9 @@ export const ArgusSearchInput: React.FC<{
         ref={autocompleteRef}
         open={searchFocused}
         anchorEl={searchContainerRef.current}
-        query={chipsText ? chipsText + ' ' + remainder : remainder || localSearch}
+        query={
+          chipsText ? chipsText + ' ' + remainder : remainder || localSearch
+        }
         fields={fields}
         facets={mappedFacets}
         isDark={isDark}

@@ -41,7 +41,7 @@ describe('Edge Cases', () => {
 
     it('should handle escaped quotes in string', () => {
       const tokens = tokenize('message:"\\"hello\\""');
-      const strings = tokens.filter(t => t.type === TokenType.STRING);
+      const strings = tokens.filter((t) => t.type === TokenType.STRING);
       expect(strings[0].value).toBe('"hello"');
     });
   });
@@ -50,7 +50,11 @@ describe('Edge Cases', () => {
     it('should parse country: KR as country:KR', () => {
       const { ast, errors } = parse('country: KR');
       expect(errors).toHaveLength(0);
-      expect(ast).toMatchObject({ type: 'Filter', field: 'country', value: 'KR' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'country',
+        value: 'KR',
+      });
     });
 
     it('should parse with multiple spaces after colon', () => {
@@ -63,7 +67,11 @@ describe('Edge Cases', () => {
   describe('keywords as field names', () => {
     it('should parse and:value as filter', () => {
       const { ast } = parse('and:value');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'and', value: 'value' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'and',
+        value: 'value',
+      });
     });
 
     it('should parse or:test as filter', () => {
@@ -73,7 +81,11 @@ describe('Edge Cases', () => {
 
     it('should parse not:test as filter', () => {
       const { ast } = parse('not:test');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'not', value: 'test' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'not',
+        value: 'test',
+      });
     });
   });
 
@@ -90,12 +102,20 @@ describe('Edge Cases', () => {
   describe('identifier rules', () => {
     it('should allow dots in field names', () => {
       const { ast } = parse('event.type:click');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'event.type', value: 'click' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'event.type',
+        value: 'click',
+      });
     });
 
     it('should allow underscores in field names', () => {
       const { ast } = parse('logger_name:main');
-      expect(ast).toMatchObject({ type: 'Filter', field: 'logger_name', value: 'main' });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        field: 'logger_name',
+        value: 'main',
+      });
     });
 
     it('should allow underscore-start field names', () => {
@@ -111,7 +131,9 @@ describe('Edge Cases', () => {
     });
 
     it('should serialize relative time as-is', () => {
-      const serialized = serializeForBackend(parse('timestamp:after("now-1h")').ast);
+      const serialized = serializeForBackend(
+        parse('timestamp:after("now-1h")').ast
+      );
       expect(serialized).toContain('now-1h');
     });
   });
@@ -124,7 +146,11 @@ describe('Edge Cases', () => {
 
     it('should parse single-value in()', () => {
       const { ast } = parse('country:in("KR")');
-      expect(ast).toMatchObject({ type: 'Filter', operator: 'in', values: ['KR'] });
+      expect(ast).toMatchObject({
+        type: 'Filter',
+        operator: 'in',
+        values: ['KR'],
+      });
     });
 
     it('should serialize single-value in() without extra parens', () => {

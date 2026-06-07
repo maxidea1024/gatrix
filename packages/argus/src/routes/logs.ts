@@ -731,7 +731,8 @@ export default async function logsRoutes(app: FastifyInstance) {
         params.keyLimit = String(Math.min(parseInt(limit, 10), 50));
 
         const keysResult = await optic.rawQuery({ query: keysSql, params });
-        const keys = (keysResult.data as { attr_key: string; key_count: string }[]) || [];
+        const keys =
+          (keysResult.data as { attr_key: string; key_count: string }[]) || [];
 
         if (keys.length === 0) {
           return reply.send({ data: [] });
@@ -760,11 +761,15 @@ export default async function logsRoutes(app: FastifyInstance) {
             LIMIT 20
           `;
 
-          const valResult = await optic.rawQuery({ query: valSql, params: valParams });
+          const valResult = await optic.rawQuery({
+            query: valSql,
+            params: valParams,
+          });
           return {
             key: attr_key,
             count: Number(key_count),
-            values: (valResult.data as { attr_value: string; count: string }[]) || [],
+            values:
+              (valResult.data as { attr_value: string; count: string }[]) || [],
           };
         });
 
@@ -775,7 +780,9 @@ export default async function logsRoutes(app: FastifyInstance) {
           projectId,
           error: String(error),
         });
-        return reply.code(500).send({ error: 'Failed to discover attribute keys' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to discover attribute keys' });
       }
     }
   );
