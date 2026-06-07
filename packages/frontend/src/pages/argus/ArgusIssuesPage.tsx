@@ -32,7 +32,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 
-import { SearchQueryInput } from '@/components/argus/search/SearchQueryInput';
+import { QueryDSLEditor } from '@/components/argus/query-dsl';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -768,16 +768,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               }}
             />
             <Box sx={{ width: 360, minWidth: 200, flexShrink: 1 }}>
-              <SearchQueryInput
+              <QueryDSLEditor
+                domain="issues"
                 initialQuery={storeSearch}
                 onSearch={(val) => {
                   setStoreSearch(val);
                   setCurrentPage(1);
                 }}
-                isDark={isDark}
-                theme={theme}
-                facets={mappedFacets}
-                fields={QUERY_BUILDER_FIELDS}
               />
             </Box>
             <FilterChipSelect

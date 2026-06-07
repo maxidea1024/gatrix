@@ -75,7 +75,7 @@ import ArgusFilterBar, {
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
-import { SearchQueryInput } from '@/components/argus/search/SearchQueryInput';
+import { QueryDSLEditor } from '@/components/argus/query-dsl';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
@@ -1129,13 +1129,10 @@ const ArgusDiscoverPage: React.FC = () => {
       />
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <SearchQueryInput
+        <QueryDSLEditor
+          domain="discover"
           initialQuery={conditions}
           onSearch={handleSearchChange}
-          fields={groupableColumns.slice(0, 15)}
-          facets={facets}
-          isDark={isDark}
-          theme={theme}
           placeholder={t(
             'argus.discover.searchPlaceholder',
             'Search for events, users, tags (e.g. level:error OR browser:Chrome)'

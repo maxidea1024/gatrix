@@ -82,7 +82,7 @@ export function FilterTokenChip({
     const newFieldMeta = getFieldByKey(newField, domain);
     const newOps = newFieldMeta?.operators ?? ['='];
     // Reset operator if current one isn't valid for new field
-    const validOp = newOps.includes(chip.operator) ? chip.operator : '=' as QueryOperator;
+    const validOp = newOps.includes(chip.operator as QueryOperator) ? chip.operator as QueryOperator : '=' as QueryOperator;
     onUpdate(chip.id, { field: newField, operator: validOp });
     handleClose();
   };

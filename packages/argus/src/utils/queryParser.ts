@@ -657,8 +657,25 @@ export class QueryParser {
           // ── Special key: timestamp / event.timestamp ──
           // Allows direct timestamp comparison using ClickHouse's flexible date parser.
         } else if (key === 'event.timestamp' || key === 'timestamp') {
+          const valStr = String(n.value);
+          const nowMatch = valStr.match(/^(?:now)?([+-])(\d+)(h|d|w|m)$/);
+          
+          if (nowMatch) {
+            const sign = nowMatch[1];
+            const num = nowMatch[2];
+            let unit = 'HOUR';
+            if (nowMatch[3] === 'd') unit = 'DAY';
+            else if (nowMatch[3] === 'w') unit = 'WEEK';
+            else if (nowMatch[3] === 'm') unit = 'MINUTE';
+            
+            return {
+              w: `timestamp ${op} now() ${sign} INTERVAL ${num} ${unit}`,
+              h: '',
+            };
+          }
+          
           const pName = `ts_${Math.random().toString(36).substring(7)}`;
-          params[pName] = String(n.value);
+          params[pName] = valStr;
           return {
             w: `timestamp ${op} parseDateTimeBestEffort({${pName}:String})`,
             h: '',

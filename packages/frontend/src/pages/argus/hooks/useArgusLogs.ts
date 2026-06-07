@@ -367,38 +367,52 @@ export function useArgusLogs() {
     return '14d';
   }, [filters.dateRange]);
 
+  // Discovered attribute facets from backend API (time-period only, no search filter)
+  const [discoveredFacets, setDiscoveredFacets] = useState<FacetGroup[]>([]);
+
   const mappedFacets = useMemo(
     () => {
-      const severityValues =
-        facets.levels?.map((l) => ({
-          value: l.level,
-          count: Number(l.count),
-        })) || [];
-      const serviceValues =
-        facets.services?.map((s) => ({
-          value: s.service,
-          count: Number(s.count),
-        })) || [];
-      const environmentValues =
-        facets.environments?.map((e) => ({
-          value: e.environment,
-          count: Number(e.count),
-        })) || [];
-      const loggerValues =
-        facets.loggers?.map((l) => ({
-          value: l.logger_name,
-          count: Number(l.count),
-        })) || [];
-      return {
-        severity: severityValues,
-        level: severityValues,       // alias: level → severity data
-        service: serviceValues,
-        environment: environmentValues,
-        logger: loggerValues,
-        logger_name: loggerValues,   // alias: logger_name → logger data
-      };
+      const result: Record<string, { value: string; count: number }[]> = {};
+
+      // Base facets from getLogFacets API
+      if (facets.levels?.length) {
+        const vals = facets.levels.map((l) => ({ value: l.level, count: Number(l.count) }));
+        result.severity = vals;
+        result.level = vals;
+      }
+      if (facets.services?.length) {
+        const vals = facets.services.map((s) => ({ value: s.service, count: Number(s.count) }));
+        result.service = vals;
+      }
+      if (facets.environments?.length) {
+        const vals = facets.environments.map((e) => ({ value: e.environment, count: Number(e.count) }));
+        result.environment = vals;
+      }
+      if (facets.loggers?.length) {
+        const vals = facets.loggers.map((l) => ({ value: l.logger_name, count: Number(l.count) }));
+        result.logger = vals;
+        result.logger_name = vals;
+      }
+
+      // Discovered facets from log attributes
+      for (const df of discoveredFacets) {
+        const key = df.label;
+        if (!result[key]) {
+          result[key] = df.values;
+        }
+      }
+
+      // Custom facets from user-defined attribute keys
+      for (const cf of customFacetData) {
+        const key = cf.label;
+        if (!result[key]) {
+          result[key] = cf.values;
+        }
+      }
+
+      return result;
     },
-    [facets]
+    [facets, discoveredFacets, customFacetData]
   );
 
   // Build facet groups for the sidebar component
@@ -408,52 +422,26 @@ export function useArgusLogs() {
         {
           key: 'severity',
           label: t('argus.logs.facet.severity', 'Severity'),
-          values: mappedFacets.severity,
+          values: mappedFacets.severity || [],
         },
         {
           key: 'service',
           label: t('argus.logs.facet.service', 'Service'),
-          values: mappedFacets.service,
+          values: mappedFacets.service || [],
         },
         {
           key: 'environment',
           label: t('argus.logs.facet.environment', 'Environment'),
-          values: mappedFacets.environment,
+          values: mappedFacets.environment || [],
         },
         {
           key: 'logger',
           label: t('argus.logs.facet.logger', 'Logger'),
-          values: mappedFacets.logger,
+          values: mappedFacets.logger || [],
         },
       ].filter((g) => g.values.length > 0),
     [mappedFacets, t]
   );
-
-  const discoveredFacets = useMemo(() => {
-    const counts: Record<string, Record<string, number>> = {};
-    const customKeys = customFacetData?.map((f) => f.key) || [];
-    logs.forEach((log) => {
-      if (log.attributes) {
-        Object.entries(log.attributes).forEach(([k, v]) => {
-          if (
-            customKeys.includes(k) ||
-            AVAILABLE_COLUMNS.some((c) => c.key === k)
-          )
-            return;
-          if (!counts[k]) counts[k] = {};
-          const valStr = String(v);
-          counts[k][valStr] = (counts[k][valStr] || 0) + 1;
-        });
-      }
-    });
-    return Object.entries(counts).map(([k, valCounts]) => ({
-      key: `discovered.${k}`,
-      label: k,
-      values: Object.entries(valCounts)
-        .map(([val, count]) => ({ value: val, count }))
-        .sort((a, b) => b.count - a.count),
-    }));
-  }, [logs, customFacetData]);
 
   // ─── Search + Filter Merge Helper ───
   const buildSearchWithFilters = useCallback((): string | undefined => {
@@ -509,13 +497,51 @@ export function useArgusLogs() {
   const fetchFacets = useCallback(async () => {
     try {
       const apiParams = argusFilterStateToApiParams(filters);
-      const data = await argusService.getLogFacets(
-        projectId,
-        apiParams.period || currentPeriod,
-        apiParams.start,
-        apiParams.end
-      );
-      setFacets(data);
+      const periodParam = apiParams.period || currentPeriod;
+
+      // Fetch base facets and attribute keys in parallel (time-period only)
+      const [facetData, attrKeys, messageFacet] = await Promise.all([
+        argusService.getLogFacets(
+          projectId,
+          periodParam,
+          apiParams.start,
+          apiParams.end
+        ),
+        argusService.getAttributeKeys(projectId, {
+          period: periodParam,
+          start: apiParams.start,
+          end: apiParams.end,
+          limit: 30,
+        }).catch(() => [] as { key: string; count: number; values: { attr_value: string; count: string }[] }[]),
+        argusService.getAttributeFacet(projectId, 'message', {
+          period: periodParam,
+          start: apiParams.start,
+          end: apiParams.end,
+        }).catch(() => []),
+      ]);
+
+      setFacets(facetData);
+
+      // Convert attribute keys to FacetGroup format
+      const discovered: FacetGroup[] = attrKeys.map((ak) => ({
+        key: `discovered.${ak.key}`,
+        label: ak.key,
+        values: ak.values.map((v) => ({
+          value: v.attr_value,
+          count: Number(v.count),
+        })),
+      }));
+
+      // Add message facet as a discovered facet so it appears in autocomplete
+      if (messageFacet.length > 0) {
+        discovered.push({
+          key: 'discovered.message',
+          label: 'message',
+          values: messageFacet.map(m => ({ value: m.attr_value, count: Number(m.count) })),
+        });
+      }
+
+      setDiscoveredFacets(discovered);
     } catch (err) {
       console.error('Failed to fetch facets', err);
     }

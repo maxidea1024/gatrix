@@ -92,3 +92,57 @@ t('argus.feedback.issueCreatedExternal', 'Issue created: {{key}}', { key: 'PROJ-
 ```
 const localizedText = _t('key', 'hello');
 ```
+
+---
+
+## ⚠️ 인코딩 안전 규칙 (CRITICAL — 반드시 준수)
+
+### 문제
+
+`.ini` 파일은 **UTF-8 without BOM** 인코딩이다. 터미널 명령어(`Add-Content`, `echo >>`, `Out-File` 등)로 한글/중문을 직접 쓰면 **인코딩이 깨진다**.
+
+PowerShell의 `Add-Content`는 기본적으로 **시스템 코드페이지(CP949/EUC-KR)**로 쓰기 때문에 UTF-8 파일에 한글이 깨진다. `-Encoding UTF8` 옵션을 붙여도 **UTF-8 BOM**이 추가되어 기존 파일과 충돌할 수 있다.
+
+### 규칙
+
+1. **절대 `Add-Content`, `Out-File`, `echo >>`, `Set-Content`로 ini 파일에 비ASCII 문자를 쓰지 마라**
+2. **반드시 `write_to_file` 또는 `replace_file_content` 도구(에디터 API)를 사용해서 파일을 수정하라**
+3. 터미널 명령어는 **검증(grep, diff, 키 개수 확인)에만** 사용하라
+
+### ❌ 금지 패턴
+
+```powershell
+# 금지: PowerShell로 한글/중문 직접 쓰기
+Add-Content -Path "ko.ini" -Value "dsl.field.level=레벨"
+Add-Content -Path "zh.ini" -Value "dsl.field.level=级别"
+
+# 금지: -Encoding UTF8 써도 BOM 문제 발생
+Add-Content -Path "ko.ini" -Value "key=값" -Encoding UTF8
+
+# 금지: heredoc으로 한글 쓰기
+Add-Content -Path "ko.ini" -Value @"
+dsl.field.level=레벨
+"@
+```
+
+### ✅ 올바른 패턴
+
+```
+# 에디터 API(write_to_file, replace_file_content)로 파일 수정
+# 이 도구들은 항상 UTF-8 without BOM으로 저장함
+
+# 터미널은 검증에만 사용:
+Select-String -Path "ko.ini" -Pattern "dsl.field"
+node archived/compare-locales.js
+```
+
+### 인코딩 깨짐 확인 방법
+
+```powershell
+# 깨진 문자 탐지 (replacement character U+FFFD 또는 ? 패턴)
+[System.IO.File]::ReadAllText("packages/frontend/src/locales/ko.ini") | Select-String -Pattern "[\uFFFD]|[?]{2,}"
+```
+
+### 깨진 파일 복구
+
+깨졌으면 해당 섹션을 `write_to_file` (Overwrite=false) 또는 `replace_file_content`로 다시 작성한다. 절대 터미널로 복구하지 마라.

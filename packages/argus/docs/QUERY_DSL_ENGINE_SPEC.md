@@ -1040,6 +1040,8 @@ interface SuggestionItem {
   description?: string;   // 설명
   type: 'field' | 'operator' | 'value' | 'logical';
   category?: FieldCategory;
+  /** 필드의 도메인 카테고리 (log, resource, trace 등). 탭 그룹핑에 사용 */
+  fieldCategory?: string;
   count?: number;         // facet count
   icon?: string;
 }
@@ -1177,6 +1179,69 @@ class RemoteProvider implements SuggestionProvider {
 | `MemoryProvider` | ❌ | 메모리 내 즉시 반환 — 지연 없음 |
 | `FacetProvider` | ❌ | 이미 캐시된 데이터에서 필터링 |
 | `RemoteProvider` | ✅ 100ms | 네트워크 요청 → 서버 부하 방지 필요 |
+
+### 11.6 Domain-Aware Suggestion Tabs (도메인 기반 추천 탭)
+
+추천 팝오버의 탭은 필드의 `category`(도메인 카테고리) 기반으로 동적 생성된다.
+Sentry의 검색 패턴(Recent / All / Logs / Attributes / Logic)을 참고하되, 프로젝트의 필드 분류에 맞게 구현한다.
+
+#### 11.6.1 탭 표시 조건
+
+| 입력 상태 | 탭 표시 | 이유 |
+|-----------|---------|------|
+| **빈 입력** (포커스 첫 진입) | ✅ 표시 | 필드 탐색/선택 모드 |
+| **텍스트 입력 중** (`1111111`) | ❌ 숨김 | 스마트 추천만 flat 표시 |
+| **필드:연산자 입력 중** (`level:>`) | ❌ 숨김 | 값 추천만 flat 표시 |
+
+#### 11.6.2 탭 종류 (도메인 카테고리 기반)
+
+```typescript
+const FIELD_CAT_TABS: Record<string, { fallback: string }> = {
+  log:       { fallback: 'Logs' },
+  resource:  { fallback: 'Resource' },
+  trace:     { fallback: 'Trace' },
+  event:     { fallback: 'Event' },
+  user:      { fallback: 'User' },
+  attribute: { fallback: 'Attributes' },  // facets에서 온 동적 필드
+};
+```
+
+| 탭 | 포함 필드 | 표시 조건 |
+|----|-----------|----------|
+| **Recent** | 최근 검색 히스토리 (localStorage) | 히스토리 존재 시 |
+| **All** | 현재 도메인의 모든 필드 | 항상 |
+| **Logs** | `category: 'log'` 필드들 (level, message, body 등) | 해당 필드 존재 시 |
+| **Resource** | `category: 'resource'` 필드들 (service, environment 등) | 해당 필드 존재 시 |
+| **Trace** | `category: 'trace'` 필드들 (trace_id, span_id 등) | 해당 필드 존재 시 |
+| **Event** | `category: 'event'` 필드들 (type, value 등) | 해당 필드 존재 시 |
+| **Attributes** | facets에서 온 동적 필드 (static registry에 없는 것) | 해당 필드 존재 시 |
+
+도메인별로 사용하는 필드가 다르므로 (Section 5.4), 탭도 도메인에 따라 다르게 표시된다.
+
+```
+logs 도메인    → Recent | All | Logs | Resource | Trace
+issues 도메인  → Recent | All | Logs | Resource | Trace | Event | User
+```
+
+#### 11.6.3 Smart Suggestions (스마트 추천)
+
+사용자가 필드명 없이 자유 텍스트를 입력할 때, Sentry 스타일로 문장형 필터를 제안한다.
+
+```
+사용자 입력: 1111111
+
+추천:
+• message contains 1111111    → insertText: message:contains("1111111")
+• message is 1111111          → insertText: message:"1111111"
+```
+
+이 추천은 탭 없이 flat 리스트로 표시된다. 카테고리 헤더도 숨긴다.
+
+#### 11.6.4 칩 모드에서 AND/OR 토글
+
+칩 모드에서 칩과 칩 사이에 join 연산자 라벨(`AND` / `OR`)을 표시한다.
+AND는 기본(implicit)이고, OR는 주황색으로 강조 표시한다.
+클릭으로 AND ↔ OR 토글이 가능하다.
 
 ---
 

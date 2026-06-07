@@ -30,7 +30,9 @@ export enum TokenType {
   ENDS_WITH = 'ENDS_WITH',
   BEFORE = 'BEFORE',
   AFTER = 'AFTER',
-  IN = 'IN',            // in (multi-value search)
+  NOT_CONTAINS = 'NOT_CONTAINS',
+  NOT_STARTS_WITH = 'NOT_STARTS_WITH',
+  NOT_ENDS_WITH = 'NOT_ENDS_WITH',
 
   // === Logical Operators ===
   AND = 'AND',
@@ -66,8 +68,6 @@ export interface FilterExpression {
   field: string;
   operator: QueryOperator;
   value: string | number | boolean;
-  /** IN operator: multiple values */
-  values?: (string | number | boolean)[];
   /** Whether the value was a quoted string in the input */
   quoted: boolean;
   /** For function operators: the function name (contains, startsWith, etc.) */
@@ -96,6 +96,7 @@ export interface BinaryExpression {
   operator: 'and' | 'or';
   left: Expression;
   right: Expression;
+  implicit?: boolean;
   start: number;
   end: number;
 }
@@ -118,6 +119,7 @@ export interface GroupExpression {
 
 export interface PartialExpression {
   type: 'Partial';
+  raw: string;
   field?: string;
   operator?: string;
   value?: string;
@@ -176,8 +178,7 @@ export type QueryOperator =
   | 'startsWith'
   | 'endsWith'
   | 'before'
-  | 'after'
-  | 'in';
+  | 'after';
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'datetime';
 
@@ -251,16 +252,20 @@ export interface CursorContext {
 
 // ─── Suggestion ──────────────────────────────────────────────────────────────
 
-export type SuggestionType = 'field' | 'operator' | 'value' | 'logical';
+export type SuggestionCategory = 'field' | 'operator' | 'value' | 'logical' | 'paren';
+
+/** @deprecated Use SuggestionCategory instead */
+export type SuggestionType = SuggestionCategory;
 
 export interface SuggestionItem {
   label: string;
-  value: string;
+  insertText?: string;
   description?: string;
-  type: SuggestionType;
-  category?: FieldCategory;
+  category: SuggestionCategory;
+  fieldType?: FieldType;
+  /** Field domain category (log, resource, trace, etc.) for tab grouping */
+  fieldCategory?: string;
   count?: number;       // facet count
-  icon?: string;
 }
 
 export interface SuggestionResult {
@@ -301,7 +306,9 @@ export const FUNCTION_OPERATORS = new Set([
   'endswith',
   'before',
   'after',
-  'in',
+  '!contains',
+  '!startswith',
+  '!endswith',
 ]);
 
 /** Logical operator keywords */
@@ -317,5 +324,7 @@ export const FUNC_OP_TOKEN_MAP: Record<string, TokenType> = {
   endswith: TokenType.ENDS_WITH,
   before: TokenType.BEFORE,
   after: TokenType.AFTER,
-  in: TokenType.IN,
+  '!contains': TokenType.NOT_CONTAINS,
+  '!startswith': TokenType.NOT_STARTS_WITH,
+  '!endswith': TokenType.NOT_ENDS_WITH,
 };

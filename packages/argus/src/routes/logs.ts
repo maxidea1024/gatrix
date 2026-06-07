@@ -686,7 +686,101 @@ export default async function logsRoutes(app: FastifyInstance) {
       }
     }
   );
-  // ?�?�?� Live Tail (SSE ??stream new logs in real-time) ?�?�?�
+
+  // ─── Attribute Keys Discovery (all attribute facets, time-period only) ───
+  app.get(
+    '/:projectId/logs/attribute-keys',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const {
+        period = '24h',
+        start,
+        end,
+        limit = '20',
+      } = request.query as Record<string, string>;
+
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+
+      try {
+        const params: Record<string, string> = {
+          projectId: String(projectId),
+          fillStart: String(bucket.queryParams.fillStart),
+          fillEnd: String(bucket.queryParams.fillEnd),
+        };
+
+        // Step 1: Discover all attribute keys with their occurrence count
+        // Sample up to 10000 recent logs to extract attribute keys
+        const keysSql = `
+          SELECT
+            arrayJoin(JSONExtractKeys(attributes)) AS attr_key,
+            count() AS key_count
+          FROM (
+            SELECT attributes
+            FROM argus.logs
+            WHERE project_id = {projectId:String}
+              AND ${timeCond}
+              AND attributes != '{}'
+            ORDER BY timestamp DESC
+            LIMIT 10000
+          )
+          GROUP BY attr_key
+          ORDER BY key_count DESC
+          LIMIT {keyLimit:UInt32}
+        `;
+        params.keyLimit = String(Math.min(parseInt(limit, 10), 50));
+
+        const keysResult = await optic.rawQuery({ query: keysSql, params });
+        const keys = (keysResult.data as { attr_key: string; key_count: string }[]) || [];
+
+        if (keys.length === 0) {
+          return reply.send({ data: [] });
+        }
+
+        // Step 2: For each discovered key, get top values
+        const facetPromises = keys.map(async ({ attr_key, key_count }) => {
+          const valParams: Record<string, string> = {
+            projectId: String(projectId),
+            fillStart: String(bucket.queryParams.fillStart),
+            fillEnd: String(bucket.queryParams.fillEnd),
+            attrKey: attr_key,
+          };
+
+          const valSql = `
+            SELECT
+              JSONExtractString(attributes, {attrKey:String}) AS attr_value,
+              count() AS count
+            FROM argus.logs
+            WHERE project_id = {projectId:String}
+              AND ${timeCond}
+              AND JSONHas(attributes, {attrKey:String})
+              AND attr_value != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 20
+          `;
+
+          const valResult = await optic.rawQuery({ query: valSql, params: valParams });
+          return {
+            key: attr_key,
+            count: Number(key_count),
+            values: (valResult.data as { attr_value: string; count: string }[]) || [],
+          };
+        });
+
+        const facets = await Promise.all(facetPromises);
+        return reply.send({ data: facets });
+      } catch (error) {
+        logger.error('Failed to discover attribute keys', {
+          projectId,
+          error: String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to discover attribute keys' });
+      }
+    }
+  );
+
+  // ─── Live Tail (SSE — stream new logs in real-time) ───
   app.get(
     '/:projectId/logs/live-tail',
     async (request: FastifyRequest, reply: FastifyReply) => {
