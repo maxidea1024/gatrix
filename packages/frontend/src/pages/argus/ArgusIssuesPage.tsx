@@ -32,7 +32,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 
-import { ArgusSearchInput } from '@/components/argus/ArgusSearchInput';
+import { SearchQueryInput } from '@/components/argus/search/SearchQueryInput';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -190,9 +190,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Local input mirror — follows Zustand for initial value, debounced into store
-  const [searchInput, setSearchInput] = useState(storeSearch);
-  const [searchDebounce, setSearchDebounce] = useState(storeSearch);
+  // Search is managed directly by Zustand store (no local debounce needed)
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [merging, setMerging] = useState(false);
@@ -343,35 +341,19 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     fetchMembers();
   }, [projectId]);
 
-  // ─── Sync local search input when store changes externally ─────
-  // (e.g. via hydration, reset, or saved-searches sidebar)
-  useEffect(() => {
-    setSearchInput(storeSearch);
-  }, [storeSearch]);
 
-  // ─── Debounce search input → store ─────────────────────────────
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchDebounce(searchInput);
-      // Commit debounced value to Zustand if different from current store value
-      if (searchInput !== storeSearch) {
-        setStoreSearch(searchInput);
-      }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchInput, storeSearch, setStoreSearch]);
 
   // ─── Fetch issues ──────────────────────────────────────────────
   /** Merge search text + active chip filters into a single query string */
   const buildSearchWithFilters = useCallback((): string | undefined => {
     const parts: string[] = [];
-    if (searchDebounce.trim()) parts.push(searchDebounce.trim());
+    if (storeSearch.trim()) parts.push(storeSearch.trim());
     for (const f of activeFilters) {
       if (!f.enabled) continue;
       parts.push(`${f.exclude ? '!' : ''}${f.key}:${f.value}`);
     }
     return parts.length > 0 ? parts.join(' ') : undefined;
-  }, [searchDebounce, activeFilters]);
+  }, [storeSearch, activeFilters]);
 
   const fetchIssues = useCallback(async () => {
     setLoading(true);
@@ -597,7 +579,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         sort,
         limit: 1000,
         offset: 0,
-        query: searchDebounce || undefined,
+        query: storeSearch || undefined,
         ...dateParams,
         substatus: substatus || undefined,
         assigned_to: assignedTo || undefined,
@@ -635,7 +617,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     status,
     level,
     sort,
-    searchDebounce,
+    storeSearch,
     substatus,
     assignedTo,
   ]);
@@ -786,17 +768,15 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               }}
             />
             <Box sx={{ width: 360, minWidth: 200, flexShrink: 1 }}>
-              <ArgusSearchInput
-                initialValue={storeSearch}
-                onDebouncedChange={(val) => setSearchInput(val)}
-                onSubmit={(val) => {
+              <SearchQueryInput
+                initialQuery={storeSearch}
+                onSearch={(val) => {
                   setStoreSearch(val);
-                  setSearchInput(val);
                   setCurrentPage(1);
                 }}
                 isDark={isDark}
                 theme={theme}
-                mappedFacets={mappedFacets}
+                facets={mappedFacets}
                 fields={QUERY_BUILDER_FIELDS}
               />
             </Box>
@@ -1081,7 +1061,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                         key={issue.id}
                         issue={issue}
                         onClick={handleIssueClick}
-                        highlight={searchDebounce}
+                        highlight={storeSearch}
                         showCheckbox
                         checked={selectedIds.has(issue.id)}
                         onCheckChange={(id) => {

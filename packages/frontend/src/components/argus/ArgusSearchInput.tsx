@@ -30,7 +30,6 @@ const RECENT_KEY = 'argusLogs.recentSearch';
 
 export const ArgusSearchInput: React.FC<{
   initialValue: string;
-  onDebouncedChange: (val: string) => void;
   onSubmit: (val: string) => void;
   isDark: boolean;
   theme: any;
@@ -39,7 +38,6 @@ export const ArgusSearchInput: React.FC<{
   fields?: string[];
 }> = ({
   initialValue,
-  onDebouncedChange,
   onSubmit,
   isDark,
   theme,
@@ -88,16 +86,28 @@ export const ArgusSearchInput: React.FC<{
     localStorage.removeItem(RECENT_KEY);
   };
 
-  useEffect(() => {
-    setLocalSearch(initialValue);
-  }, [initialValue]);
+  // Track the last value we submitted so we don't reset local state
+  // when the parent echoes it back as initialValue.
+  const lastSubmittedRef = useRef<string>(initialValue);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onDebouncedChange(localSearch);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [localSearch, onDebouncedChange]);
+    // Only reset if this is a genuinely NEW external value
+    // (e.g. loading a saved query, navigating back), not our own submit echoing back.
+    if (initialValue !== lastSubmittedRef.current) {
+      setLocalSearch(initialValue);
+      lastSubmittedRef.current = initialValue;
+    }
+  }, [initialValue]);
+
+  // NOTE: Input is composing state (like IME).
+  // Only onSubmit fires when the query is committed.
+  // No debounce, no intermediate callbacks.
+
+  /** Commit a completed query to the parent */
+  const submitQuery = (query: string) => {
+    lastSubmittedRef.current = query;
+    onSubmit(query);
+  };
 
   /* ─── Chip-based search input ─── */
   const inputRef = useRef<HTMLInputElement>(null);
@@ -187,30 +197,25 @@ export const ArgusSearchInput: React.FC<{
     const newQuery = (newChipsText ? newChipsText + ' ' : '') + remainder;
     const final = newQuery.trim();
     setLocalSearch(final);
-    onSubmit(final);
+    submitQuery(final);
+  };
+
+  /** Reconstruct localSearch from chips + remainder */
+  const buildQuery = (newRemainder: string): string => {
+    const base = chipsText ? chipsText + ' ' : '';
+    return (base + newRemainder).replace(/ {2,}/g, ' ').trimStart();
   };
 
   /** Update localSearch by replacing the remainder portion */
   const updateRemainder = (newRemainder: string) => {
-    const newQuery = (
-      (chipsText ? chipsText + ' ' : '') + newRemainder
-    ).replace(/ {2,}/g, ' ');
-    setLocalSearch(newQuery);
+    setLocalSearch(buildQuery(newRemainder));
     setSearchFocused(true);
   };
 
-  // If the remainder is empty but we have chips, the cursor is conceptually resting on the trailing space after the chips.
-  const normalizedQuery =
-    chipsText && !remainder ? chipsText + ' ' : localSearch;
-
-  /** Get cursor-adjusted word position in full localSearch */
+  /** Get word boundaries at cursor position within REMAINDER only */
   const getWordAtCursor = (): { word: string; start: number; end: number } => {
-    const el = inputRef.current;
-    const inputCursor = el?.selectionStart ?? remainder.length;
-    // Offset: chips text + separator space
-    const offset = chipsText ? chipsText.length + 1 : 0;
-    const cursor = offset + inputCursor;
-    const text = normalizedQuery;
+    const cursor = inputRef.current?.selectionStart ?? remainder.length;
+    const text = remainder;
 
     let start = cursor;
     while (start > 0 && text[start - 1] !== ' ') start--;
@@ -220,31 +225,38 @@ export const ArgusSearchInput: React.FC<{
     return { word: text.slice(start, end), start, end };
   };
 
+  /** Replace the word at cursor within REMAINDER, then rebuild localSearch */
   const replaceWordAtCursor = (
     replacement: string,
     moveCursorToEnd = true
   ): string => {
     const { start, end } = getWordAtCursor();
-    const before = normalizedQuery.slice(0, start);
-    const after = normalizedQuery.slice(end);
+    const before = remainder.slice(0, start);
+    const after = remainder.slice(end);
     // Don't add space after ':' — user is about to type a value
     const needsTrailingSpace = !replacement.endsWith(':');
-    const joined = needsTrailingSpace
-      ? before +
-        replacement +
-        (after.startsWith(' ') ? after : ' ' + after.trimStart())
-      : before + replacement + after;
-    const result = joined.replace(/^ +/, '').replace(/ {2,}/g, ' ');
+    let newRemainder: string;
+    if (needsTrailingSpace) {
+      newRemainder = before + replacement + (after.startsWith(' ') ? after : (after ? ' ' + after : ''));
+    } else {
+      newRemainder = before + replacement + after;
+    }
+    newRemainder = newRemainder.replace(/ {2,}/g, ' ');
 
+    const result = buildQuery(newRemainder);
     setLocalSearch(result);
+
     if (moveCursorToEnd) {
+      // Calculate cursor position within the NEW remainder after re-parse
+      const cursorTarget = (before + replacement).length + (needsTrailingSpace && !after ? 0 : 0);
       requestAnimationFrame(() => {
         if (inputRef.current) {
           inputRef.current.focus();
-          // Cursor at end of input
-          const newLen = result.length;
-          inputRef.current.selectionStart = inputRef.current.selectionEnd =
-            newLen;
+          // After React re-render, the input value will be the new remainder.
+          // Place cursor at end of the replacement within remainder.
+          const inputLen = inputRef.current.value.length;
+          const pos = Math.min(cursorTarget, inputLen);
+          inputRef.current.selectionStart = inputRef.current.selectionEnd = pos;
         }
       });
     }
@@ -252,10 +264,37 @@ export const ArgusSearchInput: React.FC<{
   };
 
   const addSearchTag = (key: string, value: string, op: string = 'is') => {
-    const opStr = op === '!=' ? '!=' : ':';
-    const tag = `${key}${opStr}"${value}"`;
+    let tag: string;
+    switch (op) {
+      case 'is':
+        tag = `${key}:"${value}"`;
+        break;
+      case 'is_not':
+      case '!=':
+        tag = `!${key}:"${value}"`;
+        break;
+      case 'contains':
+        tag = `${key}.contains:"${value}"`;
+        break;
+      case 'not_contains':
+        tag = `${key}.not_contains:"${value}"`;
+        break;
+      case 'starts_with':
+        tag = `${key}.starts_with:"${value}"`;
+        break;
+      case 'ends_with':
+        tag = `${key}.ends_with:"${value}"`;
+        break;
+      default:
+        // Numeric / comparison operators: >, <, >=, <=
+        if (['>', '<', '>=', '<='].includes(op)) {
+          tag = `${key}:${op}${value}`;
+        } else {
+          tag = `${key}:"${value}"`;
+        }
+    }
     const result = replaceWordAtCursor(tag, true);
-    onSubmit(result.trim());
+    submitQuery(result.trim());
     // Keep searchFocused true so that autocomplete suggests AND/OR
     setSearchFocused(true);
   };
@@ -272,8 +311,21 @@ export const ArgusSearchInput: React.FC<{
     // Forward to autocomplete for arrow/enter/tab navigation
     if (autocompleteRef.current?.handleKeyDown(e)) return;
     if (e.key === 'Enter') {
-      saveRecentSearch(localSearch.trim());
-      onSubmit(localSearch.trim());
+      // If there's a plain text remainder (not a key:value pair),
+      // auto-wrap it as message:"text" before submitting.
+      let finalQuery = localSearch.trim();
+      if (remainder.trim()) {
+        const plainText = remainder.trim();
+        // Check if it looks like a partial key:value — if not, wrap as message search
+        if (!plainText.includes(':')) {
+          const messageTag = `message:"${plainText}"`;
+          const base = chipsText ? chipsText + ' ' : '';
+          finalQuery = (base + messageTag).trim();
+          setLocalSearch(finalQuery);
+        }
+      }
+      saveRecentSearch(finalQuery);
+      submitQuery(finalQuery);
       setSearchFocused(false);
     }
   };
@@ -480,12 +532,12 @@ export const ArgusSearchInput: React.FC<{
         ref={autocompleteRef}
         open={searchFocused}
         anchorEl={searchContainerRef.current}
-        query={normalizedQuery}
+        query={chipsText ? chipsText + ' ' + remainder : remainder || localSearch}
         fields={fields}
         facets={mappedFacets}
         isDark={isDark}
-        onSelectTag={(field, value) => {
-          addSearchTag(field, value);
+        onSelectTag={(field, value, op) => {
+          addSearchTag(field, value, op);
         }}
         onSelectField={(field) => {
           replaceWordAtCursor(field + ':');

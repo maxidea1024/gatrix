@@ -45,6 +45,13 @@ const logger = createLogger('query-parser');
 // │  9. Column aliases (e.g. severity → level):                            │
 // │     The parser resolves user-friendly names to actual DB column names   │
 // │     via the columnAliases map passed to the constructor.               │
+// │                                                                        │
+// │ 10. Compound text-matching operators:                                  │
+// │     message.contains:timeout       → message ILIKE '%timeout%'         │
+// │     message.not_contains:timeout   → message NOT ILIKE '%timeout%'     │
+// │     message.starts_with:Error      → message ILIKE 'Error%'            │
+// │     message.ends_with:.js          → message ILIKE '%.js'              │
+// │     These operators use dot-notation: key.operator:value               │
 // └─────────────────────────────────────────────────────────────────────────┘
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -230,6 +237,10 @@ export class QueryParser {
       // A word is any contiguous run of characters that are NOT whitespace,
       // parentheses, brackets, commas, operators, or quotes.
       // The special words "AND" and "OR" are promoted to their own token types.
+      //
+      // Compound operators (key.contains, key.starts_with, etc.) are handled
+      // by tokenizing the entire dot-notation key as a single WORD token.
+      // The parser later splits it to extract the compound operator.
       let wordMatch = input.slice(this.pos).match(/^[^\s\(\)\[\],:=><!'"]+/);
       if (wordMatch) {
         const word = wordMatch[0];
@@ -391,13 +402,40 @@ export class QueryParser {
     // ── Key-operator-value condition ──
     // The token is a key (e.g. "severity", "count()"), followed by an operator
     // (: = != > < >= <=), followed by a value (word, quoted string, or list).
+    //
+    // Compound operators are expressed as dot-notation keys:
+    //   message.contains:timeout   → key='message', compoundOp='contains'
+    //   message.starts_with:Error  → key='message', compoundOp='starts_with'
     if (token.type === 'WORD' || token.type === 'QUOTED_STRING') {
-      const key = token.value;
+      let key = token.value;
+
+      // ── Extract compound operator from dot-notation ──
+      // Supported: .contains, .not_contains, .starts_with, .ends_with
+      const COMPOUND_OPS = ['contains', 'not_contains', 'starts_with', 'ends_with'];
+      let compoundOp: string | null = null;
+      const dotIdx = key.lastIndexOf('.');
+      if (dotIdx > 0) {
+        const suffix = key.slice(dotIdx + 1);
+        if (COMPOUND_OPS.includes(suffix)) {
+          compoundOp = suffix;
+          key = key.slice(0, dotIdx);
+        }
+      }
 
       if (this.peek().type === 'OP') {
         let op = this.advance().value;
         // Normalise Sentry-style colon operator to SQL equality
         if (op === ':') op = '=';
+
+        // Apply compound operator — override the parsed op
+        if (compoundOp) {
+          switch (compoundOp) {
+            case 'contains':     op = 'CONTAINS'; break;
+            case 'not_contains': op = 'NOT_CONTAINS'; break;
+            case 'starts_with':  op = 'STARTS_WITH'; break;
+            case 'ends_with':    op = 'ENDS_WITH'; break;
+          }
+        }
 
         // ── List value: key:[val1, val2, val3] → IN clause ──
         if (this.match('LBRACKET')) {
@@ -671,6 +709,22 @@ export class QueryParser {
             val = val.replace(/\*/g, '%');
             if (op === '=') op = 'ILIKE';
             if (op === '!=') op = 'NOT ILIKE';
+          }
+
+          // ── Compound text-matching operators ──
+          // Convert CONTAINS/NOT_CONTAINS/STARTS_WITH/ENDS_WITH to ILIKE patterns
+          if (op === 'CONTAINS') {
+            op = 'ILIKE';
+            val = `%${val}%`;
+          } else if (op === 'NOT_CONTAINS') {
+            op = 'NOT ILIKE';
+            val = `%${val}%`;
+          } else if (op === 'STARTS_WITH') {
+            op = 'ILIKE';
+            val = `${val}%`;
+          } else if (op === 'ENDS_WITH') {
+            op = 'ILIKE';
+            val = `%${val}`;
           }
 
           const pName = `p_${Math.random().toString(36).substring(7)}`;

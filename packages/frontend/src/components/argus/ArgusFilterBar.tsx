@@ -126,6 +126,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         backdropFilter: 'blur(8px)',
         flexWrap: 'wrap',
         position: 'relative',
+        zIndex: 20,
         transition: 'border-color 0.2s',
         ...(hasActiveFilters && {
           borderColor: alpha(theme.palette.primary.main, 0.2),

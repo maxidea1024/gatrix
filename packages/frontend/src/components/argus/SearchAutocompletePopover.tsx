@@ -29,7 +29,7 @@ export interface SearchAutocompletePopoverProps {
   fields: string[];
   facets: Record<string, SearchAutocompleteFacet[]>;
   isDark: boolean;
-  onSelectTag: (field: string, value: string) => void;
+  onSelectTag: (field: string, value: string, op?: string) => void;
   onSelectField: (field: string) => void;
   onSelectSyntax: (syntax: string) => void;
   onClose: () => void;
@@ -46,7 +46,7 @@ export interface SearchAutocompletePopoverHandle {
 /* ─── Item types for flat list ─── */
 interface AutocompleteItem {
   key: string;
-  type: 'recent' | 'syntax' | 'field' | 'value' | 'has-field';
+  type: 'recent' | 'syntax' | 'field' | 'value' | 'has-field' | 'message-suggestion';
   label: string;
   action: () => void;
   fieldKey?: string;
@@ -151,16 +151,9 @@ const SearchAutocompletePopover = forwardRef<
     const shouldShowPopover = useMemo(() => {
       if (!open || !anchorEl) return false;
       if (editingContext.state === 'completed_value') return false;
-      // If typing a field and nothing matches, hide
-      if (editingContext.state === 'typing_field') {
-        const p = editingContext.partial;
-        const anyField = fields.some((f) => f.toLowerCase().includes(p));
-        const anySyntax = ['and', 'or'].some((s) => s.includes(p));
-        const anyHas = 'has'.includes(p);
-        if (!anyField && !anySyntax && !anyHas) return false;
-      }
+      // Always show popover when typing (even for plain text — we suggest "message contains/is")
       return true;
-    }, [open, anchorEl, editingContext, fields]);
+    }, [open, anchorEl, editingContext]);
 
     // ─── Compute items ───
     const items = useMemo((): AutocompleteItem[] => {
@@ -229,6 +222,26 @@ const SearchAutocompletePopover = forwardRef<
                   action: () => onSelectSyntax(s),
                 });
               });
+          }
+
+          // ── "message contains/is" suggestions for plain text ──
+          // When user types text that isn't a field name, suggest wrapping it
+          // in a message search. This ensures all queries become key:value format.
+          if (p.length > 0) {
+            result.push({
+              key: 'msg-contains',
+              type: 'message-suggestion',
+              label: `message contains ${p}`,
+              sublabel: `message.contains:"${p}"`,
+              action: () => onSelectTag('message', p, 'contains'),
+            });
+            result.push({
+              key: 'msg-is',
+              type: 'message-suggestion',
+              label: `message is ${p}`,
+              sublabel: `message:"${p}"`,
+              action: () => onSelectTag('message', p, 'is'),
+            });
           }
 
           // Filtered fields
@@ -477,6 +490,12 @@ const SearchAutocompletePopover = forwardRef<
               }
               headerText = t('argus.discover.special', 'Special');
               break;
+            case 'message-suggestion':
+              if (prevType && prevType !== 'message-suggestion') {
+                elements.push(<Divider key="div-msg" sx={{ my: 0.5 }} />);
+              }
+              headerText = t('argus.discover.searchFor', 'Search for');
+              break;
           }
 
           if (headerText) {
@@ -582,6 +601,45 @@ const SearchAutocompletePopover = forwardRef<
                 >
                   {item.label}
                 </span>
+              )
+            );
+            break;
+
+          case 'message-suggestion':
+            elements.push(
+              renderItemBox(
+                item,
+                idx,
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, width: '100%' }}>
+                  <Typography
+                    sx={{
+                      fontSize: '0.78rem',
+                      fontWeight: 500,
+                      color: 'text.primary',
+                      flex: 1,
+                    }}
+                  >
+                    <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>
+                      message
+                    </span>
+                    {' '}
+                    <span style={{ opacity: 0.7 }}>
+                      {item.label.replace('message ', '')}
+                    </span>
+                  </Typography>
+                  {item.sublabel && (
+                    <Typography
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontFamily: 'monospace',
+                        color: 'text.disabled',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.sublabel}
+                    </Typography>
+                  )}
+                </Box>
               )
             );
             break;

@@ -13,7 +13,7 @@ import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ArgusFilterBar from '@/components/argus/ArgusFilterBar';
-import { ArgusSearchInput } from '@/components/argus/ArgusSearchInput';
+import { SearchQueryInput } from '@/components/argus/search/SearchQueryInput';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -51,7 +51,6 @@ const ArgusLogsPage: React.FC = () => {
     aggGroupBy,
     filters,
     search,
-    searchDebounce,
     logs,
     loading,
     volume,
@@ -93,7 +92,6 @@ const ArgusLogsPage: React.FC = () => {
     clearAllActiveFilters,
     handleAddCustomFacet,
     handleRemoveCustomFacet,
-    handleDebouncedSearchChange,
     handleSearchSubmit,
     handleSelectLog,
     handleCloseSidePanel,
@@ -319,13 +317,12 @@ const ArgusLogsPage: React.FC = () => {
         loading={loading}
         hideFilters={['browser', 'os']}
         extraControls={
-          <ArgusSearchInput
-            initialValue={search}
-            onDebouncedChange={handleDebouncedSearchChange}
-            onSubmit={handleSearchSubmit}
+          <SearchQueryInput
+            initialQuery={search}
+            onSearch={handleSearchSubmit}
             isDark={isDark}
             theme={theme}
-            mappedFacets={mappedFacets}
+            facets={mappedFacets}
             activeFilters={activeFilters}
           />
         }
@@ -522,7 +519,7 @@ const ArgusLogsPage: React.FC = () => {
                     hasMore={hasMore}
                     selectedLogIndex={selectedLogIndex}
                     displayDensity={displayDensity}
-                    searchDebounce={searchDebounce}
+                    searchDebounce={search}
                     logContainerRef={logContainerRef}
                     onSelectLog={handleSelectLog}
                     onLoadMore={handleLoadMore}
@@ -574,7 +571,7 @@ const ArgusLogsPage: React.FC = () => {
                 {activeTab === 3 && (
                   <LogsLiveTailPanel
                     projectId={projectId}
-                    searchDebounce={searchDebounce}
+                    searchDebounce={search}
                     isDark={isDark}
                   />
                 )}

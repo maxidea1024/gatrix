@@ -75,8 +75,7 @@ import ArgusFilterBar, {
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
-import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
-import SearchAutocompletePopover from '@/components/argus/SearchAutocompletePopover';
+import { SearchQueryInput } from '@/components/argus/search/SearchQueryInput';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
@@ -541,10 +540,16 @@ const ArgusDiscoverPage: React.FC = () => {
 
   // Search conditions (raw input)
   const [conditions, setConditions] = useState<string>(urlState.q || '');
+  // Guard: don't reset conditions when the URL change was triggered by our own submit
+  const lastSubmittedConditionsRef = useRef<string>(urlState.q || '');
 
-  // Sync state if URL changes externally
+  // Sync state if URL changes externally (e.g. browser back/forward, loading saved query)
   useEffect(() => {
-    setConditions(urlState.q || '');
+    const urlVal = urlState.q || '';
+    if (urlVal !== lastSubmittedConditionsRef.current) {
+      setConditions(urlVal);
+      lastSubmittedConditionsRef.current = urlVal;
+    }
   }, [urlState.q]);
 
   // ─── Results ───
@@ -581,14 +586,7 @@ const ArgusDiscoverPage: React.FC = () => {
     }
   }, [urlState.queryId, savedQueries, currentQueryId]);
 
-  // Query Builder State
-  const [builderAnchorEl, setBuilderAnchorEl] = useState<HTMLElement | null>(
-    null
-  );
 
-  // Autocomplete
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
 
   // ─── Tag/schema data ───
   const [facets, setFacets] = useState<Record<string, any[]>>({});
@@ -784,36 +782,23 @@ const ArgusDiscoverPage: React.FC = () => {
     setSavedPanelOpen(false);
   };
 
-  const addSearchTag = (key: string, value: string, op: string = 'is') => {
-    const opStr = op === '!=' ? '!=' : ':';
-    const appendStr = `${key}${opStr}"${value}"`;
-
-    // Replace the last typing token if it matches
-    let newConditions = conditions;
-    const colonMatch = conditions.match(/([\w.-]+):([^\s]*)$/);
-    if (colonMatch && colonMatch[1] === key) {
-      newConditions = conditions.substring(
-        0,
-        conditions.length - colonMatch[0].length
-      );
-    } else {
-      const bareMatch = conditions.match(/([\w.-]+)$/);
-      if (bareMatch && bareMatch[1] === key) {
-        newConditions = conditions.substring(
-          0,
-          conditions.length - bareMatch[0].length
-        );
-      }
-    }
-
-    const finalStr = (newConditions.trim() + ' ' + appendStr).trim();
-    setConditions(finalStr);
-    setUrlState({ q: finalStr });
-    setSearchFocused(false);
+  const handleSearchChange = (query: string) => {
+    setConditions(query);
+    lastSubmittedConditionsRef.current = query;
+    setUrlState({ q: query });
+    setTimeout(runQuery, 10);
   };
 
   const handleSelectFacet = (tag: string, value: string, exclude?: boolean) => {
-    addSearchTag(tag, value, exclude ? '!=' : 'is');
+    const op = exclude ? '!=' : 'is';
+    let appendStr: string;
+    if (op === '!=') {
+      appendStr = `!${tag}:"${value}"`;
+    } else {
+      appendStr = `${tag}:"${value}"`;
+    }
+    const finalStr = (conditions.trim() + ' ' + appendStr).trim();
+    handleSearchChange(finalStr);
   };
 
   const handleColumnSort = (colKey: string) => {
@@ -822,15 +807,6 @@ const ArgusDiscoverPage: React.FC = () => {
       setUrlState({ orderBy: newOrderBy });
     } else {
       setUrlState({ orderBy: `-${colKey}` });
-    }
-  };
-
-  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setUrlState({ q: conditions.trim() });
-      setSearchFocused(false);
-      // Wait a tick for URL state to update, then run query
-      setTimeout(runQuery, 10);
     }
   };
 
@@ -1152,92 +1128,19 @@ const ArgusDiscoverPage: React.FC = () => {
         }
       />
 
-      {/* ── Advanced Search Bar ── */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <Box
-          ref={searchContainerRef}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            flex: 1,
-            px: 1,
-            py: 0.3,
-            borderRadius: '8px',
-            minHeight: 36,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-            transition: 'border-color 0.2s',
-            backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-            '&:focus-within': {
-              borderColor: theme.palette.primary.main,
-              boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
-            },
-          }}
-        >
-          <SearchIcon
-            sx={{
-              fontSize: 16,
-              color: 'text.disabled',
-              flexShrink: 0,
-              ml: 0.5,
-            }}
-          />
-          <Box
-            component="input"
-            value={conditions}
-            spellCheck={false}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConditions(e.target.value)
-            }
-            onKeyDown={handleSearchKeyDown as any}
-            onFocus={() => setSearchFocused(true)}
-            placeholder={t(
-              'argus.discover.searchPlaceholder',
-              'Search for events, users, tags (e.g. level:error OR browser:Chrome)'
-            )}
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              backgroundColor: 'transparent',
-              color: 'inherit',
-              fontFamily: 'inherit',
-              fontSize: '0.85rem',
-              fontWeight: 500,
-              minWidth: 120,
-              padding: '6px 8px',
-            }}
-          />
-          {conditions && (
-            <IconButton
-              size="small"
-              onClick={() => {
-                setConditions('');
-                setUrlState({ q: '' });
-              }}
-              sx={{ p: 0.2, mr: 0.5 }}
-            >
-              <CloseIcon sx={{ fontSize: 14 }} />
-            </IconButton>
+        <SearchQueryInput
+          initialQuery={conditions}
+          onSearch={handleSearchChange}
+          fields={groupableColumns.slice(0, 15)}
+          facets={facets}
+          isDark={isDark}
+          theme={theme}
+          placeholder={t(
+            'argus.discover.searchPlaceholder',
+            'Search for events, users, tags (e.g. level:error OR browser:Chrome)'
           )}
-        </Box>
-        <Tooltip title={t('argus.builder.open', 'Open Query Builder')}>
-          <IconButton
-            size="small"
-            onClick={(e) => setBuilderAnchorEl(e.currentTarget)}
-            sx={{
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-              borderRadius: '6px',
-              height: 36,
-              width: 36,
-              backgroundColor: isDark
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.02)',
-            }}
-          >
-            <FilterIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
+        />
         <Button
           variant="contained"
           size="small"
@@ -1258,48 +1161,6 @@ const ArgusDiscoverPage: React.FC = () => {
             t('argus.discover.run', 'Search')
           )}
         </Button>
-
-        <ArgusQueryBuilder
-          fields={groupableColumns}
-          query={conditions}
-          onApply={(q) => setConditions(q)}
-          anchorEl={builderAnchorEl}
-          onClose={() => setBuilderAnchorEl(null)}
-        />
-
-        {/* 2-stage Autocomplete: fields → values from facets */}
-        <SearchAutocompletePopover
-          open={searchFocused}
-          anchorEl={searchContainerRef.current}
-          query={conditions}
-          fields={groupableColumns.slice(0, 15)}
-          facets={facets}
-          isDark={isDark}
-          onSelectTag={(field, value) => {
-            addSearchTag(field, value);
-          }}
-          onSelectField={(field) => {
-            const tokens = conditions.split(/\s+/);
-            const newCond =
-              tokens.slice(0, -1).join(' ') +
-              (tokens.length > 1 ? ' ' : '') +
-              field +
-              ':';
-            setConditions(newCond);
-            searchContainerRef.current?.querySelector('input')?.focus();
-          }}
-          onSelectSyntax={(syntax) => {
-            const tokens = conditions.split(/\s+/);
-            const newCond =
-              tokens.slice(0, -1).join(' ') +
-              (tokens.length > 1 ? ' ' : '') +
-              syntax +
-              ' ';
-            setConditions(newCond);
-            searchContainerRef.current?.querySelector('input')?.focus();
-          }}
-          onClose={() => setSearchFocused(false)}
-        />
       </Box>
 
       {/* ── Tag Summary (Facet Map) ── */}

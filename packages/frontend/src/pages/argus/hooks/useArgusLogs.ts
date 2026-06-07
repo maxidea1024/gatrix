@@ -116,12 +116,17 @@ export function useArgusLogs() {
     }
   }, [urlState.period, urlState.start, urlState.end, setUrlState]);
 
-  // Search state
+  // Search state — only updated on explicit submit (no debounce needed)
   const [search, setSearch] = useState<string>(urlState.q || '');
-  const [searchDebounce, setSearchDebounce] = useState(urlState.q || '');
 
+  // Sync from URL only on external changes (e.g., browser back/forward)
+  const lastSubmittedSearchRef = useRef<string>(urlState.q || '');
   useEffect(() => {
-    setSearch(urlState.q || '');
+    const urlVal = urlState.q || '';
+    if (urlVal !== lastSubmittedSearchRef.current) {
+      setSearch(urlVal);
+      lastSubmittedSearchRef.current = urlVal;
+    }
   }, [urlState.q]);
 
   // ─── State ───
@@ -363,28 +368,36 @@ export function useArgusLogs() {
   }, [filters.dateRange]);
 
   const mappedFacets = useMemo(
-    () => ({
-      severity:
+    () => {
+      const severityValues =
         facets.levels?.map((l) => ({
           value: l.level,
           count: Number(l.count),
-        })) || [],
-      service:
+        })) || [];
+      const serviceValues =
         facets.services?.map((s) => ({
           value: s.service,
           count: Number(s.count),
-        })) || [],
-      environment:
+        })) || [];
+      const environmentValues =
         facets.environments?.map((e) => ({
           value: e.environment,
           count: Number(e.count),
-        })) || [],
-      logger:
+        })) || [];
+      const loggerValues =
         facets.loggers?.map((l) => ({
           value: l.logger_name,
           count: Number(l.count),
-        })) || [],
-    }),
+        })) || [];
+      return {
+        severity: severityValues,
+        level: severityValues,       // alias: level → severity data
+        service: serviceValues,
+        environment: environmentValues,
+        logger: loggerValues,
+        logger_name: loggerValues,   // alias: logger_name → logger data
+      };
+    },
     [facets]
   );
 
@@ -445,14 +458,14 @@ export function useArgusLogs() {
   // ─── Search + Filter Merge Helper ───
   const buildSearchWithFilters = useCallback((): string | undefined => {
     const parts: string[] = [];
-    if (searchDebounce.trim()) parts.push(searchDebounce.trim());
+    if (search.trim()) parts.push(search.trim());
     for (const f of activeFilters) {
       if (!f.enabled) continue;
       const prefix = f.exclude ? '!' : '';
       parts.push(`${prefix}${f.key}:"${f.value}"`);
     }
     return parts.length > 0 ? parts.join(' ') : undefined;
-  }, [searchDebounce, activeFilters]);
+  }, [search, activeFilters]);
 
   // ─── Fetch ───
   const fetchLogs = useCallback(
@@ -468,7 +481,7 @@ export function useArgusLogs() {
         if (apiParams.start) params.start = apiParams.start;
         if (apiParams.end) params.end = apiParams.end;
         if (apiParams.environment) params.environment = apiParams.environment;
-        if (searchDebounce.trim()) params.search = searchDebounce.trim();
+        if (search.trim()) params.search = search.trim();
         if (cursor) params.cursor = cursor;
 
         const mergedSearch = buildSearchWithFilters();
@@ -490,7 +503,7 @@ export function useArgusLogs() {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [projectId, filters, searchDebounce, activeFilters]
+    [projectId, filters, search, activeFilters]
   );
 
   const fetchFacets = useCallback(async () => {
@@ -592,13 +605,10 @@ export function useArgusLogs() {
     fetchVolume();
   }, [activeFilters]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDebouncedSearchChange = useCallback((val: string) => {
-    setSearchDebounce(val);
-  }, []);
-
   const handleSearchSubmit = useCallback(
     (val: string) => {
       setSearch(val);
+      lastSubmittedSearchRef.current = val;
       setUrlState({ q: val });
       setTimeout(() => fetchLogs(), 10);
     },
@@ -742,7 +752,6 @@ export function useArgusLogs() {
     aggGroupBy,
     filters,
     search,
-    searchDebounce,
     logs,
     loading,
     facets,
@@ -785,7 +794,6 @@ export function useArgusLogs() {
     clearAllActiveFilters,
     handleAddCustomFacet,
     handleRemoveCustomFacet,
-    handleDebouncedSearchChange,
     handleSearchSubmit,
     handleSelectLog,
     handleCloseSidePanel,
