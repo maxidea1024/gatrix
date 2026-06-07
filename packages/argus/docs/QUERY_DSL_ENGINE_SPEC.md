@@ -70,6 +70,33 @@ country:!=CN         — 부정
 level:>100           — 초과
 level:>=100          — 이상
 level:<1000          — 미만
+level:<=1000         — 이하
+```
+
+#### 함수형 연산자 (괄호 포함)
+
+```
+message:contains("timeout")
+message:startsWith("network")
+message:endsWith("error")
+createdAt:before("2025-02-01")
+createdAt:after("2025-01-01")
+```
+
+#### IN 연산자 (다중 값 검색)
+
+여러 값을 OR로 반복하는 대신 `in()` 함수형 연산자로 간결하게 표현할 수 있다.
+
+```
+country:in("KR", "JP", "US")     — country가 KR, JP, US 중 하나
+level:in("error", "fatal")        — level이 error 또는 fatal
+```
+
+**IN은 내부적으로 OR 체인으로 변환된다:**
+```
+country:in("KR", "JP")  →  (country:KR or country:JP)
+```
+
 ### 2.2 값 표현
 
 ```
@@ -81,6 +108,29 @@ createdAt:before("2025-02-01")
 createdAt:after("2025-01-01")
 ```
 
+#### 상대 시간 (Relative Time)
+
+datetime 필드에서 상대 시간 표기를 지원한다.
+
+```
+timestamp:after("now-1h")         — 1시간 전 이후
+timestamp:before("now-7d")        — 7일 전 이전
+timestamp:after("-24h")           — 24시간 전 이후 (축약형)
+timestamp:after("-30m")           — 30분 전 이후
+```
+
+| 포맷 | 의미 | 예시 |
+|------|------|------|
+| `now` | 현재 시각 | `now` |
+| `now-Nd` | N일 전 | `now-7d` |
+| `now-Nh` | N시간 전 | `now-1h` |
+| `now-Nm` | N분 전 | `now-30m` |
+| `-Nd` / `-Nh` / `-Nm` | 축약형 (now 생략) | `-24h` |
+| `YYYY-MM-DD` | 절대 날짜 | `2025-01-01` |
+| `YYYY-MM-DDTHH:mm:ss` | 절대 시각 | `2025-01-01T00:00:00` |
+
+상대 시간은 **Serializer에서 절대 시각으로 변환하지 않는다** — 백엔드에 문자열 그대로 전달하고 백엔드가 해석한다.
+
 ### 2.2.1 Free Text Search (필드 없는 검색)
 
 필드 없이 단독으로 입력하면 **message 필드의 contains 검색**으로 처리한다.
@@ -89,6 +139,19 @@ createdAt:after("2025-01-01")
 timeout                    → message:contains("timeout")
 "network error"            → message:contains("network error")
 timeout and country:KR     → message:contains("timeout") and country:KR
+```
+
+### 2.2.2 와일드카드 및 정규식 지원 정책
+
+| 기능 | 지원 여부 | 이유 |
+|------|-----------|------|
+| **와일드카드 (`*`, `?`)** | ❌ 미지원 | `contains`/`startsWith`/`endsWith` 함수형 연산자로 대체. 와일드카드는 모호성 유발 |
+| **정규식** | ❌ 미지원 | 백엔드 ClickHouse가 정규식 검색을 지원하지만, 쿼리 성능 저하 위험. 향후 Extension Point로 예약 |
+
+값 내부의 `*`, `?`는 **특수문자가 아닌 일반 문자**로 취급한다:
+```
+message:contains("*network*")  → "*network*" 문자열 그대로 검색 (와일드카드 아님)
+message:"test?.log"            → "test?.log" 문자열 그대로 검색 (와일드카드 아님)
 ```
 
 ### 2.3 논리 연산자
@@ -116,18 +179,21 @@ UnaryExpr     = (NOT | BANG) UnaryExpr | Primary
 Primary       = LPAREN Expression RPAREN | Filter | FreeText
 
 Filter        = FIELD COLON ValueExpr
-FreeText      = QuotedString | UnquotedString    — 필드 없이 단독 입력 (→ message:contains 변환)
+FreeText      = QuotedString | UnquotedString    — 필드 없이 단독 입력 → FreeTextExpression AST 노드
 
 ValueExpr     = CompareOp Value
-              | FuncOp LPAREN QuotedString RPAREN
+              | FuncOp LPAREN ArgList RPAREN
               | Value
 
+ArgList       = QuotedString ( ',' QuotedString )*    — in() 등 다중 인자 지원
+
 CompareOp     = '!=' | '>=' | '<=' | '>' | '<'
-FuncOp        = 'contains' | 'startsWith' | 'endsWith' | 'before' | 'after'
+FuncOp        = 'contains' | 'startsWith' | 'endsWith' | 'before' | 'after' | 'in'
 
 Value         = QuotedString | NUMBER | BOOLEAN | UnquotedString
 QuotedString  = '"' ( EscapeChar | [^"\\] )* '"'
 UnquotedString = [^\s()"]+
+Identifier    = [a-zA-Z_][a-zA-Z0-9_.]*    — 필드명 허용 문자 규칙
 
 OR            = 'or' | 'OR' | 'Or'
 AND           = 'and' | 'AND' | 'And'
@@ -165,6 +231,7 @@ enum TokenType {
   ENDS_WITH     = 'ENDS_WITH',     // endsWith
   BEFORE        = 'BEFORE',        // before
   AFTER         = 'AFTER',         // after
+  IN            = 'IN',            // in (다중 값 검색)
 
   // === Logical Operators ===
   AND           = 'AND',
@@ -173,6 +240,7 @@ enum TokenType {
   BANG          = 'BANG',          // ! (NOT의 축약형, != 와 구분)
 
   // === Special ===
+  COMMA         = 'COMMA',         // , (함수 인자 구분)
   EOF           = 'EOF',
   ERROR         = 'ERROR',
 }
@@ -201,8 +269,27 @@ interface Token {
 interface FilterExpression {
   type: 'FilterExpression';
   field: string;
-  operator: string;     // '=' | '!=' | '>' | '>=' | '<' | '<=' | 'contains' | 'startsWith' | 'endsWith' | 'before' | 'after'
+  operator: string;     // '=' | '!=' | '>' | '>=' | '<' | '<=' | 'contains' | 'startsWith' | 'endsWith' | 'before' | 'after' | 'in'
   value: string | number | boolean;
+  /** IN 연산자의 경우 다중 값 */
+  values?: (string | number | boolean)[];
+  start: number;
+  end: number;
+}
+
+/**
+ * 필드 없이 단독 입력된 텍스트.
+ * Parser 단계에서 FreeTextExpression AST 노드로 생성된다.
+ * Serializer 단계에서 message:contains("...") 로 변환된다.
+ * 
+ * 이유: Parser는 DSL 문법을 구조화만 할 뿐, 의미 해석(어떤 필드에 매핑할지)은
+ * Serializer의 책임이다. Parser가 직접 FilterExpression으로 변환하면
+ * AST에서 사용자의 원래 의도(free text 입력)를 구분할 수 없다.
+ */
+interface FreeTextExpression {
+  type: 'FreeTextExpression';
+  value: string;
+  quoted: boolean;
   start: number;
   end: number;
 }
@@ -219,6 +306,15 @@ interface BinaryExpression {
 interface NotExpression {
   type: 'NotExpression';
   expression: Expression;
+  /** ! 사용 여부 (not 대신) */
+  usedBang: boolean;
+  start: number;
+  end: number;
+}
+
+interface GroupExpression {
+  type: 'GroupExpression';
+  expression: Expression;
   start: number;
   end: number;
 }
@@ -234,8 +330,10 @@ interface PartialExpression {
 
 type Expression =
   | FilterExpression
+  | FreeTextExpression
   | BinaryExpression
   | NotExpression
+  | GroupExpression
   | PartialExpression;
 ```
 
@@ -483,8 +581,34 @@ const DEFAULT_FIELD_ALIASES: Record<string, string> = {
 - 키워드 판별은 **case-insensitive** (`and`, `AND`, `And` 모두 동일)
 - 미완성 따옴표도 STRING 토큰으로 처리 (에러가 아님)
 - escape sequence 지원: `\"` inside quoted strings
+- **colon 뒤 공백 허용**: `country: KR` → `country:KR`로 처리 (공백 무시)
+- **Free text**: colon 없이 단독 입력된 단어 → FreeText 토큰으로 처리
 
-### 6.2 Tokenization Rules
+### 6.2 Identifier (필드명) Lexical Rules
+
+필드명으로 인식되는 문자열의 허용 범위:
+
+```
+Identifier = [a-zA-Z_][a-zA-Z0-9_.]*
+```
+
+| 규칙 | 설명 | 예시 |
+|------|------|------|
+| 시작 문자 | 영문 대소문자 또는 `_` | `level`, `_custom` |
+| 후속 문자 | 영문, 숫자, `_`, `.` | `logger_name`, `event.type` |
+| 금지 문자 | 공백, 특수문자 (`!@#$%^&*` 등) | ❌ `my field`, ❌ `field@name` |
+| 길이 | 1자 이상, 64자 이하 | — |
+
+**특수한 경우:**
+- 필드명이 논리 키워드(`and`, `or`, `not`)와 동일한 경우: **colon이 따라오면 FIELD**, 아니면 논리 키워드
+- 필드명이 boolean 값(`true`, `false`)과 동일한 경우: 동일 규칙 적용
+
+```
+and:value   →  FIELD("and"), COLON, STRING("value")   — colon이 따라오므로 FIELD
+and level:1 →  AND, FIELD("level"), COLON, ...          — colon이 없으므로 AND
+```
+
+### 6.3 Tokenization Rules
 
 | Input | Token(s) |
 |---|---|
@@ -494,25 +618,35 @@ const DEFAULT_FIELD_ALIASES: Record<string, string> = {
 | `"timeout"` | `STRING("timeout")` |
 | `"network` (미완성) | `STRING("network")` |
 | `100` | `NUMBER(100)` |
+| `-50` | `NUMBER(-50)` |
+| `3.14` | `NUMBER(3.14)` |
 | `true` | `BOOLEAN(true)` |
 | `!=` | `NE` |
 | `>=` | `GTE` |
 | `>` | `GT` |
 | `contains` | `CONTAINS` (colon 뒤에서만) |
 | `startsWith` | `STARTS_WITH` (colon 뒤에서만) |
+| `in` | `IN` (colon 뒤에서만) |
 | `and` | `AND` |
 | `or` | `OR` |
 | `not` | `NOT` |
+| `!` | `BANG` (colon 뒤 아닌 위치) |
 | `(` | `LPAREN` |
 | `)` | `RPAREN` |
+| `,` | `COMMA` (함수 인자 구분) |
+| `now-1h` | `STRING("now-1h")` (datetime 값) |
+| `-7d` | `STRING("-7d")` (상대 시간 축약형) |
 
-### 6.3 Context-Sensitive Lexing
+### 6.4 Context-Sensitive Lexing
 
-`contains`, `startsWith`, `endsWith`, `before`, `after`는 **colon 직후**에 나타날 때만 함수형 연산자로 인식한다. 그 외 위치에서는 일반 FIELD 또는 STRING으로 취급한다.
+`contains`, `startsWith`, `endsWith`, `before`, `after`, `in`은 **colon 직후**에 나타날 때만 함수형 연산자로 인식한다. 그 외 위치에서는 일반 FIELD 또는 STRING으로 취급한다.
 
 ```
 message:contains("timeout")
          ^^^^^^^^ → CONTAINS token
+
+country:in("KR", "JP")
+         ^^ → IN token
 
 contains:value
 ^^^^^^^^ → FIELD token (field named "contains")
@@ -956,67 +1090,93 @@ T1200: Response B 도착 → []
 T1500: Response A 도착 → ["KR"] ← ❌ 여전히 순서 역전!
 ```
 
-디바운스는 **추가 지연**을 유발하면서도 문제를 근본적으로 해결하지 못한다.
+디바운스**만**으로는 문제를 근본적으로 해결하지 못한다. 하지만 **서버 부하 방어**에는 효과적이다.
 
-#### 해결: AbortController + Request ID 이중 보호
+#### 해결: 하이브리드 전략 (Short Debounce + AbortController + Request ID)
+
+**디바운스(100ms)** + **AbortController** + **Request ID** 3중 보호를 사용한다.
+
+| 계층 | 역할 | 필요 이유 |
+|------|------|----------|
+| **Debounce (100ms)** | 빠른 타이핑 시 불필요한 요청 발생 억제 | 서버 부하 방지, 비용 절감 |
+| **AbortController** | 이전 진행 중 요청을 즉시 취소 | 네트워크 자원 해제, 대역폭 절약 |
+| **Request ID** | 응답 도착해도 stale이면 무시 | abort 직전에 도착한 응답 방어 (race window) |
 
 ```typescript
+const REMOTE_DEBOUNCE_MS = 100; // 체감 속도에 영향 없는 최소 디바운스
+
 class RemoteProvider implements SuggestionProvider {
   private currentController: AbortController | null = null;
   private currentRequestId = 0;
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   async getValueSuggestions(
     field: string,
     operator: string,
     prefix: string
   ): Promise<SuggestionItem[]> {
-    // 1. 이전 요청 즉시 abort (네트워크 자원 해제)
+    // 1. 이전 디바운스 타이머 취소
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+
+    // 2. 이전 네트워크 요청 abort
     if (this.currentController) {
       this.currentController.abort();
     }
 
-    // 2. 새 AbortController + Request ID 생성
-    const controller = new AbortController();
-    this.currentController = controller;
-    const requestId = ++this.currentRequestId;
+    // 3. 짧은 디바운스 (100ms) — 빠른 타이핑 시 서버 부하 방지
+    return new Promise((resolve) => {
+      this.debounceTimer = setTimeout(async () => {
+        const controller = new AbortController();
+        this.currentController = controller;
+        const requestId = ++this.currentRequestId;
 
-    try {
-      const response = await fetch(
-        `/api/query/autocomplete?field=${field}&operator=${operator}&prefix=${prefix}`,
-        { signal: controller.signal }
-      );
-      const data = await response.json();
+        try {
+          const response = await fetch(
+            `/api/query/autocomplete?field=${field}&operator=${operator}&prefix=${prefix}`,
+            { signal: controller.signal }
+          );
+          const data = await response.json();
 
-      // 3. 응답 도착 시 Request ID 확인
-      //    → 현재 ID와 다르면 이미 새 요청이 발송됨 = stale response → 무시
-      if (requestId !== this.currentRequestId) {
-        return []; // stale response — 무시
-      }
+          // 4. Request ID 확인 — stale response 방어
+          if (requestId !== this.currentRequestId) {
+            resolve([]); // stale
+            return;
+          }
 
-      return data.map(toSuggestionItem);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        return []; // 정상적인 abort — 무시
-      }
-      throw err;
-    }
+          resolve(data.map(toSuggestionItem));
+        } catch (err) {
+          if (err instanceof DOMException && err.name === 'AbortError') {
+            resolve([]); // 정상적인 abort
+            return;
+          }
+          resolve([]); // 네트워크 에러 시 빈 결과
+        }
+      }, REMOTE_DEBOUNCE_MS);
+    });
   }
 }
 ```
 
-#### 왜 이중 보호가 필요한가
+#### 왜 디바운스 100ms인가?
 
-| 방법 | 역할 | 단독 사용 시 문제 |
-|---|---|---|
-| **AbortController** | 네트워크 요청 자체를 취소. 서버 부하 감소, 대역폭 절약 | abort 직전에 이미 응답이 도착할 수 있음 (race window) |
-| **Request ID** | 응답이 도착해도 stale이면 무시 | 네트워크 요청은 계속 진행됨 (자원 낭비) |
-| **둘 다** | abort로 자원 해제 + ID로 race window 방어 | — (완전한 보호) |
+| 디바운스 값 | 체감 | 서버 부하 |
+|-------------|------|----------|
+| 0ms | 즉각 반응 | ⚠️ 키 입력마다 요청 (부하 높음) |
+| **100ms** | **거의 즉각 반응** | **✅ 빠른 타이핑 시 불필요한 요청 억제** |
+| 200ms | 약간의 지연 체감 | 좋음 |
+| 300ms+ | 확실한 지연 체감 | 매우 좋음 (하지만 UX 저하) |
 
-#### 디바운스는 사용하지 않는 이유
+100ms는 인간의 타이핑 속도(평균 키 간격 ~50-150ms)를 고려할 때 **체감 지연 없이 불필요한 요청을 충분히 억제**하는 최적 값이다.
 
-1. **추가 지연**: 자동완성은 즉각적 반응이 생명. 300ms 디바운스는 체감 속도를 저하
-2. **불필요**: AbortController가 네트워크 자원을 이미 관리함
-3. **문제 미해결**: 디바운스는 요청 빈도만 줄이고 순서 보장은 못함
+#### 로컬 Provider에는 디바운스 불필요
+
+| Provider | 디바운스 | 이유 |
+|----------|----------|------|
+| `MemoryProvider` | ❌ | 메모리 내 즉시 반환 — 지연 없음 |
+| `FacetProvider` | ❌ | 이미 캐시된 데이터에서 필터링 |
+| `RemoteProvider` | ✅ 100ms | 네트워크 요청 → 서버 부하 방지 필요 |
 
 ---
 
