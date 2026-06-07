@@ -227,20 +227,50 @@ export function QueryDSLEditor({
   const applySuggestion = useCallback((item: SuggestionItem) => {
     const result = applyCompletion(inputValue, cursorContext, item);
 
-    if (item.category === 'value' || item.category === 'logical' || item.category === 'paren') {
-      // Value selected → try to create chip
-      const completedChips = queryToChips(result.text);
-      if (completedChips.length > 0) {
-        // Chip created → close dropdown
-        setChips((prev) => [...prev, ...completedChips]);
-        setInputValue('');
-        setShowDropdown(false);
-        setSelectedIndex(-1);
-      } else {
-        // Value inserted but filter not yet complete → keep dropdown for more input
+    if (item.category === 'logical') {
+      // AND/OR: if inside unclosed parens in current input, keep as text
+      if (hasUnclosedParens(inputValue)) {
         setInputValue(result.text);
         setShowDropdown(true);
         setSelectedIndex(-1);
+      } else {
+        // Outside parens → directly add as logical chip
+        setChips((prev) => [
+          ...prev,
+          {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'logical' as const,
+            label: item.label.toUpperCase(),
+          },
+        ]);
+        setInputValue('');
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+      }
+    } else if (item.category === 'paren') {
+      // Parentheses → always keep as text input, never immediately chip
+      setInputValue(result.text);
+      setShowDropdown(true);
+      setSelectedIndex(-1);
+    } else if (item.category === 'value') {
+      // If inside unclosed parens, don't try to create chips yet
+      if (hasUnclosedParens(result.text)) {
+        setInputValue(result.text);
+        setShowDropdown(true);
+        setSelectedIndex(-1);
+      } else {
+        // Normal value → try to create chips
+        const completedChips = queryToChips(result.text);
+        if (completedChips.length > 0) {
+          setChips((prev) => [...prev, ...completedChips]);
+          setInputValue('');
+          setShowDropdown(false);
+          setSelectedIndex(-1);
+        } else {
+          setInputValue(result.text);
+          setShowDropdown(true);
+          setSelectedIndex(-1);
+        }
       }
     } else {
       // Field or operator selected → keep dropdown open for next step
@@ -308,12 +338,29 @@ export function QueryDSLEditor({
       if (showDropdown && suggestions.length > 0) {
         applySuggestion(suggestions[selectedIndex >= 0 ? selectedIndex : 0]);
       } else if (inputValue.trim()) {
-        const parsed = queryToChips(inputValue);
-        if (parsed.length > 0) {
-          setChips((prev) => [...prev, ...parsed]);
-          setInputValue('');
+        // Don't commit chips if inside unclosed parens
+        if (!hasUnclosedParens(inputValue)) {
+          const lower = inputValue.trim().toLowerCase();
+          if (lower === 'and' || lower === 'or') {
+            // Direct logical keyword → add as logical chip
+            setChips((prev) => [
+              ...prev,
+              {
+                id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                type: 'logical' as const,
+                label: lower.toUpperCase(),
+              },
+            ]);
+            setInputValue('');
+          } else {
+            const parsed = queryToChips(inputValue);
+            if (parsed.length > 0) {
+              setChips((prev) => [...prev, ...parsed]);
+              setInputValue('');
+            }
+          }
+          setShowDropdown(false);
         }
-        setShowDropdown(false);
       }
       return;
     }
@@ -322,11 +369,30 @@ export function QueryDSLEditor({
       if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
         applySuggestion(suggestions[selectedIndex]);
       } else if (inputValue.trim()) {
-        // Try to parse and create chip from current input
-        const parsed = queryToChips(inputValue);
-        if (parsed.length > 0) {
-          setChips((prev) => [...prev, ...parsed]);
+        // Don't commit chips if inside unclosed parens
+        if (hasUnclosedParens(inputValue)) {
+          // Stay in input, user needs to close the parens
+          return;
+        }
+        const lower = inputValue.trim().toLowerCase();
+        if (lower === 'and' || lower === 'or') {
+          // Direct logical keyword → add as logical chip
+          setChips((prev) => [
+            ...prev,
+            {
+              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              type: 'logical' as const,
+              label: lower.toUpperCase(),
+            },
+          ]);
           setInputValue('');
+        } else {
+          // Try to parse and create chip from current input
+          const parsed = queryToChips(inputValue);
+          if (parsed.length > 0) {
+            setChips((prev) => [...prev, ...parsed]);
+            setInputValue('');
+          }
         }
         setShowDropdown(false);
       } else {
@@ -549,4 +615,16 @@ export function QueryDSLEditor({
       </Box>
     </ClickAwayListener>
   );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Check if a string has unclosed parentheses (more '(' than ')') */
+function hasUnclosedParens(text: string): boolean {
+  let depth = 0;
+  for (const ch of text) {
+    if (ch === '(') depth++;
+    else if (ch === ')') depth = Math.max(0, depth - 1);
+  }
+  return depth > 0;
 }
