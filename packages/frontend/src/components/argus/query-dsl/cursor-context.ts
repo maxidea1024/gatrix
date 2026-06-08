@@ -252,6 +252,17 @@ export function resolveCursorContext(
       break;
     case EditorState.IN_QUOTED_STRING:
       type = 'VALUE';
+      // Fix prefix: inside a quoted string, the prefix should be the text
+      // between the opening quote and cursor (excluding the quote itself).
+      if (currentToken && currentToken.type === TokenType.STRING) {
+        // STRING token start includes the opening quote, so content starts at start+1
+        const contentStart = currentToken.start + 1;
+        prefix = contentStart < cursorOffset
+          ? input.slice(contentStart, cursorOffset)
+          : '';
+        tokenStart = contentStart;
+        tokenEnd = currentToken.end - 1; // exclude closing quote
+      }
       break;
     default:
       type = 'FIELD';
