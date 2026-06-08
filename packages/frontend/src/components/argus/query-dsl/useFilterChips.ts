@@ -141,7 +141,7 @@ function negateOperator(op: QueryOperator): QueryOperator {
     '!startsWith': 'startsWith',
     endsWith: '!endsWith',
     '!endsWith': 'endsWith',
-    'in': '!in',
+    in: '!in',
     '!in': 'in',
   };
   return negMap[op] ?? op;
@@ -415,9 +415,15 @@ export function queryToChips(query: string): FilterChip[] {
           // ── in()/!in(): multi-value argument list ──
           if (funcOp === 'in' || funcOp === '!in') {
             const values: string[] = [];
-            while (tok().type !== TokenType.RPAREN && tok().type !== TokenType.EOF) {
+            while (
+              tok().type !== TokenType.RPAREN &&
+              tok().type !== TokenType.EOF
+            ) {
               const valTok = tok();
-              if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
+              if (
+                VALUE_TYPES.has(valTok.type) ||
+                valTok.type === TokenType.FIELD
+              ) {
                 values.push(valTok.value);
                 advance();
               } else if (valTok.type === TokenType.COMMA) {
@@ -428,8 +434,13 @@ export function queryToChips(query: string): FilterChip[] {
             }
             if (tok().type === TokenType.RPAREN) advance(); // skip )
             chips.push({
-              id: nextChipId(), type: 'filter', field, operator: funcOp,
-              value: values.join(', '), values, quoted: true,
+              id: nextChipId(),
+              type: 'filter',
+              field,
+              operator: funcOp,
+              value: values.join(', '),
+              values,
+              quoted: true,
             });
             continue;
           }

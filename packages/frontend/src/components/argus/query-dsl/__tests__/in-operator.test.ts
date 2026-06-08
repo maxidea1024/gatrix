@@ -35,14 +35,14 @@ describe('Lexer — in/!in tokenization', () => {
     const types = tokens.map((t) => t.type);
 
     expect(types).toEqual([
-      TokenType.FIELD,   // logger
-      TokenType.COLON,   // :
-      TokenType.IN,      // in
-      TokenType.LPAREN,  // (
-      TokenType.STRING,  // UE4Core
-      TokenType.COMMA,   // ,
-      TokenType.STRING,  // LuaVM
-      TokenType.RPAREN,  // )
+      TokenType.FIELD, // logger
+      TokenType.COLON, // :
+      TokenType.IN, // in
+      TokenType.LPAREN, // (
+      TokenType.STRING, // UE4Core
+      TokenType.COMMA, // ,
+      TokenType.STRING, // LuaVM
+      TokenType.RPAREN, // )
       TokenType.EOF,
     ]);
   });
@@ -89,11 +89,11 @@ describe('Lexer — in/!in tokenization', () => {
       TokenType.COLON,
       TokenType.IN,
       TokenType.LPAREN,
-      TokenType.FIELD,   // error (unquoted → FIELD)
+      TokenType.FIELD, // error (unquoted → FIELD)
       TokenType.COMMA,
-      TokenType.FIELD,   // warning
+      TokenType.FIELD, // warning
       TokenType.COMMA,
-      TokenType.FIELD,   // info
+      TokenType.FIELD, // info
       TokenType.RPAREN,
       TokenType.EOF,
     ]);
@@ -170,7 +170,9 @@ describe('Parser — in/!in AST structure', () => {
   });
 
   it('should parse in() combined with AND', () => {
-    const { ast, errors } = parse('logger:in("UE4Core", "LuaVM") and level:error');
+    const { ast, errors } = parse(
+      'logger:in("UE4Core", "LuaVM") and level:error'
+    );
     expect(errors).toHaveLength(0);
     expect(ast).not.toBeNull();
     expect(ast!.type).toBe('Binary');
@@ -285,9 +287,13 @@ describe('useFilterChips — in/!in round-trip', () => {
 
   it('chipsToQuery should serialize in chip correctly', () => {
     const chip: FilterChip = {
-      id: 'test1', type: 'filter', field: 'logger',
-      operator: 'in', value: 'UE4Core, LuaVM',
-      values: ['UE4Core', 'LuaVM'], quoted: true,
+      id: 'test1',
+      type: 'filter',
+      field: 'logger',
+      operator: 'in',
+      value: 'UE4Core, LuaVM',
+      values: ['UE4Core', 'LuaVM'],
+      quoted: true,
     };
     const query = chipsToQuery([chip]);
     expect(query).toBe('logger:in("UE4Core", "LuaVM")');
@@ -295,9 +301,13 @@ describe('useFilterChips — in/!in round-trip', () => {
 
   it('chipsToQuery should serialize !in chip correctly', () => {
     const chip: FilterChip = {
-      id: 'test2', type: 'filter', field: 'logger',
-      operator: '!in', value: 'UE4Core, LuaVM',
-      values: ['UE4Core', 'LuaVM'], quoted: true,
+      id: 'test2',
+      type: 'filter',
+      field: 'logger',
+      operator: '!in',
+      value: 'UE4Core, LuaVM',
+      values: ['UE4Core', 'LuaVM'],
+      quoted: true,
     };
     const query = chipsToQuery([chip]);
     expect(query).toBe('logger:!in("UE4Core", "LuaVM")');
@@ -368,7 +378,9 @@ describe('Edge cases — in/!in', () => {
   });
 
   it('in() combined with OR', () => {
-    const { ast, errors } = parse('logger:in("UE4Core", "LuaVM") or level:error');
+    const { ast, errors } = parse(
+      'logger:in("UE4Core", "LuaVM") or level:error'
+    );
     expect(errors).toHaveLength(0);
     expect(ast).not.toBeNull();
     expect(ast!.type).toBe('Binary');

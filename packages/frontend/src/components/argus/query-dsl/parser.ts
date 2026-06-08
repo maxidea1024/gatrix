@@ -369,7 +369,7 @@ class Parser {
   private parseInFunctionArgs(
     fieldToken: Token,
     funcToken: Token,
-    funcOp: QueryOperator,
+    funcOp: QueryOperator
   ): FilterExpression {
     const values: (string | number | boolean)[] = [];
 
