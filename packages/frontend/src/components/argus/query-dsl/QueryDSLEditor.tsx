@@ -731,8 +731,8 @@ export function QueryDSLEditor({
         }
         return;
       }
-      // Enter on selected token → open editing dropdown
-      if (e.key === 'Enter' && selectedTokenIdx >= 0 && inputValue === '') {
+      // Enter or Space on selected token → open editing dropdown (same as click)
+      if ((e.key === 'Enter' || e.key === ' ') && selectedTokenIdx >= 0 && inputValue === '') {
         e.preventDefault();
         const token = visualTokens[selectedTokenIdx];
         if (
@@ -898,6 +898,8 @@ export function QueryDSLEditor({
     }
     // Don't show main dropdown while a chip is being edited
     if (chipEditingRef.current) return;
+    // Clear token selection when input gains focus
+    setSelectedTokenIdx(-1);
     // Always show dropdown on focus
     setShowDropdown(true);
     setSelectedIndex(-1);
@@ -966,6 +968,8 @@ export function QueryDSLEditor({
   const handleContainerClick = useCallback((e: React.MouseEvent) => {
     // Don't focus input if clicking on a chip (chip handles its own click)
     if ((e.target as HTMLElement).closest('[data-chip]')) return;
+    // Clear token selection and focus input
+    setSelectedTokenIdx(-1);
     inputRef.current?.focus();
   }, []);
 
@@ -1157,6 +1161,8 @@ export function QueryDSLEditor({
               fontFamily: 'inherit',
               lineHeight: '24px',
               padding: '2px 4px',
+              // Hide caret when a token is selected (token selection IS the cursor)
+              caretColor: selectedTokenIdx >= 0 ? 'transparent' : undefined,
             }}
           />
 
