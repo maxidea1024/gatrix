@@ -3,7 +3,7 @@
 // Used in TokenEditDropdown for datetime-type fields (e.g., timestamp)
 // ============================================================================
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Box,
   List,
@@ -43,6 +43,8 @@ const RELATIVE_PRESETS: TimePreset[] = [
 
 /** Number of quick presets (for keyboard navigation) */
 export const DATETIME_PRESET_COUNT = RELATIVE_PRESETS.length;
+/** Total navigable items: presets + DateTimePicker input */
+export const DATETIME_NAVIGABLE_COUNT = DATETIME_PRESET_COUNT + 1;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -91,6 +93,19 @@ export default function DatetimeValueEditor({
   // Local state for between mode
   const [fromValue, setFromValue] = useState<Dayjs | null>(parsedFrom);
   const [toValue, setToValue] = useState<Dayjs | null>(parsedTo);
+
+  // Ref for DateTimePicker container — to auto-focus input when arrow navigates to it
+  const pickerContainerRef = useRef<HTMLDivElement>(null);
+
+  // When highlight moves past presets, focus the DateTimePicker input
+  useEffect(() => {
+    if (highlightIndex >= DATETIME_PRESET_COUNT && pickerContainerRef.current) {
+      const input = pickerContainerRef.current.querySelector('input');
+      if (input) {
+        input.focus();
+      }
+    }
+  }, [highlightIndex]);
 
   // ─── Handlers ────────────────────────────────────────────────────────
 
@@ -220,7 +235,7 @@ export default function DatetimeValueEditor({
           ? t('dsl.datetime.dateRange', 'Date Range')
           : t('dsl.datetime.pickDateTime', 'Pick Date & Time')}
       </Box>
-      <Box sx={{ px: 1.5, pb: 1.5 }}>
+      <Box ref={pickerContainerRef} sx={{ px: 1.5, pb: 1.5 }}>
         <LocalizationProvider
           dateAdapter={AdapterDayjs}
           adapterLocale={dateLocale}
@@ -244,6 +259,19 @@ export default function DatetimeValueEditor({
                 size: 'small',
                 fullWidth: true,
                 sx: { mt: 0.5 },
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' && fromValue) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isBetween) {
+                      if (toValue) {
+                        onSelect(fromValue.utc().toISOString(), toValue.utc().toISOString());
+                      }
+                    } else {
+                      onSelect(fromValue.utc().toISOString());
+                    }
+                  }
+                },
               },
             }}
           />

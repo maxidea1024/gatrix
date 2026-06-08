@@ -34,7 +34,7 @@ import {
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import { getFieldByKey } from './fields';
-import { DATETIME_PRESET_COUNT } from './DatetimeValueEditor';
+import { DATETIME_PRESET_COUNT, DATETIME_NAVIGABLE_COUNT } from './DatetimeValueEditor';
 import {
   getRecentSearches,
   addRecentSearch,
@@ -622,10 +622,10 @@ export function QueryDSLEditor({
 
       // Datetime fields: navigate presets with arrows, Enter/Tab to commit
       if (isDatetime) {
-        const presetMaxIdx = DATETIME_PRESET_COUNT - 1;
+        const navMaxIdx = DATETIME_NAVIGABLE_COUNT - 1;
         if (e.key === 'ArrowDown') {
           e.preventDefault();
-          setPopoverHighlightIdx((prev) => Math.min(prev + 1, presetMaxIdx));
+          setPopoverHighlightIdx((prev) => Math.min(prev + 1, navMaxIdx));
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
           setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
