@@ -120,8 +120,10 @@ describe('Chained autocomplete: empty → level → info', () => {
 
   it('Prioritization: operators are sorted to the bottom', () => {
     const { suggestions } = pipeline('level:', 6);
-    const firstOpIdx = suggestions.findIndex(s => s.category === 'operator');
-    const lastValueIdx = suggestions.map(s => s.category).lastIndexOf('value');
+    const firstOpIdx = suggestions.findIndex((s) => s.category === 'operator');
+    const lastValueIdx = suggestions
+      .map((s) => s.category)
+      .lastIndexOf('value');
     if (firstOpIdx !== -1 && lastValueIdx !== -1) {
       expect(firstOpIdx).toBeGreaterThan(lastValueIdx);
     }
