@@ -4,7 +4,7 @@
 // Extracted from FilterTokenChip's FieldMenu, OperatorMenu, ValueEditor
 // ============================================================================
 
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   Box,
   Popover,
@@ -193,6 +193,8 @@ function FieldMenu({
 }) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const listRef = useRef<HTMLUListElement>(null);
   const allFields = getFieldsForDomain(domain);
 
   const filtered = filter
@@ -200,6 +202,37 @@ function FieldMenu({
         f.key.toLowerCase().includes(filter.toLowerCase())
       )
     : allFields;
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [filter]);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const items = list.querySelectorAll('div[role="button"]');
+    const item = items[selectedIndex] as HTMLElement;
+    if (item) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < filtered.length) {
+        onSelect(filtered[selectedIndex].key);
+      } else if (filtered.length > 0) {
+        onSelect(filtered[0].key);
+      }
+    }
+  };
 
   return (
     <Box sx={{ minWidth: 200 }}>
@@ -213,6 +246,7 @@ function FieldMenu({
         <InputBase
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
+          onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
           placeholder={t('dsl.chip.filterFields', 'Filter fields...')}
@@ -222,35 +256,38 @@ function FieldMenu({
           }}
         />
       </Box>
-      <List dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
-        {filtered.map((f) => (
-          <ListItemButton
-            key={f.key}
-            onClick={() => onSelect(f.key)}
-            selected={f.key === currentField}
-            sx={{
-              py: 0.5,
-              px: 1.5,
-              fontSize: '0.8rem',
-              '&.Mui-selected': {
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.06)'
-                  : 'rgba(0,0,0,0.04)',
-              },
-            }}
-          >
-            <ListItemText
-              primary={f.key}
-              primaryTypographyProps={{
+      <List ref={listRef} dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
+        {filtered.map((f, idx) => {
+          const isSelected = idx === selectedIndex || f.key === currentField;
+          return (
+            <ListItemButton
+              key={f.key}
+              onClick={() => onSelect(f.key)}
+              selected={isSelected}
+              sx={{
+                py: 0.5,
+                px: 1.5,
                 fontSize: '0.8rem',
-                fontWeight: f.key === currentField ? 600 : 400,
+                '&.Mui-selected': {
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.04)',
+                },
               }}
-            />
-            {f.key === currentField && (
-              <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
-            )}
-          </ListItemButton>
-        ))}
+            >
+              <ListItemText
+                primary={f.key}
+                primaryTypographyProps={{
+                  fontSize: '0.8rem',
+                  fontWeight: isSelected ? 600 : 400,
+                }}
+              />
+              {f.key === currentField && (
+                <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+              )}
+            </ListItemButton>
+          );
+        })}
       </List>
     </Box>
   );
@@ -273,35 +310,70 @@ function OperatorMenu({
   const fieldType = field?.type ?? 'string';
   const options = getOperatorOptions(operators, fieldType);
 
+  const [selectedIndex, setSelectedIndex] = useState(() => {
+    const idx = options.findIndex((o) => o.op === currentOperator);
+    return idx >= 0 ? idx : 0;
+  });
+
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    listRef.current?.focus();
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, options.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < options.length) {
+        onSelect(options[selectedIndex].op);
+      }
+    }
+  };
+
   return (
-    <List dense sx={{ py: 0.5 }}>
-      {options.map(({ op, label }) => (
-        <ListItemButton
-          key={op}
-          onClick={() => onSelect(op)}
-          selected={op === currentOperator}
-          sx={{
-            py: 0.5,
-            px: 1.5,
-            '&.Mui-selected': {
-              backgroundColor: isDark
-                ? 'rgba(255,255,255,0.06)'
-                : 'rgba(0,0,0,0.04)',
-            },
-          }}
-        >
-          <ListItemText
-            primary={label}
-            primaryTypographyProps={{
-              fontSize: '0.8rem',
-              fontWeight: op === currentOperator ? 600 : 400,
+    <List
+      ref={listRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      dense
+      sx={{ py: 0.5, outline: 'none' }}
+    >
+      {options.map(({ op, label }, idx) => {
+        const isSelected = idx === selectedIndex || op === currentOperator;
+        return (
+          <ListItemButton
+            key={op}
+            onClick={() => onSelect(op)}
+            selected={isSelected}
+            sx={{
+              py: 0.5,
+              px: 1.5,
+              '&.Mui-selected': {
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
+              },
             }}
-          />
-          {op === currentOperator && (
-            <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
-          )}
-        </ListItemButton>
-      ))}
+          >
+            <ListItemText
+              primary={label}
+              primaryTypographyProps={{
+                fontSize: '0.8rem',
+                fontWeight: isSelected ? 600 : 400,
+              }}
+            />
+            {op === currentOperator && (
+              <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+            )}
+          </ListItemButton>
+        );
+      })}
     </List>
   );
 }
@@ -322,6 +394,8 @@ function ValueEditor({
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const listRef = useRef<HTMLUListElement>(null);
 
   // Initialize valueInput from chip's current values
   const initialValue = useMemo(() => {
@@ -370,6 +444,20 @@ function ValueEditor({
         )
       : (initialOrderRef.current ?? facetValues);
 
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [valueInput]);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const items = list.querySelectorAll('div[role="button"]');
+    const item = items[selectedIndex] as HTMLElement;
+    if (item) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -380,21 +468,6 @@ function ValueEditor({
   const handleApplyMulti = () => {
     const vals = Array.from(currentSelected);
     onConfirm(vals.join(', '), vals);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (hasMultiValues) {
-        handleApplyMulti();
-      } else {
-        onConfirm(valueInput || chip.value || '');
-      }
-    }
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      onConfirm(chip.value || '', chip.values); // revert
-    }
   };
 
   const handleItemClick = (v: string, e?: React.MouseEvent) => {
@@ -413,6 +486,31 @@ function ValueEditor({
       onConfirm(vals[0] ?? '', vals);
     } else {
       onConfirm(v);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const items = sorted.slice(0, 30);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < items.length) {
+        handleItemClick(items[selectedIndex]);
+      } else {
+        if (hasMultiValues) {
+          handleApplyMulti();
+        } else {
+          onConfirm(valueInput || chip.value || '');
+        }
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      onConfirm(chip.value || '', chip.values); // revert
     }
   };
 
@@ -446,14 +544,15 @@ function ValueEditor({
         />
       </Box>
       {sorted.length > 0 && (
-        <List dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
-          {sorted.slice(0, 30).map((v) => {
+        <List ref={listRef} dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
+          {sorted.slice(0, 30).map((v, idx) => {
             const isSelected = currentSelected.has(v);
+            const isHighlighted = idx === selectedIndex || isSelected;
             return (
               <ListItemButton
                 key={v}
                 onClick={(e) => handleItemClick(v, e)}
-                selected={isSelected}
+                selected={isHighlighted}
                 sx={{
                   py: 0.25,
                   px: 1.5,
@@ -494,7 +593,7 @@ function ValueEditor({
                   primary={v}
                   primaryTypographyProps={{
                     fontSize: '0.8rem',
-                    fontWeight: isSelected ? 600 : 400,
+                    fontWeight: isHighlighted ? 600 : 400,
                   }}
                 />
               </ListItemButton>
@@ -544,6 +643,8 @@ function HasFieldSelector({
 }) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const listRef = useRef<HTMLUListElement>(null);
   const fields = getFieldsForDomain(domain);
 
   // Build combined list: static fields + dynamic facet keys
@@ -572,6 +673,39 @@ function HasFieldSelector({
     return a.localeCompare(b);
   });
 
+  const displayItems = sorted.slice(0, 30);
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [filter]);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const items = list.querySelectorAll('div[role="button"]');
+    const item = items[selectedIndex] as HTMLElement;
+    if (item) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, displayItems.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < displayItems.length) {
+        onSelect(displayItems[selectedIndex]);
+      } else if (displayItems.length > 0) {
+        onSelect(displayItems[0]);
+      }
+    }
+  };
+
   return (
     <Box sx={{ minWidth: 200 }}>
       <Box
@@ -584,6 +718,7 @@ function HasFieldSelector({
         <InputBase
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
+          onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
           placeholder={t('dsl.chip.filterFields', 'Filter fields...')}
@@ -593,9 +728,10 @@ function HasFieldSelector({
           }}
         />
       </Box>
-      <List dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
-        {sorted.slice(0, 30).map((key) => {
+      <List ref={listRef} dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
+        {displayItems.map((key, idx) => {
           const isCurrent = key === currentValue;
+          const isSelected = idx === selectedIndex || isCurrent;
           const fieldDef = getFieldByKey(key, domain);
           const cat = fieldDef?.category ?? 'attribute';
           const badge = HAS_CATEGORY_BADGES[cat];
@@ -603,7 +739,7 @@ function HasFieldSelector({
             <ListItemButton
               key={key}
               onClick={() => onSelect(key)}
-              selected={isCurrent}
+              selected={isSelected}
               sx={{
                 py: 0.5,
                 px: 1.5,
@@ -641,7 +777,7 @@ function HasFieldSelector({
                 primary={key}
                 primaryTypographyProps={{
                   fontSize: '0.8rem',
-                  fontWeight: isCurrent ? 600 : 400,
+                  fontWeight: isSelected ? 600 : 400,
                 }}
               />
               {isCurrent && (

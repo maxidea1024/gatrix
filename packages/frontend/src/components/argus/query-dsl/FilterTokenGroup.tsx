@@ -133,7 +133,7 @@ export const FilterTokenGroup = forwardRef<
     return {
       display: 'inline-flex',
       alignItems: 'center',
-      px: 0.75,
+      px: 0.5,
       py: 0.25,
       cursor: 'pointer',
       borderRadius: '4px',
@@ -142,9 +142,7 @@ export const FilterTokenGroup = forwardRef<
       border: isSelected ? selectedBorder : '1px solid transparent',
       backgroundColor: isSelected
         ? selectedBg
-        : isDark
-          ? 'rgba(255,255,255,0.04)'
-          : 'rgba(0,0,0,0.02)',
+        : 'transparent',
       color: isIncomplete
         ? isDark
           ? 'rgba(255,255,255,0.25)'
@@ -183,10 +181,20 @@ export const FilterTokenGroup = forwardRef<
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '2px',
+        gap: '1px',
         mr: 1,
         my: 0.25,
         maxWidth: '100%',
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.04)'
+          : 'rgba(0, 0, 0, 0.02)',
+        border: `1px solid ${
+          isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+        }`,
+        borderRadius: '6px',
+        pl: 0.5,
+        pr: 0.25,
+        py: 0.25,
       }}
     >
       {/* Field token */}
@@ -242,7 +250,7 @@ export const FilterTokenGroup = forwardRef<
         }}
         sx={{
           p: 0.25,
-          ml: 0,
+          ml: 0.25,
           opacity: 0.3,
           '&:hover': { opacity: 1 },
         }}

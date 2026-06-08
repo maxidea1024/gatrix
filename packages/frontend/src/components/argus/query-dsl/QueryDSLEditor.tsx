@@ -237,6 +237,8 @@ export function QueryDSLEditor({
     // Skip onChange during programmatic updates (e.g. recent selection)
     // to prevent race condition where empty chips trigger URL clear
     if (suppressOnChangeRef.current) return;
+    // Skip notifying parent if there is an active composing chip (incomplete filter)
+    if (chips.some((c) => c.composingPart !== undefined)) return;
     onChangeRef.current?.(chipsToQuery(chips));
   }, [chips]);
 
@@ -332,6 +334,7 @@ export function QueryDSLEditor({
 
   /** Handle update from TokenEditDropdown */
   const skipEditCloseRef = useRef(false);
+  const skipDeleteOnCloseRef = useRef(false);
 
   const handleTokenUpdate = useCallback(
     (chipId: string, updates: Partial<FilterChip>) => {
@@ -348,6 +351,7 @@ export function QueryDSLEditor({
 
       if (chip?.composingPart === 'value') {
         // Value selected during step-by-step → complete chip
+        skipDeleteOnCloseRef.current = true;
         updateChip(chipId, { ...updates, composingPart: undefined });
         return;
       }
@@ -369,7 +373,7 @@ export function QueryDSLEditor({
     // If chip was composing and closed without completing, delete it
     if (editingToken) {
       const chip = chips.find((c) => c.id === editingToken.chipId);
-      if (chip?.composingPart) {
+      if (chip?.composingPart && !skipDeleteOnCloseRef.current) {
         // Incomplete composing chip → delete
         deleteChip(editingToken.chipId);
         setEditingToken(null);
@@ -379,6 +383,9 @@ export function QueryDSLEditor({
         return;
       }
     }
+
+    // Always reset the ref
+    skipDeleteOnCloseRef.current = false;
 
     setEditingToken(null);
     chipEditingRef.current = false;
@@ -705,14 +712,15 @@ export function QueryDSLEditor({
               id: newChipId,
               type: 'filter' as const,
               field: item.label,
-              composingPart: 'operator' as const,
+              operator: '=',
+              composingPart: 'value' as const,
             },
           ]);
           setInputValue('');
           setCursorOffset(0);
           setShowDropdown(false);
           setSelectedIndex(-1);
-          // useEffect will auto-open operator dropdown after render
+          // useEffect will auto-open value dropdown after render
           return;
         }
 
@@ -802,13 +810,11 @@ export function QueryDSLEditor({
         e.preventDefault();
         if (visualTokens.length > 0) {
           setShowDropdown(false);
-          if (selectedTokenIdx < 0) {
-            setSelectedTokenIdx(0);
-          } else if (selectedTokenIdx >= visualTokens.length - 1) {
-            setSelectedTokenIdx(-1);
-          } else {
-            setSelectedTokenIdx((prev) => prev + 1);
-          }
+          setSelectedTokenIdx((prev) => {
+            if (prev < 0) return 0;
+            if (prev >= visualTokens.length - 1) return -1;
+            return prev + 1;
+          });
         } else if (showDropdown) {
           dropdownRef.current?.nextTab();
         }
@@ -816,7 +822,7 @@ export function QueryDSLEditor({
       }
       // Enter or Space on selected token → open editing dropdown (same as click)
       if (
-        (e.key === 'Enter' || e.key === ' ') &&
+        (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') &&
         selectedTokenIdx >= 0 &&
         inputValue === ''
       ) {
@@ -957,6 +963,8 @@ export function QueryDSLEditor({
       onSearch,
       domain,
       refreshRecent,
+      selectedTokenIdx,
+      visualTokens,
     ]
   );
 
@@ -1006,6 +1014,13 @@ export function QueryDSLEditor({
       // the dropdown area (which uses preventDefault). Don't commit here —
       // handleClickAway will handle real outside clicks.
       if (showDropdown) return;
+
+      // Do NOT commit while composing (IME) or if any chip is currently in step-by-step composition
+      const hasComposingChip = chips.some((c) => c.composingPart);
+      if (isComposing || hasComposingChip) {
+        return;
+      }
+
       // Real blur (focus left the editor) — finalize multi-select and commit
       isMultiSelectingRef.current = false;
       // Force-commit any composing input
@@ -1014,7 +1029,7 @@ export function QueryDSLEditor({
       }
       justFocusedRef.current = false;
     },
-    [inputValue, commitPendingInput, showDropdown]
+    [inputValue, commitPendingInput, showDropdown, isComposing, chips]
   );
 
   const handleInputClick = useCallback(
@@ -1044,13 +1059,29 @@ export function QueryDSLEditor({
     // (Popover/dropdown render via Portal, outside ClickAwayListener wrapper)
     if (isMultiSelectingRef.current) return;
     if (chipEditingRef.current) return;
+
+    // Do NOT commit while composing (IME) or if any chip is currently in step-by-step composition
+    const hasComposingChip = chips.some((c) => c.composingPart);
+    if (isComposing || hasComposingChip) {
+      setShowDropdown(false);
+      justFocusedRef.current = false;
+      return;
+    }
+
+    // Do NOT commit if suggestion dropdown is visible during click away (user cancelled selection)
+    if (showDropdown) {
+      setShowDropdown(false);
+      justFocusedRef.current = false;
+      return;
+    }
+
     // Force-commit any composing input when clicking outside
     if (inputValue.trim()) {
       commitPendingInput();
     }
     setShowDropdown(false);
     justFocusedRef.current = false;
-  }, [inputValue, commitPendingInput]);
+  }, [inputValue, commitPendingInput, isComposing, chips, showDropdown]);
 
   const handleContainerClick = useCallback((e: React.MouseEvent) => {
     // Don't focus input if clicking on a chip (chip handles its own click)
