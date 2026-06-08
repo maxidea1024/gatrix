@@ -26,7 +26,8 @@ import { resolveCursorContext } from './cursor-context';
 import { getSuggestions, applyCompletion } from './suggestion-engine';
 import { QuerySuggestionDropdown } from './QuerySuggestionDropdown';
 import type { QuerySuggestionDropdownHandle } from './QuerySuggestionDropdown';
-import { FilterTokenChip } from './FilterTokenChip';
+import { FilterTokenGroup, type FilterTokenGroupHandle, type TokenPart } from './FilterTokenGroup';
+import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import {
   getRecentSearches,
@@ -140,6 +141,14 @@ export function QueryDSLEditor({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isComposing, setIsComposing] = useState(false);
+  // ─── Token navigation state ───────────────────────────────────────
+  const [selectedTokenIdx, setSelectedTokenIdx] = useState(-1); // -1 = input focused
+  const [editingToken, setEditingToken] = useState<{
+    chipId: string;
+    part: EditingPart;
+    anchorEl: HTMLElement;
+  } | null>(null);
+  const tokenGroupRefs = useRef<Map<string, FilterTokenGroupHandle>>(new Map());
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() =>
     getRecentSearches(domain)
   );
@@ -250,14 +259,39 @@ export function QueryDSLEditor({
     );
   }, [cursorContext, domain, normalizedFacets, maxSuggestions, chips]);
 
+  // ─── Visual token index computation ─────────────────────────────────
+
+  type VisualTokenRef = {
+    chipId: string;
+    part: 'field' | 'operator' | 'value' | 'logical' | 'paren';
+  };
+
+  const visualTokens: VisualTokenRef[] = useMemo(() => {
+    return chips.flatMap((chip): VisualTokenRef[] => {
+      if (chip.type === 'logical' || chip.type === 'paren') {
+        return [{ chipId: chip.id, part: chip.type as 'logical' | 'paren' }];
+      }
+      const isHas = chip.field === 'has' || chip.field === '!has';
+      if (isHas) {
+        return [
+          { chipId: chip.id, part: 'field' },
+          { chipId: chip.id, part: 'value' },
+        ];
+      }
+      return [
+        { chipId: chip.id, part: 'field' },
+        { chipId: chip.id, part: 'operator' },
+        { chipId: chip.id, part: 'value' },
+      ];
+    });
+  }, [chips]);
+
   // ─── Chip operations ──────────────────────────────────────────────
 
   const updateChip = useCallback(
     (
       chipId: string,
-      updates: Partial<
-        Pick<FilterChip, 'field' | 'operator' | 'value' | 'values'>
-      >
+      updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value' | 'values' | 'composingPart'>>
     ) => {
       setChips((prev) =>
         prev.map((c) => (c.id === chipId ? { ...c, ...updates } : c))
@@ -269,45 +303,42 @@ export function QueryDSLEditor({
   const deleteChip = useCallback(
     (chipId: string) => {
       setChips((prev) => prev.filter((c) => c.id !== chipId));
+      setSelectedTokenIdx(-1);
+      setEditingToken(null);
     },
     [setChips]
   );
 
-  /** Decompose a chip back into the input field (composing state) for value re-editing */
-  const handleDecomposeChip = useCallback(
-    (chip: FilterChip) => {
-      // Remove the chip from array
-      setChips((prev) => prev.filter((c) => c.id !== chip.id));
-
-      // Convert chip to DSL text
-      const dslText = chipsToQuery([chip]);
-
-      // Determine cursor position (inside brackets for multi-value, end for single)
-      const hasMultiValues = chip.values && chip.values.length > 1;
-      const cursorPos = hasMultiValues
-        ? dslText.length - 1 // before ]
-        : dslText.length;
-
-      setInputValue(dslText);
-      setCursorOffset(cursorPos);
-      setShowDropdown(true);
-      setSelectedIndex(-1);
-
-      // Mark as multi-selecting if chip has multiple values
-      if (hasMultiValues) {
-        isMultiSelectingRef.current = true;
-      }
-
-      // Focus input and position cursor
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          inputRef.current.setSelectionRange(cursorPos, cursorPos);
-        }
-      });
+  /** Handle click on a token part (field/operator/value) */
+  const handlePartClick = useCallback(
+    (chipId: string, part: TokenPart, anchorEl: HTMLElement) => {
+      // Don't open while composing input
+      if (inputValue.trim()) return;
+      setEditingToken({ chipId, part, anchorEl });
+      setShowDropdown(false);
+      chipEditingRef.current = true;
     },
-    [setChips]
+    [inputValue]
   );
+
+  /** Handle update from TokenEditDropdown */
+  const handleTokenUpdate = useCallback(
+    (chipId: string, updates: Partial<FilterChip>) => {
+      updateChip(chipId, updates);
+    },
+    [updateChip]
+  );
+
+  /** Close token editing dropdown */
+  const handleEditClose = useCallback(() => {
+    setEditingToken(null);
+    chipEditingRef.current = false;
+    // Suppress dropdown re-open on focus restoration
+    suppressDropdownRef.current = true;
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }, []);
 
   // ─── Input handlers ───────────────────────────────────────────────
 
@@ -399,7 +430,7 @@ export function QueryDSLEditor({
           setCursorOffset(0);
           setShowDropdown(false);
           setSelectedIndex(-1);
-
+          
           suppressDropdownRef.current = true;
           requestAnimationFrame(() => {
             if (inputRef.current) {
@@ -423,7 +454,7 @@ export function QueryDSLEditor({
           setCursorOffset(0);
           setShowDropdown(false);
           setSelectedIndex(-1);
-
+          
           suppressDropdownRef.current = true;
           requestAnimationFrame(() => {
             if (inputRef.current) {
@@ -447,7 +478,7 @@ export function QueryDSLEditor({
         setCursorOffset(0);
         setShowDropdown(false);
         setSelectedIndex(-1);
-
+        
         suppressDropdownRef.current = true;
         requestAnimationFrame(() => {
           if (inputRef.current) {
@@ -477,22 +508,17 @@ export function QueryDSLEditor({
 
             let nextInput = '';
             const quotedValues = nextValues.map((v) => `"${v}"`).join(', ');
-
+            
             if (nextValues.length === 0) {
-              nextInput =
-                nextOp === '=' ? `${field}:[]` : `${field}:${nextOp}[]`;
+              nextInput = nextOp === '=' ? `${field}:[]` : `${field}:${nextOp}[]`;
             } else {
               // Always use bracketed form during multi-select to keep FSM in VALUE state.
               // Single-value without brackets (level:"debug") is only for final chip commit (single click).
-              nextInput =
-                nextOp === '='
-                  ? `${field}:[${quotedValues}]`
-                  : `${field}:${nextOp}[${quotedValues}]`;
+              nextInput = nextOp === '=' ? `${field}:[${quotedValues}]` : `${field}:${nextOp}[${quotedValues}]`;
             }
 
-            const cursorPos =
-              nextInput.length - (nextInput.endsWith(']') ? 1 : 0);
-
+            const cursorPos = nextInput.length - (nextInput.endsWith(']') ? 1 : 0);
+            
             setInputValue(nextInput);
             setCursorOffset(cursorPos);
             setShowDropdown(true);
@@ -513,42 +539,22 @@ export function QueryDSLEditor({
         } else {
           // Single-value mode or fallback
           let finalInput = result.text;
-
+          
           // Rebuild the filter to ensure any partial parenthesis or multi-value state is discarded
-          if (
-            currentFilterInfo.field &&
-            !item.description?.startsWith('dsl.smart.')
-          ) {
-            const field = currentFilterInfo.field;
-            let op = currentFilterInfo.operator || '=';
-            if (op === 'in') op = '=';
-            if (op === '!in') op = '!=';
-
-            const funcOps = [
-              'contains',
-              '!contains',
-              'startsWith',
-              '!startsWith',
-              'endsWith',
-              '!endsWith',
-              'before',
-              'after',
-            ];
-            if (funcOps.includes(op)) {
-              finalInput = `${field}:${op}("${item.label.replace(/"/g, '\\"')}")`;
-            } else {
-              const needsQuotes =
-                item.label.includes(' ') ||
-                item.label.includes('"') ||
-                item.label.includes('(') ||
-                item.label.includes(')') ||
-                item.label === '';
-              const escaped = needsQuotes
-                ? `"${item.label.replace(/"/g, '\\"')}"`
-                : item.label;
-              finalInput =
-                op === '=' ? `${field}:${escaped}` : `${field}:${op}${escaped}`;
-            }
+          if (currentFilterInfo.field && !item.description?.startsWith('dsl.smart.')) {
+             const field = currentFilterInfo.field;
+             let op = currentFilterInfo.operator || '=';
+             if (op === 'in') op = '=';
+             if (op === '!in') op = '!=';
+             
+             const funcOps = ['contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith', 'before', 'after'];
+             if (funcOps.includes(op)) {
+                finalInput = `${field}:${op}("${item.label.replace(/"/g, '\\"')}")`;
+             } else {
+                const needsQuotes = item.label.includes(' ') || item.label.includes('"') || item.label.includes('(') || item.label.includes(')') || item.label === '';
+                const escaped = needsQuotes ? `"${item.label.replace(/"/g, '\\"')}"` : item.label;
+                finalInput = op === '=' ? `${field}:${escaped}` : `${field}:${op}${escaped}`;
+             }
           }
 
           // Value → try to create filter chips
@@ -559,7 +565,7 @@ export function QueryDSLEditor({
             setCursorOffset(0);
             setShowDropdown(false);
             setSelectedIndex(-1);
-
+            
             suppressDropdownRef.current = true;
             requestAnimationFrame(() => {
               if (inputRef.current) {
@@ -573,15 +579,12 @@ export function QueryDSLEditor({
             setCursorOffset(finalInput.length);
             setShowDropdown(true);
             setSelectedIndex(-1);
-
+            
             suppressDropdownRef.current = true;
             requestAnimationFrame(() => {
               if (inputRef.current) {
                 inputRef.current.focus();
-                inputRef.current.setSelectionRange(
-                  finalInput.length,
-                  finalInput.length
-                );
+                inputRef.current.setSelectionRange(finalInput.length, finalInput.length);
               }
             });
             return;
@@ -593,7 +596,7 @@ export function QueryDSLEditor({
         setCursorOffset(result.cursorOffset);
         setShowDropdown(true);
         setSelectedIndex(-1);
-
+        
         suppressDropdownRef.current = true;
         requestAnimationFrame(() => {
           if (inputRef.current) {
@@ -655,15 +658,56 @@ export function QueryDSLEditor({
         setSelectedIndex((prev) => Math.max(prev - 1, -1));
         return;
       }
-      // Left/Right arrow keys → tab switching (when dropdown is open)
-      if (e.key === 'ArrowLeft' && showDropdown && inputValue === '') {
+      // Left/Right arrow keys → token navigation (when input is empty)
+      if (e.key === 'ArrowLeft' && inputValue === '') {
         e.preventDefault();
-        dropdownRef.current?.prevTab();
+        if (showDropdown && !selectedTokenIdx) {
+          dropdownRef.current?.prevTab();
+          return;
+        }
+        if (visualTokens.length > 0) {
+          setSelectedTokenIdx((prev) => {
+            if (prev <= 0) return visualTokens.length - 1;
+            return prev - 1;
+          });
+          setShowDropdown(false);
+        }
         return;
       }
-      if (e.key === 'ArrowRight' && showDropdown && inputValue === '') {
+      if (e.key === 'ArrowRight' && inputValue === '') {
         e.preventDefault();
-        dropdownRef.current?.nextTab();
+        if (showDropdown && selectedTokenIdx < 0) {
+          dropdownRef.current?.nextTab();
+          return;
+        }
+        if (selectedTokenIdx >= 0) {
+          if (selectedTokenIdx >= visualTokens.length - 1) {
+            setSelectedTokenIdx(-1); // back to input
+            inputRef.current?.focus();
+          } else {
+            setSelectedTokenIdx((prev) => prev + 1);
+          }
+        }
+        return;
+      }
+      // Enter on selected token → open editing dropdown
+      if (e.key === 'Enter' && selectedTokenIdx >= 0 && inputValue === '') {
+        e.preventDefault();
+        const token = visualTokens[selectedTokenIdx];
+        if (token && (token.part === 'field' || token.part === 'operator' || token.part === 'value')) {
+          const groupHandle = tokenGroupRefs.current.get(token.chipId);
+          const el = groupHandle?.getPartEl(token.part);
+          if (el) {
+            handlePartClick(token.chipId, token.part, el);
+          }
+        }
+        return;
+      }
+      // Escape on selected token → deselect
+      if (e.key === 'Escape' && selectedTokenIdx >= 0) {
+        e.preventDefault();
+        setSelectedTokenIdx(-1);
+        inputRef.current?.focus();
         return;
       }
       if (e.key === 'Tab') {
@@ -740,9 +784,25 @@ export function QueryDSLEditor({
         return;
       }
       if (e.key === 'Backspace' && inputValue === '' && chips.length > 0) {
-        // Delete last chip when backspace on empty input
         e.preventDefault();
-        setChips((prev) => prev.slice(0, -1));
+        if (selectedTokenIdx >= 0 && selectedTokenIdx < visualTokens.length) {
+          // Delete selected token appropriately
+          const token = visualTokens[selectedTokenIdx];
+          if (token.part === 'field' || token.part === 'logical' || token.part === 'paren') {
+            // Delete entire chip
+            deleteChip(token.chipId);
+          } else if (token.part === 'value') {
+            // Clear value only
+            updateChip(token.chipId, { value: '', values: [] });
+          } else if (token.part === 'operator') {
+            // Clear operator + value
+            updateChip(token.chipId, { operator: '=', value: '', values: [] });
+          }
+          setSelectedTokenIdx(-1);
+        } else {
+          // No token selected → delete last chip
+          setChips((prev) => prev.slice(0, -1));
+        }
         return;
       }
     },
@@ -794,51 +854,43 @@ export function QueryDSLEditor({
     justFocusedRef.current = true;
   }, []);
 
-  const handleBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      // Don't do anything while a chip is being edited
-      if (chipEditingRef.current) return;
-      // Don't commit if focus moved to the dropdown (mouseDown on suggestion)
-      const related = e.relatedTarget as HTMLElement | null;
-      if (related && containerRef2.current?.contains(related)) {
-        return;
-      }
-      // If dropdown is visible, the blur was likely caused by clicking inside
-      // the dropdown area (which uses preventDefault). Don't commit here —
-      // handleClickAway will handle real outside clicks.
-      if (showDropdown) return;
-      // Real blur (focus left the editor) — finalize multi-select and commit
-      isMultiSelectingRef.current = false;
-      // Force-commit any composing input
-      if (inputValue.trim()) {
-        commitPendingInput();
-      }
-      justFocusedRef.current = false;
-    },
-    [inputValue, commitPendingInput, showDropdown]
-  );
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    // Don't do anything while a chip is being edited
+    if (chipEditingRef.current) return;
+    // Don't commit if focus moved to the dropdown (mouseDown on suggestion)
+    const related = e.relatedTarget as HTMLElement | null;
+    if (related && containerRef2.current?.contains(related)) {
+      return;
+    }
+    // If dropdown is visible, the blur was likely caused by clicking inside
+    // the dropdown area (which uses preventDefault). Don't commit here —
+    // handleClickAway will handle real outside clicks.
+    if (showDropdown) return;
+    // Real blur (focus left the editor) — finalize multi-select and commit
+    isMultiSelectingRef.current = false;
+    // Force-commit any composing input
+    if (inputValue.trim()) {
+      commitPendingInput();
+    }
+    justFocusedRef.current = false;
+  }, [inputValue, commitPendingInput, showDropdown]);
 
-  const handleInputClick = useCallback(
-    (e: React.MouseEvent<HTMLInputElement>) => {
-      setCursorOffset(
-        (e.target as HTMLInputElement).selectionStart ?? inputValue.length
-      );
-      if (justFocusedRef.current) {
-        justFocusedRef.current = false;
-        return;
-      }
-      // If composing a filter (has colon), force commit it
-      if (inputValue.includes(':')) {
-        isMultiSelectingRef.current = false;
-        commitPendingInput();
-        return;
-      }
-      // Re-click on already-focused input → toggle
-      setShowDropdown((prev) => !prev);
-      setSelectedIndex(-1);
-    },
-    [inputValue, commitPendingInput]
-  );
+  const handleInputClick = useCallback((e: React.MouseEvent<HTMLInputElement>) => {
+    setCursorOffset((e.target as HTMLInputElement).selectionStart ?? inputValue.length);
+    if (justFocusedRef.current) {
+      justFocusedRef.current = false;
+      return;
+    }
+    // If composing a filter (has colon), force commit it
+    if (inputValue.includes(':')) {
+      isMultiSelectingRef.current = false;
+      commitPendingInput();
+      return;
+    }
+    // Re-click on already-focused input → toggle
+    setShowDropdown((prev) => !prev);
+    setSelectedIndex(-1);
+  }, [inputValue, commitPendingInput]);
 
   const handleClickAway = useCallback(() => {
     // Ignore click-away during multi-select composing or chip editing
@@ -895,10 +947,7 @@ export function QueryDSLEditor({
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
-      <Box
-        ref={containerRef2}
-        sx={{ position: 'relative', flex: 1, minWidth: 0 }}
-      >
+      <Box ref={containerRef2} sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
         {/* Main tokenized grid */}
         <Box
           ref={containerRef}
@@ -981,24 +1030,31 @@ export function QueryDSLEditor({
               );
             }
 
+            // Find which part of this chip is selected (if any)
+            const chipSelectedPart = (() => {
+              if (selectedTokenIdx < 0) return null;
+              const vt = visualTokens[selectedTokenIdx];
+              if (vt && vt.chipId === chip.id && (vt.part === 'field' || vt.part === 'operator' || vt.part === 'value')) {
+                return vt.part as TokenPart;
+              }
+              return null;
+            })();
+
             return (
-              <FilterTokenChip
+              <FilterTokenGroup
                 key={chip.id}
-                chip={chip}
-                domain={domain}
-                facets={normalizedFacets}
-                onUpdate={updateChip}
-                onDelete={deleteChip}
-                onEditToggle={(editing) => {
-                  chipEditingRef.current = editing;
-                  if (editing) {
-                    setShowDropdown(false);
+                ref={(handle) => {
+                  if (handle) {
+                    tokenGroupRefs.current.set(chip.id, handle);
                   } else {
-                    // Suppress the dropdown that focus restoration would re-open
-                    suppressDropdownRef.current = true;
+                    tokenGroupRefs.current.delete(chip.id);
                   }
                 }}
-                onDecomposeToInput={handleDecomposeChip}
+                chip={chip}
+                domain={domain}
+                selectedPart={chipSelectedPart}
+                onPartClick={handlePartClick}
+                onDelete={deleteChip}
               />
             );
           })}
@@ -1086,6 +1142,19 @@ export function QueryDSLEditor({
               dropdownLeft={dropdownLeft}
             />
           )}
+
+        {/* Token edit dropdown (field/operator/value editing) */}
+        {editingToken && (
+          <TokenEditDropdown
+            type={editingToken.part}
+            chip={chips.find((c) => c.id === editingToken.chipId)!}
+            domain={domain}
+            facets={normalizedFacets}
+            anchorEl={editingToken.anchorEl}
+            onUpdate={(updates) => handleTokenUpdate(editingToken.chipId, updates)}
+            onClose={handleEditClose}
+          />
+        )}
       </Box>
     </ClickAwayListener>
   );
