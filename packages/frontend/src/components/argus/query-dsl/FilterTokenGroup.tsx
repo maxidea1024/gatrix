@@ -3,7 +3,7 @@
 // Sentry-style: [field] [operator] [value]  each independently editable
 // ============================================================================
 
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -21,14 +21,24 @@ export interface FilterTokenGroupProps {
   domain: QueryDomain;
   /** Which part is currently keyboard-selected (highlighted) */
   selectedPart: TokenPart | null;
+  /** Which part is currently being inline-edited (value only) */
+  editingPart: TokenPart | null;
+  /** Current inline editing text for the value cell */
+  editingValueText?: string;
   /** Called when a token part is clicked */
   onPartClick: (chipId: string, part: TokenPart, el: HTMLElement) => void;
   onDelete: (chipId: string) => void;
+  /** Inline value input callbacks */
+  onValueInputChange?: (chipId: string, text: string) => void;
+  onValueInputKeyDown?: (chipId: string, e: React.KeyboardEvent) => void;
+  onValueInputBlur?: (chipId: string) => void;
 }
 
 /** Ref handle to access individual token DOM elements */
 export interface FilterTokenGroupHandle {
   getPartEl: (part: TokenPart) => HTMLElement | null;
+  focusValueInput: () => void;
+  getChipEl: () => HTMLElement | null;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -37,20 +47,36 @@ export const FilterTokenGroup = forwardRef<
   FilterTokenGroupHandle,
   FilterTokenGroupProps
 >(function FilterTokenGroup(
-  { chip, domain, selectedPart, onPartClick, onDelete },
+  {
+    chip,
+    domain,
+    selectedPart,
+    editingPart,
+    editingValueText,
+    onPartClick,
+    onDelete,
+    onValueInputChange,
+    onValueInputKeyDown,
+    onValueInputBlur,
+  },
   ref
 ) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
+  const chipContainerRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLElement>(null);
   const operatorRef = useRef<HTMLElement>(null);
   const valueRef = useRef<HTMLElement>(null);
+  const valueInputRef = useRef<HTMLInputElement>(null);
 
   const field = getFieldByKey(chip.field ?? '', domain);
   const fieldType = field?.type ?? 'string';
   const opLabel = getOpLabel(chip.operator ?? '=', fieldType);
   const isHasChip = chip.field === 'has' || chip.field === '!has';
+
+  // IME composition tracking (Korean, Japanese, etc.)
+  const [isIME, setIsIME] = useState(false);
 
   useImperativeHandle(ref, () => ({
     getPartEl: (part: TokenPart) => {
@@ -64,6 +90,12 @@ export const FilterTokenGroup = forwardRef<
         default:
           return null;
       }
+    },
+    focusValueInput: () => {
+      valueInputRef.current?.focus();
+    },
+    getChipEl: () => {
+      return chipContainerRef.current;
     },
   }));
 
@@ -120,6 +152,7 @@ export const FilterTokenGroup = forwardRef<
 
   const tokenStyle = (part: TokenPart) => {
     const isSelected = selectedPart === part;
+    const isEditing = editingPart === part;
     const isComposing = chip.composingPart !== undefined;
 
     // Dim incomplete parts during composing
@@ -139,8 +172,8 @@ export const FilterTokenGroup = forwardRef<
       borderRadius: '4px',
       fontSize: '0.8rem',
       fontWeight: part === 'field' ? 600 : 400,
-      border: isSelected ? selectedBorder : '1px solid transparent',
-      backgroundColor: isSelected ? selectedBg : 'transparent',
+      border: isSelected || isEditing ? selectedBorder : '1px solid transparent',
+      backgroundColor: isSelected || isEditing ? selectedBg : 'transparent',
       color: isIncomplete
         ? isDark
           ? 'rgba(255,255,255,0.25)'
@@ -157,7 +190,7 @@ export const FilterTokenGroup = forwardRef<
               ? '#fbbf24'
               : '#d97706',
       '&:hover': {
-        backgroundColor: isSelected
+        backgroundColor: isSelected || isEditing
           ? selectedBg
           : isDark
             ? 'rgba(255,255,255,0.08)'
@@ -169,10 +202,16 @@ export const FilterTokenGroup = forwardRef<
     };
   };
 
+  // ─── Inline value input style ──────────────────────────────────────
+
+  const valueColor = isDark ? '#fbbf24' : '#d97706';
+  const inputWidth = Math.max(40, Math.min(300, (editingValueText?.length ?? 0) * 7.5 + 16));
+
   // ─── Render ─────────────────────────────────────────────────────────
 
   return (
     <Box
+      ref={chipContainerRef}
       data-chip
       data-chip-id={chip.id}
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -221,23 +260,67 @@ export const FilterTokenGroup = forwardRef<
         </Box>
       )}
 
-      {/* Value token */}
-      <Box
-        ref={valueRef}
-        component="span"
-        sx={{
-          ...tokenStyle('value'),
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          maxWidth: 240,
-          minWidth: 0,
-        }}
-        onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-          onPartClick(chip.id, 'value', e.currentTarget)
-        }
-      >
-        {renderValueText()}
-      </Box>
+      {/* Value token — inline input mode or display mode */}
+      {editingPart === 'value' ? (
+        <Box
+          component="span"
+          sx={{
+            ...tokenStyle('value'),
+            overflow: 'visible',
+            cursor: 'text',
+          }}
+        >
+          <input
+            ref={valueInputRef}
+            autoFocus
+            value={editingValueText ?? ''}
+            placeholder="..."
+            onChange={(e) => onValueInputChange?.(chip.id, e.target.value)}
+            onKeyDown={(e) => {
+              // Block Enter/Tab during IME composition
+              if (isIME && (e.key === 'Enter' || e.key === 'Tab')) {
+                e.preventDefault();
+                return;
+              }
+              onValueInputKeyDown?.(chip.id, e);
+            }}
+            onBlur={() => onValueInputBlur?.(chip.id)}
+            onCompositionStart={() => setIsIME(true)}
+            onCompositionEnd={() => setIsIME(false)}
+            style={{
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+              color: valueColor,
+              fontSize: '0.8rem',
+              fontFamily: 'inherit',
+              fontWeight: 400,
+              padding: 0,
+              margin: 0,
+              width: `${inputWidth}px`,
+              minWidth: '40px',
+              maxWidth: '300px',
+            }}
+          />
+        </Box>
+      ) : (
+        <Box
+          ref={valueRef}
+          component="span"
+          sx={{
+            ...tokenStyle('value'),
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: 240,
+            minWidth: 0,
+          }}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            onPartClick(chip.id, 'value', e.currentTarget)
+          }
+        >
+          {renderValueText()}
+        </Box>
+      )}
 
       {/* Delete button */}
       <IconButton

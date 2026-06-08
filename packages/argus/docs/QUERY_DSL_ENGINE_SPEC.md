@@ -1645,6 +1645,155 @@ interface QueryDSLEditorProps {
 | `Tab` | 선택된 항목 적용 |
 | `Backspace` | 일반 삭제 (빈 입력에서는 무시) |
 
+### 14.5 칩 모드: 값 인라인 편집
+
+칩의 값 편집은 **항상 인라인 텍스트 입력 모드**를 사용한다. 최초 칩 생성(composing)이든, 완성된 칩의 값 수정이든 동일하다. 타이핑이 primary이고, 추천 팝오버는 optional helper이다.
+
+> **적용 범위**: 값(`value`) part 편집은 **모든 경우**에 인라인 input 사용. 팝오버 내 InputBase는 사용하지 않는다.
+
+#### 14.5.1 인라인 편집 진입
+
+**시나리오 A: 최초 칩 생성 (composing)**
+
+```
+1. 사용자가 field "level" 선택, operator "is" 선택
+2. [level] [is] [________]       ← 값 셀이 인라인 input (빈 상태, 커서 깜빡임)
+                  ┌────────────────┐
+                  │ ☐ debug        │  ← 추천 팝오버 (optional, 포커스 없음)
+                  │ ☐ error        │
+                  │ ☐ info         │
+                  └────────────────┘
+3. 사용자가 직접 타이핑 or 방향키로 선택 or 체크박스 클릭
+```
+
+**시나리오 B: 완성된 칩 값 편집**
+
+```
+완성된 칩:  [level] [is] [debug or error or info or warn]
+                                    ↓ 값 영역 클릭
+편집 모드:  [level] [is] [debug, error, info, warn____]   ← 인라인 <input>
+                          ┌────────────────┐
+                          │ ☑ debug        │  ← 추천 팝오버 (optional, 포커스 없음)
+                          │ ☑ error        │
+                          │ ☑ info         │
+                          │ ☑ warn         │
+                          └────────────────┘
+```
+
+**진입 조건:**
+- 칩의 `composingPart`가 `undefined` (완성된 칩)
+- 클릭된 part가 `'value'`
+
+**진입 시 동작:**
+1. 값 셀의 `<span>` → `<input>`으로 DOM 전환
+2. 기존 값을 쉼표+공백 구분 텍스트로 표시 (`"debug, error, info, warn"`)
+3. input에 `autoFocus` → 즉시 커서 표시
+4. 추천 팝오버 열림 (앵커: 칩 컨테이너 `[data-chip]`)
+5. 원래 값을 ref에 저장 (Escape 복원용)
+
+#### 14.5.2 인라인 input 키보드 인터랙션
+
+| 키 | 동작 |
+|----|------|
+| 일반 타이핑 | 인라인 input에 텍스트 직접 입력 (primary) |
+| `←` / `→` | 인라인 input 내 텍스트 커서 이동 (네이티브) |
+| `↓` | 추천 팝오버 리스트에서 하이라이트 아래로 이동 |
+| `↑` | 추천 팝오버 리스트에서 하이라이트 위로 이동 |
+| `Enter` (하이라이트 없음, idx=-1) | 현재 인라인 텍스트로 확정 → 편집 종료 |
+| `Enter` (하이라이트 있음, idx≥0) | 하이라이트 항목을 토글 (체크박스처럼) → 편집 계속 |
+| `Tab` | 현재 값으로 확정 → 편집 종료 |
+| `Escape` | 원래 값 복원 → 편집 종료 |
+
+#### 14.5.3 추천 팝오버 동작
+
+- **상단 InputBase 없음** — 인라인 input이 대체하므로 불필요
+- **하단 multi-select hint 없음** — 체크박스로 충분히 self-explanatory
+- **Popover 포커스 비간섭**: `disableAutoFocus`, `disableEnforceFocus`, `disableRestoreFocus` 설정하여 인라인 input에서 포커스를 빼앗지 않음
+- **팝오버 내 클릭**: 체크박스 클릭 → 값 토글 → 인라인 텍스트 동기화 → 포커스 인라인 input 유지
+- **텍스트 클릭 (체크박스 아닌 부분)**: 단일 선택 → 편집 종료
+- **필터링**: 인라인 input에서 쉼표 뒤의 마지막 토큰을 필터 텍스트로 사용
+
+```
+인라인 input: "debug, error, in"
+                              ^^ 마지막 토큰 → 팝오버에서 "info" 필터링 표시
+```
+
+#### 14.5.4 값 파싱 규칙
+
+인라인 input의 텍스트를 칩의 `values` 배열로 파싱:
+
+```typescript
+"debug, error, info, warn"  →  ["debug", "error", "info", "warn"]
+"debug"                     →  ["debug"]
+""                          →  []  (빈 값 → 원래 값 복원)
+"hello world, foo bar"      →  ["hello world", "foo bar"]  (공백 포함 값 허용)
+```
+
+| 파싱 규칙 | 설명 |
+|-----------|------|
+| 쉼표(`,`) 구분 | 쉼표를 기준으로 분할 |
+| 각 토큰 trim | 앞뒤 공백 제거 |
+| 빈 토큰 무시 | `"debug, , error"` → `["debug", "error"]` |
+| 단일 값 | `values` 배열 길이 1, `value`에도 동일 저장 |
+
+#### 14.5.5 편집 종료 조건
+
+| 이벤트 | 동작 |
+|--------|------|
+| `Enter` (하이라이트 없음) | 현재 텍스트 파싱 → 칩 업데이트 → 편집 종료 |
+| `Tab` | 현재 텍스트 파싱 → 칩 업데이트 → 편집 종료 |
+| `Escape` | 원래 값 복원 → 칩 업데이트 → 편집 종료 |
+| 외부 클릭 (click-away) | 현재 텍스트 파싱 → 칩 업데이트 → 편집 종료 |
+| 다른 칩/part 클릭 | 현재 편집 커밋 → 새 편집 시작 |
+
+#### 14.5.6 엣지 케이스
+
+| 엣지 케이스 | 처리 방법 |
+|-------------|-----------|
+| **빈 input + Enter** | 원래 값 복원 (빈 필터는 무의미) |
+| **has/!has 칩** | 인라인 편집 미적용 — 기존 HasFieldSelector 팝오버 유지 |
+| **값에 쉼표 포함** | 현재 스코프에서는 쉼표를 구분자로만 사용. 향후 따옴표 이스케이프 고려 |
+| **IME 조합 중 (한글/일본어)** | `compositionend` 이전에 Enter 무시 — 조합 완료 후에만 커밋 |
+| **앵커 안정성** | 값 셀이 `<span>` → `<input>` 전환되어도 앵커는 칩 컨테이너 `[data-chip]` 사용 → DOM 변경에 안전 |
+| **Popover onClose 간섭** | `disableAutoFocus`/`disableEnforceFocus` 설정 + 체크박스 클릭 시 `event.stopPropagation()` |
+| **동시 편집 방지** | 한 번에 하나의 칩만 편집 가능. 다른 칩 클릭 시 현재 편집 커밋 후 전환 |
+| **facet 없는 필드** | 추천 팝오버가 빈 리스트 → 팝오버 숨김 → 순수 타이핑 모드 |
+| **실시간 칩 업데이트** | 타이핑 중 칩의 values를 실시간 업데이트하되, `chipEditingRef.current = true`로 `onChange` 전파 억제 |
+| **입력값 > maxWidth** | 인라인 input의 width를 텍스트 길이에 따라 동적 조절, `maxWidth: 300px` 제한 |
+
+### 14.6 칩 모드: 토큰 탐색 (좌/우 방향키)
+
+좌/우 방향키로 칩의 토큰을 탐색할 때 **경계에서 멈춤 (clamping)** 방식을 사용한다. 순환(rotation)하지 않는다.
+
+```
+토큰 인덱스:  [0] [1] [2] [3] [4] [5]  → [input]
+               ↑                    ↑       ↑
+              첫 토큰            마지막    input (idx = -1)
+```
+
+| 현재 위치 | `←` 누름 | `→` 누름 |
+|-----------|----------|----------|
+| input (`-1`) | 마지막 토큰 (`length - 1`) | 그대로 유지 (`-1`) |
+| 첫 토큰 (`0`) | **그대로 유지 (`0`)** | 다음 토큰 (`1`) |
+| 마지막 토큰 (`length - 1`) | 이전 토큰 (`length - 2`) | input (`-1`) |
+| 중간 토큰 (`n`) | `n - 1` | `n + 1` |
+
+```typescript
+// ArrowLeft: clamp at 0 (첫 토큰에서 멈춤)
+setSelectedTokenIdx(prev => {
+  if (prev < 0) return visualTokens.length - 1;  // input → 마지막 토큰
+  if (prev <= 0) return 0;                        // 첫 토큰에서 멈춤 (순환 안함)
+  return prev - 1;
+});
+
+// ArrowRight: clamp at -1 (input에서 멈춤)
+setSelectedTokenIdx(prev => {
+  if (prev < 0) return -1;                        // input에서 멈춤 (순환 안함)
+  if (prev >= visualTokens.length - 1) return -1; // 마지막 → input
+  return prev + 1;
+});
+```
+
 ---
 
 ## 15. History & Saved Queries

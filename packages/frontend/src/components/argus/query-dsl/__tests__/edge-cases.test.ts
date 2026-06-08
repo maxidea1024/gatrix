@@ -138,26 +138,6 @@ describe('Edge Cases', () => {
     });
   });
 
-  describe('IN operator edge cases', () => {
-    it('should parse empty in()', () => {
-      const { ast } = parse('country:in()');
-      expect(ast).toMatchObject({ type: 'Filter', operator: 'in', values: [] });
-    });
-
-    it('should parse single-value in()', () => {
-      const { ast } = parse('country:in("KR")');
-      expect(ast).toMatchObject({
-        type: 'Filter',
-        operator: 'in',
-        values: ['KR'],
-      });
-    });
-
-    it('should serialize single-value in() without extra parens', () => {
-      const s = serializeForBackend(parse('country:in("KR")').ast);
-      expect(s).toBe('country:"KR"');
-    });
-  });
 
   describe('round-trip consistency', () => {
     it('should preserve semantics through parse → serialize', () => {

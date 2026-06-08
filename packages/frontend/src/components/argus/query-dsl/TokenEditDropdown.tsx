@@ -80,6 +80,12 @@ export interface TokenEditDropdownProps {
   /** Called when the chip should be updated */
   onUpdate: (updates: Partial<FilterChip>) => void;
   onClose: () => void;
+  /** Inline value editing mode props (value type only) */
+  filterText?: string;
+  selectedValues?: Set<string>;
+  highlightIndex?: number;
+  onCheckboxToggle?: (value: string) => void;
+  onTextSelect?: (value: string) => void;
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -92,6 +98,11 @@ export function TokenEditDropdown({
   anchorEl,
   onUpdate,
   onClose,
+  filterText,
+  selectedValues,
+  highlightIndex,
+  onCheckboxToggle,
+  onTextSelect,
 }: TokenEditDropdownProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -116,6 +127,9 @@ export function TokenEditDropdown({
     onClose();
   };
 
+  // Value editing uses inline input — popover should not steal focus
+  const isValueType = type === 'value' && !isHasChip;
+
   return (
     <Popover
       open
@@ -123,6 +137,11 @@ export function TokenEditDropdown({
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      {...(isValueType ? {
+        disableAutoFocus: true,
+        disableEnforceFocus: true,
+        disableRestoreFocus: true,
+      } : {})}
       slotProps={{
         paper: {
           sx: {
@@ -130,13 +149,10 @@ export function TokenEditDropdown({
             minWidth: 200,
             borderRadius: '8px',
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-            backgroundColor: isDark
-              ? 'rgba(24,28,36,0.98)'
-              : 'rgba(255,255,255,0.98)',
-            backdropFilter: 'blur(12px)',
+            backgroundColor: isDark ? '#1e1e1e' : '#fff',
             boxShadow: isDark
-              ? '0 8px 32px rgba(0,0,0,0.5)'
-              : '0 4px 20px rgba(0,0,0,0.12)',
+              ? '0 4px 20px rgba(0,0,0,0.6)'
+              : '0 4px 20px rgba(0,0,0,0.1)',
           },
         },
       }}
@@ -166,12 +182,15 @@ export function TokenEditDropdown({
           isDark={isDark}
         />
       )}
-      {type === 'value' && !isHasChip && (
-        <ValueEditor
+      {isValueType && (
+        <ValueSuggestionList
           chip={chip}
           facets={facets}
-          onConfirm={handleValueConfirm}
-          onUpdate={onUpdate}
+          filterText={filterText ?? ''}
+          selectedValues={selectedValues ?? new Set()}
+          highlightIndex={highlightIndex ?? -1}
+          onCheckboxToggle={onCheckboxToggle ?? (() => {})}
+          onTextSelect={onTextSelect ?? (() => {})}
           isDark={isDark}
         />
       )}
@@ -385,274 +404,132 @@ function OperatorMenu({
   );
 }
 
-// ─── Value Editor ────────────────────────────────────────────────────────────
+// ─── Value Suggestion List (pure display, no InputBase) ─────────────────────
+// Replaces the old ValueEditor. All typing happens in the inline input in
+// FilterTokenGroup. This component only renders the suggestion list.
 
-function ValueEditor({
+function ValueSuggestionList({
   chip,
   facets,
-  onConfirm,
-  onUpdate,
+  filterText,
+  selectedValues,
+  highlightIndex,
+  onCheckboxToggle,
+  onTextSelect,
   isDark,
 }: {
   chip: FilterChip;
   facets?: Map<string, string[]>;
-  onConfirm: (v: string, nextValues?: string[]) => void;
-  onUpdate: (updates: Partial<FilterChip>) => void;
+  filterText: string;
+  selectedValues: Set<string>;
+  highlightIndex: number;
+  onCheckboxToggle: (value: string) => void;
+  onTextSelect: (value: string) => void;
   isDark: boolean;
 }) {
-  const { t } = useTranslation();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [isDirty, setIsDirty] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
   const listRef = useRef<HTMLUListElement>(null);
-  // Store original values on mount to support Esc cancel/revert
-  const originalValRef = useRef({ value: chip.value, values: chip.values });
-
-  // Initialize valueInput from chip's current values
-  const initialValue = useMemo(() => {
-    if (chip.values && chip.values.length > 0) {
-      return chip.values.join(', ');
-    }
-    return chip.value ?? '';
-  }, [chip.value, chip.values]);
-
-  const [valueInput, setValueInput] = useState(initialValue);
-
   const facetValues = facets?.get(chip.field ?? '') ?? [];
-  const hasMultiValues = (chip.values?.length ?? 0) >= 1;
 
-  // Parse current values from valueInput
-  const currentSelected = useMemo(() => {
-    return new Set(
-      valueInput
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v !== '')
-    );
-  }, [valueInput]);
+  // Extract last token after comma for filtering
+  const lastToken = filterText.includes(',')
+    ? filterText.split(',').pop()?.trim() ?? ''
+    : filterText.trim();
 
-  const filterText = isDirty ? valueInput.trim() : '';
-
-  // Stable initial sort order
-  const initialOrderRef = useRef<string[] | null>(null);
-  if (initialOrderRef.current === null && facetValues.length > 0) {
-    const initSelected = new Set(
-      (chip.values ?? [chip.value ?? '']).filter((v) => v !== '')
-    );
-    initialOrderRef.current = [...facetValues].sort((a, b) => {
-      const aS = initSelected.has(a);
-      const bS = initSelected.has(b);
-      if (aS && !bS) return -1;
-      if (!aS && bS) return 1;
-      return a.localeCompare(b);
-    });
-  }
-
-  const sorted =
-    isDirty && filterText !== ''
-      ? (initialOrderRef.current ?? facetValues).filter((v) =>
-          v.toLowerCase().includes(filterText.toLowerCase())
+  const filtered =
+    lastToken !== ''
+      ? facetValues.filter((v) =>
+          v.toLowerCase().includes(lastToken.toLowerCase())
         )
-      : (initialOrderRef.current ?? facetValues);
+      : facetValues;
 
-  useEffect(() => {
-    setSelectedIndex(-1);
-  }, [valueInput]);
-
+  // Scroll highlighted item into view
   useEffect(() => {
     const list = listRef.current;
-    if (!list) return;
+    if (!list || highlightIndex < 0) return;
     const items = list.querySelectorAll('div[role="button"]');
-    const item = items[selectedIndex] as HTMLElement;
+    const item = items[highlightIndex] as HTMLElement;
     if (item) {
       item.scrollIntoView({ block: 'nearest' });
     }
-  }, [selectedIndex]);
+  }, [highlightIndex]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setValueInput(e.target.value);
-    setIsDirty(true);
-  };
-
-  const handleApplyMulti = () => {
-    const vals = Array.from(currentSelected);
-    onConfirm(vals.join(', '), vals);
-  };
-
-  const handleCheckboxClick = (v: string) => {
-    const nextSet = new Set(currentSelected);
-    if (nextSet.has(v)) {
-      nextSet.delete(v);
-    } else {
-      nextSet.add(v);
-    }
-    const vals = Array.from(nextSet);
-    setValueInput(vals.join(', '));
-    // Immediately update chip in real-time without closing the dropdown
-    onUpdate({ value: vals[0] ?? '', values: vals });
-  };
-
-  const handleTextClick = (v: string) => {
-    setValueInput(v);
-    onUpdate({ value: v, values: [v] });
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    const items = sorted.slice(0, 30);
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex((prev) => Math.max(prev - 1, -1));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (selectedIndex >= 0 && selectedIndex < items.length) {
-        // Pressing Enter on an item inside popover sets it as single value and commits (closes)
-        onConfirm(items[selectedIndex]);
-      } else {
-        if (hasMultiValues) {
-          handleApplyMulti();
-        } else {
-          onConfirm(valueInput || chip.value || '');
-        }
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      // Revert to original values on Escape cancel
-      onConfirm(
-        originalValRef.current.value || '',
-        originalValRef.current.values
-      );
-    }
-  };
+  if (filtered.length === 0) return null;
 
   return (
     <Box sx={{ minWidth: 220 }}>
-      {/* Input row for filtering values */}
-      <Box
-        sx={{
-          px: 1,
-          py: 0.75,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-        }}
+      <List
+        ref={listRef}
+        dense
+        sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}
       >
-        <InputBase
-          ref={inputRef}
-          value={valueInput}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          autoFocus
-          fullWidth
-          placeholder={
-            chip.value || t('dsl.chip.filterValues', 'Filter values...')
-          }
-          sx={{
-            fontSize: '0.8rem',
-            '& input': { py: 0.25 },
-          }}
-        />
-      </Box>
-      {sorted.length > 0 && (
-        <List
-          ref={listRef}
-          dense
-          sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}
-        >
-          {sorted.slice(0, 30).map((v, idx) => {
-            const isSelected = currentSelected.has(v);
-            const isHighlighted = idx === selectedIndex || isSelected;
-            return (
-              <ListItemButton
-                key={v}
-                onClick={(e) => {
-                  const target = e.target as HTMLElement;
-                  const isCheckboxClick = !!target.closest('[data-checkbox]');
-                  const isCtrlClick = !!(e.ctrlKey || e.metaKey);
-                  const isAlreadyMulti = (chip.values?.length ?? 0) > 1;
-                  if (isCheckboxClick || isCtrlClick || isAlreadyMulti) {
-                    handleCheckboxClick(v);
-                  } else {
-                    handleTextClick(v);
-                  }
+        {filtered.slice(0, 30).map((v, idx) => {
+          const isChecked = selectedValues.has(v);
+          const isHighlighted = idx === highlightIndex;
+          return (
+            <ListItemButton
+              key={v}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCheckboxToggle(v);
+              }}
+              selected={false}
+              sx={{
+                py: 0.25,
+                px: 1.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1,
+                // Keyboard highlight: dashed outline
+                outline: isHighlighted
+                  ? `1px dashed ${isDark ? 'rgba(124,138,255,0.7)' : 'rgba(92,107,192,0.6)'}`
+                  : 'none',
+                outlineOffset: -1,
+                // Checked items: subtle background
+                backgroundColor: isChecked
+                  ? (isDark ? 'rgba(124,138,255,0.10)' : 'rgba(92,107,192,0.08)')
+                  : 'transparent',
+                '&:hover': {
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.04)',
+                },
+              }}
+            >
+              <ListItemText
+                primary={v}
+                primaryTypographyProps={{
+                  fontSize: '0.8rem',
+                  fontWeight: isChecked ? 600 : 400,
                 }}
-                selected={isHighlighted}
+              />
+              {/* Checkbox on the right */}
+              <Box
+                data-checkbox
                 sx={{
-                  py: 0.25,
-                  px: 1.5,
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 1,
-                  '&.Mui-selected': {
-                    backgroundColor: isDark
-                      ? 'rgba(255,255,255,0.06)'
-                      : 'rgba(0,0,0,0.04)',
-                  },
+                  justifyContent: 'center',
+                  width: 14,
+                  height: 14,
+                  flexShrink: 0,
+                  borderRadius: '3px',
+                  border: `1px solid ${isChecked ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
+                  backgroundColor: isChecked
+                    ? (isDark ? '#7c8aff' : '#5c6bc0')
+                    : 'transparent',
+                  color: '#fff',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  lineHeight: 1,
                 }}
               >
-                {/* Passive Checkbox Box (toggled via event delegation) */}
-                <Box
-                  data-checkbox
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 14,
-                    height: 14,
-                    flexShrink: 0,
-                    borderRadius: '3px',
-                    border: `1px solid ${isSelected ? 'transparent' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
-                    backgroundColor: isSelected
-                      ? isDark
-                        ? '#7c8aff'
-                        : '#5c6bc0'
-                      : 'transparent',
-                    color: '#fff',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    lineHeight: 1,
-                  }}
-                >
-                  {isSelected && '✓'}
-                </Box>
-                <ListItemText
-                  primary={v}
-                  primaryTypographyProps={{
-                    fontSize: '0.8rem',
-                    fontWeight: isHighlighted ? 600 : 400,
-                  }}
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
-      )}
-      {/* Multi-select hint footer */}
-      {sorted.length >= 2 && (
-        <Box
-          sx={{
-            px: 1.5,
-            py: 0.5,
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: '11px',
-              color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
-            }}
-          >
-            {t('dsl.hint.multiSelect', 'Hold {{key}} to select multiple', {
-              key: navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl',
-            })}
-          </Typography>
-        </Box>
-      )}
+                {isChecked && '✓'}
+              </Box>
+            </ListItemButton>
+          );
+        })}
+      </List>
     </Box>
   );
 }

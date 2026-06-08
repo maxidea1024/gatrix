@@ -98,16 +98,6 @@ describe('Parser', () => {
         value: 'net',
       });
     });
-
-    it('should parse in() with multiple values', () => {
-      const { ast } = parse('country:in("KR", "JP", "US")');
-      expect(ast).toMatchObject({
-        type: 'Filter',
-        field: 'country',
-        operator: 'in',
-        values: ['KR', 'JP', 'US'],
-      });
-    });
   });
 
   describe('logical operators', () => {

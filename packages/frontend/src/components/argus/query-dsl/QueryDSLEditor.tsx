@@ -157,6 +157,13 @@ export function QueryDSLEditor({
     getRecentSearches(domain)
   );
 
+  // ─── Inline value editing state ──────────────────────────────────
+  const [inlineValueText, setInlineValueText] = useState('');
+  const [popoverHighlightIdx, setPopoverHighlightIdx] = useState(-1);
+  const originalValueRef = useRef<{ value: string; values: string[] }>({ value: '', values: [] });
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inlineValueDirtyRef = useRef(false);
+
   const currentFilterInfo = useMemo(
     () => parseInputFilter(inputValue),
     [inputValue]
@@ -327,11 +334,39 @@ export function QueryDSLEditor({
     (chipId: string, part: TokenPart, anchorEl: HTMLElement) => {
       // Don't open while composing input
       if (inputValue.trim()) return;
+
+      if (part === 'value') {
+        const chip = chips.find((c) => c.id === chipId);
+        const isHas = chip?.field === 'has' || chip?.field === '!has';
+        if (!isHas) {
+          // Start inline value editing
+          originalValueRef.current = {
+            value: chip?.value ?? '',
+            values: [...(chip?.values ?? [])],
+          };
+          const isComposingChip = !!chip?.composingPart;
+          const textVal = isComposingChip
+            ? ''
+            : (chip?.values?.length ?? 0) > 0
+              ? chip!.values!.join(', ')
+              : chip?.value ?? '';
+          setInlineValueText(textVal);
+          setPopoverHighlightIdx(-1);
+          inlineValueDirtyRef.current = false;
+          // Use chip container as anchor for stability
+          const chipEl = anchorEl.closest('[data-chip]') as HTMLElement || anchorEl;
+          setEditingToken({ chipId, part, anchorEl: chipEl });
+          setShowDropdown(false);
+          chipEditingRef.current = true;
+          return;
+        }
+      }
+
       setEditingToken({ chipId, part, anchorEl });
       setShowDropdown(false);
       chipEditingRef.current = true;
     },
-    [inputValue]
+    [inputValue, chips]
   );
 
   /** Handle update from TokenEditDropdown */
@@ -404,6 +439,207 @@ export function QueryDSLEditor({
     requestAnimationFrame(() => inputRef.current?.focus());
   }, [editingToken, chips, deleteChip, updateChip]);
 
+  // ─── Inline value editing handlers ──────────────────────────────────
+
+  /** Parsed set of currently selected values from inline text */
+  const inlineSelectedValues = useMemo(() => {
+    return new Set(
+      inlineValueText
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '')
+    );
+  }, [inlineValueText]);
+
+  /** Close inline editing and return focus to main input */
+  const closeInlineEdit = useCallback(() => {
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
+    setEditingToken(null);
+    chipEditingRef.current = false;
+    setInlineValueText('');
+    setPopoverHighlightIdx(-1);
+    skipDeleteOnCloseRef.current = true;
+    suppressDropdownRef.current = true;
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  /** Commit inline edit: parse comma-separated values into chip */
+  const commitInlineEdit = useCallback(
+    (chipId: string) => {
+      const vals = inlineValueText
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
+      if (vals.length === 0) {
+        // Empty → revert
+        const orig = originalValueRef.current;
+        if (!orig.value && orig.values.length === 0) {
+          deleteChip(chipId);
+        } else {
+          updateChip(chipId, { value: orig.value, values: orig.values });
+        }
+        closeInlineEdit();
+        return;
+      }
+      updateChip(chipId, {
+        value: vals[0],
+        values: vals,
+        composingPart: undefined,
+      });
+      closeInlineEdit();
+    },
+    [inlineValueText, updateChip, deleteChip, closeInlineEdit]
+  );
+
+  /** Revert inline edit: restore original values */
+  const revertInlineEdit = useCallback(
+    (chipId: string) => {
+      const orig = originalValueRef.current;
+      if (!orig.value && orig.values.length === 0) {
+        // Composing with no original value → delete chip
+        deleteChip(chipId);
+      } else {
+        updateChip(chipId, { value: orig.value, values: orig.values });
+      }
+      closeInlineEdit();
+    },
+    [updateChip, deleteChip, closeInlineEdit]
+  );
+
+  /** Handle inline text change */
+  const handleInlineValueChange = useCallback(
+    (_chipId: string, text: string) => {
+      setInlineValueText(text);
+      setPopoverHighlightIdx(-1);
+      inlineValueDirtyRef.current = true;
+    },
+    []
+  );
+
+  /** Handle inline input blur → commit (with cancellable timeout) */
+  const handleInlineValueBlur = useCallback(
+    (chipId: string) => {
+      // Cancel any previous pending blur
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+      // Small delay to allow click on popover list items to cancel this
+      blurTimeoutRef.current = setTimeout(() => {
+        blurTimeoutRef.current = null;
+        // Check if we're still editing this chip
+        if (chipEditingRef.current) {
+          commitInlineEdit(chipId);
+        }
+      }, 200);
+    },
+    [commitInlineEdit]
+  );
+
+  /** Handle inline input key events */
+  const handleInlineValueKeyDown = useCallback(
+    (chipId: string, e: React.KeyboardEvent) => {
+      // IME composing → skip
+      if (e.nativeEvent.isComposing) return;
+
+      const editedChip = chips.find((c) => c.id === chipId);
+      const facetValues = normalizedFacets?.get(editedChip?.field ?? '') ?? [];
+      // Apply same filtering as ValueSuggestionList (only when dirty)
+      const filterStr = inlineValueDirtyRef.current ? inlineValueText : '';
+      const lastToken = filterStr.includes(',')
+        ? filterStr.split(',').pop()?.trim() ?? ''
+        : filterStr.trim();
+      const sorted = lastToken !== ''
+        ? facetValues.filter((v) => v.toLowerCase().includes(lastToken.toLowerCase()))
+        : facetValues;
+      const maxIdx = Math.min(sorted.length, 30) - 1;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setPopoverHighlightIdx((prev) => Math.min(prev + 1, maxIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (popoverHighlightIdx >= 0 && popoverHighlightIdx <= maxIdx) {
+          // Toggle highlighted item
+          handleInlineCheckboxToggle(sorted[popoverHighlightIdx]);
+        } else {
+          commitInlineEdit(chipId);
+        }
+      } else if (e.key === ' ' && popoverHighlightIdx >= 0 && popoverHighlightIdx <= maxIdx) {
+        // Space toggles checkbox when an item is highlighted
+        e.preventDefault();
+        handleInlineCheckboxToggle(sorted[popoverHighlightIdx]);
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        commitInlineEdit(chipId);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        revertInlineEdit(chipId);
+      }
+    },
+    [chips, normalizedFacets, inlineValueText, popoverHighlightIdx, commitInlineEdit, revertInlineEdit]
+  );
+
+  /** Toggle a value from popover checkbox or keyboard selection */
+  const handleInlineCheckboxToggle = useCallback(
+    (value: string) => {
+      if (!editingToken) return;
+      // Cancel any pending blur timeout — user is actively interacting
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+        blurTimeoutRef.current = null;
+      }
+      const currentVals = inlineValueText
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
+      const valSet = new Set(currentVals);
+      if (valSet.has(value)) {
+        valSet.delete(value);
+      } else {
+        valSet.add(value);
+      }
+      const newVals = Array.from(valSet);
+      setInlineValueText(newVals.join(', '));
+      setPopoverHighlightIdx(-1);
+      // Real-time chip update
+      updateChip(editingToken.chipId, {
+        value: newVals[0] ?? '',
+        values: newVals,
+      });
+      // Re-focus inline input after popover click
+      requestAnimationFrame(() => {
+        const groupHandle = tokenGroupRefs.current.get(editingToken.chipId);
+        groupHandle?.focusValueInput();
+      });
+    },
+    [editingToken, inlineValueText, updateChip]
+  );
+
+  /** Select a single value from popover text click → commit and close */
+  const handleInlineTextSelect = useCallback(
+    (value: string) => {
+      if (!editingToken) return;
+      // Cancel any pending blur timeout
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+        blurTimeoutRef.current = null;
+      }
+      updateChip(editingToken.chipId, {
+        value,
+        values: [value],
+        composingPart: undefined,
+      });
+      closeInlineEdit();
+    },
+    [editingToken, updateChip, closeInlineEdit]
+  );
+
   // ─── Auto-open dropdown for composing chips ────────────────────────
   // Runs after render so refs are guaranteed to be set.
   useEffect(() => {
@@ -422,6 +658,28 @@ export function QueryDSLEditor({
     const raf = requestAnimationFrame(() => {
       const groupHandle = tokenGroupRefs.current.get(composingChip.id);
       const part = composingChip.composingPart!;
+
+      if (part === 'value') {
+        // Value composing → start inline editing mode
+        const isHas = composingChip.field === 'has' || composingChip.field === '!has';
+        if (!isHas) {
+          setInlineValueText('');
+          setPopoverHighlightIdx(-1);
+          inlineValueDirtyRef.current = false;
+          originalValueRef.current = { value: '', values: [] };
+          const chipEl = groupHandle?.getChipEl();
+          if (chipEl) {
+            setEditingToken({ chipId: composingChip.id, part, anchorEl: chipEl });
+            chipEditingRef.current = true;
+            setShowDropdown(false);
+            // Focus inline input after DOM update
+            requestAnimationFrame(() => groupHandle?.focusValueInput());
+          }
+          return;
+        }
+      }
+
+      // field/operator → existing popover behavior
       const el = groupHandle?.getPartEl(part);
       if (el) {
         setEditingToken({ chipId: composingChip.id, part, anchorEl: el });
@@ -584,7 +842,7 @@ export function QueryDSLEditor({
         const isBracketedInProgress =
           inputValue.includes('[') || isMultiSelectingRef.current;
         if (isMultiSelect || isBracketedInProgress) {
-          // Multi-select mode: toggle value in field:in("val1", "val2") list format
+          // Multi-select mode: toggle value in field:["val1", "val2"] list format
           const { field, operator, values: currentValues } = currentFilterInfo;
           if (field) {
             let nextValues = [...currentValues];
@@ -597,9 +855,6 @@ export function QueryDSLEditor({
             }
 
             let nextOp = operator || '=';
-            // Fallback for migrated old queries that might still have !in/in stored somehow
-            if (nextOp === 'in') nextOp = '=';
-            if (nextOp === '!in') nextOp = '!=';
 
             let nextInput = '';
             const quotedValues = nextValues.map((v) => `"${v}"`).join(', ');
@@ -811,7 +1066,8 @@ export function QueryDSLEditor({
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
-            if (prev <= 0) return visualTokens.length - 1;
+            if (prev < 0) return visualTokens.length - 1; // input → last token
+            if (prev <= 0) return 0; // clamp at first token
             return prev - 1;
           });
         } else if (showDropdown) {
@@ -824,8 +1080,8 @@ export function QueryDSLEditor({
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
-            if (prev < 0) return 0;
-            if (prev >= visualTokens.length - 1) return -1;
+            if (prev < 0) return -1; // clamp at input
+            if (prev >= visualTokens.length - 1) return -1; // last → input
             return prev + 1;
           });
         } else if (showDropdown) {
@@ -1279,8 +1535,22 @@ export function QueryDSLEditor({
                 chip={chip}
                 domain={domain}
                 selectedPart={chipSelectedPart}
+                editingPart={
+                  editingToken?.chipId === chip.id
+                    ? (editingToken.part as TokenPart)
+                    : null
+                }
+                editingValueText={
+                  editingToken?.chipId === chip.id &&
+                  editingToken.part === 'value'
+                    ? inlineValueText
+                    : undefined
+                }
                 onPartClick={handlePartClick}
                 onDelete={deleteChip}
+                onValueInputChange={handleInlineValueChange}
+                onValueInputKeyDown={handleInlineValueKeyDown}
+                onValueInputBlur={handleInlineValueBlur}
               />
             );
           })}
@@ -1387,6 +1657,11 @@ export function QueryDSLEditor({
                 handleTokenUpdate(editingToken.chipId, updates)
               }
               onClose={handleEditClose}
+              filterText={inlineValueDirtyRef.current ? inlineValueText : ''}
+              selectedValues={inlineSelectedValues}
+              highlightIndex={popoverHighlightIdx}
+              onCheckboxToggle={handleInlineCheckboxToggle}
+              onTextSelect={handleInlineTextSelect}
             />
           );
         })()}
@@ -1412,7 +1687,7 @@ function canInsertLogical(chips: FilterChip[]): boolean {
 
 /**
  * Parse the current typing filter input to extract its field, operator, and values.
- * e.g., 'level:in("info", "warn")' -> { field: 'level', operator: 'in', values: ['info', 'warn'] }
+ * e.g., 'level:["info", "warn"]' -> { field: 'level', operator: '=', values: ['info', 'warn'] }
  */
 function parseInputFilter(input: string): {
   field: string;

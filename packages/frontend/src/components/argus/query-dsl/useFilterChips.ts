@@ -456,7 +456,7 @@ export function queryToChips(query: string): FilterChip[] {
         continue;
       }
 
-      // Function operator: field:contains("value") or field:in("v1", "v2")
+      // Function operator: field:contains("value"), field:startsWith("value"), etc.
       const funcOp = FUNC_OPS[opTok.type];
       if (funcOp) {
         advance(); // skip function name

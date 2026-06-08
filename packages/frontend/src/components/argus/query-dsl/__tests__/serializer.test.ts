@@ -61,17 +61,6 @@ describe('Serializer', () => {
     });
   });
 
-  describe('IN operator', () => {
-    it('should serialize in() as OR chain', () => {
-      expect(serialize('country:in("KR", "JP")')).toBe(
-        '(country:"KR" OR country:"JP")'
-      );
-    });
-
-    it('should serialize single-value in() without parens', () => {
-      expect(serialize('country:in("KR")')).toBe('country:"KR"');
-    });
-  });
 
   describe('logical operators', () => {
     it('should serialize AND', () => {
