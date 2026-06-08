@@ -549,67 +549,6 @@ export function QueryDSLEditor({
     [commitInlineEdit]
   );
 
-  /** Handle inline input key events */
-  const handleInlineValueKeyDown = useCallback(
-    (chipId: string, e: React.KeyboardEvent) => {
-      // IME composing → skip
-      if (e.nativeEvent.isComposing) return;
-
-      const editedChip = chips.find((c) => c.id === chipId);
-      const facetValues = normalizedFacets?.get(editedChip?.field ?? '') ?? [];
-      // Apply same filtering as ValueSuggestionList (only when dirty)
-      const filterStr = inlineValueDirtyRef.current ? inlineValueText : '';
-      const lastToken = filterStr.includes(',')
-        ? (filterStr.split(',').pop()?.trim() ?? '')
-        : filterStr.trim();
-      const sorted =
-        lastToken !== ''
-          ? facetValues.filter((v) =>
-              v.toLowerCase().includes(lastToken.toLowerCase())
-            )
-          : facetValues;
-      const maxIdx = Math.min(sorted.length, 30) - 1;
-
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setPopoverHighlightIdx((prev) => Math.min(prev + 1, maxIdx));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (popoverHighlightIdx >= 0 && popoverHighlightIdx <= maxIdx) {
-          // Toggle highlighted item
-          handleInlineCheckboxToggle(sorted[popoverHighlightIdx]);
-        } else {
-          commitInlineEdit(chipId);
-        }
-      } else if (
-        e.key === ' ' &&
-        popoverHighlightIdx >= 0 &&
-        popoverHighlightIdx <= maxIdx
-      ) {
-        // Space toggles checkbox when an item is highlighted
-        e.preventDefault();
-        handleInlineCheckboxToggle(sorted[popoverHighlightIdx]);
-      } else if (e.key === 'Tab') {
-        e.preventDefault();
-        commitInlineEdit(chipId);
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        revertInlineEdit(chipId);
-      }
-    },
-    [
-      chips,
-      normalizedFacets,
-      inlineValueText,
-      popoverHighlightIdx,
-      commitInlineEdit,
-      revertInlineEdit,
-    ]
-  );
-
   /** Toggle a value from popover checkbox or keyboard selection */
   const handleInlineCheckboxToggle = useCallback(
     (value: string) => {
@@ -631,7 +570,6 @@ export function QueryDSLEditor({
       }
       const newVals = Array.from(valSet);
       setInlineValueText(newVals.join(', '));
-      setPopoverHighlightIdx(-1);
       // Real-time chip update
       updateChip(editingToken.chipId, {
         value: newVals[0] ?? '',
@@ -645,6 +583,52 @@ export function QueryDSLEditor({
     },
     [editingToken, inlineValueText, updateChip]
   );
+
+  /** Handle inline input key events */
+  const handleInlineValueKeyDown = useCallback(
+    (chipId: string, e: React.KeyboardEvent) => {
+      // IME composing → skip
+      if (e.nativeEvent.isComposing) return;
+
+      const editedChip = chips.find((c) => c.id === chipId);
+      const facetValues = normalizedFacets?.get(editedChip?.field ?? '') ?? [];
+      const maxIdx = Math.min(facetValues.length, 30) - 1;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setPopoverHighlightIdx((prev) => Math.min(prev + 1, maxIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        commitInlineEdit(chipId);
+      } else if (
+        e.key === ' ' &&
+        popoverHighlightIdx >= 0 &&
+        popoverHighlightIdx <= maxIdx
+      ) {
+        // Space toggles checkbox when an item is highlighted
+        e.preventDefault();
+        handleInlineCheckboxToggle(facetValues[popoverHighlightIdx]);
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        commitInlineEdit(chipId);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        revertInlineEdit(chipId);
+      }
+    },
+    [
+      chips,
+      normalizedFacets,
+      popoverHighlightIdx,
+      handleInlineCheckboxToggle,
+      commitInlineEdit,
+      revertInlineEdit,
+    ]
+  );
+
 
   /** Select a single value from popover text click → commit and close */
   const handleInlineTextSelect = useCallback(

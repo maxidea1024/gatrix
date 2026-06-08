@@ -130,9 +130,16 @@ export function TokenEditDropdown({
   // Value editing uses inline input — popover should not steal focus
   const isValueType = type === 'value' && !isHasChip;
 
+  // Check if value suggestions have results — hide popover if no facets
+  const hasValueResults = (() => {
+    if (!isValueType) return true;
+    const facetValues = facets?.get(chip.field ?? '') ?? [];
+    return facetValues.length > 0;
+  })();
+
   return (
     <Popover
-      open
+      open={hasValueResults}
       anchorEl={anchorEl}
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
@@ -432,18 +439,6 @@ function ValueSuggestionList({
   const listRef = useRef<HTMLUListElement>(null);
   const facetValues = facets?.get(chip.field ?? '') ?? [];
 
-  // Extract last token after comma for filtering
-  const lastToken = filterText.includes(',')
-    ? (filterText.split(',').pop()?.trim() ?? '')
-    : filterText.trim();
-
-  const filtered =
-    lastToken !== ''
-      ? facetValues.filter((v) =>
-          v.toLowerCase().includes(lastToken.toLowerCase())
-        )
-      : facetValues;
-
   // Scroll highlighted item into view
   useEffect(() => {
     const list = listRef.current;
@@ -455,7 +450,7 @@ function ValueSuggestionList({
     }
   }, [highlightIndex]);
 
-  if (filtered.length === 0) return null;
+  if (facetValues.length === 0) return null;
 
   return (
     <Box sx={{ minWidth: 220 }}>
@@ -464,7 +459,7 @@ function ValueSuggestionList({
         dense
         sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}
       >
-        {filtered.slice(0, 30).map((v, idx) => {
+        {facetValues.slice(0, 30).map((v, idx) => {
           const isChecked = selectedValues.has(v);
           const isHighlighted = idx === highlightIndex;
           return (
