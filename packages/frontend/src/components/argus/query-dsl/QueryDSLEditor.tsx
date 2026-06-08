@@ -698,16 +698,16 @@ export function QueryDSLEditor({
       // Left/Right arrow keys → token navigation (when input is empty)
       if (e.key === 'ArrowLeft' && inputValue === '') {
         e.preventDefault();
-        if (showDropdown && !selectedTokenIdx) {
+        if (showDropdown && selectedTokenIdx < 0) {
           dropdownRef.current?.prevTab();
           return;
         }
         if (visualTokens.length > 0) {
+          setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
             if (prev <= 0) return visualTokens.length - 1;
             return prev - 1;
           });
-          setShowDropdown(false);
         }
         return;
       }
@@ -717,8 +717,12 @@ export function QueryDSLEditor({
           dropdownRef.current?.nextTab();
           return;
         }
-        if (selectedTokenIdx >= 0) {
-          if (selectedTokenIdx >= visualTokens.length - 1) {
+        if (visualTokens.length > 0) {
+          setShowDropdown(false);
+          if (selectedTokenIdx < 0) {
+            // Start from first token
+            setSelectedTokenIdx(0);
+          } else if (selectedTokenIdx >= visualTokens.length - 1) {
             setSelectedTokenIdx(-1); // back to input
             inputRef.current?.focus();
           } else {
