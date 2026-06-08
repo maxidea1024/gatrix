@@ -629,7 +629,6 @@ export function QueryDSLEditor({
     ]
   );
 
-
   /** Select a single value from popover text click → commit and close */
   const handleInlineTextSelect = useCallback(
     (value: string) => {
