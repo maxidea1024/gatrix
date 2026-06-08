@@ -342,17 +342,7 @@ export function QueryDSLEditor({
         // Operator selected during step-by-step → chain to value
         updateChip(chipId, { ...updates, composingPart: 'value' });
         skipEditCloseRef.current = true;
-        // Wait for render, then auto-open value dropdown
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            const groupHandle = tokenGroupRefs.current.get(chipId);
-            const el = groupHandle?.getPartEl('value');
-            if (el) {
-              setEditingToken({ chipId, part: 'value', anchorEl: el });
-              chipEditingRef.current = true;
-            }
-          });
-        });
+        // useEffect will auto-open value dropdown after render
         return;
       }
 
@@ -395,6 +385,35 @@ export function QueryDSLEditor({
     suppressDropdownRef.current = true;
     requestAnimationFrame(() => inputRef.current?.focus());
   }, [editingToken, chips, deleteChip]);
+
+  // ─── Auto-open dropdown for composing chips ────────────────────────
+  // Runs after render so refs are guaranteed to be set.
+  useEffect(() => {
+    const composingChip = chips.find((c) => c.composingPart);
+    if (!composingChip) return;
+
+    // Already editing this chip's correct part
+    if (
+      editingToken?.chipId === composingChip.id &&
+      editingToken?.part === composingChip.composingPart
+    ) {
+      return;
+    }
+
+    // Use rAF to ensure DOM layout is complete (ref callbacks have fired)
+    const raf = requestAnimationFrame(() => {
+      const groupHandle = tokenGroupRefs.current.get(composingChip.id);
+      const part = composingChip.composingPart!;
+      const el = groupHandle?.getPartEl(part);
+      if (el) {
+        setEditingToken({ chipId: composingChip.id, part, anchorEl: el });
+        chipEditingRef.current = true;
+        setShowDropdown(false);
+      }
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, [chips, editingToken]);
 
   // ─── Input handlers ───────────────────────────────────────────────
 
@@ -693,22 +712,7 @@ export function QueryDSLEditor({
           setCursorOffset(0);
           setShowDropdown(false);
           setSelectedIndex(-1);
-
-          // Auto-open operator dropdown after render
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              const groupHandle = tokenGroupRefs.current.get(newChipId);
-              const el = groupHandle?.getPartEl('operator');
-              if (el) {
-                setEditingToken({
-                  chipId: newChipId,
-                  part: 'operator',
-                  anchorEl: el,
-                });
-                chipEditingRef.current = true;
-              }
-            });
-          });
+          // useEffect will auto-open operator dropdown after render
           return;
         }
 
