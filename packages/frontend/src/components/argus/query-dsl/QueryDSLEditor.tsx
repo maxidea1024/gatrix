@@ -160,7 +160,10 @@ export function QueryDSLEditor({
   // ─── Inline value editing state ──────────────────────────────────
   const [inlineValueText, setInlineValueText] = useState('');
   const [popoverHighlightIdx, setPopoverHighlightIdx] = useState(-1);
-  const originalValueRef = useRef<{ value: string; values: string[] }>({ value: '', values: [] });
+  const originalValueRef = useRef<{ value: string; values: string[] }>({
+    value: '',
+    values: [],
+  });
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inlineValueDirtyRef = useRef(false);
 
@@ -349,12 +352,13 @@ export function QueryDSLEditor({
             ? ''
             : (chip?.values?.length ?? 0) > 0
               ? chip!.values!.join(', ')
-              : chip?.value ?? '';
+              : (chip?.value ?? '');
           setInlineValueText(textVal);
           setPopoverHighlightIdx(-1);
           inlineValueDirtyRef.current = false;
           // Use chip container as anchor for stability
-          const chipEl = anchorEl.closest('[data-chip]') as HTMLElement || anchorEl;
+          const chipEl =
+            (anchorEl.closest('[data-chip]') as HTMLElement) || anchorEl;
           setEditingToken({ chipId, part, anchorEl: chipEl });
           setShowDropdown(false);
           chipEditingRef.current = true;
@@ -549,11 +553,14 @@ export function QueryDSLEditor({
       // Apply same filtering as ValueSuggestionList (only when dirty)
       const filterStr = inlineValueDirtyRef.current ? inlineValueText : '';
       const lastToken = filterStr.includes(',')
-        ? filterStr.split(',').pop()?.trim() ?? ''
+        ? (filterStr.split(',').pop()?.trim() ?? '')
         : filterStr.trim();
-      const sorted = lastToken !== ''
-        ? facetValues.filter((v) => v.toLowerCase().includes(lastToken.toLowerCase()))
-        : facetValues;
+      const sorted =
+        lastToken !== ''
+          ? facetValues.filter((v) =>
+              v.toLowerCase().includes(lastToken.toLowerCase())
+            )
+          : facetValues;
       const maxIdx = Math.min(sorted.length, 30) - 1;
 
       if (e.key === 'ArrowDown') {
@@ -570,7 +577,11 @@ export function QueryDSLEditor({
         } else {
           commitInlineEdit(chipId);
         }
-      } else if (e.key === ' ' && popoverHighlightIdx >= 0 && popoverHighlightIdx <= maxIdx) {
+      } else if (
+        e.key === ' ' &&
+        popoverHighlightIdx >= 0 &&
+        popoverHighlightIdx <= maxIdx
+      ) {
         // Space toggles checkbox when an item is highlighted
         e.preventDefault();
         handleInlineCheckboxToggle(sorted[popoverHighlightIdx]);
@@ -582,7 +593,14 @@ export function QueryDSLEditor({
         revertInlineEdit(chipId);
       }
     },
-    [chips, normalizedFacets, inlineValueText, popoverHighlightIdx, commitInlineEdit, revertInlineEdit]
+    [
+      chips,
+      normalizedFacets,
+      inlineValueText,
+      popoverHighlightIdx,
+      commitInlineEdit,
+      revertInlineEdit,
+    ]
   );
 
   /** Toggle a value from popover checkbox or keyboard selection */
@@ -661,7 +679,8 @@ export function QueryDSLEditor({
 
       if (part === 'value') {
         // Value composing → start inline editing mode
-        const isHas = composingChip.field === 'has' || composingChip.field === '!has';
+        const isHas =
+          composingChip.field === 'has' || composingChip.field === '!has';
         if (!isHas) {
           setInlineValueText('');
           setPopoverHighlightIdx(-1);
@@ -669,7 +688,11 @@ export function QueryDSLEditor({
           originalValueRef.current = { value: '', values: [] };
           const chipEl = groupHandle?.getChipEl();
           if (chipEl) {
-            setEditingToken({ chipId: composingChip.id, part, anchorEl: chipEl });
+            setEditingToken({
+              chipId: composingChip.id,
+              part,
+              anchorEl: chipEl,
+            });
             chipEditingRef.current = true;
             setShowDropdown(false);
             // Focus inline input after DOM update

@@ -138,7 +138,6 @@ describe('Edge Cases', () => {
     });
   });
 
-
   describe('round-trip consistency', () => {
     it('should preserve semantics through parse → serialize', () => {
       const input = 'country:KR and level:error';

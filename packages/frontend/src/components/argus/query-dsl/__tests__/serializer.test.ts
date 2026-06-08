@@ -61,7 +61,6 @@ describe('Serializer', () => {
     });
   });
 
-
   describe('logical operators', () => {
     it('should serialize AND', () => {
       expect(serialize('country:KR and level:error')).toBe(

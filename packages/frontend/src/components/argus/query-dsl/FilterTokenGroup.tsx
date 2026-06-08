@@ -3,7 +3,12 @@
 // Sentry-style: [field] [operator] [value]  each independently editable
 // ============================================================================
 
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -172,7 +177,8 @@ export const FilterTokenGroup = forwardRef<
       borderRadius: '4px',
       fontSize: '0.8rem',
       fontWeight: part === 'field' ? 600 : 400,
-      border: isSelected || isEditing ? selectedBorder : '1px solid transparent',
+      border:
+        isSelected || isEditing ? selectedBorder : '1px solid transparent',
       backgroundColor: isSelected || isEditing ? selectedBg : 'transparent',
       color: isIncomplete
         ? isDark
@@ -190,11 +196,12 @@ export const FilterTokenGroup = forwardRef<
               ? '#fbbf24'
               : '#d97706',
       '&:hover': {
-        backgroundColor: isSelected || isEditing
-          ? selectedBg
-          : isDark
-            ? 'rgba(255,255,255,0.08)'
-            : 'rgba(0,0,0,0.06)',
+        backgroundColor:
+          isSelected || isEditing
+            ? selectedBg
+            : isDark
+              ? 'rgba(255,255,255,0.08)'
+              : 'rgba(0,0,0,0.06)',
       },
       transition: 'all 0.15s',
       userSelect: 'none' as const,
@@ -205,7 +212,10 @@ export const FilterTokenGroup = forwardRef<
   // ─── Inline value input style ──────────────────────────────────────
 
   const valueColor = isDark ? '#fbbf24' : '#d97706';
-  const inputWidth = Math.max(40, Math.min(300, (editingValueText?.length ?? 0) * 7.5 + 16));
+  const inputWidth = Math.max(
+    40,
+    Math.min(300, (editingValueText?.length ?? 0) * 7.5 + 16)
+  );
 
   // ─── Render ─────────────────────────────────────────────────────────
 

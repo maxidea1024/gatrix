@@ -137,11 +137,13 @@ export function TokenEditDropdown({
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-      {...(isValueType ? {
-        disableAutoFocus: true,
-        disableEnforceFocus: true,
-        disableRestoreFocus: true,
-      } : {})}
+      {...(isValueType
+        ? {
+            disableAutoFocus: true,
+            disableEnforceFocus: true,
+            disableRestoreFocus: true,
+          }
+        : {})}
       slotProps={{
         paper: {
           sx: {
@@ -432,7 +434,7 @@ function ValueSuggestionList({
 
   // Extract last token after comma for filtering
   const lastToken = filterText.includes(',')
-    ? filterText.split(',').pop()?.trim() ?? ''
+    ? (filterText.split(',').pop()?.trim() ?? '')
     : filterText.trim();
 
   const filtered =
@@ -487,7 +489,9 @@ function ValueSuggestionList({
                 outlineOffset: -1,
                 // Checked items: subtle background
                 backgroundColor: isChecked
-                  ? (isDark ? 'rgba(124,138,255,0.10)' : 'rgba(92,107,192,0.08)')
+                  ? isDark
+                    ? 'rgba(124,138,255,0.10)'
+                    : 'rgba(92,107,192,0.08)'
                   : 'transparent',
                 '&:hover': {
                   backgroundColor: isDark
@@ -514,9 +518,11 @@ function ValueSuggestionList({
                   height: 14,
                   flexShrink: 0,
                   borderRadius: '3px',
-                  border: `1px solid ${isChecked ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
+                  border: `1px solid ${isChecked ? 'transparent' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
                   backgroundColor: isChecked
-                    ? (isDark ? '#7c8aff' : '#5c6bc0')
+                    ? isDark
+                      ? '#7c8aff'
+                      : '#5c6bc0'
                     : 'transparent',
                   color: '#fff',
                   fontSize: 10,
