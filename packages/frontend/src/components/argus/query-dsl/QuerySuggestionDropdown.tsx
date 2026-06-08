@@ -691,32 +691,40 @@ export const QuerySuggestionDropdown = forwardRef<
                           />
                         );
                       }
-                      // Values → show selected indicator (checkmark) when value is selected
                       if (isValue) {
                         const isChecked = selectedValues.has(item.label);
-                        if (hasMultipleValues && isChecked) {
+                        if (hasMultipleValues) {
                           return (
                             <Box
-                              component="span"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onSelect(item, true);
+                              }}
                               sx={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                width: 16,
-                                height: 16,
+                                width: 14,
+                                height: 14,
                                 flexShrink: 0,
+                                cursor: 'pointer',
                                 borderRadius: '3px',
-                                backgroundColor: isDark ? '#7c8aff' : '#5c6bc0',
+                                border: `1px solid ${isChecked ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
+                                backgroundColor: isChecked
+                                  ? (isDark ? '#7c8aff' : '#5c6bc0')
+                                  : 'transparent',
                                 color: '#fff',
-                                fontSize: 11,
+                                fontSize: 10,
                                 fontWeight: 700,
+                                lineHeight: 1,
                               }}
                             >
-                              ✓
+                              {isChecked && '✓'}
                             </Box>
                           );
                         }
-                        return <Box sx={{ width: 16, flexShrink: 0 }} />;
+                        return <Box sx={{ width: 14, flexShrink: 0 }} />;
                       }
                       // Everything else → category badge
                       const badgeKey = isLogical

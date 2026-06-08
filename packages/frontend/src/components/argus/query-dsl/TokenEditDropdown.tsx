@@ -479,23 +479,21 @@ function ValueEditor({
     onConfirm(vals.join(', '), vals);
   };
 
-  const handleItemClick = (v: string, e?: React.MouseEvent) => {
-    const isCtrlClick = !!(e?.ctrlKey || e?.metaKey);
-    if (hasMultiValues || isCtrlClick) {
-      // Toggle multi-select
-      const nextSet = new Set(currentSelected);
-      if (nextSet.has(v)) {
-        nextSet.delete(v);
-      } else {
-        nextSet.add(v);
-      }
-      const vals = Array.from(nextSet);
-      setValueInput(vals.join(', '));
-      // Immediately update chip in real-time without closing the dropdown
-      onUpdate({ value: vals[0] ?? '', values: vals });
+  const handleCheckboxClick = (v: string) => {
+    const nextSet = new Set(currentSelected);
+    if (nextSet.has(v)) {
+      nextSet.delete(v);
     } else {
-      onConfirm(v);
+      nextSet.add(v);
     }
+    const vals = Array.from(nextSet);
+    setValueInput(vals.join(', '));
+    // Immediately update chip in real-time without closing the dropdown
+    onUpdate({ value: vals[0] ?? '', values: vals });
+  };
+
+  const handleTextClick = (v: string) => {
+    onConfirm(v);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -509,7 +507,7 @@ function ValueEditor({
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < items.length) {
-        handleItemClick(items[selectedIndex]);
+        handleTextClick(items[selectedIndex]);
       } else {
         if (hasMultiValues) {
           handleApplyMulti();
@@ -564,7 +562,14 @@ function ValueEditor({
             return (
               <ListItemButton
                 key={v}
-                onClick={(e) => handleItemClick(v, e)}
+                onClick={(e) => {
+                  const isCtrlClick = !!(e.ctrlKey || e.metaKey);
+                  if (isCtrlClick) {
+                    handleCheckboxClick(v);
+                  } else {
+                    handleTextClick(v);
+                  }
+                }}
                 selected={isHighlighted}
                 sx={{
                   py: 0.25,
@@ -579,29 +584,33 @@ function ValueEditor({
                   },
                 }}
               >
-                {/* Selected indicator: checkmark badge */}
-                {isSelected ? (
-                  <Box
-                    component="span"
-                    sx={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 16,
-                      height: 16,
-                      flexShrink: 0,
-                      borderRadius: '3px',
-                      backgroundColor: isDark ? '#7c8aff' : '#5c6bc0',
-                      color: '#fff',
-                      fontSize: 11,
-                      fontWeight: 700,
-                    }}
-                  >
-                    ✓
-                  </Box>
-                ) : (
-                  <Box sx={{ width: 16, flexShrink: 0 }} />
-                )}
+                {/* Clickable Checkbox Box */}
+                <Box
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCheckboxClick(v);
+                  }}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 14,
+                    height: 14,
+                    flexShrink: 0,
+                    cursor: 'pointer',
+                    borderRadius: '3px',
+                    border: `1px solid ${isSelected ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
+                    backgroundColor: isSelected
+                      ? (isDark ? '#7c8aff' : '#5c6bc0')
+                      : 'transparent',
+                    color: '#fff',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                  }}
+                >
+                  {isSelected && '✓'}
+                </Box>
                 <ListItemText
                   primary={v}
                   primaryTypographyProps={{
