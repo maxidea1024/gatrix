@@ -250,8 +250,8 @@ export default function DatetimeValueEditor({
             onChange={(d) => handleDateChange(d, 'from')}
             onAccept={(d) => handleDateAccept(d, 'from')}
             timezone={storedTz}
-            ampm={true}
-            format="YYYY-MM-DD A hh:mm"
+            ampm={false}
+            format="YYYY-MM-DD HH:mm"
             views={['year', 'month', 'day', 'hours', 'minutes']}
             timeSteps={{ minutes: 1 }}
             slotProps={{
@@ -285,8 +285,8 @@ export default function DatetimeValueEditor({
               onChange={(d) => handleDateChange(d, 'to')}
               onAccept={(d) => handleDateAccept(d, 'to')}
               timezone={storedTz}
-              ampm={true}
-              format="YYYY-MM-DD A hh:mm"
+              ampm={false}
+              format="YYYY-MM-DD HH:mm"
               views={['year', 'month', 'day', 'hours', 'minutes']}
               timeSteps={{ minutes: 1 }}
               minDateTime={fromValue ?? undefined}
