@@ -661,8 +661,15 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         // Top-level columns can be queried directly (not from attributes Map)
         const TOP_LEVEL_COLUMNS = new Set([
-          'message', 'body', 'level', 'service', 'environment',
-          'release', 'logger_name', 'trace_id', 'span_id',
+          'message',
+          'body',
+          'level',
+          'service',
+          'environment',
+          'release',
+          'logger_name',
+          'trace_id',
+          'span_id',
         ]);
 
         let sql: string;

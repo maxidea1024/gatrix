@@ -159,8 +159,12 @@ describe('Spec 11.1: Suggestions per context', () => {
   it('LOGICAL_OPERATOR context → AND, OR', () => {
     const { suggestions } = pipeline('level:error ');
     // Logical suggestions now use uppercase labels
-    expect(suggestions.some((s) => s.label === 'AND' || s.label === 'and')).toBe(true);
-    expect(suggestions.some((s) => s.label === 'OR' || s.label === 'or')).toBe(true);
+    expect(
+      suggestions.some((s) => s.label === 'AND' || s.label === 'and')
+    ).toBe(true);
+    expect(suggestions.some((s) => s.label === 'OR' || s.label === 'or')).toBe(
+      true
+    );
   });
 
   it('environment: → facet values', () => {
@@ -187,10 +191,14 @@ describe('Spec 10: Autocomplete rules', () => {
   // Rule 5: logical op adds space
   it('Rule 5: logical op adds trailing space', () => {
     const { ctx, suggestions } = pipeline('level:error ');
-    const andItem = suggestions.find((s) => s.label === 'AND' || s.label === 'and');
+    const andItem = suggestions.find(
+      (s) => s.label === 'AND' || s.label === 'and'
+    );
     expect(andItem).toBeDefined();
     const result = applyCompletion('level:error ', ctx, andItem!);
-    expect(result.text.endsWith('AND ') || result.text.endsWith('and ')).toBe(true);
+    expect(result.text.endsWith('AND ') || result.text.endsWith('and ')).toBe(
+      true
+    );
   });
 
   // shouldKeepDropdownOpen: field/operator → true, value/logical → false

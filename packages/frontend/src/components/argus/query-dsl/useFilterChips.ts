@@ -5,7 +5,12 @@
 
 import { tokenize } from './lexer';
 import { TokenType } from './types';
-import type { Token, Expression, FilterExpression, QueryOperator } from './types';
+import type {
+  Token,
+  Expression,
+  FilterExpression,
+  QueryOperator,
+} from './types';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -122,11 +127,11 @@ function negateOperator(op: QueryOperator): QueryOperator {
   const negMap: Record<string, QueryOperator> = {
     '=': '!=',
     '!=': '=',
-    'contains': '!contains',
+    contains: '!contains',
     '!contains': 'contains',
-    'startsWith': '!startsWith',
+    startsWith: '!startsWith',
     '!startsWith': 'startsWith',
-    'endsWith': '!endsWith',
+    endsWith: '!endsWith',
     '!endsWith': 'endsWith',
   };
   return negMap[op] ?? op;
@@ -197,10 +202,14 @@ function chipToQueryPart(chip: FilterChip): string {
 
   // Function operators: field:op("value") — including negated forms
   const funcOps = [
-    'contains', '!contains',
-    'startsWith', '!startsWith',
-    'endsWith', '!endsWith',
-    'before', 'after',
+    'contains',
+    '!contains',
+    'startsWith',
+    '!startsWith',
+    'endsWith',
+    '!endsWith',
+    'before',
+    'after',
   ];
   if (funcOps.includes(operator as string)) {
     return `${field}:${operator}("${escapeQuotes(value)}")`;
@@ -231,10 +240,12 @@ function needsQuoting(value: string): boolean {
 
 // ─── Query string → FilterChip[] (convenience) ──────────────────────────────
 
-
-
 const COMPARE_OPS = new Set([
-  TokenType.NE, TokenType.GT, TokenType.GTE, TokenType.LT, TokenType.LTE,
+  TokenType.NE,
+  TokenType.GT,
+  TokenType.GTE,
+  TokenType.LT,
+  TokenType.LTE,
 ]);
 
 const FUNC_OPS: Record<string, QueryOperator> = {
@@ -249,7 +260,10 @@ const FUNC_OPS: Record<string, QueryOperator> = {
 };
 
 const VALUE_TYPES = new Set([
-  TokenType.STRING, TokenType.NUMBER, TokenType.BOOLEAN, TokenType.FIELD,
+  TokenType.STRING,
+  TokenType.NUMBER,
+  TokenType.BOOLEAN,
+  TokenType.FIELD,
 ]);
 
 /**
@@ -263,8 +277,11 @@ export function queryToChips(query: string): FilterChip[] {
   const chips: FilterChip[] = [];
   let i = 0;
 
-  const tok = (offset = 0): Token => tokens[i + offset] ?? tokens[tokens.length - 1];
-  const advance = () => { i++; };
+  const tok = (offset = 0): Token =>
+    tokens[i + offset] ?? tokens[tokens.length - 1];
+  const advance = () => {
+    i++;
+  };
 
   while (tok().type !== TokenType.EOF) {
     const t = tok();
@@ -282,12 +299,23 @@ export function queryToChips(query: string): FilterChip[] {
       const valTok = tok();
       if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
         chips.push({
-          id: nextChipId(), type: 'filter', field: '!has',
-          operator: '=', value: valTok.value, quoted: false,
+          id: nextChipId(),
+          type: 'filter',
+          field: '!has',
+          operator: '=',
+          value: valTok.value,
+          quoted: false,
         });
         advance();
       } else {
-        chips.push({ id: nextChipId(), type: 'filter', field: '!has', operator: '=', value: '', quoted: false });
+        chips.push({
+          id: nextChipId(),
+          type: 'filter',
+          field: '!has',
+          operator: '=',
+          value: '',
+          quoted: false,
+        });
       }
       continue;
     }
@@ -303,12 +331,23 @@ export function queryToChips(query: string): FilterChip[] {
         const valTok = tok();
         if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
           chips.push({
-            id: nextChipId(), type: 'filter', field: 'has',
-            operator: '=', value: valTok.value, quoted: false,
+            id: nextChipId(),
+            type: 'filter',
+            field: 'has',
+            operator: '=',
+            value: valTok.value,
+            quoted: false,
           });
           advance();
         } else {
-          chips.push({ id: nextChipId(), type: 'filter', field: 'has', operator: '=', value: '', quoted: false });
+          chips.push({
+            id: nextChipId(),
+            type: 'filter',
+            field: 'has',
+            operator: '=',
+            value: '',
+            quoted: false,
+          });
         }
         continue;
       }
@@ -326,12 +365,23 @@ export function queryToChips(query: string): FilterChip[] {
         if (VALUE_TYPES.has(valTok.type)) {
           const rawChar = query[valTok.start];
           chips.push({
-            id: nextChipId(), type: 'filter', field, operator,
-            value: valTok.value, quoted: rawChar === '"',
+            id: nextChipId(),
+            type: 'filter',
+            field,
+            operator,
+            value: valTok.value,
+            quoted: rawChar === '"',
           });
           advance();
         } else {
-          chips.push({ id: nextChipId(), type: 'filter', field, operator, value: '', quoted: false });
+          chips.push({
+            id: nextChipId(),
+            type: 'filter',
+            field,
+            operator,
+            value: '',
+            quoted: false,
+          });
         }
         continue;
       }
@@ -345,12 +395,23 @@ export function queryToChips(query: string): FilterChip[] {
           const valTok = tok();
           if (VALUE_TYPES.has(valTok.type)) {
             chips.push({
-              id: nextChipId(), type: 'filter', field, operator: funcOp,
-              value: valTok.value, quoted: true,
+              id: nextChipId(),
+              type: 'filter',
+              field,
+              operator: funcOp,
+              value: valTok.value,
+              quoted: true,
             });
             advance();
           } else {
-            chips.push({ id: nextChipId(), type: 'filter', field, operator: funcOp, value: '', quoted: false });
+            chips.push({
+              id: nextChipId(),
+              type: 'filter',
+              field,
+              operator: funcOp,
+              value: '',
+              quoted: false,
+            });
           }
           if (tok().type === TokenType.RPAREN) advance(); // skip )
         } else {
@@ -358,12 +419,23 @@ export function queryToChips(query: string): FilterChip[] {
           const valTok = tok();
           if (VALUE_TYPES.has(valTok.type)) {
             chips.push({
-              id: nextChipId(), type: 'filter', field, operator: funcOp,
-              value: valTok.value, quoted: true,
+              id: nextChipId(),
+              type: 'filter',
+              field,
+              operator: funcOp,
+              value: valTok.value,
+              quoted: true,
             });
             advance();
           } else {
-            chips.push({ id: nextChipId(), type: 'filter', field, operator: funcOp, value: '', quoted: false });
+            chips.push({
+              id: nextChipId(),
+              type: 'filter',
+              field,
+              operator: funcOp,
+              value: '',
+              quoted: false,
+            });
           }
         }
         continue;
@@ -373,21 +445,36 @@ export function queryToChips(query: string): FilterChip[] {
       if (VALUE_TYPES.has(opTok.type)) {
         const rawChar = query[opTok.start];
         chips.push({
-          id: nextChipId(), type: 'filter', field, operator: '=',
-          value: opTok.value, quoted: rawChar === '"',
+          id: nextChipId(),
+          type: 'filter',
+          field,
+          operator: '=',
+          value: opTok.value,
+          quoted: rawChar === '"',
         });
         advance();
         continue;
       }
 
       // Incomplete: field: (no value)
-      chips.push({ id: nextChipId(), type: 'filter', field, operator: '=', value: '', quoted: false });
+      chips.push({
+        id: nextChipId(),
+        type: 'filter',
+        field,
+        operator: '=',
+        value: '',
+        quoted: false,
+      });
       continue;
     }
 
     // ── AND / OR → logical chip ──
     if (t.type === TokenType.AND || t.type === TokenType.OR) {
-      chips.push({ id: nextChipId(), type: 'logical', label: t.value.toUpperCase() });
+      chips.push({
+        id: nextChipId(),
+        type: 'logical',
+        label: t.value.toUpperCase(),
+      });
       advance();
       continue;
     }
@@ -416,8 +503,12 @@ export function queryToChips(query: string): FilterChip[] {
     // ── Standalone string/field → free text message search ──
     if (t.type === TokenType.STRING || t.type === TokenType.FIELD) {
       chips.push({
-        id: nextChipId(), type: 'filter', field: 'message',
-        operator: 'contains', value: t.value, quoted: true,
+        id: nextChipId(),
+        type: 'filter',
+        field: 'message',
+        operator: 'contains',
+        value: t.value,
+        quoted: true,
       });
       advance();
       continue;

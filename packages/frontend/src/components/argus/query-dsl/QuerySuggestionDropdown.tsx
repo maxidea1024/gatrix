@@ -75,23 +75,75 @@ interface CategoryBadge {
 
 const CATEGORY_BADGES: Record<string, CategoryBadge> = {
   // Field domain categories
-  log:       { label: 'LOG', color: '#7c8aff', bg: 'rgba(124,138,255,0.12)', bgLight: 'rgba(92,107,192,0.10)' },
-  resource:  { label: 'RES', color: '#6ec87a', bg: 'rgba(110,200,122,0.12)', bgLight: 'rgba(56,142,60,0.10)' },
-  trace:     { label: 'TRC', color: '#e6994a', bg: 'rgba(230,153,74,0.12)',  bgLight: 'rgba(230,81,0,0.10)' },
-  event:     { label: 'EVT', color: '#d97ce6', bg: 'rgba(217,124,230,0.12)', bgLight: 'rgba(156,39,176,0.10)' },
-  user:      { label: 'USR', color: '#4fc3f7', bg: 'rgba(79,195,247,0.12)',  bgLight: 'rgba(2,136,209,0.10)' },
-  attribute: { label: 'ATR', color: '#90a4ae', bg: 'rgba(144,164,174,0.12)', bgLight: 'rgba(96,125,139,0.10)' },
+  log: {
+    label: 'LOG',
+    color: '#7c8aff',
+    bg: 'rgba(124,138,255,0.12)',
+    bgLight: 'rgba(92,107,192,0.10)',
+  },
+  resource: {
+    label: 'RES',
+    color: '#6ec87a',
+    bg: 'rgba(110,200,122,0.12)',
+    bgLight: 'rgba(56,142,60,0.10)',
+  },
+  trace: {
+    label: 'TRC',
+    color: '#e6994a',
+    bg: 'rgba(230,153,74,0.12)',
+    bgLight: 'rgba(230,81,0,0.10)',
+  },
+  event: {
+    label: 'EVT',
+    color: '#d97ce6',
+    bg: 'rgba(217,124,230,0.12)',
+    bgLight: 'rgba(156,39,176,0.10)',
+  },
+  user: {
+    label: 'USR',
+    color: '#4fc3f7',
+    bg: 'rgba(79,195,247,0.12)',
+    bgLight: 'rgba(2,136,209,0.10)',
+  },
+  attribute: {
+    label: 'ATR',
+    color: '#90a4ae',
+    bg: 'rgba(144,164,174,0.12)',
+    bgLight: 'rgba(96,125,139,0.10)',
+  },
   // Suggestion categories
-  operator:  { label: 'OP',  color: '#e6994a', bg: 'rgba(230,153,74,0.12)',  bgLight: 'rgba(230,81,0,0.08)' },
-  logical:   { label: 'KW',  color: '#b07adb', bg: 'rgba(176,122,219,0.12)', bgLight: 'rgba(123,31,162,0.08)' },
-  paren:     { label: '( )', color: '#b07adb', bg: 'rgba(176,122,219,0.12)', bgLight: 'rgba(123,31,162,0.08)' },
+  operator: {
+    label: 'OP',
+    color: '#e6994a',
+    bg: 'rgba(230,153,74,0.12)',
+    bgLight: 'rgba(230,81,0,0.08)',
+  },
+  logical: {
+    label: 'KW',
+    color: '#b07adb',
+    bg: 'rgba(176,122,219,0.12)',
+    bgLight: 'rgba(123,31,162,0.08)',
+  },
+  paren: {
+    label: '( )',
+    color: '#b07adb',
+    bg: 'rgba(176,122,219,0.12)',
+    bgLight: 'rgba(123,31,162,0.08)',
+  },
 };
 
 // Legacy color map for non-badge uses
 const CATEGORY_COLORS: Record<string, string> = {
-  log: '#7c8aff', resource: '#6ec87a', trace: '#e6994a',
-  event: '#d97ce6', user: '#4fc3f7', attribute: '#90a4ae',
-  field: '#7c8aff', operator: '#e6994a', value: '#6ec87a', logical: '#b07adb',
+  log: '#7c8aff',
+  resource: '#6ec87a',
+  trace: '#e6994a',
+  event: '#d97ce6',
+  user: '#4fc3f7',
+  attribute: '#90a4ae',
+  field: '#7c8aff',
+  operator: '#e6994a',
+  value: '#6ec87a',
+  logical: '#b07adb',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -586,10 +638,16 @@ export const QuerySuggestionDropdown = forwardRef<
                       // Smart suggestions → search icon
                       if (isSmart) {
                         return (
-                          <SearchIcon sx={{
-                            fontSize: 13, flexShrink: 0, ml: '1px',
-                            color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
-                          }} />
+                          <SearchIcon
+                            sx={{
+                              fontSize: 13,
+                              flexShrink: 0,
+                              ml: '1px',
+                              color: isDark
+                                ? 'rgba(255,255,255,0.35)'
+                                : 'rgba(0,0,0,0.35)',
+                            }}
+                          />
                         );
                       }
                       // Values → indent spacer (no badge)
@@ -597,33 +655,56 @@ export const QuerySuggestionDropdown = forwardRef<
                         return <Box sx={{ width: 22, flexShrink: 0 }} />;
                       }
                       // Everything else → category badge
-                      const badgeKey = isLogical ? 'logical' : isParen ? 'paren'
-                        : item.category === 'operator' ? 'operator'
-                        : (item.fieldCategory ?? item.category);
+                      const badgeKey = isLogical
+                        ? 'logical'
+                        : isParen
+                          ? 'paren'
+                          : item.category === 'operator'
+                            ? 'operator'
+                            : (item.fieldCategory ?? item.category);
                       const badge = CATEGORY_BADGES[badgeKey];
                       if (badge) {
                         return (
-                          <Box sx={{
-                            fontSize: '8px', fontWeight: 700, flexShrink: 0,
-                            fontFamily: '"JetBrains Mono", monospace',
-                            color: isDark ? badge.color : badge.color,
-                            backgroundColor: isDark ? badge.bg : badge.bgLight,
-                            borderRadius: '3px', px: '3px', py: '1px',
-                            lineHeight: 1.3, letterSpacing: '0.02em',
-                            minWidth: 22, textAlign: 'center',
-                            whiteSpace: 'nowrap',
-                          }}>
+                          <Box
+                            sx={{
+                              fontSize: '8px',
+                              fontWeight: 700,
+                              flexShrink: 0,
+                              fontFamily: '"JetBrains Mono", monospace',
+                              color: isDark ? badge.color : badge.color,
+                              backgroundColor: isDark
+                                ? badge.bg
+                                : badge.bgLight,
+                              borderRadius: '3px',
+                              px: '3px',
+                              py: '1px',
+                              lineHeight: 1.3,
+                              letterSpacing: '0.02em',
+                              minWidth: 22,
+                              textAlign: 'center',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
                             {badge.label}
                           </Box>
                         );
                       }
                       // Fallback dot
                       return (
-                        <Box sx={{
-                          width: 6, height: 6, borderRadius: '50%',
-                          backgroundColor: CATEGORY_COLORS[item.fieldCategory ?? item.category] ?? '#90a4ae',
-                          opacity: 0.7, flexShrink: 0, ml: '8px',
-                        }} />
+                        <Box
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            backgroundColor:
+                              CATEGORY_COLORS[
+                                item.fieldCategory ?? item.category
+                              ] ?? '#90a4ae',
+                            opacity: 0.7,
+                            flexShrink: 0,
+                            ml: '8px',
+                          }}
+                        />
                       );
                     })()}
 
@@ -757,8 +838,7 @@ function renderSuggestionLabel(
           }}
         >
           {field}
-        </span>
-        {' '}
+        </span>{' '}
         <span
           style={{
             color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
@@ -766,8 +846,7 @@ function renderSuggestionLabel(
           }}
         >
           {op}
-        </span>
-        {' '}
+        </span>{' '}
         <span
           style={{
             color: isDark ? '#e6994a' : '#e65100',
@@ -786,7 +865,11 @@ function renderSuggestionLabel(
   }
 
   // has / not has operators: show with operator styling
-  if (item.label === 'has' || item.label === '!has' || item.label === 'not has') {
+  if (
+    item.label === 'has' ||
+    item.label === '!has' ||
+    item.label === 'not has'
+  ) {
     return (
       <span
         style={{

@@ -218,27 +218,17 @@ describe('Backend serializer: negated function operators', () => {
 
 describe('Complex queries with negated operators', () => {
   it('negated contains AND positive filter → roundtrip', () => {
-    const result = roundtrip(
-      'message:!contains("timeout") AND level:error'
-    );
+    const result = roundtrip('message:!contains("timeout") AND level:error');
     expect(result).toBe('message:!contains("timeout") AND level:error');
   });
 
   it('multiple negated operators → roundtrip', () => {
-    const result = roundtrip(
-      'message:!contains("timeout") AND logger:!=LuaVM'
-    );
-    expect(result).toBe(
-      'message:!contains("timeout") AND logger:!=LuaVM'
-    );
+    const result = roundtrip('message:!contains("timeout") AND logger:!=LuaVM');
+    expect(result).toBe('message:!contains("timeout") AND logger:!=LuaVM');
   });
 
   it('negated with has → roundtrip', () => {
-    const result = roundtrip(
-      '!has:logger AND message:!contains("timeout")'
-    );
-    expect(result).toBe(
-      '!has:logger AND message:!contains("timeout")'
-    );
+    const result = roundtrip('!has:logger AND message:!contains("timeout")');
+    expect(result).toBe('!has:logger AND message:!contains("timeout")');
   });
 });

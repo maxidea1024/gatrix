@@ -21,9 +21,18 @@ import { QueryParser } from '../utils/queryParser';
 // ─── Test Fixtures ───────────────────────────────────────────────────────────
 
 const ALLOWED_COLUMNS = new Set([
-  'log_id', 'trace_id', 'span_id', 'issue_id', 'timestamp',
-  'level', 'logger_name', 'message', 'body', 'service',
-  'environment', 'release',
+  'log_id',
+  'trace_id',
+  'span_id',
+  'issue_id',
+  'timestamp',
+  'level',
+  'logger_name',
+  'message',
+  'body',
+  'service',
+  'environment',
+  'release',
 ]);
 
 const COLUMN_ALIASES: Record<string, string> = {
@@ -53,21 +62,23 @@ describe('Colon + comparison operators', () => {
     const { where, params } = parseSql('logger_name:!=UE4Core');
     expect(where).toContain('logger_name !=');
     // Verify param has the value
-    const paramKey = Object.keys(params).find(k => params[k] === 'UE4Core');
+    const paramKey = Object.keys(params).find((k) => params[k] === 'UE4Core');
     expect(paramKey).toBeDefined();
   });
 
   test('key:!=value with alias → resolved column != param', () => {
     const { where, params } = parseSql('logger:!=LuaVM');
     expect(where).toContain('logger_name !=');
-    const paramKey = Object.keys(params).find(k => params[k] === 'LuaVM');
+    const paramKey = Object.keys(params).find((k) => params[k] === 'LuaVM');
     expect(paramKey).toBeDefined();
   });
 
   test('key:!=quoted_value → column != param', () => {
     const { where, params } = parseSql('service:!="my service"');
     expect(where).toContain('service !=');
-    const paramKey = Object.keys(params).find(k => params[k] === 'my service');
+    const paramKey = Object.keys(params).find(
+      (k) => params[k] === 'my service'
+    );
     expect(paramKey).toBeDefined();
   });
 
@@ -94,7 +105,7 @@ describe('Colon + comparison operators', () => {
   test('key:=value (positive) still works', () => {
     const { where, params } = parseSql('logger_name:UE4Core');
     expect(where).toContain('logger_name =');
-    const paramKey = Object.keys(params).find(k => params[k] === 'UE4Core');
+    const paramKey = Object.keys(params).find((k) => params[k] === 'UE4Core');
     expect(paramKey).toBeDefined();
   });
 });
@@ -108,7 +119,7 @@ describe('Compound text operators (positive)', () => {
     const { where, params } = parseSql('message.contains:timeout');
     expect(where).toContain('ILIKE');
     expect(where).not.toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === '%timeout%');
+    const paramKey = Object.keys(params).find((k) => params[k] === '%timeout%');
     expect(paramKey).toBeDefined();
   });
 
@@ -116,7 +127,7 @@ describe('Compound text operators (positive)', () => {
     const { where, params } = parseSql('message.starts_with:Error');
     expect(where).toContain('ILIKE');
     expect(where).not.toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === 'Error%');
+    const paramKey = Object.keys(params).find((k) => params[k] === 'Error%');
     expect(paramKey).toBeDefined();
   });
 
@@ -124,7 +135,7 @@ describe('Compound text operators (positive)', () => {
     const { where, params } = parseSql('message.ends_with:failed');
     expect(where).toContain('ILIKE');
     expect(where).not.toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === '%failed');
+    const paramKey = Object.keys(params).find((k) => params[k] === '%failed');
     expect(paramKey).toBeDefined();
   });
 });
@@ -137,28 +148,32 @@ describe('Compound text operators (negated)', () => {
   test('.not_contains: → NOT ILIKE %value%', () => {
     const { where, params } = parseSql('message.not_contains:timeout');
     expect(where).toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === '%timeout%');
+    const paramKey = Object.keys(params).find((k) => params[k] === '%timeout%');
     expect(paramKey).toBeDefined();
   });
 
   test('.not_starts_with: → NOT ILIKE value%', () => {
     const { where, params } = parseSql('message.not_starts_with:Error');
     expect(where).toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === 'Error%');
+    const paramKey = Object.keys(params).find((k) => params[k] === 'Error%');
     expect(paramKey).toBeDefined();
   });
 
   test('.not_ends_with: → NOT ILIKE %value', () => {
     const { where, params } = parseSql('message.not_ends_with:failed');
     expect(where).toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === '%failed');
+    const paramKey = Object.keys(params).find((k) => params[k] === '%failed');
     expect(paramKey).toBeDefined();
   });
 
   test('.not_contains: with quoted value', () => {
-    const { where, params } = parseSql('message.not_contains:"connection reset"');
+    const { where, params } = parseSql(
+      'message.not_contains:"connection reset"'
+    );
     expect(where).toContain('NOT ILIKE');
-    const paramKey = Object.keys(params).find(k => params[k] === '%connection reset%');
+    const paramKey = Object.keys(params).find(
+      (k) => params[k] === '%connection reset%'
+    );
     expect(paramKey).toBeDefined();
   });
 });
@@ -196,7 +211,7 @@ describe('Prefix negation', () => {
     const { where, params } = parseSql('!level:error');
     expect(where).toContain('NOT');
     expect(where).toContain('level =');
-    const paramKey = Object.keys(params).find(k => params[k] === 'error');
+    const paramKey = Object.keys(params).find((k) => params[k] === 'error');
     expect(paramKey).toBeDefined();
   });
 
@@ -251,7 +266,9 @@ describe('Complex queries with negated operators', () => {
   });
 
   test('parenthesized negated expression', () => {
-    const { where } = parseSql('(level:error OR level:warning) AND service:!=test');
+    const { where } = parseSql(
+      '(level:error OR level:warning) AND service:!=test'
+    );
     expect(where).toContain('OR');
     expect(where).toContain('AND');
     expect(where).toContain('service !=');

@@ -31,7 +31,13 @@ export function getSuggestions(
 ): SuggestionItem[] {
   switch (context.type) {
     case 'FIELD':
-      return getFieldSuggestions(context, domain, facets, maxSuggestions, chips);
+      return getFieldSuggestions(
+        context,
+        domain,
+        facets,
+        maxSuggestions,
+        chips
+      );
     case 'OPERATOR':
       // Spec 10.6 Rule 1: EXPECT_OPERATOR_OR_VALUE → show operators AND values
       return getOperatorAndValueSuggestions(
@@ -108,7 +114,7 @@ function getFieldSuggestions(
   domain: QueryDomain,
   facets?: Map<string, string[]>,
   max: number = DEFAULT_MAX_SUGGESTIONS,
-  chips?: { type?: string; label?: string }[],
+  chips?: { type?: string; label?: string }[]
 ): SuggestionItem[] {
   const fields = getFieldsForDomain(domain);
   const prefix = context.prefix.toLowerCase();
@@ -142,19 +148,55 @@ function getFieldSuggestions(
     const escapedPrefix = originalPrefix.replace(/"/g, '\\"');
 
     // Ordered from least to most common (unshift reverses order → top items first)
-    const smartSuggestions: { label: string; insertText: string; desc: string }[] = [
+    const smartSuggestions: {
+      label: string;
+      insertText: string;
+      desc: string;
+    }[] = [
       // Primary — most common
-      { label: `message contains ${originalPrefix}`, insertText: `message:contains("${escapedPrefix}")`, desc: 'dsl.smart.messageContains' },
-      { label: `message is ${originalPrefix}`, insertText: `message:"${escapedPrefix}"`, desc: 'dsl.smart.messageIs' },
+      {
+        label: `message contains ${originalPrefix}`,
+        insertText: `message:contains("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageContains',
+      },
+      {
+        label: `message is ${originalPrefix}`,
+        insertText: `message:"${escapedPrefix}"`,
+        desc: 'dsl.smart.messageIs',
+      },
       // Negation
-      { label: `message not contains ${originalPrefix}`, insertText: `message:!contains("${escapedPrefix}")`, desc: 'dsl.smart.messageNotContains' },
-      { label: `message is not ${originalPrefix}`, insertText: `message:!"${escapedPrefix}"`, desc: 'dsl.smart.messageIsNot' },
+      {
+        label: `message not contains ${originalPrefix}`,
+        insertText: `message:!contains("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageNotContains',
+      },
+      {
+        label: `message is not ${originalPrefix}`,
+        insertText: `message:!"${escapedPrefix}"`,
+        desc: 'dsl.smart.messageIsNot',
+      },
       // Prefix/suffix
-      { label: `message starts with ${originalPrefix}`, insertText: `message:startsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageStartsWith' },
-      { label: `message ends with ${originalPrefix}`, insertText: `message:endsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageEndsWith' },
+      {
+        label: `message starts with ${originalPrefix}`,
+        insertText: `message:startsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageStartsWith',
+      },
+      {
+        label: `message ends with ${originalPrefix}`,
+        insertText: `message:endsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageEndsWith',
+      },
       // Negated prefix/suffix
-      { label: `message not starts with ${originalPrefix}`, insertText: `message:!startsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageNotStartsWith' },
-      { label: `message not ends with ${originalPrefix}`, insertText: `message:!endsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageNotEndsWith' },
+      {
+        label: `message not starts with ${originalPrefix}`,
+        insertText: `message:!startsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageNotStartsWith',
+      },
+      {
+        label: `message not ends with ${originalPrefix}`,
+        insertText: `message:!endsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageNotEndsWith',
+      },
     ];
 
     // unshift in reverse so first item ends up at top
@@ -171,10 +213,16 @@ function getFieldSuggestions(
 
   // ── Logical operator and paren suggestions (context-aware) ──
   const lastChip = chips && chips.length > 0 ? chips[chips.length - 1] : null;
-  const hasFilterChip = chips?.some(c => c.type === 'filter' || (c.type === 'paren' && c.label === ')'));
+  const hasFilterChip = chips?.some(
+    (c) => c.type === 'filter' || (c.type === 'paren' && c.label === ')')
+  );
 
   // AND/OR: available when at least one filter/closeparen chip exists
-  if (hasFilterChip && (lastChip?.type === 'filter' || (lastChip?.type === 'paren' && lastChip?.label === ')'))) {
+  if (
+    hasFilterChip &&
+    (lastChip?.type === 'filter' ||
+      (lastChip?.type === 'paren' && lastChip?.label === ')'))
+  ) {
     if (prefix === '' || 'or'.startsWith(prefix)) {
       results.unshift({
         label: 'OR',
@@ -192,8 +240,10 @@ function getFieldSuggestions(
   }
 
   // ')': available when there's an unmatched '(' in chips
-  const openParens = chips?.filter(c => c.type === 'paren' && c.label === '(').length ?? 0;
-  const closeParens = chips?.filter(c => c.type === 'paren' && c.label === ')').length ?? 0;
+  const openParens =
+    chips?.filter((c) => c.type === 'paren' && c.label === '(').length ?? 0;
+  const closeParens =
+    chips?.filter((c) => c.type === 'paren' && c.label === ')').length ?? 0;
   if (openParens > closeParens && (prefix === '' || ')'.startsWith(prefix))) {
     results.unshift({
       label: ')',
@@ -213,7 +263,12 @@ function getFieldSuggestions(
 
   // ── has / !has existence operators ──
   // Show in All + Logic tabs — unshift to appear at top (before field list)
-  if (prefix === '' || '!has'.startsWith(prefix) || 'not has'.startsWith(prefix) || 'not'.startsWith(prefix)) {
+  if (
+    prefix === '' ||
+    '!has'.startsWith(prefix) ||
+    'not has'.startsWith(prefix) ||
+    'not'.startsWith(prefix)
+  ) {
     results.unshift({
       label: 'not has',
       insertText: '!has:',
@@ -262,7 +317,16 @@ function getOperatorAndValueSuggestions(
       label: context.field,
       type: 'string',
       category: 'log',
-      operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith'],
+      operators: [
+        '=',
+        '!=',
+        'contains',
+        '!contains',
+        'startsWith',
+        '!startsWith',
+        'endsWith',
+        '!endsWith',
+      ],
       searchable: true,
       description: '',
     } as QueryField);
@@ -323,7 +387,16 @@ function getValueSuggestions(
       label: context.field,
       type: 'string',
       category: 'log',
-      operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith'],
+      operators: [
+        '=',
+        '!=',
+        'contains',
+        '!contains',
+        'startsWith',
+        '!startsWith',
+        'endsWith',
+        '!endsWith',
+      ],
       searchable: true,
       description: '',
     } as QueryField);
@@ -518,7 +591,7 @@ function getHasFieldSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  max: number = DEFAULT_MAX_SUGGESTIONS,
+  max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   const prefix = context.prefix.toLowerCase();
   const results: SuggestionItem[] = [];

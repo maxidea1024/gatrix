@@ -27,13 +27,46 @@ import { getOpLabel, getOperatorOptions } from './operator-labels';
 
 // ─── Category badges for HasFieldSelector ────────────────────────────────────
 
-const HAS_CATEGORY_BADGES: Record<string, { label: string; color: string; bg: string; bgLight: string }> = {
-  log:       { label: 'LOG', color: '#7c8aff', bg: 'rgba(124,138,255,0.12)', bgLight: 'rgba(92,107,192,0.10)' },
-  resource:  { label: 'RES', color: '#6ec87a', bg: 'rgba(110,200,122,0.12)', bgLight: 'rgba(56,142,60,0.10)' },
-  trace:     { label: 'TRC', color: '#e6994a', bg: 'rgba(230,153,74,0.12)',  bgLight: 'rgba(230,81,0,0.10)' },
-  event:     { label: 'EVT', color: '#d97ce6', bg: 'rgba(217,124,230,0.12)', bgLight: 'rgba(156,39,176,0.10)' },
-  user:      { label: 'USR', color: '#4fc3f7', bg: 'rgba(79,195,247,0.12)',  bgLight: 'rgba(2,136,209,0.10)' },
-  attribute: { label: 'ATR', color: '#90a4ae', bg: 'rgba(144,164,174,0.12)', bgLight: 'rgba(96,125,139,0.10)' },
+const HAS_CATEGORY_BADGES: Record<
+  string,
+  { label: string; color: string; bg: string; bgLight: string }
+> = {
+  log: {
+    label: 'LOG',
+    color: '#7c8aff',
+    bg: 'rgba(124,138,255,0.12)',
+    bgLight: 'rgba(92,107,192,0.10)',
+  },
+  resource: {
+    label: 'RES',
+    color: '#6ec87a',
+    bg: 'rgba(110,200,122,0.12)',
+    bgLight: 'rgba(56,142,60,0.10)',
+  },
+  trace: {
+    label: 'TRC',
+    color: '#e6994a',
+    bg: 'rgba(230,153,74,0.12)',
+    bgLight: 'rgba(230,81,0,0.10)',
+  },
+  event: {
+    label: 'EVT',
+    color: '#d97ce6',
+    bg: 'rgba(217,124,230,0.12)',
+    bgLight: 'rgba(156,39,176,0.10)',
+  },
+  user: {
+    label: 'USR',
+    color: '#4fc3f7',
+    bg: 'rgba(79,195,247,0.12)',
+    bgLight: 'rgba(2,136,209,0.10)',
+  },
+  attribute: {
+    label: 'ATR',
+    color: '#90a4ae',
+    bg: 'rgba(144,164,174,0.12)',
+    bgLight: 'rgba(96,125,139,0.10)',
+  },
 };
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -265,10 +298,15 @@ export function FilterTokenChip({
           },
         }}
       >
-        {editingPart === 'field' && (
-          isHasChip ? (
+        {editingPart === 'field' &&
+          (isHasChip ? (
             <List dense sx={{ py: 0.5 }}>
-              {([['has', 'has'], ['!has', 'not has']] as const).map(([val, label]) => (
+              {(
+                [
+                  ['has', 'has'],
+                  ['!has', 'not has'],
+                ] as const
+              ).map(([val, label]) => (
                 <ListItemButton
                   key={val}
                   onClick={() => {
@@ -294,7 +332,9 @@ export function FilterTokenChip({
                     }}
                   />
                   {chip.field === val && (
-                    <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+                    <CheckIcon
+                      sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                    />
                   )}
                 </ListItemButton>
               ))}
@@ -306,8 +346,7 @@ export function FilterTokenChip({
               onSelect={handleFieldSelect}
               isDark={isDark}
             />
-          )
-        )}
+          ))}
         {editingPart === 'operator' && (
           <OperatorMenu
             field={field}
@@ -316,8 +355,8 @@ export function FilterTokenChip({
             isDark={isDark}
           />
         )}
-        {editingPart === 'value' && (
-          isHasChip ? (
+        {editingPart === 'value' &&
+          (isHasChip ? (
             <HasFieldSelector
               domain={domain}
               facets={facets}
@@ -334,8 +373,7 @@ export function FilterTokenChip({
               onConfirm={handleValueConfirm}
               isDark={isDark}
             />
-          )
-        )}
+          ))}
       </Popover>
     </>
   );
@@ -513,7 +551,9 @@ function ValueEditor({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
-          placeholder={chip.value || t('dsl.chip.filterValues', 'Filter values...')}
+          placeholder={
+            chip.value || t('dsl.chip.filterValues', 'Filter values...')
+          }
           sx={{
             fontSize: '0.8rem',
             '& input': { py: 0.25 },
@@ -649,16 +689,24 @@ function HasFieldSelector({
               }}
             >
               {badge && (
-                <Box sx={{
-                  fontSize: '8px', fontWeight: 700, flexShrink: 0,
-                  fontFamily: '"JetBrains Mono", monospace',
-                  color: badge.color,
-                  backgroundColor: isDark ? badge.bg : badge.bgLight,
-                  borderRadius: '3px', px: '3px', py: '1px',
-                  lineHeight: 1.3, letterSpacing: '0.02em',
-                  minWidth: 22, textAlign: 'center',
-                  whiteSpace: 'nowrap',
-                }}>
+                <Box
+                  sx={{
+                    fontSize: '8px',
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    fontFamily: '"JetBrains Mono", monospace',
+                    color: badge.color,
+                    backgroundColor: isDark ? badge.bg : badge.bgLight,
+                    borderRadius: '3px',
+                    px: '3px',
+                    py: '1px',
+                    lineHeight: 1.3,
+                    letterSpacing: '0.02em',
+                    minWidth: 22,
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {badge.label}
                 </Box>
               )}
@@ -670,7 +718,9 @@ function HasFieldSelector({
                 }}
               />
               {isCurrent && (
-                <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+                <CheckIcon
+                  sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                />
               )}
             </ListItemButton>
           );

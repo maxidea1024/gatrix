@@ -227,8 +227,14 @@ function isOperatorPrefix(prefix: string): boolean {
     return true;
   // Function operator prefixes
   const funcOps = [
-    'contains', 'startswith', 'endswith', 'before', 'after',
-    '!contains', '!startswith', '!endswith',
+    'contains',
+    'startswith',
+    'endswith',
+    'before',
+    'after',
+    '!contains',
+    '!startswith',
+    '!endswith',
   ];
   return funcOps.some((op) => op.startsWith(p));
 }
