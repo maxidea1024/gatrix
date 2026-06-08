@@ -3,8 +3,9 @@
 // AST ↔ FilterChip[] conversion for tokenized grid editor
 // ============================================================================
 
-import { parse } from './parser';
-import type { Expression, FilterExpression, QueryOperator } from './types';
+import { tokenize } from './lexer';
+import { TokenType } from './types';
+import type { Token, Expression, FilterExpression, QueryOperator } from './types';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -118,16 +119,17 @@ function filterToChip(node: FilterExpression): FilterChip {
 }
 
 function negateOperator(op: QueryOperator): QueryOperator {
-  switch (op) {
-    case '=':
-      return '!=';
-    case '!=':
-      return '=';
-    case 'contains':
-      return 'contains'; // no negated form in our DSL yet
-    default:
-      return op;
-  }
+  const negMap: Record<string, QueryOperator> = {
+    '=': '!=',
+    '!=': '=',
+    'contains': '!contains',
+    '!contains': 'contains',
+    'startsWith': '!startsWith',
+    '!startsWith': 'startsWith',
+    'endsWith': '!endsWith',
+    '!endsWith': 'endsWith',
+  };
+  return negMap[op] ?? op;
 }
 
 // ─── FilterChip[] → DSL string ───────────────────────────────────────────────
@@ -188,12 +190,19 @@ function chipToQueryPart(chip: FilterChip): string {
   const value = chip.value ?? '';
   const quoted = chip.quoted ?? false;
 
-  // Function operators: field:op("value")
-  if (
-    ['contains', 'startsWith', 'endsWith', 'before', 'after'].includes(
-      operator as string
-    )
-  ) {
+  // has / !has operators: has:field or !has:field
+  if (field === 'has' || field === '!has') {
+    return `${field}:${value}`;
+  }
+
+  // Function operators: field:op("value") — including negated forms
+  const funcOps = [
+    'contains', '!contains',
+    'startsWith', '!startsWith',
+    'endsWith', '!endsWith',
+    'before', 'after',
+  ];
+  if (funcOps.includes(operator as string)) {
     return `${field}:${operator}("${escapeQuotes(value)}")`;
   }
 
@@ -222,10 +231,201 @@ function needsQuoting(value: string): boolean {
 
 // ─── Query string → FilterChip[] (convenience) ──────────────────────────────
 
+
+
+const COMPARE_OPS = new Set([
+  TokenType.NE, TokenType.GT, TokenType.GTE, TokenType.LT, TokenType.LTE,
+]);
+
+const FUNC_OPS: Record<string, QueryOperator> = {
+  [TokenType.CONTAINS]: 'contains',
+  [TokenType.STARTS_WITH]: 'startsWith',
+  [TokenType.ENDS_WITH]: 'endsWith',
+  [TokenType.NOT_CONTAINS]: '!contains',
+  [TokenType.NOT_STARTS_WITH]: '!startsWith',
+  [TokenType.NOT_ENDS_WITH]: '!endsWith',
+  [TokenType.BEFORE]: 'before',
+  [TokenType.AFTER]: 'after',
+};
+
+const VALUE_TYPES = new Set([
+  TokenType.STRING, TokenType.NUMBER, TokenType.BOOLEAN, TokenType.FIELD,
+]);
+
 /**
  * Parse a DSL query string directly into FilterChips.
+ * Uses token-based reconstruction for perfect roundtrip fidelity.
+ * Each token maps directly to a chip — parens/AND/OR are never auto-paired.
  */
 export function queryToChips(query: string): FilterChip[] {
-  const { ast } = parse(query);
-  return astToChips(ast);
+  if (!query.trim()) return [];
+  const tokens = tokenize(query);
+  const chips: FilterChip[] = [];
+  let i = 0;
+
+  const tok = (offset = 0): Token => tokens[i + offset] ?? tokens[tokens.length - 1];
+  const advance = () => { i++; };
+
+  while (tok().type !== TokenType.EOF) {
+    const t = tok();
+
+    // ── !has:field pattern → !has filter chip ──
+    if (
+      (t.type === TokenType.BANG || t.type === TokenType.NOT) &&
+      tok(1)?.type === TokenType.FIELD &&
+      tok(1)?.value.toLowerCase() === 'has' &&
+      tok(2)?.type === TokenType.COLON
+    ) {
+      advance(); // skip BANG/NOT
+      advance(); // skip 'has' FIELD
+      advance(); // skip COLON
+      const valTok = tok();
+      if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
+        chips.push({
+          id: nextChipId(), type: 'filter', field: '!has',
+          operator: '=', value: valTok.value, quoted: false,
+        });
+        advance();
+      } else {
+        chips.push({ id: nextChipId(), type: 'filter', field: '!has', operator: '=', value: '', quoted: false });
+      }
+      continue;
+    }
+
+    // ── FIELD:value pattern → filter chip ──
+    if (t.type === TokenType.FIELD && tok(1)?.type === TokenType.COLON) {
+      const field = t.value;
+
+      // ── has:field pattern → has filter chip ──
+      if (field.toLowerCase() === 'has') {
+        advance(); // skip 'has' FIELD
+        advance(); // skip COLON
+        const valTok = tok();
+        if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
+          chips.push({
+            id: nextChipId(), type: 'filter', field: 'has',
+            operator: '=', value: valTok.value, quoted: false,
+          });
+          advance();
+        } else {
+          chips.push({ id: nextChipId(), type: 'filter', field: 'has', operator: '=', value: '', quoted: false });
+        }
+        continue;
+      }
+
+      advance(); // skip FIELD
+      advance(); // skip COLON
+
+      const opTok = tok();
+
+      // Comparison operator: field:!=value, field:>value
+      if (COMPARE_OPS.has(opTok.type)) {
+        const operator = opTok.value as QueryOperator;
+        advance(); // skip operator
+        const valTok = tok();
+        if (VALUE_TYPES.has(valTok.type)) {
+          const rawChar = query[valTok.start];
+          chips.push({
+            id: nextChipId(), type: 'filter', field, operator,
+            value: valTok.value, quoted: rawChar === '"',
+          });
+          advance();
+        } else {
+          chips.push({ id: nextChipId(), type: 'filter', field, operator, value: '', quoted: false });
+        }
+        continue;
+      }
+
+      // Function operator: field:contains("value")
+      const funcOp = FUNC_OPS[opTok.type];
+      if (funcOp) {
+        advance(); // skip function name
+        if (tok().type === TokenType.LPAREN) {
+          advance(); // skip (
+          const valTok = tok();
+          if (VALUE_TYPES.has(valTok.type)) {
+            chips.push({
+              id: nextChipId(), type: 'filter', field, operator: funcOp,
+              value: valTok.value, quoted: true,
+            });
+            advance();
+          } else {
+            chips.push({ id: nextChipId(), type: 'filter', field, operator: funcOp, value: '', quoted: false });
+          }
+          if (tok().type === TokenType.RPAREN) advance(); // skip )
+        } else {
+          // Function without parens (e.g., field:contains value)
+          const valTok = tok();
+          if (VALUE_TYPES.has(valTok.type)) {
+            chips.push({
+              id: nextChipId(), type: 'filter', field, operator: funcOp,
+              value: valTok.value, quoted: true,
+            });
+            advance();
+          } else {
+            chips.push({ id: nextChipId(), type: 'filter', field, operator: funcOp, value: '', quoted: false });
+          }
+        }
+        continue;
+      }
+
+      // Implicit '=' with value
+      if (VALUE_TYPES.has(opTok.type)) {
+        const rawChar = query[opTok.start];
+        chips.push({
+          id: nextChipId(), type: 'filter', field, operator: '=',
+          value: opTok.value, quoted: rawChar === '"',
+        });
+        advance();
+        continue;
+      }
+
+      // Incomplete: field: (no value)
+      chips.push({ id: nextChipId(), type: 'filter', field, operator: '=', value: '', quoted: false });
+      continue;
+    }
+
+    // ── AND / OR → logical chip ──
+    if (t.type === TokenType.AND || t.type === TokenType.OR) {
+      chips.push({ id: nextChipId(), type: 'logical', label: t.value.toUpperCase() });
+      advance();
+      continue;
+    }
+
+    // ── NOT → logical chip ──
+    if (t.type === TokenType.NOT || t.type === TokenType.BANG) {
+      chips.push({ id: nextChipId(), type: 'logical', label: 'NOT' });
+      advance();
+      continue;
+    }
+
+    // ── ( → paren chip ──
+    if (t.type === TokenType.LPAREN) {
+      chips.push({ id: nextChipId(), type: 'paren', label: '(' });
+      advance();
+      continue;
+    }
+
+    // ── ) → paren chip ──
+    if (t.type === TokenType.RPAREN) {
+      chips.push({ id: nextChipId(), type: 'paren', label: ')' });
+      advance();
+      continue;
+    }
+
+    // ── Standalone string/field → free text message search ──
+    if (t.type === TokenType.STRING || t.type === TokenType.FIELD) {
+      chips.push({
+        id: nextChipId(), type: 'filter', field: 'message',
+        operator: 'contains', value: t.value, quoted: true,
+      });
+      advance();
+      continue;
+    }
+
+    // Skip unhandled tokens
+    advance();
+  }
+
+  return chips;
 }

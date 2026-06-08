@@ -53,6 +53,9 @@ const FUNC_TOKEN_TO_OP: Partial<Record<TokenType, QueryOperator>> = {
   [TokenType.CONTAINS]: 'contains',
   [TokenType.STARTS_WITH]: 'startsWith',
   [TokenType.ENDS_WITH]: 'endsWith',
+  [TokenType.NOT_CONTAINS]: '!contains',
+  [TokenType.NOT_STARTS_WITH]: '!startsWith',
+  [TokenType.NOT_ENDS_WITH]: '!endsWith',
   [TokenType.BEFORE]: 'before',
   [TokenType.AFTER]: 'after',
 };

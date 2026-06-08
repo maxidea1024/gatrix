@@ -415,7 +415,9 @@ export class QueryParser {
         'contains',
         'not_contains',
         'starts_with',
+        'not_starts_with',
         'ends_with',
+        'not_ends_with',
       ];
       let compoundOp: string | null = null;
       const dotIdx = key.lastIndexOf('.');
@@ -432,6 +434,16 @@ export class QueryParser {
         // Normalise Sentry-style colon operator to SQL equality
         if (op === ':') op = '=';
 
+        // ── Colon followed by comparison operator: key:!=value, key:>100 ──
+        // When ':' was consumed and the next token is also an operator,
+        // the comparison operator overrides the default '=' from ':'.
+        if (op === '=' && this.peek().type === 'OP') {
+          const nextOp = this.peek().value;
+          if (['!=', '>', '<', '>=', '<='].includes(nextOp)) {
+            op = this.advance().value;
+          }
+        }
+
         // Apply compound operator — override the parsed op
         if (compoundOp) {
           switch (compoundOp) {
@@ -446,6 +458,12 @@ export class QueryParser {
               break;
             case 'ends_with':
               op = 'ENDS_WITH';
+              break;
+            case 'not_starts_with':
+              op = 'NOT_STARTS_WITH';
+              break;
+            case 'not_ends_with':
+              op = 'NOT_ENDS_WITH';
               break;
           }
         }
@@ -754,6 +772,12 @@ export class QueryParser {
             val = `${val}%`;
           } else if (op === 'ENDS_WITH') {
             op = 'ILIKE';
+            val = `%${val}`;
+          } else if (op === 'NOT_STARTS_WITH') {
+            op = 'NOT ILIKE';
+            val = `${val}%`;
+          } else if (op === 'NOT_ENDS_WITH') {
+            op = 'NOT ILIKE';
             val = `%${val}`;
           }
 

@@ -6,7 +6,6 @@ import {
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
   Search as SearchIcon,
-  PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -347,23 +346,6 @@ const ArgusLogsPage: React.FC = () => {
                 }}
                 facets={mappedFacets}
               />
-              <IconButton
-                size="small"
-                onClick={() => handleSearchSubmit(dslQueryRef.current)}
-                sx={{
-                  flexShrink: 0,
-                  width: 26,
-                  height: 26,
-                  borderRadius: '6px',
-                  color: 'primary.main',
-                  border: '1px solid',
-                  borderColor: 'primary.main',
-                  '&:hover': { backgroundColor: 'primary.main', color: '#fff' },
-                  transition: 'all 0.15s',
-                }}
-              >
-                <PlayArrowIcon sx={{ fontSize: 16 }} />
-              </IconButton>
             </Box>
           );
         })()}

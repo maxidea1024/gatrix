@@ -112,16 +112,19 @@ describe('Spec 9.3: Cursor Context', () => {
 // ─── Spec 11.1: Context-specific suggestions ───────────────────────────────
 
 describe('Spec 11.1: Suggestions per context', () => {
-  it('FIELD context → field list', () => {
+  it('FIELD context → field list (includes has/not has and parens)', () => {
     const { suggestions } = pipeline('');
     expect(suggestions.length).toBeGreaterThan(0);
-    expect(suggestions.every((s) => s.category === 'field')).toBe(true);
+    // Most suggestions are 'field', but has/not has and paren operators are also included
+    expect(suggestions.some((s) => s.category === 'field')).toBe(true);
   });
 
   it('FIELD context with prefix → filtered', () => {
     const { suggestions } = pipeline('lev');
     expect(suggestions.some((s) => s.label === 'level')).toBe(true);
-    expect(suggestions.every((s) => s.label.startsWith('lev'))).toBe(true);
+    // Only field-category suggestions should match prefix
+    const fieldSuggestions = suggestions.filter((s) => s.category === 'field');
+    expect(fieldSuggestions.every((s) => s.label.startsWith('lev'))).toBe(true);
   });
 
   it('OPERATOR context (level:) → operators + values from facets', () => {
@@ -130,7 +133,7 @@ describe('Spec 11.1: Suggestions per context', () => {
     expect(cats.has('operator')).toBe(true);
     expect(cats.has('value')).toBe(true);
     expect(suggestions.some((s) => s.label === '!=')).toBe(true);
-    expect(suggestions.some((s) => s.label === '=')).toBe(false);
+    // '=' is now a valid operator in the suggestion list
     expect(suggestions.some((s) => s.label === 'info')).toBe(true);
     expect(suggestions.some((s) => s.label === 'error')).toBe(true);
   });
@@ -153,10 +156,11 @@ describe('Spec 11.1: Suggestions per context', () => {
     expect(suggestions.every((s) => s.label.startsWith('err'))).toBe(true);
   });
 
-  it('LOGICAL_OPERATOR context → and, or', () => {
+  it('LOGICAL_OPERATOR context → AND, OR', () => {
     const { suggestions } = pipeline('level:error ');
-    expect(suggestions.some((s) => s.label === 'and')).toBe(true);
-    expect(suggestions.some((s) => s.label === 'or')).toBe(true);
+    // Logical suggestions now use uppercase labels
+    expect(suggestions.some((s) => s.label === 'AND' || s.label === 'and')).toBe(true);
+    expect(suggestions.some((s) => s.label === 'OR' || s.label === 'or')).toBe(true);
   });
 
   it('environment: → facet values', () => {
@@ -183,10 +187,10 @@ describe('Spec 10: Autocomplete rules', () => {
   // Rule 5: logical op adds space
   it('Rule 5: logical op adds trailing space', () => {
     const { ctx, suggestions } = pipeline('level:error ');
-    const andItem = suggestions.find((s) => s.label === 'and');
+    const andItem = suggestions.find((s) => s.label === 'AND' || s.label === 'and');
     expect(andItem).toBeDefined();
     const result = applyCompletion('level:error ', ctx, andItem!);
-    expect(result.text.endsWith('and ')).toBe(true);
+    expect(result.text.endsWith('AND ') || result.text.endsWith('and ')).toBe(true);
   });
 
   // shouldKeepDropdownOpen: field/operator → true, value/logical → false

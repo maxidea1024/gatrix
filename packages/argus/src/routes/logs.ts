@@ -633,7 +633,7 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // ?�?�?� Custom Attribute Facet (distinct values for a given attribute key) ?�?�?�
+  // ─── Custom Attribute Facet (distinct values for a given attribute key) ───
   app.get(
     '/:projectId/logs/attribute-facet',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -657,22 +657,44 @@ export default async function logsRoutes(app: FastifyInstance) {
           projectId: String(projectId),
           fillStart: String(bucket.queryParams.fillStart),
           fillEnd: String(bucket.queryParams.fillEnd),
-          attrKey: key,
         };
 
-        const sql = `
-          SELECT
-            JSONExtractString(attributes, {attrKey:String}) AS attr_value,
-            count() AS count
-          FROM argus.logs
-          WHERE project_id = {projectId:String}
-            AND ${timeCond}
-            AND JSONHas(attributes, {attrKey:String})
-            AND attr_value != ''
-          GROUP BY attr_value
-          ORDER BY count DESC
-          LIMIT 30
-        `;
+        // Top-level columns can be queried directly (not from attributes Map)
+        const TOP_LEVEL_COLUMNS = new Set([
+          'message', 'body', 'level', 'service', 'environment',
+          'release', 'logger_name', 'trace_id', 'span_id',
+        ]);
+
+        let sql: string;
+        if (TOP_LEVEL_COLUMNS.has(key)) {
+          sql = `
+            SELECT
+              ${key} AS attr_value,
+              count() AS count
+            FROM argus.logs
+            WHERE project_id = {projectId:String}
+              AND ${timeCond}
+              AND ${key} != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 30
+          `;
+        } else {
+          params.attrKey = key;
+          sql = `
+            SELECT
+              attributes[{attrKey:String}] AS attr_value,
+              count() AS count
+            FROM argus.logs
+            WHERE project_id = {projectId:String}
+              AND ${timeCond}
+              AND mapContains(attributes, {attrKey:String})
+              AND attr_value != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 30
+          `;
+        }
 
         const result = await optic.rawQuery({ query: sql, params });
         return reply.send({ data: result.data });
@@ -713,14 +735,14 @@ export default async function logsRoutes(app: FastifyInstance) {
         // Sample up to 10000 recent logs to extract attribute keys
         const keysSql = `
           SELECT
-            arrayJoin(JSONExtractKeys(attributes)) AS attr_key,
+            arrayJoin(mapKeys(attributes)) AS attr_key,
             count() AS key_count
           FROM (
             SELECT attributes
             FROM argus.logs
             WHERE project_id = {projectId:String}
               AND ${timeCond}
-              AND attributes != '{}'
+              AND length(mapKeys(attributes)) > 0
             ORDER BY timestamp DESC
             LIMIT 10000
           )
@@ -749,12 +771,12 @@ export default async function logsRoutes(app: FastifyInstance) {
 
           const valSql = `
             SELECT
-              JSONExtractString(attributes, {attrKey:String}) AS attr_value,
+              attributes[{attrKey:String}] AS attr_value,
               count() AS count
             FROM argus.logs
             WHERE project_id = {projectId:String}
               AND ${timeCond}
-              AND JSONHas(attributes, {attrKey:String})
+              AND mapContains(attributes, {attrKey:String})
               AND attr_value != ''
             GROUP BY attr_value
             ORDER BY count DESC

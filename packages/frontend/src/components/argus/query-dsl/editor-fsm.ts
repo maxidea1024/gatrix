@@ -52,6 +52,9 @@ export function resolveEditorState(
       case TokenType.CONTAINS:
       case TokenType.STARTS_WITH:
       case TokenType.ENDS_WITH:
+      case TokenType.NOT_CONTAINS:
+      case TokenType.NOT_STARTS_WITH:
+      case TokenType.NOT_ENDS_WITH:
       case TokenType.BEFORE:
       case TokenType.AFTER:
         if (state === EditorState.EXPECT_OPERATOR_OR_VALUE) {
@@ -152,6 +155,9 @@ function isInsideFunctionParens(
     TokenType.CONTAINS,
     TokenType.STARTS_WITH,
     TokenType.ENDS_WITH,
+    TokenType.NOT_CONTAINS,
+    TokenType.NOT_STARTS_WITH,
+    TokenType.NOT_ENDS_WITH,
     TokenType.BEFORE,
     TokenType.AFTER,
   ]);

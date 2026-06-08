@@ -177,6 +177,9 @@ export type QueryOperator =
   | 'contains'
   | 'startsWith'
   | 'endsWith'
+  | '!contains'
+  | '!startsWith'
+  | '!endsWith'
   | 'before'
   | 'after';
 

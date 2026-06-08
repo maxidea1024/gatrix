@@ -80,6 +80,9 @@ export function resolveCursorContext(
       t.type === TokenType.CONTAINS ||
       t.type === TokenType.STARTS_WITH ||
       t.type === TokenType.ENDS_WITH ||
+      t.type === TokenType.NOT_CONTAINS ||
+      t.type === TokenType.NOT_STARTS_WITH ||
+      t.type === TokenType.NOT_ENDS_WITH ||
       t.type === TokenType.BEFORE ||
       t.type === TokenType.AFTER
     ) {
@@ -117,11 +120,12 @@ export function resolveCursorContext(
     TokenType.CONTAINS,
     TokenType.STARTS_WITH,
     TokenType.ENDS_WITH,
+    TokenType.NOT_CONTAINS,
+    TokenType.NOT_STARTS_WITH,
+    TokenType.NOT_ENDS_WITH,
     TokenType.BEFORE,
     TokenType.AFTER,
-    // Logical operators
-    TokenType.AND,
-    TokenType.OR,
+    // Logical operators (NOT and BANG are structural, but AND/OR may be user-typed prefixes)
     TokenType.NOT,
     TokenType.BANG,
   ]);
@@ -222,6 +226,9 @@ function isOperatorPrefix(prefix: string): boolean {
   )
     return true;
   // Function operator prefixes
-  const funcOps = ['contains', 'startswith', 'endswith', 'before', 'after'];
+  const funcOps = [
+    'contains', 'startswith', 'endswith', 'before', 'after',
+    '!contains', '!startswith', '!endswith',
+  ];
   return funcOps.some((op) => op.startsWith(p));
 }

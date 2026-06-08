@@ -31,7 +31,7 @@ export function getSuggestions(
 ): SuggestionItem[] {
   switch (context.type) {
     case 'FIELD':
-      return getFieldSuggestions(context, domain, facets, maxSuggestions);
+      return getFieldSuggestions(context, domain, facets, maxSuggestions, chips);
     case 'OPERATOR':
       // Spec 10.6 Rule 1: EXPECT_OPERATOR_OR_VALUE → show operators AND values
       return getOperatorAndValueSuggestions(
@@ -107,10 +107,12 @@ function getFieldSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  max: number = DEFAULT_MAX_SUGGESTIONS
+  max: number = DEFAULT_MAX_SUGGESTIONS,
+  chips?: { type?: string; label?: string }[],
 ): SuggestionItem[] {
   const fields = getFieldsForDomain(domain);
   const prefix = context.prefix.toLowerCase();
+  const originalPrefix = context.prefix; // preserve original casing for display
 
   // Static (registered) fields
   const results: SuggestionItem[] = fields
@@ -134,29 +136,99 @@ function getFieldSuggestions(
     }
   }
 
-  // Smart suggestions: when user types free text, suggest message:contains("X") and message:"X"
+  // Smart suggestions: when user types free text, suggest message operator variants
+  // Use originalPrefix to preserve user's casing in displayed labels
   if (prefix !== '' && !prefix.includes(':')) {
-    const escapedPrefix = prefix.replace(/"/g, '\\"');
+    const escapedPrefix = originalPrefix.replace(/"/g, '\\"');
+
+    // Ordered from least to most common (unshift reverses order → top items first)
+    const smartSuggestions: { label: string; insertText: string; desc: string }[] = [
+      // Primary — most common
+      { label: `message contains ${originalPrefix}`, insertText: `message:contains("${escapedPrefix}")`, desc: 'dsl.smart.messageContains' },
+      { label: `message is ${originalPrefix}`, insertText: `message:"${escapedPrefix}"`, desc: 'dsl.smart.messageIs' },
+      // Negation
+      { label: `message not contains ${originalPrefix}`, insertText: `message:!contains("${escapedPrefix}")`, desc: 'dsl.smart.messageNotContains' },
+      { label: `message is not ${originalPrefix}`, insertText: `message:!"${escapedPrefix}"`, desc: 'dsl.smart.messageIsNot' },
+      // Prefix/suffix
+      { label: `message starts with ${originalPrefix}`, insertText: `message:startsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageStartsWith' },
+      { label: `message ends with ${originalPrefix}`, insertText: `message:endsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageEndsWith' },
+      // Negated prefix/suffix
+      { label: `message not starts with ${originalPrefix}`, insertText: `message:!startsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageNotStartsWith' },
+      { label: `message not ends with ${originalPrefix}`, insertText: `message:!endsWith("${escapedPrefix}")`, desc: 'dsl.smart.messageNotEndsWith' },
+    ];
+
+    // unshift in reverse so first item ends up at top
+    for (let i = smartSuggestions.length - 1; i >= 0; i--) {
+      const s = smartSuggestions[i];
+      results.unshift({
+        label: s.label,
+        insertText: s.insertText,
+        category: 'value',
+        description: s.desc,
+      });
+    }
+  }
+
+  // ── Logical operator and paren suggestions (context-aware) ──
+  const lastChip = chips && chips.length > 0 ? chips[chips.length - 1] : null;
+  const hasFilterChip = chips?.some(c => c.type === 'filter' || (c.type === 'paren' && c.label === ')'));
+
+  // AND/OR: available when at least one filter/closeparen chip exists
+  if (hasFilterChip && (lastChip?.type === 'filter' || (lastChip?.type === 'paren' && lastChip?.label === ')'))) {
+    if (prefix === '' || 'or'.startsWith(prefix)) {
+      results.unshift({
+        label: 'OR',
+        category: 'logical' as SuggestionCategory,
+        fieldCategory: 'logic',
+      });
+    }
+    if (prefix === '' || 'and'.startsWith(prefix)) {
+      results.unshift({
+        label: 'AND',
+        category: 'logical' as SuggestionCategory,
+        fieldCategory: 'logic',
+      });
+    }
+  }
+
+  // ')': available when there's an unmatched '(' in chips
+  const openParens = chips?.filter(c => c.type === 'paren' && c.label === '(').length ?? 0;
+  const closeParens = chips?.filter(c => c.type === 'paren' && c.label === ')').length ?? 0;
+  if (openParens > closeParens && (prefix === '' || ')'.startsWith(prefix))) {
     results.unshift({
-      label: `message is ${prefix}`,
-      insertText: `message:"${escapedPrefix}"`,
-      category: 'value',
-      description: 'dsl.smart.messageIs',
-    });
-    results.unshift({
-      label: `message contains ${prefix}`,
-      insertText: `message:contains("${escapedPrefix}")`,
-      category: 'value',
-      description: 'dsl.smart.messageContains',
+      label: ')',
+      category: 'paren',
+      fieldCategory: 'logic',
     });
   }
 
-  // Suggest '(' when user is just starting a new token
+  // '(': always available
   if (prefix === '' || '('.startsWith(prefix)) {
     results.unshift({
       label: '(',
       category: 'paren',
       fieldCategory: 'logic',
+    });
+  }
+
+  // ── has / !has existence operators ──
+  // Show in All + Logic tabs — unshift to appear at top (before field list)
+  if (prefix === '' || '!has'.startsWith(prefix) || 'not has'.startsWith(prefix) || 'not'.startsWith(prefix)) {
+    results.unshift({
+      label: 'not has',
+      insertText: '!has:',
+      category: 'field',
+      fieldCategory: 'logic',
+      description: 'dsl.has.fieldNotExists',
+    });
+  }
+  if (prefix === '' || 'has'.startsWith(prefix)) {
+    results.unshift({
+      label: 'has',
+      insertText: 'has:',
+      category: 'field',
+      fieldCategory: 'logic',
+      description: 'dsl.has.fieldExists',
     });
   }
 
@@ -175,6 +247,12 @@ function getOperatorAndValueSuggestions(
 ): SuggestionItem[] {
   if (!context.field) return [];
 
+  // ── has / !has: show field list as values ──
+  const fieldLower = context.field.toLowerCase();
+  if (fieldLower === 'has' || fieldLower === '!has') {
+    return getHasFieldSuggestions(context, domain, facets, max);
+  }
+
   const field = getFieldByKey(context.field, domain);
   // For dynamic facet fields not in registry, create a virtual string field
   const effectiveField =
@@ -184,7 +262,7 @@ function getOperatorAndValueSuggestions(
       label: context.field,
       type: 'string',
       category: 'log',
-      operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'],
+      operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith'],
       searchable: true,
       description: '',
     } as QueryField);
@@ -245,7 +323,7 @@ function getValueSuggestions(
       label: context.field,
       type: 'string',
       category: 'log',
-      operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'],
+      operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith'],
       searchable: true,
       description: '',
     } as QueryField);
@@ -411,8 +489,11 @@ function getOperatorDescriptionKey(op: string): string {
     '<': 'dsl.op.lessThan',
     '<=': 'dsl.op.lessOrEqual',
     contains: 'dsl.op.contains',
+    '!contains': 'dsl.op.notContains',
     startsWith: 'dsl.op.startsWith',
+    '!startsWith': 'dsl.op.notStartsWith',
     endsWith: 'dsl.op.endsWith',
+    '!endsWith': 'dsl.op.notEndsWith',
     before: 'dsl.op.before',
     after: 'dsl.op.after',
     in: 'dsl.op.in',
@@ -427,4 +508,50 @@ function needsQuoting(value: string): boolean {
     value.includes('(') ||
     value.includes(')')
   );
+}
+
+/**
+ * Suggest field names after has: or !has: prefix.
+ * Shows all available fields (static + dynamic from facets).
+ */
+function getHasFieldSuggestions(
+  context: CursorContext,
+  domain: QueryDomain,
+  facets?: Map<string, string[]>,
+  max: number = DEFAULT_MAX_SUGGESTIONS,
+): SuggestionItem[] {
+  const prefix = context.prefix.toLowerCase();
+  const results: SuggestionItem[] = [];
+  const fields = getFieldsForDomain(domain);
+
+  // Static fields
+  for (const f of fields) {
+    if (prefix === '' || f.key.toLowerCase().startsWith(prefix)) {
+      results.push({
+        label: f.key,
+        insertText: f.key,
+        category: 'value',
+        fieldCategory: f.category,
+        description: f.description,
+      });
+    }
+  }
+
+  // Dynamic fields from facets
+  if (facets) {
+    const staticKeys = new Set(fields.map((f) => f.key));
+    for (const key of facets.keys()) {
+      if (staticKeys.has(key)) continue;
+      if (prefix === '' || key.toLowerCase().startsWith(prefix)) {
+        results.push({
+          label: key,
+          insertText: key,
+          category: 'value',
+          fieldCategory: 'attribute',
+        });
+      }
+    }
+  }
+
+  return results.slice(0, max);
 }

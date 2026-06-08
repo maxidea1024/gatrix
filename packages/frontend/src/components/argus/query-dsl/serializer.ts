@@ -8,8 +8,11 @@ import type { Expression } from './types';
 // Backend operator mappings
 const FUNC_OP_MAP: Record<string, string> = {
   contains: '.contains:',
+  '!contains': '.not_contains:',
   startsWith: '.starts_with:',
+  '!startsWith': '.not_starts_with:',
   endsWith: '.ends_with:',
+  '!endsWith': '.not_ends_with:',
   before: '.before:',
   after: '.after:',
 };

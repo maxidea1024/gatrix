@@ -18,11 +18,23 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
 import type { QueryDomain, QueryField, QueryOperator } from './types';
 import { getFieldsForDomain, getFieldByKey } from './fields';
 import { getOpLabel, getOperatorOptions } from './operator-labels';
+
+// ─── Category badges for HasFieldSelector ────────────────────────────────────
+
+const HAS_CATEGORY_BADGES: Record<string, { label: string; color: string; bg: string; bgLight: string }> = {
+  log:       { label: 'LOG', color: '#7c8aff', bg: 'rgba(124,138,255,0.12)', bgLight: 'rgba(92,107,192,0.10)' },
+  resource:  { label: 'RES', color: '#6ec87a', bg: 'rgba(110,200,122,0.12)', bgLight: 'rgba(56,142,60,0.10)' },
+  trace:     { label: 'TRC', color: '#e6994a', bg: 'rgba(230,153,74,0.12)',  bgLight: 'rgba(230,81,0,0.10)' },
+  event:     { label: 'EVT', color: '#d97ce6', bg: 'rgba(217,124,230,0.12)', bgLight: 'rgba(156,39,176,0.10)' },
+  user:      { label: 'USR', color: '#4fc3f7', bg: 'rgba(79,195,247,0.12)',  bgLight: 'rgba(2,136,209,0.10)' },
+  attribute: { label: 'ATR', color: '#90a4ae', bg: 'rgba(144,164,174,0.12)', bgLight: 'rgba(96,125,139,0.10)' },
+};
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -51,6 +63,7 @@ export function FilterTokenChip({
 }: FilterTokenChipProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { t } = useTranslation();
 
   const [editingPart, setEditingPart] = useState<
     'field' | 'operator' | 'value' | null
@@ -61,6 +74,7 @@ export function FilterTokenChip({
   const field = getFieldByKey(chip.field, domain);
   const fieldType = field?.type ?? 'string';
   const opLabel = getOpLabel(chip.operator, fieldType);
+  const isHasChip = chip.field === 'has' || chip.field === '!has';
 
   const handlePartClick = (
     part: 'field' | 'operator' | 'value',
@@ -168,19 +182,21 @@ export function FilterTokenChip({
             handlePartClick('field', e.currentTarget)
           }
         >
-          {chip.field}
+          {chip.field === '!has' ? 'not has' : chip.field}
         </Box>
 
-        {/* Operator part */}
-        <Box
-          component="span"
-          sx={partStyle('operator')}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-            handlePartClick('operator', e.currentTarget)
-          }
-        >
-          {opLabel}
-        </Box>
+        {/* Operator part — hidden for has/!has */}
+        {isHasChip ? null : (
+          <Box
+            component="span"
+            sx={partStyle('operator')}
+            onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+              handlePartClick('operator', e.currentTarget)
+            }
+          >
+            {opLabel}
+          </Box>
+        )}
 
         {/* Value part */}
         <Box
@@ -250,12 +266,47 @@ export function FilterTokenChip({
         }}
       >
         {editingPart === 'field' && (
-          <FieldMenu
-            domain={domain}
-            currentField={chip.field}
-            onSelect={handleFieldSelect}
-            isDark={isDark}
-          />
+          isHasChip ? (
+            <List dense sx={{ py: 0.5 }}>
+              {([['has', 'has'], ['!has', 'not has']] as const).map(([val, label]) => (
+                <ListItemButton
+                  key={val}
+                  onClick={() => {
+                    onUpdate(chip.id, { field: val });
+                    handleClose();
+                  }}
+                  selected={chip.field === val}
+                  sx={{
+                    py: 0.5,
+                    px: 1.5,
+                    '&.Mui-selected': {
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.06)'
+                        : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={label}
+                    primaryTypographyProps={{
+                      fontSize: '0.8rem',
+                      fontWeight: chip.field === val ? 600 : 400,
+                    }}
+                  />
+                  {chip.field === val && (
+                    <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+                  )}
+                </ListItemButton>
+              ))}
+            </List>
+          ) : (
+            <FieldMenu
+              domain={domain}
+              currentField={chip.field}
+              onSelect={handleFieldSelect}
+              isDark={isDark}
+            />
+          )
         )}
         {editingPart === 'operator' && (
           <OperatorMenu
@@ -266,14 +317,24 @@ export function FilterTokenChip({
           />
         )}
         {editingPart === 'value' && (
-          <ValueEditor
-            chip={chip}
-            facets={facets}
-            valueInput={valueInput}
-            setValueInput={setValueInput}
-            onConfirm={handleValueConfirm}
-            isDark={isDark}
-          />
+          isHasChip ? (
+            <HasFieldSelector
+              domain={domain}
+              facets={facets}
+              currentValue={chip.value}
+              onSelect={handleValueConfirm}
+              isDark={isDark}
+            />
+          ) : (
+            <ValueEditor
+              chip={chip}
+              facets={facets}
+              valueInput={valueInput}
+              setValueInput={setValueInput}
+              onConfirm={handleValueConfirm}
+              isDark={isDark}
+            />
+          )
         )}
       </Popover>
     </>
@@ -396,6 +457,7 @@ function ValueEditor({
   onConfirm: (v: string) => void;
   isDark: boolean;
 }) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   // Track whether user has started typing (to decide filtering)
   const [isDirty, setIsDirty] = useState(false);
@@ -451,7 +513,7 @@ function ValueEditor({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
-          placeholder={chip.value || 'Filter values...'}
+          placeholder={chip.value || t('dsl.chip.filterValues', 'Filter values...')}
           sx={{
             fontSize: '0.8rem',
             '& input': { py: 0.25 },
@@ -494,6 +556,126 @@ function ValueEditor({
           })}
         </List>
       )}
+    </Box>
+  );
+}
+
+// ─── Has Field Selector ──────────────────────────────────────────────────────
+
+function HasFieldSelector({
+  domain,
+  facets,
+  currentValue,
+  onSelect,
+  isDark,
+}: {
+  domain: QueryDomain;
+  facets?: Map<string, string[]>;
+  currentValue: string;
+  onSelect: (v: string) => void;
+  isDark: boolean;
+}) {
+  const { t } = useTranslation();
+  const [filter, setFilter] = useState('');
+  const fields = getFieldsForDomain(domain);
+
+  // Build combined list: static fields + dynamic facet keys
+  const allKeys: string[] = [];
+  const staticKeys = new Set<string>();
+  for (const f of fields) {
+    allKeys.push(f.key);
+    staticKeys.add(f.key);
+  }
+  if (facets) {
+    for (const key of facets.keys()) {
+      if (!staticKeys.has(key)) {
+        allKeys.push(key);
+      }
+    }
+  }
+
+  const filtered = filter
+    ? allKeys.filter((k) => k.toLowerCase().includes(filter.toLowerCase()))
+    : allKeys;
+
+  // Sort: current value first
+  const sorted = [...filtered].sort((a, b) => {
+    if (a === currentValue) return -1;
+    if (b === currentValue) return 1;
+    return a.localeCompare(b);
+  });
+
+  return (
+    <Box sx={{ minWidth: 200 }}>
+      <Box
+        sx={{
+          px: 1,
+          py: 0.75,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        }}
+      >
+        <InputBase
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          autoFocus
+          fullWidth
+          placeholder={t('dsl.chip.filterFields', 'Filter fields...')}
+          sx={{
+            fontSize: '0.8rem',
+            '& input': { py: 0.25 },
+          }}
+        />
+      </Box>
+      <List dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
+        {sorted.slice(0, 30).map((key) => {
+          const isCurrent = key === currentValue;
+          const fieldDef = getFieldByKey(key, domain);
+          const cat = fieldDef?.category ?? 'attribute';
+          const badge = HAS_CATEGORY_BADGES[cat];
+          return (
+            <ListItemButton
+              key={key}
+              onClick={() => onSelect(key)}
+              selected={isCurrent}
+              sx={{
+                py: 0.5,
+                px: 1.5,
+                gap: 1,
+                '&.Mui-selected': {
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.04)',
+                },
+              }}
+            >
+              {badge && (
+                <Box sx={{
+                  fontSize: '8px', fontWeight: 700, flexShrink: 0,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  color: badge.color,
+                  backgroundColor: isDark ? badge.bg : badge.bgLight,
+                  borderRadius: '3px', px: '3px', py: '1px',
+                  lineHeight: 1.3, letterSpacing: '0.02em',
+                  minWidth: 22, textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {badge.label}
+                </Box>
+              )}
+              <ListItemText
+                primary={key}
+                primaryTypographyProps={{
+                  fontSize: '0.8rem',
+                  fontWeight: isCurrent ? 600 : 400,
+                }}
+              />
+              {isCurrent && (
+                <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+              )}
+            </ListItemButton>
+          );
+        })}
+      </List>
     </Box>
   );
 }

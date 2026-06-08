@@ -1729,8 +1729,11 @@ class ArgusService {
       values: { attr_value: string; count: string }[];
     }[]
   > {
-    // Temporarily disabled to prevent 404 console errors since backend doesn't support this yet
-    return Promise.resolve([]);
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/${projectId}/logs/attribute-keys`,
+      { params }
+    );
+    return response.data?.data || [];
   }
 
   createLiveTailConnection(

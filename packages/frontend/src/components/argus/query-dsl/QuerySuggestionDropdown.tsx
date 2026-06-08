@@ -19,7 +19,10 @@ import React, {
   useImperativeHandle,
 } from 'react';
 import { Box, Typography, IconButton, Checkbox } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  SearchRounded as SearchIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type { SuggestionItem } from './types';
 import type { RecentSearch } from './recent-searches';
@@ -63,19 +66,32 @@ interface TabConfig {
 
 // ─── Category visual config ──────────────────────────────────────────────────
 
-const CATEGORY_COLORS: Record<string, string> = {
+interface CategoryBadge {
+  label: string;
+  color: string;
+  bg: string;
+  bgLight: string;
+}
+
+const CATEGORY_BADGES: Record<string, CategoryBadge> = {
   // Field domain categories
-  log: '#7c8aff',
-  resource: '#6ec87a',
-  trace: '#e6994a',
-  event: '#d97ce6',
-  user: '#4fc3f7',
-  attribute: '#90a4ae',
-  // Suggestion categories (fallback)
-  field: '#7c8aff',
-  operator: '#e6994a',
-  value: '#6ec87a',
-  logical: '#b07adb',
+  log:       { label: 'LOG', color: '#7c8aff', bg: 'rgba(124,138,255,0.12)', bgLight: 'rgba(92,107,192,0.10)' },
+  resource:  { label: 'RES', color: '#6ec87a', bg: 'rgba(110,200,122,0.12)', bgLight: 'rgba(56,142,60,0.10)' },
+  trace:     { label: 'TRC', color: '#e6994a', bg: 'rgba(230,153,74,0.12)',  bgLight: 'rgba(230,81,0,0.10)' },
+  event:     { label: 'EVT', color: '#d97ce6', bg: 'rgba(217,124,230,0.12)', bgLight: 'rgba(156,39,176,0.10)' },
+  user:      { label: 'USR', color: '#4fc3f7', bg: 'rgba(79,195,247,0.12)',  bgLight: 'rgba(2,136,209,0.10)' },
+  attribute: { label: 'ATR', color: '#90a4ae', bg: 'rgba(144,164,174,0.12)', bgLight: 'rgba(96,125,139,0.10)' },
+  // Suggestion categories
+  operator:  { label: 'OP',  color: '#e6994a', bg: 'rgba(230,153,74,0.12)',  bgLight: 'rgba(230,81,0,0.08)' },
+  logical:   { label: 'KW',  color: '#b07adb', bg: 'rgba(176,122,219,0.12)', bgLight: 'rgba(123,31,162,0.08)' },
+  paren:     { label: '( )', color: '#b07adb', bg: 'rgba(176,122,219,0.12)', bgLight: 'rgba(123,31,162,0.08)' },
+};
+
+// Legacy color map for non-badge uses
+const CATEGORY_COLORS: Record<string, string> = {
+  log: '#7c8aff', resource: '#6ec87a', trace: '#e6994a',
+  event: '#d97ce6', user: '#4fc3f7', attribute: '#90a4ae',
+  field: '#7c8aff', operator: '#e6994a', value: '#6ec87a', logical: '#b07adb',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -222,19 +238,31 @@ export const QuerySuggestionDropdown = forwardRef<
 
   // Filter suggestions by active tab (using fieldCategory)
   const filteredSuggestions = useMemo(() => {
+    // When typing (tabs hidden), show ALL suggestions including logical operators
+    if (!showTabs) return suggestions;
     if (activeTab === 'recent') return suggestions;
     if (activeTab === 'all') {
-      return suggestions.filter((s) => s.fieldCategory !== 'logic');
+      // Show has/not has in All tab, but exclude AND/OR/parens
+      return suggestions.filter((s) => {
+        if (s.fieldCategory !== 'logic') return true;
+        // Keep has/not has (they have insertText starting with 'has:' or '!has:')
+        const insert = (s.insertText ?? '').toLowerCase();
+        return insert.startsWith('has:') || insert.startsWith('!has:');
+      });
     }
     // Filter by fieldCategory
     return suggestions.filter((s) => s.fieldCategory === activeTab);
-  }, [suggestions, activeTab]);
+  }, [suggestions, activeTab, showTabs]);
 
   // Pre-compute tab counts
   const tabCounts = useMemo(() => {
     const counts: Record<string, number> = {
       recent: recentSearches.length,
-      all: suggestions.filter((s) => s.fieldCategory !== 'logic').length,
+      all: suggestions.filter((s) => {
+        if (s.fieldCategory !== 'logic') return true;
+        const insert = (s.insertText ?? '').toLowerCase();
+        return insert.startsWith('has:') || insert.startsWith('!has:');
+      }).length,
     };
     for (const cat of fieldCategories) {
       counts[cat] = suggestions.filter((s) => s.fieldCategory === cat).length;
@@ -281,8 +309,9 @@ export const QuerySuggestionDropdown = forwardRef<
         position: 'absolute',
         top: '100%',
         left: 0,
-        right: 0,
         mt: '2px',
+        minWidth: 360,
+        maxWidth: 480,
         borderRadius: '8px',
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
         backgroundColor: isDark ? '#1e1e1e' : '#fff',
@@ -517,7 +546,11 @@ export const QuerySuggestionDropdown = forwardRef<
                 const isSelected = idx === selectedIndex;
                 const isValue =
                   item.category === 'value' &&
-                  !item.description?.startsWith('dsl.smart.');
+                  !item.description?.startsWith('dsl.smart.') &&
+                  !item.fieldCategory;
+                const isSmart = item.description?.startsWith('dsl.smart.');
+                const isLogical = item.category === 'logical';
+                const isParen = item.category === 'paren';
 
                 return (
                   <Box
@@ -548,25 +581,51 @@ export const QuerySuggestionDropdown = forwardRef<
                       mx: '3px',
                     }}
                   >
-                    {/* Category dot */}
-                    {isValue ? (
-                      <Box sx={{ width: 14, height: 14, flexShrink: 0 }} />
-                    ) : (
-                      <Box
-                        sx={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: '50%',
-                          backgroundColor:
-                            CATEGORY_COLORS[
-                              item.fieldCategory ?? item.category
-                            ] ?? '#90a4ae',
-                          opacity: 0.7,
-                          flexShrink: 0,
-                          ml: '4px',
-                        }}
-                      />
-                    )}
+                    {/* Category badge — unified visual system */}
+                    {(() => {
+                      // Smart suggestions → search icon
+                      if (isSmart) {
+                        return (
+                          <SearchIcon sx={{
+                            fontSize: 13, flexShrink: 0, ml: '1px',
+                            color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
+                          }} />
+                        );
+                      }
+                      // Values → indent spacer (no badge)
+                      if (isValue) {
+                        return <Box sx={{ width: 22, flexShrink: 0 }} />;
+                      }
+                      // Everything else → category badge
+                      const badgeKey = isLogical ? 'logical' : isParen ? 'paren'
+                        : item.category === 'operator' ? 'operator'
+                        : (item.fieldCategory ?? item.category);
+                      const badge = CATEGORY_BADGES[badgeKey];
+                      if (badge) {
+                        return (
+                          <Box sx={{
+                            fontSize: '8px', fontWeight: 700, flexShrink: 0,
+                            fontFamily: '"JetBrains Mono", monospace',
+                            color: isDark ? badge.color : badge.color,
+                            backgroundColor: isDark ? badge.bg : badge.bgLight,
+                            borderRadius: '3px', px: '3px', py: '1px',
+                            lineHeight: 1.3, letterSpacing: '0.02em',
+                            minWidth: 22, textAlign: 'center',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {badge.label}
+                          </Box>
+                        );
+                      }
+                      // Fallback dot
+                      return (
+                        <Box sx={{
+                          width: 6, height: 6, borderRadius: '50%',
+                          backgroundColor: CATEGORY_COLORS[item.fieldCategory ?? item.category] ?? '#90a4ae',
+                          opacity: 0.7, flexShrink: 0, ml: '8px',
+                        }} />
+                      );
+                    })()}
 
                     {/* Label — smart rendering for composite suggestions */}
                     <Box
@@ -581,9 +640,6 @@ export const QuerySuggestionDropdown = forwardRef<
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
                         lineHeight: 1.4,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
                       }}
                     >
                       {renderSuggestionLabel(item, isDark)}
@@ -686,9 +742,9 @@ function renderSuggestionLabel(
   item: SuggestionItem,
   isDark: boolean
 ): React.ReactNode {
-  // Smart suggestions: "message contains X" or "message is X"
+  // Smart suggestions: "message contains X", "message not starts with X", etc.
   const smartMatch = item.label.match(
-    /^(\w+)\s+(contains|is|startsWith|endsWith)\s+(.+)$/
+    /^(\w+)\s+(not\s+contains|not\s+starts\s+with|not\s+ends\s+with|is\s+not|contains|starts\s+with|ends\s+with|is)\s+(.+)$/
   );
   if (smartMatch) {
     const [, field, op, value] = smartMatch;
@@ -702,6 +758,7 @@ function renderSuggestionLabel(
         >
           {field}
         </span>
+        {' '}
         <span
           style={{
             color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
@@ -710,6 +767,7 @@ function renderSuggestionLabel(
         >
           {op}
         </span>
+        {' '}
         <span
           style={{
             color: isDark ? '#e6994a' : '#e65100',
@@ -726,6 +784,21 @@ function renderSuggestionLabel(
   if (item.category === 'operator') {
     return <span>{getOpLabel(item.label, item.fieldType ?? 'string')}</span>;
   }
+
+  // has / not has operators: show with operator styling
+  if (item.label === 'has' || item.label === '!has' || item.label === 'not has') {
+    return (
+      <span
+        style={{
+          color: isDark ? '#c792ea' : '#7b1fa2',
+          fontWeight: 600,
+        }}
+      >
+        {item.label}
+      </span>
+    );
+  }
+
   return <span>{item.label}</span>;
 }
 
