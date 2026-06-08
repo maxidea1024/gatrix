@@ -398,3 +398,27 @@ describe('Edge cases', () => {
     expect(r2.where).toContain('level =');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 9. List value (IN / NOT IN) operators
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe('List value (IN / NOT IN) SQL generation', () => {
+  test('key:[val1, val2] → column IN (param1, param2)', () => {
+    const { where, params } = parseSql('logger_name:[UE4Core, LuaVM]');
+    expect(where).toContain('logger_name IN (');
+    expect(Object.values(params)).toContain('UE4Core');
+    expect(Object.values(params)).toContain('LuaVM');
+  });
+
+  test('!key:[val1, val2] → NOT(column IN (param1, param2))', () => {
+    const { where } = parseSql('!logger_name:[UE4Core, LuaVM]');
+    expect(where).toContain('NOT (logger_name IN (');
+  });
+
+  test('key:!= [val1, val2] → column NOT IN (param1, param2)', () => {
+    const { where } = parseSql('logger_name:!=[UE4Core, LuaVM]');
+    expect(where).toContain('logger_name NOT IN (');
+  });
+});
+

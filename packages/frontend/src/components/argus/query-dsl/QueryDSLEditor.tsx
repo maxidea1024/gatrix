@@ -19,6 +19,7 @@ import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 import type { QueryDomain, SuggestionItem } from './types';
+import { TokenType } from './types';
 import { tokenize } from './lexer';
 import { resolveCursorContext } from './cursor-context';
 import { getSuggestions, applyCompletion } from './suggestion-engine';
@@ -140,6 +141,9 @@ export function QueryDSLEditor({
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() =>
     getRecentSearches(domain)
   );
+
+  const currentFilterInfo = useMemo(() => parseInputFilter(inputValue), [inputValue]);
+  const selectedValues = useMemo(() => new Set(currentFilterInfo.values), [currentFilterInfo]);
 
   const refreshRecent = useCallback(() => {
     setRecentSearches(getRecentSearches(domain));
@@ -326,7 +330,7 @@ export function QueryDSLEditor({
   );
 
   const applySuggestion = useCallback(
-    (item: SuggestionItem) => {
+    (item: SuggestionItem, isMultiSelect?: boolean) => {
       const result = applyCompletion(inputValue, cursorContext, item);
 
       if (item.category === 'logical') {
@@ -372,6 +376,49 @@ export function QueryDSLEditor({
         setShowDropdown(false);
         setSelectedIndex(-1);
       } else if (item.category === 'value') {
+        if (isMultiSelect) {
+          // Multi-select mode: toggle value in field:in("val1", "val2") list format
+          const { field, operator, values: currentValues } = currentFilterInfo;
+          if (field) {
+            let nextValues = [...currentValues];
+            const itemValue = item.label;
+
+            if (nextValues.includes(itemValue)) {
+              nextValues = nextValues.filter((v) => v !== itemValue);
+            } else {
+              nextValues.push(itemValue);
+            }
+
+            let nextOp = 'in';
+            if (operator === '!=' || operator === '!in') {
+              nextOp = '!in';
+            }
+
+            let nextInput = '';
+            if (nextValues.length === 0) {
+              nextInput = `${field}:${nextOp}()`;
+            } else {
+              const quotedValues = nextValues.map((v) => `"${v}"`).join(', ');
+              nextInput = `${field}:${nextOp}(${quotedValues})`;
+            }
+
+            setInputValue(nextInput);
+            setShowDropdown(true);
+            setSelectedIndex(-1);
+
+            // Adjust cursor position to be inside the parentheses
+            requestAnimationFrame(() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+                const cursorPos = nextInput.length - (nextInput.endsWith(')') ? 1 : 0);
+                inputRef.current.setSelectionRange(cursorPos, cursorPos);
+              }
+            });
+            return;
+          }
+        }
+
+        // Single-value mode or fallback
         // Value → try to create filter chips
         const completedChips = queryToChips(result.text);
         if (completedChips.length > 0) {
@@ -403,7 +450,7 @@ export function QueryDSLEditor({
         }
       });
     },
-    [inputValue, cursorContext, setChips, chips]
+    [inputValue, cursorContext, setChips, chips, currentFilterInfo]
   );
 
   const handleKeyDown = useCallback(
@@ -763,6 +810,7 @@ export function QueryDSLEditor({
               recentSearches={recentSearches}
               onSelectRecent={handleSelectRecent}
               onRemoveRecent={handleRemoveRecent}
+              selectedValues={selectedValues}
             />
           )}
       </Box>
@@ -783,4 +831,69 @@ function canInsertLogical(chips: FilterChip[]): boolean {
   if (last.type === 'filter') return true;
   if (last.type === 'paren' && last.label === ')') return true;
   return false;
+}
+
+/**
+ * Parse the current typing filter input to extract its field, operator, and values.
+ * e.g., 'level:in("info", "warn")' -> { field: 'level', operator: 'in', values: ['info', 'warn'] }
+ */
+function parseInputFilter(input: string): {
+  field: string;
+  operator: string;
+  values: string[];
+} {
+  const tokens = tokenize(input);
+  let field = '';
+  let operator = '=';
+  const values: string[] = [];
+
+  const fieldTok = tokens.find((t) => t.type === TokenType.FIELD);
+  if (fieldTok) {
+    field = fieldTok.value;
+  }
+
+  const hasNotIn = tokens.some((t) => t.type === TokenType.NOT_IN);
+  const hasIn = tokens.some((t) => t.type === TokenType.IN);
+  const hasNe = tokens.some((t) => t.type === TokenType.NE);
+
+  if (hasNotIn) {
+    operator = '!in';
+  } else if (hasIn) {
+    operator = 'in';
+  } else if (hasNe) {
+    operator = '!=';
+  } else {
+    operator = '=';
+  }
+
+  let foundColon = false;
+  for (const t of tokens) {
+    if (t.type === TokenType.COLON) {
+      foundColon = true;
+      continue;
+    }
+    if (!foundColon) continue;
+
+    if (t.type === TokenType.IN || t.type === TokenType.NOT_IN) {
+      continue;
+    }
+    if (
+      t.type === TokenType.LPAREN ||
+      t.type === TokenType.RPAREN ||
+      t.type === TokenType.COMMA
+    ) {
+      continue;
+    }
+
+    if (
+      t.type === TokenType.STRING ||
+      t.type === TokenType.NUMBER ||
+      t.type === TokenType.BOOLEAN ||
+      t.type === TokenType.FIELD
+    ) {
+      values.push(t.value);
+    }
+  }
+
+  return { field, operator, values };
 }

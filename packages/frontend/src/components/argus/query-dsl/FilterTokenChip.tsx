@@ -4,7 +4,7 @@
 // Each part is clickable and opens a popover for editing
 // ============================================================================
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   Box,
   Popover,
@@ -15,6 +15,7 @@ import {
   InputBase,
   Typography,
   useTheme,
+  Checkbox,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -77,7 +78,7 @@ interface FilterTokenChipProps {
   facets?: Map<string, string[]>;
   onUpdate: (
     chipId: string,
-    updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value'>>
+    updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value' | 'values'>>
   ) => void;
   onDelete: (chipId: string) => void;
   /** Called when chip editing starts (true) or ends (false) */
@@ -149,8 +150,8 @@ export function FilterTokenChip({
     handleClose();
   };
 
-  const handleValueConfirm = (newValue: string) => {
-    onUpdate(chip.id, { value: newValue });
+  const handleValueConfirm = (newValue: string, nextValues?: string[]) => {
+    onUpdate(chip.id, { value: newValue, values: nextValues });
     handleClose();
   };
 
@@ -492,28 +493,47 @@ function ValueEditor({
   facets?: Map<string, string[]>;
   valueInput: string;
   setValueInput: (v: string) => void;
-  onConfirm: (v: string) => void;
+  onConfirm: (v: string, nextValues?: string[]) => void;
   isDark: boolean;
 }) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
-  // Track whether user has started typing (to decide filtering)
   const [isDirty, setIsDirty] = useState(false);
 
   const facetValues = facets?.get(chip.field) ?? [];
+  const isMulti = chip.operator === 'in' || chip.operator === '!in';
+
+  // Parse current values from valueInput (split by comma and trim)
+  const currentSelected = useMemo(() => {
+    if (!isMulti) return new Set<string>();
+    return new Set(
+      valueInput
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '')
+    );
+  }, [valueInput, isMulti]);
 
   // When popover opens, show all values. Once user types, filter by input.
+  const filterText = isDirty
+    ? isMulti
+      ? valueInput.split(',').pop()?.trim() ?? ''
+      : valueInput
+    : '';
+
   const filtered =
-    isDirty && valueInput !== ''
+    isDirty && filterText !== ''
       ? facetValues.filter((v) =>
-          v.toLowerCase().includes(valueInput.toLowerCase())
+          v.toLowerCase().includes(filterText.toLowerCase())
         )
       : facetValues;
 
   // Sort: current value first, then rest alphabetically
   const sorted = [...filtered].sort((a, b) => {
-    if (a === chip.value) return -1;
-    if (b === chip.value) return 1;
+    const aSelected = isMulti ? currentSelected.has(a) : a === chip.value;
+    const bSelected = isMulti ? currentSelected.has(b) : b === chip.value;
+    if (aSelected && !bSelected) return -1;
+    if (!aSelected && bSelected) return 1;
     return a.localeCompare(b);
   });
 
@@ -524,23 +544,50 @@ function ValueEditor({
     setIsDirty(true);
   };
 
+  const handleApplyMulti = () => {
+    const vals = Array.from(currentSelected);
+    onConfirm(vals.join(', '), vals);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      onConfirm(valueInput || chip.value);
+      if (isMulti) {
+        handleApplyMulti();
+      } else {
+        onConfirm(valueInput || chip.value);
+      }
     }
     if (e.key === 'Escape') {
       e.preventDefault();
-      onConfirm(chip.value); // revert
+      onConfirm(chip.value, chip.values); // revert
+    }
+  };
+
+  const handleItemClick = (v: string) => {
+    if (isMulti) {
+      const nextSet = new Set(currentSelected);
+      if (nextSet.has(v)) {
+        nextSet.delete(v);
+      } else {
+        nextSet.add(v);
+      }
+      setValueInput(Array.from(nextSet).join(', '));
+      setIsDirty(true);
+    } else {
+      onConfirm(v);
     }
   };
 
   return (
-    <Box sx={{ minWidth: 200 }}>
+    <Box sx={{ minWidth: 220 }}>
       <Box
         sx={{
           px: 1,
           py: 0.75,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
           borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
         }}
       >
@@ -559,19 +606,37 @@ function ValueEditor({
             '& input': { py: 0.25 },
           }}
         />
+        {isMulti && (
+          <IconButton
+            size="small"
+            onClick={handleApplyMulti}
+            sx={{
+              p: 0.25,
+              color: isDark ? '#7c8aff' : '#5c6bc0',
+              '&:hover': {
+                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              },
+            }}
+          >
+            <CheckIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        )}
       </Box>
       {sorted.length > 0 && (
         <List dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
           {sorted.slice(0, 30).map((v) => {
-            const isCurrent = v === chip.value;
+            const isSelected = isMulti ? currentSelected.has(v) : v === chip.value;
             return (
               <ListItemButton
                 key={v}
-                onClick={() => onConfirm(v)}
-                selected={isCurrent}
+                onClick={() => handleItemClick(v)}
+                selected={isSelected}
                 sx={{
                   py: 0.25,
                   px: 1.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
                   '&.Mui-selected': {
                     backgroundColor: isDark
                       ? 'rgba(255,255,255,0.06)'
@@ -579,14 +644,27 @@ function ValueEditor({
                   },
                 }}
               >
+                {isMulti ? (
+                  <Checkbox
+                    checked={isSelected}
+                    size="small"
+                    sx={{
+                      p: 0,
+                      color: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                      '&.Mui-checked': {
+                        color: isDark ? '#7c8aff' : '#5c6bc0',
+                      },
+                    }}
+                  />
+                ) : null}
                 <ListItemText
                   primary={v}
                   primaryTypographyProps={{
                     fontSize: '0.8rem',
-                    fontWeight: isCurrent ? 600 : 400,
+                    fontWeight: isSelected ? 600 : 400,
                   }}
                 />
-                {isCurrent && (
+                {!isMulti && isSelected && (
                   <CheckIcon
                     sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
                   />

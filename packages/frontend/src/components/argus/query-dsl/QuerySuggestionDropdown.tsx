@@ -33,7 +33,7 @@ import { getOpLabel } from './operator-labels';
 export interface QuerySuggestionDropdownProps {
   suggestions: SuggestionItem[];
   selectedIndex: number;
-  onSelect: (item: SuggestionItem) => void;
+  onSelect: (item: SuggestionItem, isMultiSelect?: boolean) => void;
   onSelectedIndexChange?: (index: number) => void;
   isDark: boolean;
   /** Current input prefix — tabs only show when empty */
@@ -46,6 +46,8 @@ export interface QuerySuggestionDropdownProps {
   onRemoveRecent?: (query: string) => void;
   /** Called when multiple values are selected */
   onSelectMultiple?: (values: string[]) => void;
+  /** Set of currently selected values for in/!in operators */
+  selectedValues?: Set<string>;
 }
 
 /** Imperative handle for tab navigation */
@@ -163,13 +165,12 @@ export const QuerySuggestionDropdown = forwardRef<
     onSelectRecent,
     onRemoveRecent,
     onSelectMultiple,
+    selectedValues = new Set(),
   },
   ref
 ) {
   const { t } = useTranslation();
   const listRef = useRef<HTMLDivElement>(null);
-
-  const [selectedValues, setSelectedValues] = useState<Set<string>>(new Set());
 
   // Tabs only visible when input is empty (field selection mode)
   const showTabs = inputPrefix.trim() === '';
@@ -610,7 +611,12 @@ export const QuerySuggestionDropdown = forwardRef<
                     data-suggestion-item
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      onSelect(item);
+                      const isCheckboxClick = (e.target as HTMLElement).closest('.MuiCheckbox-root');
+                      const isMulti = !!(e.ctrlKey || e.metaKey || isCheckboxClick);
+                      if (isMulti) {
+                        e.stopPropagation();
+                      }
+                      onSelect(item, isMulti);
                     }}
                     sx={{
                       display: 'flex',
@@ -650,8 +656,25 @@ export const QuerySuggestionDropdown = forwardRef<
                           />
                         );
                       }
-                      // Values → indent spacer (no badge)
+                      // Values → Checkbox (if multi-value available) or indent spacer
                       if (isValue) {
+                        if (hasMultipleValues) {
+                          const isChecked = selectedValues.has(item.label);
+                          return (
+                            <Checkbox
+                              checked={isChecked}
+                              size="small"
+                              sx={{
+                                p: 0,
+                                mr: 0.5,
+                                color: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                                '&.Mui-checked': {
+                                  color: isDark ? '#7c8aff' : '#5c6bc0',
+                                },
+                              }}
+                            />
+                          );
+                        }
                         return <Box sx={{ width: 22, flexShrink: 0 }} />;
                       }
                       // Everything else → category badge

@@ -487,7 +487,7 @@ export class QueryParser {
             const node: ASTNode = {
               type: 'CONDITION',
               key,
-              op: 'IN',
+              op: op === '!=' ? '!=' : 'IN',
               value: values,
             };
             return isNegated ? { type: 'NOT', expr: node } : node;

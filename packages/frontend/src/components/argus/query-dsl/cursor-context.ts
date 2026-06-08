@@ -83,6 +83,8 @@ export function resolveCursorContext(
       t.type === TokenType.NOT_CONTAINS ||
       t.type === TokenType.NOT_STARTS_WITH ||
       t.type === TokenType.NOT_ENDS_WITH ||
+      t.type === TokenType.IN ||
+      t.type === TokenType.NOT_IN ||
       t.type === TokenType.BEFORE ||
       t.type === TokenType.AFTER
     ) {
@@ -232,9 +234,11 @@ function isOperatorPrefix(prefix: string): boolean {
     'endswith',
     'before',
     'after',
+    'in',
     '!contains',
     '!startswith',
     '!endswith',
+    '!in',
   ];
   return funcOps.some((op) => op.startsWith(p));
 }
