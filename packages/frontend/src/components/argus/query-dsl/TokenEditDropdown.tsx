@@ -261,9 +261,7 @@ function FieldMenu({
         f.key.toLowerCase().includes(filter.toLowerCase())
       )
     : allFields.filter(
-        (f) =>
-          f.key === currentField ||
-          f.key.startsWith(currentField + '.')
+        (f) => f.key === currentField || f.key.startsWith(currentField + '.')
       );
 
   useEffect(() => {

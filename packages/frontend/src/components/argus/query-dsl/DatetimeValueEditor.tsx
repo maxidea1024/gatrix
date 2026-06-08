@@ -195,7 +195,9 @@ export default function DatetimeValueEditor({
       {/* DateTimePicker */}
       <Box sx={sectionHeaderSx}>
         <CalendarMonthIcon sx={{ fontSize: 14 }} />
-        {isBetween ? t('dsl.datetime.dateRange', 'Date Range') : t('dsl.datetime.pickDateTime', 'Pick Date & Time')}
+        {isBetween
+          ? t('dsl.datetime.dateRange', 'Date Range')
+          : t('dsl.datetime.pickDateTime', 'Pick Date & Time')}
       </Box>
       <Box sx={{ px: 1.5, pb: 1.5 }}>
         <LocalizationProvider
@@ -203,7 +205,11 @@ export default function DatetimeValueEditor({
           adapterLocale={dateLocale}
         >
           <DateTimePicker
-            label={isBetween ? t('dsl.datetime.from', 'From') : t('dsl.datetime.pickDateTime', 'Date & Time')}
+            label={
+              isBetween
+                ? t('dsl.datetime.from', 'From')
+                : t('dsl.datetime.pickDateTime', 'Date & Time')
+            }
             value={fromValue}
             onChange={(d) => handleDateChange(d, 'from')}
             timezone={storedTz}
