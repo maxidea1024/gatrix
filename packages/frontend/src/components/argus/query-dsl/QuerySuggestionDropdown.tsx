@@ -710,9 +710,11 @@ export const QuerySuggestionDropdown = forwardRef<
                                 flexShrink: 0,
                                 cursor: 'pointer',
                                 borderRadius: '3px',
-                                border: `1px solid ${isChecked ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
+                                border: `1px solid ${isChecked ? 'transparent' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
                                 backgroundColor: isChecked
-                                  ? (isDark ? '#7c8aff' : '#5c6bc0')
+                                  ? isDark
+                                    ? '#7c8aff'
+                                    : '#5c6bc0'
                                   : 'transparent',
                                 color: '#fff',
                                 fontSize: 10,

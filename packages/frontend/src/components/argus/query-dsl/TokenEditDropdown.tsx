@@ -522,7 +522,10 @@ function ValueEditor({
     } else if (e.key === 'Escape') {
       e.preventDefault();
       // Revert to original values on Escape cancel
-      onConfirm(originalValRef.current.value || '', originalValRef.current.values);
+      onConfirm(
+        originalValRef.current.value || '',
+        originalValRef.current.values
+      );
     }
   };
 
@@ -602,9 +605,11 @@ function ValueEditor({
                     height: 14,
                     flexShrink: 0,
                     borderRadius: '3px',
-                    border: `1px solid ${isSelected ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
+                    border: `1px solid ${isSelected ? 'transparent' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
                     backgroundColor: isSelected
-                      ? (isDark ? '#7c8aff' : '#5c6bc0')
+                      ? isDark
+                        ? '#7c8aff'
+                        : '#5c6bc0'
                       : 'transparent',
                     color: '#fff',
                     fontSize: 10,
