@@ -377,8 +377,14 @@ export function QueryDSLEditor({
     if (editingToken) {
       const chip = chips.find((c) => c.id === editingToken.chipId);
       if (chip?.composingPart && !skipDeleteOnCloseRef.current) {
-        // Incomplete composing chip → delete
-        deleteChip(editingToken.chipId);
+        const hasValue = chip.value || (chip.values && chip.values.length > 0);
+        if (hasValue) {
+          // Has selected values → finalize
+          updateChip(editingToken.chipId, { composingPart: undefined });
+        } else {
+          // Truly empty/incomplete composing chip → delete
+          deleteChip(editingToken.chipId);
+        }
         setEditingToken(null);
         chipEditingRef.current = false;
         suppressDropdownRef.current = true;
@@ -394,7 +400,7 @@ export function QueryDSLEditor({
     chipEditingRef.current = false;
     suppressDropdownRef.current = true;
     requestAnimationFrame(() => inputRef.current?.focus());
-  }, [editingToken, chips, deleteChip]);
+  }, [editingToken, chips, deleteChip, updateChip]);
 
   // ─── Auto-open dropdown for composing chips ────────────────────────
   // Runs after render so refs are guaranteed to be set.
