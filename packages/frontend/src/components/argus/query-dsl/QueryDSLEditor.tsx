@@ -274,8 +274,15 @@ export function QueryDSLEditor({
   // Support logical operator chips explicitly
   // Suppress suggestions when cursor is inside a quoted string (e.g., level:"")
   const suggestions = useMemo(() => {
+    // Suppress suggestions when cursor is inside a quoted string,
+    // EXCEPT for datetime fields which should show presets (now-1h, etc.)
     if (cursorContext.editorState === EditorState.IN_QUOTED_STRING) {
-      return [];
+      const ctxField = cursorContext.field
+        ? getFieldByKey(cursorContext.field, domain)
+        : null;
+      if (ctxField?.type !== 'datetime') {
+        return [];
+      }
     }
     return getSuggestions(
       cursorContext,
