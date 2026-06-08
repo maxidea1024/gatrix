@@ -130,16 +130,20 @@ export function TokenEditDropdown({
   // Value editing uses inline input — popover should not steal focus
   const isValueType = type === 'value' && !isHasChip;
 
-  // Check if value suggestions have results — hide popover if no facets
+  // Check if value suggestions have results — skip popover entirely if no facets
   const hasValueResults = (() => {
     if (!isValueType) return true;
     const facetValues = facets?.get(chip.field ?? '') ?? [];
     return facetValues.length > 0;
   })();
 
+  // Don't render popover at all for value types with no facets
+  // (rendering with open={false} would trigger onClose and kill the editing session)
+  if (!hasValueResults) return null;
+
   return (
     <Popover
-      open={hasValueResults}
+      open
       anchorEl={anchorEl}
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
