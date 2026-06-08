@@ -34,7 +34,11 @@ import {
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import { getFieldByKey } from './fields';
-import { DATETIME_PRESET_COUNT, DATETIME_NAVIGABLE_COUNT, RELATIVE_PRESETS } from './DatetimeValueEditor';
+import {
+  DATETIME_PRESET_COUNT,
+  DATETIME_NAVIGABLE_COUNT,
+  RELATIVE_PRESETS,
+} from './DatetimeValueEditor';
 import {
   getRecentSearches,
   addRecentSearch,
@@ -632,7 +636,10 @@ export function QueryDSLEditor({
         } else if (e.key === 'Enter' || e.key === 'Tab') {
           e.preventDefault();
           // If a preset is highlighted, apply it directly
-          if (popoverHighlightIdx >= 0 && popoverHighlightIdx < DATETIME_PRESET_COUNT) {
+          if (
+            popoverHighlightIdx >= 0 &&
+            popoverHighlightIdx < DATETIME_PRESET_COUNT
+          ) {
             const preset = RELATIVE_PRESETS[popoverHighlightIdx];
             updateChip(chipId, {
               value: preset.value,
