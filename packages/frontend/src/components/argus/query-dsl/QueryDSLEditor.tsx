@@ -350,10 +350,13 @@ export function QueryDSLEditor({
       }
 
       if (chip?.composingPart === 'value') {
-        // Value selected during step-by-step → complete chip
-        skipDeleteOnCloseRef.current = true;
-        updateChip(chipId, { ...updates, composingPart: undefined });
-        return;
+        // Value selected during step-by-step → complete chip only if not a multi-value select in progress
+        const shouldComplete = !updates.values || 'composingPart' in updates;
+        if (shouldComplete) {
+          skipDeleteOnCloseRef.current = true;
+          updateChip(chipId, { ...updates, composingPart: undefined });
+          return;
+        }
       }
 
       // Normal (non-composing) update

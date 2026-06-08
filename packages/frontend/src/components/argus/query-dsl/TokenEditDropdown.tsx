@@ -109,9 +109,9 @@ export function TokenEditDropdown({
 
   const handleValueConfirm = (value: string, values?: string[]) => {
     if (values && values.length > 1) {
-      onUpdate({ value: values[0], values });
+      onUpdate({ value: values[0], values, composingPart: undefined });
     } else {
-      onUpdate({ value, values: values ?? [value] });
+      onUpdate({ value, values: values ?? [value], composingPart: undefined });
     }
     onClose();
   };
@@ -417,7 +417,7 @@ function ValueEditor({
   const [valueInput, setValueInput] = useState(initialValue);
 
   const facetValues = facets?.get(chip.field ?? '') ?? [];
-  const hasMultiValues = (chip.values?.length ?? 0) > 1;
+  const hasMultiValues = (chip.values?.length ?? 0) >= 1;
 
   // Parse current values from valueInput
   const currentSelected = useMemo(() => {
