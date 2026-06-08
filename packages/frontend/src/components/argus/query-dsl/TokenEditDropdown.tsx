@@ -563,8 +563,10 @@ function ValueEditor({
               <ListItemButton
                 key={v}
                 onClick={(e) => {
+                  const target = e.target as HTMLElement;
+                  const isCheckboxClick = !!target.closest('[data-checkbox]');
                   const isCtrlClick = !!(e.ctrlKey || e.metaKey);
-                  if (isCtrlClick) {
+                  if (isCheckboxClick || isCtrlClick) {
                     handleCheckboxClick(v);
                   } else {
                     handleTextClick(v);
@@ -584,12 +586,9 @@ function ValueEditor({
                   },
                 }}
               >
-                {/* Clickable Checkbox Box */}
+                {/* Passive Checkbox Box (toggled via event delegation) */}
                 <Box
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCheckboxClick(v);
-                  }}
+                  data-checkbox
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -597,7 +596,6 @@ function ValueEditor({
                     width: 14,
                     height: 14,
                     flexShrink: 0,
-                    cursor: 'pointer',
                     borderRadius: '3px',
                     border: `1px solid ${isSelected ? 'transparent' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')}`,
                     backgroundColor: isSelected
