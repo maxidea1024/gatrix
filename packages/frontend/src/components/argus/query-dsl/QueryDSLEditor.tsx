@@ -196,8 +196,8 @@ export function QueryDSLEditor({
 
   // Support logical operator chips explicitly
   const suggestions = useMemo(
-    () => getSuggestions(cursorContext, domain, normalizedFacets, maxSuggestions),
-    [cursorContext, domain, normalizedFacets, maxSuggestions],
+    () => getSuggestions(cursorContext, domain, normalizedFacets, maxSuggestions, chips),
+    [cursorContext, domain, normalizedFacets, maxSuggestions, chips],
   );
 
   // ─── Chip operations ──────────────────────────────────────────────
@@ -224,19 +224,81 @@ export function QueryDSLEditor({
     setSelectedIndex(-1);
   }, []);
 
-  const applySuggestion = useCallback((item: SuggestionItem) => {
-    const result = applyCompletion(inputValue, cursorContext, item);
-
-    if (item.category === 'logical' || item.category === 'paren') {
-      // AND/OR/(/): immediately create a chip (Sentry-style)
-      const chipType = item.category === 'logical' ? 'logical' as const : 'paren' as const;
-      const chipLabel = item.category === 'logical' ? item.label.toUpperCase() : item.label;
+  /** Commit typed text in the input field as chip(s) */
+  const commitInputAsChip = useCallback((text: string) => {
+    const lower = text.toLowerCase();
+    if ((lower === 'and' || lower === 'or') && canInsertLogical(chips)) {
+      // Valid logical operator position → logical chip
       setChips((prev) => [
         ...prev,
         {
           id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: chipType,
-          label: chipLabel,
+          type: 'logical' as const,
+          label: lower.toUpperCase(),
+        },
+      ]);
+      setInputValue('');
+    } else if (lower === '(' || lower === ')') {
+      // Paren → paren chip
+      setChips((prev) => [
+        ...prev,
+        {
+          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          type: 'paren' as const,
+          label: lower,
+        },
+      ]);
+      setInputValue('');
+    } else {
+      // Try to parse as filter, or fall through as free text
+      const parsed = queryToChips(text);
+      if (parsed.length > 0) {
+        setChips((prev) => [...prev, ...parsed]);
+        setInputValue('');
+      }
+    }
+  }, [chips, setChips]);
+
+  const applySuggestion = useCallback((item: SuggestionItem) => {
+    const result = applyCompletion(inputValue, cursorContext, item);
+
+    if (item.category === 'logical') {
+      // AND/OR: only valid after a filter chip or closing paren
+      if (canInsertLogical(chips)) {
+        setChips((prev) => [
+          ...prev,
+          {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'logical' as const,
+            label: item.label.toUpperCase(),
+          },
+        ]);
+        setInputValue('');
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+      } else {
+        // No valid preceding filter → treat as free text message search
+        const freeTextChip: FilterChip = {
+          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          type: 'filter',
+          field: 'message',
+          operator: 'contains',
+          value: item.label,
+          quoted: true,
+        };
+        setChips((prev) => [...prev, freeTextChip]);
+        setInputValue('');
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+      }
+    } else if (item.category === 'paren') {
+      // (/) → immediately create a chip (Sentry-style)
+      setChips((prev) => [
+        ...prev,
+        {
+          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          type: 'paren' as const,
+          label: item.label,
         },
       ]);
       setInputValue('');
@@ -270,7 +332,7 @@ export function QueryDSLEditor({
         inputRef.current.setSelectionRange(result.cursorOffset, result.cursorOffset);
       }
     });
-  }, [inputValue, cursorContext, setChips]);
+  }, [inputValue, cursorContext, setChips, chips]);
 
 
 
@@ -321,34 +383,7 @@ export function QueryDSLEditor({
       if (showDropdown && suggestions.length > 0) {
         applySuggestion(suggestions[selectedIndex >= 0 ? selectedIndex : 0]);
       } else if (inputValue.trim()) {
-        const lower = inputValue.trim().toLowerCase();
-        if (lower === 'and' || lower === 'or') {
-          setChips((prev) => [
-            ...prev,
-            {
-              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              type: 'logical' as const,
-              label: lower.toUpperCase(),
-            },
-          ]);
-          setInputValue('');
-        } else if (lower === '(' || lower === ')') {
-          setChips((prev) => [
-            ...prev,
-            {
-              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              type: 'paren' as const,
-              label: lower,
-            },
-          ]);
-          setInputValue('');
-        } else {
-          const parsed = queryToChips(inputValue);
-          if (parsed.length > 0) {
-            setChips((prev) => [...prev, ...parsed]);
-            setInputValue('');
-          }
-        }
+        commitInputAsChip(inputValue.trim());
         setShowDropdown(false);
       }
       return;
@@ -358,34 +393,7 @@ export function QueryDSLEditor({
       if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
         applySuggestion(suggestions[selectedIndex]);
       } else if (inputValue.trim()) {
-        const lower = inputValue.trim().toLowerCase();
-        if (lower === 'and' || lower === 'or') {
-          setChips((prev) => [
-            ...prev,
-            {
-              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              type: 'logical' as const,
-              label: lower.toUpperCase(),
-            },
-          ]);
-          setInputValue('');
-        } else if (lower === '(' || lower === ')') {
-          setChips((prev) => [
-            ...prev,
-            {
-              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              type: 'paren' as const,
-              label: lower,
-            },
-          ]);
-          setInputValue('');
-        } else {
-          const parsed = queryToChips(inputValue);
-          if (parsed.length > 0) {
-            setChips((prev) => [...prev, ...parsed]);
-            setInputValue('');
-          }
-        }
+        commitInputAsChip(inputValue.trim());
         setShowDropdown(false);
       } else {
         // No input text → execute search with current chips
@@ -607,4 +615,19 @@ export function QueryDSLEditor({
       </Box>
     </ClickAwayListener>
   );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * AND/OR is only valid after a filter chip (key:value) or closing paren ')'.
+ * At the start of the query or after '(' or another logical chip, AND/OR is
+ * invalid and should be treated as free text message search.
+ */
+function canInsertLogical(chips: FilterChip[]): boolean {
+  if (chips.length === 0) return false;
+  const last = chips[chips.length - 1];
+  if (last.type === 'filter') return true;
+  if (last.type === 'paren' && last.label === ')') return true;
+  return false;
 }

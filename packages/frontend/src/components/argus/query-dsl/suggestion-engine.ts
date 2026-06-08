@@ -26,7 +26,8 @@ export function getSuggestions(
   context: CursorContext,
   domain: QueryDomain,
   facets?: Map<string, string[]>,
-  maxSuggestions: number = DEFAULT_MAX_SUGGESTIONS
+  maxSuggestions: number = DEFAULT_MAX_SUGGESTIONS,
+  chips?: { type?: string; label?: string }[],
 ): SuggestionItem[] {
   switch (context.type) {
     case 'FIELD':
@@ -42,7 +43,7 @@ export function getSuggestions(
     case 'VALUE':
       return getValueSuggestions(context, domain, facets, maxSuggestions);
     case 'LOGICAL_OPERATOR':
-      return getLogicalSuggestions(maxSuggestions);
+      return getLogicalSuggestions(maxSuggestions, chips);
     default:
       return [];
   }
@@ -262,24 +263,30 @@ function getValueSuggestions(
   );
 }
 
-function getLogicalSuggestions(max: number): SuggestionItem[] {
-  return [
-    {
-      label: 'AND',
-      category: 'logical' as SuggestionCategory,
-      fieldCategory: 'logic',
-    },
-    {
-      label: 'OR',
-      category: 'logical' as SuggestionCategory,
-      fieldCategory: 'logic',
-    },
-    {
-      label: ')',
-      category: 'paren' as SuggestionCategory,
-      fieldCategory: 'logic',
-    },
-  ].slice(0, max);
+function getLogicalSuggestions(
+  max: number,
+  chips?: { type?: string; label?: string }[],
+): SuggestionItem[] {
+  const results: SuggestionItem[] = [];
+
+  // AND/OR only after a filter chip (key:value) or closing paren ')'
+  const lastChip = chips && chips.length > 0 ? chips[chips.length - 1] : null;
+  const allowLogical = lastChip != null &&
+    (lastChip.type === 'filter' || (lastChip.type === 'paren' && lastChip.label === ')'));
+
+  if (allowLogical) {
+    results.push(
+      { label: 'AND', category: 'logical' as SuggestionCategory, fieldCategory: 'logic' },
+      { label: 'OR', category: 'logical' as SuggestionCategory, fieldCategory: 'logic' },
+    );
+  }
+
+  // Always allow closing paren
+  results.push(
+    { label: ')', category: 'paren' as SuggestionCategory, fieldCategory: 'logic' },
+  );
+
+  return results.slice(0, max);
 }
 
 // ─── Shared value builder ────────────────────────────────────────────────────
