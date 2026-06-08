@@ -191,6 +191,9 @@ export function QueryDSLEditor({
       resetTo(queryToChips(query));
       setInputValue('');
       setShowDropdown(false);
+      // Pre-update prevInitialQuery so the sync effect won't re-reset
+      // when parent updates initialQuery in response to onSearch
+      prevInitialQuery.current = query;
       // Delay onSearch to next tick so chips state is committed first
       requestAnimationFrame(() => {
         suppressOnChangeRef.current = false;
@@ -251,7 +254,11 @@ export function QueryDSLEditor({
     if (chipEditingRef.current || editingToken !== null) return;
     // Skip notifying parent if there is an active composing chip (incomplete filter)
     if (chips.some((c) => c.composingPart !== undefined)) return;
-    onChangeRef.current?.(chipsToQuery(chips));
+    const query = chipsToQuery(chips);
+    // Pre-update so the initialQuery sync effect won't re-reset
+    // when parent echoes back the same query
+    prevInitialQuery.current = query;
+    onChangeRef.current?.(query);
   }, [chips, editingToken]);
 
   // ─── Suggestion engine for inline input ────────────────────────────
