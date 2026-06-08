@@ -287,6 +287,18 @@ function getFieldSuggestions(
     });
   }
 
+  // Exact field name match prioritization:
+  // Move suggestion whose label matches prefix (case-insensitive) to the very top.
+  if (prefix !== '') {
+    const exactMatchIndex = results.findIndex(
+      (item) => item.category === 'field' && item.label.toLowerCase() === prefix
+    );
+    if (exactMatchIndex > 0) {
+      const [exactMatchItem] = results.splice(exactMatchIndex, 1);
+      results.unshift(exactMatchItem);
+    }
+  }
+
   return results.slice(0, max);
 }
 
@@ -334,6 +346,17 @@ function getOperatorAndValueSuggestions(
   const prefix = context.prefix.toLowerCase();
   const suggestions: SuggestionItem[] = [];
 
+  // ── Values (from facets and type-specific) ──
+  const valueSuggestions = buildValueSuggestions(
+    effectiveField,
+    context.field,
+    '=',
+    prefix,
+    facets,
+    max
+  );
+  suggestions.push(...valueSuggestions);
+
   // ── Operators ──
   const ops = effectiveField.operators;
   for (const op of ops) {
@@ -356,17 +379,6 @@ function getOperatorAndValueSuggestions(
       });
     }
   }
-
-  // ── Values (from facets and type-specific) ──
-  const valueSuggestions = buildValueSuggestions(
-    effectiveField,
-    context.field,
-    '=',
-    prefix,
-    facets,
-    max
-  );
-  suggestions.push(...valueSuggestions);
 
   return suggestions.slice(0, max);
 }

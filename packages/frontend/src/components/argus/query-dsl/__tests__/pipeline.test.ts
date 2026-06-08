@@ -10,6 +10,7 @@ import {
   shouldKeepDropdownOpen,
 } from '../suggestion-engine';
 import type { CursorContext, SuggestionItem } from '../types';
+import { queryToChips } from '../useFilterChips';
 
 const MOCK_FACETS = new Map<string, string[]>([
   ['level', ['debug', 'info', 'warn', 'error', 'warning', 'fatal']],
@@ -25,7 +26,9 @@ function pipeline(
   const c = cursor ?? input.length;
   const tokens = tokenize(input);
   const ctx = resolveCursorContext(input, c, tokens);
-  const suggestions = getSuggestions(ctx, 'logs', facets, 20);
+  const textBeforeCursor = input.slice(0, c);
+  const chips = queryToChips(textBeforeCursor);
+  const suggestions = getSuggestions(ctx, 'logs', facets, 20, chips);
   return { tokens, ctx, suggestions };
 }
 

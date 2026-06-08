@@ -9,12 +9,21 @@ import {
   applyCompletion,
   shouldKeepDropdownOpen,
 } from '../suggestion-engine';
+import { queryToChips } from '../useFilterChips';
+
+const MOCK_FACETS = new Map<string, string[]>([
+  ['level', ['debug', 'info', 'warn', 'error', 'warning', 'fatal']],
+  ['environment', ['production', 'staging', 'development', 'local', 'test']],
+  ['service', ['web', 'api', 'worker']],
+]);
 
 function pipeline(input: string, cursor?: number) {
   const c = cursor ?? input.length;
   const tokens = tokenize(input);
   const ctx = resolveCursorContext(input, c, tokens);
-  const suggestions = getSuggestions(ctx, 'logs', undefined, 20);
+  const textBeforeCursor = input.slice(0, c);
+  const chips = queryToChips(textBeforeCursor);
+  const suggestions = getSuggestions(ctx, 'logs', MOCK_FACETS, 20, chips);
   return { tokens, ctx, suggestions };
 }
 
@@ -91,7 +100,7 @@ describe('Chained autocomplete: empty → level → info', () => {
 
     // Space then logical
     ({ ctx, suggestions } = pipeline('level:info ', 11));
-    const andItem = suggestions.find((s) => s.label === 'and')!;
+    const andItem = suggestions.find((s) => s.label === 'AND')!;
     let result = applyCompletion('level:info ', ctx, andItem);
     console.log('After and:', result);
 
@@ -99,6 +108,22 @@ describe('Chained autocomplete: empty → level → info', () => {
     const msg = suggestions.find((s) => s.label === 'message')!;
     result = applyCompletion(result.text, ctx, msg);
     console.log('After message:', result);
-    expect(result.text).toBe('level:info and message:');
+    expect(result.text).toBe('level:info AND message:');
+  });
+
+  it('Prioritization: exact match field "level" is sorted to the top (index 0)', () => {
+    const { suggestions } = pipeline('level', 5);
+    expect(suggestions[0]).toBeDefined();
+    expect(suggestions[0].category).toBe('field');
+    expect(suggestions[0].label).toBe('level');
+  });
+
+  it('Prioritization: operators are sorted to the bottom', () => {
+    const { suggestions } = pipeline('level:', 6);
+    const firstOpIdx = suggestions.findIndex(s => s.category === 'operator');
+    const lastValueIdx = suggestions.map(s => s.category).lastIndexOf('value');
+    if (firstOpIdx !== -1 && lastValueIdx !== -1) {
+      expect(firstOpIdx).toBeGreaterThan(lastValueIdx);
+    }
   });
 });
