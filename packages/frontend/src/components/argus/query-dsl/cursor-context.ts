@@ -257,9 +257,10 @@ export function resolveCursorContext(
       if (currentToken && currentToken.type === TokenType.STRING) {
         // STRING token start includes the opening quote, so content starts at start+1
         const contentStart = currentToken.start + 1;
-        prefix = contentStart < cursorOffset
-          ? input.slice(contentStart, cursorOffset)
-          : '';
+        prefix =
+          contentStart < cursorOffset
+            ? input.slice(contentStart, cursorOffset)
+            : '';
         tokenStart = contentStart;
         tokenEnd = currentToken.end - 1; // exclude closing quote
       }
