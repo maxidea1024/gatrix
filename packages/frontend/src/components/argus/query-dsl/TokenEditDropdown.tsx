@@ -574,7 +574,8 @@ function ValueEditor({
                   const target = e.target as HTMLElement;
                   const isCheckboxClick = !!target.closest('[data-checkbox]');
                   const isCtrlClick = !!(e.ctrlKey || e.metaKey);
-                  if (isCheckboxClick || isCtrlClick) {
+                  const isAlreadyMulti = (chip.values?.length ?? 0) > 1;
+                  if (isCheckboxClick || isCtrlClick || isAlreadyMulti) {
                     handleCheckboxClick(v);
                   } else {
                     handleTextClick(v);

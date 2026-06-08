@@ -237,10 +237,12 @@ export function QueryDSLEditor({
     // Skip onChange during programmatic updates (e.g. recent selection)
     // to prevent race condition where empty chips trigger URL clear
     if (suppressOnChangeRef.current) return;
+    // Skip notifying parent while editing a chip to prevent external initialQuery sync from closing the dropdown
+    if (chipEditingRef.current || editingToken !== null) return;
     // Skip notifying parent if there is an active composing chip (incomplete filter)
     if (chips.some((c) => c.composingPart !== undefined)) return;
     onChangeRef.current?.(chipsToQuery(chips));
-  }, [chips]);
+  }, [chips, editingToken]);
 
   // ─── Suggestion engine for inline input ────────────────────────────
 
