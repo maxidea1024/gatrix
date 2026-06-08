@@ -976,6 +976,25 @@ export function QueryDSLEditor({
   const chipEditingRef = useRef(false);
   // True while user is multi-selecting values via checkboxes (composing state)
   const isMultiSelectingRef = useRef(false);
+  // Track window focus/blur status to prevent dropdown flash on reactivation
+  const windowBlurRef = useRef(false);
+
+  useEffect(() => {
+    const handleWindowBlur = () => {
+      windowBlurRef.current = true;
+    };
+    const handleWindowFocus = () => {
+      setTimeout(() => {
+        windowBlurRef.current = false;
+      }, 50);
+    };
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
+    return () => {
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, []);
 
   // Force-commit pending input as chip(s)
   const commitPendingInput = useCallback(() => {
@@ -987,6 +1006,11 @@ export function QueryDSLEditor({
   }, [inputValue, commitInputAsChip]);
 
   const handleFocus = useCallback(() => {
+    // If focus was triggered by browser window reactivation, do not show dropdown
+    if (windowBlurRef.current) {
+      windowBlurRef.current = false;
+      return;
+    }
     if (suppressDropdownRef.current) {
       suppressDropdownRef.current = false;
       return;
