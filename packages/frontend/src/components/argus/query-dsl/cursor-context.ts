@@ -162,7 +162,10 @@ export function resolveCursorContext(
     currentToken.start < cursorOffset &&
     !nonPrefixTokens.has(currentToken.type)
   ) {
-    if (currentToken.type === TokenType.STRING && cursorOffset === currentToken.end) {
+    if (
+      currentToken.type === TokenType.STRING &&
+      cursorOffset === currentToken.end
+    ) {
       prefix = '';
       tokenStart = cursorOffset;
       tokenEnd = cursorOffset;
@@ -231,7 +234,10 @@ export function resolveCursorContext(
         type = 'VALUE';
         operator = '=';
         // Re-derive prefix from the previous token ONLY if it's not a closed string
-        if (prevToken.type === TokenType.STRING && cursorOffset === prevToken.end) {
+        if (
+          prevToken.type === TokenType.STRING &&
+          cursorOffset === prevToken.end
+        ) {
           prefix = '';
           tokenStart = cursorOffset;
           tokenEnd = cursorOffset;

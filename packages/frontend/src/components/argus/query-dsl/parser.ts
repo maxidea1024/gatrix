@@ -336,7 +336,10 @@ class Parser {
       }
     }
 
-    let end = this.pos > 0 ? this.tokens[this.pos - 1].end : (funcToken?.end ?? fieldToken.end);
+    let end =
+      this.pos > 0
+        ? this.tokens[this.pos - 1].end
+        : (funcToken?.end ?? fieldToken.end);
     if (this.current().type === TokenType.RPAREN) {
       end = this.current().end;
       this.advance(); // consume )

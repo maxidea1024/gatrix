@@ -131,10 +131,12 @@ describe('Chained autocomplete: empty → level → info', () => {
 
   it('All tab operator sorting: logic and parenthesis suggestions are placed at the bottom', () => {
     const { suggestions } = pipeline('', 0);
-    
-    const firstLogicIdx = suggestions.findIndex(s => s.fieldCategory === 'logic');
+
+    const firstLogicIdx = suggestions.findIndex(
+      (s) => s.fieldCategory === 'logic'
+    );
     const lastDataFieldIdx = suggestions
-      .map(s => s.category === 'field' && s.fieldCategory !== 'logic')
+      .map((s) => s.category === 'field' && s.fieldCategory !== 'logic')
       .lastIndexOf(true);
 
     if (firstLogicIdx !== -1 && lastDataFieldIdx !== -1) {
@@ -142,7 +144,7 @@ describe('Chained autocomplete: empty → level → info', () => {
     }
 
     // Verify relative ordering of operators is has -> not has -> (
-    const labels = suggestions.map(s => s.label);
+    const labels = suggestions.map((s) => s.label);
     const hasIdx = labels.indexOf('has');
     const notHasIdx = labels.indexOf('not has');
     const openParenIdx = labels.indexOf('(');

@@ -133,9 +133,10 @@ export function FilterTokenChip({
     if (part === 'value') {
       // For multi-select: initialize with existing values so they show as checked
       // For single-select: start empty so all facet values are visible
-      const existingValues = chip.values && chip.values.length > 0
-        ? chip.values.join(', ')
-        : chip.value || '';
+      const existingValues =
+        chip.values && chip.values.length > 0
+          ? chip.values.join(', ')
+          : chip.value || '';
       setValueInput(existingValues);
     }
     setEditingPart(part);
@@ -432,8 +433,7 @@ function FieldMenu({
 
   // Only show the current field and sub-fields (e.g., message → message, message.template)
   const fields = allFields.filter(
-    (f) =>
-      f.key === currentField || f.key.startsWith(currentField + '.')
+    (f) => f.key === currentField || f.key.startsWith(currentField + '.')
   );
 
   return (
@@ -629,7 +629,7 @@ function ValueEditor({
   return (
     <Box sx={{ minWidth: 220 }}>
       {/* Input row for filtering values */}
-      {(
+      {
         <Box
           sx={{
             px: 1,
@@ -656,7 +656,7 @@ function ValueEditor({
             }}
           />
         </Box>
-      )}
+      }
       {sorted.length > 0 && (
         <List dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
           {sorted.slice(0, 30).map((v) => {

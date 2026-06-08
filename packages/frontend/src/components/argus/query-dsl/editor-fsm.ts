@@ -193,7 +193,10 @@ function isInsideValueListParens(
       } else if (inValueList) {
         depth++;
       }
-    } else if (token.type === TokenType.RPAREN || token.type === TokenType.RBRACKET) {
+    } else if (
+      token.type === TokenType.RPAREN ||
+      token.type === TokenType.RBRACKET
+    ) {
       if (inValueList) {
         depth--;
         if (depth === 0) {
