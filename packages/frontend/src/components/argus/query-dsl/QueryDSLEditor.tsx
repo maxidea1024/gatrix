@@ -570,7 +570,8 @@ export function QueryDSLEditor({
         });
         return;
       } else if (item.category === 'value') {
-        if (isMultiSelect) {
+        const isBracketedInProgress = inputValue.includes('[') || isMultiSelectingRef.current;
+        if (isMultiSelect || isBracketedInProgress) {
           // Multi-select mode: toggle value in field:in("val1", "val2") list format
           const { field, operator, values: currentValues } = currentFilterInfo;
           if (field) {

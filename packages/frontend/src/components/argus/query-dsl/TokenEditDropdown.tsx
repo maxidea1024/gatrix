@@ -171,6 +171,7 @@ export function TokenEditDropdown({
           chip={chip}
           facets={facets}
           onConfirm={handleValueConfirm}
+          onUpdate={onUpdate}
           isDark={isDark}
         />
       )}
@@ -390,11 +391,13 @@ function ValueEditor({
   chip,
   facets,
   onConfirm,
+  onUpdate,
   isDark,
 }: {
   chip: FilterChip;
   facets?: Map<string, string[]>;
   onConfirm: (v: string, nextValues?: string[]) => void;
+  onUpdate: (updates: Partial<FilterChip>) => void;
   isDark: boolean;
 }) {
   const { t } = useTranslation();
@@ -488,8 +491,8 @@ function ValueEditor({
       }
       const vals = Array.from(nextSet);
       setValueInput(vals.join(', '));
-      // Immediately update chip (Sentry pattern: real-time feedback)
-      onConfirm(vals[0] ?? '', vals);
+      // Immediately update chip in real-time without closing the dropdown
+      onUpdate({ value: vals[0] ?? '', values: vals });
     } else {
       onConfirm(v);
     }
