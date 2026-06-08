@@ -82,6 +82,18 @@ class Lexer {
         continue;
       }
 
+      if (ch === '[') {
+        this.emitSingle(TokenType.LBRACKET, '[');
+        // Stay in afterColon context (inside value list)
+        continue;
+      }
+
+      if (ch === ']') {
+        this.emitSingle(TokenType.RBRACKET, ']');
+        this.afterColon = false;
+        continue;
+      }
+
       if (ch === '"') {
         this.readQuotedString();
         this.afterColon = false;
@@ -235,6 +247,8 @@ class Lexer {
         this.isWhitespace(ch) ||
         ch === ')' ||
         ch === '(' ||
+        ch === ']' ||
+        ch === '[' ||
         ch === '"' ||
         ch === ',' ||
         ch === ':'
@@ -264,6 +278,8 @@ class Lexer {
           this.isWhitespace(ch) ||
           ch === ')' ||
           ch === '(' ||
+          ch === ']' ||
+          ch === '[' ||
           ch === '"' ||
           ch === ',' ||
           ch === ':'

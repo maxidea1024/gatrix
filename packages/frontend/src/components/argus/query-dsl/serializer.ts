@@ -48,13 +48,22 @@ function serializeNode(node: Expression): string {
 function serializeFilter(node: Expression & { type: 'Filter' }): string {
   const field = node.field;
 
-  // IN / NOT IN → field:[val1, val2] or !field:[val1, val2]
-  if (node.operator === 'in' || node.operator === '!in') {
-    const vals = (node.values ?? [node.value])
-      .map((v) => formatValue(v))
-      .join(', ');
-    const bracket = `${field}:[${vals}]`;
-    return node.operator === '!in' ? `!${bracket}` : bracket;
+  // Multi-value support (array representation)
+  if (node.values && node.values.length > 0) {
+    const vals = node.values.map((v) => formatValue(v)).join(', ');
+    
+    // Function operators with multiple values
+    const funcMapping = FUNC_OP_MAP[node.operator];
+    if (funcMapping) {
+      return `${field}${funcMapping}[${vals}]`;
+    }
+
+    // Comparison operators with multiple values
+    if (node.operator === '!=') {
+      return `!${field}:[${vals}]`;
+    }
+    // Default implicit or explicit '=' with multiple values
+    return `${field}:[${vals}]`;
   }
 
   // Function operators

@@ -56,8 +56,6 @@ const FUNC_TOKEN_TO_OP: Partial<Record<TokenType, QueryOperator>> = {
   [TokenType.NOT_CONTAINS]: '!contains',
   [TokenType.NOT_STARTS_WITH]: '!startsWith',
   [TokenType.NOT_ENDS_WITH]: '!endsWith',
-  [TokenType.IN]: 'in',
-  [TokenType.NOT_IN]: '!in',
   [TokenType.BEFORE]: 'before',
   [TokenType.AFTER]: 'after',
 };
@@ -295,83 +293,22 @@ class Parser {
       const funcToken = tok;
       this.advance(); // consume function name
 
-      if (this.current().type === TokenType.LPAREN) {
-        this.advance(); // consume (
-
-        // Multi-value argument list for in/!in
-        if (funcOp === 'in' || funcOp === '!in') {
-          return this.parseInFunctionArgs(fieldToken, funcToken, funcOp);
-        }
-
-        // Single arg function: contains("..."), before("..."), etc.
-        const valueToken = this.current();
-        let value: string | number | boolean = '';
-        let quoted = false;
-
-        if (valueToken.type === TokenType.STRING) {
-          value = valueToken.value;
-          quoted = true;
-          this.advance();
-        } else if (valueToken.type === TokenType.RPAREN) {
-          // Empty function call: contains()
-          this.addError('INCOMPLETE_FUNCTION', funcToken.start, funcToken.end, {
-            op: funcToken.value,
-          });
-        } else {
-          value = valueToken.value;
-          this.advance();
-        }
-
-        let end =
-          this.pos < this.tokens.length
-            ? this.tokens[this.pos - 1].end
-            : valueToken.end;
-
-        if (this.current().type === TokenType.RPAREN) {
-          end = this.current().end;
-          this.advance(); // consume )
-        } else {
-          this.addError('UNCLOSED_PAREN', funcToken.start, end, {});
-        }
-
-        return {
-          type: 'Filter',
-          field: fieldToken.value,
-          operator: funcOp,
-          value,
-          quoted,
-          funcOp: funcToken.value,
-          start: fieldToken.start,
-          end,
-        };
-      } else {
-        // Function name without parentheses
-        this.addError('INCOMPLETE_FUNCTION', funcToken.start, funcToken.end, {
-          op: funcToken.value,
-        });
-        return {
-          type: 'Filter',
-          field: fieldToken.value,
-          operator: funcOp,
-          value: '',
-          quoted: false,
-          funcOp: funcToken.value,
-          start: fieldToken.start,
-          end: funcToken.end,
-        };
-      }
+      return this.parseFilterValue(fieldToken, funcOp, funcToken);
     }
 
     // Simple value: field:value
     return this.parseFilterValue(fieldToken, '=');
   }
 
-  private parseInFunctionArgs(
+  private parseMultiValueArgs(
     fieldToken: Token,
-    funcToken: Token,
-    funcOp: QueryOperator
+    operator: QueryOperator,
+    funcToken?: Token
   ): FilterExpression {
+    this.advance(); // consume (
+
     const values: (string | number | boolean)[] = [];
+    let quoted = true; // default for array representation
 
     while (
       this.current().type !== TokenType.RPAREN &&
@@ -399,22 +336,23 @@ class Parser {
       }
     }
 
-    let end = this.pos > 0 ? this.tokens[this.pos - 1].end : funcToken.end;
+    let end = this.pos > 0 ? this.tokens[this.pos - 1].end : (funcToken?.end ?? fieldToken.end);
     if (this.current().type === TokenType.RPAREN) {
       end = this.current().end;
       this.advance(); // consume )
     } else {
-      this.addError('UNCLOSED_PAREN', funcToken.start, end, {});
+      const startPos = funcToken ? funcToken.start : fieldToken.end + 1;
+      this.addError('UNCLOSED_PAREN', startPos, end, {});
     }
 
     return {
       type: 'Filter',
       field: fieldToken.value,
-      operator: funcOp,
+      operator,
       value: values.length > 0 ? values[0] : '',
       values,
-      quoted: true,
-      funcOp: funcToken.value,
+      quoted,
+      funcOp: funcToken?.value,
       start: fieldToken.start,
       end,
     };
@@ -422,8 +360,38 @@ class Parser {
 
   private parseFilterValue(
     fieldToken: Token,
-    operator: QueryOperator
+    operator: QueryOperator,
+    funcToken?: Token
   ): FilterExpression {
+    if (this.current().type === TokenType.LPAREN) {
+      // Empty function call check, e.g. contains()
+      if (this.peek()?.type === TokenType.RPAREN) {
+        this.advance(); // consume (
+        const end = this.current().end;
+        this.advance(); // consume )
+        if (funcToken) {
+          this.addError('INCOMPLETE_FUNCTION', funcToken.start, funcToken.end, {
+            op: funcToken.value,
+          });
+        } else {
+          this.addError('INCOMPLETE_FILTER', fieldToken.start, end, {
+            field: fieldToken.value,
+          });
+        }
+        return {
+          type: 'Filter',
+          field: fieldToken.value,
+          operator,
+          value: '',
+          quoted: false,
+          funcOp: funcToken?.value,
+          start: fieldToken.start,
+          end,
+        };
+      }
+      return this.parseMultiValueArgs(fieldToken, operator, funcToken);
+    }
+
     const tok = this.current();
     let value: string | number | boolean;
     let quoted = false;
@@ -461,6 +429,7 @@ class Parser {
         operator,
         value: '',
         quoted: false,
+        funcOp: funcToken?.value,
         start: fieldToken.start,
         end: this.tokens[this.pos - 1].end,
       };
@@ -476,6 +445,7 @@ class Parser {
       operator,
       value,
       quoted,
+      funcOp: funcToken?.value,
       start: fieldToken.start,
       end: this.tokens[this.pos - 1].end,
     };

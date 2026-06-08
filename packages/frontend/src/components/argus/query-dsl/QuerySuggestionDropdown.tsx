@@ -18,7 +18,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import { Box, Typography, IconButton, Checkbox } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
   SearchRounded as SearchIcon,
@@ -48,6 +48,8 @@ export interface QuerySuggestionDropdownProps {
   onSelectMultiple?: (values: string[]) => void;
   /** Set of currently selected values for in/!in operators */
   selectedValues?: Set<string>;
+  /** Left offset for positioning dropdown near cursor */
+  dropdownLeft?: number;
 }
 
 /** Imperative handle for tab navigation */
@@ -166,6 +168,7 @@ export const QuerySuggestionDropdown = forwardRef<
     onRemoveRecent,
     onSelectMultiple,
     selectedValues = new Set(),
+    dropdownLeft = 0,
   },
   ref
 ) {
@@ -226,7 +229,7 @@ export const QuerySuggestionDropdown = forwardRef<
 
   const hasRecent = recentSearches.length > 0;
 
-  const showCheckboxes = hasMultipleValues && isCtrlPressed;
+  // Use hasMultipleValues to determine if we are in a context that supports multi-select
 
   // Domain-aware tab labels
   const FIELD_CAT_TABS: Record<string, { i18nKey: string; fallback: string }> =
@@ -391,7 +394,7 @@ export const QuerySuggestionDropdown = forwardRef<
       sx={{
         position: 'absolute',
         top: '100%',
-        left: 0,
+        left: dropdownLeft,
         mt: '2px',
         minWidth: 360,
         maxWidth: 480,
@@ -639,16 +642,12 @@ export const QuerySuggestionDropdown = forwardRef<
                   <Box
                     key={`${category}-${item.label}`}
                     data-suggestion-item
+                    onMouseEnter={() => setHoveredIndex(idx)}
+                    onMouseLeave={() => setHoveredIndex(null)}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      const isCheckboxClick = (e.target as HTMLElement).closest(
-                        '.MuiCheckbox-root'
-                      );
-                      const isMulti = !!(
-                        e.ctrlKey ||
-                        e.metaKey ||
-                        isCheckboxClick
-                      );
+                      // Ctrl/Cmd + click = multi-select (toggle value without closing)
+                      const isMulti = !!(e.ctrlKey || e.metaKey);
                       if (isMulti) {
                         e.stopPropagation();
                       }
@@ -692,28 +691,32 @@ export const QuerySuggestionDropdown = forwardRef<
                           />
                         );
                       }
-                      // Values → Checkbox (only when showCheckboxes is true) or indent spacer
+                      // Values → show selected indicator (checkmark) when value is selected
                       if (isValue) {
-                        if (showCheckboxes) {
-                          const isChecked = selectedValues.has(item.label);
+                        const isChecked = selectedValues.has(item.label);
+                        if (hasMultipleValues && isChecked) {
                           return (
-                            <Checkbox
-                              checked={isChecked}
-                              size="small"
+                            <Box
+                              component="span"
                               sx={{
-                                p: 0,
-                                mr: 0.5,
-                                color: isDark
-                                  ? 'rgba(255, 255, 255, 0.3)'
-                                  : 'rgba(0, 0, 0, 0.3)',
-                                '&.Mui-checked': {
-                                  color: isDark ? '#7c8aff' : '#5c6bc0',
-                                },
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: 16,
+                                height: 16,
+                                flexShrink: 0,
+                                borderRadius: '3px',
+                                backgroundColor: isDark ? '#7c8aff' : '#5c6bc0',
+                                color: '#fff',
+                                fontSize: 11,
+                                fontWeight: 700,
                               }}
-                            />
+                            >
+                              ✓
+                            </Box>
                           );
                         }
-                        return <Box sx={{ width: 22, flexShrink: 0 }} />;
+                        return <Box sx={{ width: 16, flexShrink: 0 }} />;
                       }
                       // Everything else → category badge
                       const badgeKey = isLogical
@@ -826,7 +829,20 @@ export const QuerySuggestionDropdown = forwardRef<
           alignItems: 'center',
         }}
       >
-        <Box sx={{ flex: 1 }} />
+        {/* Multi-select hint — shown when multiple values are available */}
+        {hasMultipleValues && (
+          <Typography
+            sx={{
+              fontSize: '11px',
+              color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {t('dsl.hint.multiSelect', 'Hold {{key}} to select multiple', {
+              key: navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl',
+            })}
+          </Typography>
+        )}
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           {[
             { keys: '↑↓', label: t('dsl.hint.navigate', 'navigate') },

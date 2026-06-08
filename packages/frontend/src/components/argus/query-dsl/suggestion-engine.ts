@@ -172,7 +172,7 @@ function getFieldSuggestions(
       },
       {
         label: `message is not ${originalPrefix}`,
-        insertText: `message:!"${escapedPrefix}"`,
+        insertText: `message:!="${escapedPrefix}"`,
         desc: 'dsl.smart.messageIsNot',
       },
       // Prefix/suffix
@@ -217,26 +217,39 @@ function getFieldSuggestions(
     (c) => c.type === 'filter' || (c.type === 'paren' && c.label === ')')
   );
 
-  // AND/OR: available when at least one filter/closeparen chip exists
+  // ── has / !has existence operators ──
+  // Show in All + Logic tabs — push to appear at the bottom (after field list)
+  if (prefix === '' || 'has'.startsWith(prefix)) {
+    results.push({
+      label: 'has',
+      insertText: 'has:',
+      category: 'field',
+      fieldCategory: 'logic',
+      description: 'dsl.has.fieldExists',
+    });
+  }
   if (
-    hasFilterChip &&
-    (lastChip?.type === 'filter' ||
-      (lastChip?.type === 'paren' && lastChip?.label === ')'))
+    prefix === '' ||
+    '!has'.startsWith(prefix) ||
+    'not has'.startsWith(prefix) ||
+    'not'.startsWith(prefix)
   ) {
-    if (prefix === '' || 'or'.startsWith(prefix)) {
-      results.unshift({
-        label: 'OR',
-        category: 'logical' as SuggestionCategory,
-        fieldCategory: 'logic',
-      });
-    }
-    if (prefix === '' || 'and'.startsWith(prefix)) {
-      results.unshift({
-        label: 'AND',
-        category: 'logical' as SuggestionCategory,
-        fieldCategory: 'logic',
-      });
-    }
+    results.push({
+      label: 'not has',
+      insertText: '!has:',
+      category: 'field',
+      fieldCategory: 'logic',
+      description: 'dsl.has.fieldNotExists',
+    });
+  }
+
+  // '(': always available
+  if (prefix === '' || '('.startsWith(prefix)) {
+    results.push({
+      label: '(',
+      category: 'paren',
+      fieldCategory: 'logic',
+    });
   }
 
   // ')': available when there's an unmatched '(' in chips
@@ -245,53 +258,41 @@ function getFieldSuggestions(
   const closeParens =
     chips?.filter((c) => c.type === 'paren' && c.label === ')').length ?? 0;
   if (openParens > closeParens && (prefix === '' || ')'.startsWith(prefix))) {
-    results.unshift({
+    results.push({
       label: ')',
       category: 'paren',
       fieldCategory: 'logic',
     });
   }
 
-  // '(': always available
-  if (prefix === '' || '('.startsWith(prefix)) {
-    results.unshift({
-      label: '(',
-      category: 'paren',
-      fieldCategory: 'logic',
-    });
-  }
-
-  // ── has / !has existence operators ──
-  // Show in All + Logic tabs — unshift to appear at top (before field list)
+  // AND/OR: available when at least one filter/closeparen chip exists
   if (
-    prefix === '' ||
-    '!has'.startsWith(prefix) ||
-    'not has'.startsWith(prefix) ||
-    'not'.startsWith(prefix)
+    hasFilterChip &&
+    (lastChip?.type === 'filter' ||
+      (lastChip?.type === 'paren' && lastChip?.label === ')'))
   ) {
-    results.unshift({
-      label: 'not has',
-      insertText: '!has:',
-      category: 'field',
-      fieldCategory: 'logic',
-      description: 'dsl.has.fieldNotExists',
-    });
-  }
-  if (prefix === '' || 'has'.startsWith(prefix)) {
-    results.unshift({
-      label: 'has',
-      insertText: 'has:',
-      category: 'field',
-      fieldCategory: 'logic',
-      description: 'dsl.has.fieldExists',
-    });
+    if (prefix === '' || 'and'.startsWith(prefix)) {
+      results.push({
+        label: 'AND',
+        category: 'logical' as SuggestionCategory,
+        fieldCategory: 'logic',
+      });
+    }
+    if (prefix === '' || 'or'.startsWith(prefix)) {
+      results.push({
+        label: 'OR',
+        category: 'logical' as SuggestionCategory,
+        fieldCategory: 'logic',
+      });
+    }
   }
 
-  // Exact field name match prioritization:
-  // Move suggestion whose label matches prefix (case-insensitive) to the very top.
+  // Exact match prioritization:
+  // Move ANY suggestion whose label matches prefix (case-insensitive) to the very top.
+  // This ensures 'AND', 'OR', exact field names, etc. appear first.
   if (prefix !== '') {
     const exactMatchIndex = results.findIndex(
-      (item) => item.category === 'field' && item.label.toLowerCase() === prefix
+      (item) => item.label.toLowerCase() === prefix
     );
     if (exactMatchIndex > 0) {
       const [exactMatchItem] = results.splice(exactMatchIndex, 1);

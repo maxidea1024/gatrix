@@ -94,7 +94,17 @@ export function resolveEditorState(
         }
         break;
 
+      case TokenType.LBRACKET:
+        // [ starts a value list — expect values inside
+        parenDepth++;
+        break;
+
       case TokenType.RPAREN:
+        parenDepth = Math.max(0, parenDepth - 1);
+        state = EditorState.EXPECT_LOGICAL_OPERATOR;
+        break;
+
+      case TokenType.RBRACKET:
         parenDepth = Math.max(0, parenDepth - 1);
         state = EditorState.EXPECT_LOGICAL_OPERATOR;
         break;
@@ -112,8 +122,8 @@ export function resolveEditorState(
     state = EditorState.IN_QUOTED_STRING;
   }
 
-  // If inside function parentheses (e.g., contains(...)), force VALUE context
-  if (isInsideFunctionParens(tokens, cursorOffset)) {
+  // If inside value list brackets/parens (e.g., :[...], contains(...)), force VALUE context
+  if (isInsideValueListParens(tokens, cursorOffset)) {
     if (state !== EditorState.IN_QUOTED_STRING) {
       state = EditorState.EXPECT_VALUE;
     }
@@ -135,7 +145,7 @@ function isInsideQuotedString(tokens: Token[], cursorOffset: number): boolean {
     if (token.type === TokenType.STRING) {
       // STRING tokens include quotes in their span
       // If cursor is anywhere within the token's character range, we're inside
-      if (token.start < cursorOffset && cursorOffset <= token.end) {
+      if (token.start < cursorOffset && cursorOffset < token.end) {
         return true;
       }
     }
@@ -144,42 +154,54 @@ function isInsideQuotedString(tokens: Token[], cursorOffset: number): boolean {
 }
 
 /**
- * Check if cursor is inside function parentheses (e.g., contains(...)).
- * Tracks LPAREN after function operator tokens.
+ * Check if cursor is inside value list brackets/parens (e.g., field:[...], field:contains(...)).
  */
-function isInsideFunctionParens(
+function isInsideValueListParens(
   tokens: Token[],
   cursorOffset: number
 ): boolean {
-  const funcOps = new Set([
-    TokenType.CONTAINS,
-    TokenType.STARTS_WITH,
-    TokenType.ENDS_WITH,
-    TokenType.NOT_CONTAINS,
-    TokenType.NOT_STARTS_WITH,
-    TokenType.NOT_ENDS_WITH,
-    TokenType.BEFORE,
-    TokenType.AFTER,
-  ]);
+  let inValueList = false;
+  let depth = 0;
 
-  let afterFuncOp = false;
-  let funcParenDepth = 0;
-
-  for (const token of tokens) {
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
     if (token.type === TokenType.EOF) break;
     if (token.start >= cursorOffset) break;
 
-    if (funcOps.has(token.type)) {
-      afterFuncOp = true;
-    } else if (token.type === TokenType.LPAREN && afterFuncOp) {
-      funcParenDepth++;
-    } else if (token.type === TokenType.RPAREN && funcParenDepth > 0) {
-      funcParenDepth--;
-      afterFuncOp = false;
-    } else if (token.type !== TokenType.LPAREN) {
-      afterFuncOp = false;
+    if (token.type === TokenType.LPAREN || token.type === TokenType.LBRACKET) {
+      const prev = i > 0 ? tokens[i - 1] : null;
+      if (
+        prev &&
+        (prev.type === TokenType.COLON ||
+          prev.type === TokenType.FIELD ||
+          prev.type === TokenType.NE ||
+          prev.type === TokenType.GT ||
+          prev.type === TokenType.GTE ||
+          prev.type === TokenType.LT ||
+          prev.type === TokenType.LTE ||
+          prev.type === TokenType.CONTAINS ||
+          prev.type === TokenType.STARTS_WITH ||
+          prev.type === TokenType.ENDS_WITH ||
+          prev.type === TokenType.NOT_CONTAINS ||
+          prev.type === TokenType.NOT_STARTS_WITH ||
+          prev.type === TokenType.NOT_ENDS_WITH ||
+          prev.type === TokenType.BEFORE ||
+          prev.type === TokenType.AFTER)
+      ) {
+        depth++;
+        inValueList = true;
+      } else if (inValueList) {
+        depth++;
+      }
+    } else if (token.type === TokenType.RPAREN || token.type === TokenType.RBRACKET) {
+      if (inValueList) {
+        depth--;
+        if (depth === 0) {
+          inValueList = false;
+        }
+      }
     }
   }
 
-  return funcParenDepth > 0;
+  return inValueList && depth > 0;
 }

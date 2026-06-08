@@ -16,6 +16,8 @@ export enum TokenType {
   COLON = 'COLON',
   LPAREN = 'LPAREN',
   RPAREN = 'RPAREN',
+  LBRACKET = 'LBRACKET', // [ (multi-value list)
+  RBRACKET = 'RBRACKET', // ] (multi-value list)
 
   // === Comparison Operators (after colon) ===
   NE = 'NE', // !=
@@ -33,8 +35,6 @@ export enum TokenType {
   NOT_CONTAINS = 'NOT_CONTAINS',
   NOT_STARTS_WITH = 'NOT_STARTS_WITH',
   NOT_ENDS_WITH = 'NOT_ENDS_WITH',
-  IN = 'IN',
-  NOT_IN = 'NOT_IN',
 
   // === Logical Operators ===
   AND = 'AND',
@@ -184,8 +184,6 @@ export type QueryOperator =
   | '!contains'
   | '!startsWith'
   | '!endsWith'
-  | 'in'
-  | '!in'
   | 'before'
   | 'after';
 
@@ -318,13 +316,11 @@ export const FUNCTION_OPERATORS = new Set([
   'contains',
   'startswith',
   'endswith',
-  'in',
   'before',
   'after',
   '!contains',
   '!startswith',
   '!endswith',
-  '!in',
 ]);
 
 /** Logical operator keywords */
@@ -338,11 +334,9 @@ export const FUNC_OP_TOKEN_MAP: Record<string, TokenType> = {
   contains: TokenType.CONTAINS,
   startswith: TokenType.STARTS_WITH,
   endswith: TokenType.ENDS_WITH,
-  in: TokenType.IN,
   before: TokenType.BEFORE,
   after: TokenType.AFTER,
   '!contains': TokenType.NOT_CONTAINS,
   '!startswith': TokenType.NOT_STARTS_WITH,
   '!endswith': TokenType.NOT_ENDS_WITH,
-  '!in': TokenType.NOT_IN,
 };

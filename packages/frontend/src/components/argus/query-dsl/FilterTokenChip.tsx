@@ -15,7 +15,6 @@ import {
   InputBase,
   Typography,
   useTheme,
-  Checkbox,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -85,6 +84,8 @@ interface FilterTokenChipProps {
   onDelete: (chipId: string) => void;
   /** Called when chip editing starts (true) or ends (false) */
   onEditToggle?: (editing: boolean) => void;
+  /** Called when value part is clicked to decompose chip back into input (composing state) */
+  onDecomposeToInput?: (chip: FilterChip) => void;
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -96,6 +97,7 @@ export function FilterTokenChip({
   onUpdate,
   onDelete,
   onEditToggle,
+  onDecomposeToInput,
 }: FilterTokenChipProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -104,7 +106,9 @@ export function FilterTokenChip({
   const [editingPart, setEditingPart] = useState<
     'field' | 'operator' | 'value' | null
   >(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const fieldPartRef = useRef<HTMLElement>(null);
+  const operatorPartRef = useRef<HTMLElement>(null);
+  const valuePartRef = useRef<HTMLElement>(null);
   const [valueInput, setValueInput] = useState(chip.value);
 
   const field = getFieldByKey(chip.field, domain);
@@ -114,25 +118,45 @@ export function FilterTokenChip({
 
   const handlePartClick = (
     part: 'field' | 'operator' | 'value',
-    el: HTMLElement
+    _el: HTMLElement
   ) => {
     // Toggle: clicking the same part again closes the popover
     if (editingPart === part) {
       handleClose();
       return;
     }
+    // For regular filter chips, decompose value back to composing state in input field
+    if (part === 'value' && !isHasChip && onDecomposeToInput) {
+      onDecomposeToInput(chip);
+      return;
+    }
     if (part === 'value') {
-      // Start empty so all facet values are visible; current value is highlighted
-      setValueInput('');
+      // For multi-select: initialize with existing values so they show as checked
+      // For single-select: start empty so all facet values are visible
+      const existingValues = chip.values && chip.values.length > 0
+        ? chip.values.join(', ')
+        : chip.value || '';
+      setValueInput(existingValues);
     }
     setEditingPart(part);
-    setAnchorEl(el);
     onEditToggle?.(true);
   };
 
   const handleClose = () => {
+    // Auto-apply pending multi-select value changes when popover closes
+    if (editingPart === 'value') {
+      // Auto-commit selected values when popover closes
+      const vals = valueInput
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
+      if (vals.length > 1) {
+        onUpdate(chip.id, { value: vals.join(', '), values: vals });
+      } else if (vals.length === 1) {
+        onUpdate(chip.id, { value: vals[0], values: undefined });
+      }
+    }
     setEditingPart(null);
-    setAnchorEl(null);
     onEditToggle?.(false);
   };
 
@@ -212,6 +236,7 @@ export function FilterTokenChip({
       >
         {/* Field part */}
         <Box
+          ref={fieldPartRef}
           component="span"
           sx={partStyle('field')}
           onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
@@ -224,6 +249,7 @@ export function FilterTokenChip({
         {/* Operator part — hidden for has/!has */}
         {isHasChip ? null : (
           <Box
+            ref={operatorPartRef}
             component="span"
             sx={partStyle('operator')}
             onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
@@ -236,6 +262,7 @@ export function FilterTokenChip({
 
         {/* Value part */}
         <Box
+          ref={valuePartRef}
           component="span"
           sx={{
             ...partStyle('value'),
@@ -280,7 +307,13 @@ export function FilterTokenChip({
       {/* ── Popover for editing ── */}
       <Popover
         open={editingPart !== null}
-        anchorEl={anchorEl}
+        anchorEl={
+          editingPart === 'field'
+            ? fieldPartRef.current
+            : editingPart === 'operator'
+              ? operatorPartRef.current
+              : valuePartRef.current
+        }
         onClose={handleClose}
         disableRestoreFocus
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
@@ -395,7 +428,13 @@ function FieldMenu({
   onSelect: (field: string) => void;
   isDark: boolean;
 }) {
-  const fields = getFieldsForDomain(domain);
+  const allFields = getFieldsForDomain(domain);
+
+  // Only show the current field and sub-fields (e.g., message → message, message.template)
+  const fields = allFields.filter(
+    (f) =>
+      f.key === currentField || f.key.startsWith(currentField + '.')
+  );
 
   return (
     <List dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
@@ -503,41 +542,45 @@ function ValueEditor({
   const [isDirty, setIsDirty] = useState(false);
 
   const facetValues = facets?.get(chip.field) ?? [];
-  const isMulti = chip.operator === 'in' || chip.operator === '!in';
+  // Chip already has multiple values selected (e.g. level:["debug","info"])
+  const hasMultiValues = (chip.values?.length ?? 0) > 1;
 
-  // Parse current values from valueInput (split by comma and trim)
+  // Parse current values from valueInput (always track selected set for Ctrl+click)
   const currentSelected = useMemo(() => {
-    if (!isMulti) return new Set<string>();
     return new Set(
       valueInput
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v !== '')
     );
-  }, [valueInput, isMulti]);
+  }, [valueInput]);
 
   // When popover opens, show all values. Once user types, filter by input.
-  const filterText = isDirty
-    ? isMulti
-      ? (valueInput.split(',').pop()?.trim() ?? '')
-      : valueInput
-    : '';
+  const filterText = isDirty ? valueInput.trim() : '';
 
-  const filtered =
+  // Stable initial sort order — capture once when the list first renders,
+  // so toggling checkboxes doesn't cause items to jump around.
+  const initialOrderRef = useRef<string[] | null>(null);
+  if (initialOrderRef.current === null && facetValues.length > 0) {
+    const initSelected = new Set(
+      (chip.values ?? [chip.value]).filter((v) => v !== '')
+    );
+    initialOrderRef.current = [...facetValues].sort((a, b) => {
+      const aS = initSelected.has(a);
+      const bS = initSelected.has(b);
+      if (aS && !bS) return -1;
+      if (!aS && bS) return 1;
+      return a.localeCompare(b);
+    });
+  }
+
+  // Apply text filter on the stable order
+  const sorted =
     isDirty && filterText !== ''
-      ? facetValues.filter((v) =>
+      ? (initialOrderRef.current ?? facetValues).filter((v) =>
           v.toLowerCase().includes(filterText.toLowerCase())
         )
-      : facetValues;
-
-  // Sort: current value first, then rest alphabetically
-  const sorted = [...filtered].sort((a, b) => {
-    const aSelected = isMulti ? currentSelected.has(a) : a === chip.value;
-    const bSelected = isMulti ? currentSelected.has(b) : b === chip.value;
-    if (aSelected && !bSelected) return -1;
-    if (!aSelected && bSelected) return 1;
-    return a.localeCompare(b);
-  });
+      : (initialOrderRef.current ?? facetValues);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -554,7 +597,7 @@ function ValueEditor({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (isMulti) {
+      if (hasMultiValues) {
         handleApplyMulti();
       } else {
         onConfirm(valueInput || chip.value);
@@ -566,16 +609,18 @@ function ValueEditor({
     }
   };
 
-  const handleItemClick = (v: string) => {
-    if (isMulti) {
+  const handleItemClick = (v: string, e?: React.MouseEvent) => {
+    const isCtrlClick = !!(e?.ctrlKey || e?.metaKey);
+    if (hasMultiValues || isCtrlClick) {
       const nextSet = new Set(currentSelected);
       if (nextSet.has(v)) {
         nextSet.delete(v);
       } else {
         nextSet.add(v);
       }
-      setValueInput(Array.from(nextSet).join(', '));
-      setIsDirty(true);
+      const vals = Array.from(nextSet);
+      setValueInput(vals.join(', '));
+      // Only update local state — commit happens on close
     } else {
       onConfirm(v);
     }
@@ -583,59 +628,43 @@ function ValueEditor({
 
   return (
     <Box sx={{ minWidth: 220 }}>
-      <Box
-        sx={{
-          px: 1,
-          py: 0.75,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-        }}
-      >
-        <InputBase
-          ref={inputRef}
-          value={valueInput}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          autoFocus
-          fullWidth
-          placeholder={
-            chip.value || t('dsl.chip.filterValues', 'Filter values...')
-          }
+      {/* Input row for filtering values */}
+      {(
+        <Box
           sx={{
-            fontSize: '0.8rem',
-            '& input': { py: 0.25 },
+            px: 1,
+            py: 0.75,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
           }}
-        />
-        {isMulti && (
-          <IconButton
-            size="small"
-            onClick={handleApplyMulti}
+        >
+          <InputBase
+            ref={inputRef}
+            value={valueInput}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            autoFocus
+            fullWidth
+            placeholder={
+              chip.value || t('dsl.chip.filterValues', 'Filter values...')
+            }
             sx={{
-              p: 0.25,
-              color: isDark ? '#7c8aff' : '#5c6bc0',
-              '&:hover': {
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.06)'
-                  : 'rgba(0,0,0,0.04)',
-              },
+              fontSize: '0.8rem',
+              '& input': { py: 0.25 },
             }}
-          >
-            <CheckIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        )}
-      </Box>
+          />
+        </Box>
+      )}
       {sorted.length > 0 && (
         <List dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
           {sorted.slice(0, 30).map((v) => {
-            const isSelected = isMulti
-              ? currentSelected.has(v)
-              : v === chip.value;
+            const isSelected = currentSelected.has(v);
             return (
               <ListItemButton
                 key={v}
-                onClick={() => handleItemClick(v)}
+                onClick={(e) => handleItemClick(v, e)}
                 selected={isSelected}
                 sx={{
                   py: 0.25,
@@ -650,21 +679,29 @@ function ValueEditor({
                   },
                 }}
               >
-                {isMulti ? (
-                  <Checkbox
-                    checked={isSelected}
-                    size="small"
+                {/* Selected indicator: checkmark badge */}
+                {isSelected ? (
+                  <Box
+                    component="span"
                     sx={{
-                      p: 0,
-                      color: isDark
-                        ? 'rgba(255, 255, 255, 0.3)'
-                        : 'rgba(0, 0, 0, 0.3)',
-                      '&.Mui-checked': {
-                        color: isDark ? '#7c8aff' : '#5c6bc0',
-                      },
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 16,
+                      height: 16,
+                      flexShrink: 0,
+                      borderRadius: '3px',
+                      backgroundColor: isDark ? '#7c8aff' : '#5c6bc0',
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 700,
                     }}
-                  />
-                ) : null}
+                  >
+                    ✓
+                  </Box>
+                ) : (
+                  <Box sx={{ width: 16, flexShrink: 0 }} />
+                )}
                 <ListItemText
                   primary={v}
                   primaryTypographyProps={{
@@ -672,15 +709,31 @@ function ValueEditor({
                     fontWeight: isSelected ? 600 : 400,
                   }}
                 />
-                {!isMulti && isSelected && (
-                  <CheckIcon
-                    sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
-                  />
-                )}
               </ListItemButton>
             );
           })}
         </List>
+      )}
+      {/* Multi-select hint footer */}
+      {sorted.length >= 2 && (
+        <Box
+          sx={{
+            px: 1.5,
+            py: 0.5,
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: '11px',
+              color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
+            }}
+          >
+            {t('dsl.hint.multiSelect', 'Hold {{key}} to select multiple', {
+              key: navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl',
+            })}
+          </Typography>
+        </Box>
       )}
     </Box>
   );

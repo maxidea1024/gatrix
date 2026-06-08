@@ -34,6 +34,8 @@ export interface FilterChip {
   values?: string[];
   /** Whether the value was quoted */
   quoted?: boolean;
+  /** Which part is currently being composed during step-by-step creation */
+  composingPart?: 'operator' | 'value';
 }
 
 let _chipIdCounter = 0;
@@ -123,8 +125,8 @@ function filterToChip(node: FilterExpression): FilterChip {
     value: String(node.value),
     quoted: node.quoted,
   };
-  // Populate values for in/!in operators
-  if ((node.operator === 'in' || node.operator === '!in') && node.values) {
+  // Populate values for multi-value operators
+  if (node.values && node.values.length > 0) {
     chip.values = node.values.map(String);
     chip.value = chip.values.join(', ');
   }
@@ -141,8 +143,6 @@ function negateOperator(op: QueryOperator): QueryOperator {
     '!startsWith': 'startsWith',
     endsWith: '!endsWith',
     '!endsWith': 'endsWith',
-    in: '!in',
-    '!in': 'in',
   };
   return negMap[op] ?? op;
 }
@@ -198,7 +198,7 @@ export function chipsToQuery(chips: FilterChip[]): string {
   return parts.join('').replace(/\s+/g, ' ').trim();
 }
 
-function chipToQueryPart(chip: FilterChip): string {
+export function chipToQueryPart(chip: FilterChip): string {
   // Graceful fallback if type is filter but fields are missing
   const field = chip.field ?? '';
   const operator = chip.operator ?? '=';
@@ -225,11 +225,23 @@ function chipToQueryPart(chip: FilterChip): string {
     return `${field}:${operator}("${escapeQuotes(value)}")`;
   }
 
-  // IN / NOT IN operators: field:in("v1", "v2") or field:!in("v1", "v2")
-  if (operator === 'in' || operator === '!in') {
-    const vals = chip.values ?? (value ? value.split(', ') : []);
+  // Multi-value operators: field:=(v1, v2), field:!=(v1, v2), field:contains(v1, v2)
+  if (chip.values && chip.values.length > 0) {
+    const vals = chip.values;
     const quotedVals = vals.map((v) => `"${escapeQuotes(v)}"`).join(', ');
-    return `${field}:${operator}(${quotedVals})`;
+    
+    // Explicit functions
+    if (funcOps.includes(operator as string)) {
+      return `${field}:${operator}(${quotedVals})`;
+    }
+    
+    // Comparison ops (explicit)
+    if (operator !== '=') {
+      return `${field}:${operator}[${quotedVals}]`;
+    }
+    
+    // Implicit '='
+    return `${field}:[${quotedVals}]`;
   }
 
   // Comparison operators: field:!=value, field:>value
@@ -252,7 +264,7 @@ function escapeQuotes(s: string): string {
 }
 
 function needsQuoting(value: string): boolean {
-  return /[\s"(),]/.test(value) || value === '';
+  return /[\s"(),\[\]]/.test(value) || value === '';
 }
 
 // ─── Query string → FilterChip[] (convenience) ──────────────────────────────
@@ -272,8 +284,6 @@ const FUNC_OPS: Record<string, QueryOperator> = {
   [TokenType.NOT_CONTAINS]: '!contains',
   [TokenType.NOT_STARTS_WITH]: '!startsWith',
   [TokenType.NOT_ENDS_WITH]: '!endsWith',
-  [TokenType.IN]: 'in',
-  [TokenType.NOT_IN]: '!in',
   [TokenType.BEFORE]: 'before',
   [TokenType.AFTER]: 'after',
 };
@@ -300,6 +310,24 @@ export function queryToChips(query: string): FilterChip[] {
     tokens[i + offset] ?? tokens[tokens.length - 1];
   const advance = () => {
     i++;
+  };
+
+  const parseMultiValueList = (): string[] => {
+    advance(); // skip ( or [
+    const values: string[] = [];
+    while (tok().type !== TokenType.RPAREN && tok().type !== TokenType.RBRACKET && tok().type !== TokenType.EOF) {
+      const valTok = tok();
+      if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
+        values.push(valTok.value);
+        advance();
+      } else if (valTok.type === TokenType.COMMA) {
+        advance(); // skip comma
+      } else {
+        advance(); // skip unexpected
+      }
+    }
+    if (tok().type === TokenType.RPAREN || tok().type === TokenType.RBRACKET) advance(); // skip ) or ]
+    return values;
   };
 
   while (tok().type !== TokenType.EOF) {
@@ -380,6 +408,21 @@ export function queryToChips(query: string): FilterChip[] {
       if (COMPARE_OPS.has(opTok.type)) {
         const operator = opTok.value as QueryOperator;
         advance(); // skip operator
+
+        if (tok().type === TokenType.LPAREN || tok().type === TokenType.LBRACKET) {
+          const values = parseMultiValueList();
+          chips.push({
+            id: nextChipId(),
+            type: 'filter',
+            field,
+            operator,
+            value: values.join(', '),
+            values,
+            quoted: true,
+          });
+          continue;
+        }
+
         const valTok = tok();
         if (VALUE_TYPES.has(valTok.type)) {
           const rawChar = query[valTok.start];
@@ -409,41 +452,19 @@ export function queryToChips(query: string): FilterChip[] {
       const funcOp = FUNC_OPS[opTok.type];
       if (funcOp) {
         advance(); // skip function name
-        if (tok().type === TokenType.LPAREN) {
-          advance(); // skip (
-
-          // ── in()/!in(): multi-value argument list ──
-          if (funcOp === 'in' || funcOp === '!in') {
-            const values: string[] = [];
-            while (
-              tok().type !== TokenType.RPAREN &&
-              tok().type !== TokenType.EOF
-            ) {
-              const valTok = tok();
-              if (
-                VALUE_TYPES.has(valTok.type) ||
-                valTok.type === TokenType.FIELD
-              ) {
-                values.push(valTok.value);
-                advance();
-              } else if (valTok.type === TokenType.COMMA) {
-                advance(); // skip comma
-              } else {
-                advance(); // skip unexpected
-              }
-            }
-            if (tok().type === TokenType.RPAREN) advance(); // skip )
-            chips.push({
-              id: nextChipId(),
-              type: 'filter',
-              field,
-              operator: funcOp,
-              value: values.join(', '),
-              values,
-              quoted: true,
-            });
-            continue;
-          }
+        if (tok().type === TokenType.LPAREN || tok().type === TokenType.LBRACKET) {
+          // parseMultiValueList already advances past the opening ( or [
+          const values = parseMultiValueList();
+          chips.push({
+            id: nextChipId(),
+            type: 'filter',
+            field,
+            operator: funcOp,
+            value: values.length > 0 ? values[0] : '',
+            values,
+            quoted: true,
+          });
+          continue;
 
           // Single-value function: contains("value"), startsWith("value"), etc.
           const valTok = tok();
@@ -492,6 +513,21 @@ export function queryToChips(query: string): FilterChip[] {
             });
           }
         }
+        continue;
+      }
+
+      // Implicit '=' with multiple values
+      if (opTok.type === TokenType.LPAREN || opTok.type === TokenType.LBRACKET) {
+        const values = parseMultiValueList();
+        chips.push({
+          id: nextChipId(),
+          type: 'filter',
+          field,
+          operator: '=',
+          value: values.join(', '),
+          values,
+          quoted: true,
+        });
         continue;
       }
 

@@ -128,4 +128,29 @@ describe('Chained autocomplete: empty → level → info', () => {
       expect(firstOpIdx).toBeGreaterThan(lastValueIdx);
     }
   });
+
+  it('All tab operator sorting: logic and parenthesis suggestions are placed at the bottom', () => {
+    const { suggestions } = pipeline('', 0);
+    
+    const firstLogicIdx = suggestions.findIndex(s => s.fieldCategory === 'logic');
+    const lastDataFieldIdx = suggestions
+      .map(s => s.category === 'field' && s.fieldCategory !== 'logic')
+      .lastIndexOf(true);
+
+    if (firstLogicIdx !== -1 && lastDataFieldIdx !== -1) {
+      expect(firstLogicIdx).toBeGreaterThan(lastDataFieldIdx);
+    }
+
+    // Verify relative ordering of operators is has -> not has -> (
+    const labels = suggestions.map(s => s.label);
+    const hasIdx = labels.indexOf('has');
+    const notHasIdx = labels.indexOf('not has');
+    const openParenIdx = labels.indexOf('(');
+
+    expect(hasIdx).toBeDefined();
+    expect(notHasIdx).toBeDefined();
+    expect(openParenIdx).toBeDefined();
+    expect(hasIdx).toBeLessThan(notHasIdx);
+    expect(notHasIdx).toBeLessThan(openParenIdx);
+  });
 });

@@ -12,6 +12,7 @@ import React, {
   useRef,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
 } from 'react';
 import { Box, IconButton, useTheme, ClickAwayListener } from '@mui/material';
@@ -19,7 +20,7 @@ import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 import type { QueryDomain, SuggestionItem } from './types';
-import { TokenType } from './types';
+import { TokenType, EditorState } from './types';
 import { tokenize } from './lexer';
 import { resolveCursorContext } from './cursor-context';
 import { getSuggestions, applyCompletion } from './suggestion-engine';
@@ -135,6 +136,7 @@ export function QueryDSLEditor({
     queryToChips(initialQuery)
   );
   const [inputValue, setInputValue] = useState('');
+  const [cursorOffset, setCursorOffset] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isComposing, setIsComposing] = useState(false);
@@ -229,29 +231,31 @@ export function QueryDSLEditor({
 
   const tokens = useMemo(() => tokenize(inputValue), [inputValue]);
   const cursorContext = useMemo(
-    () => resolveCursorContext(inputValue, inputValue.length, tokens),
-    [inputValue, tokens]
+    () => resolveCursorContext(inputValue, cursorOffset, tokens),
+    [inputValue, cursorOffset, tokens]
   );
 
   // Support logical operator chips explicitly
-  const suggestions = useMemo(
-    () =>
-      getSuggestions(
-        cursorContext,
-        domain,
-        normalizedFacets,
-        maxSuggestions,
-        chips
-      ),
-    [cursorContext, domain, normalizedFacets, maxSuggestions, chips]
-  );
+  // Suppress suggestions when cursor is inside a quoted string (e.g., level:"")
+  const suggestions = useMemo(() => {
+    if (cursorContext.editorState === EditorState.IN_QUOTED_STRING) {
+      return [];
+    }
+    return getSuggestions(
+      cursorContext,
+      domain,
+      normalizedFacets,
+      maxSuggestions,
+      chips
+    );
+  }, [cursorContext, domain, normalizedFacets, maxSuggestions, chips]);
 
   // ─── Chip operations ──────────────────────────────────────────────
 
   const updateChip = useCallback(
     (
       chipId: string,
-      updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value'>>
+      updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value' | 'values'>>
     ) => {
       setChips((prev) =>
         prev.map((c) => (c.id === chipId ? { ...c, ...updates } : c))
@@ -267,12 +271,49 @@ export function QueryDSLEditor({
     [setChips]
   );
 
+  /** Decompose a chip back into the input field (composing state) for value re-editing */
+  const handleDecomposeChip = useCallback(
+    (chip: FilterChip) => {
+      // Remove the chip from array
+      setChips((prev) => prev.filter((c) => c.id !== chip.id));
+
+      // Convert chip to DSL text
+      const dslText = chipsToQuery([chip]);
+
+      // Determine cursor position (inside brackets for multi-value, end for single)
+      const hasMultiValues = chip.values && chip.values.length > 1;
+      const cursorPos = hasMultiValues
+        ? dslText.length - 1 // before ]
+        : dslText.length;
+
+      setInputValue(dslText);
+      setCursorOffset(cursorPos);
+      setShowDropdown(true);
+      setSelectedIndex(-1);
+
+      // Mark as multi-selecting if chip has multiple values
+      if (hasMultiValues) {
+        isMultiSelectingRef.current = true;
+      }
+
+      // Focus input and position cursor
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.setSelectionRange(cursorPos, cursorPos);
+        }
+      });
+    },
+    [setChips]
+  );
+
   // ─── Input handlers ───────────────────────────────────────────────
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value;
       setInputValue(val);
+      setCursorOffset(e.target.selectionStart ?? val.length);
       // Show dropdown when there's actual text (not just spaces)
       if (val.trim().length > 0) {
         setShowDropdown(true);
@@ -285,6 +326,8 @@ export function QueryDSLEditor({
   /** Commit typed text in the input field as chip(s) */
   const commitInputAsChip = useCallback(
     (text: string) => {
+      // Block auto-commit while multi-selecting values via checkboxes
+      if (isMultiSelectingRef.current) return;
       const lower = text.toLowerCase();
       if (lower === 'and' || lower === 'or') {
         if (canInsertLogical(chips)) {
@@ -351,8 +394,18 @@ export function QueryDSLEditor({
             },
           ]);
           setInputValue('');
+          setCursorOffset(0);
           setShowDropdown(false);
           setSelectedIndex(-1);
+          
+          suppressDropdownRef.current = true;
+          requestAnimationFrame(() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+              inputRef.current.setSelectionRange(0, 0);
+            }
+          });
+          return;
         } else {
           // No valid preceding filter → treat as free text message search
           const freeTextChip: FilterChip = {
@@ -365,8 +418,18 @@ export function QueryDSLEditor({
           };
           setChips((prev) => [...prev, freeTextChip]);
           setInputValue('');
+          setCursorOffset(0);
           setShowDropdown(false);
           setSelectedIndex(-1);
+          
+          suppressDropdownRef.current = true;
+          requestAnimationFrame(() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+              inputRef.current.setSelectionRange(0, 0);
+            }
+          });
+          return;
         }
       } else if (item.category === 'paren') {
         // (/) → immediately create a chip (Sentry-style)
@@ -379,8 +442,18 @@ export function QueryDSLEditor({
           },
         ]);
         setInputValue('');
+        setCursorOffset(0);
         setShowDropdown(false);
         setSelectedIndex(-1);
+        
+        suppressDropdownRef.current = true;
+        requestAnimationFrame(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.setSelectionRange(0, 0);
+          }
+        });
+        return;
       } else if (item.category === 'value') {
         if (isMultiSelect) {
           // Multi-select mode: toggle value in field:in("val1", "val2") list format
@@ -395,73 +468,130 @@ export function QueryDSLEditor({
               nextValues.push(itemValue);
             }
 
-            let nextOp = 'in';
-            if (operator === '!=' || operator === '!in') {
-              nextOp = '!in';
-            }
+            let nextOp = operator || '=';
+            // Fallback for migrated old queries that might still have !in/in stored somehow
+            if (nextOp === 'in') nextOp = '=';
+            if (nextOp === '!in') nextOp = '!=';
 
             let nextInput = '';
+            const quotedValues = nextValues.map((v) => `"${v}"`).join(', ');
+            
             if (nextValues.length === 0) {
-              nextInput = `${field}:${nextOp}()`;
+              nextInput = nextOp === '=' ? `${field}:[]` : `${field}:${nextOp}[]`;
             } else {
-              const quotedValues = nextValues.map((v) => `"${v}"`).join(', ');
-              nextInput = `${field}:${nextOp}(${quotedValues})`;
+              // Always use bracketed form during multi-select to keep FSM in VALUE state.
+              // Single-value without brackets (level:"debug") is only for final chip commit (single click).
+              nextInput = nextOp === '=' ? `${field}:[${quotedValues}]` : `${field}:${nextOp}[${quotedValues}]`;
             }
 
+            const cursorPos = nextInput.length - (nextInput.endsWith(']') ? 1 : 0);
+            
             setInputValue(nextInput);
+            setCursorOffset(cursorPos);
             setShowDropdown(true);
             setSelectedIndex(-1);
 
-            // Adjust cursor position to be inside the parentheses
+            // Mark as composing multi-select
+            isMultiSelectingRef.current = true;
+
+            // Keep dropdown open — do NOT suppress
             requestAnimationFrame(() => {
               if (inputRef.current) {
                 inputRef.current.focus();
-                const cursorPos =
-                  nextInput.length - (nextInput.endsWith(')') ? 1 : 0);
                 inputRef.current.setSelectionRange(cursorPos, cursorPos);
               }
             });
             return;
           }
-        }
-
-        // Single-value mode or fallback
-        // Value → try to create filter chips
-        const completedChips = queryToChips(result.text);
-        if (completedChips.length > 0) {
-          setChips((prev) => [...prev, ...completedChips]);
-          setInputValue('');
-          setShowDropdown(false);
-          setSelectedIndex(-1);
         } else {
-          setInputValue(result.text);
-          setShowDropdown(true);
-          setSelectedIndex(-1);
+          // Single-value mode or fallback
+          let finalInput = result.text;
+          
+          // Rebuild the filter to ensure any partial parenthesis or multi-value state is discarded
+          if (currentFilterInfo.field && !item.description?.startsWith('dsl.smart.')) {
+             const field = currentFilterInfo.field;
+             let op = currentFilterInfo.operator || '=';
+             if (op === 'in') op = '=';
+             if (op === '!in') op = '!=';
+             
+             const funcOps = ['contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith', 'before', 'after'];
+             if (funcOps.includes(op)) {
+                finalInput = `${field}:${op}("${item.label.replace(/"/g, '\\"')}")`;
+             } else {
+                const needsQuotes = item.label.includes(' ') || item.label.includes('"') || item.label.includes('(') || item.label.includes(')') || item.label === '';
+                const escaped = needsQuotes ? `"${item.label.replace(/"/g, '\\"')}"` : item.label;
+                finalInput = op === '=' ? `${field}:${escaped}` : `${field}:${op}${escaped}`;
+             }
+          }
+
+          // Value → try to create filter chips
+          const completedChips = queryToChips(finalInput);
+          if (completedChips.length > 0) {
+            setChips((prev) => [...prev, ...completedChips]);
+            setInputValue('');
+            setCursorOffset(0);
+            setShowDropdown(false);
+            setSelectedIndex(-1);
+            
+            suppressDropdownRef.current = true;
+            requestAnimationFrame(() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+                inputRef.current.setSelectionRange(0, 0);
+              }
+            });
+            return;
+          } else {
+            setInputValue(finalInput);
+            setCursorOffset(finalInput.length);
+            setShowDropdown(true);
+            setSelectedIndex(-1);
+            
+            suppressDropdownRef.current = true;
+            requestAnimationFrame(() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+                inputRef.current.setSelectionRange(finalInput.length, finalInput.length);
+              }
+            });
+            return;
+          }
         }
       } else {
         // Field or operator selected → keep dropdown open for next step
         setInputValue(result.text);
+        setCursorOffset(result.cursorOffset);
         setShowDropdown(true);
         setSelectedIndex(-1);
+        
+        suppressDropdownRef.current = true;
+        requestAnimationFrame(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.setSelectionRange(
+              result.cursorOffset,
+              result.cursorOffset
+            );
+          }
+        });
+        return;
       }
-
-      // Re-focus input (suppress dropdown from the focus event to prevent double-open)
-      suppressDropdownRef.current = true;
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          inputRef.current.setSelectionRange(
-            result.cursorOffset,
-            result.cursorOffset
-          );
-        }
-      });
     },
     [inputValue, cursorContext, setChips, chips, currentFilterInfo]
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // Update cursor offset for navigation keys
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+        // Need to wait for browser to update selection
+        requestAnimationFrame(() => {
+          if (inputRef.current) {
+            setCursorOffset(inputRef.current.selectionStart ?? 0);
+          }
+        });
+      }
+
       if (isComposing) return;
 
       // ── Undo / Redo ──
@@ -508,6 +638,8 @@ export function QueryDSLEditor({
       }
       if (e.key === 'Tab') {
         e.preventDefault();
+        // Finalize multi-select composing state
+        isMultiSelectingRef.current = false;
         // If user typed a structural keyword, handle it directly (don't pick dropdown suggestion)
         if (inputValue.trim()) {
           const lower = inputValue.trim().toLowerCase();
@@ -535,6 +667,8 @@ export function QueryDSLEditor({
       }
       if (e.key === 'Enter') {
         e.preventDefault();
+        // Finalize multi-select composing state
+        isMultiSelectingRef.current = false;
         if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
           applySuggestion(suggestions[selectedIndex]);
         } else if (inputValue.trim()) {
@@ -602,33 +736,84 @@ export function QueryDSLEditor({
   const suppressDropdownRef = useRef(false);
   // Prevents click handler from toggling right after focus showed the dropdown
   const justFocusedRef = useRef(false);
+  const containerRef2 = useRef<HTMLDivElement>(null);
+  // Stays true while any chip popover is open — blocks main dropdown entirely
+  const chipEditingRef = useRef(false);
+  // True while user is multi-selecting values via checkboxes (composing state)
+  const isMultiSelectingRef = useRef(false);
+
+  // Force-commit pending input as chip(s)
+  const commitPendingInput = useCallback(() => {
+    const text = inputValue.trim();
+    if (text) {
+      commitInputAsChip(text);
+      setShowDropdown(false);
+    }
+  }, [inputValue, commitInputAsChip]);
 
   const handleFocus = useCallback(() => {
     if (suppressDropdownRef.current) {
       suppressDropdownRef.current = false;
       return;
     }
+    // Don't show main dropdown while a chip is being edited
+    if (chipEditingRef.current) return;
     // Always show dropdown on focus
     setShowDropdown(true);
     setSelectedIndex(-1);
     justFocusedRef.current = true;
   }, []);
 
-  const handleInputClick = useCallback(() => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    // Don't do anything while a chip is being edited
+    if (chipEditingRef.current) return;
+    // Don't commit if focus moved to the dropdown (mouseDown on suggestion)
+    const related = e.relatedTarget as HTMLElement | null;
+    if (related && containerRef2.current?.contains(related)) {
+      return;
+    }
+    // If dropdown is visible, the blur was likely caused by clicking inside
+    // the dropdown area (which uses preventDefault). Don't commit here —
+    // handleClickAway will handle real outside clicks.
+    if (showDropdown) return;
+    // Real blur (focus left the editor) — finalize multi-select and commit
+    isMultiSelectingRef.current = false;
+    // Force-commit any composing input
+    if (inputValue.trim()) {
+      commitPendingInput();
+    }
+    justFocusedRef.current = false;
+  }, [inputValue, commitPendingInput, showDropdown]);
+
+  const handleInputClick = useCallback((e: React.MouseEvent<HTMLInputElement>) => {
+    setCursorOffset((e.target as HTMLInputElement).selectionStart ?? inputValue.length);
     if (justFocusedRef.current) {
-      // This click is the one that triggered focus → don't toggle
       justFocusedRef.current = false;
+      return;
+    }
+    // If composing a filter (has colon), force commit it
+    if (inputValue.includes(':')) {
+      isMultiSelectingRef.current = false;
+      commitPendingInput();
       return;
     }
     // Re-click on already-focused input → toggle
     setShowDropdown((prev) => !prev);
     setSelectedIndex(-1);
-  }, []);
+  }, [inputValue, commitPendingInput]);
 
   const handleClickAway = useCallback(() => {
+    // Ignore click-away during multi-select composing or chip editing
+    // (Popover/dropdown render via Portal, outside ClickAwayListener wrapper)
+    if (isMultiSelectingRef.current) return;
+    if (chipEditingRef.current) return;
+    // Force-commit any composing input when clicking outside
+    if (inputValue.trim()) {
+      commitPendingInput();
+    }
     setShowDropdown(false);
     justFocusedRef.current = false;
-  }, []);
+  }, [inputValue, commitPendingInput]);
 
   const handleContainerClick = useCallback((e: React.MouseEvent) => {
     // Don't focus input if clicking on a chip (chip handles its own click)
@@ -649,9 +834,30 @@ export function QueryDSLEditor({
 
   const hasContent = chips.length > 0 || inputValue !== '';
 
+  // Mirror element for measuring cursor position → dropdown left offset
+  const mirrorRef = useRef<HTMLSpanElement>(null);
+  const [dropdownLeft, setDropdownLeft] = useState(0);
+  useLayoutEffect(() => {
+    // Lock position during multi-select to avoid jumping
+    if (isMultiSelectingRef.current) return;
+    if (!inputRef.current) {
+      setDropdownLeft(0);
+      return;
+    }
+    const inputLeft = inputRef.current.offsetLeft;
+    if (!inputValue || !mirrorRef.current) {
+      setDropdownLeft(inputLeft);
+      return;
+    }
+    // Measure text width up to cursor
+    mirrorRef.current.textContent = inputValue.slice(0, cursorOffset);
+    const textWidth = mirrorRef.current.offsetWidth;
+    setDropdownLeft(inputLeft + textWidth);
+  }, [inputValue, cursorOffset, chips.length]);
+
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
-      <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
+      <Box ref={containerRef2} sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
         {/* Main tokenized grid */}
         <Box
           ref={containerRef}
@@ -743,6 +949,7 @@ export function QueryDSLEditor({
                 onUpdate={updateChip}
                 onDelete={deleteChip}
                 onEditToggle={(editing) => {
+                  chipEditingRef.current = editing;
                   if (editing) {
                     setShowDropdown(false);
                   } else {
@@ -750,6 +957,7 @@ export function QueryDSLEditor({
                     suppressDropdownRef.current = true;
                   }
                 }}
+                onDecomposeToInput={handleDecomposeChip}
               />
             );
           })}
@@ -762,6 +970,7 @@ export function QueryDSLEditor({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
+            onBlur={handleBlur}
             onClick={handleInputClick}
             onCompositionStart={() => setIsComposing(true)}
             onCompositionEnd={() => setIsComposing(false)}
@@ -800,6 +1009,21 @@ export function QueryDSLEditor({
               <CloseIcon sx={{ fontSize: 14 }} />
             </IconButton>
           )}
+
+          {/* Hidden mirror span for cursor position measurement */}
+          <span
+            ref={mirrorRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              visibility: 'hidden',
+              whiteSpace: 'pre',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              fontFamily: 'inherit',
+              pointerEvents: 'none',
+            }}
+          />
         </Box>
 
         {/* Suggestion dropdown */}
@@ -818,6 +1042,7 @@ export function QueryDSLEditor({
               onSelectRecent={handleSelectRecent}
               onRemoveRecent={handleRemoveRecent}
               selectedValues={selectedValues}
+              dropdownLeft={dropdownLeft}
             />
           )}
       </Box>
@@ -859,18 +1084,24 @@ function parseInputFilter(input: string): {
     field = fieldTok.value;
   }
 
-  const hasNotIn = tokens.some((t) => t.type === TokenType.NOT_IN);
-  const hasIn = tokens.some((t) => t.type === TokenType.IN);
-  const hasNe = tokens.some((t) => t.type === TokenType.NE);
-
-  if (hasNotIn) {
-    operator = '!in';
-  } else if (hasIn) {
-    operator = 'in';
-  } else if (hasNe) {
-    operator = '!=';
-  } else {
-    operator = '=';
+  for (const t of tokens) {
+    if (
+      t.type === TokenType.NE ||
+      t.type === TokenType.GT ||
+      t.type === TokenType.GTE ||
+      t.type === TokenType.LT ||
+      t.type === TokenType.LTE ||
+      t.type === TokenType.CONTAINS ||
+      t.type === TokenType.STARTS_WITH ||
+      t.type === TokenType.ENDS_WITH ||
+      t.type === TokenType.NOT_CONTAINS ||
+      t.type === TokenType.NOT_STARTS_WITH ||
+      t.type === TokenType.NOT_ENDS_WITH ||
+      t.type === TokenType.BEFORE ||
+      t.type === TokenType.AFTER
+    ) {
+      operator = String(t.value);
+    }
   }
 
   let foundColon = false;
@@ -881,12 +1112,11 @@ function parseInputFilter(input: string): {
     }
     if (!foundColon) continue;
 
-    if (t.type === TokenType.IN || t.type === TokenType.NOT_IN) {
-      continue;
-    }
     if (
       t.type === TokenType.LPAREN ||
       t.type === TokenType.RPAREN ||
+      t.type === TokenType.LBRACKET ||
+      t.type === TokenType.RBRACKET ||
       t.type === TokenType.COMMA
     ) {
       continue;

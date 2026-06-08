@@ -55,15 +55,40 @@ export function resolveCursorContext(
     if (t.type === TokenType.EOF) continue;
     if (t.start >= cursorOffset) continue;
 
-    // Stop at logical operators or parens
+    // Stop at logical operators
     if (
       t.type === TokenType.AND ||
       t.type === TokenType.OR ||
       t.type === TokenType.NOT ||
-      t.type === TokenType.BANG ||
-      t.type === TokenType.LPAREN
+      t.type === TokenType.BANG
     ) {
       break;
+    }
+
+    // Stop at grouping parens, but NOT at value-list parens/brackets like field:(...) or field:[...]
+    if (t.type === TokenType.LPAREN || t.type === TokenType.LBRACKET) {
+      // Check if previous token is COLON or a comparison/function operator
+      // If so, this is a value-list paren/bracket — don't break, continue to find the field
+      const prevTok = i > 0 ? tokens[i - 1] : null;
+      const isValueListParen =
+        prevTok &&
+        (prevTok.type === TokenType.COLON ||
+          prevTok.type === TokenType.NE ||
+          prevTok.type === TokenType.GT ||
+          prevTok.type === TokenType.GTE ||
+          prevTok.type === TokenType.LT ||
+          prevTok.type === TokenType.LTE ||
+          prevTok.type === TokenType.CONTAINS ||
+          prevTok.type === TokenType.STARTS_WITH ||
+          prevTok.type === TokenType.ENDS_WITH ||
+          prevTok.type === TokenType.NOT_CONTAINS ||
+          prevTok.type === TokenType.NOT_STARTS_WITH ||
+          prevTok.type === TokenType.NOT_ENDS_WITH ||
+          prevTok.type === TokenType.BEFORE ||
+          prevTok.type === TokenType.AFTER);
+      if (!isValueListParen) {
+        break;
+      }
     }
 
     // Found comparison/function operator
@@ -83,8 +108,6 @@ export function resolveCursorContext(
       t.type === TokenType.NOT_CONTAINS ||
       t.type === TokenType.NOT_STARTS_WITH ||
       t.type === TokenType.NOT_ENDS_WITH ||
-      t.type === TokenType.IN ||
-      t.type === TokenType.NOT_IN ||
       t.type === TokenType.BEFORE ||
       t.type === TokenType.AFTER
     ) {
@@ -111,6 +134,8 @@ export function resolveCursorContext(
     TokenType.COLON,
     TokenType.LPAREN,
     TokenType.RPAREN,
+    TokenType.LBRACKET,
+    TokenType.RBRACKET,
     TokenType.COMMA,
     // Comparison operators
     TokenType.NE,
@@ -137,9 +162,15 @@ export function resolveCursorContext(
     currentToken.start < cursorOffset &&
     !nonPrefixTokens.has(currentToken.type)
   ) {
-    prefix = input.slice(currentToken.start, cursorOffset);
-    tokenStart = currentToken.start;
-    tokenEnd = currentToken.end;
+    if (currentToken.type === TokenType.STRING && cursorOffset === currentToken.end) {
+      prefix = '';
+      tokenStart = cursorOffset;
+      tokenEnd = cursorOffset;
+    } else {
+      prefix = input.slice(currentToken.start, cursorOffset);
+      tokenStart = currentToken.start;
+      tokenEnd = currentToken.end;
+    }
   }
 
   // ── Map editor state to context type ──
@@ -178,16 +209,37 @@ export function resolveCursorContext(
       // Only show logical operators if there's a space gap between cursor and previous token.
       // If cursor is right at the end of a value token (no space), user is still typing the value.
       if (
+        currentToken &&
+        (currentToken.type === TokenType.STRING ||
+          currentToken.type === TokenType.NUMBER ||
+          currentToken.type === TokenType.BOOLEAN ||
+          currentToken.type === TokenType.FIELD) &&
+        currentToken.start < cursorOffset &&
+        cursorOffset <= currentToken.end
+      ) {
+        // Cursor is inside a value token — user is still typing
+        type = 'VALUE';
+        operator = operator || '=';
+        prefix = input.slice(currentToken.start, cursorOffset);
+        tokenStart = currentToken.start;
+        tokenEnd = currentToken.end;
+      } else if (
         prevToken &&
         cursorOffset === prevToken.end &&
         !nonPrefixTokens.has(prevToken.type)
       ) {
         type = 'VALUE';
         operator = '=';
-        // Re-derive prefix from the previous token
-        prefix = input.slice(prevToken.start, cursorOffset);
-        tokenStart = prevToken.start;
-        tokenEnd = prevToken.end;
+        // Re-derive prefix from the previous token ONLY if it's not a closed string
+        if (prevToken.type === TokenType.STRING && cursorOffset === prevToken.end) {
+          prefix = '';
+          tokenStart = cursorOffset;
+          tokenEnd = cursorOffset;
+        } else {
+          prefix = input.slice(prevToken.start, cursorOffset);
+          tokenStart = prevToken.start;
+          tokenEnd = prevToken.end;
+        }
       } else {
         type = 'LOGICAL_OPERATOR';
       }
@@ -234,11 +286,9 @@ function isOperatorPrefix(prefix: string): boolean {
     'endswith',
     'before',
     'after',
-    'in',
     '!contains',
     '!startswith',
     '!endswith',
-    '!in',
   ];
   return funcOps.some((op) => op.startsWith(p));
 }
