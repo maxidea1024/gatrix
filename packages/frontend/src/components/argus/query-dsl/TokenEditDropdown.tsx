@@ -405,6 +405,8 @@ function ValueEditor({
   const [isDirty, setIsDirty] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const listRef = useRef<HTMLUListElement>(null);
+  // Store original values on mount to support Esc cancel/revert
+  const originalValRef = useRef({ value: chip.value, values: chip.values });
 
   // Initialize valueInput from chip's current values
   const initialValue = useMemo(() => {
@@ -493,7 +495,8 @@ function ValueEditor({
   };
 
   const handleTextClick = (v: string) => {
-    onConfirm(v);
+    setValueInput(v);
+    onUpdate({ value: v, values: [v] });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -507,7 +510,8 @@ function ValueEditor({
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < items.length) {
-        handleTextClick(items[selectedIndex]);
+        // Pressing Enter on an item inside popover sets it as single value and commits (closes)
+        onConfirm(items[selectedIndex]);
       } else {
         if (hasMultiValues) {
           handleApplyMulti();
@@ -517,7 +521,8 @@ function ValueEditor({
       }
     } else if (e.key === 'Escape') {
       e.preventDefault();
-      onConfirm(chip.value || '', chip.values); // revert
+      // Revert to original values on Escape cancel
+      onConfirm(originalValRef.current.value || '', originalValRef.current.values);
     }
   };
 
