@@ -1300,19 +1300,24 @@ export function QueryDSLEditor({
           )}
 
         {/* Token edit dropdown (field/operator/value editing) */}
-        {editingToken && (
-          <TokenEditDropdown
-            type={editingToken.part}
-            chip={chips.find((c) => c.id === editingToken.chipId)!}
-            domain={domain}
-            facets={normalizedFacets}
-            anchorEl={editingToken.anchorEl}
-            onUpdate={(updates) =>
-              handleTokenUpdate(editingToken.chipId, updates)
-            }
-            onClose={handleEditClose}
-          />
-        )}
+        {(() => {
+          if (!editingToken) return null;
+          const editedChip = chips.find((c) => c.id === editingToken.chipId);
+          if (!editedChip) return null;
+          return (
+            <TokenEditDropdown
+              type={editingToken.part}
+              chip={editedChip}
+              domain={domain}
+              facets={normalizedFacets}
+              anchorEl={editingToken.anchorEl}
+              onUpdate={(updates) =>
+                handleTokenUpdate(editingToken.chipId, updates)
+              }
+              onClose={handleEditClose}
+            />
+          );
+        })()}
       </Box>
     </ClickAwayListener>
   );
