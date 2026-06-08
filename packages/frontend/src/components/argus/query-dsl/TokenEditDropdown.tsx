@@ -254,11 +254,17 @@ function FieldMenu({
   const listRef = useRef<HTMLUListElement>(null);
   const allFields = getFieldsForDomain(domain);
 
+  // When no filter text: show only current field + fields starting with currentField.
+  // When filter text: search all fields
   const filtered = filter
     ? allFields.filter((f) =>
         f.key.toLowerCase().includes(filter.toLowerCase())
       )
-    : allFields;
+    : allFields.filter(
+        (f) =>
+          f.key === currentField ||
+          f.key.startsWith(currentField + '.')
+      );
 
   useEffect(() => {
     setSelectedIndex(-1);
