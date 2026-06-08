@@ -30,15 +30,15 @@ dayjs.extend(timezone);
 // ─── Quick Presets ───────────────────────────────────────────────────────────
 
 interface TimePreset {
-  label: string;
+  labelKey: string;
   value: string;
 }
 
 const RELATIVE_PRESETS: TimePreset[] = [
-  { label: '1 hour ago', value: 'now-1h' },
-  { label: '24 hours ago', value: 'now-24h' },
-  { label: '7 days ago', value: 'now-7d' },
-  { label: '30 days ago', value: 'now-30d' },
+  { labelKey: 'dsl.datetime.preset.1h', value: 'now-1h' },
+  { labelKey: 'dsl.datetime.preset.24h', value: 'now-24h' },
+  { labelKey: 'dsl.datetime.preset.7d', value: 'now-7d' },
+  { labelKey: 'dsl.datetime.preset.30d', value: 'now-30d' },
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -63,7 +63,7 @@ export default function DatetimeValueEditor({
   isDark,
 }: DatetimeValueEditorProps) {
   const theme = useTheme();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dateLocale = getDateLocale(i18n.language);
   const storedTz = getStoredTimezone();
 
@@ -152,7 +152,7 @@ export default function DatetimeValueEditor({
       {/* Quick Presets */}
       <Box sx={sectionHeaderSx}>
         <AccessTimeIcon sx={{ fontSize: 14 }} />
-        Quick Select
+        {t('dsl.datetime.quickSelect', 'Quick Select')}
       </Box>
       <List dense disablePadding sx={{ px: 0.5 }}>
         {RELATIVE_PRESETS.map((preset) => (
@@ -171,7 +171,7 @@ export default function DatetimeValueEditor({
                     alignItems: 'center',
                   }}
                 >
-                  <Typography variant="body2">{preset.label}</Typography>
+                  <Typography variant="body2">{t(preset.labelKey)}</Typography>
                   <Typography
                     variant="caption"
                     sx={{
@@ -195,7 +195,7 @@ export default function DatetimeValueEditor({
       {/* DateTimePicker */}
       <Box sx={sectionHeaderSx}>
         <CalendarMonthIcon sx={{ fontSize: 14 }} />
-        {isBetween ? 'Date Range' : 'Pick Date & Time'}
+        {isBetween ? t('dsl.datetime.dateRange', 'Date Range') : t('dsl.datetime.pickDateTime', 'Pick Date & Time')}
       </Box>
       <Box sx={{ px: 1.5, pb: 1.5 }}>
         <LocalizationProvider
@@ -203,7 +203,7 @@ export default function DatetimeValueEditor({
           adapterLocale={dateLocale}
         >
           <DateTimePicker
-            label={isBetween ? 'From' : 'Date & Time'}
+            label={isBetween ? t('dsl.datetime.from', 'From') : t('dsl.datetime.pickDateTime', 'Date & Time')}
             value={fromValue}
             onChange={(d) => handleDateChange(d, 'from')}
             timezone={storedTz}
@@ -221,7 +221,7 @@ export default function DatetimeValueEditor({
           />
           {isBetween && (
             <DateTimePicker
-              label="To"
+              label={t('dsl.datetime.to', 'To')}
               value={toValue}
               onChange={(d) => handleDateChange(d, 'to')}
               timezone={storedTz}
