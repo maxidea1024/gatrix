@@ -1243,6 +1243,15 @@ export function QueryDSLEditor({
       }
       if (e.key === 'Enter') {
         e.preventDefault();
+        // If multi-select is in progress, Enter = commit current input as chip
+        if (isMultiSelectingRef.current || inputValue.includes('[')) {
+          isMultiSelectingRef.current = false;
+          if (inputValue.trim()) {
+            commitInputAsChip(inputValue.trim());
+          }
+          setShowDropdown(false);
+          return;
+        }
         // Finalize multi-select composing state
         isMultiSelectingRef.current = false;
         if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
