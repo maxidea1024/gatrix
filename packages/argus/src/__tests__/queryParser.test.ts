@@ -421,4 +421,3 @@ describe('List value (IN / NOT IN) SQL generation', () => {
     expect(where).toContain('logger_name NOT IN (');
   });
 });
-

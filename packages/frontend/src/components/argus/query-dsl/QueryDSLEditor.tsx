@@ -142,8 +142,14 @@ export function QueryDSLEditor({
     getRecentSearches(domain)
   );
 
-  const currentFilterInfo = useMemo(() => parseInputFilter(inputValue), [inputValue]);
-  const selectedValues = useMemo(() => new Set(currentFilterInfo.values), [currentFilterInfo]);
+  const currentFilterInfo = useMemo(
+    () => parseInputFilter(inputValue),
+    [inputValue]
+  );
+  const selectedValues = useMemo(
+    () => new Set(currentFilterInfo.values),
+    [currentFilterInfo]
+  );
 
   const refreshRecent = useCallback(() => {
     setRecentSearches(getRecentSearches(domain));
@@ -410,7 +416,8 @@ export function QueryDSLEditor({
             requestAnimationFrame(() => {
               if (inputRef.current) {
                 inputRef.current.focus();
-                const cursorPos = nextInput.length - (nextInput.endsWith(')') ? 1 : 0);
+                const cursorPos =
+                  nextInput.length - (nextInput.endsWith(')') ? 1 : 0);
                 inputRef.current.setSelectionRange(cursorPos, cursorPos);
               }
             });

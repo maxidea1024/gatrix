@@ -611,8 +611,14 @@ export const QuerySuggestionDropdown = forwardRef<
                     data-suggestion-item
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      const isCheckboxClick = (e.target as HTMLElement).closest('.MuiCheckbox-root');
-                      const isMulti = !!(e.ctrlKey || e.metaKey || isCheckboxClick);
+                      const isCheckboxClick = (e.target as HTMLElement).closest(
+                        '.MuiCheckbox-root'
+                      );
+                      const isMulti = !!(
+                        e.ctrlKey ||
+                        e.metaKey ||
+                        isCheckboxClick
+                      );
                       if (isMulti) {
                         e.stopPropagation();
                       }
@@ -667,7 +673,9 @@ export const QuerySuggestionDropdown = forwardRef<
                               sx={{
                                 p: 0,
                                 mr: 0.5,
-                                color: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                                color: isDark
+                                  ? 'rgba(255, 255, 255, 0.3)'
+                                  : 'rgba(0, 0, 0, 0.3)',
                                 '&.Mui-checked': {
                                   color: isDark ? '#7c8aff' : '#5c6bc0',
                                 },

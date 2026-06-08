@@ -78,7 +78,9 @@ interface FilterTokenChipProps {
   facets?: Map<string, string[]>;
   onUpdate: (
     chipId: string,
-    updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value' | 'values'>>
+    updates: Partial<
+      Pick<FilterChip, 'field' | 'operator' | 'value' | 'values'>
+    >
   ) => void;
   onDelete: (chipId: string) => void;
   /** Called when chip editing starts (true) or ends (false) */
@@ -517,7 +519,7 @@ function ValueEditor({
   // When popover opens, show all values. Once user types, filter by input.
   const filterText = isDirty
     ? isMulti
-      ? valueInput.split(',').pop()?.trim() ?? ''
+      ? (valueInput.split(',').pop()?.trim() ?? '')
       : valueInput
     : '';
 
@@ -614,7 +616,9 @@ function ValueEditor({
               p: 0.25,
               color: isDark ? '#7c8aff' : '#5c6bc0',
               '&:hover': {
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
               },
             }}
           >
@@ -625,7 +629,9 @@ function ValueEditor({
       {sorted.length > 0 && (
         <List dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
           {sorted.slice(0, 30).map((v) => {
-            const isSelected = isMulti ? currentSelected.has(v) : v === chip.value;
+            const isSelected = isMulti
+              ? currentSelected.has(v)
+              : v === chip.value;
             return (
               <ListItemButton
                 key={v}
@@ -650,7 +656,9 @@ function ValueEditor({
                     size="small"
                     sx={{
                       p: 0,
-                      color: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                      color: isDark
+                        ? 'rgba(255, 255, 255, 0.3)'
+                        : 'rgba(0, 0, 0, 0.3)',
                       '&.Mui-checked': {
                         color: isDark ? '#7c8aff' : '#5c6bc0',
                       },
