@@ -22,6 +22,7 @@ import type { FilterChip } from './useFilterChips';
 import type { QueryDomain, QueryField } from './types';
 import { getFieldsForDomain, getFieldByKey } from './fields';
 import { getOperatorOptions } from './operator-labels';
+import DatetimeValueEditor from './DatetimeValueEditor';
 
 // ─── Category badges for HasFieldSelector ────────────────────────────────────
 
@@ -130,9 +131,15 @@ export function TokenEditDropdown({
   // Value editing uses inline input — popover should not steal focus
   const isValueType = type === 'value' && !isHasChip;
 
+  // Check if this is a datetime field
+  const field = getFieldByKey(chip.field ?? '', domain);
+  const isDatetimeField = isValueType && field?.type === 'datetime';
+
   // Check if value suggestions have results — skip popover entirely if no facets
+  // Datetime fields always show the popover (presets + DateTimePicker)
   const hasValueResults = (() => {
     if (!isValueType) return true;
+    if (isDatetimeField) return true;
     const facetValues = facets?.get(chip.field ?? '') ?? [];
     return facetValues.length > 0;
   })();
@@ -195,7 +202,24 @@ export function TokenEditDropdown({
           isDark={isDark}
         />
       )}
-      {isValueType && (
+      {isDatetimeField && (
+        <DatetimeValueEditor
+          operator={chip.operator ?? '='}
+          currentValue={chip.value}
+          currentValueTo={chip.valueTo}
+          onSelect={(value, valueTo) => {
+            onUpdate({
+              value,
+              valueTo,
+              values: [value],
+              composingPart: undefined,
+            });
+            onClose();
+          }}
+          isDark={isDark}
+        />
+      )}
+      {isValueType && !isDatetimeField && (
         <ValueSuggestionList
           chip={chip}
           facets={facets}

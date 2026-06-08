@@ -32,6 +32,8 @@ export interface FilterChip {
   value?: string;
   /** Multiple values for in/!in operators */
   values?: string[];
+  /** End value for 'between' operator (datetime range) */
+  valueTo?: string;
   /** Whether the value was quoted */
   quoted?: boolean;
   /** Which part is currently being composed during step-by-step creation */

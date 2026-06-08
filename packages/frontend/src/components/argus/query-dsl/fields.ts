@@ -69,7 +69,7 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     label: 'dsl.field.timestamp',
     type: 'datetime',
     category: 'log',
-    operators: ['=', '!=', 'before', 'after'],
+    operators: ['=', '!=', 'before', 'after', 'between'],
     searchable: false,
     description: 'dsl.field.timestamp.desc',
   },

@@ -32,6 +32,7 @@ export const DATE_OP_LABELS: Record<string, string> = {
   '<=': 'is on or before',
   before: 'is before',
   after: 'is after',
+  between: 'is between',
 };
 
 // ─── Reverse lookup (label → operator) ───────────────────────────────────────

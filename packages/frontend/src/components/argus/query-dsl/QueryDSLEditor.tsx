@@ -33,6 +33,7 @@ import {
 } from './FilterTokenGroup';
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
+import { getFieldByKey } from './fields';
 import {
   getRecentSearches,
   addRecentSearch,
@@ -1014,13 +1015,16 @@ export function QueryDSLEditor({
         // create a composing chip instead of putting text in input
         if (item.category === 'field' && !inputValue.includes(':')) {
           const newChipId = `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          // Datetime fields default to 'after' operator
+          const selectedField = getFieldByKey(item.label, domain);
+          const defaultOp = selectedField?.type === 'datetime' ? 'after' : '=';
           setChips((prev) => [
             ...prev,
             {
               id: newChipId,
               type: 'filter' as const,
               field: item.label,
-              operator: '=',
+              operator: defaultOp,
               composingPart: 'value' as const,
             },
           ]);

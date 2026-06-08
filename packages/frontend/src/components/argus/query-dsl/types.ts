@@ -185,7 +185,8 @@ export type QueryOperator =
   | '!startsWith'
   | '!endsWith'
   | 'before'
-  | 'after';
+  | 'after'
+  | 'between';
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'datetime';
 
