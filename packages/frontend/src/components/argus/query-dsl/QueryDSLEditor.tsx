@@ -732,7 +732,11 @@ export function QueryDSLEditor({
         return;
       }
       // Enter or Space on selected token → open editing dropdown (same as click)
-      if ((e.key === 'Enter' || e.key === ' ') && selectedTokenIdx >= 0 && inputValue === '') {
+      if (
+        (e.key === 'Enter' || e.key === ' ') &&
+        selectedTokenIdx >= 0 &&
+        inputValue === ''
+      ) {
         e.preventDefault();
         const token = visualTokens[selectedTokenIdx];
         if (
