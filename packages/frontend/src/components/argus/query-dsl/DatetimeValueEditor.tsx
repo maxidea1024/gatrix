@@ -79,13 +79,15 @@ export default function DatetimeValueEditor({
 
   // Parse existing values into Dayjs for DateTimePicker
   const parsedFrom = useMemo(() => {
-    if (!currentValue || currentValue.startsWith('now')) return dayjs().tz(storedTz);
+    if (!currentValue || currentValue.startsWith('now'))
+      return dayjs().tz(storedTz);
     const d = dayjs(currentValue).tz(storedTz);
     return d.isValid() ? d : dayjs().tz(storedTz);
   }, [currentValue, storedTz]);
 
   const parsedTo = useMemo(() => {
-    if (!currentValueTo || currentValueTo.startsWith('now')) return dayjs().tz(storedTz);
+    if (!currentValueTo || currentValueTo.startsWith('now'))
+      return dayjs().tz(storedTz);
     const d = dayjs(currentValueTo).tz(storedTz);
     return d.isValid() ? d : dayjs().tz(storedTz);
   }, [currentValueTo, storedTz]);
