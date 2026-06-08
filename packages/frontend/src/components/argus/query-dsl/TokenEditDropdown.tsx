@@ -207,6 +207,7 @@ export function TokenEditDropdown({
           operator={chip.operator ?? '='}
           currentValue={chip.value}
           currentValueTo={chip.valueTo}
+          highlightIndex={highlightIndex ?? -1}
           onSelect={(value, valueTo) => {
             onUpdate({
               value,

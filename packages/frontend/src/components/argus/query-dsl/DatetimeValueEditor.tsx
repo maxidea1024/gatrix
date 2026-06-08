@@ -41,6 +41,9 @@ const RELATIVE_PRESETS: TimePreset[] = [
   { labelKey: 'dsl.datetime.preset.30d', value: 'now-30d' },
 ];
 
+/** Number of quick presets (for keyboard navigation) */
+export const DATETIME_PRESET_COUNT = RELATIVE_PRESETS.length;
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 interface DatetimeValueEditorProps {
@@ -52,6 +55,8 @@ interface DatetimeValueEditorProps {
   currentValueTo?: string;
   /** Called when user selects a value */
   onSelect: (value: string, valueTo?: string) => void;
+  /** Keyboard navigation highlight index (-1 = none) */
+  highlightIndex?: number;
   isDark: boolean;
 }
 
@@ -60,6 +65,7 @@ export default function DatetimeValueEditor({
   currentValue,
   currentValueTo,
   onSelect,
+  highlightIndex = -1,
   isDark,
 }: DatetimeValueEditorProps) {
   const theme = useTheme();
@@ -155,12 +161,17 @@ export default function DatetimeValueEditor({
         {t('dsl.datetime.quickSelect', 'Quick Select')}
       </Box>
       <List dense disablePadding sx={{ px: 0.5 }}>
-        {RELATIVE_PRESETS.map((preset) => (
+        {RELATIVE_PRESETS.map((preset, idx) => (
           <ListItemButton
             key={preset.value}
             onClick={() => handlePresetClick(preset)}
-            selected={selectedPreset === preset.value}
-            sx={listItemSx}
+            selected={selectedPreset === preset.value || idx === highlightIndex}
+            sx={{
+              ...listItemSx,
+              ...(idx === highlightIndex && {
+                bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+              }),
+            }}
           >
             <ListItemText
               primary={

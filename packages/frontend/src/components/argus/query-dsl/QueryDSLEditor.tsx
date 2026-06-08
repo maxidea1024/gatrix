@@ -34,6 +34,7 @@ import {
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import { getFieldByKey } from './fields';
+import { DATETIME_PRESET_COUNT } from './DatetimeValueEditor';
 import {
   getRecentSearches,
   addRecentSearch,
@@ -544,6 +545,13 @@ export function QueryDSLEditor({
   /** Handle inline input blur → commit (with cancellable timeout) */
   const handleInlineValueBlur = useCallback(
     (chipId: string) => {
+      // Datetime fields: don't auto-commit on blur.
+      // The DateTimePicker manages values via onSelect callback,
+      // and blur fires when its calendar popup opens (stealing focus).
+      const blurredChip = chips.find((c) => c.id === chipId);
+      const blurredField = getFieldByKey(blurredChip?.field ?? '', domain);
+      if (blurredField?.type === 'datetime') return;
+
       // Cancel any previous pending blur
       if (blurTimeoutRef.current) {
         clearTimeout(blurTimeoutRef.current);
@@ -557,7 +565,7 @@ export function QueryDSLEditor({
         }
       }, 200);
     },
-    [commitInlineEdit]
+    [chips, domain, commitInlineEdit]
   );
 
   /** Toggle a value from popover checkbox or keyboard selection */
@@ -605,9 +613,16 @@ export function QueryDSLEditor({
       const editedField = getFieldByKey(editedChip?.field ?? '', domain);
       const isDatetime = editedField?.type === 'datetime';
 
-      // Datetime fields: only handle Enter/Tab/Escape (no popover navigation)
+      // Datetime fields: navigate presets with arrows, Enter/Tab to commit
       if (isDatetime) {
-        if (e.key === 'Enter' || e.key === 'Tab') {
+        const presetMaxIdx = DATETIME_PRESET_COUNT - 1;
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setPopoverHighlightIdx((prev) => Math.min(prev + 1, presetMaxIdx));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
+        } else if (e.key === 'Enter' || e.key === 'Tab') {
           e.preventDefault();
           commitInlineEdit(chipId);
         } else if (e.key === 'Escape') {
