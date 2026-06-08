@@ -602,6 +602,22 @@ export function QueryDSLEditor({
       if (e.nativeEvent.isComposing) return;
 
       const editedChip = chips.find((c) => c.id === chipId);
+      const editedField = getFieldByKey(editedChip?.field ?? '', domain);
+      const isDatetime = editedField?.type === 'datetime';
+
+      // Datetime fields: only handle Enter/Tab/Escape (no popover navigation)
+      if (isDatetime) {
+        if (e.key === 'Enter' || e.key === 'Tab') {
+          e.preventDefault();
+          commitInlineEdit(chipId);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          revertInlineEdit(chipId);
+        }
+        return;
+      }
+
+      // Non-datetime: full popover navigation
       const facetValues = normalizedFacets?.get(editedChip?.field ?? '') ?? [];
       const maxIdx = Math.min(facetValues.length, 30) - 1;
 
@@ -649,11 +665,14 @@ export function QueryDSLEditor({
     },
     [
       chips,
+      domain,
       normalizedFacets,
       popoverHighlightIdx,
       handleInlineCheckboxToggle,
       commitInlineEdit,
       revertInlineEdit,
+      updateChip,
+      closeInlineEdit,
     ]
   );
 
