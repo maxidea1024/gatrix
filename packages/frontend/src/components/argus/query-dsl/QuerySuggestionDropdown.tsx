@@ -172,6 +172,34 @@ export const QuerySuggestionDropdown = forwardRef<
   const { t } = useTranslation();
   const listRef = useRef<HTMLDivElement>(null);
 
+  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Control' || e.key === 'Meta') {
+        setIsCtrlPressed(true);
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Control' || e.key === 'Meta') {
+        setIsCtrlPressed(false);
+      }
+    };
+    const handleWindowBlur = () => {
+      setIsCtrlPressed(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleWindowBlur);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleWindowBlur);
+    };
+  }, []);
+
   // Tabs only visible when input is empty (field selection mode)
   const showTabs = inputPrefix.trim() === '';
 
@@ -197,6 +225,8 @@ export const QuerySuggestionDropdown = forwardRef<
   }, [suggestions]);
 
   const hasRecent = recentSearches.length > 0;
+
+  const showCheckboxes = hasMultipleValues && isCtrlPressed;
 
   // Domain-aware tab labels
   const FIELD_CAT_TABS: Record<string, { i18nKey: string; fallback: string }> =
@@ -662,9 +692,9 @@ export const QuerySuggestionDropdown = forwardRef<
                           />
                         );
                       }
-                      // Values → Checkbox (if multi-value available) or indent spacer
+                      // Values → Checkbox (only when showCheckboxes is true) or indent spacer
                       if (isValue) {
-                        if (hasMultipleValues) {
+                        if (showCheckboxes) {
                           const isChecked = selectedValues.has(item.label);
                           return (
                             <Checkbox
