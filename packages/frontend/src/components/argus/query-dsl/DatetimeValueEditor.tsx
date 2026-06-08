@@ -34,7 +34,7 @@ interface TimePreset {
   value: string;
 }
 
-const RELATIVE_PRESETS: TimePreset[] = [
+export const RELATIVE_PRESETS: TimePreset[] = [
   { labelKey: 'dsl.datetime.preset.1h', value: 'now-1h' },
   { labelKey: 'dsl.datetime.preset.24h', value: 'now-24h' },
   { labelKey: 'dsl.datetime.preset.7d', value: 'now-7d' },

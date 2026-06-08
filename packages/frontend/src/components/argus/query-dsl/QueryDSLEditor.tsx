@@ -34,10 +34,7 @@ import {
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import { getFieldByKey } from './fields';
-import {
-  DATETIME_PRESET_COUNT,
-  DATETIME_NAVIGABLE_COUNT,
-} from './DatetimeValueEditor';
+import { DATETIME_PRESET_COUNT, DATETIME_NAVIGABLE_COUNT, RELATIVE_PRESETS } from './DatetimeValueEditor';
 import {
   getRecentSearches,
   addRecentSearch,
@@ -634,7 +631,18 @@ export function QueryDSLEditor({
           setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
         } else if (e.key === 'Enter' || e.key === 'Tab') {
           e.preventDefault();
-          commitInlineEdit(chipId);
+          // If a preset is highlighted, apply it directly
+          if (popoverHighlightIdx >= 0 && popoverHighlightIdx < DATETIME_PRESET_COUNT) {
+            const preset = RELATIVE_PRESETS[popoverHighlightIdx];
+            updateChip(chipId, {
+              value: preset.value,
+              values: [preset.value],
+              composingPart: undefined,
+            });
+            closeInlineEdit();
+          } else {
+            commitInlineEdit(chipId);
+          }
         } else if (e.key === 'Escape') {
           e.preventDefault();
           revertInlineEdit(chipId);
