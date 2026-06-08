@@ -1137,6 +1137,19 @@ export function QueryDSLEditor({
         setSelectedIndex((prev) => Math.max(prev - 1, -1));
         return;
       }
+      // Space → toggle checkbox on highlighted value suggestion (multi-select)
+      if (
+        (e.key === ' ' || e.code === 'Space') &&
+        showDropdown &&
+        selectedIndex >= 0 &&
+        selectedIndex < suggestions.length &&
+        suggestions[selectedIndex].category === 'value' &&
+        selectedTokenIdx < 0
+      ) {
+        e.preventDefault();
+        applySuggestion(suggestions[selectedIndex], true);
+        return;
+      }
       // Left/Right arrow keys → token navigation (when input is empty)
       // Token navigation takes priority over tab switching when chips exist
       if (e.key === 'ArrowLeft' && inputValue === '') {
