@@ -92,7 +92,10 @@ export function renderTokensToSpans(
 function formatNode(node: Expression): string {
   switch (node.type) {
     case 'Filter': {
-      const { field, operator, value, funcOp } = node;
+      const { field, operator, value, values, funcOp } = node;
+      if (operator === 'between' && values && values.length >= 2) {
+        return `${field}:between("${values[0]}","${values[1]}")`;
+      }
       if (funcOp) {
         return `${field}:${funcOp}("${value}")`;
       }
@@ -155,6 +158,7 @@ function getTokenClassName(type: TokenType): string {
     case TokenType.ENDS_WITH:
     case TokenType.BEFORE:
     case TokenType.AFTER:
+    case TokenType.BETWEEN:
       return 'token-function';
     case TokenType.AND:
     case TokenType.OR:

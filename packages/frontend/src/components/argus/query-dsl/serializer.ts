@@ -15,6 +15,7 @@ const FUNC_OP_MAP: Record<string, string> = {
   '!endsWith': '.not_ends_with:',
   before: '.before:',
   after: '.after:',
+  between: '.between:',
 };
 
 /**

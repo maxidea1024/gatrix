@@ -58,6 +58,7 @@ const FUNC_TOKEN_TO_OP: Partial<Record<TokenType, QueryOperator>> = {
   [TokenType.NOT_ENDS_WITH]: '!endsWith',
   [TokenType.BEFORE]: 'before',
   [TokenType.AFTER]: 'after',
+  [TokenType.BETWEEN]: 'between',
 };
 
 class Parser {
