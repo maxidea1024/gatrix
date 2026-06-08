@@ -103,23 +103,33 @@ export default function DatetimeValueEditor({
     }
   };
 
+  // onChange: only update local state (don't commit)
   const handleDateChange = (date: Dayjs | null, target: 'from' | 'to') => {
-    const isoString = date ? date.utc().toISOString() : '';
+    if (target === 'from') {
+      setFromValue(date);
+    } else {
+      setToValue(date);
+    }
+  };
 
+  // onAccept: user clicked OK → commit value
+  const handleDateAccept = (date: Dayjs | null, target: 'from' | 'to') => {
     if (isBetween) {
       if (target === 'from') {
-        setFromValue(date);
-        // Auto-commit when both values are set
-        if (date && toValue) {
-          onSelect(isoString, toValue.utc().toISOString());
+        const newFrom = date;
+        setFromValue(newFrom);
+        if (newFrom && toValue) {
+          onSelect(newFrom.utc().toISOString(), toValue.utc().toISOString());
         }
       } else {
-        setToValue(date);
-        if (fromValue && date) {
-          onSelect(fromValue.utc().toISOString(), isoString);
+        const newTo = date;
+        setToValue(newTo);
+        if (fromValue && newTo) {
+          onSelect(fromValue.utc().toISOString(), newTo.utc().toISOString());
         }
       }
     } else {
+      const isoString = date ? date.utc().toISOString() : '';
       if (isoString) {
         onSelect(isoString);
       }
@@ -223,6 +233,7 @@ export default function DatetimeValueEditor({
             }
             value={fromValue}
             onChange={(d) => handleDateChange(d, 'from')}
+            onAccept={(d) => handleDateAccept(d, 'from')}
             timezone={storedTz}
             ampm={true}
             format="YYYY-MM-DD A hh:mm"
@@ -241,6 +252,7 @@ export default function DatetimeValueEditor({
               label={t('dsl.datetime.to', 'To')}
               value={toValue}
               onChange={(d) => handleDateChange(d, 'to')}
+              onAccept={(d) => handleDateAccept(d, 'to')}
               timezone={storedTz}
               ampm={true}
               format="YYYY-MM-DD A hh:mm"
