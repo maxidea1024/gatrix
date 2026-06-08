@@ -256,7 +256,11 @@ function FieldMenu({
           }}
         />
       </Box>
-      <List ref={listRef} dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
+      <List
+        ref={listRef}
+        dense
+        sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}
+      >
         {filtered.map((f, idx) => {
           const isSelected = idx === selectedIndex || f.key === currentField;
           return (
@@ -283,7 +287,9 @@ function FieldMenu({
                 }}
               />
               {f.key === currentField && (
-                <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+                <CheckIcon
+                  sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                />
               )}
             </ListItemButton>
           );
@@ -544,7 +550,11 @@ function ValueEditor({
         />
       </Box>
       {sorted.length > 0 && (
-        <List ref={listRef} dense sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}>
+        <List
+          ref={listRef}
+          dense
+          sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}
+        >
           {sorted.slice(0, 30).map((v, idx) => {
             const isSelected = currentSelected.has(v);
             const isHighlighted = idx === selectedIndex || isSelected;
@@ -728,7 +738,11 @@ function HasFieldSelector({
           }}
         />
       </Box>
-      <List ref={listRef} dense sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}>
+      <List
+        ref={listRef}
+        dense
+        sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}
+      >
         {displayItems.map((key, idx) => {
           const isCurrent = key === currentValue;
           const isSelected = idx === selectedIndex || isCurrent;

@@ -140,9 +140,7 @@ export const FilterTokenGroup = forwardRef<
       fontSize: '0.8rem',
       fontWeight: part === 'field' ? 600 : 400,
       border: isSelected ? selectedBorder : '1px solid transparent',
-      backgroundColor: isSelected
-        ? selectedBg
-        : 'transparent',
+      backgroundColor: isSelected ? selectedBg : 'transparent',
       color: isIncomplete
         ? isDark
           ? 'rgba(255,255,255,0.25)'
