@@ -700,7 +700,11 @@ export function QueryDSLEditor({
               const groupHandle = tokenGroupRefs.current.get(newChipId);
               const el = groupHandle?.getPartEl('operator');
               if (el) {
-                setEditingToken({ chipId: newChipId, part: 'operator', anchorEl: el });
+                setEditingToken({
+                  chipId: newChipId,
+                  part: 'operator',
+                  anchorEl: el,
+                });
                 chipEditingRef.current = true;
               }
             });
