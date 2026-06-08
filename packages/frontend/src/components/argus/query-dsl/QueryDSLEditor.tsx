@@ -14,16 +14,8 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
-import {
-  Box,
-  IconButton,
-  useTheme,
-  ClickAwayListener,
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Box, IconButton, useTheme, ClickAwayListener } from '@mui/material';
+import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 import type { QueryDomain, SuggestionItem } from './types';
@@ -34,7 +26,12 @@ import { QuerySuggestionDropdown } from './QuerySuggestionDropdown';
 import type { QuerySuggestionDropdownHandle } from './QuerySuggestionDropdown';
 import { FilterTokenChip } from './FilterTokenChip';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
-import { getRecentSearches, addRecentSearch, removeRecentSearch, type RecentSearch } from './recent-searches';
+import {
+  getRecentSearches,
+  addRecentSearch,
+  removeRecentSearch,
+  type RecentSearch,
+} from './recent-searches';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -45,7 +42,10 @@ export interface QueryDSLEditorProps {
   /** Called whenever the query changes (for parent state sync) */
   onChange?: (query: string) => void;
   /** Accepts Map<string, string[]> or Record<string, {value,count}[]> */
-  facets?: Map<string, string[]> | Record<string, { value: string; count: number }[]> | Record<string, string[]>;
+  facets?:
+    | Map<string, string[]>
+    | Record<string, { value: string; count: number }[]>
+    | Record<string, string[]>;
   placeholder?: string;
   maxSuggestions?: number;
 }
@@ -58,25 +58,30 @@ function useChipHistory(initial: FilterChip[] | (() => FilterChip[])) {
   const [chips, setChipsRaw] = useState<FilterChip[]>(initial);
   const undoStack = useRef<FilterChip[][]>([]);
   const redoStack = useRef<FilterChip[][]>([]);
-  const chipsRef = useRef<FilterChip[]>(typeof initial === 'function' ? initial() : initial);
+  const chipsRef = useRef<FilterChip[]>(
+    typeof initial === 'function' ? initial() : initial
+  );
 
   // Keep chipsRef in sync
   chipsRef.current = chips;
 
-  const setChips = useCallback((updater: FilterChip[] | ((prev: FilterChip[]) => FilterChip[])) => {
-    const prev = chipsRef.current;
-    const next = typeof updater === 'function' ? updater(prev) : updater;
+  const setChips = useCallback(
+    (updater: FilterChip[] | ((prev: FilterChip[]) => FilterChip[])) => {
+      const prev = chipsRef.current;
+      const next = typeof updater === 'function' ? updater(prev) : updater;
 
-    // Only push to history if chips actually changed
-    if (JSON.stringify(prev) !== JSON.stringify(next)) {
-      undoStack.current.push(prev);
-      if (undoStack.current.length > MAX_HISTORY) {
-        undoStack.current.shift();
+      // Only push to history if chips actually changed
+      if (JSON.stringify(prev) !== JSON.stringify(next)) {
+        undoStack.current.push(prev);
+        if (undoStack.current.length > MAX_HISTORY) {
+          undoStack.current.shift();
+        }
+        redoStack.current = []; // clear redo on new action
+        setChipsRaw(next);
       }
-      redoStack.current = []; // clear redo on new action
-      setChipsRaw(next);
-    }
-  }, []);
+    },
+    []
+  );
 
   const undo = useCallback(() => {
     const prevState = undoStack.current.pop();
@@ -126,29 +131,37 @@ export function QueryDSLEditor({
   // ─── State ───────────────────────────────────────────────────────────
 
   const { chips, setChips, undo, redo, resetTo } = useChipHistory(
-    queryToChips(initialQuery),
+    queryToChips(initialQuery)
   );
   const [inputValue, setInputValue] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isComposing, setIsComposing] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() => getRecentSearches(domain));
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() =>
+    getRecentSearches(domain)
+  );
 
   const refreshRecent = useCallback(() => {
     setRecentSearches(getRecentSearches(domain));
   }, [domain]);
 
-  const handleSelectRecent = useCallback((query: string) => {
-    resetTo(queryToChips(query));
-    setInputValue('');
-    setShowDropdown(false);
-    onSearch(query);
-  }, [resetTo, onSearch]);
+  const handleSelectRecent = useCallback(
+    (query: string) => {
+      resetTo(queryToChips(query));
+      setInputValue('');
+      setShowDropdown(false);
+      onSearch(query);
+    },
+    [resetTo, onSearch]
+  );
 
-  const handleRemoveRecent = useCallback((query: string) => {
-    removeRecentSearch(domain, query);
-    refreshRecent();
-  }, [domain, refreshRecent]);
+  const handleRemoveRecent = useCallback(
+    (query: string) => {
+      removeRecentSearch(domain, query);
+      refreshRecent();
+    },
+    [domain, refreshRecent]
+  );
 
   // ─── Sync initialQuery → chips when it changes externally ──────────
   const prevInitialQuery = useRef(initialQuery);
@@ -173,7 +186,10 @@ export function QueryDSLEditor({
         } else if (typeof values[0] === 'string') {
           map.set(key, values as string[]);
         } else {
-          map.set(key, (values as { value: string; count: number }[]).map((v) => v.value));
+          map.set(
+            key,
+            (values as { value: string; count: number }[]).map((v) => v.value)
+          );
         }
       }
     }
@@ -191,233 +207,279 @@ export function QueryDSLEditor({
   const tokens = useMemo(() => tokenize(inputValue), [inputValue]);
   const cursorContext = useMemo(
     () => resolveCursorContext(inputValue, inputValue.length, tokens),
-    [inputValue, tokens],
+    [inputValue, tokens]
   );
 
   // Support logical operator chips explicitly
   const suggestions = useMemo(
-    () => getSuggestions(cursorContext, domain, normalizedFacets, maxSuggestions, chips),
-    [cursorContext, domain, normalizedFacets, maxSuggestions, chips],
+    () =>
+      getSuggestions(
+        cursorContext,
+        domain,
+        normalizedFacets,
+        maxSuggestions,
+        chips
+      ),
+    [cursorContext, domain, normalizedFacets, maxSuggestions, chips]
   );
 
   // ─── Chip operations ──────────────────────────────────────────────
 
-  const updateChip = useCallback((chipId: string, updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value'>>) => {
-    setChips((prev) =>
-      prev.map((c) => (c.id === chipId ? { ...c, ...updates } : c))
-    );
-  }, [setChips]);
+  const updateChip = useCallback(
+    (
+      chipId: string,
+      updates: Partial<Pick<FilterChip, 'field' | 'operator' | 'value'>>
+    ) => {
+      setChips((prev) =>
+        prev.map((c) => (c.id === chipId ? { ...c, ...updates } : c))
+      );
+    },
+    [setChips]
+  );
 
-  const deleteChip = useCallback((chipId: string) => {
-    setChips((prev) => prev.filter((c) => c.id !== chipId));
-  }, [setChips]);
+  const deleteChip = useCallback(
+    (chipId: string) => {
+      setChips((prev) => prev.filter((c) => c.id !== chipId));
+    },
+    [setChips]
+  );
 
   // ─── Input handlers ───────────────────────────────────────────────
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setInputValue(val);
-    // Show dropdown when there's actual text (not just spaces)
-    if (val.trim().length > 0) {
-      setShowDropdown(true);
-    }
-    setSelectedIndex(-1);
-  }, []);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value;
+      setInputValue(val);
+      // Show dropdown when there's actual text (not just spaces)
+      if (val.trim().length > 0) {
+        setShowDropdown(true);
+      }
+      setSelectedIndex(-1);
+    },
+    []
+  );
 
   /** Commit typed text in the input field as chip(s) */
-  const commitInputAsChip = useCallback((text: string) => {
-    const lower = text.toLowerCase();
-    if ((lower === 'and' || lower === 'or') && canInsertLogical(chips)) {
-      // Valid logical operator position → logical chip
-      setChips((prev) => [
-        ...prev,
-        {
-          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: 'logical' as const,
-          label: lower.toUpperCase(),
-        },
-      ]);
-      setInputValue('');
-    } else if (lower === '(' || lower === ')') {
-      // Paren → paren chip
-      setChips((prev) => [
-        ...prev,
-        {
-          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: 'paren' as const,
-          label: lower,
-        },
-      ]);
-      setInputValue('');
-    } else {
-      // Try to parse as filter, or fall through as free text
-      const parsed = queryToChips(text);
-      if (parsed.length > 0) {
-        setChips((prev) => [...prev, ...parsed]);
-        setInputValue('');
-      }
-    }
-  }, [chips, setChips]);
-
-  const applySuggestion = useCallback((item: SuggestionItem) => {
-    const result = applyCompletion(inputValue, cursorContext, item);
-
-    if (item.category === 'logical') {
-      // AND/OR: only valid after a filter chip or closing paren
-      if (canInsertLogical(chips)) {
+  const commitInputAsChip = useCallback(
+    (text: string) => {
+      const lower = text.toLowerCase();
+      if ((lower === 'and' || lower === 'or') && canInsertLogical(chips)) {
+        // Valid logical operator position → logical chip
         setChips((prev) => [
           ...prev,
           {
             id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             type: 'logical' as const,
-            label: item.label.toUpperCase(),
+            label: lower.toUpperCase(),
+          },
+        ]);
+        setInputValue('');
+      } else if (lower === '(' || lower === ')') {
+        // Paren → paren chip
+        setChips((prev) => [
+          ...prev,
+          {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'paren' as const,
+            label: lower,
+          },
+        ]);
+        setInputValue('');
+      } else {
+        // Try to parse as filter, or fall through as free text
+        const parsed = queryToChips(text);
+        if (parsed.length > 0) {
+          setChips((prev) => [...prev, ...parsed]);
+          setInputValue('');
+        }
+      }
+    },
+    [chips, setChips]
+  );
+
+  const applySuggestion = useCallback(
+    (item: SuggestionItem) => {
+      const result = applyCompletion(inputValue, cursorContext, item);
+
+      if (item.category === 'logical') {
+        // AND/OR: only valid after a filter chip or closing paren
+        if (canInsertLogical(chips)) {
+          setChips((prev) => [
+            ...prev,
+            {
+              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              type: 'logical' as const,
+              label: item.label.toUpperCase(),
+            },
+          ]);
+          setInputValue('');
+          setShowDropdown(false);
+          setSelectedIndex(-1);
+        } else {
+          // No valid preceding filter → treat as free text message search
+          const freeTextChip: FilterChip = {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'filter',
+            field: 'message',
+            operator: 'contains',
+            value: item.label,
+            quoted: true,
+          };
+          setChips((prev) => [...prev, freeTextChip]);
+          setInputValue('');
+          setShowDropdown(false);
+          setSelectedIndex(-1);
+        }
+      } else if (item.category === 'paren') {
+        // (/) → immediately create a chip (Sentry-style)
+        setChips((prev) => [
+          ...prev,
+          {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'paren' as const,
+            label: item.label,
           },
         ]);
         setInputValue('');
         setShowDropdown(false);
         setSelectedIndex(-1);
+      } else if (item.category === 'value') {
+        // Value → try to create filter chips
+        const completedChips = queryToChips(result.text);
+        if (completedChips.length > 0) {
+          setChips((prev) => [...prev, ...completedChips]);
+          setInputValue('');
+          setShowDropdown(false);
+          setSelectedIndex(-1);
+        } else {
+          setInputValue(result.text);
+          setShowDropdown(true);
+          setSelectedIndex(-1);
+        }
       } else {
-        // No valid preceding filter → treat as free text message search
-        const freeTextChip: FilterChip = {
-          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: 'filter',
-          field: 'message',
-          operator: 'contains',
-          value: item.label,
-          quoted: true,
-        };
-        setChips((prev) => [...prev, freeTextChip]);
-        setInputValue('');
-        setShowDropdown(false);
-        setSelectedIndex(-1);
-      }
-    } else if (item.category === 'paren') {
-      // (/) → immediately create a chip (Sentry-style)
-      setChips((prev) => [
-        ...prev,
-        {
-          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: 'paren' as const,
-          label: item.label,
-        },
-      ]);
-      setInputValue('');
-      setShowDropdown(false);
-      setSelectedIndex(-1);
-    } else if (item.category === 'value') {
-      // Value → try to create filter chips
-      const completedChips = queryToChips(result.text);
-      if (completedChips.length > 0) {
-        setChips((prev) => [...prev, ...completedChips]);
-        setInputValue('');
-        setShowDropdown(false);
-        setSelectedIndex(-1);
-      } else {
+        // Field or operator selected → keep dropdown open for next step
         setInputValue(result.text);
         setShowDropdown(true);
         setSelectedIndex(-1);
       }
-    } else {
-      // Field or operator selected → keep dropdown open for next step
-      setInputValue(result.text);
-      setShowDropdown(true);
-      setSelectedIndex(-1);
-    }
 
-    // Re-focus input (suppress dropdown from the focus event to prevent double-open)
-    suppressDropdownRef.current = true;
-    requestAnimationFrame(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.setSelectionRange(result.cursorOffset, result.cursorOffset);
-      }
-    });
-  }, [inputValue, cursorContext, setChips, chips]);
-
-
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (isComposing) return;
-
-    // ── Undo / Redo ──
-    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-      // Only intercept Ctrl+Z when input is empty (for chip undo)
-      // Otherwise let browser handle native input undo
-      if (inputValue === '') {
-        e.preventDefault();
-        undo();
-        return;
-      }
-    }
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-      if (inputValue === '') {
-        e.preventDefault();
-        redo();
-        return;
-      }
-    }
-
-    if (e.key === 'ArrowDown' && showDropdown && suggestions.length > 0) {
-      e.preventDefault();
-      setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
-      return;
-    }
-    if (e.key === 'ArrowUp' && showDropdown && suggestions.length > 0) {
-      e.preventDefault();
-      setSelectedIndex((prev) => Math.max(prev - 1, -1));
-      return;
-    }
-    // Left/Right arrow keys → tab switching (when dropdown is open)
-    if (e.key === 'ArrowLeft' && showDropdown && inputValue === '') {
-      e.preventDefault();
-      dropdownRef.current?.prevTab();
-      return;
-    }
-    if (e.key === 'ArrowRight' && showDropdown && inputValue === '') {
-      e.preventDefault();
-      dropdownRef.current?.nextTab();
-      return;
-    }
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      if (showDropdown && suggestions.length > 0) {
-        applySuggestion(suggestions[selectedIndex >= 0 ? selectedIndex : 0]);
-      } else if (inputValue.trim()) {
-        commitInputAsChip(inputValue.trim());
-        setShowDropdown(false);
-      }
-      return;
-    }
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
-        applySuggestion(suggestions[selectedIndex]);
-      } else if (inputValue.trim()) {
-        commitInputAsChip(inputValue.trim());
-        setShowDropdown(false);
-      } else {
-        // No input text → execute search with current chips
-        const query = chipsToQuery(chips);
-        if (query.trim()) {
-          addRecentSearch(domain, query);
-          refreshRecent();
+      // Re-focus input (suppress dropdown from the focus event to prevent double-open)
+      suppressDropdownRef.current = true;
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.setSelectionRange(
+            result.cursorOffset,
+            result.cursorOffset
+          );
         }
-        onSearch(query);
-        setShowDropdown(false);
+      });
+    },
+    [inputValue, cursorContext, setChips, chips]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (isComposing) return;
+
+      // ── Undo / Redo ──
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        // Only intercept Ctrl+Z when input is empty (for chip undo)
+        // Otherwise let browser handle native input undo
+        if (inputValue === '') {
+          e.preventDefault();
+          undo();
+          return;
+        }
       }
-      return;
-    }
-    if (e.key === 'Escape') {
-      setShowDropdown(false);
-      return;
-    }
-    if (e.key === 'Backspace' && inputValue === '' && chips.length > 0) {
-      // Delete last chip when backspace on empty input
-      e.preventDefault();
-      setChips((prev) => prev.slice(0, -1));
-      return;
-    }
-  }, [isComposing, showDropdown, suggestions, selectedIndex, inputValue, chips, undo, redo, applySuggestion, setChips, onSearch, domain, refreshRecent]);
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === 'y' || (e.key === 'z' && e.shiftKey))
+      ) {
+        if (inputValue === '') {
+          e.preventDefault();
+          redo();
+          return;
+        }
+      }
+
+      if (e.key === 'ArrowDown' && showDropdown && suggestions.length > 0) {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
+        return;
+      }
+      if (e.key === 'ArrowUp' && showDropdown && suggestions.length > 0) {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.max(prev - 1, -1));
+        return;
+      }
+      // Left/Right arrow keys → tab switching (when dropdown is open)
+      if (e.key === 'ArrowLeft' && showDropdown && inputValue === '') {
+        e.preventDefault();
+        dropdownRef.current?.prevTab();
+        return;
+      }
+      if (e.key === 'ArrowRight' && showDropdown && inputValue === '') {
+        e.preventDefault();
+        dropdownRef.current?.nextTab();
+        return;
+      }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (showDropdown && suggestions.length > 0) {
+          applySuggestion(suggestions[selectedIndex >= 0 ? selectedIndex : 0]);
+        } else if (inputValue.trim()) {
+          commitInputAsChip(inputValue.trim());
+          setShowDropdown(false);
+        }
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
+          applySuggestion(suggestions[selectedIndex]);
+        } else if (inputValue.trim()) {
+          commitInputAsChip(inputValue.trim());
+          setShowDropdown(false);
+        } else {
+          // No input text → execute search with current chips
+          const query = chipsToQuery(chips);
+          if (query.trim()) {
+            addRecentSearch(domain, query);
+            refreshRecent();
+          }
+          onSearch(query);
+          setShowDropdown(false);
+        }
+        return;
+      }
+      if (e.key === 'Escape') {
+        setShowDropdown(false);
+        return;
+      }
+      if (e.key === 'Backspace' && inputValue === '' && chips.length > 0) {
+        // Delete last chip when backspace on empty input
+        e.preventDefault();
+        setChips((prev) => prev.slice(0, -1));
+        return;
+      }
+    },
+    [
+      isComposing,
+      showDropdown,
+      suggestions,
+      selectedIndex,
+      inputValue,
+      chips,
+      undo,
+      redo,
+      applySuggestion,
+      setChips,
+      onSearch,
+      domain,
+      refreshRecent,
+    ]
+  );
 
   const suppressDropdownRef = useRef(false);
   // Prevents click handler from toggling right after focus showed the dropdown
@@ -491,7 +553,14 @@ export function QueryDSLEditor({
             cursor: 'text',
           }}
         >
-          <SearchIcon sx={{ fontSize: 14, color: 'text.disabled', flexShrink: 0, mr: 0.5 }} />
+          <SearchIcon
+            sx={{
+              fontSize: 14,
+              color: 'text.disabled',
+              flexShrink: 0,
+              mr: 0.5,
+            }}
+          />
 
           {/* Existing filter chips */}
           {chips.map((chip, chipIdx) => {
@@ -505,13 +574,24 @@ export function QueryDSLEditor({
                     mx: '2px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    color: chip.type === 'logical'
-                      ? (chip.label === 'OR' ? (isDark ? '#e6994a' : '#e65100') : (isDark ? '#4dabf5' : '#1976d2'))
-                      : (isDark ? '#9e9e9e' : '#757575'),
+                    color:
+                      chip.type === 'logical'
+                        ? chip.label === 'OR'
+                          ? isDark
+                            ? '#e6994a'
+                            : '#e65100'
+                          : isDark
+                            ? '#4dabf5'
+                            : '#1976d2'
+                        : isDark
+                          ? '#9e9e9e'
+                          : '#757575',
                     userSelect: 'none',
                     textTransform: 'uppercase',
                     borderRadius: '4px',
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                    backgroundColor: isDark
+                      ? 'rgba(255,255,255,0.06)'
+                      : 'rgba(0,0,0,0.04)',
                     display: 'flex',
                     alignItems: 'center',
                   }}
@@ -569,7 +649,11 @@ export function QueryDSLEditor({
             onCompositionEnd={() => setIsComposing(false)}
             spellCheck={false}
             autoComplete="off"
-            placeholder={chips.length === 0 ? (placeholder ?? t('dsl.placeholder', 'Search with DSL...')) : ''}
+            placeholder={
+              chips.length === 0
+                ? (placeholder ?? t('dsl.placeholder', 'Search with DSL...'))
+                : ''
+            }
             style={{
               flex: 1,
               minWidth: 80,
@@ -589,7 +673,10 @@ export function QueryDSLEditor({
           {hasContent && (
             <IconButton
               size="small"
-              onClick={(e) => { e.stopPropagation(); handleClear(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClear();
+              }}
               sx={{ p: 0.2, flexShrink: 0 }}
             >
               <CloseIcon sx={{ fontSize: 14 }} />
@@ -598,20 +685,22 @@ export function QueryDSLEditor({
         </Box>
 
         {/* Suggestion dropdown */}
-        {showDropdown && (suggestions.length > 0 || recentSearches.length > 0) && !isComposing && (
-          <QuerySuggestionDropdown
-            ref={dropdownRef}
-            suggestions={suggestions}
-            selectedIndex={selectedIndex}
-            onSelect={applySuggestion}
-            onSelectedIndexChange={setSelectedIndex}
-            isDark={isDark}
-            inputPrefix={inputValue}
-            recentSearches={recentSearches}
-            onSelectRecent={handleSelectRecent}
-            onRemoveRecent={handleRemoveRecent}
-          />
-        )}
+        {showDropdown &&
+          (suggestions.length > 0 || recentSearches.length > 0) &&
+          !isComposing && (
+            <QuerySuggestionDropdown
+              ref={dropdownRef}
+              suggestions={suggestions}
+              selectedIndex={selectedIndex}
+              onSelect={applySuggestion}
+              onSelectedIndexChange={setSelectedIndex}
+              isDark={isDark}
+              inputPrefix={inputValue}
+              recentSearches={recentSearches}
+              onSelectRecent={handleSelectRecent}
+              onRemoveRecent={handleRemoveRecent}
+            />
+          )}
       </Box>
     </ClickAwayListener>
   );
