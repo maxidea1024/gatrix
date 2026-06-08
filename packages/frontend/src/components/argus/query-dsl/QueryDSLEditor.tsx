@@ -612,7 +612,24 @@ export function QueryDSLEditor({
         setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        commitInlineEdit(chipId);
+        // If nothing is checked yet and a suggestion is highlighted, select it directly
+        const currentChip = chips.find((c) => c.id === chipId);
+        const currentVals = currentChip?.values?.filter((v) => v !== '') ?? [];
+        if (
+          currentVals.length === 0 &&
+          popoverHighlightIdx >= 0 &&
+          popoverHighlightIdx <= maxIdx
+        ) {
+          const highlightedValue = facetValues[popoverHighlightIdx];
+          updateChip(chipId, {
+            value: highlightedValue,
+            values: [highlightedValue],
+            composingPart: undefined,
+          });
+          closeInlineEdit();
+        } else {
+          commitInlineEdit(chipId);
+        }
       } else if (
         e.key === ' ' &&
         popoverHighlightIdx >= 0 &&
