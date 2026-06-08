@@ -79,15 +79,15 @@ export default function DatetimeValueEditor({
 
   // Parse existing values into Dayjs for DateTimePicker
   const parsedFrom = useMemo(() => {
-    if (!currentValue || currentValue.startsWith('now')) return null;
+    if (!currentValue || currentValue.startsWith('now')) return dayjs().tz(storedTz);
     const d = dayjs(currentValue).tz(storedTz);
-    return d.isValid() ? d : null;
+    return d.isValid() ? d : dayjs().tz(storedTz);
   }, [currentValue, storedTz]);
 
   const parsedTo = useMemo(() => {
-    if (!currentValueTo || currentValueTo.startsWith('now')) return null;
+    if (!currentValueTo || currentValueTo.startsWith('now')) return dayjs().tz(storedTz);
     const d = dayjs(currentValueTo).tz(storedTz);
-    return d.isValid() ? d : null;
+    return d.isValid() ? d : dayjs().tz(storedTz);
   }, [currentValueTo, storedTz]);
 
   // Local state for between mode
@@ -248,7 +248,6 @@ export default function DatetimeValueEditor({
             }
             value={fromValue}
             onChange={(d) => handleDateChange(d, 'from')}
-            onAccept={(d) => handleDateAccept(d, 'from')}
             timezone={storedTz}
             ampm={false}
             format="YYYY-MM-DD HH:mm"
@@ -283,7 +282,6 @@ export default function DatetimeValueEditor({
               label={t('dsl.datetime.to', 'To')}
               value={toValue}
               onChange={(d) => handleDateChange(d, 'to')}
-              onAccept={(d) => handleDateAccept(d, 'to')}
               timezone={storedTz}
               ampm={false}
               format="YYYY-MM-DD HH:mm"
