@@ -331,23 +331,70 @@ export function QueryDSLEditor({
   );
 
   /** Handle update from TokenEditDropdown */
+  const skipEditCloseRef = useRef(false);
+
   const handleTokenUpdate = useCallback(
     (chipId: string, updates: Partial<FilterChip>) => {
+      // Find the current chip to check composing state
+      const chip = chips.find((c) => c.id === chipId);
+
+      if (chip?.composingPart === 'operator' && updates.operator) {
+        // Operator selected during step-by-step → chain to value
+        updateChip(chipId, { ...updates, composingPart: 'value' });
+        skipEditCloseRef.current = true;
+        // Wait for render, then auto-open value dropdown
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const groupHandle = tokenGroupRefs.current.get(chipId);
+            const el = groupHandle?.getPartEl('value');
+            if (el) {
+              setEditingToken({ chipId, part: 'value', anchorEl: el });
+              chipEditingRef.current = true;
+            }
+          });
+        });
+        return;
+      }
+
+      if (chip?.composingPart === 'value') {
+        // Value selected during step-by-step → complete chip
+        updateChip(chipId, { ...updates, composingPart: undefined });
+        return;
+      }
+
+      // Normal (non-composing) update
       updateChip(chipId, updates);
     },
-    [updateChip]
+    [updateChip, chips]
   );
 
   /** Close token editing dropdown */
   const handleEditClose = useCallback(() => {
+    // Skip close when chaining composing steps (operator → value)
+    if (skipEditCloseRef.current) {
+      skipEditCloseRef.current = false;
+      return;
+    }
+
+    // If chip was composing and closed without completing, delete it
+    if (editingToken) {
+      const chip = chips.find((c) => c.id === editingToken.chipId);
+      if (chip?.composingPart) {
+        // Incomplete composing chip → delete
+        deleteChip(editingToken.chipId);
+        setEditingToken(null);
+        chipEditingRef.current = false;
+        suppressDropdownRef.current = true;
+        requestAnimationFrame(() => inputRef.current?.focus());
+        return;
+      }
+    }
+
     setEditingToken(null);
     chipEditingRef.current = false;
-    // Suppress dropdown re-open on focus restoration
     suppressDropdownRef.current = true;
-    requestAnimationFrame(() => {
-      inputRef.current?.focus();
-    });
-  }, []);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, [editingToken, chips, deleteChip]);
 
   // ─── Input handlers ───────────────────────────────────────────────
 
@@ -628,7 +675,40 @@ export function QueryDSLEditor({
           }
         }
       } else {
-        // Field or operator selected → keep dropdown open for next step
+        // Field or operator selected
+        // Step-by-step creation: if this is a field selection from empty input,
+        // create a composing chip instead of putting text in input
+        if (item.category === 'field' && !inputValue.includes(':')) {
+          const newChipId = `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          setChips((prev) => [
+            ...prev,
+            {
+              id: newChipId,
+              type: 'filter' as const,
+              field: item.label,
+              composingPart: 'operator' as const,
+            },
+          ]);
+          setInputValue('');
+          setCursorOffset(0);
+          setShowDropdown(false);
+          setSelectedIndex(-1);
+
+          // Auto-open operator dropdown after render
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const groupHandle = tokenGroupRefs.current.get(newChipId);
+              const el = groupHandle?.getPartEl('operator');
+              if (el) {
+                setEditingToken({ chipId: newChipId, part: 'operator', anchorEl: el });
+                chipEditingRef.current = true;
+              }
+            });
+          });
+          return;
+        }
+
+        // Operator or other → keep dropdown open for next step (legacy flow)
         setInputValue(result.text);
         setCursorOffset(result.cursorOffset);
         setShowDropdown(true);
@@ -696,38 +776,33 @@ export function QueryDSLEditor({
         return;
       }
       // Left/Right arrow keys → token navigation (when input is empty)
+      // Token navigation takes priority over tab switching when chips exist
       if (e.key === 'ArrowLeft' && inputValue === '') {
         e.preventDefault();
-        if (showDropdown && selectedTokenIdx < 0) {
-          dropdownRef.current?.prevTab();
-          return;
-        }
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
             if (prev <= 0) return visualTokens.length - 1;
             return prev - 1;
           });
+        } else if (showDropdown) {
+          dropdownRef.current?.prevTab();
         }
         return;
       }
       if (e.key === 'ArrowRight' && inputValue === '') {
         e.preventDefault();
-        if (showDropdown && selectedTokenIdx < 0) {
-          dropdownRef.current?.nextTab();
-          return;
-        }
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           if (selectedTokenIdx < 0) {
-            // Start from first token
             setSelectedTokenIdx(0);
           } else if (selectedTokenIdx >= visualTokens.length - 1) {
-            setSelectedTokenIdx(-1); // back to input
-            inputRef.current?.focus();
+            setSelectedTokenIdx(-1);
           } else {
             setSelectedTokenIdx((prev) => prev + 1);
           }
+        } else if (showDropdown) {
+          dropdownRef.current?.nextTab();
         }
         return;
       }
