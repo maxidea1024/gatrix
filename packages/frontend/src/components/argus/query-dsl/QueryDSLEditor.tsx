@@ -952,7 +952,10 @@ export function QueryDSLEditor({
             setInputValue(nextInput);
             setCursorOffset(cursorPos);
             setShowDropdown(true);
-            setSelectedIndex(-1);
+            // Preserve highlight position during multi-select toggle
+            if (!isMultiSelect) {
+              setSelectedIndex(-1);
+            }
 
             // Mark as composing multi-select
             isMultiSelectingRef.current = true;
