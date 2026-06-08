@@ -26,10 +26,12 @@ export interface FilterChip {
 
   /** Field name (e.g., 'level', 'message') */
   field?: string;
-  /** Internal operator (e.g., '=', '!=', 'contains') */
+  /** Internal operator (e.g., '=', '!=', 'contains', 'in') */
   operator?: QueryOperator | string;
-  /** Filter value */
+  /** Filter value (first value for in/!in) */
   value?: string;
+  /** Multiple values for in/!in operators */
+  values?: string[];
   /** Whether the value was quoted */
   quoted?: boolean;
 }
@@ -113,7 +115,7 @@ function collectChips(node: Expression, chips: FilterChip[]): void {
 }
 
 function filterToChip(node: FilterExpression): FilterChip {
-  return {
+  const chip: FilterChip = {
     id: nextChipId(),
     type: 'filter',
     field: node.field,
@@ -121,6 +123,12 @@ function filterToChip(node: FilterExpression): FilterChip {
     value: String(node.value),
     quoted: node.quoted,
   };
+  // Populate values for in/!in operators
+  if ((node.operator === 'in' || node.operator === '!in') && node.values) {
+    chip.values = node.values.map(String);
+    chip.value = chip.values.join(', ');
+  }
+  return chip;
 }
 
 function negateOperator(op: QueryOperator): QueryOperator {
@@ -133,6 +141,8 @@ function negateOperator(op: QueryOperator): QueryOperator {
     '!startsWith': 'startsWith',
     endsWith: '!endsWith',
     '!endsWith': 'endsWith',
+    'in': '!in',
+    '!in': 'in',
   };
   return negMap[op] ?? op;
 }
@@ -215,6 +225,13 @@ function chipToQueryPart(chip: FilterChip): string {
     return `${field}:${operator}("${escapeQuotes(value)}")`;
   }
 
+  // IN / NOT IN operators: field:in("v1", "v2") or field:!in("v1", "v2")
+  if (operator === 'in' || operator === '!in') {
+    const vals = chip.values ?? (value ? value.split(', ') : []);
+    const quotedVals = vals.map((v) => `"${escapeQuotes(v)}"`).join(', ');
+    return `${field}:${operator}(${quotedVals})`;
+  }
+
   // Comparison operators: field:!=value, field:>value
   if (operator !== '=') {
     if (quoted || needsQuoting(value)) {
@@ -255,6 +272,8 @@ const FUNC_OPS: Record<string, QueryOperator> = {
   [TokenType.NOT_CONTAINS]: '!contains',
   [TokenType.NOT_STARTS_WITH]: '!startsWith',
   [TokenType.NOT_ENDS_WITH]: '!endsWith',
+  [TokenType.IN]: 'in',
+  [TokenType.NOT_IN]: '!in',
   [TokenType.BEFORE]: 'before',
   [TokenType.AFTER]: 'after',
 };
@@ -386,12 +405,36 @@ export function queryToChips(query: string): FilterChip[] {
         continue;
       }
 
-      // Function operator: field:contains("value")
+      // Function operator: field:contains("value") or field:in("v1", "v2")
       const funcOp = FUNC_OPS[opTok.type];
       if (funcOp) {
         advance(); // skip function name
         if (tok().type === TokenType.LPAREN) {
           advance(); // skip (
+
+          // ── in()/!in(): multi-value argument list ──
+          if (funcOp === 'in' || funcOp === '!in') {
+            const values: string[] = [];
+            while (tok().type !== TokenType.RPAREN && tok().type !== TokenType.EOF) {
+              const valTok = tok();
+              if (VALUE_TYPES.has(valTok.type) || valTok.type === TokenType.FIELD) {
+                values.push(valTok.value);
+                advance();
+              } else if (valTok.type === TokenType.COMMA) {
+                advance(); // skip comma
+              } else {
+                advance(); // skip unexpected
+              }
+            }
+            if (tok().type === TokenType.RPAREN) advance(); // skip )
+            chips.push({
+              id: nextChipId(), type: 'filter', field, operator: funcOp,
+              value: values.join(', '), values, quoted: true,
+            });
+            continue;
+          }
+
+          // Single-value function: contains("value"), startsWith("value"), etc.
           const valTok = tok();
           if (VALUE_TYPES.has(valTok.type)) {
             chips.push({

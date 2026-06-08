@@ -56,6 +56,8 @@ const FUNC_TOKEN_TO_OP: Partial<Record<TokenType, QueryOperator>> = {
   [TokenType.NOT_CONTAINS]: '!contains',
   [TokenType.NOT_STARTS_WITH]: '!startsWith',
   [TokenType.NOT_ENDS_WITH]: '!endsWith',
+  [TokenType.IN]: 'in',
+  [TokenType.NOT_IN]: '!in',
   [TokenType.BEFORE]: 'before',
   [TokenType.AFTER]: 'after',
 };
@@ -296,6 +298,11 @@ class Parser {
       if (this.current().type === TokenType.LPAREN) {
         this.advance(); // consume (
 
+        // Multi-value argument list for in/!in
+        if (funcOp === 'in' || funcOp === '!in') {
+          return this.parseInFunctionArgs(fieldToken, funcToken, funcOp);
+        }
+
         // Single arg function: contains("..."), before("..."), etc.
         const valueToken = this.current();
         let value: string | number | boolean = '';
@@ -357,6 +364,60 @@ class Parser {
 
     // Simple value: field:value
     return this.parseFilterValue(fieldToken, '=');
+  }
+
+  private parseInFunctionArgs(
+    fieldToken: Token,
+    funcToken: Token,
+    funcOp: QueryOperator,
+  ): FilterExpression {
+    const values: (string | number | boolean)[] = [];
+
+    while (
+      this.current().type !== TokenType.RPAREN &&
+      this.current().type !== TokenType.EOF
+    ) {
+      const valTok = this.current();
+
+      if (valTok.type === TokenType.STRING) {
+        values.push(valTok.value);
+        this.advance();
+      } else if (valTok.type === TokenType.NUMBER) {
+        values.push(parseFloat(valTok.value));
+        this.advance();
+      } else if (valTok.type === TokenType.BOOLEAN) {
+        values.push(valTok.value === 'true');
+        this.advance();
+      } else if (valTok.type === TokenType.FIELD) {
+        values.push(valTok.value);
+        this.advance();
+      } else if (valTok.type === TokenType.COMMA) {
+        this.advance(); // skip comma
+        continue;
+      } else {
+        this.advance();
+      }
+    }
+
+    let end = this.pos > 0 ? this.tokens[this.pos - 1].end : funcToken.end;
+    if (this.current().type === TokenType.RPAREN) {
+      end = this.current().end;
+      this.advance(); // consume )
+    } else {
+      this.addError('UNCLOSED_PAREN', funcToken.start, end, {});
+    }
+
+    return {
+      type: 'Filter',
+      field: fieldToken.value,
+      operator: funcOp,
+      value: values.length > 0 ? values[0] : '',
+      values,
+      quoted: true,
+      funcOp: funcToken.value,
+      start: fieldToken.start,
+      end,
+    };
   }
 
   private parseFilterValue(

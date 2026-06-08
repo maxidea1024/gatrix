@@ -33,6 +33,8 @@ export enum TokenType {
   NOT_CONTAINS = 'NOT_CONTAINS',
   NOT_STARTS_WITH = 'NOT_STARTS_WITH',
   NOT_ENDS_WITH = 'NOT_ENDS_WITH',
+  IN = 'IN',
+  NOT_IN = 'NOT_IN',
 
   // === Logical Operators ===
   AND = 'AND',
@@ -68,6 +70,8 @@ export interface FilterExpression {
   field: string;
   operator: QueryOperator;
   value: string | number | boolean;
+  /** Multiple values for in/!in operators */
+  values?: (string | number | boolean)[];
   /** Whether the value was a quoted string in the input */
   quoted: boolean;
   /** For function operators: the function name (contains, startsWith, etc.) */
@@ -180,6 +184,8 @@ export type QueryOperator =
   | '!contains'
   | '!startsWith'
   | '!endsWith'
+  | 'in'
+  | '!in'
   | 'before'
   | 'after';
 
@@ -312,11 +318,13 @@ export const FUNCTION_OPERATORS = new Set([
   'contains',
   'startswith',
   'endswith',
+  'in',
   'before',
   'after',
   '!contains',
   '!startswith',
   '!endswith',
+  '!in',
 ]);
 
 /** Logical operator keywords */
@@ -330,9 +338,11 @@ export const FUNC_OP_TOKEN_MAP: Record<string, TokenType> = {
   contains: TokenType.CONTAINS,
   startswith: TokenType.STARTS_WITH,
   endswith: TokenType.ENDS_WITH,
+  in: TokenType.IN,
   before: TokenType.BEFORE,
   after: TokenType.AFTER,
   '!contains': TokenType.NOT_CONTAINS,
   '!startswith': TokenType.NOT_STARTS_WITH,
   '!endswith': TokenType.NOT_ENDS_WITH,
+  '!in': TokenType.NOT_IN,
 };

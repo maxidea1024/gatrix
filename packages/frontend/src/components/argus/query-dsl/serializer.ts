@@ -48,6 +48,15 @@ function serializeNode(node: Expression): string {
 function serializeFilter(node: Expression & { type: 'Filter' }): string {
   const field = node.field;
 
+  // IN / NOT IN → field:[val1, val2] or !field:[val1, val2]
+  if (node.operator === 'in' || node.operator === '!in') {
+    const vals = (node.values ?? [node.value])
+      .map((v) => formatValue(v))
+      .join(', ');
+    const bracket = `${field}:[${vals}]`;
+    return node.operator === '!in' ? `!${bracket}` : bracket;
+  }
+
   // Function operators
   const funcMapping = FUNC_OP_MAP[node.operator];
   if (funcMapping) {
