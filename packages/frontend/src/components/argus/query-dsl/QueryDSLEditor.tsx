@@ -34,7 +34,10 @@ import {
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import { getFieldByKey } from './fields';
-import { DATETIME_PRESET_COUNT, DATETIME_NAVIGABLE_COUNT } from './DatetimeValueEditor';
+import {
+  DATETIME_PRESET_COUNT,
+  DATETIME_NAVIGABLE_COUNT,
+} from './DatetimeValueEditor';
 import {
   getRecentSearches,
   addRecentSearch,

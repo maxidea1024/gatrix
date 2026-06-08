@@ -265,7 +265,10 @@ export default function DatetimeValueEditor({
                     e.stopPropagation();
                     if (isBetween) {
                       if (toValue) {
-                        onSelect(fromValue.utc().toISOString(), toValue.utc().toISOString());
+                        onSelect(
+                          fromValue.utc().toISOString(),
+                          toValue.utc().toISOString()
+                        );
                       }
                     } else {
                       onSelect(fromValue.utc().toISOString());
