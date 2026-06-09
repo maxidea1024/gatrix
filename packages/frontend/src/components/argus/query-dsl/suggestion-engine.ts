@@ -221,28 +221,40 @@ function getFieldSuggestions(
 
   // ── has / !has existence operators ──
   // Show in All + Logic tabs — push to appear at the bottom (after field list)
-  if (prefix === '' || 'has'.startsWith(prefix)) {
-    results.push({
-      label: 'has',
-      insertText: 'has:',
-      category: 'field',
-      fieldCategory: 'logic',
-      description: 'dsl.has.fieldExists',
-    });
-  }
-  if (
-    prefix === '' ||
-    '!has'.startsWith(prefix) ||
-    'not has'.startsWith(prefix) ||
-    'not'.startsWith(prefix)
-  ) {
-    results.push({
-      label: 'not has',
-      insertText: '!has:',
-      category: 'field',
-      fieldCategory: 'logic',
-      description: 'dsl.has.fieldNotExists',
-    });
+  if (context.isNegated) {
+    if (prefix === '' || 'has'.startsWith(prefix)) {
+      results.push({
+        label: 'not has',
+        insertText: 'has:',
+        category: 'field',
+        fieldCategory: 'logic',
+        description: 'dsl.has.fieldNotExists',
+      });
+    }
+  } else {
+    if (prefix === '' || 'has'.startsWith(prefix)) {
+      results.push({
+        label: 'has',
+        insertText: 'has:',
+        category: 'field',
+        fieldCategory: 'logic',
+        description: 'dsl.has.fieldExists',
+      });
+    }
+    if (
+      prefix === '' ||
+      '!has'.startsWith(prefix) ||
+      'not has'.startsWith(prefix) ||
+      'not'.startsWith(prefix)
+    ) {
+      results.push({
+        label: 'not has',
+        insertText: '!has:',
+        category: 'field',
+        fieldCategory: 'logic',
+        description: 'dsl.has.fieldNotExists',
+      });
+    }
   }
 
   // '(': always available

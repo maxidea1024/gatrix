@@ -217,6 +217,16 @@ describe('Spec 11.1: Suggestions per context', () => {
     expect(hasSeSuggestions.some((s) => s.label === 'service')).toBe(true);
     expect(hasSeSuggestions.some((s) => s.label === 'level')).toBe(false);
   });
+
+  it('negated prefix (e.g. !has) suggests "not has" and not "has"', () => {
+    const { suggestions } = pipeline('!has', 4);
+    const hasSug = suggestions.find((s) => s.label === 'has');
+    const notHasSug = suggestions.find((s) => s.label === 'not has');
+
+    expect(hasSug).toBeUndefined();
+    expect(notHasSug).toBeDefined();
+    expect(notHasSug!.insertText).toBe('has:'); // should be 'has:' since ! is already typed
+  });
 });
 
 // ─── Spec 10: Autocomplete rules ────────────────────────────────────────────

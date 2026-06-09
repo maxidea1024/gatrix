@@ -269,6 +269,21 @@ export function resolveCursorContext(
       type = 'FIELD';
   }
 
+  let isNegated = false;
+  if (currentToken) {
+    const idx = tokens.indexOf(currentToken);
+    if (idx > 0) {
+      const prev = tokens[idx - 1];
+      if (prev.type === TokenType.BANG || prev.type === TokenType.NOT) {
+        isNegated = true;
+      }
+    }
+  } else if (prevToken) {
+    if (prevToken.type === TokenType.BANG || prevToken.type === TokenType.NOT) {
+      isNegated = true;
+    }
+  }
+
   const emptyHasInfo = isEditingEmptyHasFilter(input, cursorOffset);
   if (emptyHasInfo.isHas) {
     const colonIdx = input.indexOf(':');
@@ -282,6 +297,7 @@ export function resolveCursorContext(
       editorState: EditorState.IN_QUOTED_STRING,
       inQuotedString: true,
       inParenthesis: false,
+      isNegated: emptyHasInfo.field?.startsWith('!'),
     };
   }
 
@@ -295,6 +311,7 @@ export function resolveCursorContext(
     editorState,
     inQuotedString: editorState === EditorState.IN_QUOTED_STRING,
     inParenthesis: editorState === EditorState.IN_PARENTHESIS,
+    isNegated,
   };
 }
 

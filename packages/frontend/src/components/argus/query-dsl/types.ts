@@ -255,6 +255,7 @@ export interface CursorContext {
   editorState: EditorState;
   inQuotedString: boolean;
   inParenthesis: boolean;
+  isNegated?: boolean;
 }
 
 // ─── Suggestion ──────────────────────────────────────────────────────────────
