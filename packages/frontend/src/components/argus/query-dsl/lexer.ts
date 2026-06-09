@@ -16,7 +16,6 @@
 import {
   TokenType,
   FUNCTION_OPERATORS,
-  LOGICAL_KEYWORDS,
   FUNC_OP_TOKEN_MAP,
 } from './types';
 import type { Token } from './types';
