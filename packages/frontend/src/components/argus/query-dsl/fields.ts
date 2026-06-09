@@ -387,7 +387,7 @@ export const FEEDBACK_CONFIG: DomainConfig = {
     [
       'feedback', 'contact_email',
       'environment', 'release', 'service',
-      'browser_name', 'os_name', 'device', 'level',
+      'browser_name', 'os_name', 'device',
       'timestamp', 'status', 'assigned',
     ],
     {

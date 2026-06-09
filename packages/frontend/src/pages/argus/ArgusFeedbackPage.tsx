@@ -199,22 +199,25 @@ const ArgusFeedbackPage: React.FC = () => {
   }, [urlState.period]);
 
   // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
-  // Feedback uses its own filter-options API (not the logs attribute-facet endpoint)
+  // Uses the generic attribute-facet API (same pattern as logs)
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
-        const opts = await argusService.getFeedbackFilterOptions(
-          projectId,
-          urlState.period
-        );
-        // Map DSL field keys to API response keys
-        const fieldMap: Record<string, string[]> = {
-          environment: opts.environments ?? [],
-          browser_name: opts.browsers ?? [],
-          os_name: opts.os ?? [],
-          assigned: opts.assigned ?? [],
+        // Map DSL field keys → ClickHouse column names
+        const columnMap: Record<string, string> = {
+          browser_name: 'browser',
+          os_name: 'os',
+          assigned: 'assigned_to',
+          feedback: 'message',
+          contact_email: 'contact_email',
         };
-        return fieldMap[fieldKey] ?? [];
+        const chKey = columnMap[fieldKey] ?? fieldKey;
+        const data = await argusService.getFeedbackAttributeFacet(
+          projectId,
+          chKey,
+          { period: urlState.period }
+        );
+        return data.map((d) => d.attr_value);
       } catch {
         return [];
       }
