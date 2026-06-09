@@ -13,11 +13,7 @@
 // - Keywords are case-insensitive
 // ============================================================================
 
-import {
-  TokenType,
-  FUNCTION_OPERATORS,
-  FUNC_OP_TOKEN_MAP,
-} from './types';
+import { TokenType, FUNCTION_OPERATORS, FUNC_OP_TOKEN_MAP } from './types';
 import type { Token } from './types';
 
 // ─── Public API ──────────────────────────────────────────────────────────────
