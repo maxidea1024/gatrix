@@ -489,19 +489,13 @@ export function QueryDSLEditor({
   /** Commit inline edit: parse comma-separated values into chip */
   const commitInlineEdit = useCallback(
     (chipId: string) => {
-      // Prefer chip's current values (already updated by checkbox toggles)
-      const chip = chips.find((c) => c.id === chipId);
-      const chipVals = chip?.values?.filter((v) => v !== '') ?? [];
-
-      // If chip already has values from checkbox selections, use those
-      // Otherwise fall back to parsing inline text
-      const vals =
-        chipVals.length > 0
-          ? chipVals
-          : inlineValueText
-              .split(',')
-              .map((v) => v.trim())
-              .filter((v) => v !== '');
+      // Always use inlineValueText as the source of truth.
+      // Both manual typing and checkbox toggles keep it in sync,
+      // so it always reflects the user's intended final values.
+      const vals = inlineValueText
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
 
       if (vals.length === 0) {
         // Empty → revert
@@ -521,7 +515,7 @@ export function QueryDSLEditor({
       });
       closeInlineEdit();
     },
-    [chips, inlineValueText, updateChip, deleteChip, closeInlineEdit]
+    [inlineValueText, updateChip, deleteChip, closeInlineEdit]
   );
 
   /** Revert inline edit: restore original values */
