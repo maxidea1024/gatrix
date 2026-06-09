@@ -21,7 +21,11 @@ interface EventTabProps {
   onFilter: (key: string, value: string, exclude: boolean) => void;
 }
 
-export const EventTab: React.FC<EventTabProps> = ({ log, isDark, onFilter }) => {
+export const EventTab: React.FC<EventTabProps> = ({
+  log,
+  isDark,
+  onFilter,
+}) => {
   const { t } = useTranslation();
 
   const coreAttrs: [string, string, string?, boolean?][] = [

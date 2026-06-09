@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Typography, IconButton, useTheme } from '@mui/material';
-import { FilterList as FilterIcon, Block as ExcludeIcon } from '@mui/icons-material';
+import {
+  FilterList as FilterIcon,
+  Block as ExcludeIcon,
+} from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useTranslation } from 'react-i18next';

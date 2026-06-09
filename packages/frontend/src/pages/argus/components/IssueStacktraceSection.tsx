@@ -41,9 +41,15 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({
   const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
 
   // Stable callback handlers (for React.memo)
-  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget),
+    []
+  );
   const handleSortClose = useCallback(() => setSortAnchor(null), []);
-  const handleSortSelect = useCallback((v: string) => setOrder(v as 'recent' | 'oldest'), [setOrder]);
+  const handleSortSelect = useCallback(
+    (v: string) => setOrder(v as 'recent' | 'oldest'),
+    [setOrder]
+  );
 
   const handleCopyRaw = () => {
     if (event.stacktrace_raw) {

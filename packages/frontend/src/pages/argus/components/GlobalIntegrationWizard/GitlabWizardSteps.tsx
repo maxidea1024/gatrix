@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Typography, Button, alpha } from '@mui/material';
-import { Cloud as GitLabIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import {
+  Cloud as GitLabIcon,
+  OpenInNew as OpenInNewIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { GitlabFormState } from './types';
 import { CopyableUrl, PermissionItem, WizardInput } from './WizardFields';
@@ -50,7 +53,10 @@ export const GitlabWizardSteps: React.FC<GitlabWizardStepsProps> = ({
             )}
           </Typography>
           <WizardInput
-            label={t('argus.settings.gitlabWizard.instanceUrl', 'GitLab Instance URL')}
+            label={t(
+              'argus.settings.gitlabWizard.instanceUrl',
+              'GitLab Instance URL'
+            )}
             value={form.instanceUrl}
             onChange={(v) => onChange('instanceUrl', v)}
             isDark={isDark}
@@ -102,7 +108,10 @@ export const GitlabWizardSteps: React.FC<GitlabWizardStepsProps> = ({
                 '&:hover': { backgroundColor: '#4090e0' },
               }}
             >
-              {t('argus.settings.gitlabWizard.goToGitlab', 'Open GitLab Applications')}
+              {t(
+                'argus.settings.gitlabWizard.goToGitlab',
+                'Open GitLab Applications'
+              )}
             </Button>
           </Box>
         </Box>
@@ -201,7 +210,10 @@ export const GitlabWizardSteps: React.FC<GitlabWizardStepsProps> = ({
             )}
           </Typography>
           <WizardInput
-            label={t('argus.settings.gitlabWizard.applicationId', 'Application ID')}
+            label={t(
+              'argus.settings.gitlabWizard.applicationId',
+              'Application ID'
+            )}
             value={form.applicationId}
             onChange={(v) => onChange('applicationId', v)}
             isDark={isDark}
@@ -219,12 +231,18 @@ export const GitlabWizardSteps: React.FC<GitlabWizardStepsProps> = ({
             required
           />
           <WizardInput
-            label={t('argus.settings.gitlabWizard.webhookSecret', 'Webhook Secret')}
+            label={t(
+              'argus.settings.gitlabWizard.webhookSecret',
+              'Webhook Secret'
+            )}
             value={form.webhookSecret}
             onChange={(v) => onChange('webhookSecret', v)}
             isDark={isDark}
             type="password"
-            hint={t('argus.settings.providerWizard.testDescOptional', 'Optional but recommended for security')}
+            hint={t(
+              'argus.settings.providerWizard.testDescOptional',
+              'Optional but recommended for security'
+            )}
           />
 
           <ConnectionTestSection

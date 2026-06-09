@@ -326,247 +326,259 @@ const FacetSection = React.memo<{
 
 /* ─── Main Sidebar ─── */
 
-const FacetSidebar = React.memo<FacetSidebarProps>(({
-  facets,
-  onFilter,
-  collapsed,
-  onToggleCollapse,
-  loading,
-  customFacets,
-  discoveredFacets,
-  onAddCustomFacet,
-  onRemoveCustomFacet,
-  width = 240,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation();
-  const isDark = theme.palette.mode === 'dark';
-  const [newFacetKey, setNewFacetKey] = useState('');
+const FacetSidebar = React.memo<FacetSidebarProps>(
+  ({
+    facets,
+    onFilter,
+    collapsed,
+    onToggleCollapse,
+    loading,
+    customFacets,
+    discoveredFacets,
+    onAddCustomFacet,
+    onRemoveCustomFacet,
+    width = 240,
+  }) => {
+    const theme = useTheme();
+    const { t } = useTranslation();
+    const isDark = theme.palette.mode === 'dark';
+    const [newFacetKey, setNewFacetKey] = useState('');
 
-  if (collapsed) {
+    if (collapsed) {
+      return (
+        <Box
+          sx={{
+            width: 32,
+            flexShrink: 0,
+            borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            pt: 1,
+          }}
+        >
+          <SafeTooltip
+            title={t('argus.logs.facet.expandFacets', 'Expand facets')}
+            placement="right"
+          >
+            <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.5 }}>
+              <ExpandIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </SafeTooltip>
+        </Box>
+      );
+    }
+
     return (
       <Box
         sx={{
-          width: 32,
+          width,
           flexShrink: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
           borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pt: 1,
+          '&::-webkit-scrollbar': { width: 4 },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.1)'
+              : 'rgba(0,0,0,0.1)',
+            borderRadius: 2,
+          },
         }}
       >
-        <SafeTooltip
-          title={t('argus.logs.facet.expandFacets', 'Expand facets')}
-          placement="right"
-        >
-          <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.5 }}>
-            <ExpandIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        </SafeTooltip>
-      </Box>
-    );
-  }
-
-  return (
-    <Box
-      sx={{
-        width,
-        flexShrink: 0,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-        '&::-webkit-scrollbar': { width: 4 },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-          borderRadius: 2,
-        },
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: 1.5,
-          py: 1,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: '0.72rem',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
-            color: 'text.secondary',
-          }}
-        >
-          {t('argus.logs.facet.facets', 'Facets')}
-        </Typography>
-        <SafeTooltip
-          title={t('argus.logs.facet.collapseFacets', 'Collapse')}
-          placement="right"
-        >
-          <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.3 }}>
-            <CollapseIcon sx={{ fontSize: 14, transform: 'rotate(180deg)' }} />
-          </IconButton>
-        </SafeTooltip>
-      </Box>
-
-      {/* Facet sections */}
-      {facets.map((facet) => (
-        <FacetSection
-          key={facet.key}
-          facet={facet}
-          onFilter={onFilter}
-          isDark={isDark}
-        />
-      ))}
-
-      {facets.length === 0 && !loading && (
-        <Typography
-          sx={{
-            px: 2,
-            py: 3,
-            fontSize: '0.72rem',
-            color: 'text.disabled',
-            textAlign: 'center',
-          }}
-        >
-          {t('argus.logs.facet.noFacets', 'No facets available')}
-        </Typography>
-      )}
-
-      {/* Custom Facets */}
-      {customFacets && customFacets.length > 0 && (
+        {/* Header */}
         <Box
           sx={{
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-            mt: 0.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 1.5,
+            py: 1,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
           }}
         >
           <Typography
             sx={{
-              fontSize: '0.65rem',
+              fontSize: '0.72rem',
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.04em',
-              color: 'text.disabled',
-              px: 1.5,
-              py: 0.6,
+              color: 'text.secondary',
             }}
           >
-            {t('argus.logs.customFacets.title', 'Custom Facets')}
+            {t('argus.logs.facet.facets', 'Facets')}
           </Typography>
-          {customFacets.map((facet) => (
-            <Box key={facet.key} sx={{ position: 'relative' }}>
-              <FacetSection facet={facet} onFilter={onFilter} isDark={isDark} />
-              {onRemoveCustomFacet && (
-                <IconButton
-                  size="small"
-                  onClick={() => onRemoveCustomFacet(facet.key)}
-                  sx={{
-                    position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    p: 0.2,
-                    opacity: 0.4,
-                    '&:hover': { opacity: 1 },
-                  }}
-                >
-                  <RemoveIcon sx={{ fontSize: 12 }} />
-                </IconButton>
-              )}
-            </Box>
-          ))}
+          <SafeTooltip
+            title={t('argus.logs.facet.collapseFacets', 'Collapse')}
+            placement="right"
+          >
+            <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.3 }}>
+              <CollapseIcon
+                sx={{ fontSize: 14, transform: 'rotate(180deg)' }}
+              />
+            </IconButton>
+          </SafeTooltip>
         </Box>
-      )}
 
-      {/* Discovered Facets */}
-      {discoveredFacets && discoveredFacets.length > 0 && (
-        <Box
-          sx={{
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-            mt: 0.5,
-          }}
-        >
+        {/* Facet sections */}
+        {facets.map((facet) => (
+          <FacetSection
+            key={facet.key}
+            facet={facet}
+            onFilter={onFilter}
+            isDark={isDark}
+          />
+        ))}
+
+        {facets.length === 0 && !loading && (
           <Typography
             sx={{
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
+              px: 2,
+              py: 3,
+              fontSize: '0.72rem',
               color: 'text.disabled',
-              px: 1.5,
-              py: 0.6,
+              textAlign: 'center',
             }}
           >
-            {t('argus.logs.customFacets.discovered', 'Discovered')}
+            {t('argus.logs.facet.noFacets', 'No facets available')}
           </Typography>
-          {discoveredFacets.map((facet) => (
-            <FacetSection
-              key={facet.key}
-              facet={facet}
-              onFilter={onFilter}
-              isDark={isDark}
-            />
-          ))}
-        </Box>
-      )}
+        )}
 
-      {/* Add Custom Facet */}
-      {onAddCustomFacet && (
-        <Box
-          sx={{
-            px: 1,
-            py: 0.5,
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <InputBase
-              value={newFacetKey}
-              onChange={(e) => setNewFacetKey(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newFacetKey.trim()) {
-                  onAddCustomFacet(newFacetKey.trim());
-                  setNewFacetKey('');
-                }
-              }}
-              placeholder={t(
-                'argus.logs.customFacets.placeholder',
-                'e.g. user_id, request_path'
-              )}
+        {/* Custom Facets */}
+        {customFacets && customFacets.length > 0 && (
+          <Box
+            sx={{
+              borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+              mt: 0.5,
+            }}
+          >
+            <Typography
               sx={{
-                flex: 1,
                 fontSize: '0.65rem',
-                height: 24,
-                px: 0.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
-                borderRadius: '4px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                color: 'text.disabled',
+                px: 1.5,
+                py: 0.6,
               }}
-            />
-            <SafeTooltip title={t('argus.logs.customFacets.add', 'Add Facet')}>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  if (newFacetKey.trim()) {
+            >
+              {t('argus.logs.customFacets.title', 'Custom Facets')}
+            </Typography>
+            {customFacets.map((facet) => (
+              <Box key={facet.key} sx={{ position: 'relative' }}>
+                <FacetSection
+                  facet={facet}
+                  onFilter={onFilter}
+                  isDark={isDark}
+                />
+                {onRemoveCustomFacet && (
+                  <IconButton
+                    size="small"
+                    onClick={() => onRemoveCustomFacet(facet.key)}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      p: 0.2,
+                      opacity: 0.4,
+                      '&:hover': { opacity: 1 },
+                    }}
+                  >
+                    <RemoveIcon sx={{ fontSize: 12 }} />
+                  </IconButton>
+                )}
+              </Box>
+            ))}
+          </Box>
+        )}
+
+        {/* Discovered Facets */}
+        {discoveredFacets && discoveredFacets.length > 0 && (
+          <Box
+            sx={{
+              borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+              mt: 0.5,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                color: 'text.disabled',
+                px: 1.5,
+                py: 0.6,
+              }}
+            >
+              {t('argus.logs.customFacets.discovered', 'Discovered')}
+            </Typography>
+            {discoveredFacets.map((facet) => (
+              <FacetSection
+                key={facet.key}
+                facet={facet}
+                onFilter={onFilter}
+                isDark={isDark}
+              />
+            ))}
+          </Box>
+        )}
+
+        {/* Add Custom Facet */}
+        {onAddCustomFacet && (
+          <Box
+            sx={{
+              px: 1,
+              py: 0.5,
+              borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <InputBase
+                value={newFacetKey}
+                onChange={(e) => setNewFacetKey(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newFacetKey.trim()) {
                     onAddCustomFacet(newFacetKey.trim());
                     setNewFacetKey('');
                   }
                 }}
-                sx={{ p: 0.3 }}
+                placeholder={t(
+                  'argus.logs.customFacets.placeholder',
+                  'e.g. user_id, request_path'
+                )}
+                sx={{
+                  flex: 1,
+                  fontSize: '0.65rem',
+                  height: 24,
+                  px: 0.5,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
+                  borderRadius: '4px',
+                }}
+              />
+              <SafeTooltip
+                title={t('argus.logs.customFacets.add', 'Add Facet')}
               >
-                <AddIcon sx={{ fontSize: 14 }} />
-              </IconButton>
-            </SafeTooltip>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    if (newFacetKey.trim()) {
+                      onAddCustomFacet(newFacetKey.trim());
+                      setNewFacetKey('');
+                    }
+                  }}
+                  sx={{ p: 0.3 }}
+                >
+                  <AddIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </SafeTooltip>
+            </Box>
           </Box>
-        </Box>
-      )}
-    </Box>
-  );
-});
+        )}
+      </Box>
+    );
+  }
+);
 
 export default FacetSidebar;

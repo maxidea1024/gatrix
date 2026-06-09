@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { GitHub as GitHubIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import {
+  GitHub as GitHubIcon,
+  OpenInNew as OpenInNewIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { GithubFormState } from './types';
 import { CopyableUrl, PermissionItem, WizardInput } from './WizardFields';
@@ -93,7 +96,10 @@ export const GithubWizardSteps: React.FC<GithubWizardStepsProps> = ({
                 '&:hover': { backgroundColor: '#4090e0' },
               }}
             >
-              {t('argus.settings.githubWizard.goToGithub', 'Go to GitHub Settings')}
+              {t(
+                'argus.settings.githubWizard.goToGithub',
+                'Go to GitHub Settings'
+              )}
             </Button>
           </Box>
         </Box>
@@ -187,9 +193,7 @@ export const GithubWizardSteps: React.FC<GithubWizardStepsProps> = ({
               'Enter the App ID, Client ID, Client Secret, Webhook Secret, and Private Key issued by your GitHub App.'
             )}
           </Typography>
-          <Box
-            sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
-          >
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <WizardInput
               label={t('argus.settings.githubWizard.appId', 'App ID')}
               value={form.appId}
@@ -205,11 +209,12 @@ export const GithubWizardSteps: React.FC<GithubWizardStepsProps> = ({
               required
             />
           </Box>
-          <Box
-            sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
-          >
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <WizardInput
-              label={t('argus.settings.githubWizard.clientSecret', 'Client Secret')}
+              label={t(
+                'argus.settings.githubWizard.clientSecret',
+                'Client Secret'
+              )}
               value={form.clientSecret}
               onChange={(v) => onChange('clientSecret', v)}
               isDark={isDark}
@@ -217,7 +222,10 @@ export const GithubWizardSteps: React.FC<GithubWizardStepsProps> = ({
               required
             />
             <WizardInput
-              label={t('argus.settings.githubWizard.webhookSecret', 'Webhook Secret')}
+              label={t(
+                'argus.settings.githubWizard.webhookSecret',
+                'Webhook Secret'
+              )}
               value={form.webhookSecret}
               onChange={(v) => onChange('webhookSecret', v)}
               isDark={isDark}

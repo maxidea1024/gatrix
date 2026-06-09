@@ -127,14 +127,26 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               ]}
               size="title"
             />
-            <LevelChip label={issue.level} size="small" levelColor={levelColor} />
+            <LevelChip
+              label={issue.level}
+              size="small"
+              levelColor={levelColor}
+            />
           </Box>
         }
         subtitle={issue.culprit}
         enableAutoBack
         onBack={onBack}
         actions={
-          <Box sx={{ display: 'flex', gap: 3, pt: 0.5, pr: 1, alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 3,
+              pt: 0.5,
+              pr: 1,
+              alignItems: 'center',
+            }}
+          >
             <AiAnalysisButton
               size="small"
               variant="outlined"
@@ -156,7 +168,9 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                 >
                   <StatNumber
                     variant="h6"
-                    sx={{ cursor: issue.event_count >= 1000 ? 'help' : 'default' }}
+                    sx={{
+                      cursor: issue.event_count >= 1000 ? 'help' : 'default',
+                    }}
                   >
                     {formatCompactNumber(issue.event_count || 0)}
                   </StatNumber>
@@ -177,7 +191,9 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                 >
                   <StatNumber
                     variant="h6"
-                    sx={{ cursor: issue.user_count >= 1000 ? 'help' : 'default' }}
+                    sx={{
+                      cursor: issue.user_count >= 1000 ? 'help' : 'default',
+                    }}
                   >
                     {formatCompactNumber(issue.user_count || 0)}
                   </StatNumber>
@@ -206,9 +222,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                 </SubstatusText>
               )}
               {issue.is_regression && (
-                <SubstatusText>
-                  {t('argus.issues.regression')}
-                </SubstatusText>
+                <SubstatusText>{t('argus.issues.regression')}</SubstatusText>
               )}
             </Box>
           }

@@ -681,7 +681,11 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           {!isExpanded && (
             <Tooltip title={t('common.expand')}>
-              <IconButton size="small" onClick={() => onExpand?.(config.id)} sx={{ p: 0.4 }}>
+              <IconButton
+                size="small"
+                onClick={() => onExpand?.(config.id)}
+                sx={{ p: 0.4 }}
+              >
                 <ExpandIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
@@ -703,7 +707,11 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
               <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
               {onEdit && (
                 <Tooltip title={t('common.edit')}>
-                  <IconButton size="small" onClick={() => onEdit?.(config.id)} sx={{ p: 0.4 }}>
+                  <IconButton
+                    size="small"
+                    onClick={() => onEdit?.(config.id)}
+                    sx={{ p: 0.4 }}
+                  >
                     <EditIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
@@ -1803,19 +1811,28 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     handleDeleteClick(configId);
   }, []);
 
-  const handlePanelEdit = useCallback((configId: string) => {
-    const cfg = configs.find((c) => c.id === configId);
-    if (cfg) handleOpenEditDialog(cfg);
-  }, [configs]);
+  const handlePanelEdit = useCallback(
+    (configId: string) => {
+      const cfg = configs.find((c) => c.id === configId);
+      if (cfg) handleOpenEditDialog(cfg);
+    },
+    [configs]
+  );
 
-  const handlePanelExpand = useCallback((configId: string) => {
-    const cfg = configs.find((c) => c.id === configId);
-    if (cfg) setExpandedConfig(cfg);
-  }, [configs]);
+  const handlePanelExpand = useCallback(
+    (configId: string) => {
+      const cfg = configs.find((c) => c.id === configId);
+      if (cfg) setExpandedConfig(cfg);
+    },
+    [configs]
+  );
 
-  const handlePanelChartTypeChange = useCallback((configId: string, chartType: ChartType) => {
-    handleChartTypeChange(configId, chartType);
-  }, []);
+  const handlePanelChartTypeChange = useCallback(
+    (configId: string, chartType: ChartType) => {
+      handleChartTypeChange(configId, chartType);
+    },
+    []
+  );
 
   if (loading) {
     return (

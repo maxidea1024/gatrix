@@ -79,13 +79,29 @@ export const GlobalIntegrationWizardModal: React.FC<
 
   // Test states
   const [ghTesting, setGhTesting] = useState(false);
-  const [ghTestResult, setGhTestResult] = useState<{ ok: boolean; name?: string; error?: string } | null>(null);
+  const [ghTestResult, setGhTestResult] = useState<{
+    ok: boolean;
+    name?: string;
+    error?: string;
+  } | null>(null);
   const [glTesting, setGlTesting] = useState(false);
-  const [glTestResult, setGlTestResult] = useState<{ ok: boolean; message?: string; error?: string } | null>(null);
+  const [glTestResult, setGlTestResult] = useState<{
+    ok: boolean;
+    message?: string;
+    error?: string;
+  } | null>(null);
   const [bbTesting, setBbTesting] = useState(false);
-  const [bbTestResult, setBbTestResult] = useState<{ ok: boolean; display_name?: string; error?: string } | null>(null);
+  const [bbTestResult, setBbTestResult] = useState<{
+    ok: boolean;
+    display_name?: string;
+    error?: string;
+  } | null>(null);
   const [slackTesting, setSlackTesting] = useState(false);
-  const [slackTestResult, setSlackTestResult] = useState<{ ok: boolean; team?: string; error?: string } | null>(null);
+  const [slackTestResult, setSlackTestResult] = useState<{
+    ok: boolean;
+    team?: string;
+    error?: string;
+  } | null>(null);
 
   // Reset state on open
   useEffect(() => {
@@ -93,8 +109,19 @@ export const GlobalIntegrationWizardModal: React.FC<
       setActiveStep(0);
       setError('');
       setLoading(false);
-      setGhForm({ appId: '', clientId: '', clientSecret: '', webhookSecret: '', privateKey: '' });
-      setGlForm({ instanceUrl: '', applicationId: '', applicationSecret: '', webhookSecret: '' });
+      setGhForm({
+        appId: '',
+        clientId: '',
+        clientSecret: '',
+        webhookSecret: '',
+        privateKey: '',
+      });
+      setGlForm({
+        instanceUrl: '',
+        applicationId: '',
+        applicationSecret: '',
+        webhookSecret: '',
+      });
       setBbForm({ workspace: '', username: '', appPassword: '' });
       setSlackForm({ botToken: '', signingSecret: '' });
       setGhTestResult(null);
@@ -116,7 +143,10 @@ export const GlobalIntegrationWizardModal: React.FC<
     setGhTesting(true);
     setGhTestResult(null);
     try {
-      const result = await argusService.testGithubConnection(ghForm.appId, ghForm.privateKey);
+      const result = await argusService.testGithubConnection(
+        ghForm.appId,
+        ghForm.privateKey
+      );
       setGhTestResult(result);
     } catch {
       setGhTestResult({ ok: false, error: 'Network error' });
@@ -148,7 +178,10 @@ export const GlobalIntegrationWizardModal: React.FC<
     setBbTesting(true);
     setBbTestResult(null);
     try {
-      const result = await argusService.testBitbucketConnection(bbForm.username, bbForm.appPassword);
+      const result = await argusService.testBitbucketConnection(
+        bbForm.username,
+        bbForm.appPassword
+      );
       setBbTestResult(result);
     } catch {
       setBbTestResult({ ok: false, error: 'Network error' });
@@ -229,16 +262,33 @@ export const GlobalIntegrationWizardModal: React.FC<
     const lastStep = cfg.steps.length - 1;
     if (activeStep < lastStep) return true;
     if (provider === 'github') {
-      return !!(ghForm.appId && ghForm.clientId && ghForm.clientSecret && ghForm.privateKey);
+      return !!(
+        ghForm.appId &&
+        ghForm.clientId &&
+        ghForm.clientSecret &&
+        ghForm.privateKey
+      );
     }
     if (provider === 'gitlab') {
-      return !!(glForm.instanceUrl && glForm.applicationId && glForm.applicationSecret);
+      return !!(
+        glForm.instanceUrl &&
+        glForm.applicationId &&
+        glForm.applicationSecret
+      );
     }
     if (provider === 'slack') {
       return !!slackForm.botToken;
     }
     return !!(bbForm.workspace && bbForm.username && bbForm.appPassword);
-  }, [activeStep, provider, ghForm, glForm, bbForm, slackForm, cfg.steps.length]);
+  }, [
+    activeStep,
+    provider,
+    ghForm,
+    glForm,
+    bbForm,
+    slackForm,
+    cfg.steps.length,
+  ]);
 
   return (
     <Dialog
@@ -257,11 +307,24 @@ export const GlobalIntegrationWizardModal: React.FC<
         },
       }}
     >
-      <WizardSidebar provider={provider} activeStep={activeStep} cfg={cfg} isDark={isDark} />
+      <WizardSidebar
+        provider={provider}
+        activeStep={activeStep}
+        cfg={cfg}
+        isDark={isDark}
+      />
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5, pb: 0 }}>
-          <IconButton size="small" onClick={onClose} sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}>
+      <Box
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}
+      >
+        <Box
+          sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5, pb: 0 }}
+        >
+          <IconButton
+            size="small"
+            onClick={onClose}
+            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+          >
             <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Box>
@@ -350,7 +413,9 @@ export const GlobalIntegrationWizardModal: React.FC<
                 py: 0.8,
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                 '&:hover': {
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.03)',
                 },
               }}
             >
@@ -362,7 +427,13 @@ export const GlobalIntegrationWizardModal: React.FC<
               onClick={handleSave}
               variant="contained"
               disabled={loading || !canProceed()}
-              startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <LockIcon sx={{ fontSize: 18 }} />}
+              startIcon={
+                loading ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <LockIcon sx={{ fontSize: 18 }} />
+                )
+              }
               sx={{
                 textTransform: 'none',
                 fontWeight: 700,

@@ -41,4 +41,3 @@ export interface ProviderWizardModalProps {
     data: Record<string, string>
   ) => Promise<{ ok: boolean; message: string }>;
 }
-

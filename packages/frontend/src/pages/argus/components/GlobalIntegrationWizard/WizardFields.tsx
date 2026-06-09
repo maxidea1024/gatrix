@@ -76,7 +76,14 @@ export const CopyableUrl: React.FC<{
         >
           {value}
         </Typography>
-        <Tooltip title={copied ? `✓ ${t('argus.settings.wizard.copied', 'Copied')}` : t('argus.settings.wizard.copyUrl', 'Click to copy')} placement="top">
+        <Tooltip
+          title={
+            copied
+              ? `✓ ${t('argus.settings.wizard.copied', 'Copied')}`
+              : t('argus.settings.wizard.copyUrl', 'Click to copy')
+          }
+          placement="top"
+        >
           <Box
             sx={{
               color: copied ? '#2ea44f' : 'text.secondary',

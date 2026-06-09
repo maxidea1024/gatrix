@@ -1,6 +1,16 @@
 import React from 'react';
-import { Box, Typography, Button, alpha, CircularProgress, Alert } from '@mui/material';
-import { Chat as SlackIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Button,
+  alpha,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
+import {
+  Chat as SlackIcon,
+  OpenInNew as OpenInNewIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { SlackFormState } from './types';
 import { PermissionItem, WizardInput } from './WizardFields';
@@ -110,7 +120,10 @@ export const SlackWizardSteps: React.FC<SlackWizardStepsProps> = ({
             )}
           </Typography>
           <PermissionItem
-            title={t('argus.settings.slackWizard.botScopes', 'Bot Token Scopes')}
+            title={t(
+              'argus.settings.slackWizard.botScopes',
+              'Bot Token Scopes'
+            )}
             items={[
               'chat:write',
               'channels:read',
@@ -161,7 +174,10 @@ export const SlackWizardSteps: React.FC<SlackWizardStepsProps> = ({
             )}
           </Typography>
           <WizardInput
-            label={t('argus.settings.slackWizard.botToken', 'Bot User OAuth Token')}
+            label={t(
+              'argus.settings.slackWizard.botToken',
+              'Bot User OAuth Token'
+            )}
             value={form.botToken}
             onChange={(v) => onChange('botToken', v)}
             isDark={isDark}
@@ -174,7 +190,10 @@ export const SlackWizardSteps: React.FC<SlackWizardStepsProps> = ({
             )}
           />
           <WizardInput
-            label={t('argus.settings.slackWizard.signingSecret', 'Signing Secret')}
+            label={t(
+              'argus.settings.slackWizard.signingSecret',
+              'Signing Secret'
+            )}
             value={form.signingSecret}
             onChange={(v) => onChange('signingSecret', v)}
             isDark={isDark}
@@ -211,7 +230,10 @@ export const SlackWizardSteps: React.FC<SlackWizardStepsProps> = ({
               sx={{ mt: 2, borderRadius: '8px' }}
             >
               {testResult.ok
-                ? t('argus.settings.slackWizard.testSuccess', 'Connected to {{team}}').replace('{{team}}', testResult.team || 'Slack')
+                ? t(
+                    'argus.settings.slackWizard.testSuccess',
+                    'Connected to {{team}}'
+                  ).replace('{{team}}', testResult.team || 'Slack')
                 : `${t('argus.settings.slackWizard.testFailed', 'Connection failed')}: ${testResult.error}`}
             </Alert>
           )}

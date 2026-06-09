@@ -1,13 +1,39 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Dialog, Button, IconButton, Alert, CircularProgress, useTheme, alpha, Fade, Box, Typography } from '@mui/material';
-import { Close as CloseIcon, ArrowForward as ArrowForwardIcon, ArrowBack as ArrowBackIcon, Save as SaveIcon } from '@mui/icons-material';
+import {
+  Dialog,
+  Button,
+  IconButton,
+  Alert,
+  CircularProgress,
+  useTheme,
+  alpha,
+  Fade,
+  Box,
+  Typography,
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  ArrowForward as ArrowForwardIcon,
+  ArrowBack as ArrowBackIcon,
+  Save as SaveIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { WizardFieldDef, WizardProviderConfig, WizardStep, ProviderWizardModalProps } from './ProviderWizard/types';
+import {
+  WizardFieldDef,
+  WizardProviderConfig,
+  WizardStep,
+  ProviderWizardModalProps,
+} from './ProviderWizard/types';
 import { WizardSidebar } from './ProviderWizard/WizardSidebar';
 import { IntroStep } from './ProviderWizard/IntroStep';
 import { FieldsStep } from './ProviderWizard/FieldsStep';
 
-export type { WizardFieldDef, WizardProviderConfig, WizardStep, ProviderWizardModalProps };
+export type {
+  WizardFieldDef,
+  WizardProviderConfig,
+  WizardStep,
+  ProviderWizardModalProps,
+};
 
 export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
   open,
@@ -30,7 +56,10 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{
+    ok: boolean;
+    message: string;
+  } | null>(null);
 
   const hasGuide = !!provider?.guideUrl;
   const splitThreshold = 4;
@@ -38,13 +67,25 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
 
   const buildSteps = useCallback((): WizardStep[] => {
     const steps: WizardStep[] = [
-      { titleKey: 'argus.settings.providerWizard.introTitle', subtitleKey: 'argus.settings.providerWizard.introSubtitle' },
+      {
+        titleKey: 'argus.settings.providerWizard.introTitle',
+        subtitleKey: 'argus.settings.providerWizard.introSubtitle',
+      },
     ];
     if (needsSplit) {
-      steps.push({ titleKey: 'argus.settings.providerWizard.basicTitle', subtitleKey: 'argus.settings.providerWizard.basicSubtitle' });
-      steps.push({ titleKey: 'argus.settings.providerWizard.detailTitle', subtitleKey: 'argus.settings.providerWizard.detailSubtitle' });
+      steps.push({
+        titleKey: 'argus.settings.providerWizard.basicTitle',
+        subtitleKey: 'argus.settings.providerWizard.basicSubtitle',
+      });
+      steps.push({
+        titleKey: 'argus.settings.providerWizard.detailTitle',
+        subtitleKey: 'argus.settings.providerWizard.detailSubtitle',
+      });
     } else {
-      steps.push({ titleKey: 'argus.settings.providerWizard.configTitle', subtitleKey: 'argus.settings.providerWizard.configSubtitle' });
+      steps.push({
+        titleKey: 'argus.settings.providerWizard.configTitle',
+        subtitleKey: 'argus.settings.providerWizard.configSubtitle',
+      });
     }
     return steps;
   }, [needsSplit]);
@@ -89,7 +130,10 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
       await onSubmit(formData);
       onClose();
     } catch (err: any) {
-      setError(err.message || t('argus.settings.providerWizard.saveFailed', 'Failed to save'));
+      setError(
+        err.message ||
+          t('argus.settings.providerWizard.saveFailed', 'Failed to save')
+      );
     } finally {
       setLoading(false);
     }
@@ -108,10 +152,17 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
 
   const renderStepContent = () => {
     if (activeStep === 0) {
-      return <IntroStep cfg={provider} hasGuide={hasGuide} isDark={isDark} accent={accent} />;
+      return (
+        <IntroStep
+          cfg={provider}
+          hasGuide={hasGuide}
+          isDark={isDark}
+          accent={accent}
+        />
+      );
     }
     const currentFields = activeStep === 1 ? firstFields : secondFields;
-    const showTest = activeStep === 1 ? (!needsSplit && isLastStep) : true;
+    const showTest = activeStep === 1 ? !needsSplit && isLastStep : true;
     return (
       <FieldsStep
         fieldsToRender={currentFields}
@@ -133,11 +184,42 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: '16px', overflow: 'hidden', minHeight: 440, maxHeight: '85vh', display: 'flex', flexDirection: 'row' } }}>
-      <WizardSidebar cfg={provider} wizardTitleKey={wizardTitleKey} activeStep={activeStep} steps={steps} isDark={isDark} sidebarBg={sidebarBg} accent={accent} />
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5, pb: 0 }}>
-          <IconButton size="small" onClick={onClose} sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: '16px',
+          overflow: 'hidden',
+          minHeight: 440,
+          maxHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'row',
+        },
+      }}
+    >
+      <WizardSidebar
+        cfg={provider}
+        wizardTitleKey={wizardTitleKey}
+        activeStep={activeStep}
+        steps={steps}
+        isDark={isDark}
+        sidebarBg={sidebarBg}
+        accent={accent}
+      />
+      <Box
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}
+      >
+        <Box
+          sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5, pb: 0 }}
+        >
+          <IconButton
+            size="small"
+            onClick={onClose}
+            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+          >
             <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Box>
@@ -145,16 +227,36 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
           <Fade in key={activeStep} timeout={300}>
             <Box>
               <Box sx={{ mb: 3 }}>
-                <Typography sx={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                <Typography
+                  sx={{
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
                   {t(steps[activeStep].titleKey)}
                 </Typography>
               </Box>
               {renderStepContent()}
-              {error && <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>{error}</Alert>}
+              {error && (
+                <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>
+                  {error}
+                </Alert>
+              )}
             </Box>
           </Fade>
         </Box>
-        <Box sx={{ px: 4, py: 2.5, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1.5 }}>
+        <Box
+          sx={{
+            px: 4,
+            py: 2.5,
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 1.5,
+          }}
+        >
           {activeStep > (isEditMode ? 1 : 0) && (
             <Button
               onClick={() => setActiveStep((s) => s - 1)}
@@ -168,7 +270,11 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
                 px: 2.5,
                 py: 0.8,
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+                '&:hover': {
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.03)',
+                },
               }}
             >
               {t('common.back', 'Back')}
@@ -178,8 +284,20 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
             <Button
               onClick={handleSave}
               variant="contained"
-              disabled={loading || !canProceed() || (isEditMode && JSON.stringify(formData) === JSON.stringify(initialData || {}))}
-              startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <SaveIcon sx={{ fontSize: 18 }} />}
+              disabled={
+                loading ||
+                !canProceed() ||
+                (isEditMode &&
+                  JSON.stringify(formData) ===
+                    JSON.stringify(initialData || {}))
+              }
+              startIcon={
+                loading ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <SaveIcon sx={{ fontSize: 18 }} />
+                )
+              }
               sx={{
                 textTransform: 'none',
                 fontWeight: 700,
@@ -191,7 +309,12 @@ export const ProviderWizardModal: React.FC<ProviderWizardModalProps> = ({
                 '&.Mui-disabled': { backgroundColor: alpha(accent, 0.3) },
               }}
             >
-              {t(isEditMode ? 'common.save' : 'argus.settings.providerWizard.save', isEditMode ? 'Save' : 'Complete Integration')}
+              {t(
+                isEditMode
+                  ? 'common.save'
+                  : 'argus.settings.providerWizard.save',
+                isEditMode ? 'Save' : 'Complete Integration'
+              )}
             </Button>
           ) : (
             <Button

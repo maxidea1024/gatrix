@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { Storage as BitbucketIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import {
+  Storage as BitbucketIcon,
+  OpenInNew as OpenInNewIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { BitbucketFormState } from './types';
 import { PermissionItem, WizardInput } from './WizardFields';
@@ -43,7 +46,7 @@ export const BitbucketWizardSteps: React.FC<BitbucketWizardStepsProps> = ({
           >
             {t(
               'argus.settings.bitbucketWizard.step1Instruction',
-              'Create a new App Password in Bitbucket\'s App Passwords page.'
+              "Create a new App Password in Bitbucket's App Passwords page."
             )}
           </Typography>
           <Box
@@ -146,7 +149,10 @@ export const BitbucketWizardSteps: React.FC<BitbucketWizardStepsProps> = ({
             placeholder=""
           />
           <WizardInput
-            label={t('argus.settings.bitbucketWizard.appPassword', 'App Password')}
+            label={t(
+              'argus.settings.bitbucketWizard.appPassword',
+              'App Password'
+            )}
             value={form.appPassword}
             onChange={(v) => onChange('appPassword', v)}
             isDark={isDark}

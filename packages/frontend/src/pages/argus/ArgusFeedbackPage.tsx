@@ -695,25 +695,37 @@ const ArgusFeedbackPage: React.FC = () => {
     });
   }, []);
 
-  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget),
+    []
+  );
   const handleSortClose = useCallback(() => setSortAnchor(null), []);
-  const handleSortSelect = useCallback((v: string) => {
-    setUrlState({ sort: v, page: '1', fb: '' });
-  }, [setUrlState]);
+  const handleSortSelect = useCallback(
+    (v: string) => {
+      setUrlState({ sort: v, page: '1', fb: '' });
+    },
+    [setUrlState]
+  );
 
-  const handleFeedbackSelect = useCallback((feedbackId: string) => {
-    setUrlState({ fb: feedbackId });
-    // Mark as read if not already
-    const found = data?.items?.find((i) => i.feedback_id === feedbackId);
-    if (found && !found.is_read) {
-      argusService.markFeedbackRead(projectId, [feedbackId]).catch(() => {});
-      found.is_read = 1;
-    }
-  }, [setUrlState, data?.items, projectId]);
+  const handleFeedbackSelect = useCallback(
+    (feedbackId: string) => {
+      setUrlState({ fb: feedbackId });
+      // Mark as read if not already
+      const found = data?.items?.find((i) => i.feedback_id === feedbackId);
+      if (found && !found.is_read) {
+        argusService.markFeedbackRead(projectId, [feedbackId]).catch(() => {});
+        found.is_read = 1;
+      }
+    },
+    [setUrlState, data?.items, projectId]
+  );
 
-  const handleFeedbackToggleCheck = useCallback((feedbackId: string) => {
-    toggleSelect(feedbackId);
-  }, [toggleSelect]);
+  const handleFeedbackToggleCheck = useCallback(
+    (feedbackId: string) => {
+      toggleSelect(feedbackId);
+    },
+    [toggleSelect]
+  );
 
   // ─── Derived Data ───
   const items = data?.items || [];

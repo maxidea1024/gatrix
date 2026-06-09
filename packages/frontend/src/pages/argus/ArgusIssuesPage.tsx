@@ -537,16 +537,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     setCurrentPage(1);
   };
 
-  const handleCheckChange = useCallback(
-    (id: number) => {
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.has(id) ? next.delete(id) : next.add(id);
-        return next;
-      });
-    },
-    []
-  );
+  const handleCheckChange = useCallback((id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
 
   const handleAssigneeClick = useCallback(
     (e: React.MouseEvent, iss: ArgusIssue) => {
@@ -559,20 +556,47 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   );
 
   // ─── Stable callback handlers (for React.memo) ─────────────────
-  const handleStatusOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setStatusAnchor(e.currentTarget), []);
+  const handleStatusOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setStatusAnchor(e.currentTarget),
+    []
+  );
   const handleStatusClose = useCallback(() => setStatusAnchor(null), []);
-  const handleStatusSelect = useCallback((v: string) => { setStatus(v); setCurrentPage(1); }, [setStatus, setCurrentPage]);
+  const handleStatusSelect = useCallback(
+    (v: string) => {
+      setStatus(v);
+      setCurrentPage(1);
+    },
+    [setStatus, setCurrentPage]
+  );
 
-  const handleLevelOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setLevelAnchor(e.currentTarget), []);
+  const handleLevelOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setLevelAnchor(e.currentTarget),
+    []
+  );
   const handleLevelClose = useCallback(() => setLevelAnchor(null), []);
-  const handleLevelSelect = useCallback((v: string) => { setLevel(v); setCurrentPage(1); }, [setLevel, setCurrentPage]);
+  const handleLevelSelect = useCallback(
+    (v: string) => {
+      setLevel(v);
+      setCurrentPage(1);
+    },
+    [setLevel, setCurrentPage]
+  );
 
-  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget),
+    []
+  );
   const handleSortClose = useCallback(() => setSortAnchor(null), []);
   const handleSortSelect = useCallback((v: string) => setSort(v), [setSort]);
 
-  const handleBulkResolve = useCallback(() => handleBulkAction('resolved'), [handleBulkAction]);
-  const handleBulkIgnore = useCallback(() => handleBulkAction('ignored'), [handleBulkAction]);
+  const handleBulkResolve = useCallback(
+    () => handleBulkAction('resolved'),
+    [handleBulkAction]
+  );
+  const handleBulkIgnore = useCallback(
+    () => handleBulkAction('ignored'),
+    [handleBulkAction]
+  );
   const handleBulkCancel = useCallback(() => setSelectedIds(new Set()), []);
 
   const handleNewIssuesClick = useCallback(() => {
@@ -580,7 +604,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     fetchIssues();
   }, [resetNewIssueCount, fetchIssues]);
 
-  const handleAssigneeMenuClose = useCallback(() => setAssigneeAnchor(null), []);
+  const handleAssigneeMenuClose = useCallback(
+    () => setAssigneeAnchor(null),
+    []
+  );
 
   // ─── Filter options ────────────────────────────────────────────
 

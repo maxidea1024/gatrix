@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, InputAdornment, IconButton } from '@mui/material';
-import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+import {
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 
 export const WizardInput: React.FC<{
   label: string;

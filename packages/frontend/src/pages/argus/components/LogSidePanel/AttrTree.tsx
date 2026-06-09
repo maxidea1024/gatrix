@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Typography, Collapse, useTheme } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 import { AttrTreeNode } from './types';
 import { AttrRow } from './AttrRow';
 

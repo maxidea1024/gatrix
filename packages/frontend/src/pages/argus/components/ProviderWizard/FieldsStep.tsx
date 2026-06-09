@@ -10,10 +10,7 @@ import {
   Alert,
   alpha,
 } from '@mui/material';
-import {
-  Check as CheckIcon,
-  PlayArrow as TestIcon,
-} from '@mui/icons-material';
+import { Check as CheckIcon, PlayArrow as TestIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { WizardFieldDef } from './types';
 import { WizardInput } from './WizardFields';
@@ -25,7 +22,9 @@ interface FieldsStepProps {
   isDark: boolean;
   accent: string;
   showTest?: boolean;
-  onTestConnection?: (data: Record<string, string>) => Promise<{ ok: boolean; message: string }>;
+  onTestConnection?: (
+    data: Record<string, string>
+  ) => Promise<{ ok: boolean; message: string }>;
   testing: boolean;
   testResult: { ok: boolean; message: string } | null;
   onTest: () => void;

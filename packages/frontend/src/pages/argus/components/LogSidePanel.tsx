@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, IconButton, Tabs, Tab, Divider, Button, useTheme, alpha, Chip, CircularProgress } from '@mui/material';
-import { Close as CloseIcon, KeyboardArrowUp as PrevIcon, KeyboardArrowDown as NextIcon, Timeline as TraceIcon, OpenInNew as OpenIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tabs,
+  Tab,
+  Divider,
+  Button,
+  useTheme,
+  alpha,
+  Chip,
+  CircularProgress,
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  KeyboardArrowUp as PrevIcon,
+  KeyboardArrowDown as NextIcon,
+  Timeline as TraceIcon,
+  OpenInNew as OpenIcon,
+} from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +65,10 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
       const tag = (document.activeElement?.tagName || '').toLowerCase();
-      const isEditable = tag === 'input' || tag === 'textarea' || (document.activeElement as HTMLElement)?.isContentEditable;
+      const isEditable =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        (document.activeElement as HTMLElement)?.isContentEditable;
       if (e.key === 'Escape') {
         onClose();
         return;
@@ -83,16 +104,34 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
 
   if (!log) {
     return (
-      <Box sx={{ width, flexShrink: 0, height: '100%', display: open ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', position: 'relative' }}>
+      <Box
+        sx={{
+          width,
+          flexShrink: 0,
+          height: '100%',
+          display: open ? 'flex' : 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+      >
         <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
           <SafeTooltip title={t('argus.logs.panel.close', 'Close (Esc)')}>
-            <IconButton size="small" onClick={onClose} sx={{ color: 'text.secondary' }}>
+            <IconButton
+              size="small"
+              onClick={onClose}
+              sx={{ color: 'text.secondary' }}
+            >
               <CloseIcon fontSize="small" />
             </IconButton>
           </SafeTooltip>
         </Box>
         <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 4 }}>
-          {t('argus.logs.panel.selectLog', 'Select a log event to view details')}
+          {t(
+            'argus.logs.panel.selectLog',
+            'Select a log event to view details'
+          )}
         </Typography>
       </Box>
     );
@@ -102,21 +141,73 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
   const formattedTime = formatWith(log.timestamp, 'YYYY-MM-DD HH:mm:ss.SSS');
 
   return (
-    <Box sx={{ width, flexShrink: 0, height: '100%', overflow: 'auto', display: open ? 'flex' : 'none', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`, backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.02)', flexShrink: 0 }}>
-        <Chip label={log.level?.toUpperCase() || 'UNKNOWN'} size="small" sx={{ height: 22, fontSize: '0.65rem', fontWeight: 800, backgroundColor: alpha(levelColor, 0.15), color: levelColor, border: `1px solid ${alpha(levelColor, 0.3)}` }} />
-        <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontFamily: 'monospace', flex: 1 }}>{formattedTime}</Typography>
+    <Box
+      sx={{
+        width,
+        flexShrink: 0,
+        height: '100%',
+        overflow: 'auto',
+        display: open ? 'flex' : 'none',
+        flexDirection: 'column',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 2,
+          py: 1,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+          backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.02)',
+          flexShrink: 0,
+        }}
+      >
+        <Chip
+          label={log.level?.toUpperCase() || 'UNKNOWN'}
+          size="small"
+          sx={{
+            height: 22,
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            backgroundColor: alpha(levelColor, 0.15),
+            color: levelColor,
+            border: `1px solid ${alpha(levelColor, 0.3)}`,
+          }}
+        />
+        <Typography
+          sx={{
+            fontSize: '0.7rem',
+            color: 'text.secondary',
+            fontFamily: 'monospace',
+            flex: 1,
+          }}
+        >
+          {formattedTime}
+        </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
-          <SafeTooltip title={t('argus.logs.panel.prevLog', 'Previous log (↑)')}>
+          <SafeTooltip
+            title={t('argus.logs.panel.prevLog', 'Previous log (↑)')}
+          >
             <span>
-              <IconButton size="small" onClick={onPrev} disabled={!hasPrev} sx={{ p: 0.3 }}>
+              <IconButton
+                size="small"
+                onClick={onPrev}
+                disabled={!hasPrev}
+                sx={{ p: 0.3 }}
+              >
                 <PrevIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
           </SafeTooltip>
           <SafeTooltip title={t('argus.logs.panel.nextLog', 'Next log (↓)')}>
             <span>
-              <IconButton size="small" onClick={onNext} disabled={!hasNext} sx={{ p: 0.3 }}>
+              <IconButton
+                size="small"
+                onClick={onNext}
+                disabled={!hasNext}
+                sx={{ p: 0.3 }}
+              >
                 <NextIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
@@ -125,7 +216,15 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
         {log.trace_id && (
           <SafeTooltip title={t('argus.logs.panel.viewTrace', 'View Trace')}>
-            <IconButton size="small" onClick={() => navigate(`/argus/performance?trace=${log.trace_id}`, { state: { allowBack: true } })} sx={{ p: 0.3, color: theme.palette.primary.main }}>
+            <IconButton
+              size="small"
+              onClick={() =>
+                navigate(`/argus/performance?trace=${log.trace_id}`, {
+                  state: { allowBack: true },
+                })
+              }
+              sx={{ p: 0.3, color: theme.palette.primary.main }}
+            >
               <TraceIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </SafeTooltip>
@@ -137,43 +236,156 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         </SafeTooltip>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', px: 2, py: 0.8, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`, backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.01)', flexShrink: 0 }}>
-        {log.service && <Chip label={log.service} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.62rem', fontWeight: 600 }} />}
-        {log.environment && <Chip label={log.environment} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.62rem' }} />}
-        {log.release && <Chip label={log.release} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.62rem' }} />}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 0.5,
+          flexWrap: 'wrap',
+          px: 2,
+          py: 0.8,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+          backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.01)',
+          flexShrink: 0,
+        }}
+      >
+        {log.service && (
+          <Chip
+            label={log.service}
+            size="small"
+            variant="outlined"
+            sx={{ height: 20, fontSize: '0.62rem', fontWeight: 600 }}
+          />
+        )}
+        {log.environment && (
+          <Chip
+            label={log.environment}
+            size="small"
+            variant="outlined"
+            sx={{ height: 20, fontSize: '0.62rem' }}
+          />
+        )}
+        {log.release && (
+          <Chip
+            label={log.release}
+            size="small"
+            variant="outlined"
+            sx={{ height: 20, fontSize: '0.62rem' }}
+          />
+        )}
       </Box>
 
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ minHeight: 34, flexShrink: 0, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`, '& .MuiTab-root': { minHeight: 34, py: 0, fontSize: '0.72rem', fontWeight: 600, textTransform: 'none' } }}>
+      <Tabs
+        value={tab}
+        onChange={(_, v) => setTab(v)}
+        sx={{
+          minHeight: 34,
+          flexShrink: 0,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          '& .MuiTab-root': {
+            minHeight: 34,
+            py: 0,
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            textTransform: 'none',
+          },
+        }}
+      >
         <Tab label={t('argus.logs.panel.eventTab', 'Event')} />
         <Tab label="JSON" />
-        {log.trace_id && <Tab label={t('argus.logs.panel.traceTab', 'Trace')} />}
+        {log.trace_id && (
+          <Tab label={t('argus.logs.panel.traceTab', 'Trace')} />
+        )}
       </Tabs>
 
       <Box sx={{ flex: 1, overflowY: 'auto' }}>
-        {tab === 0 && <EventTab log={log} isDark={isDark} onFilter={onFilter} />}
+        {tab === 0 && (
+          <EventTab log={log} isDark={isDark} onFilter={onFilter} />
+        )}
         {tab === 1 && <JsonTab log={log} isDark={isDark} />}
         {tab === 2 && log.trace_id && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1, flexShrink: 0, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                px: 2,
+                py: 1,
+                flexShrink: 0,
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+              }}
+            >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <TraceIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-                <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontFamily: 'monospace' }}>{log.trace_id.slice(0, 16)}...</Typography>
+                <Typography
+                  sx={{
+                    fontSize: '0.72rem',
+                    color: 'text.secondary',
+                    fontFamily: 'monospace',
+                  }}
+                >
+                  {log.trace_id.slice(0, 16)}...
+                </Typography>
                 <CopyButton text={log.trace_id} size={12} sx={{ p: 0.2 }} />
               </Box>
-              <Button size="small" variant="outlined" startIcon={<OpenIcon sx={{ fontSize: 12 }} />} onClick={() => navigate(`/argus/performance?trace=${log.trace_id}`, { state: { allowBack: true } })} sx={{ textTransform: 'none', fontSize: '0.68rem', fontWeight: 600, borderRadius: '6px', py: 0.25, px: 1, borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' }}>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<OpenIcon sx={{ fontSize: 12 }} />}
+                onClick={() =>
+                  navigate(`/argus/performance?trace=${log.trace_id}`, {
+                    state: { allowBack: true },
+                  })
+                }
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.68rem',
+                  fontWeight: 600,
+                  borderRadius: '6px',
+                  py: 0.25,
+                  px: 1,
+                  borderColor: isDark
+                    ? 'rgba(255,255,255,0.12)'
+                    : 'rgba(0,0,0,0.12)',
+                }}
+              >
                 {t('argus.logs.panel.viewFullTrace', 'View full trace')}
               </Button>
             </Box>
             <Box sx={{ flex: 1, overflow: 'auto', minHeight: 200 }}>
               {traceLoading ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}><CircularProgress size={24} /></Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    py: 8,
+                  }}
+                >
+                  <CircularProgress size={24} />
+                </Box>
               ) : traceData ? (
                 <TraceWaterfall trace={traceData} isDark={isDark} />
               ) : (
                 <Box sx={{ py: 6, textAlign: 'center' }}>
-                  <TraceIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
-                  <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, mb: 0.5 }}>{t('argus.logs.panel.traceNotFound', 'Trace not found')}</Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>{t('argus.logs.panel.traceNotFoundDesc', 'The trace data may have expired or is not available.')}</Typography>
+                  <TraceIcon
+                    sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }}
+                  />
+                  <Typography
+                    sx={{ fontSize: '0.82rem', fontWeight: 600, mb: 0.5 }}
+                  >
+                    {t('argus.logs.panel.traceNotFound', 'Trace not found')}
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: '0.72rem', color: 'text.secondary' }}
+                  >
+                    {t(
+                      'argus.logs.panel.traceNotFoundDesc',
+                      'The trace data may have expired or is not available.'
+                    )}
+                  </Typography>
                 </Box>
               )}
             </Box>

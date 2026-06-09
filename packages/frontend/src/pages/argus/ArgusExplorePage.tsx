@@ -703,9 +703,15 @@ const ArgusExplorePage: React.FC = () => {
   };
 
   // ─── Stable callback handlers (for React.memo) ─────────────────
-  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget),
+    []
+  );
   const handleSortClose = useCallback(() => setSortAnchor(null), []);
-  const handleSortSelect = useCallback((v: string) => setSort(v as SortOption), []);
+  const handleSortSelect = useCallback(
+    (v: string) => setSort(v as SortOption),
+    []
+  );
 
   /* ═══ RENDER ═══ */
   return (

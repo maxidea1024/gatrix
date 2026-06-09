@@ -1,6 +1,15 @@
 import React from 'react';
-import { Box, Button, Typography, CircularProgress, Alert } from '@mui/material';
-import { PlayArrow as PlayArrowIcon, Check as CheckIcon } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Typography,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
+import {
+  PlayArrow as PlayArrowIcon,
+  Check as CheckIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 interface ConnectionTestSectionProps {
@@ -44,7 +53,10 @@ export const ConnectionTestSection: React.FC<ConnectionTestSectionProps> = ({
             {t('argus.settings.providerWizard.testTitle', 'Test Connection')}
           </Typography>
           <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-            {t('argus.settings.providerWizard.testDesc', 'Verify the connection status before saving (optional)')}
+            {t(
+              'argus.settings.providerWizard.testDesc',
+              'Verify the connection status before saving (optional)'
+            )}
           </Typography>
         </Box>
         <Button
@@ -52,7 +64,9 @@ export const ConnectionTestSection: React.FC<ConnectionTestSectionProps> = ({
           disabled={disabled || testing}
           variant="outlined"
           size="small"
-          startIcon={testing ? <CircularProgress size={16} /> : <PlayArrowIcon />}
+          startIcon={
+            testing ? <CircularProgress size={16} /> : <PlayArrowIcon />
+          }
           sx={{
             borderRadius: '8px',
             textTransform: 'none',
@@ -68,7 +82,9 @@ export const ConnectionTestSection: React.FC<ConnectionTestSectionProps> = ({
           sx={{ borderRadius: '8px', fontSize: '0.82rem' }}
           icon={testResult.ok ? <CheckIcon sx={{ fontSize: 18 }} /> : undefined}
         >
-          {testResult.ok ? successText : `${t('argus.settings.providerWizard.testFailed', 'Connection failed')}: ${testResult.error}`}
+          {testResult.ok
+            ? successText
+            : `${t('argus.settings.providerWizard.testFailed', 'Connection failed')}: ${testResult.error}`}
         </Alert>
       )}
     </Box>

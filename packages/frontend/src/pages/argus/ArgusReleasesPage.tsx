@@ -411,9 +411,15 @@ const ArgusReleasesPage: React.FC = () => {
   }, [filteredReleases, currentPage, rowsPerPage]);
 
   // ─── Stable callback handlers (for React.memo) ─────────────────
-  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget),
+    []
+  );
   const handleSortClose = useCallback(() => setSortAnchor(null), []);
-  const handleSortSelect = useCallback((v: string) => setSortBy(v as typeof sortBy), [setSortBy]);
+  const handleSortSelect = useCallback(
+    (v: string) => setSortBy(v as typeof sortBy),
+    [setSortBy]
+  );
 
   return (
     <Box>
