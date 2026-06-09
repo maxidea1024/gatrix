@@ -858,9 +858,7 @@ function HasToggleMenu({
               }}
             />
             {isCurrent && (
-              <CheckIcon
-                sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
-              />
+              <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
             )}
           </ListItemButton>
         );

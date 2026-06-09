@@ -182,22 +182,38 @@ describe('Spec 11.1: Suggestions per context', () => {
     expect(hasSuggestions.some((s) => s.label === 'service')).toBe(true);
 
     // !has:"" with cursor at 6 (inside quotes)
-    const { suggestions: notHasSuggestions } = pipeline('!has:""', 6, MOCK_FACETS);
+    const { suggestions: notHasSuggestions } = pipeline(
+      '!has:""',
+      6,
+      MOCK_FACETS
+    );
     expect(notHasSuggestions.some((s) => s.label === 'level')).toBe(true);
     expect(notHasSuggestions.some((s) => s.label === 'service')).toBe(true);
 
     // has:"" with cursor at 4 (before quotes: has:|"")
-    const { suggestions: hasBeforeSuggestions } = pipeline('has:""', 4, MOCK_FACETS);
+    const { suggestions: hasBeforeSuggestions } = pipeline(
+      'has:""',
+      4,
+      MOCK_FACETS
+    );
     expect(hasBeforeSuggestions.some((s) => s.label === 'level')).toBe(true);
     expect(hasBeforeSuggestions.some((s) => s.label === 'service')).toBe(true);
 
     // has:"" with cursor at 6 (after quotes: has:""|)
-    const { suggestions: hasAfterSuggestions } = pipeline('has:""', 6, MOCK_FACETS);
+    const { suggestions: hasAfterSuggestions } = pipeline(
+      'has:""',
+      6,
+      MOCK_FACETS
+    );
     expect(hasAfterSuggestions.some((s) => s.label === 'level')).toBe(true);
     expect(hasAfterSuggestions.some((s) => s.label === 'service')).toBe(true);
 
     // has:"se" with cursor at 7 (after "se" inside quotes)
-    const { suggestions: hasSeSuggestions } = pipeline('has:"se"', 7, MOCK_FACETS);
+    const { suggestions: hasSeSuggestions } = pipeline(
+      'has:"se"',
+      7,
+      MOCK_FACETS
+    );
     expect(hasSeSuggestions.some((s) => s.label === 'service')).toBe(true);
     expect(hasSeSuggestions.some((s) => s.label === 'level')).toBe(false);
   });

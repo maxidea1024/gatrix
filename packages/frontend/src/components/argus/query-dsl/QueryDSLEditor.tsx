@@ -15,8 +15,21 @@ import React, {
   useLayoutEffect,
   useMemo,
 } from 'react';
-import { Box, IconButton, useTheme, ClickAwayListener, Popover, List, ListItemButton, ListItemText } from '@mui/material';
-import { Search as SearchIcon, Close as CloseIcon, Check as CheckIcon } from '@mui/icons-material';
+import {
+  Box,
+  IconButton,
+  useTheme,
+  ClickAwayListener,
+  Popover,
+  List,
+  ListItemButton,
+  ListItemText,
+} from '@mui/material';
+import {
+  Search as SearchIcon,
+  Close as CloseIcon,
+  Check as CheckIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 import type { DomainConfig, SuggestionItem } from './types';
@@ -228,7 +241,7 @@ export function QueryDSLEditor({
         ? chipsToQuery(queryToChips(lastInternalQueryRef.current))
         : null;
       const isInternalCatchUp = standardInitial === standardLastInternal;
-      
+
       prevInitialQuery.current = initialQuery;
       if (isInternalCatchUp) {
         lastInternalQueryRef.current = null;
@@ -1264,7 +1277,8 @@ export function QueryDSLEditor({
       }
       if (e.key === 'ArrowDown' && showDropdown && suggestions.length > 0) {
         e.preventDefault();
-        const maxIdx = (dropdownRef.current?.getItemCount() ?? suggestions.length) - 1;
+        const maxIdx =
+          (dropdownRef.current?.getItemCount() ?? suggestions.length) - 1;
         setSelectedIndex((prev) => Math.min(prev + 1, maxIdx));
         return;
       }
@@ -1944,7 +1958,10 @@ export function QueryDSLEditor({
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLogicalMenu({ chipId: chip.id, anchorEl: e.currentTarget as HTMLElement });
+                      setLogicalMenu({
+                        chipId: chip.id,
+                        anchorEl: e.currentTarget as HTMLElement,
+                      });
                     }}
                   >
                     {chip.label}

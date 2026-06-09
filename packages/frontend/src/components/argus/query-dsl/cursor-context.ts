@@ -315,7 +315,6 @@ function isEditingEmptyHasFilter(
   return { isHas: false };
 }
 
-
 /** Check if prefix looks like the start of an operator token */
 function isOperatorPrefix(prefix: string): boolean {
   const p = prefix.toLowerCase();

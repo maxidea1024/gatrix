@@ -316,35 +316,34 @@ export const FilterTokenGroup = forwardRef<
         </Box>
       ) : (
         <Tooltip
-          title={
-            (() => {
-              const fullText = chip.values && chip.values.length > 1
+          title={(() => {
+            const fullText =
+              chip.values && chip.values.length > 1
                 ? chip.values.join(chip.operator === '!=' ? ' and ' : ' or ')
-                : chip.value ?? '';
-              return fullText.length > 30 ? fullText : '';
-            })()
-          }
+                : (chip.value ?? '');
+            return fullText.length > 30 ? fullText : '';
+          })()}
           placement="top"
           enterDelay={300}
           arrow
         >
-        <Box
-          ref={valueRef}
-          component="span"
-          sx={{
-            ...tokenStyle('value'),
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            maxWidth: 240,
-            minWidth: 0,
-          }}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-            onPartClick(chip.id, 'value', e.currentTarget)
-          }
-        >
-          {renderValueText()}
-        </Box>
+          <Box
+            ref={valueRef}
+            component="span"
+            sx={{
+              ...tokenStyle('value'),
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: 240,
+              minWidth: 0,
+            }}
+            onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+              onPartClick(chip.id, 'value', e.currentTarget)
+            }
+          >
+            {renderValueText()}
+          </Box>
         </Tooltip>
       )}
 
