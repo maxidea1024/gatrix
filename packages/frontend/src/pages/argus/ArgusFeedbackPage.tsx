@@ -1885,8 +1885,8 @@ const ArgusFeedbackPage: React.FC = () => {
                         key={ai}
                         onClick={() => setLightboxUrl(url)}
                         sx={{
-                          width: 125,
-                          height: 94,
+                          width: 188,
+                          height: 141,
                           borderRadius: 1.5,
                           overflow: 'hidden',
                           border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
