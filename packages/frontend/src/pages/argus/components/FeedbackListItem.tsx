@@ -21,8 +21,8 @@ interface FeedbackListItemProps {
   isSelected: boolean;
   isDark: boolean;
   searchHighlight: string;
-  onSelect: () => void;
-  onToggleCheck: () => void;
+  onSelect: (feedbackId: string) => void;
+  onToggleCheck: (feedbackId: string) => void;
 }
 
 const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
@@ -40,7 +40,7 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
 
   return (
     <Box
-      onClick={onSelect}
+      onClick={() => onSelect(item.feedback_id)}
       sx={{
         display: 'flex',
         alignItems: 'flex-start',
@@ -68,7 +68,7 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
       <Checkbox
         size="small"
         checked={isSelected}
-        onChange={onToggleCheck}
+        onChange={() => onToggleCheck(item.feedback_id)}
         onClick={(e) => e.stopPropagation()}
         sx={{ p: 0.2, mt: 0.2 }}
       />

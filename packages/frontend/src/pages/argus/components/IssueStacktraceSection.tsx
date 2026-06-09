@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -39,6 +39,11 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({
     null
   );
   const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
+
+  // Stable callback handlers (for React.memo)
+  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortClose = useCallback(() => setSortAnchor(null), []);
+  const handleSortSelect = useCallback((v: string) => setOrder(v as 'recent' | 'oldest'), [setOrder]);
 
   const handleCopyRaw = () => {
     if (event.stacktrace_raw) {
@@ -119,9 +124,9 @@ const IssueStacktraceSection: React.FC<IssueStacktraceSectionProps> = ({
                 { value: 'oldest', label: t('argus.issues.oldestFirst') },
               ]}
               anchorEl={sortAnchor}
-              onOpen={(e) => setSortAnchor(e.currentTarget)}
-              onClose={() => setSortAnchor(null)}
-              onSelect={(v) => setOrder(v as 'recent' | 'oldest')}
+              onOpen={handleSortOpen}
+              onClose={handleSortClose}
+              onSelect={handleSortSelect}
             />
             <ActionChip
               label={<MoreHorizIcon sx={{ fontSize: 16 }} />}

@@ -234,7 +234,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
   );
 };
 
-export default ArgusFilterBar;
+export default React.memo(ArgusFilterBar);
 
 // ==================== Utility ====================
 

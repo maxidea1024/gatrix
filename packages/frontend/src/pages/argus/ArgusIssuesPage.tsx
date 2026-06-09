@@ -222,6 +222,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     maxWidth: 400,
   });
 
+  const handleToggleFacetCollapse = useCallback(
+    () => setFacetCollapsed((c) => !c),
+    [setFacetCollapsed]
+  );
+
   // ─── Active Filters (chip tags from facet sidebar) ─────────────
   type ActiveFilter = {
     key: string;
@@ -532,6 +537,51 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     setCurrentPage(1);
   };
 
+  const handleCheckChange = useCallback(
+    (id: number) => {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.has(id) ? next.delete(id) : next.add(id);
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleAssigneeClick = useCallback(
+    (e: React.MouseEvent, iss: ArgusIssue) => {
+      setAssigneeAnchor({
+        el: e.currentTarget as HTMLElement,
+        issue: iss,
+      });
+    },
+    []
+  );
+
+  // ─── Stable callback handlers (for React.memo) ─────────────────
+  const handleStatusOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setStatusAnchor(e.currentTarget), []);
+  const handleStatusClose = useCallback(() => setStatusAnchor(null), []);
+  const handleStatusSelect = useCallback((v: string) => { setStatus(v); setCurrentPage(1); }, [setStatus, setCurrentPage]);
+
+  const handleLevelOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setLevelAnchor(e.currentTarget), []);
+  const handleLevelClose = useCallback(() => setLevelAnchor(null), []);
+  const handleLevelSelect = useCallback((v: string) => { setLevel(v); setCurrentPage(1); }, [setLevel, setCurrentPage]);
+
+  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortClose = useCallback(() => setSortAnchor(null), []);
+  const handleSortSelect = useCallback((v: string) => setSort(v), [setSort]);
+
+  const handleBulkResolve = useCallback(() => handleBulkAction('resolved'), [handleBulkAction]);
+  const handleBulkIgnore = useCallback(() => handleBulkAction('ignored'), [handleBulkAction]);
+  const handleBulkCancel = useCallback(() => setSelectedIds(new Set()), []);
+
+  const handleNewIssuesClick = useCallback(() => {
+    resetNewIssueCount();
+    fetchIssues();
+  }, [resetNewIssueCount, fetchIssues]);
+
+  const handleAssigneeMenuClose = useCallback(() => setAssigneeAnchor(null), []);
+
   // ─── Filter options ────────────────────────────────────────────
 
   const statusOptions = [
@@ -802,12 +852,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               value={status}
               options={statusOptions}
               anchorEl={statusAnchor}
-              onOpen={(e) => setStatusAnchor(e.currentTarget)}
-              onClose={() => setStatusAnchor(null)}
-              onSelect={(v) => {
-                setStatus(v);
-                setCurrentPage(1);
-              }}
+              onOpen={handleStatusOpen}
+              onClose={handleStatusClose}
+              onSelect={handleStatusSelect}
               sx={{ height: 32 }}
             />
             <FilterChipSelect
@@ -815,12 +862,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               value={level}
               options={levelOptions}
               anchorEl={levelAnchor}
-              onOpen={(e) => setLevelAnchor(e.currentTarget)}
-              onClose={() => setLevelAnchor(null)}
-              onSelect={(v) => {
-                setLevel(v);
-                setCurrentPage(1);
-              }}
+              onOpen={handleLevelOpen}
+              onClose={handleLevelClose}
+              onSelect={handleLevelSelect}
               sx={{ height: 32 }}
             />
             <FilterChipSelect
@@ -828,11 +872,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               value={sort}
               options={sortOptions}
               anchorEl={sortAnchor}
-              onOpen={(e) => setSortAnchor(e.currentTarget)}
-              onClose={() => setSortAnchor(null)}
-              onSelect={(v) => {
-                setSort(v);
-              }}
+              onOpen={handleSortOpen}
+              onClose={handleSortClose}
+              onSelect={handleSortSelect}
               sx={{ height: 32 }}
             />
           </>
@@ -942,11 +984,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
-            onFilter={(key, val, exclude) =>
-              toggleActiveFilter(key, val, exclude)
-            }
+            onFilter={toggleActiveFilter}
             collapsed={facetCollapsed}
-            onToggleCollapse={() => setFacetCollapsed((c) => !c)}
+            onToggleCollapse={handleToggleFacetCollapse}
             loading={loading}
             customFacets={customFacetData}
             onAddCustomFacet={handleAddCustomFacet}
@@ -1038,20 +1078,17 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
             <IssueBulkActions
               selectedIds={selectedIds}
               merging={merging}
-              onResolve={() => handleBulkAction('resolved')}
-              onIgnore={() => handleBulkAction('ignored')}
+              onResolve={handleBulkResolve}
+              onIgnore={handleBulkIgnore}
               onMerge={handleMerge}
               onDelete={handleBulkDelete}
-              onCancel={() => setSelectedIds(new Set())}
+              onCancel={handleBulkCancel}
             />
 
             {/* Real-time new issues banner */}
             <NewIssuesBanner
               count={newIssueCount}
-              onClick={() => {
-                resetNewIssueCount();
-                fetchIssues();
-              }}
+              onClick={handleNewIssuesClick}
             />
 
             <PageContentLoader
@@ -1084,20 +1121,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                         highlight={storeSearch}
                         showCheckbox
                         checked={selectedIds.has(issue.id)}
-                        onCheckChange={(id) => {
-                          setSelectedIds((prev) => {
-                            const next = new Set(prev);
-                            next.has(id) ? next.delete(id) : next.add(id);
-                            return next;
-                          });
-                        }}
+                        onCheckChange={handleCheckChange}
                         showAssignee
-                        onAssigneeClick={(e, iss) =>
-                          setAssigneeAnchor({
-                            el: e.currentTarget as HTMLElement,
-                            issue: iss,
-                          })
-                        }
+                        onAssigneeClick={handleAssigneeClick}
                         showSparkline
                         showLastSeen
                         isFirst={idx === 0}
@@ -1138,7 +1164,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
       <IssueAssigneeMenu
         anchor={assigneeAnchor}
         members={members}
-        onClose={() => setAssigneeAnchor(null)}
+        onClose={handleAssigneeMenuClose}
         onAssign={handleAssignIssue}
       />
     </Box>

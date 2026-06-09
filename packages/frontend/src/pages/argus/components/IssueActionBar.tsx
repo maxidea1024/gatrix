@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Typography,
-  Chip,
   Divider,
   useTheme,
-  alpha,
   Tooltip,
   Menu,
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Button,
 } from '@mui/material';
 import {
   ErrorOutline as ErrorIcon,
@@ -33,6 +29,20 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PresenceIndicator from '@/components/argus/PresenceIndicator';
 import IssueDetailActions from '@/components/argus/IssueDetailActions';
 import PageHeader from '@/components/common/PageHeader';
+import {
+  LevelIndicator,
+  LevelChip,
+  AiAnalysisButton,
+  StatNumber,
+  StatLabel,
+  ActionBarRow,
+  StatusText,
+  SubstatusText,
+  StatusMenu,
+  PriorityDot,
+  RightSideContainer,
+  MetaChip,
+} from './IssueActionBar.styles';
 
 export interface IssueActionBarProps {
   issue: ArgusIssueDetail;
@@ -57,8 +67,6 @@ export interface IssueActionBarProps {
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
 }
-
-const aiColor = '#7c4dff';
 
 const IssueActionBar: React.FC<IssueActionBarProps> = ({
   issue,
@@ -106,17 +114,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
     <>
       {/* Header */}
       <PageHeader
-        icon={
-          <Box
-            sx={{
-              width: 4,
-              height: 18,
-              borderRadius: 1,
-              backgroundColor: levelColor,
-              ml: 1,
-            }}
-          />
-        }
+        icon={<LevelIndicator color={levelColor} />}
         title={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ArgusBreadcrumbs
@@ -129,54 +127,22 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               ]}
               size="title"
             />
-            <Chip
-              label={issue.level}
-              size="small"
-              sx={{
-                fontWeight: 700,
-                fontSize: '0.65rem',
-                height: 18,
-                backgroundColor: alpha(levelColor, 0.12),
-                color: levelColor,
-                border: 'none',
-              }}
-            />
+            <LevelChip label={issue.level} size="small" levelColor={levelColor} />
           </Box>
         }
         subtitle={issue.culprit}
         enableAutoBack
         onBack={onBack}
         actions={
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 3,
-              pt: 0.5,
-              pr: 1,
-              alignItems: 'center',
-            }}
-          >
-            <Button
+          <Box sx={{ display: 'flex', gap: 3, pt: 0.5, pr: 1, alignItems: 'center' }}>
+            <AiAnalysisButton
               size="small"
               variant="outlined"
               startIcon={<AutoAwesomeIcon sx={{ fontSize: 18 }} />}
               onClick={onAiAnalysis}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: '8px',
-                px: 2,
-                borderColor: alpha(aiColor, 0.5),
-                color: aiColor,
-                backgroundColor: alpha(aiColor, 0.05),
-                '&:hover': {
-                  borderColor: aiColor,
-                  backgroundColor: alpha(aiColor, 0.1),
-                },
-              }}
             >
               {t('argus.issues.aiAnalysis', 'AI Analysis')}
-            </Button>
+            </AiAnalysisButton>
             <Box sx={{ display: 'flex', gap: 3 }}>
               <Box sx={{ textAlign: 'center' }}>
                 <Tooltip
@@ -188,24 +154,16 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                   arrow
                   placement="top"
                 >
-                  <Typography
+                  <StatNumber
                     variant="h6"
-                    fontWeight={700}
-                    sx={{
-                      lineHeight: 1,
-                      fontSize: '1.2rem',
-                      cursor: issue.event_count >= 1000 ? 'help' : 'default',
-                    }}
+                    sx={{ cursor: issue.event_count >= 1000 ? 'help' : 'default' }}
                   >
                     {formatCompactNumber(issue.event_count || 0)}
-                  </Typography>
+                  </StatNumber>
                 </Tooltip>
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'text.secondary', fontSize: '0.65rem' }}
-                >
+                <StatLabel variant="caption">
                   {t('argus.issues.events')}
-                </Typography>
+                </StatLabel>
               </Box>
               <Box sx={{ textAlign: 'center' }}>
                 <Tooltip
@@ -217,24 +175,16 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                   arrow
                   placement="top"
                 >
-                  <Typography
+                  <StatNumber
                     variant="h6"
-                    fontWeight={700}
-                    sx={{
-                      lineHeight: 1,
-                      fontSize: '1.2rem',
-                      cursor: issue.user_count >= 1000 ? 'help' : 'default',
-                    }}
+                    sx={{ cursor: issue.user_count >= 1000 ? 'help' : 'default' }}
                   >
                     {formatCompactNumber(issue.user_count || 0)}
-                  </Typography>
+                  </StatNumber>
                 </Tooltip>
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'text.secondary', fontSize: '0.65rem' }}
-                >
+                <StatLabel variant="caption">
                   {t('argus.issues.users')}
-                </Typography>
+                </StatLabel>
               </Box>
             </Box>
           </Box>
@@ -242,55 +192,23 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
       />
 
       {/* Action Bar */}
-      <Box
-        sx={{
-          py: 1,
-          mb: 2,
-          display: 'flex',
-          gap: 0.8,
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        }}
-      >
+      <ActionBarRow isDark={isDark}>
         {/* Status Badge */}
         <ActionChip
           label={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography
-                component="span"
-                sx={{
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.03em',
-                }}
-              >
+              <StatusText>
                 {t(`argus.issues.${issue.status}`, issue.status)}
-              </Typography>
+              </StatusText>
               {issue.substatus === 'regressed' && (
-                <Typography
-                  component="span"
-                  sx={{
-                    fontSize: '0.62rem',
-                    fontWeight: 600,
-                    color: '#ff9800',
-                  }}
-                >
+                <SubstatusText>
                   {t('argus.issues.regressed', 'Regressed')}
-                </Typography>
+                </SubstatusText>
               )}
               {issue.is_regression && (
-                <Typography
-                  component="span"
-                  sx={{
-                    fontSize: '0.62rem',
-                    fontWeight: 600,
-                    color: '#ff9800',
-                  }}
-                >
+                <SubstatusText>
                   {t('argus.issues.regression')}
-                </Typography>
+                </SubstatusText>
               )}
             </Box>
           }
@@ -326,22 +244,13 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           onDropdownClick={(e) => setStatusMenuAnchor(e.currentTarget)}
         />
 
-        <Menu
+        <StatusMenu
+          isDark={isDark}
           anchorEl={statusMenuAnchor}
           open={Boolean(statusMenuAnchor)}
           onClose={() => setStatusMenuAnchor(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          sx={{
-            '& .MuiPaper-root': {
-              minWidth: 150,
-              mt: 0.5,
-              borderRadius: 2,
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-              backgroundImage: 'none',
-              backgroundColor: isDark ? '#222' : '#fff',
-            },
-          }}
         >
           {issue.status !== 'resolved' && (
             <MenuItem
@@ -440,20 +349,15 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               />
             </MenuItem>
           )}
-        </Menu>
+        </StatusMenu>
 
         {/* Priority & Assignee */}
         <ActionChip
           icon={
-            <Box
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                backgroundColor:
-                  PRIORITY_CONFIG[issue.priority || 'medium']?.color ||
-                  '#ff9800',
-              }}
+            <PriorityDot
+              dotColor={
+                PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800'
+              }
             />
           }
           label={
@@ -501,15 +405,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               onClick={() => handlePrioritySelect(key)}
               sx={{ fontSize: '0.82rem' }}
             >
-              <Box
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: cfg.color,
-                  mr: 1,
-                }}
-              />
+              <PriorityDot dotColor={cfg.color} sx={{ mr: 1 }} />
               {cfg.label}
             </MenuItem>
           ))}
@@ -527,7 +423,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
         />
 
         {/* Right side items */}
-        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <RightSideContainer>
           {projectId && issueId && (
             <PresenceIndicator
               projectId={projectId}
@@ -540,36 +436,20 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           <Divider orientation="vertical" flexItem sx={{ mx: 0.3 }} />
           {issue.fingerprint && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Chip
+              <MetaChip
                 label={`FP: ${issue.fingerprint.slice(0, 8)}`}
                 size="small"
-                sx={{
-                  cursor: 'default',
-                  height: 22,
-                  fontSize: '0.68rem',
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.04)'
-                    : 'rgba(0,0,0,0.04)',
-                  border: 'none',
-                }}
+                isDark={isDark}
               />
               <CopyButton text={issue.fingerprint} size={12} />
             </Box>
           )}
           {latestEvent?.event_id && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Chip
+              <MetaChip
                 label={`ID: ${latestEvent.event_id.slice(0, 8)}`}
                 size="small"
-                sx={{
-                  cursor: 'default',
-                  height: 22,
-                  fontSize: '0.68rem',
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.04)'
-                    : 'rgba(0,0,0,0.04)',
-                  border: 'none',
-                }}
+                isDark={isDark}
               />
               <CopyButton text={latestEvent.event_id} size={12} />
             </Box>
@@ -588,8 +468,8 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
             sidebarCollapsed={sidebarCollapsed}
             onToggleSidebar={onToggleSidebar}
           />
-        </Box>
-      </Box>
+        </RightSideContainer>
+      </ActionBarRow>
     </>
   );
 };

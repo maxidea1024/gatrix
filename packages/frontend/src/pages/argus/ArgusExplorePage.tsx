@@ -702,6 +702,11 @@ const ArgusExplorePage: React.FC = () => {
     navigate(DATASET_CONFIG[type].path);
   };
 
+  // ─── Stable callback handlers (for React.memo) ─────────────────
+  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortClose = useCallback(() => setSortAnchor(null), []);
+  const handleSortSelect = useCallback((v: string) => setSort(v as SortOption), []);
+
   /* ═══ RENDER ═══ */
   return (
     <Box>
@@ -903,9 +908,9 @@ const ArgusExplorePage: React.FC = () => {
               { value: 'name', label: t('argus.explore.sortName') },
             ]}
             anchorEl={sortAnchor}
-            onOpen={(e) => setSortAnchor(e.currentTarget)}
-            onClose={() => setSortAnchor(null)}
-            onSelect={(v) => setSort(v as SortOption)}
+            onOpen={handleSortOpen}
+            onClose={handleSortClose}
+            onSelect={handleSortSelect}
           />
 
           {/* + New */}

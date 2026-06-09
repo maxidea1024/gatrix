@@ -302,4 +302,4 @@ const LogsToolbar: React.FC<LogsToolbarProps> = ({
   );
 };
 
-export default LogsToolbar;
+export default React.memo(LogsToolbar);

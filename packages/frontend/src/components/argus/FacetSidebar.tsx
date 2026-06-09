@@ -45,11 +45,11 @@ export interface FacetSidebarProps {
 
 /* ─── Single Facet Section ─── */
 
-const FacetSection: React.FC<{
+const FacetSection = React.memo<{
   facet: FacetGroup;
   onFilter: (key: string, value: string, exclude?: boolean) => void;
   isDark: boolean;
-}> = ({ facet, onFilter, isDark }) => {
+}>(({ facet, onFilter, isDark }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
@@ -322,11 +322,11 @@ const FacetSection: React.FC<{
       </Collapse>
     </Box>
   );
-};
+});
 
 /* ─── Main Sidebar ─── */
 
-const FacetSidebar: React.FC<FacetSidebarProps> = ({
+const FacetSidebar = React.memo<FacetSidebarProps>(({
   facets,
   onFilter,
   collapsed,
@@ -567,6 +567,6 @@ const FacetSidebar: React.FC<FacetSidebarProps> = ({
       )}
     </Box>
   );
-};
+});
 
 export default FacetSidebar;

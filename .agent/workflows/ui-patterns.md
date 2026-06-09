@@ -346,11 +346,26 @@ const sortOptions = [
   { value: 'oldest', label: t('common.oldest') },
 ];
 
+// ✅ 반드시 useCallback으로 안정적 참조 생성 (FilterChipSelect는 React.memo)
+const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+const handleSortClose = useCallback(() => setSortAnchor(null), []);
+const handleSortSelect = useCallback((v: string) => setSort(v), []);
+
 <FilterChipSelect
   label={t('argus.issues.sort')}
   value={sort}
   options={sortOptions}
   anchorEl={sortAnchor}
+  onOpen={handleSortOpen}
+  onClose={handleSortClose}
+  onSelect={handleSortSelect}
+/>
+```
+
+**❌ 인라인 콜백 금지 (FilterChipSelect는 React.memo이므로 memo가 무력화됨):**
+```tsx
+// ❌ 매 렌더마다 새 함수 참조 → React.memo 무력화
+<FilterChipSelect
   onOpen={(e) => setSortAnchor(e.currentTarget)}
   onClose={() => setSortAnchor(null)}
   onSelect={(v) => setSort(v)}
@@ -577,3 +592,192 @@ return (
   </Box>
 );
 ```
+
+## Styling: Prefer Styled Components over Inline `sx`
+
+컴포넌트의 스타일을 정의할 때, MUI `sx` prop을 인라인으로 사용하지 말고 **`styled()` API로 별도 `.styles.tsx` 파일**에 분리하세요.
+
+**파일 규칙:**
+- 스타일 파일은 컴포넌트와 동일한 디렉토리에 `ComponentName.styles.tsx` 이름으로 생성
+- `@mui/material/styles`의 `styled`를 사용
+- 컴포넌트 파일에서 named import로 가져다 사용
+
+**Location 예시:**
+```
+components/
+  IssueActionBar.tsx          ← 컴포넌트 로직
+  IssueActionBar.styles.tsx   ← 스타일 정의
+```
+
+**✅ 올바른 패턴 (`.styles.tsx` 파일):**
+```tsx
+// IssueActionBar.styles.tsx
+import { styled, alpha } from '@mui/material/styles';
+import { Box, Chip } from '@mui/material';
+
+/** Main container row for the action bar */
+export const ActionBarRow = styled(Box, {
+  shouldForwardProp: (p) => p !== 'isDark',
+})<{ isDark: boolean }>(({ isDark }) => ({
+  paddingTop: 8,
+  paddingBottom: 8,
+  display: 'flex',
+  gap: 6,
+  alignItems: 'center',
+  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+}));
+
+/** Chip showing the issue level */
+export const LevelChip = styled(Chip, {
+  shouldForwardProp: (p) => p !== 'levelColor',
+})<{ levelColor: string }>(({ levelColor }) => ({
+  fontWeight: 700,
+  fontSize: '0.65rem',
+  height: 18,
+  backgroundColor: alpha(levelColor, 0.12),
+  color: levelColor,
+}));
+```
+
+```tsx
+// IssueActionBar.tsx — 컴포넌트에서 import
+import { ActionBarRow, LevelChip } from './IssueActionBar.styles';
+
+<ActionBarRow isDark={isDark}>
+  <LevelChip levelColor={color} label="Error" />
+</ActionBarRow>
+```
+
+**❌ 하지 마세요 (인라인 `sx` 남용):**
+```tsx
+// ❌ 매 렌더마다 새 객체 생성 → Emotion CSS-in-JS 직렬화 반복 → 성능 저하
+<Box sx={{
+  paddingTop: 8,
+  paddingBottom: 8,
+  display: 'flex',
+  gap: 6,
+  alignItems: 'center',
+  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+}}>
+  <Chip sx={{
+    fontWeight: 700,
+    fontSize: '0.65rem',
+    height: 18,
+    backgroundColor: alpha(levelColor, 0.12),
+    color: levelColor,
+  }} label="Error" />
+</Box>
+```
+
+**왜 `styled()`가 더 좋은가:**
+
+| | 인라인 `sx` | `styled()` |
+|---|---|---|
+| **성능** | 매 렌더마다 새 스타일 객체 생성 + Emotion 직렬화 | 스타일이 한 번만 생성되고 캐시됨 |
+| **React.memo 호환** | sx 객체가 매번 새 참조 → memo 무력화 | styled 컴포넌트는 참조 안정적 |
+| **코드 분리** | 로직과 스타일이 뒤섞여 가독성 저하 | 관심사 분리 (로직 vs 스타일) |
+| **재사용** | 불가능 (같은 스타일을 복붙) | export/import로 재사용 |
+| **TypeScript** | 타입 지원 제한적 | `shouldForwardProp` + 제네릭으로 custom prop 타입 안전 |
+
+**`sx`가 허용되는 경우:**
+- 단순한 레이아웃 유틸리티 (예: `sx={{ flex: 1 }}`, `sx={{ mt: 2 }}`)
+- 일회성이고 1~2개 속성만 있는 간단한 스타일
+- `styled()`로 분리할 가치가 없는 극히 단순한 경우
+
+> **원칙:** `sx` 속성이 3개 이상이거나, 조건부 스타일(`isDark`, 동적 색상 등)이 포함되면 반드시 `.styles.tsx`로 분리하세요.
+
+## Re-render Optimization: Memoization Rules for Interactive Pages
+
+리사이즈, 드래그, 애니메이션 등 **고빈도 state 변경**이 발생하는 페이지에서는 반드시 아래 규칙을 따르세요.
+
+**대상 페이지 예시:** 리사이저블 스플리터가 있는 페이지 (로그 탐색, 이슈 상세 등)
+
+### 규칙 1: 자식 컴포넌트는 `React.memo`로 래핑
+
+부모의 state가 변해도 props가 동일하면 리렌더링을 건너뛰도록 합니다.
+
+```tsx
+// ✅ memo 적용
+const FacetSidebar = React.memo<FacetSidebarProps>(({ facets, onFilter }) => {
+  // ...
+});
+export default FacetSidebar;  // 이미 memo 적용됨
+
+// 또는 export 시점에:
+export default React.memo(MyComponent);
+```
+
+### 규칙 2: 콜백 prop은 `useCallback` 또는 직접 참조
+
+인라인 화살표 함수는 매 렌더마다 새 참조를 생성하여 자식의 `React.memo`를 무력화합니다.
+
+```tsx
+// ❌ memo가 있어도 매번 리렌더링됨
+<FacetSidebar
+  onFilter={(key, val, exclude) => toggleActiveFilter(key, val, exclude)}
+  onToggleCollapse={() => setCollapsed(c => !c)}
+/>
+
+// ✅ 안정적 참조 → memo가 정상 작동
+const handleToggle = useCallback(() => setCollapsed(c => !c), [setCollapsed]);
+<FacetSidebar
+  onFilter={toggleActiveFilter}  // 이미 useCallback으로 래핑된 함수
+  onToggleCollapse={handleToggle}
+/>
+```
+
+### 규칙 3: 드래그/리사이즈 전용 state를 자식에 전파하지 않기
+
+`isDragging` 같은 고빈도 변경 prop을 자식에게 내리면, 해당 자식의 memo를 무력화합니다.
+
+```tsx
+// ❌ isDragging이 50ms마다 바뀌면서 차트의 memo를 무력화
+<LogVolumeChart isDragging={isPanelDragging || isFacetDragging} />
+
+// ✅ isDragging을 제거하면 차트는 data/period가 바뀔 때만 리렌더링
+<LogVolumeChart data={volume} isDark={isDark} period={currentPeriod} />
+```
+
+> **원칙:** `React.memo`를 추가하는 것만으로는 부족합니다. memo가 동작하려면 **prop 참조의 안정성**이 보장되어야 합니다. memo + useCallback + 인라인 콜백 제거를 함께 적용하세요.
+
+### 규칙 4: 리스트 아이템의 콜백 prop은 ID를 인자로 받는 패턴 사용
+
+리스트 아이템(`items.map(...)`)에서 `React.memo` 컴포넌트에 콜백을 전달할 때, 각 아이템별 클로저를 만들지 마세요. 대신 콜백이 ID를 인자로 받도록 설계합니다.
+
+```tsx
+// ❌ 아이템마다 새 클로저 → N개의 새 함수 참조 → 모든 아이템 리렌더링
+{items.map((item) => (
+  <MemoizedItem
+    key={item.id}
+    onSelect={() => handleSelect(item.id)}      // ❌ 매번 새 함수
+    onToggle={() => toggleItem(item.id)}          // ❌ 매번 새 함수
+  />
+))}
+
+// ✅ 부모에서 안정적 useCallback + 자식이 자신의 ID를 전달
+const handleSelect = useCallback((id: string) => { /* ... */ }, []);
+const handleToggle = useCallback((id: string) => { /* ... */ }, []);
+
+{items.map((item) => (
+  <MemoizedItem
+    key={item.id}
+    onSelect={handleSelect}    // ✅ 안정적 참조
+    onToggle={handleToggle}    // ✅ 안정적 참조
+  />
+))}
+
+// 자식 컴포넌트 내부에서:
+interface MemoizedItemProps {
+  item: ItemType;
+  onSelect: (id: string) => void;   // ID를 인자로 받음
+  onToggle: (id: string) => void;
+}
+const MemoizedItem: React.FC<MemoizedItemProps> = ({ item, onSelect, onToggle }) => (
+  <Box onClick={() => onSelect(item.id)}>  {/* 자식 내부에서 ID 전달 */}
+    ...
+  </Box>
+);
+export default React.memo(MemoizedItem);
+```
+
+> **핵심:** 부모 → 자식으로 전달하는 콜백은 **하나의 안정적 함수**로, 자식이 자신의 ID를 인자로 넘기는 구조를 사용합니다. 이렇게 하면 25개 아이템이 있어도 콜백 참조는 변하지 않아 `React.memo`가 정상 작동합니다.

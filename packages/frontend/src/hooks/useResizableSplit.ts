@@ -29,8 +29,8 @@ export interface UseResizableSplitReturn {
 /**
  * Reusable hook for resizable split panels.
  *
- * Performance: During drag, state updates are throttled to at most once every
- * 50ms (~20fps) to avoid excessive React re-renders of heavy parent trees.
+ * Performance: During drag, state updates are coalesced via requestAnimationFrame
+ * so that at most one React re-render occurs per browser paint frame.
  * localStorage is only written on mouseup (not on every pixel move).
  */
 export function useResizableSplit({
@@ -51,8 +51,8 @@ export function useResizableSplit({
   // Ref to track the latest width during drag (for mouseup persist)
   const latestWidthRef = useRef(splitWidth);
   latestWidthRef.current = splitWidth;
-  // Time-based throttle: last state update timestamp
-  const lastUpdateRef = useRef(0);
+  // rAF-based throttle: pending frame ID
+  const rafRef = useRef(0);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -60,24 +60,32 @@ export function useResizableSplit({
       setIsDragging(true);
       const startX = e.clientX;
       const startWidth = latestWidthRef.current;
+      // Track the latest desired width across mousemove events
+      let pendingWidth = startWidth;
 
       const onMouseMove = (ev: MouseEvent) => {
         const rawDelta = ev.clientX - startX;
         const delta = invertDelta ? -rawDelta : rawDelta;
-        const newWidth = Math.min(
+        pendingWidth = Math.min(
           maxWidth,
           Math.max(minWidth, startWidth + delta)
         );
 
-        // Time-based throttle: max ~20 state updates/sec during drag
-        const now = performance.now();
-        if (now - lastUpdateRef.current < 50) return;
-        lastUpdateRef.current = now;
-
-        setSplitWidth(newWidth);
+        // rAF throttle: coalesce multiple mousemove events into one state update per frame
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(() => {
+            rafRef.current = 0;
+            setSplitWidth(pendingWidth);
+          });
+        }
       };
 
       const onMouseUp = (ev: MouseEvent) => {
+        // Cancel any pending rAF to prevent stale update
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = 0;
+        }
         setIsDragging(false);
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);

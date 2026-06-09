@@ -233,6 +233,25 @@ const ArgusIssueDetailPage: React.FC = () => {
   const levelColor =
     LEVEL_COLORS[issue?.level || 'error'] || LEVEL_COLORS.error;
 
+  // ─── Stable callback handlers (for React.memo) ─────────────────
+  const handleAssigneeOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setAssigneeAnchor(e.currentTarget),
+    []
+  );
+  const handleOpenAiAnalysis = useCallback(() => setShowAiAnalysis(true), []);
+  const handleToggleSidebar = useCallback(
+    () => setSidebarCollapsed((c) => !c),
+    []
+  );
+  const handleEventChange = useCallback(
+    (evt: ArgusErrorEvent | null) => setCurrentEvent(evt),
+    []
+  );
+  const handleBack = useMemo(
+    () => (location.state?.allowBack ? () => navigate(-1) : undefined),
+    [location.state?.allowBack, navigate]
+  );
+
   // ─── RENDER ───
   return (
     <PageContentLoader loading={loading}>
@@ -262,9 +281,9 @@ const ArgusIssueDetailPage: React.FC = () => {
             isDark={isDark}
             onStatusChange={handleStatusChange}
             onPriorityChange={handlePriorityChange}
-            onAssigneeClick={(e) => setAssigneeAnchor(e.currentTarget)}
-            onAiAnalysis={() => setShowAiAnalysis(true)}
-            onBack={location.state?.allowBack ? () => navigate(-1) : undefined}
+            onAssigneeClick={handleAssigneeOpen}
+            onAiAnalysis={handleOpenAiAnalysis}
+            onBack={handleBack}
             isSubscribed={isSubscribed}
             isBookmarked={isBookmarked}
             onSubscribe={handleSubscribe}
@@ -272,7 +291,7 @@ const ArgusIssueDetailPage: React.FC = () => {
             onDelete={actions.deleteIssue}
             onDiscard={actions.discardIssue}
             sidebarCollapsed={sidebarCollapsed}
-            onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onToggleSidebar={handleToggleSidebar}
           />
 
           {/* Main Content + Sidebar Layout */}
@@ -344,7 +363,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                     projectId={projectId}
                     issueId={issueId}
                     currentEvent={latestEvent as ArgusErrorEvent | null}
-                    onEventChange={(evt) => setCurrentEvent(evt)}
+                    onEventChange={handleEventChange}
                     isDark={isDark}
                   />
                 </Box>

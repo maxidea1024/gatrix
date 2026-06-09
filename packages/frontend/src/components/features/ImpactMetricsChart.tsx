@@ -172,11 +172,11 @@ const SERIES_COLORS = [
 interface ChartPanelProps {
   config: MetricConfig;
   canManage?: boolean;
-  onDelete?: () => void;
-  onEdit?: () => void;
-  onExpand?: () => void;
+  onDelete?: (configId: string) => void;
+  onEdit?: (configId: string) => void;
+  onExpand?: (configId: string) => void;
   isExpanded?: boolean;
-  onChartTypeChange?: (chartType: ChartType) => void;
+  onChartTypeChange?: (configId: string, chartType: ChartType) => void;
   dateRange: DateRangeValue;
   refreshKey: number;
   globalLabelFilter?: string;
@@ -282,7 +282,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   ) => {
     if (newType) {
       setLocalChartType(newType);
-      onChartTypeChange?.(newType);
+      onChartTypeChange?.(config.id, newType);
     }
   };
 
@@ -681,7 +681,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           {!isExpanded && (
             <Tooltip title={t('common.expand')}>
-              <IconButton size="small" onClick={onExpand} sx={{ p: 0.4 }}>
+              <IconButton size="small" onClick={() => onExpand?.(config.id)} sx={{ p: 0.4 }}>
                 <ExpandIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
@@ -703,7 +703,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
               <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
               {onEdit && (
                 <Tooltip title={t('common.edit')}>
-                  <IconButton size="small" onClick={onEdit} sx={{ p: 0.4 }}>
+                  <IconButton size="small" onClick={() => onEdit?.(config.id)} sx={{ p: 0.4 }}>
                     <EditIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
@@ -712,7 +712,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
                 <Tooltip title={t('common.delete')}>
                   <IconButton
                     size="small"
-                    onClick={onDelete}
+                    onClick={() => onDelete?.(config.id)}
                     color="error"
                     sx={{ p: 0.4 }}
                   >
@@ -1798,6 +1798,25 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     }
   };
 
+  // ─── Stable callback handlers for MemoChartPanel ───────────────
+  const handlePanelDelete = useCallback((configId: string) => {
+    handleDeleteClick(configId);
+  }, []);
+
+  const handlePanelEdit = useCallback((configId: string) => {
+    const cfg = configs.find((c) => c.id === configId);
+    if (cfg) handleOpenEditDialog(cfg);
+  }, [configs]);
+
+  const handlePanelExpand = useCallback((configId: string) => {
+    const cfg = configs.find((c) => c.id === configId);
+    if (cfg) setExpandedConfig(cfg);
+  }, [configs]);
+
+  const handlePanelChartTypeChange = useCallback((configId: string, chartType: ChartType) => {
+    handleChartTypeChange(configId, chartType);
+  }, []);
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -2062,12 +2081,10 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
               <MemoChartPanel
                 config={config}
                 canManage={canManage}
-                onDelete={() => handleDeleteClick(config.id)}
-                onEdit={() => handleOpenEditDialog(config)}
-                onExpand={() => setExpandedConfig(config)}
-                onChartTypeChange={(chartType) =>
-                  handleChartTypeChange(config.id, chartType)
-                }
+                onDelete={handlePanelDelete}
+                onEdit={handlePanelEdit}
+                onExpand={handlePanelExpand}
+                onChartTypeChange={handlePanelChartTypeChange}
                 dateRange={dateRangeValue}
                 refreshKey={refreshKey}
                 globalLabelFilter={debouncedLabelFilter}
@@ -2112,9 +2129,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
                 config={expandedConfig}
                 canManage={false}
                 isExpanded={true}
-                onChartTypeChange={(chartType) =>
-                  handleChartTypeChange(expandedConfig.id, chartType)
-                }
+                onChartTypeChange={handlePanelChartTypeChange}
                 dateRange={dateRangeValue}
                 refreshKey={refreshKey}
                 globalLabelFilter={debouncedLabelFilter}

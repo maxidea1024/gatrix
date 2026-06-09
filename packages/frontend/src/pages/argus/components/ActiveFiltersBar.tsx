@@ -104,4 +104,4 @@ const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   );
 };
 
-export default ActiveFiltersBar;
+export default React.memo(ActiveFiltersBar);

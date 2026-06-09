@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -497,6 +497,9 @@ const ChatPageContent: React.FC = () => {
   //   return <ChatSkeleton stage={state.loadingStage} />;
   // }
 
+  // Stable callback handlers (for React.memo)
+  const handleOpenInviteUser = useCallback(() => setUserSearchOpen(true), []);
+
   return (
     <Box
       sx={{
@@ -687,7 +690,7 @@ const ChatPageContent: React.FC = () => {
               <ChatElementsMessageList
                 channelId={state.currentChannelId}
                 onSendMessage={handleSendMessage}
-                onInviteUser={() => setUserSearchOpen(true)}
+                onInviteUser={handleOpenInviteUser}
                 onOpenThread={handleOpenThread}
                 isThreadOpen={isThreadOpen}
               />

@@ -687,13 +687,33 @@ const ArgusFeedbackPage: React.FC = () => {
     }
   };
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
-  };
+  }, []);
+
+  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortClose = useCallback(() => setSortAnchor(null), []);
+  const handleSortSelect = useCallback((v: string) => {
+    setUrlState({ sort: v, page: '1', fb: '' });
+  }, [setUrlState]);
+
+  const handleFeedbackSelect = useCallback((feedbackId: string) => {
+    setUrlState({ fb: feedbackId });
+    // Mark as read if not already
+    const found = data?.items?.find((i) => i.feedback_id === feedbackId);
+    if (found && !found.is_read) {
+      argusService.markFeedbackRead(projectId, [feedbackId]).catch(() => {});
+      found.is_read = 1;
+    }
+  }, [setUrlState, data?.items, projectId]);
+
+  const handleFeedbackToggleCheck = useCallback((feedbackId: string) => {
+    toggleSelect(feedbackId);
+  }, [toggleSelect]);
 
   // ─── Derived Data ───
   const items = data?.items || [];
@@ -995,11 +1015,9 @@ const ArgusFeedbackPage: React.FC = () => {
                 value={sortOrder}
                 options={SORT_OPTIONS}
                 anchorEl={sortAnchor}
-                onOpen={(e) => setSortAnchor(e.currentTarget)}
-                onClose={() => setSortAnchor(null)}
-                onSelect={(v) => {
-                  setUrlState({ sort: v, page: '1', fb: '' });
-                }}
+                onOpen={handleSortOpen}
+                onClose={handleSortClose}
+                onSelect={handleSortSelect}
               />
             </>
           }
@@ -1177,16 +1195,8 @@ const ArgusFeedbackPage: React.FC = () => {
                     isSelected={selectedIds.has(item.feedback_id)}
                     isDark={isDark}
                     searchHighlight={searchDebounce}
-                    onSelect={() => {
-                      setUrlState({ fb: item.feedback_id });
-                      if (!item.is_read) {
-                        argusService
-                          .markFeedbackRead(projectId, [item.feedback_id])
-                          .catch(() => {});
-                        item.is_read = 1;
-                      }
-                    }}
-                    onToggleCheck={() => toggleSelect(item.feedback_id)}
+                    onSelect={handleFeedbackSelect}
+                    onToggleCheck={handleFeedbackToggleCheck}
                   />
                 ))}
               </Box>

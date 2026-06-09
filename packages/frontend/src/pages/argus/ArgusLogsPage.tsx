@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Box, useTheme, IconButton, Button } from '@mui/material';
 import {
   Terminal as LogIcon,
@@ -163,6 +163,11 @@ const ArgusLogsPage: React.FC = () => {
     invertDelta: true,
   });
 
+  const handleToggleFacetCollapse = useCallback(
+    () => setFacetSidebarCollapsed((c) => !c),
+    [setFacetSidebarCollapsed]
+  );
+
   const {
     splitWidth: facetWidth,
     isDragging: isFacetDragging,
@@ -225,16 +230,36 @@ const ArgusLogsPage: React.FC = () => {
     setGotoTime('');
   };
 
-  const openEditTable = () => setEditTableOpen(true);
-  const saveEditTable = (
-    newCols: string[],
-    newNames: Record<string, string>
-  ) => {
-    setColumns(newCols);
-    setColumnsLocal(newCols);
-    setColumnNamesLocal(newNames);
-    setEditTableOpen(false);
-  };
+  const openEditTable = useCallback(() => setEditTableOpen(true), []);
+  const saveEditTable = useCallback(
+    (newCols: string[], newNames: Record<string, string>) => {
+      setColumns(newCols);
+      setColumnsLocal(newCols);
+      setColumnNamesLocal(newNames);
+      setEditTableOpen(false);
+    },
+    [setColumns]
+  );
+
+  // Stable callback refs for memoized children
+  const handleTabChange = useCallback(
+    (key: string) => {
+      setUrlState({ tab: key });
+      if (key === '1') fetchAggregates();
+      if (key === '2') fetchPatterns();
+    },
+    [setUrlState, fetchAggregates, fetchPatterns]
+  );
+  const handleWrapLinesToggle = useCallback(() => setWrapLines((w) => !w), []);
+  const handleFullscreenToggle = useCallback(
+    () => setLogsFullscreen((f) => !f),
+    []
+  );
+  const handleShowGotoTime = useCallback(() => setShowGotoTime(true), []);
+  const handleGotoTimeCancel = useCallback(() => {
+    setShowGotoTime(false);
+    setGotoTime('');
+  }, []);
 
   return (
     <Box
@@ -381,11 +406,9 @@ const ArgusLogsPage: React.FC = () => {
           <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
-            onFilter={(key, val, exclude) =>
-              toggleActiveFilter(key, val, exclude)
-            }
+            onFilter={toggleActiveFilter}
             collapsed={facetSidebarCollapsed}
-            onToggleCollapse={() => setFacetSidebarCollapsed((c) => !c)}
+            onToggleCollapse={handleToggleFacetCollapse}
             loading={loading}
             customFacets={customFacetData}
             discoveredFacets={discoveredFacets}
@@ -445,7 +468,6 @@ const ArgusLogsPage: React.FC = () => {
               isDark={isDark}
               period={currentPeriod}
               onZoom={handleZoom}
-              isDragging={isPanelDragging || isFacetDragging}
             />
           </Box>
 
@@ -473,29 +495,22 @@ const ArgusLogsPage: React.FC = () => {
             <Box sx={{ flexShrink: 0 }}>
               <LogsToolbar
                 activeTab={activeTab}
-                onTabChange={(key) => {
-                  setUrlState({ tab: key });
-                  if (key === '1' && !aggData) fetchAggregates();
-                  if (key === '2') fetchPatterns();
-                }}
+                onTabChange={handleTabChange}
                 totalLogCount={totalLogCount}
                 displayCount={logs.length}
                 isDark={isDark}
                 onOpenEditTable={openEditTable}
                 onExport={handleExport}
                 wrapLines={wrapLines}
-                onWrapLinesToggle={() => setWrapLines((w) => !w)}
+                onWrapLinesToggle={handleWrapLinesToggle}
                 logsFullscreen={logsFullscreen}
-                onFullscreenToggle={() => setLogsFullscreen((f) => !f)}
+                onFullscreenToggle={handleFullscreenToggle}
                 showGotoTime={showGotoTime}
                 gotoTime={gotoTime}
-                onShowGotoTime={() => setShowGotoTime(true)}
+                onShowGotoTime={handleShowGotoTime}
                 onGotoTimeChange={setGotoTime}
                 onGotoTimeSubmit={handleGotoTimeSubmit}
-                onGotoTimeCancel={() => {
-                  setShowGotoTime(false);
-                  setGotoTime('');
-                }}
+                onGotoTimeCancel={handleGotoTimeCancel}
                 displayDensity={displayDensity}
                 onDensityChange={setDisplayDensity}
               />

@@ -456,6 +456,10 @@ const ArgusPerformancePage: React.FC = () => {
     traceData,
   ]);
 
+  // ─── Stable callback handlers (for React.memo) ─────────────────
+  const handleSortOpen = useCallback((e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget), []);
+  const handleSortClose = useCallback(() => setSortAnchor(null), []);
+
   return (
     <Box>
       {/* Header */}
@@ -486,8 +490,8 @@ const ArgusPerformancePage: React.FC = () => {
               value={sort}
               options={sortOptions}
               anchorEl={sortAnchor}
-              onOpen={(e) => setSortAnchor(e.currentTarget)}
-              onClose={() => setSortAnchor(null)}
+              onOpen={handleSortOpen}
+              onClose={handleSortClose}
               onSelect={handleSortChange}
             />
           ) : undefined
