@@ -13,14 +13,7 @@ import {
   Cancel as CrashIcon,
   People as PeopleIcon,
   Timer as TimerIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  Warning as WarningIcon,
-  InfoOutlined as InfoIcon,
-  VisibilityOff as HideIcon,
-  Visibility as ShowIcon,
 } from '@mui/icons-material';
-import { getCrosshairPlugin } from '../../utils/chartPlugins';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -36,10 +29,9 @@ import {
   Filler,
   ArcElement,
 } from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, {
   ArgusSessionHealth,
@@ -54,6 +46,13 @@ import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
+import SessionHealthCharts from './components/SessionHealthCharts';
+import SessionHealthReleases from './components/SessionHealthReleases';
+import {
+  SESSION_STATUS_DEFS,
+  ChangeIndicator,
+  calcChange,
+} from './components/sessionHealthHelpers';
 
 ChartJS.register(
   CategoryScale,
@@ -68,27 +67,7 @@ ChartJS.register(
   Filler
 );
 
-// Session status definitions for tooltips
-const SESSION_STATUS_DEFS: Record<string, string> = {
-  healthy: 'argus.sessions.healthyDef',
-  crashed: 'argus.sessions.crashedDef',
-  errored: 'argus.sessions.erroredDef',
-  abnormal: 'argus.sessions.abnormalDef',
-};
-
 type DisplayMode = 'sessions' | 'users';
-
-// Color palette for release charts
-const RELEASE_COLORS = [
-  '#7c4dff',
-  '#448aff',
-  '#00bcd4',
-  '#26a69a',
-  '#66bb6a',
-  '#ffa726',
-  '#ef5350',
-  '#ab47bc',
-];
 
 const ArgusSessionHealthPage: React.FC = () => {
   const theme = useTheme();
@@ -160,12 +139,19 @@ const ArgusSessionHealthPage: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleFilterChange = (newFilters: ArgusFilterState) => {
-    setFilters(newFilters);
-    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      setUrlState({ period: newFilters.dateRange.preset });
-    }
-  };
+  const handleFilterChange = useCallback(
+    (newFilters: ArgusFilterState) => {
+      setFilters(newFilters);
+      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+        setUrlState({ period: newFilters.dateRange.preset });
+      }
+    },
+    [setUrlState]
+  );
+
+  const handleToggleHideHealthy = useCallback(() => {
+    setHideHealthy((prev) => !prev);
+  }, []);
 
   const s = data?.summary;
   const pp = data?.previous_period;
@@ -176,14 +162,6 @@ const ArgusSessionHealthPage: React.FC = () => {
       : crashFreeRate >= 95
         ? '#ff9800'
         : '#f44336';
-
-  const calcChange = (
-    current: number | undefined,
-    previous: number | undefined
-  ): number | null => {
-    if (current == null || previous == null || previous === 0) return null;
-    return ((current - previous) / previous) * 100;
-  };
 
   // Donut chart data
   const donutData = useMemo(
@@ -225,142 +203,7 @@ const ArgusSessionHealthPage: React.FC = () => {
     []
   );
 
-  // Status timeline (stacked area) - with hide healthy support
-  const statusTimelineData = useMemo(() => {
-    if (!data?.status_timeline) return { labels: [], datasets: [] };
-    const datasets = [];
-    if (!hideHealthy) {
-      datasets.push({
-        label: t('argus.sessions.healthy'),
-        data: data.status_timeline.map((d) => Number(d.healthy)),
-        borderColor: '#4caf50',
-        backgroundColor: alpha('#4caf50', 0.15),
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
-      });
-    }
-    datasets.push(
-      {
-        label: t('argus.sessions.errored'),
-        data: data.status_timeline.map((d) => Number(d.errored)),
-        borderColor: '#ff9800',
-        backgroundColor: alpha('#ff9800', 0.25),
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
-      },
-      {
-        label: t('argus.sessions.crashed'),
-        data: data.status_timeline.map((d) => Number(d.crashed)),
-        borderColor: '#f44336',
-        backgroundColor: alpha('#f44336', 0.25),
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
-      }
-    );
-    return {
-      labels: data.status_timeline.map((d) => formatHour(d.hour)),
-      datasets,
-    };
-  }, [data, t, hideHealthy]);
-
-  // Duration distribution bar chart
-  const durationChartData = useMemo(() => {
-    if (!data?.duration_distribution) return { labels: [], datasets: [] };
-    return {
-      labels: data.duration_distribution.map((d) => d.bucket),
-      datasets: [
-        {
-          label: t('argus.sessions.sessions'),
-          data: data.duration_distribution.map((d) => Number(d.count)),
-          backgroundColor: alpha('#7c4dff', 0.6),
-          borderColor: '#7c4dff',
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-        },
-      ],
-    };
-  }, [data, t]);
-
-  const chartOpts = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 300 },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top' as const,
-          labels: {
-            boxWidth: 8,
-            font: { size: 11 },
-            usePointStyle: true,
-            pointStyle: 'circle',
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            maxRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 10,
-            font: { size: 10 },
-          },
-        },
-        y: {
-          beginAtZero: true,
-          stacked: true,
-          border: { display: false },
-          grid: {
-            color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-          },
-          ticks: { font: { size: 10 } },
-        },
-      },
-      interaction: {
-        mode: 'nearest' as const,
-        axis: 'x' as const,
-        intersect: false,
-      },
-    }),
-    [isDark]
-  );
-
-  const barOpts = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 300 },
-      plugins: { legend: { display: false } },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: { font: { size: 9 } },
-        },
-        y: {
-          beginAtZero: true,
-          border: { display: false },
-          grid: {
-            color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-          },
-          ticks: { font: { size: 10 } },
-        },
-      },
-    }),
-    [isDark]
-  );
-
-  // Stat cards — session vs user mode
+  // Stat cards
   const statCards = useMemo(() => {
     if (displayMode === 'users') {
       return [
@@ -436,88 +279,39 @@ const ArgusSessionHealthPage: React.FC = () => {
     ];
   }, [displayMode, s, pp, t]);
 
-  const legendItems = [
-    {
-      key: 'healthy',
-      label: t('argus.sessions.healthy'),
-      value: s?.healthy,
-      color: '#4caf50',
-      defKey: SESSION_STATUS_DEFS.healthy,
-    },
-    {
-      key: 'crashed',
-      label: t('argus.sessions.crashed'),
-      value: s?.crashed,
-      color: '#f44336',
-      defKey: SESSION_STATUS_DEFS.crashed,
-    },
-    {
-      key: 'errored',
-      label: t('argus.sessions.errored'),
-      value: s?.errored,
-      color: '#ff9800',
-      defKey: SESSION_STATUS_DEFS.errored,
-    },
-    {
-      key: 'abnormal',
-      label: t('argus.sessions.abnormal'),
-      value: s?.abnormal,
-      color: '#9e9e9e',
-      defKey: SESSION_STATUS_DEFS.abnormal,
-    },
-  ];
-
-  // Phase 2: Unhealthy sessions combined chart (errored + crashed + abnormal stacked)
-  const unhealthyChartData = useMemo(() => {
-    if (!data?.status_timeline) return { labels: [], datasets: [] };
-    return {
-      labels: data.status_timeline.map((d) => formatHour(d.hour)),
-      datasets: [
-        {
-          label: t('argus.sessions.errored'),
-          data: data.status_timeline.map((d) => Number(d.errored)),
-          backgroundColor: alpha('#ff9800', 0.7),
-          borderColor: '#ff9800',
-          borderWidth: 0,
-          borderRadius: 2,
-          borderSkipped: false as const,
-        },
-        {
-          label: t('argus.sessions.crashed'),
-          data: data.status_timeline.map((d) => Number(d.crashed)),
-          backgroundColor: alpha('#f44336', 0.7),
-          borderColor: '#f44336',
-          borderWidth: 0,
-          borderRadius: 2,
-          borderSkipped: false as const,
-        },
-        {
-          label: t('argus.sessions.abnormal'),
-          data: data.status_timeline.map((d) => Number(d.abnormal)),
-          backgroundColor: alpha('#9e9e9e', 0.7),
-          borderColor: '#9e9e9e',
-          borderWidth: 0,
-          borderRadius: 2,
-          borderSkipped: false as const,
-        },
-      ],
-    };
-  }, [data, t]);
-
-  // Phase 2: Release adoption data (percentage of total sessions per release)
-  const adoptionData = useMemo(() => {
-    if (!data?.by_release?.length) return [];
-    const totalAll = data.by_release.reduce(
-      (sum, r) => sum + Number(r.total),
-      0
-    );
-    if (totalAll === 0) return [];
-    return data.by_release.map((r) => ({
-      release: r.release,
-      sessions: Number(r.total),
-      pct: (Number(r.total) / totalAll) * 100,
-    }));
-  }, [data]);
+  const legendItems = useMemo(
+    () => [
+      {
+        key: 'healthy',
+        label: t('argus.sessions.healthy'),
+        value: s?.healthy,
+        color: '#4caf50',
+        defKey: SESSION_STATUS_DEFS.healthy,
+      },
+      {
+        key: 'crashed',
+        label: t('argus.sessions.crashed'),
+        value: s?.crashed,
+        color: '#f44336',
+        defKey: SESSION_STATUS_DEFS.crashed,
+      },
+      {
+        key: 'errored',
+        label: t('argus.sessions.errored'),
+        value: s?.errored,
+        color: '#ff9800',
+        defKey: SESSION_STATUS_DEFS.errored,
+      },
+      {
+        key: 'abnormal',
+        label: t('argus.sessions.abnormal'),
+        value: s?.abnormal,
+        color: '#9e9e9e',
+        defKey: SESSION_STATUS_DEFS.abnormal,
+      },
+    ],
+    [s, t]
+  );
 
   return (
     <Box>
@@ -635,7 +429,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-            {/* Legend with status tooltips */}
+            {/* Legend */}
             <Box
               sx={{
                 display: 'grid',
@@ -789,245 +583,15 @@ const ArgusSessionHealthPage: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Session Status Timeline (Stacked Area) */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2.5,
-            mb: 2.5,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-            borderRadius: 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              mb: 1.5,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-              >
-                <Box
-                  sx={{
-                    width: 3,
-                    height: 16,
-                    borderRadius: 1,
-                    backgroundColor: '#4caf50',
-                    mr: 0.5,
-                  }}
-                />
-                {t('argus.sessions.crashFreeTrend')}
-              </Typography>
-              <Tooltip title={t('argus.sessions.crashFreeTrendDesc')} arrow>
-                <InfoIcon
-                  sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-                />
-              </Tooltip>
-            </Box>
-            <Tooltip
-              title={
-                hideHealthy
-                  ? t('argus.sessions.showHealthy')
-                  : t('argus.sessions.hideHealthy')
-              }
-              arrow
-            >
-              <Chip
-                icon={
-                  hideHealthy ? (
-                    <ShowIcon sx={{ fontSize: '14px !important' }} />
-                  ) : (
-                    <HideIcon sx={{ fontSize: '14px !important' }} />
-                  )
-                }
-                label={
-                  hideHealthy
-                    ? t('argus.sessions.showHealthy')
-                    : t('argus.sessions.hideHealthy')
-                }
-                size="small"
-                onClick={() => setHideHealthy(!hideHealthy)}
-                variant={hideHealthy ? 'filled' : 'outlined'}
-                sx={{
-                  fontSize: '0.68rem',
-                  height: 24,
-                  fontWeight: 600,
-                  ...(hideHealthy
-                    ? {
-                        backgroundColor: alpha('#ff9800', 0.15),
-                        color: '#ff9800',
-                        borderColor: 'transparent',
-                        '& .MuiChip-icon': { color: '#ff9800' },
-                      }
-                    : {
-                        borderColor: isDark
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.1)',
-                        color: 'text.secondary',
-                      }),
-                }}
-              />
-            </Tooltip>
-          </Box>
-          <Box sx={{ height: 220 }}>
-            {loading ? (
-              <ArgusChartSkeleton type="line" height={220} color="#4caf50" />
-            ) : (
-              <Line
-                data={statusTimelineData}
-                options={chartOpts}
-                plugins={[getCrosshairPlugin(isDark)]}
-              />
-            )}
-          </Box>
-        </Paper>
-
-        {/* Duration Distribution + Crash by Browser/OS */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' },
-            gap: 2,
-            mb: 2.5,
-          }}
-        >
-          {/* Duration Distribution */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.5,
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              borderRadius: 2,
-            }}
-          >
-            <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-            >
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-              >
-                <TimerIcon fontSize="small" sx={{ color: '#7c4dff' }} />
-                {t('argus.sessions.durationDistribution')}
-              </Typography>
-              <Tooltip title={t('argus.sessions.durationDistDesc')} arrow>
-                <InfoIcon
-                  sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-                />
-              </Tooltip>
-            </Box>
-            <Box sx={{ height: 170 }}>
-              {loading ? (
-                <ArgusChartSkeleton type="bar" height={170} color="#7c4dff" />
-              ) : (
-                <Bar data={durationChartData} options={barOpts} />
-              )}
-            </Box>
-          </Paper>
-
-          {/* Crash by Browser */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.5,
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              borderRadius: 2,
-            }}
-          >
-            <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-            >
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-              >
-                <WarningIcon fontSize="small" sx={{ color: '#f44336' }} />
-                {t('argus.sessions.crashRateByBrowser')}
-              </Typography>
-              <Tooltip title={t('argus.sessions.crashByBrowserDesc')} arrow>
-                <InfoIcon
-                  sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-                />
-              </Tooltip>
-            </Box>
-            <CrashDistribution
-              data={
-                data?.crash_by_browser?.map((d) => ({
-                  label: d.browser,
-                  total: Number(d.total),
-                  crashed: Number(d.crashed),
-                  rate: Number(d.crash_rate),
-                })) || []
-              }
-              isDark={isDark}
-              onClick={(browser) => {
-                const params = new URLSearchParams();
-                params.set('projectId', projectId);
-                params.set('browser', browser);
-                const ap = argusDateRangeToApiParams(filters.dateRange);
-                if (ap.start) params.set('start', ap.start);
-                if (ap.end) params.set('end', ap.end);
-                navigate(`/argus/issues?${params.toString()}`);
-              }}
-            />
-          </Paper>
-
-          {/* Crash by OS */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.5,
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              borderRadius: 2,
-            }}
-          >
-            <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-            >
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-              >
-                <WarningIcon fontSize="small" sx={{ color: '#ff9800' }} />
-                {t('argus.sessions.crashRateByOS')}
-              </Typography>
-              <Tooltip title={t('argus.sessions.crashByOSDesc')} arrow>
-                <InfoIcon
-                  sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-                />
-              </Tooltip>
-            </Box>
-            <CrashDistribution
-              data={
-                data?.crash_by_os?.map((d) => ({
-                  label: d.os,
-                  total: Number(d.total),
-                  crashed: Number(d.crashed),
-                  rate: Number(d.crash_rate),
-                })) || []
-              }
-              isDark={isDark}
-              onClick={(os) => {
-                const params = new URLSearchParams();
-                params.set('projectId', projectId);
-                params.set('os', os);
-                const ap = argusDateRangeToApiParams(filters.dateRange);
-                if (ap.start) params.set('start', ap.start);
-                if (ap.end) params.set('end', ap.end);
-                navigate(`/argus/issues?${params.toString()}`);
-              }}
-            />
-          </Paper>
-        </Box>
+        {/* Charts Section */}
+        <SessionHealthCharts
+          data={data}
+          loading={loading}
+          filters={filters}
+          projectId={projectId}
+          hideHealthy={hideHealthy}
+          onToggleHideHealthy={handleToggleHideHealthy}
+        />
 
         {/* Top Crash Issues */}
         {!topIssues.length ? (
@@ -1063,15 +627,6 @@ const ArgusSessionHealthPage: React.FC = () => {
                 <Typography variant="subtitle2" fontWeight={600}>
                   {t('argus.sessions.topCrashIssues')}
                 </Typography>
-                <Tooltip title={t('argus.sessions.topCrashIssuesDesc')} arrow>
-                  <InfoIcon
-                    sx={{
-                      fontSize: 14,
-                      color: 'text.disabled',
-                      cursor: 'help',
-                    }}
-                  />
-                </Tooltip>
               </Box>
               <Chip
                 label={t('argus.overview.viewAll')}
@@ -1109,762 +664,11 @@ const ArgusSessionHealthPage: React.FC = () => {
           </Paper>
         )}
 
-        {/* ═══ Phase 2: Unhealthy Sessions Combined View ═══ */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2.5,
-            mb: 2.5,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-            borderRadius: 2,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-            <Typography
-              variant="subtitle2"
-              fontWeight={600}
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-            >
-              <Box
-                sx={{
-                  width: 3,
-                  height: 16,
-                  borderRadius: 1,
-                  backgroundColor: '#f44336',
-                  mr: 0.5,
-                }}
-              />
-              {t('argus.sessions.unhealthyTimeline')}
-            </Typography>
-            <Tooltip title={t('argus.sessions.unhealthyTimelineDesc')} arrow>
-              <InfoIcon
-                sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-              />
-            </Tooltip>
-          </Box>
-          <Box sx={{ height: 200 }}>
-            {loading ? (
-              <ArgusChartSkeleton type="bar" height={200} color="#f44336" />
-            ) : (
-              <Bar
-                data={unhealthyChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  animation: { duration: 300 },
-                  plugins: {
-                    legend: {
-                      display: true,
-                      position: 'top' as const,
-                      labels: {
-                        boxWidth: 8,
-                        font: { size: 10 },
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                      },
-                    },
-                    tooltip: {
-                      callbacks: {
-                        footer: (items: any[]) => {
-                          const total = items.reduce(
-                            (sum: number, i: any) => sum + (i.raw as number),
-                            0
-                          );
-                          return `${t('common.total')}: ${total.toLocaleString()}`;
-                        },
-                      },
-                    },
-                  },
-                  scales: {
-                    x: {
-                      stacked: true,
-                      grid: { display: false },
-                      border: { display: false },
-                      ticks: {
-                        maxRotation: 0,
-                        autoSkip: true,
-                        maxTicksLimit: 12,
-                        font: { size: 10 },
-                      },
-                    },
-                    y: {
-                      stacked: true,
-                      beginAtZero: true,
-                      border: { display: false },
-                      grid: {
-                        color: isDark
-                          ? 'rgba(255,255,255,0.04)'
-                          : 'rgba(0,0,0,0.04)',
-                      },
-                      ticks: { font: { size: 10 } },
-                    },
-                  },
-                  interaction: { mode: 'index' as const, intersect: false },
-                }}
-                plugins={[getCrosshairPlugin(isDark)]}
-              />
-            )}
-          </Box>
-        </Paper>
-
-        {/* ═══ Phase 2: Release Adoption + Comparison (side by side) ═══ */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-            gap: 2,
-            mb: 2.5,
-          }}
-        >
-          {/* Release Adoption (Horizontal stacked bar) */}
-          {/* Release Adoption (Horizontal stacked bar) */}
-          {!data?.by_release?.length ? (
-            <EmptyPlaceholder
-              message={t('argus.sessions.noData')}
-              minHeight={100}
-            />
-          ) : (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-              }}
-            >
-              <Box
-                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                >
-                  <Box
-                    sx={{
-                      width: 3,
-                      height: 16,
-                      borderRadius: 1,
-                      background: 'linear-gradient(180deg, #7c4dff, #448aff)',
-                      mr: 0.5,
-                    }}
-                  />
-                  {t('argus.sessions.adoptionChart')}
-                </Typography>
-                <Tooltip title={t('argus.sessions.adoptionChartDesc')} arrow>
-                  <InfoIcon
-                    sx={{
-                      fontSize: 14,
-                      color: 'text.disabled',
-                      cursor: 'help',
-                    }}
-                  />
-                </Tooltip>
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {/* Stacked bar */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    height: 28,
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  }}
-                >
-                  {adoptionData.map((item, idx) => (
-                    <Tooltip
-                      key={idx}
-                      title={`${item.release}: ${item.sessions.toLocaleString()} ${t('argus.sessions.sessions')} (${item.pct.toFixed(1)}%)`}
-                      arrow
-                    >
-                      <Box
-                        sx={{
-                          width: `${item.pct}%`,
-                          minWidth: item.pct > 2 ? 16 : 4,
-                          backgroundColor:
-                            RELEASE_COLORS[idx % RELEASE_COLORS.length],
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'all 0.3s',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            filter: 'brightness(1.2)',
-                            transform: 'scaleY(1.1)',
-                          },
-                        }}
-                        onClick={() =>
-                          navigate(
-                            `/argus/releases/${projectId}/${encodeURIComponent(item.release)}`
-                          )
-                        }
-                      >
-                        {item.pct > 8 && (
-                          <Typography
-                            sx={{
-                              fontSize: '0.58rem',
-                              fontWeight: 700,
-                              color: '#fff',
-                              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                            }}
-                          >
-                            {item.pct.toFixed(0)}%
-                          </Typography>
-                        )}
-                      </Box>
-                    </Tooltip>
-                  ))}
-                </Box>
-                {/* Legend */}
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {adoptionData.map((item, idx) => (
-                    <Box
-                      key={idx}
-                      onClick={() =>
-                        navigate(
-                          `/argus/releases/${projectId}/${encodeURIComponent(item.release)}`
-                        )
-                      }
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.4,
-                        px: 0.8,
-                        py: 0.3,
-                        borderRadius: 1,
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor: isDark
-                            ? 'rgba(255,255,255,0.06)'
-                            : 'rgba(0,0,0,0.04)',
-                        },
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '2px',
-                          backgroundColor:
-                            RELEASE_COLORS[idx % RELEASE_COLORS.length],
-                          flexShrink: 0,
-                        }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{ fontSize: '0.64rem', fontWeight: 500 }}
-                        noWrap
-                      >
-                        {item.release}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontSize: '0.62rem',
-                          color: 'text.disabled',
-                          ml: 0.2,
-                        }}
-                      >
-                        {item.pct.toFixed(1)}%
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            </Paper>
-          )}
-
-          {/* Release Comparison (Grouped bar chart) */}
-          {/* Release Comparison (Grouped bar chart) */}
-          {!data?.by_release?.length ? (
-            <EmptyPlaceholder
-              message={t('argus.sessions.noData')}
-              minHeight={100}
-            />
-          ) : (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-              }}
-            >
-              <Box
-                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                >
-                  <Box
-                    sx={{
-                      width: 3,
-                      height: 16,
-                      borderRadius: 1,
-                      background: 'linear-gradient(180deg, #4caf50, #ff9800)',
-                      mr: 0.5,
-                    }}
-                  />
-                  {t('argus.sessions.releaseComparison')}
-                </Typography>
-                <Tooltip
-                  title={t('argus.sessions.releaseComparisonDesc')}
-                  arrow
-                >
-                  <InfoIcon
-                    sx={{
-                      fontSize: 14,
-                      color: 'text.disabled',
-                      cursor: 'help',
-                    }}
-                  />
-                </Tooltip>
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {/* Comparison table */}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: `100px repeat(${Math.min(data.by_release.length, 5)}, 1fr)`,
-                    gap: 0,
-                    fontSize: '0.68rem',
-                  }}
-                >
-                  {/* Header */}
-                  <Box sx={{ py: 0.5, px: 0.8 }} />
-                  {data.by_release.slice(0, 5).map((r, idx) => (
-                    <Box
-                      key={idx}
-                      sx={{ py: 0.5, px: 0.5, textAlign: 'center' }}
-                    >
-                      <Chip
-                        label={r.release}
-                        size="small"
-                        onClick={() =>
-                          navigate(
-                            `/argus/releases/${projectId}/${encodeURIComponent(r.release)}`
-                          )
-                        }
-                        sx={{
-                          fontSize: '0.58rem',
-                          height: 18,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          maxWidth: '100%',
-                          backgroundColor: alpha(
-                            RELEASE_COLORS[idx % RELEASE_COLORS.length],
-                            0.15
-                          ),
-                          color: RELEASE_COLORS[idx % RELEASE_COLORS.length],
-                          border: 'none',
-                        }}
-                      />
-                    </Box>
-                  ))}
-                  {/* Crash-free rate row */}
-                  {[
-                    {
-                      label: t('argus.sessions.crashFree'),
-                      key: 'crash_free_rate',
-                      format: (v: number) => `${Number(v).toFixed(1)}%`,
-                      colorFn: (v: number) =>
-                        Number(v) >= 99
-                          ? '#4caf50'
-                          : Number(v) >= 95
-                            ? '#ff9800'
-                            : '#f44336',
-                    },
-                    {
-                      label: t('argus.sessions.sessions'),
-                      key: 'total',
-                      format: (v: number) => Number(v).toLocaleString(),
-                      colorFn: () => 'text.primary',
-                    },
-                    {
-                      label: t('argus.sessions.users'),
-                      key: 'users',
-                      format: (v: number) => Number(v).toLocaleString(),
-                      colorFn: () => 'text.primary',
-                    },
-                    {
-                      label: t('argus.sessions.crashed'),
-                      key: 'crashed',
-                      format: (v: number) => Number(v).toLocaleString(),
-                      colorFn: (v: number) =>
-                        Number(v) > 0 ? '#f44336' : '#4caf50',
-                    },
-                  ].map((row) => (
-                    <React.Fragment key={row.key}>
-                      <Box
-                        sx={{
-                          py: 0.8,
-                          px: 0.8,
-                          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            fontSize: '0.66rem',
-                            color: 'text.secondary',
-                            fontWeight: 500,
-                          }}
-                        >
-                          {row.label}
-                        </Typography>
-                      </Box>
-                      {data.by_release.slice(0, 5).map((r, idx) => {
-                        const val = (r as any)[row.key];
-                        const maxVal = Math.max(
-                          ...data.by_release
-                            .slice(0, 5)
-                            .map((x) => Number((x as any)[row.key]))
-                        );
-                        const barPct =
-                          row.key === 'crash_free_rate'
-                            ? Number(val)
-                            : maxVal > 0
-                              ? (Number(val) / maxVal) * 100
-                              : 0;
-                        return (
-                          <Box
-                            key={idx}
-                            sx={{
-                              py: 0.8,
-                              px: 0.5,
-                              textAlign: 'center',
-                              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                              position: 'relative',
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 2,
-                                right: 2,
-                                height: `${Math.min(barPct, 100) * 0.6}%`,
-                                backgroundColor: alpha(
-                                  RELEASE_COLORS[idx % RELEASE_COLORS.length],
-                                  0.06
-                                ),
-                                borderRadius: '4px 4px 0 0',
-                                transition: 'height 0.3s',
-                              }}
-                            />
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                fontSize: '0.7rem',
-                                fontWeight: 700,
-                                position: 'relative',
-                                color: row.colorFn(val),
-                              }}
-                            >
-                              {row.format(val)}
-                            </Typography>
-                          </Box>
-                        );
-                      })}
-                    </React.Fragment>
-                  ))}
-                </Box>
-              </Box>
-            </Paper>
-          )}
-        </Box>
-
-        {/* By Release (existing) */}
-        {/* By Release (existing) */}
-        {!data?.by_release?.length ? (
-          <Box sx={{ mb: 2.5 }}>
-            <EmptyPlaceholder
-              message={t('argus.sessions.noData')}
-              minHeight={150}
-            />
-          </Box>
-        ) : (
-          <Paper
-            elevation={0}
-            sx={{
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              borderRadius: 2,
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              sx={{
-                px: 2.5,
-                py: 1.5,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight={600}>
-                {t('argus.sessions.byRelease')}
-              </Typography>
-              <Tooltip title={t('argus.sessions.byReleaseDesc')} arrow>
-                <InfoIcon
-                  sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-                />
-              </Tooltip>
-            </Box>
-            {data.by_release.map((r, idx) => {
-              const rate = Number(r.crash_free_rate);
-              const barColor =
-                rate >= 99 ? '#4caf50' : rate >= 95 ? '#ff9800' : '#f44336';
-              return (
-                <Box
-                  key={`${r.release}-${idx}`}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    px: 2.5,
-                    py: 1,
-                    borderBottom:
-                      idx < data.by_release.length - 1
-                        ? `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`
-                        : 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    '&:hover': {
-                      backgroundColor: isDark
-                        ? 'rgba(255,255,255,0.04)'
-                        : 'rgba(0,0,0,0.03)',
-                      transform: 'translateX(4px)',
-                      boxShadow: isDark
-                        ? '-2px 0 0 0 #7c4dff'
-                        : '-2px 0 0 0 #7c4dff',
-                    },
-                  }}
-                  onClick={() =>
-                    navigate(
-                      `/argus/releases/${projectId}/${encodeURIComponent(r.release)}`
-                    )
-                  }
-                >
-                  <Chip
-                    label={r.release}
-                    size="small"
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: '0.7rem',
-                      minWidth: 100,
-                      backgroundColor: alpha('#7c4dff', 0.1),
-                      color: '#7c4dff',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <Box sx={{ flex: 1 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        mb: 0.3,
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: isDark ? '#777' : '#999',
-                          fontSize: '0.68rem',
-                        }}
-                      >
-                        {Number(r.total).toLocaleString()}{' '}
-                        {t('argus.sessions.sessions')} ·{' '}
-                        {Number(r.users).toLocaleString()}{' '}
-                        {t('argus.sessions.users')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        fontWeight={700}
-                        sx={{ color: barColor, fontSize: '0.72rem' }}
-                      >
-                        {rate.toFixed(1)}%
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        height: 5,
-                        borderRadius: 3,
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.04)'
-                          : 'rgba(0,0,0,0.04)',
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          height: '100%',
-                          borderRadius: 3,
-                          width: `${rate}%`,
-                          background: `linear-gradient(90deg, ${barColor}, ${alpha(barColor, 0.6)})`,
-                          transition: 'width 0.5s',
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                  <Chip
-                    label={`${Number(r.crashed)} ${t('argus.sessions.crashes')}`}
-                    size="small"
-                    sx={{
-                      height: 20,
-                      fontSize: '0.62rem',
-                      cursor: 'pointer',
-                      backgroundColor:
-                        Number(r.crashed) > 0
-                          ? alpha('#f44336', 0.1)
-                          : alpha('#4caf50', 0.1),
-                      color: Number(r.crashed) > 0 ? '#f44336' : '#4caf50',
-                      border: 'none',
-                    }}
-                  />
-                </Box>
-              );
-            })}
-          </Paper>
-        )}
+        {/* Releases Section */}
+        <SessionHealthReleases data={data} projectId={projectId} />
       </PageContentLoader>
     </Box>
   );
 };
-
-// --- Sub-components ---
-
-const ChangeIndicator: React.FC<{ value: number; invert?: boolean }> = ({
-  value,
-  invert,
-}) => {
-  const isUp = value > 0;
-  const isGood = invert ? !isUp : isUp;
-  const color = isGood ? '#4caf50' : '#f44336';
-  return (
-    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.2 }}>
-      {isUp ? (
-        <TrendingUpIcon sx={{ fontSize: 13, color }} />
-      ) : (
-        <TrendingDownIcon sx={{ fontSize: 13, color }} />
-      )}
-      <Typography
-        variant="caption"
-        sx={{ fontSize: '0.6rem', fontWeight: 700, color }}
-      >
-        {Math.abs(value).toFixed(0)}%
-      </Typography>
-    </Box>
-  );
-};
-
-const CrashDistribution: React.FC<{
-  data: { label: string; total: number; crashed: number; rate: number }[];
-  isDark: boolean;
-  onClick?: (label: string) => void;
-}> = ({ data, isDark, onClick }) => {
-  const { t } = useTranslation();
-  if (data.length === 0)
-    return (
-      <EmptyPlaceholder message={t('argus.sessions.noData')} minHeight={100} />
-    );
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.7 }}>
-      {data.slice(0, 5).map((item, idx) => (
-        <Box
-          key={`${item.label}-${idx}`}
-          onClick={() => onClick?.(item.label)}
-          sx={{
-            p: 0.8,
-            px: 1,
-            borderRadius: 1.5,
-            cursor: onClick ? 'pointer' : 'default',
-            transition: 'all 0.15s',
-            '&:hover': onClick
-              ? {
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.06)'
-                    : 'rgba(0,0,0,0.04)',
-                  transform: 'scale(1.02) translateX(2px)',
-                }
-              : {},
-          }}
-        >
-          <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.2 }}
-          >
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '0.72rem', fontWeight: 500 }}
-            >
-              {item.label}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
-              <Typography
-                variant="caption"
-                sx={{ fontSize: '0.65rem', color: isDark ? '#777' : '#999' }}
-              >
-                {item.crashed}/{item.total}
-              </Typography>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                sx={{
-                  fontSize: '0.7rem',
-                  color:
-                    item.rate > 5
-                      ? '#f44336'
-                      : item.rate > 1
-                        ? '#ff9800'
-                        : '#4caf50',
-                }}
-              >
-                {item.rate.toFixed(1)}%
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: isDark
-                ? 'rgba(255,255,255,0.04)'
-                : 'rgba(0,0,0,0.04)',
-            }}
-          >
-            <Box
-              sx={{
-                height: '100%',
-                borderRadius: 2,
-                width: `${Math.min(item.rate * 5, 100)}%`,
-                backgroundColor:
-                  item.rate > 5
-                    ? alpha('#f44336', 0.7)
-                    : item.rate > 1
-                      ? alpha('#ff9800', 0.6)
-                      : alpha('#4caf50', 0.5),
-                transition: 'width 0.4s',
-              }}
-            />
-          </Box>
-        </Box>
-      ))}
-    </Box>
-  );
-};
-
-function formatHour(h: string): string {
-  try {
-    const d = new Date(h);
-    return `${String(d.getHours()).padStart(2, '0')}:00`;
-  } catch {
-    return h;
-  }
-}
 
 export default ArgusSessionHealthPage;

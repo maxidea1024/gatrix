@@ -1,68 +1,21 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
-  Paper,
-  Chip,
-  IconButton,
   useTheme,
   alpha,
-  Avatar,
-  TextField,
-  InputAdornment,
   Button,
   Tooltip,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogActions,
-  Tabs,
   Tab,
-  Divider,
-  Collapse,
-  Select,
-  FormControl,
-  InputLabel,
 } from '@mui/material';
 import {
   Feedback as FeedbackIcon,
-  Schedule as ScheduleIcon,
-  Link as LinkIcon,
-  Search as SearchIcon,
   People as PeopleIcon,
   ContactMail as ContactIcon,
   TextFields as TextIcon,
-  TrendingUp as TrendingUpIcon,
-  CheckCircleOutline as ResolveIcon,
-  ReportProblem as SpamIcon,
-  Undo as UnresolveIcon,
-  BugReport as BugReportIcon,
-  Image as ImageIcon,
-  Close as CloseIcon,
-  PersonAdd as AssignIcon,
-  OpenInNew as OpenIcon,
-  Person as PersonIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  Add as AddIcon,
-  Mail as MailIcon,
-  Language as UrlIcon,
-  Dns as EnvIcon,
-  NewReleases as ReleaseIcon,
-  LocalOffer as TagIcon,
-  Source as SourceIcon,
   FilterList as FilterListIcon,
-  Delete as DeleteIcon,
-  PlayArrow as RunIcon,
-  ArrowBack as ArrowBackIcon,
-  Computer as BrowserIcon,
-  PhoneAndroid as DeviceIcon,
-  Public as OsIcon,
-  AccountCircle as UserIdIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
@@ -78,14 +31,11 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
 import argusService, {
-  ArgusFeedbackItem,
   ArgusFeedbackResponse,
-  ArgusIssueTracker,
   ArgusIssue,
 } from '@/services/argusService';
 import { rbacService } from '@/services/rbacService';
@@ -94,24 +44,35 @@ import ArgusFilterBar, {
   defaultArgusFilterState,
 } from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
-import { formatRelativeTime } from '@/utils/dateFormat';
-import { formatCompactNumber, formatWithCommas } from '@/utils/numberFormat';
+import { formatCompactNumber } from '@/utils/numberFormat';
 
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import SimplePagination from '@/components/common/SimplePagination';
 import PageHeader from '@/components/common/PageHeader';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import { CopyButton } from '@/components/common/CopyButton';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
-import { stringToColor, getInitials } from '@/utils/argusHelpers';
-import HighlightText from '@/components/common/HighlightText';
 import FeedbackListItem from './components/FeedbackListItem';
-import FeedbackActivityTimeline from './components/FeedbackActivityTimeline';
 import FeedbackStatsBar from './components/FeedbackStatsBar';
+import FeedbackDetailPanel from './components/FeedbackDetailPanel';
+import FeedbackBulkToolbar from './components/FeedbackBulkToolbar';
+import {
+  SpamFilterDialog,
+  CreateIssueDialog,
+  LinkIssueDialog,
+} from './components/FeedbackDialogs';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
 import { QueryDSLEditor, FEEDBACK_CONFIG } from '@/components/argus/query-dsl';
+import {
+  PageContainer,
+  TotalCountChip,
+  FeedbackTabs,
+  SplitContainer,
+  ListPanel,
+  SplitterHandle,
+  PaginationWrapper,
+} from './ArgusFeedbackPage.styles';
 
 ChartJS.register(
   CategoryScale,
@@ -133,14 +94,6 @@ const VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 const DEFAULT_SPLIT_WIDTH = 380;
 const MIN_SPLIT_WIDTH = 280;
 const MAX_SPLIT_WIDTH = 1000;
-
-// ─── Helpers ───
-
-const statusColor = (s: string) => {
-  if (s === 'resolved') return '#4caf50';
-  if (s === 'spam') return '#9e9e9e';
-  return '#ff9800';
-};
 
 type FeedbackStatusTab = 'unresolved' | 'resolved' | 'spam' | '';
 
@@ -167,7 +120,7 @@ const ArgusFeedbackPage: React.FC = () => {
       status: { key: 'status', default: 'unresolved' },
       page: { key: 'page', default: '1' },
       sort: { key: 'sort', default: 'newest' },
-      fb: { key: 'fb', default: '' }, // selected feedback ID
+      fb: { key: 'fb', default: '' },
     }),
     []
   );
@@ -198,12 +151,10 @@ const ArgusFeedbackPage: React.FC = () => {
     }));
   }, [urlState.period]);
 
-  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
-  // Uses the generic attribute-facet API (same pattern as logs)
+  // Lazy-loading callback for QueryDSLEditor
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
-        // Map DSL field keys → ClickHouse column names
         const columnMap: Record<string, string> = {
           browser_name: 'browser',
           os_name: 'os',
@@ -230,16 +181,8 @@ const ArgusFeedbackPage: React.FC = () => {
   const statusTab = urlState.status as FeedbackStatusTab;
   const sortOrder = urlState.sort;
 
-  // ─── Selection & Menus ───
+  // ─── Selection ───
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [assigneeAnchor, setAssigneeAnchor] = useState<{
-    el: HTMLElement;
-    feedbackId: string;
-  } | null>(null);
-  const [bulkAssignAnchor, setBulkAssignAnchor] = useState<HTMLElement | null>(
-    null
-  );
-  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
 
   // ─── Stats & UI ───
@@ -248,39 +191,10 @@ const ArgusFeedbackPage: React.FC = () => {
   );
   const [members, setMembers] = useState<any[]>([]);
 
-  // ─── Create Issue Dialog ───
-  const [createIssueOpen, setCreateIssueOpen] = useState(false);
-  const [createIssueTitle, setCreateIssueTitle] = useState('');
-  const [createIssueFeedbackId, setCreateIssueFeedbackId] = useState('');
-  const [issueTrackers, setIssueTrackers] = useState<ArgusIssueTracker[]>([]);
-  const [selectedTrackerId, setSelectedTrackerId] = useState<number | ''>('');
-
-  // ─── Link Existing Issue Dialog ───
-  const [linkIssueOpen, setLinkIssueOpen] = useState(false);
-  const [linkIssueSearch, setLinkIssueSearch] = useState('');
-  const [linkIssueResults, setLinkIssueResults] = useState<ArgusIssue[]>([]);
-  const [linkIssueLoading, setLinkIssueLoading] = useState(false);
-  const [linkedIssueDetail, setLinkedIssueDetail] = useState<ArgusIssue | null>(
-    null
-  );
-
-  // ─── Spam Filter Dialog ───
+  // ─── Dialog State ───
   const [spamFilterOpen, setSpamFilterOpen] = useState(false);
-  const [spamKeywords, setSpamKeywords] = useState<
-    { id: number; keyword: string; is_regex: boolean; created_at: string }[]
-  >([]);
-  const [newKeyword, setNewKeyword] = useState('');
-  const [newKeywordRegex, setNewKeywordRegex] = useState(false);
-  const [spamScanLoading, setSpamScanLoading] = useState(false);
-
-  // ─── Resizable Splitter ───
-
-  const [splitWidth, setSplitWidth] = useState(() => {
-    const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
-    return !isNaN(saved) && saved >= MIN_SPLIT_WIDTH && saved <= MAX_SPLIT_WIDTH
-      ? saved
-      : DEFAULT_SPLIT_WIDTH;
-  });
+  const [createIssueOpen, setCreateIssueOpen] = useState(false);
+  const [linkIssueOpen, setLinkIssueOpen] = useState(false);
 
   // ─── Confirm Dialog ───
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -291,6 +205,14 @@ const ArgusFeedbackPage: React.FC = () => {
     confirmText?: string;
     confirmColor?: 'primary' | 'error' | 'warning' | 'success';
   }>({ open: false, title: '', message: '', onConfirm: () => {} });
+
+  // ─── Resizable Splitter ───
+  const [splitWidth, setSplitWidth] = useState(() => {
+    const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
+    return !isNaN(saved) && saved >= MIN_SPLIT_WIDTH && saved <= MAX_SPLIT_WIDTH
+      ? saved
+      : DEFAULT_SPLIT_WIDTH;
+  });
   const [isSplitDragging, setIsSplitDragging] = useState(false);
   const splitContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -391,202 +313,169 @@ const ArgusFeedbackPage: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = (feedbackId: string, status: string) => {
-    const isResolve = status === 'resolved';
-    setConfirmConfig({
-      open: true,
-      title: isResolve
-        ? t('argus.feedback.resolveTitle')
-        : t('argus.feedback.unresolveTitle'),
-      message: isResolve
-        ? t('argus.feedback.resolveConfirm')
-        : t('argus.feedback.unresolveConfirm'),
-      confirmText: isResolve
-        ? t('argus.feedback.resolve')
-        : t('argus.feedback.unresolve'),
-      confirmColor: isResolve ? 'success' : 'warning',
-      onConfirm: async () => {
-        setConfirmConfig((p) => ({ ...p, open: false }));
-        try {
-          await argusService.updateFeedback(projectId, feedbackId, { status });
-          enqueueSnackbar(t('argus.feedback.statusUpdated'), {
-            variant: 'success',
-          });
-          fetchData();
-        } catch {
-          enqueueSnackbar(t('common.error'), { variant: 'error' });
-        }
-      },
-    });
-  };
-
-  const handleMarkSpam = (feedbackId: string) => {
-    setConfirmConfig({
-      open: true,
-      title: t('argus.feedback.spamTitle'),
-      message: t('argus.feedback.spamConfirm'),
-      confirmText: t('argus.feedback.markSpam'),
-      confirmColor: 'error',
-      onConfirm: async () => {
-        setConfirmConfig((p) => ({ ...p, open: false }));
-        try {
-          await argusService.updateFeedback(projectId, feedbackId, {
-            is_spam: true,
-          });
-          enqueueSnackbar(t('argus.feedback.markedSpam'), {
-            variant: 'success',
-          });
-          fetchData();
-        } catch {
-          enqueueSnackbar(t('common.error'), { variant: 'error' });
-        }
-      },
-    });
-  };
-
-  const handleAssignFeedback = async (feedbackId: string, assignee: string) => {
-    try {
-      await argusService.updateFeedback(projectId, feedbackId, {
-        assigned_to: assignee,
+  const handleUpdateStatus = useCallback(
+    (feedbackId: string, status: string) => {
+      const isResolve = status === 'resolved';
+      setConfirmConfig({
+        open: true,
+        title: isResolve
+          ? t('argus.feedback.resolveTitle')
+          : t('argus.feedback.unresolveTitle'),
+        message: isResolve
+          ? t('argus.feedback.resolveConfirm')
+          : t('argus.feedback.unresolveConfirm'),
+        confirmText: isResolve
+          ? t('argus.feedback.resolve')
+          : t('argus.feedback.unresolve'),
+        confirmColor: isResolve ? 'success' : 'warning',
+        onConfirm: async () => {
+          setConfirmConfig((p) => ({ ...p, open: false }));
+          try {
+            await argusService.updateFeedback(projectId, feedbackId, {
+              status,
+            });
+            enqueueSnackbar(t('argus.feedback.statusUpdated'), {
+              variant: 'success',
+            });
+            fetchData();
+          } catch {
+            enqueueSnackbar(t('common.error'), { variant: 'error' });
+          }
+        },
       });
-      enqueueSnackbar(t('argus.feedback.assigneeUpdated'), {
-        variant: 'success',
-      });
-      fetchData();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-    setAssigneeAnchor(null);
-  };
+    },
+    [projectId, t, enqueueSnackbar, fetchData]
+  );
 
-  const handleBulkAction = (action: 'resolve' | 'unresolve' | 'spam') => {
-    if (selectedIds.size === 0) return;
-
-    let title = '';
-    let message = '';
-    let confirmText = '';
-    let confirmColor: 'primary' | 'error' | 'warning' | 'success' = 'primary';
-
-    if (action === 'resolve') {
-      title = t('argus.feedback.bulkResolveTitle');
-      message = t('argus.feedback.bulkResolveConfirm', {
-        count: selectedIds.size,
+  const handleMarkSpam = useCallback(
+    (feedbackId: string) => {
+      setConfirmConfig({
+        open: true,
+        title: t('argus.feedback.spamTitle'),
+        message: t('argus.feedback.spamConfirm'),
+        confirmText: t('argus.feedback.markSpam'),
+        confirmColor: 'error',
+        onConfirm: async () => {
+          setConfirmConfig((p) => ({ ...p, open: false }));
+          try {
+            await argusService.updateFeedback(projectId, feedbackId, {
+              is_spam: true,
+            });
+            enqueueSnackbar(t('argus.feedback.markedSpam'), {
+              variant: 'success',
+            });
+            fetchData();
+          } catch {
+            enqueueSnackbar(t('common.error'), { variant: 'error' });
+          }
+        },
       });
-      confirmText = t('argus.feedback.resolve');
-      confirmColor = 'success';
-    } else if (action === 'unresolve') {
-      title = t('argus.feedback.bulkUnresolveTitle');
-      message = t('argus.feedback.bulkUnresolveConfirm', {
-        count: selectedIds.size,
-      });
-      confirmText = t('argus.feedback.unresolve');
-      confirmColor = 'warning';
-    } else if (action === 'spam') {
-      title = t('argus.feedback.bulkSpamTitle');
-      message = t('argus.feedback.bulkSpamConfirm', {
-        count: selectedIds.size,
-      });
-      confirmText = t('argus.feedback.markSpam');
-      confirmColor = 'error';
-    }
+    },
+    [projectId, t, enqueueSnackbar, fetchData]
+  );
 
-    setConfirmConfig({
-      open: true,
-      title,
-      message,
-      confirmText,
-      confirmColor,
-      onConfirm: async () => {
-        setConfirmConfig((p) => ({ ...p, open: false }));
-        try {
-          await argusService.bulkFeedbackAction(
-            projectId,
-            Array.from(selectedIds),
-            action
-          );
-          enqueueSnackbar(
-            t('argus.feedback.bulkDone', { count: selectedIds.size }),
-            { variant: 'success' }
-          );
-          setSelectedIds(new Set());
-          fetchData();
-        } catch {
-          enqueueSnackbar(t('common.error'), { variant: 'error' });
-        }
-      },
-    });
-  };
-
-  const handleBulkAssign = async (assignee: string) => {
-    if (selectedIds.size === 0) return;
-    try {
-      await argusService.bulkFeedbackAction(
-        projectId,
-        Array.from(selectedIds),
-        'assign',
-        assignee
-      );
-      enqueueSnackbar(t('argus.feedback.bulkAssignSuccess'), {
-        variant: 'success',
-      });
-      setSelectedIds(new Set());
-      fetchData();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-    setBulkAssignAnchor(null);
-  };
-
-  const handleCreateIssue = async () => {
-    if (!createIssueTitle.trim() || !createIssueFeedbackId) return;
-    try {
-      const result = await argusService.createIssue(projectId, {
-        title: createIssueTitle,
-        level: 'info',
-        message: selectedItem?.message || '',
-        culprit: selectedItem?.url || 'user-feedback',
-        tracker_id: selectedTrackerId ? Number(selectedTrackerId) : undefined,
-      });
-      if (result.external_url) {
-        enqueueSnackbar(
-          t('argus.feedback.issueCreatedExternal', {
-            key: result.external_key || '',
-          }),
-          { variant: 'success' }
-        );
-      } else {
-        enqueueSnackbar(t('argus.feedback.issueCreated'), {
+  const handleAssignFeedback = useCallback(
+    async (feedbackId: string, assignee: string) => {
+      try {
+        await argusService.updateFeedback(projectId, feedbackId, {
+          assigned_to: assignee,
+        });
+        enqueueSnackbar(t('argus.feedback.assigneeUpdated'), {
           variant: 'success',
         });
+        fetchData();
+      } catch {
+        enqueueSnackbar(t('common.error'), { variant: 'error' });
       }
-      setCreateIssueOpen(false);
-      setCreateIssueTitle('');
-      setSelectedTrackerId('');
-      fetchData();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-  };
+    },
+    [projectId, t, enqueueSnackbar, fetchData]
+  );
 
-  // ─── Link / Unlink Issue ───
-  const handleLinkIssue = async (issueId: number) => {
-    if (!selectedItem) return;
-    try {
-      await argusService.linkFeedbackToIssue(
-        projectId,
-        selectedItem.feedback_id,
-        issueId
-      );
-      enqueueSnackbar(t('argus.feedback.issueLinked'), { variant: 'success' });
-      setLinkIssueOpen(false);
-      setLinkIssueSearch('');
-      fetchData();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-  };
+  const handleBulkAction = useCallback(
+    (action: 'resolve' | 'unresolve' | 'spam') => {
+      if (selectedIds.size === 0) return;
 
-  const handleUnlinkIssue = async () => {
+      let title = '';
+      let message = '';
+      let confirmText = '';
+      let confirmColor: 'primary' | 'error' | 'warning' | 'success' =
+        'primary';
+
+      if (action === 'resolve') {
+        title = t('argus.feedback.bulkResolveTitle');
+        message = t('argus.feedback.bulkResolveConfirm', {
+          count: selectedIds.size,
+        });
+        confirmText = t('argus.feedback.resolve');
+        confirmColor = 'success';
+      } else if (action === 'unresolve') {
+        title = t('argus.feedback.bulkUnresolveTitle');
+        message = t('argus.feedback.bulkUnresolveConfirm', {
+          count: selectedIds.size,
+        });
+        confirmText = t('argus.feedback.unresolve');
+        confirmColor = 'warning';
+      } else if (action === 'spam') {
+        title = t('argus.feedback.bulkSpamTitle');
+        message = t('argus.feedback.bulkSpamConfirm', {
+          count: selectedIds.size,
+        });
+        confirmText = t('argus.feedback.markSpam');
+        confirmColor = 'error';
+      }
+
+      setConfirmConfig({
+        open: true,
+        title,
+        message,
+        confirmText,
+        confirmColor,
+        onConfirm: async () => {
+          setConfirmConfig((p) => ({ ...p, open: false }));
+          try {
+            await argusService.bulkFeedbackAction(
+              projectId,
+              Array.from(selectedIds),
+              action
+            );
+            enqueueSnackbar(
+              t('argus.feedback.bulkDone', { count: selectedIds.size }),
+              { variant: 'success' }
+            );
+            setSelectedIds(new Set());
+            fetchData();
+          } catch {
+            enqueueSnackbar(t('common.error'), { variant: 'error' });
+          }
+        },
+      });
+    },
+    [selectedIds, projectId, t, enqueueSnackbar, fetchData]
+  );
+
+  const handleBulkAssign = useCallback(
+    async (assignee: string) => {
+      if (selectedIds.size === 0) return;
+      try {
+        await argusService.bulkFeedbackAction(
+          projectId,
+          Array.from(selectedIds),
+          'assign',
+          assignee
+        );
+        enqueueSnackbar(t('argus.feedback.bulkAssignSuccess'), {
+          variant: 'success',
+        });
+        setSelectedIds(new Set());
+        fetchData();
+      } catch {
+        enqueueSnackbar(t('common.error'), { variant: 'error' });
+      }
+    },
+    [selectedIds, projectId, t, enqueueSnackbar, fetchData]
+  );
+
+  const handleUnlinkIssue = useCallback(async () => {
     if (!selectedItem) return;
     try {
       await argusService.unlinkFeedbackFromIssue(
@@ -601,91 +490,7 @@ const ArgusFeedbackPage: React.FC = () => {
     } catch {
       enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
-  };
-
-  const linkSearchTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
-
-  const searchIssuesForLink = useCallback(
-    async (search: string) => {
-      setLinkIssueLoading(true);
-      try {
-        const result = await argusService.listIssues(projectId, {
-          search,
-          limit: 15,
-        });
-        setLinkIssueResults(result.data || []);
-      } catch {
-        setLinkIssueResults([]);
-      } finally {
-        setLinkIssueLoading(false);
-      }
-    },
-    [projectId]
-  );
-
-  const debouncedSearchIssues = useCallback(
-    (search: string) => {
-      if (linkSearchTimerRef.current) clearTimeout(linkSearchTimerRef.current);
-      linkSearchTimerRef.current = setTimeout(
-        () => searchIssuesForLink(search),
-        300
-      );
-    },
-    [searchIssuesForLink]
-  );
-
-  const fetchSpamKeywords = async () => {
-    try {
-      setSpamKeywords(await argusService.getSpamKeywords(projectId));
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const handleAddKeyword = async () => {
-    if (!newKeyword.trim()) return;
-    try {
-      await argusService.addSpamKeyword(
-        projectId,
-        newKeyword.trim(),
-        newKeywordRegex
-      );
-      setNewKeyword('');
-      setNewKeywordRegex(false);
-      fetchSpamKeywords();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-  };
-
-  const handleDeleteKeyword = async (id: number) => {
-    try {
-      await argusService.deleteSpamKeyword(projectId, id);
-      fetchSpamKeywords();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-  };
-
-  const handleRunAutoSpam = async () => {
-    setSpamScanLoading(true);
-    try {
-      const result = await argusService.runAutoSpam(projectId);
-      enqueueSnackbar(
-        result.matched > 0
-          ? t('argus.feedback.spamScanDone', { count: result.matched })
-          : t('argus.feedback.spamScanNone'),
-        { variant: result.matched > 0 ? 'success' : 'info' }
-      );
-      if (result.matched > 0) fetchData();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    } finally {
-      setSpamScanLoading(false);
-    }
-  };
+  }, [projectId, t, enqueueSnackbar, fetchData]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -727,6 +532,14 @@ const ArgusFeedbackPage: React.FC = () => {
     [toggleSelect]
   );
 
+  const handleClearSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+  const handleOpenCreateIssue = useCallback(
+    () => setCreateIssueOpen(true),
+    []
+  );
+  const handleOpenLinkIssue = useCallback(() => setLinkIssueOpen(true), []);
+
   // ─── Derived Data ───
   const items = data?.items || [];
   const total = data?.total || 0;
@@ -735,7 +548,10 @@ const ArgusFeedbackPage: React.FC = () => {
   const selectedItem =
     items.find((i) => i.feedback_id === selectedFbId) || null;
 
-  // Lazy-fetch linked issue detail when selectedItem changes
+  // Lazy-fetch linked issue detail
+  const [linkedIssueDetail, setLinkedIssueDetail] =
+    useState<ArgusIssue | null>(null);
+
   useEffect(() => {
     if (selectedItem?.issue_id) {
       argusService
@@ -840,7 +656,6 @@ const ArgusFeedbackPage: React.FC = () => {
         const end = new Date(endDay);
         end.setHours(23, 59, 59, 999);
         if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-          // Update filter to custom date range
           const ap = { start: start.toISOString(), end: end.toISOString() };
           setUrlState({ period: `${ap.start}|${ap.end}`, page: '1', fb: '' });
         }
@@ -921,13 +736,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
   // ─── RENDER ───
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: 'calc(100vh - 120px)',
-      }}
-    >
+    <PageContainer>
       {/* Header */}
       <PageHeader
         icon={<FeedbackIcon />}
@@ -940,17 +749,9 @@ const ArgusFeedbackPage: React.FC = () => {
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {!loading && total > 0 && (
-              <Chip
+              <TotalCountChip
                 label={formatCompactNumber(total)}
                 size="small"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  height: 22,
-                  backgroundColor: alpha('#7c4dff', 0.1),
-                  color: '#7c4dff',
-                  border: 'none',
-                }}
               />
             )}
             <Button
@@ -973,10 +774,7 @@ const ArgusFeedbackPage: React.FC = () => {
               <Button
                 size="small"
                 startIcon={<FilterListIcon />}
-                onClick={() => {
-                  setSpamFilterOpen(true);
-                  fetchSpamKeywords();
-                }}
+                onClick={() => setSpamFilterOpen(true)}
                 sx={{
                   textTransform: 'none',
                   fontSize: '0.72rem',
@@ -1021,7 +819,6 @@ const ArgusFeedbackPage: React.FC = () => {
                   placeholder={t('argus.feedback.searchPlaceholder')}
                 />
               </Box>
-              {/* Sort */}
               <FilterChipSelect
                 label={t('argus.issues.sort')}
                 value={sortOrder}
@@ -1055,24 +852,11 @@ const ArgusFeedbackPage: React.FC = () => {
       />
 
       {/* Status Tabs */}
-      <Tabs
+      <FeedbackTabs
         value={statusTab}
         onChange={(_, v) => {
           setUrlState({ status: v, page: '1', fb: '' });
           setSelectedIds(new Set());
-        }}
-        sx={{
-          mb: 1,
-          minHeight: 30,
-          flexShrink: 0,
-          '& .MuiTab-root': {
-            minHeight: 30,
-            py: 0.3,
-            textTransform: 'none',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-          },
-          '& .MuiTabs-indicator': { height: 2 },
         }}
       >
         <Tab
@@ -1088,100 +872,29 @@ const ArgusFeedbackPage: React.FC = () => {
           label={`${t('argus.feedback.statusSpam')} (${formatCompactNumber(spamCount)})`}
         />
         <Tab value="" label={t('argus.feedback.statusAll')} />
-      </Tabs>
+      </FeedbackTabs>
 
       {/* Bulk Action Toolbar */}
       {selectedIds.size > 0 && (
-        <Paper
-          elevation={0}
-          sx={{
-            mb: 1,
-            p: 0.8,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            border: `1px solid ${alpha('#7c4dff', 0.3)}`,
-            borderRadius: 1.5,
-            backgroundColor: alpha('#7c4dff', 0.04),
-            flexShrink: 0,
-          }}
-        >
-          <Typography
-            variant="body2"
-            fontWeight={600}
-            sx={{ fontSize: '0.76rem' }}
-          >
-            {selectedIds.size} {t('argus.issues.selected')}
-          </Typography>
-          <Button
-            size="small"
-            startIcon={<ResolveIcon />}
-            onClick={() => handleBulkAction('resolve')}
-            sx={{
-              textTransform: 'none',
-              fontSize: '0.72rem',
-              borderRadius: '6px',
-            }}
-          >
-            {t('argus.feedback.resolve')}
-          </Button>
-          <Button
-            size="small"
-            startIcon={<SpamIcon />}
-            onClick={() => handleBulkAction('spam')}
-            sx={{
-              textTransform: 'none',
-              fontSize: '0.72rem',
-              borderRadius: '6px',
-            }}
-          >
-            {t('argus.feedback.markSpam')}
-          </Button>
-          <Button
-            size="small"
-            startIcon={<AssignIcon />}
-            onClick={(e) => setBulkAssignAnchor(e.currentTarget)}
-            sx={{
-              textTransform: 'none',
-              fontSize: '0.72rem',
-              borderRadius: '6px',
-            }}
-          >
-            {t('argus.feedback.assign')}
-          </Button>
-          <Button
-            size="small"
-            onClick={() => setSelectedIds(new Set())}
-            sx={{ textTransform: 'none', fontSize: '0.72rem', ml: 'auto' }}
-          >
-            {t('common.cancel')}
-          </Button>
-        </Paper>
+        <FeedbackBulkToolbar
+          selectedCount={selectedIds.size}
+          members={members}
+          onBulkAction={handleBulkAction}
+          onBulkAssign={handleBulkAssign}
+          onClearSelection={handleClearSelection}
+        />
       )}
 
       {/* ═══════ SPLIT-PANEL INBOX ═══════ */}
-      <Box
+      <SplitContainer
         ref={splitContainerRef}
-        sx={{
-          flex: 1,
-          display: 'flex',
-          gap: 0,
-          overflow: 'hidden',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: 2,
-        }}
+        isDark={isDark}
       >
         {/* ─── LEFT: Feedback List ─── */}
-        <Box
-          sx={{
-            width: splitWidth,
-            minWidth: MIN_SPLIT_WIDTH,
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            transition: isSplitDragging ? 'none' : 'width 0.2s',
-            overflow: 'hidden',
-          }}
+        <ListPanel
+          panelWidth={splitWidth}
+          isDragging={isSplitDragging}
+          minPanelWidth={MIN_SPLIT_WIDTH}
         >
           <PageContentLoader
             loading={loading}
@@ -1216,12 +929,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
             {/* Pagination */}
             {total > 0 && (
-              <Box
-                sx={{
-                  flexShrink: 0,
-                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                }}
-              >
+              <PaginationWrapper isDark={isDark}>
                 <SimplePagination
                   count={total}
                   page={page - 1}
@@ -1236,888 +944,33 @@ const ArgusFeedbackPage: React.FC = () => {
                   rowsPerPageOptions={VALID_PAGE_SIZES}
                   size="small"
                 />
-              </Box>
+              </PaginationWrapper>
             )}
           </PageContentLoader>
-        </Box>
+        </ListPanel>
 
         {/* ─── Resizable Splitter Handle ─── */}
-        <Box
+        <SplitterHandle
+          isDragging={isSplitDragging}
           onMouseDown={handleSplitterMouseDown}
-          sx={{
-            width: '1px',
-            flexShrink: 0,
-            cursor: 'col-resize',
-            bgcolor: isSplitDragging ? 'primary.main' : 'divider',
-            position: 'relative',
-            zIndex: 10,
-            transition: 'background-color 0.15s, transform 0.15s',
-            transformOrigin: 'center',
-            ...(isSplitDragging && {
-              bgcolor: 'primary.main',
-              transform: 'scaleX(4)',
-            }),
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              left: '-5px',
-              right: '-5px',
-              cursor: 'col-resize',
-            },
-            '&:hover, &:active': {
-              bgcolor: 'primary.main',
-              transform: 'scaleX(4)',
-            },
-          }}
         />
 
         {/* ─── RIGHT: Detail Panel ─── */}
         {selectedItem ? (
-          <Box
-            sx={{
-              flex: 1,
-              overflow: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {/* Detail Header */}
-            <Box
-              sx={{
-                px: 2.5,
-                py: 1.5,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.02)'
-                  : 'rgba(0,0,0,0.015)',
-                flexShrink: 0,
-              }}
-            >
-              <Avatar
-                sx={{
-                  width: 36,
-                  height: 36,
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  backgroundColor: stringToColor(
-                    selectedItem.name || selectedItem.email || 'A'
-                  ),
-                }}
-              >
-                {getInitials(
-                  selectedItem.name || selectedItem.email?.split('@')[0] || 'A'
-                )}
-              </Avatar>
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography
-                  variant="body1"
-                  fontWeight={700}
-                  sx={{ fontSize: '0.9rem' }}
-                >
-                  {selectedItem.name ||
-                    selectedItem.email?.split('@')[0] ||
-                    t('argus.feedback.anonymous')}
-                </Typography>
-                {selectedItem.email && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: isDark ? '#888' : '#777',
-                      fontSize: '0.72rem',
-                    }}
-                  >
-                    {selectedItem.email}
-                  </Typography>
-                )}
-              </Box>
-              <Chip
-                label={t(
-                  `argus.feedback.status${(selectedItem.status || 'unresolved').charAt(0).toUpperCase() + (selectedItem.status || 'unresolved').slice(1)}`,
-                  selectedItem.status
-                )}
-                size="small"
-                sx={{
-                  height: 22,
-                  fontSize: '0.68rem',
-                  fontWeight: 700,
-                  backgroundColor: alpha(
-                    statusColor(selectedItem.status),
-                    0.12
-                  ),
-                  color: statusColor(selectedItem.status),
-                  border: 'none',
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{ color: isDark ? '#666' : '#999', fontSize: '0.68rem' }}
-              >
-                {formatRelativeTime(selectedItem.submitted_at)}
-              </Typography>
-            </Box>
-
-            {/* Detail Actions — Unified Toolbar */}
-            <Box
-              sx={{
-                px: 2,
-                py: 0.8,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                flexShrink: 0,
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.015)'
-                  : 'rgba(0,0,0,0.01)',
-              }}
-            >
-              {/* Status action group */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                }}
-              >
-                {selectedItem.status !== 'resolved' ? (
-                  <Button
-                    size="small"
-                    startIcon={
-                      <ResolveIcon sx={{ fontSize: '14px !important' }} />
-                    }
-                    onClick={() =>
-                      handleUpdateStatus(selectedItem.feedback_id, 'resolved')
-                    }
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.72rem',
-                      fontWeight: 600,
-                      px: 1.2,
-                      minHeight: 30,
-                      borderRadius: 0,
-                      color: isDark ? '#66bb6a' : '#2e7d32',
-                      '&:hover': {
-                        backgroundColor: alpha('#4caf50', isDark ? 0.15 : 0.08),
-                      },
-                    }}
-                  >
-                    {t('argus.feedback.resolve')}
-                  </Button>
-                ) : (
-                  <Button
-                    size="small"
-                    startIcon={
-                      <UnresolveIcon sx={{ fontSize: '14px !important' }} />
-                    }
-                    onClick={() =>
-                      handleUpdateStatus(selectedItem.feedback_id, 'unresolved')
-                    }
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.72rem',
-                      fontWeight: 600,
-                      px: 1.2,
-                      minHeight: 30,
-                      borderRadius: 0,
-                      color: isDark ? '#ffb74d' : '#e65100',
-                      '&:hover': {
-                        backgroundColor: alpha('#ff9800', isDark ? 0.15 : 0.08),
-                      },
-                    }}
-                  >
-                    {t('argus.feedback.unresolve')}
-                  </Button>
-                )}
-                {!selectedItem.is_spam && (
-                  <>
-                    <Divider
-                      orientation="vertical"
-                      flexItem
-                      sx={{
-                        borderColor: isDark
-                          ? 'rgba(255,255,255,0.08)'
-                          : 'rgba(0,0,0,0.08)',
-                      }}
-                    />
-                    <Button
-                      size="small"
-                      startIcon={
-                        <SpamIcon sx={{ fontSize: '14px !important' }} />
-                      }
-                      onClick={() => handleMarkSpam(selectedItem.feedback_id)}
-                      sx={{
-                        textTransform: 'none',
-                        fontSize: '0.72rem',
-                        fontWeight: 500,
-                        px: 1.2,
-                        minHeight: 30,
-                        borderRadius: 0,
-                        color: isDark
-                          ? 'rgba(255,255,255,0.5)'
-                          : 'rgba(0,0,0,0.5)',
-                        '&:hover': {
-                          backgroundColor: isDark
-                            ? 'rgba(255,255,255,0.06)'
-                            : 'rgba(0,0,0,0.04)',
-                        },
-                      }}
-                    >
-                      {t('argus.feedback.markSpam')}
-                    </Button>
-                  </>
-                )}
-                <Divider
-                  orientation="vertical"
-                  flexItem
-                  sx={{
-                    borderColor: isDark
-                      ? 'rgba(255,255,255,0.08)'
-                      : 'rgba(0,0,0,0.08)',
-                  }}
-                />
-                <Button
-                  size="small"
-                  startIcon={
-                    <AssignIcon sx={{ fontSize: '14px !important' }} />
-                  }
-                  onClick={(e) =>
-                    setAssigneeAnchor({
-                      el: e.currentTarget,
-                      feedbackId: selectedItem.feedback_id,
-                    })
-                  }
-                  sx={{
-                    textTransform: 'none',
-                    fontSize: '0.72rem',
-                    fontWeight: 500,
-                    px: 1.2,
-                    minHeight: 30,
-                    borderRadius: 0,
-                    color: isDark ? '#b388ff' : '#5e35b1',
-                    '&:hover': {
-                      backgroundColor: alpha('#7c4dff', isDark ? 0.12 : 0.06),
-                    },
-                  }}
-                >
-                  {selectedItem.assigned_to || t('argus.feedback.assign')}
-                </Button>
-              </Box>
-
-              <Box sx={{ flex: 1 }} />
-
-              {/* Issue linking group */}
-              {selectedItem.issue_id ? (
-                (() => {
-                  const issueColor =
-                    selectedItem.issue_status === 'resolved'
-                      ? '#4caf50'
-                      : selectedItem.issue_status === 'ignored'
-                        ? '#9e9e9e'
-                        : '#ff9800';
-                  const issueTextColor =
-                    selectedItem.issue_status === 'resolved'
-                      ? isDark
-                        ? '#66bb6a'
-                        : '#2e7d32'
-                      : selectedItem.issue_status === 'ignored'
-                        ? isDark
-                          ? '#bdbdbd'
-                          : '#616161'
-                        : isDark
-                          ? '#ffb74d'
-                          : '#e65100';
-                  return (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        border: `1px solid ${alpha(issueColor, isDark ? 0.3 : 0.25)}`,
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <Button
-                        size="small"
-                        startIcon={
-                          <BugReportIcon sx={{ fontSize: '14px !important' }} />
-                        }
-                        onClick={() =>
-                          navigate(
-                            `/argus/issues/${projectId}/${selectedItem.issue_id}`,
-                            { state: { from: 'feedback' } }
-                          )
-                        }
-                        sx={{
-                          textTransform: 'none',
-                          fontSize: '0.72rem',
-                          fontWeight: 600,
-                          px: 1.2,
-                          minHeight: 30,
-                          borderRadius: 0,
-                          color: issueTextColor,
-                          '&:hover': {
-                            backgroundColor: alpha(
-                              issueColor,
-                              isDark ? 0.15 : 0.08
-                            ),
-                          },
-                        }}
-                      >
-                        #{selectedItem.issue_id}{' '}
-                        {selectedItem.issue_status || ''}
-                      </Button>
-                    </Box>
-                  );
-                })()
-              ) : (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Button
-                    size="small"
-                    startIcon={
-                      <LinkIcon sx={{ fontSize: '14px !important' }} />
-                    }
-                    onClick={() => {
-                      setLinkIssueSearch('');
-                      setLinkIssueResults([]);
-                      setLinkIssueOpen(true);
-                      searchIssuesForLink('');
-                    }}
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.72rem',
-                      fontWeight: 500,
-                      px: 1.2,
-                      minHeight: 30,
-                      borderRadius: 0,
-                      color: isDark ? '#64b5f6' : '#1565c0',
-                      '&:hover': {
-                        backgroundColor: alpha('#2196f3', isDark ? 0.12 : 0.06),
-                      },
-                    }}
-                  >
-                    {t('argus.feedback.linkExistingIssue')}
-                  </Button>
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    sx={{
-                      borderColor: isDark
-                        ? 'rgba(255,255,255,0.08)'
-                        : 'rgba(0,0,0,0.08)',
-                    }}
-                  />
-                  <Button
-                    size="small"
-                    startIcon={<AddIcon sx={{ fontSize: '14px !important' }} />}
-                    onClick={async () => {
-                      setCreateIssueFeedbackId(selectedItem.feedback_id);
-                      setCreateIssueTitle(
-                        `[Feedback] ${selectedItem.message.slice(0, 80)}`
-                      );
-                      setSelectedTrackerId('');
-                      try {
-                        setIssueTrackers(
-                          await argusService.listIssueTrackers(projectId)
-                        );
-                      } catch {
-                        /* ok */
-                      }
-                      setCreateIssueOpen(true);
-                    }}
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.72rem',
-                      fontWeight: 500,
-                      px: 1.2,
-                      minHeight: 30,
-                      borderRadius: 0,
-                      color: isDark ? '#7986cb' : '#283593',
-                      '&:hover': {
-                        backgroundColor: alpha('#3f51b5', isDark ? 0.12 : 0.06),
-                      },
-                    }}
-                  >
-                    {t('argus.feedback.createIssue')}
-                  </Button>
-                </Box>
-              )}
-            </Box>
-
-            {/* Detail Body */}
-            <Box sx={{ flex: 1, overflow: 'auto', px: 2.5, py: 2 }}>
-              {/* Message */}
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  mb: 2,
-                  borderRadius: 2,
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.02)'
-                    : 'rgba(0,0,0,0.01)',
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    lineHeight: 1.8,
-                    fontSize: '0.88rem',
-                  }}
-                >
-                  {selectedItem.message}
-                </Typography>
-              </Paper>
-
-              {/* Linked Issue Card */}
-              {selectedItem.issue_id && (
-                <Paper
-                  elevation={0}
-                  sx={{
-                    mb: 2,
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      px: 1.5,
-                      py: 0.6,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      backgroundColor: isDark
-                        ? 'rgba(255,255,255,0.03)'
-                        : 'rgba(0,0,0,0.02)',
-                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                    }}
-                  >
-                    <BugReportIcon
-                      sx={{ fontSize: 14, color: 'text.secondary' }}
-                    />
-                    <Typography
-                      variant="caption"
-                      fontWeight={700}
-                      sx={{
-                        fontSize: '0.7rem',
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                      }}
-                    >
-                      {t('argus.feedback.linkedIssue', 'Linked Issue')}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ px: 2, py: 1.5 }}>
-                    {/* Issue title + status */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 1,
-                        mb: 1,
-                      }}
-                    >
-                      {(() => {
-                        const issueColor =
-                          selectedItem.issue_status === 'resolved'
-                            ? '#4caf50'
-                            : selectedItem.issue_status === 'ignored'
-                              ? '#9e9e9e'
-                              : '#ff9800';
-                        return (
-                          <Chip
-                            label={selectedItem.issue_status || 'unresolved'}
-                            size="small"
-                            sx={{
-                              height: 18,
-                              fontSize: '0.6rem',
-                              fontWeight: 700,
-                              backgroundColor: alpha(issueColor, 0.12),
-                              color: issueColor,
-                              border: 'none',
-                              flexShrink: 0,
-                            }}
-                          />
-                        );
-                      })()}
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: '0.82rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          lineHeight: 1.4,
-                          '&:hover': { textDecoration: 'underline' },
-                        }}
-                        onClick={() =>
-                          navigate(
-                            `/argus/issues/${projectId}/${selectedItem.issue_id}`,
-                            { state: { from: 'feedback' } }
-                          )
-                        }
-                      >
-                        {selectedItem.issue_title ||
-                          `Issue #${selectedItem.issue_id}`}
-                      </Typography>
-                    </Box>
-
-                    {/* Issue meta from lazy-fetched detail */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        gap: 2,
-                        mb: 1.5,
-                        flexWrap: 'wrap',
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
-                      >
-                        #{selectedItem.issue_id}
-                      </Typography>
-                      {linkedIssueDetail && (
-                        <>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
-                          >
-                            {t('argus.issues.events', 'Events')}:{' '}
-                            {formatWithCommas(linkedIssueDetail.event_count)}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
-                          >
-                            {t('argus.issues.users', 'Users')}:{' '}
-                            {formatWithCommas(linkedIssueDetail.user_count)}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-
-                    {/* Actions */}
-                    <Box sx={{ display: 'flex', gap: 0.75 }}>
-                      <Button
-                        size="small"
-                        startIcon={
-                          <OpenIcon sx={{ fontSize: '14px !important' }} />
-                        }
-                        onClick={() =>
-                          navigate(
-                            `/argus/issues/${projectId}/${selectedItem.issue_id}`,
-                            { state: { from: 'feedback' } }
-                          )
-                        }
-                        sx={{
-                          textTransform: 'none',
-                          fontSize: '0.68rem',
-                          fontWeight: 500,
-                          borderRadius: '6px',
-                          px: 1.5,
-                          minHeight: 26,
-                          backgroundColor: alpha(
-                            '#2196f3',
-                            isDark ? 0.12 : 0.08
-                          ),
-                          color: isDark ? '#64b5f6' : '#1565c0',
-                          border: `1px solid ${alpha('#2196f3', isDark ? 0.25 : 0.2)}`,
-                          '&:hover': {
-                            backgroundColor: alpha(
-                              '#2196f3',
-                              isDark ? 0.2 : 0.14
-                            ),
-                          },
-                        }}
-                      >
-                        {t('argus.feedback.viewIssue')}
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={handleUnlinkIssue}
-                        sx={{
-                          textTransform: 'none',
-                          fontSize: '0.68rem',
-                          fontWeight: 500,
-                          borderRadius: '6px',
-                          px: 1.5,
-                          minHeight: 26,
-                          backgroundColor: alpha(
-                            '#f44336',
-                            isDark ? 0.12 : 0.08
-                          ),
-                          color: isDark ? '#ef9a9a' : '#c62828',
-                          border: `1px solid ${alpha('#f44336', isDark ? 0.25 : 0.2)}`,
-                          '&:hover': {
-                            backgroundColor: alpha(
-                              '#f44336',
-                              isDark ? 0.2 : 0.14
-                            ),
-                          },
-                        }}
-                      >
-                        {t('argus.feedback.unlinkIssue')}
-                      </Button>
-                    </Box>
-                  </Box>
-                </Paper>
-              )}
-
-              {/* Attachments */}
-              {selectedItem.attachments?.length > 0 && (
-                <Box sx={{ mb: 2 }}>
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      mb: 1,
-                      fontSize: '0.72rem',
-                      color: 'text.secondary',
-                    }}
-                  >
-                    <ImageIcon sx={{ fontSize: 14 }} />{' '}
-                    {t('argus.feedback.attachments')} (
-                    {selectedItem.attachments.length})
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    {selectedItem.attachments.map((url, ai) => (
-                      <Box
-                        key={ai}
-                        onClick={() => setLightboxUrl(url)}
-                        sx={{
-                          width: 188,
-                          height: 141,
-                          borderRadius: 1.5,
-                          overflow: 'hidden',
-                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                          cursor: 'pointer',
-                          transition: 'all 0.15s',
-                          '&:hover': {
-                            borderColor: '#7c4dff',
-                            transform: 'scale(1.03)',
-                          },
-                        }}
-                      >
-                        <img
-                          src={url}
-                          alt={`attachment-${ai}`}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                          }}
-                        />
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              )}
-
-              {/* Metadata Section */}
-              <Typography
-                variant="caption"
-                fontWeight={600}
-                sx={{
-                  display: 'block',
-                  mb: 1,
-                  fontSize: '0.72rem',
-                  color: 'text.secondary',
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                }}
-              >
-                {t('argus.feedback.metadata')}
-              </Typography>
-              <Paper
-                elevation={0}
-                sx={{
-                  mb: 2,
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  backgroundColor: 'transparent',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                }}
-              >
-                {[
-                  {
-                    icon: <UrlIcon sx={{ fontSize: 14 }} />,
-                    label: 'URL',
-                    value: selectedItem.url,
-                  },
-                  {
-                    icon: <MailIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.contactEmail'),
-                    value: selectedItem.contact_email,
-                  },
-                  {
-                    icon: <EnvIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.environment'),
-                    value: selectedItem.environment,
-                  },
-                  {
-                    icon: <ReleaseIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.release'),
-                    value: selectedItem.release,
-                  },
-                  {
-                    icon: <SourceIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.source'),
-                    value: selectedItem.source,
-                  },
-                  {
-                    icon: <BrowserIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.browser'),
-                    value: selectedItem.browser
-                      ? `${selectedItem.browser}${selectedItem.browser_version ? ` ${selectedItem.browser_version}` : ''}`
-                      : '',
-                  },
-                  {
-                    icon: <OsIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.os'),
-                    value: selectedItem.os
-                      ? `${selectedItem.os}${selectedItem.os_version ? ` ${selectedItem.os_version}` : ''}`
-                      : '',
-                  },
-                  {
-                    icon: <DeviceIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.device'),
-                    value: selectedItem.device,
-                  },
-                  {
-                    icon: <UserIdIcon sx={{ fontSize: 14 }} />,
-                    label: t('argus.feedback.userId'),
-                    value: selectedItem.user_id,
-                  },
-                ]
-                  .filter((row) => row.value)
-                  .map((row, idx) => (
-                    <Box
-                      key={idx}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        px: 1.5,
-                        py: 0.8,
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                        '&:last-child': { borderBottom: 'none' },
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          color: isDark ? '#666' : '#aaa',
-                          display: 'flex',
-                        }}
-                      >
-                        {row.icon}
-                      </Box>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontWeight: 600,
-                          color: 'text.secondary',
-                          fontSize: '0.7rem',
-                          minWidth: 80,
-                        }}
-                      >
-                        {row.label}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontSize: '0.72rem',
-                          wordBreak: 'break-all',
-                          flex: 1,
-                        }}
-                      >
-                        {row.value}
-                      </Typography>
-                      <CopyButton text={row.value as string} size={14} />
-                    </Box>
-                  ))}
-              </Paper>
-
-              {/* Tags */}
-              {selectedItem.tags &&
-                Object.keys(selectedItem.tags).length > 0 && (
-                  <>
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        mb: 1,
-                        fontSize: '0.72rem',
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                      }}
-                    >
-                      <TagIcon sx={{ fontSize: 14 }} />{' '}
-                      {t('argus.feedback.tags')}
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        gap: 0.5,
-                        flexWrap: 'wrap',
-                        mb: 2,
-                      }}
-                    >
-                      {Object.entries(selectedItem.tags).map(([k, v]) => (
-                        <Chip
-                          key={k}
-                          label={`${k}: ${v}`}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: '0.65rem',
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              0.08
-                            ),
-                            border: 'none',
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </>
-                )}
-
-              {/* Activity Timeline */}
-              <FeedbackActivityTimeline
-                projectId={projectId}
-                feedbackId={selectedItem.feedback_id}
-                isDark={isDark}
-              />
-            </Box>
-          </Box>
+          <FeedbackDetailPanel
+            selectedItem={selectedItem}
+            isDark={isDark}
+            projectId={projectId}
+            members={members}
+            linkedIssueDetail={linkedIssueDetail}
+            onUpdateStatus={handleUpdateStatus}
+            onMarkSpam={handleMarkSpam}
+            onAssignFeedback={handleAssignFeedback}
+            onUnlinkIssue={handleUnlinkIssue}
+            onOpenCreateIssue={handleOpenCreateIssue}
+            onOpenLinkIssue={handleOpenLinkIssue}
+          />
         ) : (
-          /* Empty Detail Placeholder */
           items.length > 0 &&
           !loading && (
             <EmptyPlaceholder
@@ -2129,559 +982,31 @@ const ArgusFeedbackPage: React.FC = () => {
             />
           )
         )}
-      </Box>
+      </SplitContainer>
 
-      {/* ═══════ DIALOGS & MENUS ═══════ */}
-
-      {/* Spam Filter Dialog */}
-      <Dialog
+      {/* ═══════ DIALOGS ═══════ */}
+      <SpamFilterDialog
         open={spamFilterOpen}
         onClose={() => setSpamFilterOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: 3 } }}
-      >
-        <DialogTitle
-          sx={{
-            fontSize: '0.9rem',
-            fontWeight: 700,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FilterListIcon sx={{ fontSize: 20, color: '#ff9800' }} />
-            {t('argus.feedback.spamFilter')}
-          </Box>
-          <IconButton size="small" onClick={() => setSpamFilterOpen(false)}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              display: 'block',
-              mb: 2,
-              fontSize: '0.75rem',
-            }}
-          >
-            {t('argus.feedback.spamFilterDesc')}
-          </Typography>
+        projectId={projectId}
+        onSpamScanComplete={fetchData}
+      />
 
-          {/* Add keyword */}
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <TextField
-              size="small"
-              fullWidth
-              placeholder={t('argus.feedback.spamKeywordPlaceholder')}
-              value={newKeyword}
-              onChange={(e) => setNewKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddKeyword()}
-              sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.82rem' } }}
-            />
-            <Tooltip title={t('argus.feedback.regexToggle')}>
-              <Chip
-                label=".*"
-                size="small"
-                onClick={() => setNewKeywordRegex(!newKeywordRegex)}
-                sx={{
-                  height: 32,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  backgroundColor: newKeywordRegex
-                    ? alpha('#ff9800', 0.15)
-                    : 'transparent',
-                  color: newKeywordRegex ? '#ff9800' : 'text.disabled',
-                  border: `1px solid ${newKeywordRegex ? '#ff9800' : 'rgba(128,128,128,0.3)'}`,
-                }}
-              />
-            </Tooltip>
-            <Button
-              variant="contained"
-              size="small"
-              onClick={handleAddKeyword}
-              disabled={!newKeyword.trim()}
-              sx={{ textTransform: 'none', minWidth: 60, fontWeight: 700 }}
-            >
-              {t('common.add')}
-            </Button>
-          </Box>
-
-          {/* Keyword list */}
-          {spamKeywords.length === 0 ? (
-            <Box sx={{ py: 3, textAlign: 'center' }}>
-              <FilterListIcon
-                sx={{ fontSize: 36, color: 'text.disabled', mb: 1 }}
-              />
-              <Typography color="text.disabled" sx={{ fontSize: '0.82rem' }}>
-                {t('argus.feedback.noSpamKeywords')}
-              </Typography>
-            </Box>
-          ) : (
-            <Box sx={{ maxHeight: 240, overflow: 'auto' }}>
-              {spamKeywords.map((kw) => (
-                <Box
-                  key={kw.id}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    px: 1.5,
-                    py: 0.8,
-                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                    '&:hover': {
-                      backgroundColor: isDark
-                        ? 'rgba(255,255,255,0.02)'
-                        : 'rgba(0,0,0,0.01)',
-                    },
-                  }}
-                >
-                  <Typography sx={{ flex: 1, fontSize: '0.82rem' }}>
-                    {kw.keyword}
-                  </Typography>
-                  {kw.is_regex && (
-                    <Chip
-                      label="regex"
-                      size="small"
-                      sx={{
-                        height: 18,
-                        fontSize: '0.58rem',
-                        fontWeight: 700,
-                        backgroundColor: alpha('#ff9800', 0.1),
-                        color: '#ff9800',
-                        border: 'none',
-                      }}
-                    />
-                  )}
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDeleteKeyword(kw.id)}
-                    sx={{
-                      color: 'text.disabled',
-                      '&:hover': { color: '#f44336' },
-                    }}
-                  >
-                    <DeleteIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Box>
-              ))}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<RunIcon />}
-            onClick={handleRunAutoSpam}
-            disabled={spamScanLoading || spamKeywords.length === 0}
-            sx={{ textTransform: 'none', fontSize: '0.78rem', fontWeight: 600 }}
-          >
-            {spamScanLoading
-              ? t('common.loading')
-              : t('argus.feedback.runSpamScan')}
-          </Button>
-          <Button
-            onClick={() => setSpamFilterOpen(false)}
-            sx={{ textTransform: 'none' }}
-          >
-            {t('common.close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Create Issue Dialog */}
-      <Dialog
+      <CreateIssueDialog
         open={createIssueOpen}
         onClose={() => setCreateIssueOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle sx={{ fontSize: '0.9rem', fontWeight: 700 }}>
-          {t('argus.feedback.createIssue')}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            size="small"
-            label={t('argus.feedback.issueTitle')}
-            value={createIssueTitle}
-            onChange={(e) => setCreateIssueTitle(e.target.value)}
-            sx={{ mt: 1 }}
-          />
+        projectId={projectId}
+        selectedItem={selectedItem}
+        onIssueCreated={fetchData}
+      />
 
-          {/* Issue Tracker Selection */}
-          <FormControl fullWidth size="small" sx={{ mt: 2 }}>
-            <InputLabel sx={{ fontSize: '0.82rem' }}>
-              {t('argus.feedback.issueTracker')}
-            </InputLabel>
-            <Select
-              value={selectedTrackerId}
-              onChange={(e) =>
-                setSelectedTrackerId(e.target.value as number | '')
-              }
-              label={t('argus.feedback.issueTracker')}
-              sx={{ fontSize: '0.82rem' }}
-            >
-              <MenuItem value="" sx={{ fontSize: '0.82rem' }}>
-                <em>{t('argus.feedback.internalOnly')}</em>
-              </MenuItem>
-              {issueTrackers
-                .filter((tr) => tr.enabled)
-                .map((tracker) => (
-                  <MenuItem
-                    key={tracker.id}
-                    value={tracker.id}
-                    sx={{ fontSize: '0.82rem' }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Chip
-                        label={tracker.provider.toUpperCase()}
-                        size="small"
-                        sx={{
-                          height: 18,
-                          fontSize: '0.6rem',
-                          fontWeight: 700,
-                          backgroundColor:
-                            tracker.provider === 'jira'
-                              ? 'rgba(0,82,204,0.1)'
-                              : tracker.provider === 'linear'
-                                ? 'rgba(94,106,210,0.1)'
-                                : 'rgba(0,0,0,0.06)',
-                          color:
-                            tracker.provider === 'jira'
-                              ? '#0052CC'
-                              : tracker.provider === 'linear'
-                                ? '#5E6AD2'
-                                : '#333',
-                          border: 'none',
-                        }}
-                      />
-                      {tracker.name}
-                    </Box>
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-
-          {selectedItem && (
-            <Paper
-              elevation={0}
-              sx={{
-                mt: 2,
-                p: 1.5,
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.03)'
-                  : 'rgba(0,0,0,0.02)',
-                borderRadius: 1.5,
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 600,
-                  color: 'text.secondary',
-                  fontSize: '0.68rem',
-                }}
-              >
-                {t('argus.feedback.feedbackMessage')}:
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  mt: 0.5,
-                  fontSize: '0.8rem',
-                  whiteSpace: 'pre-wrap',
-                  maxHeight: 120,
-                  overflow: 'auto',
-                }}
-              >
-                {selectedItem.message}
-              </Typography>
-            </Paper>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setCreateIssueOpen(false)}
-            sx={{ textTransform: 'none' }}
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleCreateIssue}
-            disabled={!createIssueTitle.trim()}
-            sx={{ textTransform: 'none' }}
-          >
-            {t('argus.feedback.createIssue')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Link Existing Issue Dialog */}
-      <Dialog
+      <LinkIssueDialog
         open={linkIssueOpen}
         onClose={() => setLinkIssueOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle sx={{ fontSize: '0.9rem', fontWeight: 700 }}>
-          {t('argus.feedback.linkExistingIssue', 'Link Existing Issue')}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder={t('argus.feedback.searchIssue', 'Search issues...')}
-            value={linkIssueSearch}
-            onChange={(e) => {
-              setLinkIssueSearch(e.target.value);
-              debouncedSearchIssues(e.target.value);
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
-                </InputAdornment>
-              ),
-            }}
-            sx={{ mt: 1, mb: 1 }}
-          />
-          <Box sx={{ height: 350, overflow: 'auto' }}>
-            {linkIssueLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-                <Typography variant="caption" color="text.disabled">
-                  {t('common.loading')}...
-                </Typography>
-              </Box>
-            ) : linkIssueResults.length === 0 ? (
-              <Box sx={{ py: 3, textAlign: 'center' }}>
-                <Typography variant="caption" color="text.disabled">
-                  {t('argus.feedback.noIssuesFound', 'No issues found')}
-                </Typography>
-              </Box>
-            ) : (
-              linkIssueResults.map((issue) => {
-                const issueColor =
-                  issue.status === 'resolved'
-                    ? '#4caf50'
-                    : issue.status === 'ignored'
-                      ? '#9e9e9e'
-                      : '#ff9800';
-                return (
-                  <Box
-                    key={issue.id}
-                    onClick={() => handleLinkIssue(issue.id)}
-                    sx={{
-                      px: 1.5,
-                      py: 1,
-                      cursor: 'pointer',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 1,
-                      '&:hover': {
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.04)'
-                          : 'rgba(0,0,0,0.03)',
-                      },
-                    }}
-                  >
-                    <Chip
-                      label={issue.status}
-                      size="small"
-                      sx={{
-                        height: 18,
-                        fontSize: '0.55rem',
-                        fontWeight: 700,
-                        backgroundColor: alpha(issueColor, 0.12),
-                        color: issueColor,
-                        border: 'none',
-                        flexShrink: 0,
-                        mt: 0.2,
-                      }}
-                    />
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: '0.78rem',
-                          fontWeight: 600,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {issue.title}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ fontSize: '0.65rem', color: 'text.disabled' }}
-                      >
-                        #{issue.id} · {t('argus.issues.events', 'Events')}:{' '}
-                        {issue.event_count} · {issue.culprit}
-                      </Typography>
-                    </Box>
-                  </Box>
-                );
-              })
-            )}
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setLinkIssueOpen(false)}
-            sx={{ textTransform: 'none' }}
-          >
-            {t('common.cancel')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Lightbox */}
-      <Dialog
-        open={Boolean(lightboxUrl)}
-        onClose={() => setLightboxUrl(null)}
-        maxWidth="lg"
-      >
-        <DialogContent sx={{ p: 0, position: 'relative' }}>
-          <IconButton
-            onClick={() => setLightboxUrl(null)}
-            sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              color: '#fff',
-              '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-          {lightboxUrl && (
-            <img
-              src={lightboxUrl}
-              alt="attachment"
-              style={{ maxWidth: '90vw', maxHeight: '80vh', display: 'block' }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Assignee Menu */}
-      <Menu
-        anchorEl={assigneeAnchor?.el}
-        open={Boolean(assigneeAnchor)}
-        onClose={() => setAssigneeAnchor(null)}
-        slotProps={{
-          paper: {
-            sx: {
-              borderRadius: 2,
-              minWidth: 160,
-              maxHeight: 300,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-            },
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() =>
-            handleAssignFeedback(assigneeAnchor?.feedbackId || '', '')
-          }
-        >
-          <ListItemIcon>
-            <PersonIcon sx={{ fontSize: 18 }} />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('argus.issues.unassigned')}
-            primaryTypographyProps={{ fontSize: '0.82rem' }}
-          />
-        </MenuItem>
-        <Divider />
-        {members.map((member) => {
-          const dn = member.name || member.email || member.userId;
-          return (
-            <MenuItem
-              key={member.userId}
-              onClick={() =>
-                handleAssignFeedback(assigneeAnchor?.feedbackId || '', dn)
-              }
-            >
-              <Avatar
-                sx={{
-                  width: 20,
-                  height: 20,
-                  mr: 1,
-                  fontSize: '0.55rem',
-                  fontWeight: 700,
-                  backgroundColor: stringToColor(dn),
-                }}
-              >
-                {getInitials(dn)}
-              </Avatar>
-              <ListItemText
-                primary={dn}
-                primaryTypographyProps={{ fontSize: '0.82rem' }}
-              />
-            </MenuItem>
-          );
-        })}
-      </Menu>
-
-      {/* Bulk Assignee Menu */}
-      <Menu
-        anchorEl={bulkAssignAnchor}
-        open={Boolean(bulkAssignAnchor)}
-        onClose={() => setBulkAssignAnchor(null)}
-        slotProps={{
-          paper: {
-            sx: {
-              borderRadius: 2,
-              minWidth: 160,
-              maxHeight: 300,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-            },
-          },
-        }}
-      >
-        <MenuItem onClick={() => handleBulkAssign('')}>
-          <ListItemIcon>
-            <PersonIcon sx={{ fontSize: 18 }} />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('argus.issues.unassigned')}
-            primaryTypographyProps={{ fontSize: '0.82rem' }}
-          />
-        </MenuItem>
-        <Divider />
-        {members.map((member) => {
-          const dn = member.name || member.email || member.userId;
-          return (
-            <MenuItem key={member.userId} onClick={() => handleBulkAssign(dn)}>
-              <Avatar
-                sx={{
-                  width: 20,
-                  height: 20,
-                  mr: 1,
-                  fontSize: '0.55rem',
-                  fontWeight: 700,
-                  backgroundColor: stringToColor(dn),
-                }}
-              >
-                {getInitials(dn)}
-              </Avatar>
-              <ListItemText
-                primary={dn}
-                primaryTypographyProps={{ fontSize: '0.82rem' }}
-              />
-            </MenuItem>
-          );
-        })}
-      </Menu>
+        projectId={projectId}
+        feedbackId={selectedItem?.feedback_id || ''}
+        onIssueLinked={fetchData}
+      />
 
       <ConfirmDialog
         open={confirmConfig.open}
@@ -2692,7 +1017,7 @@ const ArgusFeedbackPage: React.FC = () => {
         confirmText={confirmConfig.confirmText}
         confirmColor={confirmConfig.confirmColor}
       />
-    </Box>
+    </PageContainer>
   );
 };
 

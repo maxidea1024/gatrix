@@ -24,18 +24,9 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
-  Drawer,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Popover,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   Explore as DiscoverIcon,
-  Delete as DeleteIcon,
   Save as SaveIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
@@ -45,11 +36,8 @@ import {
   ArrowUpward as SortAscIcon,
   FilterList as FilterIcon,
   Block as ExcludeIcon,
-  Close as CloseIcon,
-  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -58,17 +46,10 @@ import {
   Tooltip as ChartTooltip,
 } from 'chart.js';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
-import FeatureSwitch from '@/components/common/FeatureSwitch';
-import {
-  TableSkeleton,
-  ChartSkeleton,
-} from '@/components/argus/ArgusSkeletons';
-import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import ArgusFilterBar, {
   ArgusFilterState,
   defaultArgusFilterState,
@@ -82,410 +63,19 @@ import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeries
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useLocation } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import {
+  VolumeChart,
+  GroupBySelector,
+  DisplayModeChip,
+  FALLBACK_COLUMNS,
+  Y_AXIS_OPTIONS,
+} from './components/discoverHelpers';
+import {
+  DiscoverSaveDialog,
+  DiscoverSavedPanel,
+} from './components/DiscoverDialogs';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip);
-
-/* ─── Constants ─── */
-
-const FALLBACK_COLUMNS = [
-  'event_id',
-  'timestamp',
-  'level',
-  'platform',
-  'browser',
-  'os',
-  'environment',
-  'release',
-  'transaction',
-];
-
-const DISPLAY_OPTIONS_KEYS = [
-  { value: 'total', labelKey: 'argus.discover.displayTotal' },
-  { value: 'bar', labelKey: 'argus.discover.displayBar' },
-  { value: 'top5', labelKey: 'argus.discover.displayTop5' },
-  { value: 'daily', labelKey: 'argus.discover.displayDaily' },
-];
-
-const Y_AXIS_OPTIONS = [
-  { value: 'count()', label: 'count()' },
-  { value: 'uniq(event_id)', label: 'count_unique(event_id)' },
-  { value: 'uniq(user_id)', label: 'count_unique(user_id)' },
-];
-
-/* ─── Volume Chart ─── */
-
-const VolumeChart: React.FC<{
-  data: { bucket: string; level: string; count: number }[];
-  isDark: boolean;
-  period: string;
-  onZoom?: (start: string, end: string) => void;
-}> = ({ data, isDark, onZoom }) => {
-  const { t, i18n } = useTranslation();
-  const { sortedBuckets, chartData } = useMemo(() => {
-    if (data.length === 0)
-      return { sortedBuckets: [] as string[], chartData: null };
-    const bucketMap = new Map<string, number>();
-    data.forEach((p) => {
-      const count = Number(p.count) || 0;
-      bucketMap.set(p.bucket, (bucketMap.get(p.bucket) || 0) + count);
-    });
-    const sorted = [...bucketMap.entries()].sort((a, b) =>
-      a[0].localeCompare(b[0])
-    );
-    const labels = sorted.map(([b]) => {
-      const d = new Date(b);
-      return d.toLocaleString(i18n.language || 'en', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-    });
-    const values = sorted.map(([, c]) => c);
-    return {
-      sortedBuckets: sorted.map(([b]) => b),
-      chartData: {
-        labels,
-        datasets: [
-          {
-            data: values,
-            backgroundColor: alpha('#7c4dff', 0.55),
-            hoverBackgroundColor: '#7c4dff',
-            borderRadius: 1,
-            barPercentage: 0.9,
-            categoryPercentage: 0.92,
-          },
-        ],
-      },
-    };
-  }, [data]);
-
-  const chartRef = useRef<any>(null);
-  const dragRef = useRef<{ startIdx: number; active: boolean }>({
-    startIdx: -1,
-    active: false,
-  });
-
-  const handleChartClick = useCallback(
-    (_event: any, elements: any[]) => {
-      if (!onZoom || sortedBuckets.length === 0 || elements.length === 0)
-        return;
-      const idx = elements[0].index;
-      const bucket = sortedBuckets[idx];
-      if (bucket) {
-        const start = new Date(bucket);
-        const end = new Date(start.getTime() + 3600_000); // 1hr bucket
-        onZoom(start.toISOString(), end.toISOString());
-      }
-    },
-    [onZoom, sortedBuckets]
-  );
-
-  if (!chartData)
-    return (
-      <EmptyPlaceholder
-        message={t('argus.discover.noEventData')}
-        minHeight={130}
-      />
-    );
-
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        mb: 2,
-        p: 2,
-        pt: 1.5,
-        borderRadius: 2,
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: '0.78rem',
-          fontWeight: 700,
-          mb: 1,
-          color: 'text.secondary',
-        }}
-      >
-        {t('argus.discover.volumeTitle', 'count(events)')}
-      </Typography>
-      <Box sx={{ height: 130, cursor: onZoom ? 'crosshair' : undefined }}>
-        <Bar
-          ref={chartRef}
-          data={chartData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 300 },
-            onClick: handleChartClick,
-            plugins: { legend: { display: false }, tooltip: { enabled: true } },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: {
-                  font: { size: 9 },
-                  color: isDark ? '#555' : '#bbb',
-                  maxTicksLimit: 8,
-                },
-                border: { display: false },
-              },
-              y: {
-                grid: {
-                  color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)',
-                },
-                ticks: { font: { size: 9 }, color: isDark ? '#555' : '#bbb' },
-                border: { display: false },
-                beginAtZero: true,
-              },
-            },
-          }}
-        />
-      </Box>
-    </Paper>
-  );
-};
-
-/* ─── GroupBy Chip Selector ─── */
-
-const GroupBySelector: React.FC<{
-  groupBy: string[];
-  columns: string[];
-  onToggle: (col: string) => void;
-  isDark: boolean;
-}> = ({ groupBy, columns, onToggle, isDark }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-
-  return (
-    <>
-      <Box
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 0.5,
-          height: 32,
-          px: 1.5,
-          borderRadius: '6px',
-          border: '1px solid',
-          borderColor: anchorEl ? 'primary.main' : 'divider',
-          bgcolor: anchorEl
-            ? alpha(theme.palette.primary.main, 0.04)
-            : 'transparent',
-          cursor: 'pointer',
-          transition: 'all 0.15s',
-          userSelect: 'none',
-          whiteSpace: 'nowrap',
-          '&:hover': {
-            borderColor: 'primary.main',
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
-          },
-        }}
-      >
-        <Typography
-          sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.secondary' }}
-        >
-          {t('argus.discover.groupBy', 'Group By')}:
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: '0.72rem',
-            fontWeight: 700,
-            color:
-              groupBy.length > 0 ? theme.palette.primary.main : 'text.primary',
-          }}
-        >
-          {groupBy.length > 0
-            ? groupBy.join(', ')
-            : t('argus.discover.none', 'None')}
-        </Typography>
-        <ExpandMoreIcon
-          sx={{
-            fontSize: 13,
-            color: 'text.disabled',
-            transform: anchorEl ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.2s',
-          }}
-        />
-      </Box>
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        slotProps={{
-          paper: {
-            sx: {
-              mt: 0.5,
-              borderRadius: '8px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-              minWidth: 200,
-              maxHeight: 320,
-              overflow: 'auto',
-              py: 0.5,
-            },
-          },
-        }}
-      >
-        {columns
-          .filter((c) => !c.includes('('))
-          .slice(0, 15)
-          .map((col) => (
-            <Box
-              key={col}
-              onClick={() => onToggle(col)}
-              sx={{
-                px: 1.5,
-                py: 0.6,
-                cursor: 'pointer',
-                fontSize: '0.78rem',
-                fontWeight: groupBy.includes(col) ? 700 : 400,
-                color: groupBy.includes(col)
-                  ? theme.palette.primary.main
-                  : 'text.primary',
-                backgroundColor: groupBy.includes(col)
-                  ? alpha(theme.palette.primary.main, 0.06)
-                  : 'transparent',
-                transition: 'background 0.1s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: '3px',
-                  border: `1.5px solid ${groupBy.includes(col) ? theme.palette.primary.main : isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
-                  backgroundColor: groupBy.includes(col)
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {groupBy.includes(col) && (
-                  <Typography
-                    sx={{ color: '#fff', fontSize: '0.6rem', fontWeight: 800 }}
-                  >
-                    ✓
-                  </Typography>
-                )}
-              </Box>
-              {col}
-            </Box>
-          ))}
-      </Popover>
-    </>
-  );
-};
-
-/* ─── Display Mode Chip ─── */
-
-const DisplayModeChip: React.FC<{
-  value: string;
-  onChange: (v: string) => void;
-  isDark: boolean;
-}> = ({ value, onChange, isDark }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const currentOpt = DISPLAY_OPTIONS_KEYS.find((o) => o.value === value);
-  const displayLabel = currentOpt
-    ? t(currentOpt.labelKey, currentOpt.value)
-    : value;
-
-  return (
-    <>
-      <Box
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 0.5,
-          height: 28,
-          px: 1.2,
-          borderRadius: '6px',
-          border: '1px solid',
-          borderColor: 'divider',
-          cursor: 'pointer',
-          transition: 'all 0.15s',
-          userSelect: 'none',
-          whiteSpace: 'nowrap',
-          '&:hover': { borderColor: 'primary.main' },
-        }}
-      >
-        <Typography
-          sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}
-        >
-          {t('argus.discover.display', 'Display')}:
-        </Typography>
-        <Typography
-          sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'text.primary' }}
-        >
-          {displayLabel}
-        </Typography>
-        <ExpandMoreIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
-      </Box>
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        slotProps={{
-          paper: {
-            sx: {
-              mt: 0.5,
-              borderRadius: '8px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-              minWidth: 140,
-              py: 0.5,
-            },
-          },
-        }}
-      >
-        {DISPLAY_OPTIONS_KEYS.map((opt) => (
-          <Box
-            key={opt.value}
-            onClick={() => {
-              onChange(opt.value);
-              setAnchorEl(null);
-            }}
-            sx={{
-              px: 1.5,
-              py: 0.6,
-              cursor: 'pointer',
-              fontSize: '0.78rem',
-              fontWeight: opt.value === value ? 700 : 400,
-              color: opt.value === value ? 'primary.main' : 'text.primary',
-              backgroundColor:
-                opt.value === value
-                  ? alpha(theme.palette.primary.main, 0.06)
-                  : 'transparent',
-              '&:hover': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.04),
-              },
-            }}
-          >
-            {t(opt.labelKey, opt.value)}
-          </Box>
-        ))}
-      </Popover>
-    </>
-  );
-};
-
-/* ─── Main Component ─── */
 
 const ArgusDiscoverPage: React.FC = () => {
   const theme = useTheme();
@@ -495,7 +85,6 @@ const ArgusDiscoverPage: React.FC = () => {
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
 
-  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
@@ -539,7 +128,6 @@ const ArgusDiscoverPage: React.FC = () => {
   const orderBy = urlState.orderBy;
   const orderDir: 'asc' | 'desc' = orderBy.startsWith('-') ? 'desc' : 'asc';
 
-  // Derive ArgusFilterState from URL period
   const [filters, setFilters] = useState<ArgusFilterState>(() =>
     defaultArgusFilterState(urlState.period)
   );
@@ -551,12 +139,9 @@ const ArgusDiscoverPage: React.FC = () => {
     }));
   }, [urlState.period]);
 
-  // Search conditions (raw input)
   const [conditions, setConditions] = useState<string>(urlState.q || '');
-  // Guard: don't reset conditions when the URL change was triggered by our own submit
   const lastSubmittedConditionsRef = useRef<string>(urlState.q || '');
 
-  // Sync state if URL changes externally (e.g. browser back/forward, loading saved query)
   useEffect(() => {
     const urlVal = urlState.q || '';
     if (urlVal !== lastSubmittedConditionsRef.current) {
@@ -581,13 +166,11 @@ const ArgusDiscoverPage: React.FC = () => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
 
-  // Editable Query Name
   const defaultQueryName = t('argus.discover.newQuery', 'New Discover Query');
   const [queryName, setQueryName] = useState(
     (location.state as any)?.queryName || defaultQueryName
   );
 
-  // Sync URL queryId to state
   useEffect(() => {
     if (urlState.queryId && savedQueries.length > 0) {
       const qId = parseInt(urlState.queryId, 10);
@@ -620,7 +203,6 @@ const ArgusDiscoverPage: React.FC = () => {
   }, [filters.dateRange]);
 
   // ─── API calls ───
-  // Build SQL conditions from searchTags + raw conditions
   const buildConditions = useCallback(() => {
     return urlState.q || '';
   }, [urlState.q]);
@@ -647,12 +229,10 @@ const ArgusDiscoverPage: React.FC = () => {
     try {
       const apiParams = argusFilterStateToApiParams(filters);
       const builtConditions = buildConditions();
-
       const queryFields = [...fields];
       if (yAxis && !queryFields.includes(yAxis)) {
         queryFields.push(yAxis);
       }
-
       const result = await argusService.discoverQuery(projectId, {
         fields: queryFields,
         groupBy: groupBy.length > 0 ? groupBy : undefined,
@@ -664,7 +244,7 @@ const ArgusDiscoverPage: React.FC = () => {
         end: apiParams.end,
       });
       setResults(result.data || []);
-      fetchVolume(); // fetch volume alongside query
+      fetchVolume();
     } catch (err: any) {
       setError(err?.message || t('argus.discover.queryFailed', 'Query failed'));
       setResults([]);
@@ -703,20 +283,17 @@ const ArgusDiscoverPage: React.FC = () => {
         );
       })
       .catch(() => {
-        // Backend may fail — use fallback columns so UI is still functional
         setAvailableColumns(FALLBACK_COLUMNS);
         setAvailableAggregates(['count', 'uniq', 'avg', 'sum', 'p95']);
       });
-    fetchVolume(); // Fetch initial volume on load
+    fetchVolume();
   }, [projectId, fetchVolume]);
 
-  // Auto-run query on initial load
   useEffect(() => {
     runQuery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Re-run query when yAxis changes (only after initial query)
   const yAxisRef = useRef(yAxis);
   useEffect(() => {
     if (yAxisRef.current !== yAxis) {
@@ -725,7 +302,8 @@ const ArgusDiscoverPage: React.FC = () => {
     }
   }, [yAxis, hasQueried, runQuery]);
 
-  const handleSaveQuery = async () => {
+  // ─── Handlers ───
+  const handleSaveQuery = useCallback(async () => {
     if (!saveName.trim()) return;
     try {
       const res = await argusService.createSavedQuery(projectId, {
@@ -748,94 +326,116 @@ const ArgusDiscoverPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to save query:', err);
     }
-  };
+  }, [saveName, projectId, fields, conditions, groupBy, orderBy, currentPeriod, displayMode]);
 
-  const handleRename = async (newName: string) => {
-    setQueryName(newName);
-    if (currentQueryId) {
+  const handleRename = useCallback(
+    async (newName: string) => {
+      setQueryName(newName);
+      if (currentQueryId) {
+        try {
+          await argusService.updateSavedQuery(projectId, currentQueryId, {
+            name: newName,
+          });
+          const updated = await argusService.listSavedQueries(projectId);
+          setSavedQueries(updated);
+        } catch (err) {
+          console.error('Failed to rename query:', err);
+        }
+      }
+    },
+    [currentQueryId, projectId]
+  );
+
+  const handleDeleteSavedQuery = useCallback(
+    async (id: number) => {
       try {
-        await argusService.updateSavedQuery(projectId, currentQueryId, {
-          name: newName,
-        });
-        const updated = await argusService.listSavedQueries(projectId);
-        setSavedQueries(updated);
+        await argusService.deleteSavedQuery(projectId, id);
+        setSavedQueries((prev) => prev.filter((q) => q.id !== id));
+        if (currentQueryId === id) setCurrentQueryId(null);
       } catch (err) {
-        console.error('Failed to rename query:', err);
+        console.error('Failed to delete query:', err);
       }
-    }
-  };
+    },
+    [projectId, currentQueryId]
+  );
 
-  const handleDeleteSavedQuery = async (id: number) => {
-    try {
-      await argusService.deleteSavedQuery(projectId, id);
-      setSavedQueries((prev) => prev.filter((q) => q.id !== id));
-      if (currentQueryId === id) {
-        setCurrentQueryId(null);
+  const handleLoadSavedQuery = useCallback(
+    (query: ArgusSavedQuery) => {
+      const cfg =
+        typeof query.query_config === 'string'
+          ? JSON.parse(query.query_config)
+          : query.query_config;
+      setUrlState({
+        fields: cfg.fields || ['count()'],
+        groupBy: cfg.groupBy || [],
+        orderBy: cfg.orderBy || '-count',
+      });
+      setConditions(cfg.conditions || '');
+      setQueryName(query.name);
+      setCurrentQueryId(query.id);
+      setSavedPanelOpen(false);
+    },
+    [setUrlState]
+  );
+
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      setConditions(query);
+      lastSubmittedConditionsRef.current = query;
+      setUrlState({ q: query });
+      setTimeout(runQuery, 10);
+    },
+    [setUrlState, runQuery]
+  );
+
+  const handleSelectFacet = useCallback(
+    (tag: string, value: string, exclude?: boolean) => {
+      const op = exclude ? '!=' : 'is';
+      let appendStr: string;
+      if (op === '!=') {
+        appendStr = `!${tag}:"${value}"`;
+      } else {
+        appendStr = `${tag}:"${value}"`;
       }
-    } catch (err) {
-      console.error('Failed to delete query:', err);
-    }
-  };
+      const finalStr = (conditions.trim() + ' ' + appendStr).trim();
+      handleSearchChange(finalStr);
+    },
+    [conditions, handleSearchChange]
+  );
 
-  const handleLoadSavedQuery = (query: ArgusSavedQuery) => {
-    const cfg =
-      typeof query.query_config === 'string'
-        ? JSON.parse(query.query_config)
-        : query.query_config;
-    setUrlState({
-      fields: cfg.fields || ['count()'],
-      groupBy: cfg.groupBy || [],
-      orderBy: cfg.orderBy || '-count',
-    });
-    setConditions(cfg.conditions || '');
-    setQueryName(query.name);
-    setCurrentQueryId(query.id);
-    setSavedPanelOpen(false);
-  };
+  const handleColumnSort = useCallback(
+    (colKey: string) => {
+      if (orderBy === colKey || orderBy === `-${colKey}`) {
+        const newOrderBy = orderDir === 'desc' ? colKey : `-${colKey}`;
+        setUrlState({ orderBy: newOrderBy });
+      } else {
+        setUrlState({ orderBy: `-${colKey}` });
+      }
+    },
+    [orderBy, orderDir, setUrlState]
+  );
 
-  const handleSearchChange = (query: string) => {
-    setConditions(query);
-    lastSubmittedConditionsRef.current = query;
-    setUrlState({ q: query });
-    setTimeout(runQuery, 10);
-  };
+  const toggleGroupBy = useCallback(
+    (col: string) => {
+      const next = groupBy.includes(col)
+        ? groupBy.filter((c) => c !== col)
+        : [...groupBy, col];
+      setUrlState({ groupBy: next });
+    },
+    [groupBy, setUrlState]
+  );
 
-  const handleSelectFacet = (tag: string, value: string, exclude?: boolean) => {
-    const op = exclude ? '!=' : 'is';
-    let appendStr: string;
-    if (op === '!=') {
-      appendStr = `!${tag}:"${value}"`;
-    } else {
-      appendStr = `${tag}:"${value}"`;
-    }
-    const finalStr = (conditions.trim() + ' ' + appendStr).trim();
-    handleSearchChange(finalStr);
-  };
+  const handleFilterChange = useCallback(
+    (newFilters: ArgusFilterState) => {
+      setFilters(newFilters);
+      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+        setUrlState({ period: newFilters.dateRange.preset });
+      }
+    },
+    [setUrlState]
+  );
 
-  const handleColumnSort = (colKey: string) => {
-    if (orderBy === colKey || orderBy === `-${colKey}`) {
-      const newOrderBy = orderDir === 'desc' ? colKey : `-${colKey}`;
-      setUrlState({ orderBy: newOrderBy });
-    } else {
-      setUrlState({ orderBy: `-${colKey}` });
-    }
-  };
-
-  const toggleGroupBy = (col: string) => {
-    const next = groupBy.includes(col)
-      ? groupBy.filter((c) => c !== col)
-      : [...groupBy, col];
-    setUrlState({ groupBy: next });
-  };
-
-  const handleFilterChange = (newFilters: ArgusFilterState) => {
-    setFilters(newFilters);
-    if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      setUrlState({ period: newFilters.dateRange.preset });
-    }
-  };
-
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     if (results.length === 0) return;
     const blob = new Blob([JSON.stringify(results, null, 2)], {
       type: 'application/json',
@@ -844,11 +444,10 @@ const ArgusDiscoverPage: React.FC = () => {
     a.href = URL.createObjectURL(blob);
     a.download = `discover-${new Date().toISOString()}.json`;
     a.click();
-  };
+  }, [results]);
 
-  const resultsToChartData = () => {
+  const resultsToChartData = useCallback(() => {
     if (results.length === 0) return [];
-
     let numKey = yAxis;
     if (!numKey || !(numKey in results[0])) {
       const keys = Object.keys(results[0]);
@@ -858,195 +457,17 @@ const ArgusDiscoverPage: React.FC = () => {
             typeof results[0][k] === 'number' || !isNaN(Number(results[0][k]))
         ) || '';
     }
-
     let labelKey = groupBy.length > 0 ? groupBy[0] : '';
     if (!labelKey || !(labelKey in results[0])) {
       labelKey = Object.keys(results[0]).find((k) => k !== numKey) || '';
     }
-
     if (!numKey || !labelKey) return [];
     return results
       .slice(0, 50)
       .map((r) => ({ label: String(r[labelKey]), count: Number(r[numKey]) }));
-  };
+  }, [results, yAxis, groupBy]);
 
   const currentOrderCol = orderBy.replace(/^-/, '');
-
-  const resultsTableContent = useMemo(
-    () => (
-      <PageContentLoader
-        loading={loading}
-        skeleton={<TableSkeleton rows={8} cols={fields.length || 4} />}
-      >
-        {results.length > 0 ? (
-          <Box sx={{ overflowX: 'auto' }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  {Object.keys(results[0]).map((key) => (
-                    <TableCell
-                      key={key}
-                      onClick={() => handleColumnSort(key)}
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '0.72rem',
-                        cursor: 'pointer',
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.02)'
-                          : 'rgba(0,0,0,0.01)',
-                        borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                        whiteSpace: 'nowrap',
-                        userSelect: 'none',
-                        '&:hover': { color: theme.palette.primary.main },
-                      }}
-                    >
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {key}
-                        {currentOrderCol === key &&
-                          (orderDir === 'desc' ? (
-                            <SortDescIcon
-                              sx={{
-                                fontSize: 14,
-                                color: theme.palette.primary.main,
-                              }}
-                            />
-                          ) : (
-                            <SortAscIcon
-                              sx={{
-                                fontSize: 14,
-                                color: theme.palette.primary.main,
-                              }}
-                            />
-                          ))}
-                      </Box>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {results.map((row, idx) => (
-                  <TableRow
-                    key={idx}
-                    hover
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.015)'
-                          : 'rgba(0,0,0,0.008)',
-                      },
-                    }}
-                  >
-                    {Object.entries(row).map(([colKey, val], cidx) => (
-                      <TableCell
-                        key={cidx}
-                        sx={{
-                          fontSize: '0.78rem',
-                          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                          position: 'relative',
-                          whiteSpace: 'nowrap',
-                          '&:hover .cell-actions': { opacity: 1 },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 0.5,
-                          }}
-                        >
-                          <span>
-                            {typeof val === 'number'
-                              ? val.toLocaleString()
-                              : String(val)}
-                          </span>
-                          <Box
-                            className="cell-actions"
-                            sx={{
-                              opacity: 0,
-                              transition: 'opacity 0.15s',
-                              display: 'inline-flex',
-                              gap: 0.25,
-                              ml: 0.5,
-                            }}
-                          >
-                            <Tooltip
-                              title={t(
-                                'argus.discover.facet.addToFilter',
-                                'Add to filter'
-                              )}
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  handleSelectFacet(colKey, String(val), false)
-                                }
-                                sx={{
-                                  p: 0.25,
-                                  color: theme.palette.primary.main,
-                                }}
-                              >
-                                <FilterIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                              title={t(
-                                'argus.discover.facet.exclude',
-                                'Exclude'
-                              )}
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  handleSelectFacet(colKey, String(val), true)
-                                }
-                                sx={{
-                                  p: 0.25,
-                                  color: theme.palette.error.main,
-                                }}
-                              >
-                                <ExcludeIcon sx={{ fontSize: 13 }} />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </Box>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-        ) : !loading && !error ? (
-          <Box sx={{ py: 8, textAlign: 'center' }}>
-            <DiscoverIcon
-              sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }}
-            />
-            <Typography color="text.secondary" sx={{ fontSize: '0.88rem' }}>
-              {t(
-                'argus.discover.empty',
-                'Build a query and press Search to explore your data'
-              )}
-            </Typography>
-          </Box>
-        ) : null}
-      </PageContentLoader>
-    ),
-    [
-      loading,
-      results,
-      fields,
-      theme,
-      isDark,
-      t,
-      currentOrderCol,
-      orderDir,
-      handleColumnSort,
-      handleSelectFacet,
-      error,
-    ]
-  );
 
   /* ═══ RENDER ═══ */
   return (
@@ -1173,17 +594,17 @@ const ArgusDiscoverPage: React.FC = () => {
         </Button>
       </Box>
 
-      {/* ── Tag Summary (Facet Map) ── */}
+      {/* Tag Summary (Facet Map) */}
       <DiscoverFacetMap
         facets={facets}
         onSelectFacet={handleSelectFacet}
         loading={loading}
       />
 
-      {/* ── Volume Chart ── */}
+      {/* Volume Chart */}
       <VolumeChart data={volume} isDark={isDark} period={currentPeriod} />
 
-      {/* ── Interactive Chart ── */}
+      {/* Interactive Chart */}
       {hasQueried && results.length > 0 && (
         <Paper
           elevation={0}
@@ -1255,7 +676,6 @@ const ArgusDiscoverPage: React.FC = () => {
               </Typography>
             )}
           </Box>
-
           <InteractiveTimeSeriesChart
             data={resultsToChartData()}
             type={
@@ -1267,7 +687,7 @@ const ArgusDiscoverPage: React.FC = () => {
         </Paper>
       )}
 
-      {/* ── Results Table ── */}
+      {/* Results Table */}
       {hasQueried && (
         <Paper
           elevation={0}
@@ -1362,7 +782,164 @@ const ArgusDiscoverPage: React.FC = () => {
             </Box>
           )}
 
-          {resultsTableContent}
+          <PageContentLoader
+            loading={loading}
+            skeleton={<TableSkeleton rows={8} cols={fields.length || 4} />}
+          >
+            {results.length > 0 ? (
+              <Box sx={{ overflowX: 'auto' }}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      {Object.keys(results[0]).map((key) => (
+                        <TableCell
+                          key={key}
+                          onClick={() => handleColumnSort(key)}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            cursor: 'pointer',
+                            backgroundColor: isDark
+                              ? 'rgba(255,255,255,0.02)'
+                              : 'rgba(0,0,0,0.01)',
+                            borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                            whiteSpace: 'nowrap',
+                            userSelect: 'none',
+                            '&:hover': { color: theme.palette.primary.main },
+                          }}
+                        >
+                          <Box
+                            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                          >
+                            {key}
+                            {currentOrderCol === key &&
+                              (orderDir === 'desc' ? (
+                                <SortDescIcon
+                                  sx={{
+                                    fontSize: 14,
+                                    color: theme.palette.primary.main,
+                                  }}
+                                />
+                              ) : (
+                                <SortAscIcon
+                                  sx={{
+                                    fontSize: 14,
+                                    color: theme.palette.primary.main,
+                                  }}
+                                />
+                              ))}
+                          </Box>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {results.map((row, idx) => (
+                      <TableRow
+                        key={idx}
+                        hover
+                        sx={{
+                          '&:hover': {
+                            backgroundColor: isDark
+                              ? 'rgba(255,255,255,0.015)'
+                              : 'rgba(0,0,0,0.008)',
+                          },
+                        }}
+                      >
+                        {Object.entries(row).map(([colKey, val], cidx) => (
+                          <TableCell
+                            key={cidx}
+                            sx={{
+                              fontSize: '0.78rem',
+                              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                              position: 'relative',
+                              whiteSpace: 'nowrap',
+                              '&:hover .cell-actions': { opacity: 1 },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                              }}
+                            >
+                              <span>
+                                {typeof val === 'number'
+                                  ? val.toLocaleString()
+                                  : String(val)}
+                              </span>
+                              <Box
+                                className="cell-actions"
+                                sx={{
+                                  opacity: 0,
+                                  transition: 'opacity 0.15s',
+                                  display: 'inline-flex',
+                                  gap: 0.25,
+                                  ml: 0.5,
+                                }}
+                              >
+                                <Tooltip
+                                  title={t(
+                                    'argus.discover.facet.addToFilter',
+                                    'Add to filter'
+                                  )}
+                                >
+                                  <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      handleSelectFacet(colKey, String(val), false)
+                                    }
+                                    sx={{
+                                      p: 0.25,
+                                      color: theme.palette.primary.main,
+                                    }}
+                                  >
+                                    <FilterIcon sx={{ fontSize: 13 }} />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip
+                                  title={t(
+                                    'argus.discover.facet.exclude',
+                                    'Exclude'
+                                  )}
+                                >
+                                  <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      handleSelectFacet(colKey, String(val), true)
+                                    }
+                                    sx={{
+                                      p: 0.25,
+                                      color: theme.palette.error.main,
+                                    }}
+                                  >
+                                    <ExcludeIcon sx={{ fontSize: 13 }} />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
+                            </Box>
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            ) : !loading && !error ? (
+              <Box sx={{ py: 8, textAlign: 'center' }}>
+                <DiscoverIcon
+                  sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }}
+                />
+                <Typography color="text.secondary" sx={{ fontSize: '0.88rem' }}>
+                  {t(
+                    'argus.discover.empty',
+                    'Build a query and press Search to explore your data'
+                  )}
+                </Typography>
+              </Box>
+            ) : null}
+          </PageContentLoader>
         </Paper>
       )}
 
@@ -1404,154 +981,22 @@ const ArgusDiscoverPage: React.FC = () => {
       )}
 
       {/* Save Dialog */}
-      <Dialog
+      <DiscoverSaveDialog
         open={saveDialogOpen}
         onClose={() => setSaveDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: 2.5 } }}
-      >
-        <DialogTitle
-          sx={{
-            fontWeight: 700,
-            fontSize: '0.95rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          {t('argus.discover.saveQuery', 'Save Query')}
-          <IconButton size="small" onClick={() => setSaveDialogOpen(false)}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            size="small"
-            autoFocus
-            label={t('argus.discover.queryName', 'Query Name')}
-            value={saveName}
-            onChange={(e) => setSaveName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSaveQuery();
-            }}
-            sx={{ mt: 1 }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setSaveDialogOpen(false)}
-            sx={{ textTransform: 'none' }}
-          >
-            {t('common.cancel', 'Cancel')}
-          </Button>
-          <Button
-            onClick={handleSaveQuery}
-            variant="contained"
-            disabled={!saveName.trim()}
-            sx={{ textTransform: 'none', fontWeight: 700 }}
-          >
-            {t('common.save', 'Save')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        saveName={saveName}
+        onNameChange={setSaveName}
+        onSave={handleSaveQuery}
+      />
 
       {/* Saved Queries Panel */}
-      <Drawer
-        anchor="right"
+      <DiscoverSavedPanel
         open={savedPanelOpen}
         onClose={() => setSavedPanelOpen(false)}
-        PaperProps={{ sx: { width: 340, p: 2.5 } }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 2,
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            fontWeight={700}
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <BookmarkIcon sx={{ color: theme.palette.primary.main }} />
-            {t('argus.discover.savedQueries', 'Saved Queries')}
-          </Typography>
-          <IconButton size="small" onClick={() => setSavedPanelOpen(false)}>
-            <CloseIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Box>
-        {savedQueries.length === 0 ? (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ py: 4, textAlign: 'center' }}
-          >
-            {t('argus.discover.noSavedQueries', 'No saved queries yet')}
-          </Typography>
-        ) : (
-          savedQueries.map((sq) => (
-            <Paper
-              key={sq.id}
-              elevation={0}
-              sx={{
-                p: 1.5,
-                mb: 1,
-                borderRadius: 1.5,
-                cursor: 'pointer',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                transition: 'all 0.15s',
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Box
-                  sx={{ flex: 1, minWidth: 0 }}
-                  onClick={() => handleLoadSavedQuery(sq)}
-                >
-                  <Typography variant="body2" fontWeight={600} noWrap>
-                    {sq.name}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.disabled', fontSize: '0.65rem' }}
-                  >
-                    {(() => {
-                      const cfg =
-                        typeof sq.query_config === 'string'
-                          ? JSON.parse(sq.query_config)
-                          : sq.query_config;
-                      return (cfg.fields || []).join(', ');
-                    })()}
-                  </Typography>
-                </Box>
-                <IconButton
-                  size="small"
-                  onClick={() => handleDeleteSavedQuery(sq.id)}
-                  sx={{
-                    color: 'text.disabled',
-                    '&:hover': { color: '#f44336' },
-                  }}
-                >
-                  <DeleteIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))
-        )}
-      </Drawer>
+        savedQueries={savedQueries}
+        onLoad={handleLoadSavedQuery}
+        onDelete={handleDeleteSavedQuery}
+      />
 
       {/* Column Editor Modal */}
       <ColumnEditorModal

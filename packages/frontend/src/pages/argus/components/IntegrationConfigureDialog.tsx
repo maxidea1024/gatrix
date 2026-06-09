@@ -34,6 +34,11 @@ import { useSnackbar } from 'notistack';
 import argusService from '@/services/argusService';
 import type { ArgusIntegration } from '@/services/argusService';
 import { GitLabIcon, BitbucketIcon } from './ServiceIcons';
+import {
+  ProviderAvatar,
+  RepoCard,
+  EmptyReposBox,
+} from './IntegrationConfigureDialog.styles';
 
 interface IntegrationConfigureDialogProps {
   open: boolean;
@@ -157,16 +162,9 @@ export const IntegrationConfigureDialog: React.FC<
       <DialogTitle
         sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}
       >
-        <Avatar
-          sx={{
-            width: 36,
-            height: 36,
-            backgroundColor: alpha('#667eea', isDark ? 0.2 : 0.08),
-            color: '#667eea',
-          }}
-        >
+        <ProviderAvatar isDark={isDark}>
           {info.icon}
-        </Avatar>
+        </ProviderAvatar>
         <Box sx={{ flex: 1 }}>
           <Typography
             sx={{
@@ -212,16 +210,7 @@ export const IntegrationConfigureDialog: React.FC<
                 {t('argus.settings.connectedRepos', 'Connected Repositories')}
               </Typography>
               {connectedRepos.length === 0 ? (
-                <Box
-                  sx={{
-                    p: 3,
-                    textAlign: 'center',
-                    backgroundColor: isDark
-                      ? 'rgba(255,255,255,0.02)'
-                      : 'rgba(0,0,0,0.02)',
-                    borderRadius: 2,
-                  }}
-                >
+                <EmptyReposBox isDark={isDark}>
                   <Typography
                     sx={{ fontSize: '0.85rem', color: 'text.secondary', mb: 1 }}
                   >
@@ -238,22 +227,14 @@ export const IntegrationConfigureDialog: React.FC<
                       'Find a repository from the list below and add it'
                     )}
                   </Typography>
-                </Box>
+                </EmptyReposBox>
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {connectedRepos.map((intg) => (
-                    <Paper
+                    <RepoCard
                       key={intg.id}
                       elevation={0}
-                      sx={{
-                        p: 1.5,
-                        px: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        border: `1px solid ${bdr}`,
-                        borderRadius: '10px',
-                      }}
+                      isDark={isDark}
                     >
                       <CheckCircleIcon
                         sx={{ fontSize: 18, color: '#4caf50' }}
@@ -298,7 +279,7 @@ export const IntegrationConfigureDialog: React.FC<
                           </IconButton>
                         </Tooltip>
                       </Box>
-                    </Paper>
+                    </RepoCard>
                   ))}
                 </Box>
               )}
@@ -377,18 +358,11 @@ export const IntegrationConfigureDialog: React.FC<
                         (i) => i.repo_url === url
                       );
                       return (
-                        <Paper
+                        <RepoCard
                           key={repo.id || url}
                           elevation={0}
-                          sx={{
-                            p: 1.5,
-                            px: 2,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            border: `1px solid ${bdr}`,
-                            borderRadius: '8px',
-                          }}
+                          isDark={isDark}
+                          sx={{ borderRadius: '8px' }}
                         >
                           <GitHubIcon
                             sx={{ fontSize: 18, color: 'text.secondary' }}
@@ -454,7 +428,7 @@ export const IntegrationConfigureDialog: React.FC<
                               </Button>
                             )}
                           </Box>
-                        </Paper>
+                        </RepoCard>
                       );
                     })}
                   </Box>

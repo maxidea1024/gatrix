@@ -44,37 +44,21 @@ import IssueBulkActions from './components/IssueBulkActions';
 import IssueAssigneeMenu from './components/IssueAssigneeMenu';
 import NewIssuesBanner from './components/NewIssuesBanner';
 import { useArgusIssueStore } from '@/hooks/useArgusIssueStore';
+import {
+  PAGE_SIZE_STORAGE_KEY,
+  DEFAULT_PAGE_SIZE,
+  VALID_PAGE_SIZES,
+  DEEP_LINK_KEYS,
+  type ActiveFilter,
+  getStatusOptions,
+  getLevelOptions,
+  getSortOptions,
+  EMPTY_FACET_COUNTS,
+  type FacetCounts,
+  buildFacetCounts,
+} from './components/issuesHelpers';
 
-const PAGE_SIZE_STORAGE_KEY = 'argusIssues.pageSize';
-const DEFAULT_PAGE_SIZE = 25;
-const VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
 
-const QUERY_BUILDER_FIELDS = [
-  'level',
-  'status',
-  'platform',
-  'priority',
-  'assigned_to',
-  'browser',
-  'os',
-  'device',
-  'environment',
-  'release',
-  'times_seen',
-  'user_count',
-];
-
-/** URL param keys that, when present, signal a deep-link / cross-page intent. */
-const DEEP_LINK_KEYS = [
-  'page',
-  'search',
-  'status',
-  'level',
-  'sort',
-  'view',
-  'substatus',
-  'assigned_to',
-];
 
 interface ArgusIssuesPageProps {
   projectId?: string | number;
@@ -228,12 +212,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   );
 
   // ─── Active Filters (chip tags from facet sidebar) ─────────────
-  type ActiveFilter = {
-    key: string;
-    value: string;
-    exclude: boolean;
-    enabled: boolean;
-  };
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   const toggleActiveFilter = useCallback(
@@ -611,30 +589,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
   // ─── Filter options ────────────────────────────────────────────
 
-  const statusOptions = [
-    { value: '', label: t('common.all') },
-    {
-      value: 'unresolved',
-      label: t('argus.issues.unresolved'),
-      color: '#f44336',
-    },
-    { value: 'resolved', label: t('argus.issues.resolved'), color: '#4caf50' },
-    { value: 'ignored', label: t('argus.issues.ignored'), color: '#9e9e9e' },
-  ];
-  const levelOptions = [
-    { value: '', label: t('common.all') },
-    { value: 'fatal', label: t('argus.issues.fatal'), color: '#f44336' },
-    { value: 'error', label: t('argus.issues.error'), color: '#ff5722' },
-    { value: 'warning', label: t('argus.issues.warning'), color: '#ff9800' },
-    { value: 'info', label: t('argus.issues.info'), color: '#2196f3' },
-  ];
-  const sortOptions = [
-    { value: 'last_seen', label: t('argus.issues.lastSeen') },
-    { value: 'first_seen', label: t('argus.issues.firstSeen') },
-    { value: 'event_count', label: t('argus.issues.events') },
-    { value: 'user_count', label: t('argus.issues.users') },
-    { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
-  ];
+  const statusOptions = getStatusOptions(t);
+  const levelOptions = getLevelOptions(t);
+  const sortOptions = getSortOptions(t);
 
   // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
   const fetchFieldValues = useCallback(
@@ -650,13 +607,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   );
 
   // ─── Facet data (separate fetch without activeFilters) ───
-  const [facetData, setFacetData] = useState<{
-    level: { value: string; count: number }[];
-    status: { value: string; count: number }[];
-    platform: { value: string; count: number }[];
-    assigned_to: { value: string; count: number }[];
-    priority: { value: string; count: number }[];
-  }>({ level: [], status: [], platform: [], assigned_to: [], priority: [] });
+  const [facetData, setFacetData] = useState<FacetCounts>(EMPTY_FACET_COUNTS);
 
   const fetchFacets = useCallback(async () => {
     try {
@@ -673,29 +624,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         assigned_to: assignedTo || undefined,
       };
       const result = await argusService.listIssues(projectId, params);
-      const allIssues = result.data;
-
-      const countByField = (field: keyof ArgusIssue) => {
-        const counts = new Map<string, number>();
-        allIssues.forEach((issue) => {
-          const val = issue[field];
-          if (val != null && val !== '') {
-            const key = String(val);
-            counts.set(key, (counts.get(key) || 0) + 1);
-          }
-        });
-        return Array.from(counts.entries())
-          .map(([value, count]) => ({ value, count }))
-          .sort((a, b) => b.count - a.count);
-      };
-
-      setFacetData({
-        level: countByField('level'),
-        status: countByField('status'),
-        platform: countByField('platform'),
-        assigned_to: countByField('assigned_to'),
-        priority: countByField('priority'),
-      });
+      setFacetData(buildFacetCounts(result.data));
     } catch {
       /* ignore */
     }

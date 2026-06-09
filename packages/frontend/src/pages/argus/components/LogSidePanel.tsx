@@ -32,6 +32,12 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { LogSidePanelProps } from './LogSidePanel/types';
 import { JsonTab } from './LogSidePanel/JsonTab';
 import { EventTab, SEVERITY_COLORS } from './LogSidePanel/EventTab';
+import {
+  PanelHeader,
+  LevelChip,
+  MetadataBar,
+  TraceHeaderBar,
+} from './LogSidePanel.styles';
 
 const LogSidePanel: React.FC<LogSidePanelProps> = ({
   log,
@@ -151,29 +157,11 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         flexDirection: 'column',
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          px: 2,
-          py: 1,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-          backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.02)',
-          flexShrink: 0,
-        }}
-      >
-        <Chip
+      <PanelHeader isDark={isDark}>
+        <LevelChip
           label={log.level?.toUpperCase() || 'UNKNOWN'}
           size="small"
-          sx={{
-            height: 22,
-            fontSize: '0.65rem',
-            fontWeight: 800,
-            backgroundColor: alpha(levelColor, 0.15),
-            color: levelColor,
-            border: `1px solid ${alpha(levelColor, 0.3)}`,
-          }}
+          levelColor={levelColor}
         />
         <Typography
           sx={{
@@ -234,20 +222,9 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
             <CloseIcon sx={{ fontSize: 16 }} />
           </IconButton>
         </SafeTooltip>
-      </Box>
+      </PanelHeader>
 
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          flexWrap: 'wrap',
-          px: 2,
-          py: 0.8,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-          backgroundColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.01)',
-          flexShrink: 0,
-        }}
-      >
+      <MetadataBar isDark={isDark}>
         {log.service && (
           <Chip
             label={log.service}
@@ -272,7 +249,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
             sx={{ height: 20, fontSize: '0.62rem' }}
           />
         )}
-      </Box>
+      </MetadataBar>
 
       <Tabs
         value={tab}
@@ -306,17 +283,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
           <Box
             sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                px: 2,
-                py: 1,
-                flexShrink: 0,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-              }}
-            >
+            <TraceHeaderBar isDark={isDark}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <TraceIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
                 <Typography
@@ -353,7 +320,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
               >
                 {t('argus.logs.panel.viewFullTrace', 'View full trace')}
               </Button>
-            </Box>
+            </TraceHeaderBar>
             <Box sx={{ flex: 1, overflow: 'auto', minHeight: 200 }}>
               {traceLoading ? (
                 <Box
