@@ -238,7 +238,8 @@ function getFieldSuggestions(
   // Move ANY suggestion whose label matches prefix (case-insensitive) to the very top.
   // This ensures 'AND', 'OR', exact field names, etc. appear first.
   if (prefix !== '') {
-    const targetMatch = (context.isNegated && prefix === 'has') ? 'not has' : prefix;
+    const targetMatch =
+      context.isNegated && prefix === 'has' ? 'not has' : prefix;
     const exactMatchIndex = results.findIndex(
       (item) => item.label.toLowerCase() === targetMatch
     );

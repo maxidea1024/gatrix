@@ -130,7 +130,9 @@ describe('Spec 11.1: Suggestions per context', () => {
 
     // Verify fields/keywords are prioritized before smart suggestions
     const fieldIndex = suggestions.findIndex((s) => s.label === 'level');
-    const smartIndex = suggestions.findIndex((s) => s.label.startsWith('message contains'));
+    const smartIndex = suggestions.findIndex((s) =>
+      s.label.startsWith('message contains')
+    );
     expect(fieldIndex).toBe(0);
     expect(smartIndex).toBeGreaterThan(fieldIndex);
   });

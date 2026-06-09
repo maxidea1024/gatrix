@@ -36,7 +36,11 @@ import type { DomainConfig, SuggestionItem } from './types';
 import { TokenType, EditorState } from './types';
 import { tokenize } from './lexer';
 import { resolveCursorContext } from './cursor-context';
-import { getSuggestions, applyCompletion, isIncompleteQuery } from './suggestion-engine';
+import {
+  getSuggestions,
+  applyCompletion,
+  isIncompleteQuery,
+} from './suggestion-engine';
 import { QuerySuggestionDropdown } from './QuerySuggestionDropdown';
 import type { QuerySuggestionDropdownHandle } from './QuerySuggestionDropdown';
 import {
