@@ -341,7 +341,9 @@ export function pickFields(
     const base = fieldMap.get(key);
     if (!base) {
       if (import.meta.env.DEV) {
-        console.warn(`[pickFields] Unknown field key: "${key}" — check ALL_QUERY_FIELDS`);
+        console.warn(
+          `[pickFields] Unknown field key: "${key}" — check ALL_QUERY_FIELDS`
+        );
       }
       continue;
     }
@@ -363,9 +365,18 @@ const SHARED_ALIASES: Record<string, string> = {
 export const LOGS_CONFIG: DomainConfig = {
   name: 'logs',
   fields: pickFields([
-    'level', 'message', 'body', 'logger_name', 'timestamp',
-    'service', 'environment', 'release',
-    'trace_id', 'span_id', 'log_id', 'issue_id',
+    'level',
+    'message',
+    'body',
+    'logger_name',
+    'timestamp',
+    'service',
+    'environment',
+    'release',
+    'trace_id',
+    'span_id',
+    'log_id',
+    'issue_id',
   ]),
   aliases: SHARED_ALIASES,
 };
@@ -374,17 +385,33 @@ export const ISSUES_CONFIG: DomainConfig = {
   name: 'issues',
   fields: pickFields(
     [
-      'type', 'value', 'message', 'handled', 'platform',
-      'level', 'environment', 'release', 'service',
-      'browser_name', 'os_name', 'device',
-      'timestamp', 'trace_id', 'issue_id',
-      'status', 'assigned',
+      'type',
+      'value',
+      'message',
+      'handled',
+      'platform',
+      'level',
+      'environment',
+      'release',
+      'service',
+      'browser_name',
+      'os_name',
+      'device',
+      'timestamp',
+      'trace_id',
+      'issue_id',
+      'status',
+      'assigned',
     ],
     {
       status: {
         staticValues: [
-          'resolved', 'unresolved', 'ignored',
-          'archived', 'regressed', 'escalating',
+          'resolved',
+          'unresolved',
+          'ignored',
+          'archived',
+          'regressed',
+          'escalating',
         ],
       },
     }
@@ -399,8 +426,12 @@ export const DISCOVER_CONFIG: DomainConfig = {
     {
       status: {
         staticValues: [
-          'resolved', 'unresolved', 'ignored',
-          'archived', 'regressed', 'escalating',
+          'resolved',
+          'unresolved',
+          'ignored',
+          'archived',
+          'regressed',
+          'escalating',
         ],
       },
     }
@@ -412,10 +443,17 @@ export const FEEDBACK_CONFIG: DomainConfig = {
   name: 'feedback',
   fields: pickFields(
     [
-      'feedback', 'contact_email',
-      'environment', 'release', 'service',
-      'browser_name', 'os_name', 'device',
-      'timestamp', 'status', 'assigned',
+      'feedback',
+      'contact_email',
+      'environment',
+      'release',
+      'service',
+      'browser_name',
+      'os_name',
+      'device',
+      'timestamp',
+      'status',
+      'assigned',
     ],
     {
       status: { staticValues: ['resolved', 'unresolved', 'spam'] },
@@ -428,10 +466,17 @@ export const PERFORMANCE_CONFIG: DomainConfig = {
   name: 'performance',
   fields: pickFields(
     [
-      'transaction', 'duration', 'status',
-      'service', 'environment', 'release',
-      'browser_name', 'os_name',
-      'timestamp', 'trace_id', 'span_id',
+      'transaction',
+      'duration',
+      'status',
+      'service',
+      'environment',
+      'release',
+      'browser_name',
+      'os_name',
+      'timestamp',
+      'trace_id',
+      'span_id',
     ],
     {
       status: {
@@ -444,9 +489,14 @@ export const PERFORMANCE_CONFIG: DomainConfig = {
 export const SESSIONS_CONFIG: DomainConfig = {
   name: 'sessions',
   fields: pickFields([
-    'environment', 'release', 'service',
-    'browser_name', 'os_name', 'device',
-    'duration', 'timestamp',
+    'environment',
+    'release',
+    'service',
+    'browser_name',
+    'os_name',
+    'device',
+    'duration',
+    'timestamp',
   ]),
   aliases: SHARED_ALIASES,
 };
