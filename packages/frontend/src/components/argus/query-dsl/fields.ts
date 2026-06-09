@@ -461,7 +461,12 @@ export function getFieldByKey(
   config: DomainConfig
 ): QueryField | undefined {
   const resolved = resolveAlias(key, config);
-  return config.fields.find((f) => f.key === resolved);
+  // First try domain-specific fields (may have overrides like staticValues)
+  const domainField = config.fields.find((f) => f.key === resolved);
+  if (domainField) return domainField;
+  // Fallback to global field registry so free-typed fields still get
+  // correct operators, type, etc. even if not in this domain's config
+  return getFieldMap().get(resolved);
 }
 
 /**
