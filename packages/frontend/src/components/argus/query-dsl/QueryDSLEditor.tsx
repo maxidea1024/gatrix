@@ -1241,9 +1241,11 @@ export function QueryDSLEditor({
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
-            if (prev < 0) return visualTokens.length - 1; // input → last token
+            if (prev === -2) return -2; // already at before-all, stay put
+            if (prev === -1) return visualTokens.length - 1; // input → last token
             if (prev <= 0) {
               // first token → before-all position
+              suppressDropdownRef.current = true;
               requestAnimationFrame(() => inputRef.current?.focus());
               return -2;
             }
