@@ -782,7 +782,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               <QueryDSLEditor
                 config={ISSUES_CONFIG}
                 initialQuery={storeSearch}
-                placeholder={t('argus.issues.searchPlaceholder', 'Search by title, message, or severity...')}
+                placeholder={t(
+                  'argus.issues.searchPlaceholder',
+                  'Search by title, message, or severity...'
+                )}
                 onSearch={(val) => {
                   setStoreSearch(val);
                   setCurrentPage(1);

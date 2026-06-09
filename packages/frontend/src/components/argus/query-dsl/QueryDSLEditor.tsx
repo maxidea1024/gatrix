@@ -225,8 +225,12 @@ export function QueryDSLEditor({
     }
   }, [initialQuery, resetTo]);
 
-  const { getFieldValues, getCachedFacetMap, ensureFieldValues, isFieldLoading } =
-    useLazyFacets(fetchFieldValues);
+  const {
+    getFieldValues,
+    getCachedFacetMap,
+    ensureFieldValues,
+    isFieldLoading,
+  } = useLazyFacets(fetchFieldValues);
 
   const normalizedFacets = getCachedFacetMap();
 
@@ -838,30 +842,36 @@ export function QueryDSLEditor({
       if (lower === 'and' || lower === 'or') {
         if (canInsertLogical(chips)) {
           // Valid position → logical chip
-          insertChipsAtCursor([{
-            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            type: 'logical' as const,
-            label: lower.toUpperCase(),
-          }]);
+          insertChipsAtCursor([
+            {
+              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              type: 'logical' as const,
+              label: lower.toUpperCase(),
+            },
+          ]);
         } else {
           // No preceding filter → free text message search
-          insertChipsAtCursor([{
-            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            type: 'filter' as const,
-            field: 'message',
-            operator: 'contains',
-            value: text,
-            quoted: true,
-          }]);
+          insertChipsAtCursor([
+            {
+              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              type: 'filter' as const,
+              field: 'message',
+              operator: 'contains',
+              value: text,
+              quoted: true,
+            },
+          ]);
         }
         setInputValue('');
       } else if (lower === '(' || lower === ')') {
         // Paren → paren chip
-        insertChipsAtCursor([{
-          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: 'paren' as const,
-          label: lower,
-        }]);
+        insertChipsAtCursor([
+          {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'paren' as const,
+            label: lower,
+          },
+        ]);
         setInputValue('');
       } else {
         // Try to parse as filter, or fall through as free text
@@ -1150,7 +1160,14 @@ export function QueryDSLEditor({
         return;
       }
     },
-    [inputValue, cursorContext, setChips, chips, currentFilterInfo, insertChipsAtCursor]
+    [
+      inputValue,
+      cursorContext,
+      setChips,
+      chips,
+      currentFilterInfo,
+      insertChipsAtCursor,
+    ]
   );
 
   const handleKeyDown = useCallback(
@@ -1582,18 +1599,21 @@ export function QueryDSLEditor({
     justFocusedRef.current = false;
   }, [inputValue, commitPendingInput, isComposing, chips, showDropdown]);
 
-  const handleContainerClick = useCallback((e: React.MouseEvent) => {
-    // Don't focus input if clicking on a chip (chip handles its own click)
-    if ((e.target as HTMLElement).closest('[data-chip]')) return;
-    // Force-complete any pending input
-    if (inputValue.trim()) {
-      commitPendingInput();
-      setShowDropdown(false);
-    }
-    // Clear token selection and focus input
-    setSelectedTokenIdx(-1);
-    inputRef.current?.focus();
-  }, [inputValue, commitPendingInput]);
+  const handleContainerClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Don't focus input if clicking on a chip (chip handles its own click)
+      if ((e.target as HTMLElement).closest('[data-chip]')) return;
+      // Force-complete any pending input
+      if (inputValue.trim()) {
+        commitPendingInput();
+        setShowDropdown(false);
+      }
+      // Clear token selection and focus input
+      setSelectedTokenIdx(-1);
+      inputRef.current?.focus();
+    },
+    [inputValue, commitPendingInput]
+  );
 
   const handleClear = useCallback(() => {
     setChips([]);
@@ -1654,7 +1674,9 @@ export function QueryDSLEditor({
         flex: isAtFront ? '0 0 auto' : 1,
         minWidth: isAtFront ? 2 : 80,
         width: isAtFront
-          ? (inputValue ? `${Math.max(inputValue.length + 3, 1)}ch` : 2)
+          ? inputValue
+            ? `${Math.max(inputValue.length + 3, 1)}ch`
+            : 2
           : undefined,
         border: 'none',
         outline: 'none',
@@ -1705,145 +1727,153 @@ export function QueryDSLEditor({
           />
 
           {/* Chips + input area (wraps independently) */}
-          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', flex: 1, gap: 0, minHeight: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flex: 1,
+              gap: 0,
+              minHeight: 0,
+            }}
+          >
+            {/* Input rendered before chips when in before-all position */}
+            {selectedTokenIdx === -2 && renderInput()}
 
-          {/* Input rendered before chips when in before-all position */}
-          {selectedTokenIdx === -2 && renderInput()}
-
-          {/* Existing filter chips */}
-          {chips.map((chip, chipIdx) => {
-            if (chip.type === 'logical' || chip.type === 'paren') {
-              const isToggleable =
-                chip.type === 'logical' &&
-                (chip.label === 'AND' || chip.label === 'OR');
-              return (
-                <Box
-                  key={chip.id}
-                  sx={{
-                    px: '6px',
-                    py: '2px',
-                    mx: '2px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color:
-                      chip.type === 'logical'
-                        ? chip.label === 'OR'
-                          ? isDark
-                            ? '#e6994a'
-                            : '#e65100'
-                          : isDark
-                            ? '#4dabf5'
-                            : '#1976d2'
-                        : isDark
-                          ? '#9e9e9e'
-                          : '#757575',
-                    userSelect: 'none',
-                    textTransform: 'uppercase',
-                    borderRadius: '4px',
-                    backgroundColor: isDark
-                      ? 'rgba(255,255,255,0.06)'
-                      : 'rgba(0,0,0,0.04)',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
+            {/* Existing filter chips */}
+            {chips.map((chip, chipIdx) => {
+              if (chip.type === 'logical' || chip.type === 'paren') {
+                const isToggleable =
+                  chip.type === 'logical' &&
+                  (chip.label === 'AND' || chip.label === 'OR');
+                return (
                   <Box
-                    component="span"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isToggleable) {
-                        updateChip(chip.id, {
-                          label: chip.label === 'AND' ? 'OR' : 'AND',
-                        });
-                      }
-                    }}
+                    key={chip.id}
                     sx={{
-                      cursor: isToggleable ? 'pointer' : 'default',
-                      borderRadius: '2px',
-                      px: '2px',
-                      lineHeight: 1,
-                      transition: 'background-color 0.15s',
-                      ...(isToggleable && {
-                        '&:hover': {
-                          backgroundColor: isDark
-                            ? 'rgba(255,255,255,0.1)'
-                            : 'rgba(0,0,0,0.08)',
-                        },
-                      }),
+                      px: '6px',
+                      py: '2px',
+                      mx: '2px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color:
+                        chip.type === 'logical'
+                          ? chip.label === 'OR'
+                            ? isDark
+                              ? '#e6994a'
+                              : '#e65100'
+                            : isDark
+                              ? '#4dabf5'
+                              : '#1976d2'
+                          : isDark
+                            ? '#9e9e9e'
+                            : '#757575',
+                      userSelect: 'none',
+                      textTransform: 'uppercase',
+                      borderRadius: '4px',
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.06)'
+                        : 'rgba(0,0,0,0.04)',
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
                   >
-                    {chip.label}
+                    <Box
+                      component="span"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isToggleable) {
+                          updateChip(chip.id, {
+                            label: chip.label === 'AND' ? 'OR' : 'AND',
+                          });
+                        }
+                      }}
+                      sx={{
+                        cursor: isToggleable ? 'pointer' : 'default',
+                        borderRadius: '2px',
+                        px: '2px',
+                        lineHeight: 1,
+                        transition: 'background-color 0.15s',
+                        ...(isToggleable && {
+                          '&:hover': {
+                            backgroundColor: isDark
+                              ? 'rgba(255,255,255,0.1)'
+                              : 'rgba(0,0,0,0.08)',
+                          },
+                        }),
+                      }}
+                    >
+                      {chip.label}
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteChip(chip.id);
+                      }}
+                      sx={{
+                        p: 0,
+                        ml: 0.5,
+                        opacity: 0.5,
+                        '&:hover': { opacity: 1 },
+                      }}
+                    >
+                      <CloseIcon sx={{ fontSize: 10 }} />
+                    </IconButton>
                   </Box>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteChip(chip.id);
-                    }}
-                    sx={{
-                      p: 0,
-                      ml: 0.5,
-                      opacity: 0.5,
-                      '&:hover': { opacity: 1 },
-                    }}
-                  >
-                    <CloseIcon sx={{ fontSize: 10 }} />
-                  </IconButton>
-                </Box>
-              );
-            }
-
-            // Find which part of this chip is selected (if any)
-            const chipSelectedPart = (() => {
-              if (selectedTokenIdx < 0) return null;
-              const vt = visualTokens[selectedTokenIdx];
-              if (
-                vt &&
-                vt.chipId === chip.id &&
-                (vt.part === 'field' ||
-                  vt.part === 'operator' ||
-                  vt.part === 'value')
-              ) {
-                return vt.part as TokenPart;
+                );
               }
-              return null;
-            })();
 
-            return (
-              <FilterTokenGroup
-                key={chip.id}
-                ref={(handle) => {
-                  if (handle) {
-                    tokenGroupRefs.current.set(chip.id, handle);
-                  } else {
-                    tokenGroupRefs.current.delete(chip.id);
+              // Find which part of this chip is selected (if any)
+              const chipSelectedPart = (() => {
+                if (selectedTokenIdx < 0) return null;
+                const vt = visualTokens[selectedTokenIdx];
+                if (
+                  vt &&
+                  vt.chipId === chip.id &&
+                  (vt.part === 'field' ||
+                    vt.part === 'operator' ||
+                    vt.part === 'value')
+                ) {
+                  return vt.part as TokenPart;
+                }
+                return null;
+              })();
+
+              return (
+                <FilterTokenGroup
+                  key={chip.id}
+                  ref={(handle) => {
+                    if (handle) {
+                      tokenGroupRefs.current.set(chip.id, handle);
+                    } else {
+                      tokenGroupRefs.current.delete(chip.id);
+                    }
+                  }}
+                  chip={chip}
+                  domain={config}
+                  selectedPart={chipSelectedPart}
+                  editingPart={
+                    editingToken?.chipId === chip.id
+                      ? (editingToken.part as TokenPart)
+                      : null
                   }
-                }}
-                chip={chip}
-                domain={config}
-                selectedPart={chipSelectedPart}
-                editingPart={
-                  editingToken?.chipId === chip.id
-                    ? (editingToken.part as TokenPart)
-                    : null
-                }
-                editingValueText={
-                  editingToken?.chipId === chip.id &&
-                  editingToken.part === 'value'
-                    ? inlineValueText
-                    : undefined
-                }
-                onPartClick={handlePartClick}
-                onDelete={deleteChip}
-                onValueInputChange={handleInlineValueChange}
-                onValueInputKeyDown={handleInlineValueKeyDown}
-                onValueInputBlur={handleInlineValueBlur}
-              />
-            );
-          })}
+                  editingValueText={
+                    editingToken?.chipId === chip.id &&
+                    editingToken.part === 'value'
+                      ? inlineValueText
+                      : undefined
+                  }
+                  onPartClick={handlePartClick}
+                  onDelete={deleteChip}
+                  onValueInputChange={handleInlineValueChange}
+                  onValueInputKeyDown={handleInlineValueKeyDown}
+                  onValueInputBlur={handleInlineValueBlur}
+                />
+              );
+            })}
 
-          {/* Input rendered after chips (normal position) */}
-          {selectedTokenIdx !== -2 && renderInput()}
+            {/* Input rendered after chips (normal position) */}
+            {selectedTokenIdx !== -2 && renderInput()}
           </Box>
 
           {/* Clear button */}
@@ -1878,7 +1908,9 @@ export function QueryDSLEditor({
 
         {/* Suggestion dropdown */}
         {showDropdown &&
-          (suggestions.length > 0 || recentSearches.length > 0 || (cursorContext.field && isFieldLoading(cursorContext.field))) &&
+          (suggestions.length > 0 ||
+            recentSearches.length > 0 ||
+            (cursorContext.field && isFieldLoading(cursorContext.field))) &&
           !isComposing && (
             <QuerySuggestionDropdown
               ref={dropdownRef}
@@ -1893,7 +1925,9 @@ export function QueryDSLEditor({
               onRemoveRecent={handleRemoveRecent}
               selectedValues={selectedValues}
               dropdownLeft={dropdownLeft}
-              isLoading={!!(cursorContext.field && isFieldLoading(cursorContext.field))}
+              isLoading={
+                !!(cursorContext.field && isFieldLoading(cursorContext.field))
+              }
             />
           )}
 
@@ -1918,7 +1952,9 @@ export function QueryDSLEditor({
               highlightIndex={popoverHighlightIdx}
               onCheckboxToggle={handleInlineCheckboxToggle}
               onTextSelect={handleInlineTextSelect}
-              isLoading={!!(editedChip.field && isFieldLoading(editedChip.field))}
+              isLoading={
+                !!(editedChip.field && isFieldLoading(editedChip.field))
+              }
             />
           );
         })()}

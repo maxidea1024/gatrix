@@ -4825,16 +4825,77 @@ async function main() {
   console.log(`\n💬 Phase 7: Generating ${TOTAL_FEEDBACK} feedback entries...`);
   const feedbackBatch: any[] = [];
 
-  const FEEDBACK_BROWSERS = ['Chrome 125', 'Chrome 124', 'Firefox 127', 'Safari 18', 'Edge 125', 'Whale 3.28', 'Brave 1.67'];
-  const FEEDBACK_OS = ['Windows 11', 'Windows 10', 'macOS 15', 'macOS 14', 'Ubuntu 24.04', 'iOS 18', 'Android 15'];
-  const FEEDBACK_DEVICES = ['Desktop', 'Desktop', 'Desktop', 'Mobile', 'Tablet'];
-  const FEEDBACK_SERVICES = ['game-frontend', 'game-lobby', 'game-client', 'web-dashboard', 'mobile-app'];
-  const FEEDBACK_TAG_KEYS = ['page', 'category', 'priority', 'platform', 'locale', 'build'];
+  const FEEDBACK_BROWSERS = [
+    'Chrome 125',
+    'Chrome 124',
+    'Firefox 127',
+    'Safari 18',
+    'Edge 125',
+    'Whale 3.28',
+    'Brave 1.67',
+  ];
+  const FEEDBACK_OS = [
+    'Windows 11',
+    'Windows 10',
+    'macOS 15',
+    'macOS 14',
+    'Ubuntu 24.04',
+    'iOS 18',
+    'Android 15',
+  ];
+  const FEEDBACK_DEVICES = [
+    'Desktop',
+    'Desktop',
+    'Desktop',
+    'Mobile',
+    'Tablet',
+  ];
+  const FEEDBACK_SERVICES = [
+    'game-frontend',
+    'game-lobby',
+    'game-client',
+    'web-dashboard',
+    'mobile-app',
+  ];
+  const FEEDBACK_TAG_KEYS = [
+    'page',
+    'category',
+    'priority',
+    'platform',
+    'locale',
+    'build',
+  ];
   const FEEDBACK_TAG_VALUES: Record<string, string[]> = {
-    page: ['/game/play', '/game/port', '/game/battle', '/settings', '/inventory', '/guild', '/shop', '/auction'],
-    category: ['bug', 'suggestion', 'complaint', 'question', 'praise', 'ux', 'performance', 'crash'],
+    page: [
+      '/game/play',
+      '/game/port',
+      '/game/battle',
+      '/settings',
+      '/inventory',
+      '/guild',
+      '/shop',
+      '/auction',
+    ],
+    category: [
+      'bug',
+      'suggestion',
+      'complaint',
+      'question',
+      'praise',
+      'ux',
+      'performance',
+      'crash',
+    ],
     priority: ['low', 'medium', 'high', 'critical'],
-    platform: ['Steam', 'Epic', 'Direct', 'WeGame', 'PlayStation', 'Xbox', 'Web'],
+    platform: [
+      'Steam',
+      'Epic',
+      'Direct',
+      'WeGame',
+      'PlayStation',
+      'Xbox',
+      'Web',
+    ],
     locale: ['ko-KR', 'en-US', 'ja-JP', 'zh-CN', 'zh-TW', 'de-DE', 'fr-FR'],
     build: ['10234', '10235', '10236', '10240', '10250'],
   };
@@ -4862,7 +4923,9 @@ async function main() {
     // Generate random tags (2-5 per feedback)
     const tags: Record<string, string> = {};
     const numTags = randomInt(2, 5);
-    const tagKeys = [...FEEDBACK_TAG_KEYS].sort(() => Math.random() - 0.5).slice(0, numTags);
+    const tagKeys = [...FEEDBACK_TAG_KEYS]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, numTags);
     for (const key of tagKeys) {
       tags[key] = randomPick(FEEDBACK_TAG_VALUES[key]);
     }

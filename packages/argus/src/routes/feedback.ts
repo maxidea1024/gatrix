@@ -851,11 +851,26 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         // Top-level columns that can be queried directly
         const TOP_LEVEL_COLUMNS = new Set([
-          'message', 'name', 'email', 'contact_email', 'url',
-          'environment', 'release', 'source', 'service',
-          'browser', 'browser_version', 'os', 'os_version', 'device',
-          'user_id', 'locale', 'category', 'sentiment',
-          'status', 'assigned_to',
+          'message',
+          'name',
+          'email',
+          'contact_email',
+          'url',
+          'environment',
+          'release',
+          'source',
+          'service',
+          'browser',
+          'browser_version',
+          'os',
+          'os_version',
+          'device',
+          'user_id',
+          'locale',
+          'category',
+          'sentiment',
+          'status',
+          'assigned_to',
         ]);
 
         let sql: string;
@@ -898,7 +913,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
           key,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply.code(500).send({ error: 'Failed to get feedback attribute facet' });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get feedback attribute facet' });
       }
     }
   );

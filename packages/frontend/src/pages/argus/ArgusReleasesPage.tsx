@@ -70,7 +70,7 @@ const evaluateAST = (
     case 'Binary': {
       const leftVal = evaluateAST(node.left, release, totalSessionsAll);
       const rightVal = evaluateAST(node.right, release, totalSessionsAll);
-      return node.operator === 'or' ? (leftVal || rightVal) : (leftVal && rightVal);
+      return node.operator === 'or' ? leftVal || rightVal : leftVal && rightVal;
     }
     case 'Not':
       return !evaluateAST(node.expression, release, totalSessionsAll);
@@ -99,8 +99,8 @@ const evaluateAST = (
           totalSessionsAll === 0
             ? 'low'
             : (Number(release.total_sessions) / totalSessionsAll) * 100 >= 10
-            ? 'adopted'
-            : 'low';
+              ? 'adopted'
+              : 'low';
         rVal = stage;
       } else {
         return true;
@@ -110,32 +110,53 @@ const evaluateAST = (
       const target = node.value;
 
       if (typeof rVal === 'number') {
-        const numTarget = typeof target === 'number' ? target : (typeof target === 'string' ? parseFloat(target) : NaN);
+        const numTarget =
+          typeof target === 'number'
+            ? target
+            : typeof target === 'string'
+              ? parseFloat(target)
+              : NaN;
         if (isNaN(numTarget)) return false;
 
         switch (op) {
-          case '=': return rVal === numTarget;
-          case '!=': return rVal !== numTarget;
-          case '>': return rVal > numTarget;
-          case '>=': return rVal >= numTarget;
-          case '<': return rVal < numTarget;
-          case '<=': return rVal <= numTarget;
-          default: return false;
+          case '=':
+            return rVal === numTarget;
+          case '!=':
+            return rVal !== numTarget;
+          case '>':
+            return rVal > numTarget;
+          case '>=':
+            return rVal >= numTarget;
+          case '<':
+            return rVal < numTarget;
+          case '<=':
+            return rVal <= numTarget;
+          default:
+            return false;
         }
       } else if (typeof rVal === 'string') {
         const strTarget = String(target).toLowerCase();
         const strVal = rVal.toLowerCase();
 
         switch (op) {
-          case '=': return strVal === strTarget;
-          case '!=': return strVal !== strTarget;
-          case 'contains': return strVal.includes(strTarget);
-          case '!contains': return !strVal.includes(strTarget);
-          case 'startsWith': return strVal.startsWith(strTarget);
-          case '!startsWith': return !strVal.startsWith(strTarget);
-          case 'endsWith': return strVal.endsWith(strTarget);
-          case '!endsWith': return !strVal.endsWith(strTarget);
-          default: return false;
+          case '=':
+            return strVal === strTarget;
+          case '!=':
+            return strVal !== strTarget;
+          case 'contains':
+            return strVal.includes(strTarget);
+          case '!contains':
+            return !strVal.includes(strTarget);
+          case 'startsWith':
+            return strVal.startsWith(strTarget);
+          case '!startsWith':
+            return !strVal.startsWith(strTarget);
+          case 'endsWith':
+            return strVal.endsWith(strTarget);
+          case '!endsWith':
+            return !strVal.endsWith(strTarget);
+          default:
+            return false;
         }
       }
       return true;
@@ -703,7 +724,9 @@ const ArgusReleasesPage: React.FC = () => {
                         borderRadius: '6px',
                         border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                         borderLeft: `4px solid ${statusColor}`,
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.015)' : '#fff',
+                        backgroundColor: isDark
+                          ? 'rgba(255,255,255,0.015)'
+                          : '#fff',
                         transition: 'all 0.2s ease-in-out',
                         cursor: 'pointer',
                         '&:hover': {
@@ -813,7 +836,11 @@ const ArgusReleasesPage: React.FC = () => {
                         <Typography
                           variant="subtitle2"
                           fontWeight={800}
-                          sx={{ color: statusColor, lineHeight: 1.2, fontSize: '0.85rem' }}
+                          sx={{
+                            color: statusColor,
+                            lineHeight: 1.2,
+                            fontSize: '0.85rem',
+                          }}
                         >
                           {crashFree.toFixed(2)}%
                         </Typography>
@@ -824,7 +851,9 @@ const ArgusReleasesPage: React.FC = () => {
                             sx={{
                               height: 3,
                               borderRadius: 1,
-                              backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                              backgroundColor: isDark
+                                ? 'rgba(255,255,255,0.08)'
+                                : 'rgba(0,0,0,0.08)',
                               '& .MuiLinearProgress-bar': {
                                 backgroundColor: statusColor,
                               },
@@ -832,7 +861,13 @@ const ArgusReleasesPage: React.FC = () => {
                           />
                         </Box>
                         {prevRelease && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              mt: 0.5,
+                            }}
+                          >
                             <Chip
                               label={`${crashFreeDelta > 0 ? '+' : ''}${crashFreeDelta.toFixed(2)}%`}
                               size="small"
@@ -840,8 +875,12 @@ const ArgusReleasesPage: React.FC = () => {
                                 height: 16,
                                 fontSize: '0.65rem',
                                 fontWeight: 700,
-                                backgroundColor: alpha(crashFreeDelta >= 0 ? '#4caf50' : '#f44336', 0.1),
-                                color: crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
+                                backgroundColor: alpha(
+                                  crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
+                                  0.1
+                                ),
+                                color:
+                                  crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
                                 border: 'none',
                                 '& .MuiChip-label': { px: 0.5 },
                               }}
@@ -883,7 +922,9 @@ const ArgusReleasesPage: React.FC = () => {
                                 sx={{
                                   height: 3,
                                   borderRadius: 1,
-                                  backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                                  backgroundColor: isDark
+                                    ? 'rgba(255,255,255,0.08)'
+                                    : 'rgba(0,0,0,0.08)',
                                   '& .MuiLinearProgress-bar': {
                                     backgroundColor: userStatusColor,
                                   },
@@ -893,7 +934,13 @@ const ArgusReleasesPage: React.FC = () => {
                           );
                         })()}
                         {prevRelease && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              mt: 0.5,
+                            }}
+                          >
                             <Chip
                               label={`${crashFreeUsersDelta > 0 ? '+' : ''}${crashFreeUsersDelta.toFixed(2)}%`}
                               size="small"
@@ -901,8 +948,16 @@ const ArgusReleasesPage: React.FC = () => {
                                 height: 16,
                                 fontSize: '0.65rem',
                                 fontWeight: 700,
-                                backgroundColor: alpha(crashFreeUsersDelta >= 0 ? '#4caf50' : '#f44336', 0.1),
-                                color: crashFreeUsersDelta >= 0 ? '#4caf50' : '#f44336',
+                                backgroundColor: alpha(
+                                  crashFreeUsersDelta >= 0
+                                    ? '#4caf50'
+                                    : '#f44336',
+                                  0.1
+                                ),
+                                color:
+                                  crashFreeUsersDelta >= 0
+                                    ? '#4caf50'
+                                    : '#f44336',
                                 border: 'none',
                                 '& .MuiChip-label': { px: 0.5 },
                               }}
@@ -951,7 +1006,13 @@ const ArgusReleasesPage: React.FC = () => {
 
                       {/* Total Errors */}
                       <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                          }}
+                        >
                           {errorCount > 100 && (
                             <Box
                               sx={{
@@ -963,11 +1024,26 @@ const ArgusReleasesPage: React.FC = () => {
                               }}
                             />
                           )}
-                          <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={700}
+                            sx={{ fontSize: '0.85rem' }}
+                          >
                             {formatCompactNumber(errorCount)}
                           </Typography>
                         </Box>
-                        <Box sx={{ width: '100%', mt: 0.5, height: 4, bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 1, overflow: 'hidden' }}>
+                        <Box
+                          sx={{
+                            width: '100%',
+                            mt: 0.5,
+                            height: 4,
+                            bgcolor: isDark
+                              ? 'rgba(255,255,255,0.04)'
+                              : 'rgba(0,0,0,0.04)',
+                            borderRadius: 1,
+                            overflow: 'hidden',
+                          }}
+                        >
                           <Box
                             sx={{
                               height: '100%',
@@ -981,16 +1057,42 @@ const ArgusReleasesPage: React.FC = () => {
 
                       {/* Adoption (Sessions) */}
                       {(() => {
-                        const adoptionPct = totalSessionsAll > 0 ? (Number(r.total_sessions) / totalSessionsAll) * 100 : 0;
+                        const adoptionPct =
+                          totalSessionsAll > 0
+                            ? (Number(r.total_sessions) / totalSessionsAll) *
+                              100
+                            : 0;
                         return (
                           <Box>
-                            <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
+                            <Typography
+                              variant="body2"
+                              fontWeight={700}
+                              sx={{ fontSize: '0.85rem' }}
+                            >
                               {formatCompactNumber(Number(r.total_sessions))}
-                              <span style={{ fontSize: '0.7rem', color: isDark ? '#aaa' : '#666', fontWeight: 500, marginLeft: 4 }}>
+                              <span
+                                style={{
+                                  fontSize: '0.7rem',
+                                  color: isDark ? '#aaa' : '#666',
+                                  fontWeight: 500,
+                                  marginLeft: 4,
+                                }}
+                              >
                                 ({adoptionPct.toFixed(1)}%)
                               </span>
                             </Typography>
-                            <Box sx={{ width: '100%', mt: 0.5, height: 4, bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 1, overflow: 'hidden' }}>
+                            <Box
+                              sx={{
+                                width: '100%',
+                                mt: 0.5,
+                                height: 4,
+                                bgcolor: isDark
+                                  ? 'rgba(255,255,255,0.04)'
+                                  : 'rgba(0,0,0,0.04)',
+                                borderRadius: 1,
+                                overflow: 'hidden',
+                              }}
+                            >
                               <Box
                                 sx={{
                                   height: '100%',
@@ -1000,7 +1102,13 @@ const ArgusReleasesPage: React.FC = () => {
                                 }}
                               />
                             </Box>
-                            <Box sx={{ mt: 0.75, display: 'flex', justifyContent: 'flex-start' }}>
+                            <Box
+                              sx={{
+                                mt: 0.75,
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                              }}
+                            >
                               {r.error_trend && r.error_trend.length > 1 && (
                                 <ArgusSparkline
                                   data={r.error_trend}
@@ -1027,14 +1135,25 @@ const ArgusReleasesPage: React.FC = () => {
                             fontSize: '0.8rem',
                           }}
                         >
-                          <SpeedIcon sx={{ fontSize: 14, color: isDark ? '#aaa' : '#666' }} />{' '}
+                          <SpeedIcon
+                            sx={{
+                              fontSize: 14,
+                              color: isDark ? '#aaa' : '#666',
+                            }}
+                          />{' '}
                           {p95 > 0 ? `${Math.round(p95)}ms` : '-'}
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ color: 'text.disabled', fontSize: '0.65rem', display: 'block', mt: 0.25 }}
+                          sx={{
+                            color: 'text.disabled',
+                            fontSize: '0.65rem',
+                            display: 'block',
+                            mt: 0.25,
+                          }}
                         >
-                          {formatCompactNumber(txnCount)} {t('argus.releases.txns', 'txns')}
+                          {formatCompactNumber(txnCount)}{' '}
+                          {t('argus.releases.txns', 'txns')}
                         </Typography>
                       </Box>
                     </Box>

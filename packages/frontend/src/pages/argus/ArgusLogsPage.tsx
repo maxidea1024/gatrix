@@ -339,7 +339,10 @@ const ArgusLogsPage: React.FC = () => {
               <QueryDSLEditor
                 config={LOGS_CONFIG}
                 initialQuery={search}
-                placeholder={t('argus.logs.searchPlaceholder', 'Search by message, service, or severity...')}
+                placeholder={t(
+                  'argus.logs.searchPlaceholder',
+                  'Search by message, service, or severity...'
+                )}
                 onSearch={handleSearchSubmit}
                 onChange={(q) => {
                   dslQueryRef.current = q;

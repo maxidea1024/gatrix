@@ -1,5 +1,13 @@
 import React from 'react';
-import { Box, Typography, Popover, useTheme, alpha, SxProps, Theme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Popover,
+  useTheme,
+  alpha,
+  SxProps,
+  Theme,
+} from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 
 export interface FilterChipOption {
