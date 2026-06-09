@@ -1263,7 +1263,9 @@ export function QueryDSLEditor({
           setSelectedTokenIdx((prev) => {
             if (prev === -2) {
               // before-all → first token
+              // Input moves render slots (-2 → non-(-2)), so refocus after re-render
               suppressDropdownRef.current = true;
+              requestAnimationFrame(() => inputRef.current?.focus());
               return 0;
             }
             if (prev < 0) return -1; // clamp at input
