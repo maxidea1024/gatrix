@@ -559,15 +559,17 @@ function ValueSuggestionList({
               sx={{
                 py: 0.25,
                 px: 1.5,
+                mx: 0.75,
+                my: 0.25,
+                borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 1,
-                // Keyboard highlight: dashed outline
-                outline: isHighlighted
-                  ? `1px dashed ${isDark ? 'rgba(124,138,255,0.7)' : 'rgba(92,107,192,0.6)'}`
+                // Keyboard highlight: solid outline with slight rounding and a soft glow
+                boxShadow: isHighlighted
+                  ? `0 0 0 1px ${isDark ? '#7c8aff' : '#5c6bc0'}, 0 0 8px ${isDark ? 'rgba(124,138,255,0.4)' : 'rgba(92,107,192,0.3)'}`
                   : 'none',
-                outlineOffset: -1,
                 // Checked items: subtle background
                 backgroundColor: isChecked
                   ? isDark
