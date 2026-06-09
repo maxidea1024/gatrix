@@ -223,8 +223,9 @@ export function TokenEditDropdown({
           isDark={isDark}
         />
       )}
-      {isValueType && !isDatetimeField && (
-        isLoading && !hasValueResults ? (
+      {isValueType &&
+        !isDatetimeField &&
+        (isLoading && !hasValueResults ? (
           <Box
             sx={{
               display: 'flex',
@@ -248,9 +249,7 @@ export function TokenEditDropdown({
             <Typography
               sx={{
                 fontSize: '11px',
-                color: isDark
-                  ? 'rgba(255,255,255,0.4)'
-                  : 'rgba(0,0,0,0.4)',
+                color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
               }}
             >
               Loading...
@@ -267,8 +266,7 @@ export function TokenEditDropdown({
             onTextSelect={onTextSelect ?? (() => {})}
             isDark={isDark}
           />
-        )
-      )}
+        ))}
     </Popover>
   );
 }

@@ -626,26 +626,24 @@ export const QuerySuggestionDropdown = forwardRef<
               <Typography
                 sx={{
                   fontSize: '11px',
-                  color: isDark
-                    ? 'rgba(255,255,255,0.4)'
-                    : 'rgba(0,0,0,0.4)',
+                  color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
                 }}
               >
                 {t('dsl.loadingValues', 'Loading values...')}
               </Typography>
             </Box>
           ) : (
-          <Typography
-            sx={{
-              px: 1.5,
-              py: 1,
-              fontSize: '11px',
-              color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
-              textAlign: 'center',
-            }}
-          >
-            {t('dsl.noSuggestions', 'No suggestions')}
-          </Typography>
+            <Typography
+              sx={{
+                px: 1.5,
+                py: 1,
+                fontSize: '11px',
+                color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+                textAlign: 'center',
+              }}
+            >
+              {t('dsl.noSuggestions', 'No suggestions')}
+            </Typography>
           )
         ) : (
           Array.from(grouped.entries()).map(([category, items]) => (

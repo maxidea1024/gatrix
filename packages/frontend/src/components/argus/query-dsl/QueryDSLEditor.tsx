@@ -225,8 +225,12 @@ export function QueryDSLEditor({
     }
   }, [initialQuery, resetTo]);
 
-  const { getFieldValues, getCachedFacetMap, ensureFieldValues, isFieldLoading } =
-    useLazyFacets(fetchFieldValues);
+  const {
+    getFieldValues,
+    getCachedFacetMap,
+    ensureFieldValues,
+    isFieldLoading,
+  } = useLazyFacets(fetchFieldValues);
 
   const normalizedFacets = getCachedFacetMap();
 
@@ -831,30 +835,36 @@ export function QueryDSLEditor({
       if (lower === 'and' || lower === 'or') {
         if (canInsertLogical(chips)) {
           // Valid position → logical chip
-          insertChipsAtCursor([{
-            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            type: 'logical' as const,
-            label: lower.toUpperCase(),
-          }]);
+          insertChipsAtCursor([
+            {
+              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              type: 'logical' as const,
+              label: lower.toUpperCase(),
+            },
+          ]);
         } else {
           // No preceding filter → free text message search
-          insertChipsAtCursor([{
-            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            type: 'filter' as const,
-            field: 'message',
-            operator: 'contains',
-            value: text,
-            quoted: true,
-          }]);
+          insertChipsAtCursor([
+            {
+              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              type: 'filter' as const,
+              field: 'message',
+              operator: 'contains',
+              value: text,
+              quoted: true,
+            },
+          ]);
         }
         setInputValue('');
       } else if (lower === '(' || lower === ')') {
         // Paren → paren chip
-        insertChipsAtCursor([{
-          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          type: 'paren' as const,
-          label: lower,
-        }]);
+        insertChipsAtCursor([
+          {
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'paren' as const,
+            label: lower,
+          },
+        ]);
         setInputValue('');
       } else {
         // Try to parse as filter, or fall through as free text
@@ -1139,7 +1149,14 @@ export function QueryDSLEditor({
         return;
       }
     },
-    [inputValue, cursorContext, setChips, chips, currentFilterInfo, insertChipsAtCursor]
+    [
+      inputValue,
+      cursorContext,
+      setChips,
+      chips,
+      currentFilterInfo,
+      insertChipsAtCursor,
+    ]
   );
 
   const handleKeyDown = useCallback(
@@ -1560,18 +1577,21 @@ export function QueryDSLEditor({
     justFocusedRef.current = false;
   }, [inputValue, commitPendingInput, isComposing, chips, showDropdown]);
 
-  const handleContainerClick = useCallback((e: React.MouseEvent) => {
-    // Don't focus input if clicking on a chip (chip handles its own click)
-    if ((e.target as HTMLElement).closest('[data-chip]')) return;
-    // Force-complete any pending input
-    if (inputValue.trim()) {
-      commitPendingInput();
-      setShowDropdown(false);
-    }
-    // Clear token selection and focus input
-    setSelectedTokenIdx(-1);
-    inputRef.current?.focus();
-  }, [inputValue, commitPendingInput]);
+  const handleContainerClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Don't focus input if clicking on a chip (chip handles its own click)
+      if ((e.target as HTMLElement).closest('[data-chip]')) return;
+      // Force-complete any pending input
+      if (inputValue.trim()) {
+        commitPendingInput();
+        setShowDropdown(false);
+      }
+      // Clear token selection and focus input
+      setSelectedTokenIdx(-1);
+      inputRef.current?.focus();
+    },
+    [inputValue, commitPendingInput]
+  );
 
   const handleClear = useCallback(() => {
     setChips([]);
@@ -1767,7 +1787,12 @@ export function QueryDSLEditor({
             style={{
               flex: selectedTokenIdx === -2 ? '0 0 auto' : 1,
               minWidth: selectedTokenIdx === -2 ? 2 : 80,
-              width: selectedTokenIdx === -2 ? (inputValue.length > 0 ? `${Math.max(inputValue.length * 8, 20)}px` : '2px') : undefined,
+              width:
+                selectedTokenIdx === -2
+                  ? inputValue.length > 0
+                    ? `${Math.max(inputValue.length * 8, 20)}px`
+                    : '2px'
+                  : undefined,
               border: 'none',
               outline: 'none',
               background: 'transparent',
@@ -1776,7 +1801,8 @@ export function QueryDSLEditor({
               fontWeight: 500,
               fontFamily: 'inherit',
               lineHeight: '24px',
-              padding: selectedTokenIdx === -2 && !inputValue ? '2px 0' : '2px 4px',
+              padding:
+                selectedTokenIdx === -2 && !inputValue ? '2px 0' : '2px 4px',
               // Hide caret when a token is selected (token selection IS the cursor)
               caretColor: selectedTokenIdx >= 0 ? 'transparent' : undefined,
               // Move input before chips when in before-all position
@@ -1816,7 +1842,9 @@ export function QueryDSLEditor({
 
         {/* Suggestion dropdown */}
         {showDropdown &&
-          (suggestions.length > 0 || recentSearches.length > 0 || (cursorContext.field && isFieldLoading(cursorContext.field))) &&
+          (suggestions.length > 0 ||
+            recentSearches.length > 0 ||
+            (cursorContext.field && isFieldLoading(cursorContext.field))) &&
           !isComposing && (
             <QuerySuggestionDropdown
               ref={dropdownRef}
@@ -1831,7 +1859,9 @@ export function QueryDSLEditor({
               onRemoveRecent={handleRemoveRecent}
               selectedValues={selectedValues}
               dropdownLeft={dropdownLeft}
-              isLoading={!!(cursorContext.field && isFieldLoading(cursorContext.field))}
+              isLoading={
+                !!(cursorContext.field && isFieldLoading(cursorContext.field))
+              }
             />
           )}
 
@@ -1856,7 +1886,9 @@ export function QueryDSLEditor({
               highlightIndex={popoverHighlightIdx}
               onCheckboxToggle={handleInlineCheckboxToggle}
               onTextSelect={handleInlineTextSelect}
-              isLoading={!!(editedChip.field && isFieldLoading(editedChip.field))}
+              isLoading={
+                !!(editedChip.field && isFieldLoading(editedChip.field))
+              }
             />
           );
         })()}
