@@ -1262,9 +1262,8 @@ export function QueryDSLEditor({
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
             if (prev === -2) {
-              // before-all → first token: blur input so token gets focus
+              // before-all → first token
               suppressDropdownRef.current = true;
-              inputRef.current?.blur();
               return 0;
             }
             if (prev < 0) return -1; // clamp at input
@@ -1659,7 +1658,7 @@ export function QueryDSLEditor({
         flex: isAtFront ? '0 0 auto' : 1,
         minWidth: isAtFront ? 2 : 80,
         width: isAtFront
-          ? inputValue ? `${inputValue.length + 1}ch` : 1
+          ? (inputValue ? `${Math.max(inputValue.length + 3, 1)}ch` : 2)
           : undefined,
         border: 'none',
         outline: 'none',
