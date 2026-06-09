@@ -24,7 +24,7 @@ import {
   SearchRounded as SearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import type { SuggestionItem } from './types';
+import type { SuggestionItem, SuggestionCategory } from './types';
 import type { RecentSearch } from './recent-searches';
 import { getOpLabel } from './operator-labels';
 
@@ -317,7 +317,13 @@ export const QuerySuggestionDropdown = forwardRef<
   const filteredSuggestions = useMemo(() => {
     // When typing (tabs hidden), show ALL suggestions including logical operators
     if (!showTabs) return suggestions;
-    if (activeTab === 'recent') return suggestions;
+    if (activeTab === 'recent') {
+      return recentSearches.map((r) => ({
+        label: r.query,
+        category: 'recent' as SuggestionCategory,
+        fieldCategory: 'recent',
+      }));
+    }
     if (activeTab === 'all') {
       // Show has/not has in All tab, but exclude AND/OR/parens
       return suggestions.filter((s) => {
@@ -329,7 +335,7 @@ export const QuerySuggestionDropdown = forwardRef<
     }
     // Filter by fieldCategory
     return suggestions.filter((s) => s.fieldCategory === activeTab);
-  }, [suggestions, activeTab, showTabs]);
+  }, [suggestions, activeTab, showTabs, recentSearches]);
 
   useImperativeHandle(
     _tabNavHandleRef,

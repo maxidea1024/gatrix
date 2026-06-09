@@ -36,7 +36,7 @@ import type { DomainConfig, SuggestionItem } from './types';
 import { TokenType, EditorState } from './types';
 import { tokenize } from './lexer';
 import { resolveCursorContext } from './cursor-context';
-import { getSuggestions, applyCompletion } from './suggestion-engine';
+import { getSuggestions, applyCompletion, isIncompleteQuery } from './suggestion-engine';
 import { QuerySuggestionDropdown } from './QuerySuggestionDropdown';
 import type { QuerySuggestionDropdownHandle } from './QuerySuggestionDropdown';
 import {
@@ -947,6 +947,12 @@ export function QueryDSLEditor({
       // click can land on a stale dropdown DOM that has silently re-rendered
       if (windowBlurRef.current) return;
 
+      // Special case: recent search selection (e.g. from keyboard confirmation)
+      if ((item as any).category === 'recent') {
+        handleSelectRecent(item.label);
+        return;
+      }
+
       const result = applyCompletion(inputValue, cursorContext, item);
 
       if (item.category === 'logical') {
@@ -1223,6 +1229,7 @@ export function QueryDSLEditor({
       chips,
       currentFilterInfo,
       insertChipsAtCursor,
+      handleSelectRecent,
     ]
   );
 
@@ -1426,7 +1433,11 @@ export function QueryDSLEditor({
           // Nothing selected — just close the dropdown
           setShowDropdown(false);
         } else if (inputValue.trim()) {
-          commitInputAsChip(inputValue.trim());
+          if (isIncompleteQuery(inputValue)) {
+            setInputValue('');
+          } else {
+            commitInputAsChip(inputValue.trim());
+          }
           setShowDropdown(false);
         }
         return;
@@ -1437,7 +1448,11 @@ export function QueryDSLEditor({
         if (isMultiSelectingRef.current || inputValue.includes('[')) {
           isMultiSelectingRef.current = false;
           if (inputValue.trim()) {
-            commitInputAsChip(inputValue.trim());
+            if (isIncompleteQuery(inputValue)) {
+              setInputValue('');
+            } else {
+              commitInputAsChip(inputValue.trim());
+            }
           }
           setShowDropdown(false);
           return;
@@ -1450,7 +1465,11 @@ export function QueryDSLEditor({
             applySuggestion(enterItem);
           }
         } else if (inputValue.trim()) {
-          commitInputAsChip(inputValue.trim());
+          if (isIncompleteQuery(inputValue)) {
+            setInputValue('');
+          } else {
+            commitInputAsChip(inputValue.trim());
+          }
           setShowDropdown(false);
         } else {
           // No input text → execute search with current chips
@@ -1581,7 +1600,11 @@ export function QueryDSLEditor({
   const commitPendingInput = useCallback(() => {
     const text = inputValue.trim();
     if (text) {
-      commitInputAsChip(text);
+      if (isIncompleteQuery(text)) {
+        setInputValue('');
+      } else {
+        commitInputAsChip(text);
+      }
       setShowDropdown(false);
     }
   }, [inputValue, commitInputAsChip]);
@@ -1645,8 +1668,11 @@ export function QueryDSLEditor({
         justFocusedRef.current = false;
         return;
       }
-      // If composing a filter (has colon), force commit it
+      // If composing a filter (has colon), force commit it (unless incomplete)
       if (inputValue.includes(':')) {
+        if (isIncompleteQuery(inputValue)) {
+          return;
+        }
         isMultiSelectingRef.current = false;
         commitPendingInput();
         return;

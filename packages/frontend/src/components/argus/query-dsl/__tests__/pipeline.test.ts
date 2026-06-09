@@ -5,6 +5,7 @@ import {
   getSuggestions,
   applyCompletion,
   shouldKeepDropdownOpen,
+  isIncompleteQuery,
 } from '../suggestion-engine';
 import type { CursorContext, SuggestionItem } from '../types';
 import { queryToChips } from '../useFilterChips';
@@ -126,6 +127,12 @@ describe('Spec 11.1: Suggestions per context', () => {
     // Only field-category suggestions should match prefix
     const fieldSuggestions = suggestions.filter((s) => s.category === 'field');
     expect(fieldSuggestions.every((s) => s.label.startsWith('lev'))).toBe(true);
+
+    // Verify fields/keywords are prioritized before smart suggestions
+    const fieldIndex = suggestions.findIndex((s) => s.label === 'level');
+    const smartIndex = suggestions.findIndex((s) => s.label.startsWith('message contains'));
+    expect(fieldIndex).toBe(0);
+    expect(smartIndex).toBeGreaterThan(fieldIndex);
   });
 
   it('OPERATOR context (level:) → operators + values from facets', () => {
@@ -269,5 +276,28 @@ describe('Spec 10: Autocomplete rules', () => {
   it('value selection closes dropdown', () => {
     const valItem: SuggestionItem = { label: 'error', category: 'value' };
     expect(shouldKeepDropdownOpen(valItem)).toBe(false);
+  });
+});
+
+describe('isIncompleteQuery utility', () => {
+  it('identifies incomplete queries that should be cancelled', () => {
+    expect(isIncompleteQuery('has')).toBe(true);
+    expect(isIncompleteQuery('!has')).toBe(true);
+    expect(isIncompleteQuery('not')).toBe(true);
+    expect(isIncompleteQuery('!')).toBe(true);
+    expect(isIncompleteQuery('level:')).toBe(true);
+    expect(isIncompleteQuery('level:!=')).toBe(true);
+    expect(isIncompleteQuery('level:contains')).toBe(true);
+    expect(isIncompleteQuery('level:contains(')).toBe(true);
+    expect(isIncompleteQuery('level:info AND')).toBe(true);
+    expect(isIncompleteQuery('has:""')).toBe(true);
+    expect(isIncompleteQuery('!has:""')).toBe(true);
+  });
+
+  it('identifies complete queries that should NOT be cancelled', () => {
+    expect(isIncompleteQuery('level:info')).toBe(false);
+    expect(isIncompleteQuery('has:level')).toBe(false);
+    expect(isIncompleteQuery('!has:level')).toBe(false);
+    expect(isIncompleteQuery('message:contains("test")')).toBe(false);
   });
 });

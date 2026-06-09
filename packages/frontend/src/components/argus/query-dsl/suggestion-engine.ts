@@ -10,6 +10,8 @@ import type {
   SuggestionItem,
   SuggestionCategory,
 } from './types';
+import { TokenType } from './types';
+import { tokenize } from './lexer';
 import { getFieldByKey } from './fields';
 import { getOpLabel } from './operator-labels';
 
@@ -144,75 +146,6 @@ function getFieldSuggestions(
     }
   }
 
-  // Smart suggestions: when user types free text, suggest message operator variants
-  // Use originalPrefix to preserve user's casing in displayed labels
-  if (prefix !== '' && !prefix.includes(':')) {
-    const escapedPrefix = originalPrefix.replace(/"/g, '\\"');
-
-    // Ordered from least to most common (unshift reverses order → top items first)
-    const smartSuggestions: {
-      label: string;
-      insertText: string;
-      desc: string;
-    }[] = [
-      // Primary — most common
-      {
-        label: `message contains ${originalPrefix}`,
-        insertText: `message:contains("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageContains',
-      },
-      {
-        label: `message is ${originalPrefix}`,
-        insertText: `message:"${escapedPrefix}"`,
-        desc: 'dsl.smart.messageIs',
-      },
-      // Negation
-      {
-        label: `message not contains ${originalPrefix}`,
-        insertText: `message:!contains("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageNotContains',
-      },
-      {
-        label: `message is not ${originalPrefix}`,
-        insertText: `message:!="${escapedPrefix}"`,
-        desc: 'dsl.smart.messageIsNot',
-      },
-      // Prefix/suffix
-      {
-        label: `message starts with ${originalPrefix}`,
-        insertText: `message:startsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageStartsWith',
-      },
-      {
-        label: `message ends with ${originalPrefix}`,
-        insertText: `message:endsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageEndsWith',
-      },
-      // Negated prefix/suffix
-      {
-        label: `message not starts with ${originalPrefix}`,
-        insertText: `message:!startsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageNotStartsWith',
-      },
-      {
-        label: `message not ends with ${originalPrefix}`,
-        insertText: `message:!endsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageNotEndsWith',
-      },
-    ];
-
-    // unshift in reverse so first item ends up at top
-    for (let i = smartSuggestions.length - 1; i >= 0; i--) {
-      const s = smartSuggestions[i];
-      results.unshift({
-        label: s.label,
-        insertText: s.insertText,
-        category: 'value',
-        description: s.desc,
-      });
-    }
-  }
-
   // ── Logical operator and paren suggestions (context-aware) ──
   const lastChip = chips && chips.length > 0 ? chips[chips.length - 1] : null;
   const hasFilterChip = chips?.some(
@@ -305,8 +238,9 @@ function getFieldSuggestions(
   // Move ANY suggestion whose label matches prefix (case-insensitive) to the very top.
   // This ensures 'AND', 'OR', exact field names, etc. appear first.
   if (prefix !== '') {
+    const targetMatch = (context.isNegated && prefix === 'has') ? 'not has' : prefix;
     const exactMatchIndex = results.findIndex(
-      (item) => item.label.toLowerCase() === prefix
+      (item) => item.label.toLowerCase() === targetMatch
     );
     if (exactMatchIndex > 0) {
       const [exactMatchItem] = results.splice(exactMatchIndex, 1);
@@ -334,6 +268,73 @@ function getFieldSuggestions(
           description: 'dsl.has.fieldExists',
         });
       }
+    }
+  }
+
+  // Smart suggestions: when user types free text, suggest message operator variants
+  // Use originalPrefix to preserve user's casing in displayed labels
+  // Pushed to the end so they appear below matching fields and logic keywords
+  if (prefix !== '' && !prefix.includes(':')) {
+    const escapedPrefix = originalPrefix.replace(/"/g, '\\"');
+
+    const smartSuggestions: {
+      label: string;
+      insertText: string;
+      desc: string;
+    }[] = [
+      // Primary — most common
+      {
+        label: `message contains ${originalPrefix}`,
+        insertText: `message:contains("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageContains',
+      },
+      {
+        label: `message is ${originalPrefix}`,
+        insertText: `message:"${escapedPrefix}"`,
+        desc: 'dsl.smart.messageIs',
+      },
+      // Negation
+      {
+        label: `message not contains ${originalPrefix}`,
+        insertText: `message:!contains("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageNotContains',
+      },
+      {
+        label: `message is not ${originalPrefix}`,
+        insertText: `message:!="${escapedPrefix}"`,
+        desc: 'dsl.smart.messageIsNot',
+      },
+      // Prefix/suffix
+      {
+        label: `message starts with ${originalPrefix}`,
+        insertText: `message:startsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageStartsWith',
+      },
+      {
+        label: `message ends with ${originalPrefix}`,
+        insertText: `message:endsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageEndsWith',
+      },
+      // Negated prefix/suffix
+      {
+        label: `message not starts with ${originalPrefix}`,
+        insertText: `message:!startsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageNotStartsWith',
+      },
+      {
+        label: `message not ends with ${originalPrefix}`,
+        insertText: `message:!endsWith("${escapedPrefix}")`,
+        desc: 'dsl.smart.messageNotEndsWith',
+      },
+    ];
+
+    for (const s of smartSuggestions) {
+      results.push({
+        label: s.label,
+        insertText: s.insertText,
+        category: 'value',
+        description: s.desc,
+      });
     }
   }
 
@@ -703,4 +704,111 @@ function getHasFieldSuggestions(
   }
 
   return results.slice(0, max);
+}
+
+/**
+ * Determine if the given input query string is incomplete or should not be committed/auto-completed.
+ * E.g., standalone 'has', '!has', 'not', '!', or filters ending with operators/colons without values.
+ */
+export function isIncompleteQuery(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+
+  const lower = trimmed.toLowerCase();
+  // 1. Direct logical and logic existence keywords that should not be committed by themselves
+  if (
+    lower === '!' ||
+    lower === 'not' ||
+    lower === 'has' ||
+    lower === '!has' ||
+    lower === 'not has' ||
+    lower === 'and' ||
+    lower === 'or'
+  ) {
+    return true;
+  }
+
+  // 2. Tokenize and check the last active token
+  const tokens = tokenize(trimmed);
+  const activeTokens = tokens.filter((t) => t.type !== TokenType.EOF);
+  if (activeTokens.length === 0) return false;
+
+  // Check if the query is has:"" or !has:"" (empty field name for existence check)
+  for (let i = 0; i < activeTokens.length; i++) {
+    const tok = activeTokens[i];
+    if (
+      tok.type === TokenType.FIELD &&
+      tok.value.toLowerCase() === 'has' &&
+      activeTokens[i + 1]?.type === TokenType.COLON
+    ) {
+      const valTok = activeTokens[i + 2];
+      if (valTok && valTok.type === TokenType.STRING && valTok.value === '') {
+        return true;
+      }
+    }
+  }
+
+  const lastToken = activeTokens[activeTokens.length - 1];
+
+  // If it ends with an operator, structural delimiter, or logical operator
+  if (
+    lastToken.type === TokenType.COLON ||
+    lastToken.type === TokenType.NE ||
+    lastToken.type === TokenType.GT ||
+    lastToken.type === TokenType.GTE ||
+    lastToken.type === TokenType.LT ||
+    lastToken.type === TokenType.LTE ||
+    lastToken.type === TokenType.LBRACKET ||
+    lastToken.type === TokenType.COMMA ||
+    lastToken.type === TokenType.BANG ||
+    lastToken.type === TokenType.NOT ||
+    lastToken.type === TokenType.AND ||
+    lastToken.type === TokenType.OR
+  ) {
+    return true;
+  }
+
+  // If it ends with a function operator (e.g. level:contains)
+  const functionOperators = new Set([
+    TokenType.CONTAINS,
+    TokenType.STARTS_WITH,
+    TokenType.ENDS_WITH,
+    TokenType.BEFORE,
+    TokenType.AFTER,
+    TokenType.BETWEEN,
+    TokenType.NOT_CONTAINS,
+    TokenType.NOT_STARTS_WITH,
+    TokenType.NOT_ENDS_WITH,
+  ]);
+  if (functionOperators.has(lastToken.type)) {
+    return true;
+  }
+
+  // If the last token is a STRING that matches a function operator keyword (missing parens/value)
+  if (
+    lastToken.type === TokenType.STRING &&
+    (lastToken.value.toLowerCase() === 'contains' ||
+      lastToken.value.toLowerCase() === 'startswith' ||
+      lastToken.value.toLowerCase() === 'endswith' ||
+      lastToken.value.toLowerCase() === 'before' ||
+      lastToken.value.toLowerCase() === 'after' ||
+      lastToken.value.toLowerCase() === 'between' ||
+      lastToken.value.toLowerCase() === '!contains' ||
+      lastToken.value.toLowerCase() === '!startswith' ||
+      lastToken.value.toLowerCase() === '!endswith')
+  ) {
+    return true;
+  }
+
+  // If it ends with an open paren, check if it's a function argument paren or multi-value list
+  if (lastToken.type === TokenType.LPAREN) {
+    if (activeTokens.length > 1) {
+      const prev = activeTokens[activeTokens.length - 2];
+      if (prev.type === TokenType.COLON || functionOperators.has(prev.type)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
