@@ -303,6 +303,34 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     searchable: true,
     description: 'dsl.field.feedback.desc',
   },
+  // ── Releases fields ──
+  {
+    key: 'crash_free',
+    label: 'dsl.field.crashFree',
+    type: 'number',
+    category: 'custom',
+    operators: ['=', '!=', '>', '>=', '<', '<='],
+    searchable: true,
+    description: 'dsl.field.crashFree.desc',
+  },
+  {
+    key: 'sessions',
+    label: 'dsl.field.sessions',
+    type: 'number',
+    category: 'custom',
+    operators: ['=', '!=', '>', '>=', '<', '<='],
+    searchable: true,
+    description: 'dsl.field.sessions.desc',
+  },
+  {
+    key: 'errors',
+    label: 'dsl.field.errors',
+    type: 'number',
+    category: 'custom',
+    operators: ['=', '!=', '>', '>=', '<', '<='],
+    searchable: true,
+    description: 'dsl.field.errors.desc',
+  },
 ];
 
 // ─── Field lookup cache (built lazily) ───────────────────────────────────────
@@ -449,6 +477,21 @@ export const SESSIONS_CONFIG: DomainConfig = {
     'duration', 'timestamp',
   ]),
   aliases: SHARED_ALIASES,
+};
+
+export const RELEASES_CONFIG: DomainConfig = {
+  name: 'releases',
+  fields: pickFields(
+    [
+      'release', 'environment', 'status',
+      'crash_free', 'sessions', 'errors',
+    ],
+    {
+      status: {
+        staticValues: ['adopted', 'low'],
+      },
+    }
+  ),
 };
 
 // ─── Public API (DomainConfig-based) ─────────────────────────────────────────

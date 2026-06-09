@@ -805,6 +805,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                 setStatus(v);
                 setCurrentPage(1);
               }}
+              sx={{ height: 32 }}
             />
             <FilterChipSelect
               label={t('argus.issues.level')}
@@ -817,6 +818,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                 setLevel(v);
                 setCurrentPage(1);
               }}
+              sx={{ height: 32 }}
             />
             <FilterChipSelect
               label={t('argus.issues.sort')}
@@ -828,6 +830,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               onSelect={(v) => {
                 setSort(v);
               }}
+              sx={{ height: 32 }}
             />
           </>
         }

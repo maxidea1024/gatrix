@@ -49,9 +49,102 @@ import ArgusFilterBar, {
 } from '@/components/argus/ArgusFilterBar';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
+import {
+  QueryDSLEditor,
+  parse,
+  RELEASES_CONFIG,
+  Expression,
+} from '@/components/argus/query-dsl';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
+
+const evaluateAST = (
+  node: Expression | null,
+  release: ArgusRelease,
+  totalSessionsAll: number
+): boolean => {
+  if (!node) return true;
+
+  switch (node.type) {
+    case 'Binary': {
+      const leftVal = evaluateAST(node.left, release, totalSessionsAll);
+      const rightVal = evaluateAST(node.right, release, totalSessionsAll);
+      return node.operator === 'or' ? (leftVal || rightVal) : (leftVal && rightVal);
+    }
+    case 'Not':
+      return !evaluateAST(node.expression, release, totalSessionsAll);
+    case 'Group':
+      return evaluateAST(node.expression, release, totalSessionsAll);
+    case 'FreeText': {
+      const val = node.value.toLowerCase();
+      return release.release.toLowerCase().includes(val);
+    }
+    case 'Filter': {
+      const field = node.field.toLowerCase();
+      let rVal: any;
+
+      if (field === 'release' || field === 'version') {
+        rVal = release.release;
+      } else if (field === 'crash_free') {
+        rVal = release.crash_free_rate;
+      } else if (field === 'sessions') {
+        rVal = release.total_sessions;
+      } else if (field === 'errors') {
+        rVal = release.error_count;
+      } else if (field === 'new_issues') {
+        rVal = release.new_issues;
+      } else if (field === 'status') {
+        const stage =
+          totalSessionsAll === 0
+            ? 'low'
+            : (Number(release.total_sessions) / totalSessionsAll) * 100 >= 10
+            ? 'adopted'
+            : 'low';
+        rVal = stage;
+      } else {
+        return true;
+      }
+
+      const op = node.operator;
+      const target = node.value;
+
+      if (typeof rVal === 'number') {
+        const numTarget = typeof target === 'number' ? target : (typeof target === 'string' ? parseFloat(target) : NaN);
+        if (isNaN(numTarget)) return false;
+
+        switch (op) {
+          case '=': return rVal === numTarget;
+          case '!=': return rVal !== numTarget;
+          case '>': return rVal > numTarget;
+          case '>=': return rVal >= numTarget;
+          case '<': return rVal < numTarget;
+          case '<=': return rVal <= numTarget;
+          default: return false;
+        }
+      } else if (typeof rVal === 'string') {
+        const strTarget = String(target).toLowerCase();
+        const strVal = rVal.toLowerCase();
+
+        switch (op) {
+          case '=': return strVal === strTarget;
+          case '!=': return strVal !== strTarget;
+          case 'contains': return strVal.includes(strTarget);
+          case '!contains': return !strVal.includes(strTarget);
+          case 'startsWith': return strVal.startsWith(strTarget);
+          case '!startsWith': return !strVal.startsWith(strTarget);
+          case 'endsWith': return strVal.endsWith(strTarget);
+          case '!endsWith': return !strVal.endsWith(strTarget);
+          default: return false;
+        }
+      }
+      return true;
+    }
+    case 'Partial':
+    default:
+      return true;
+  }
+};
 
 const PAGE_SIZE_STORAGE_KEY = 'argus:releases:pageSize';
 const DEEP_LINK_KEYS = ['page', 'search', 'sort'];
@@ -224,6 +317,10 @@ const ArgusReleasesPage: React.FC = () => {
     (s, r) => s + Number(r.total_sessions),
     0
   );
+
+  const maxErrorCount = useMemo(() => {
+    return Math.max(...releases.map((r) => Number(r.error_count)), 1);
+  }, [releases]);
   const getAdoptionStage = (
     r: ArgusRelease
   ): 'adopted' | 'low' | 'replaced' => {
@@ -232,14 +329,34 @@ const ArgusReleasesPage: React.FC = () => {
     return pct >= 10 ? 'adopted' : 'low';
   };
 
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string) => {
+      if (fieldKey === 'release' || fieldKey === 'version') {
+        return Array.from(new Set(releases.map((r) => r.release)));
+      }
+      return [];
+    },
+    [releases]
+  );
+
   // --- Filter & Sort ---
   const filteredReleases = useMemo(() => {
     let result = [...releases];
 
-    // Search
+    // Search using DSL Query Parser
     if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter((r) => r.release.toLowerCase().includes(term));
+      try {
+        const { ast } = parse(searchTerm);
+        if (ast) {
+          result = result.filter((r) => evaluateAST(ast, r, totalSessionsAll));
+        } else {
+          const term = searchTerm.toLowerCase();
+          result = result.filter((r) => r.release.toLowerCase().includes(term));
+        }
+      } catch (err) {
+        const term = searchTerm.toLowerCase();
+        result = result.filter((r) => r.release.toLowerCase().includes(term));
+      }
     }
 
     // Sort
@@ -264,7 +381,7 @@ const ArgusReleasesPage: React.FC = () => {
     }
 
     return result;
-  }, [releases, searchTerm, sortBy]);
+  }, [releases, searchTerm, sortBy, totalSessionsAll]);
 
   const filteredTotal = filteredReleases.length;
   const paginatedReleases = useMemo(() => {
@@ -308,7 +425,6 @@ const ArgusReleasesPage: React.FC = () => {
         projectId={projectId}
         value={filters}
         onChange={handleFilterChange}
-        onRefresh={fetchData}
         loading={loading}
       />
 
@@ -318,11 +434,11 @@ const ArgusReleasesPage: React.FC = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          mb: 3,
-          py: 1.5,
-          borderRadius: '10px',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-          backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.015)',
+          mb: 2,
+          py: 0.75,
+          borderRadius: '8px',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          backgroundColor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.01)',
         }}
       >
         {[
@@ -330,61 +446,68 @@ const ArgusReleasesPage: React.FC = () => {
             icon: <ReleaseIcon />,
             label: t('argus.releases.releasesLabel'),
             value: releases.length,
+            color: '#7c4dff',
           },
           {
             icon: <BugReportIcon />,
             label: t('argus.releases.totalErrors'),
             value: totalErrors,
+            color: '#f44336',
           },
           {
             icon: <PeopleIcon />,
             label: t('argus.releases.affectedUsers'),
             value: totalUsers,
+            color: '#2196f3',
           },
           {
             icon: <CheckIcon />,
             label: t('argus.releases.avgCrashFree'),
             value: `${avgCrashFree.toFixed(1)}%`,
+            color: '#4caf50',
           },
         ].map((card, idx, arr) => (
           <React.Fragment key={idx}>
-            <Box sx={{ flex: 1, textAlign: 'center' }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 0.5,
-                  mb: 0.5,
-                }}
-              >
-                {React.cloneElement(card.icon as React.ReactElement, {
-                  sx: { fontSize: 16, color: 'text.secondary' },
-                })}
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontWeight: 600,
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  {card.label}
-                </Typography>
-              </Box>
+            <Box sx={{ flex: 1, textAlign: 'center', py: 0.5 }}>
               <Typography
-                variant="h6"
-                fontWeight={700}
+                variant="h5"
+                fontWeight={800}
                 sx={{
-                  lineHeight: 1,
-                  fontSize: '1.2rem',
-                  color: 'text.primary',
+                  lineHeight: 1.1,
+                  fontSize: '1.35rem',
+                  color: card.color,
+                  fontFamily: 'monospace',
+                  mb: 0.25,
                 }}
               >
                 {typeof card.value === 'number'
                   ? formatCompactNumber(card.value)
                   : card.value}
               </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 0.5,
+                }}
+              >
+                {React.cloneElement(card.icon as React.ReactElement, {
+                  sx: { fontSize: 13, color: 'text.secondary' },
+                })}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    fontWeight: 600,
+                    fontSize: '0.65rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  {card.label}
+                </Typography>
+              </Box>
             </Box>
             {idx < arr.length - 1 && (
               <Divider
@@ -393,8 +516,8 @@ const ArgusReleasesPage: React.FC = () => {
                 sx={{
                   mx: 1,
                   borderColor: isDark
-                    ? 'rgba(255,255,255,0.08)'
-                    : 'rgba(0,0,0,0.08)',
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.06)',
                 }}
               />
             )}
@@ -407,40 +530,33 @@ const ArgusReleasesPage: React.FC = () => {
           <EmptyPlaceholder
             icon={<ReleaseIcon sx={{ fontSize: 48 }} />}
             message={t('argus.releases.noReleases')}
-            minHeight={300}
+            minHeight={200}
           />
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             {/* Search & Sort Bar */}
             <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}
+              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}
             >
-              <TextField
-                size="small"
-                placeholder={t(
-                  'argus.releases.searchPlaceholder',
-                  'Search releases...'
-                )}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ fontSize: 18, color: 'text.disabled' }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  flex: 1,
-                  maxWidth: 320,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    fontSize: '0.8rem',
-                  },
-                }}
-              />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <QueryDSLEditor
+                  config={RELEASES_CONFIG}
+                  initialQuery={searchTerm}
+                  placeholder={t(
+                    'argus.releases.searchPlaceholder',
+                    'Search releases... e.g. errors > 10 status:adopted'
+                  )}
+                  onSearch={(val) => {
+                    setSearchTerm(val);
+                    setCurrentPage(1);
+                  }}
+                  onChange={(val) => {
+                    setSearchTerm(val);
+                    setCurrentPage(1);
+                  }}
+                  fetchFieldValues={fetchFieldValues}
+                />
+              </Box>
               <FilterChipSelect
                 label={t('argus.releases.sortLabel', '정렬')}
                 value={sortBy}
@@ -449,6 +565,7 @@ const ArgusReleasesPage: React.FC = () => {
                 onOpen={(e) => setSortAnchor(e.currentTarget)}
                 onClose={() => setSortAnchor(null)}
                 onSelect={(v) => setSortBy(v as typeof sortBy)}
+                sx={{ height: 32 }}
               />
               {searchTerm && (
                 <Typography variant="caption" color="text.secondary">
@@ -459,9 +576,9 @@ const ArgusReleasesPage: React.FC = () => {
             </Box>
 
             {filteredReleases.length === 0 ? (
-              <Box sx={{ mt: 4 }}>
+              <Box sx={{ mt: 1 }}>
                 <EmptyPlaceholder
-                  icon={<SearchIcon sx={{ fontSize: 48 }} />}
+                  icon={<SearchIcon sx={{ fontSize: 36 }} />}
                   message={t(
                     'argus.releases.noFilteredReleases',
                     'No releases match your search.'
@@ -470,7 +587,7 @@ const ArgusReleasesPage: React.FC = () => {
                     'argus.releases.checkSearchConditions',
                     'Please check your search conditions or clear filters.'
                   )}
-                  minHeight={250}
+                  minHeight={160}
                 />
               </Box>
             ) : (
@@ -480,10 +597,10 @@ const ArgusReleasesPage: React.FC = () => {
                   sx={{
                     display: 'grid',
                     gridTemplateColumns:
-                      'minmax(200px, 2fr) 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr',
-                    gap: 2,
+                      'minmax(200px, 2fr) 1.5fr 1.5fr 1.3fr 1.2fr 1.5fr 1fr',
+                    gap: 2.5,
                     px: 3,
-                    py: 1.5,
+                    py: 1,
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
                     backgroundColor: isDark
                       ? 'rgba(255,255,255,0.02)'
@@ -577,20 +694,31 @@ const ArgusReleasesPage: React.FC = () => {
                       sx={{
                         display: 'grid',
                         gridTemplateColumns:
-                          'minmax(200px, 2fr) 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr',
-                        gap: 2,
+                          'minmax(200px, 2fr) 1.5fr 1.5fr 1.3fr 1.2fr 1.5fr 1fr',
+                        gap: 2.5,
                         alignItems: 'center',
                         px: 3,
-                        py: 2,
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                        borderLeft: `3px solid ${statusColor}`,
-                        backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-                        transition: 'all 0.15s',
+                        py: 1.25,
+                        mb: 0.75,
+                        borderRadius: '6px',
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                        borderLeft: `4px solid ${statusColor}`,
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.015)' : '#fff',
+                        transition: 'all 0.2s ease-in-out',
                         cursor: 'pointer',
                         '&:hover': {
+                          transform: 'translateY(-1px)',
+                          boxShadow: isDark
+                            ? '0 4px 12px rgba(0,0,0,0.4)'
+                            : '0 4px 12px rgba(0,0,0,0.05)',
                           backgroundColor: isDark
                             ? 'rgba(255,255,255,0.03)'
-                            : 'rgba(0,0,0,0.015)',
+                            : 'rgba(0,0,0,0.005)',
+                        },
+                        '@keyframes pulse': {
+                          '0%': { opacity: 0.6 },
+                          '50%': { opacity: 1 },
+                          '100%': { opacity: 0.6 },
                         },
                       }}
                       onClick={() =>
@@ -612,7 +740,11 @@ const ArgusReleasesPage: React.FC = () => {
                           <Typography
                             variant="subtitle2"
                             fontWeight={800}
-                            sx={{ fontSize: '0.9rem' }}
+                            sx={{
+                              fontSize: '0.85rem',
+                              fontFamily: 'monospace',
+                              color: 'text.primary',
+                            }}
                           >
                             {r.release}
                           </Typography>
@@ -664,7 +796,7 @@ const ArgusReleasesPage: React.FC = () => {
                           <ScheduleIcon
                             sx={{
                               fontSize: 13,
-                              color: isDark ? '#555' : '#bbb',
+                              color: isDark ? '#666' : '#bbb',
                             }}
                           />
                           <Typography
@@ -679,39 +811,49 @@ const ArgusReleasesPage: React.FC = () => {
                       {/* Crash-Free Sessions */}
                       <Box>
                         <Typography
-                          variant="h6"
+                          variant="subtitle2"
                           fontWeight={800}
-                          sx={{ color: statusColor, lineHeight: 1.2 }}
+                          sx={{ color: statusColor, lineHeight: 1.2, fontSize: '0.85rem' }}
                         >
-                          {crashFree.toFixed(1)}%
+                          {crashFree.toFixed(2)}%
                         </Typography>
-                        {prevRelease && (
-                          <Typography
-                            variant="caption"
+                        <Box sx={{ width: '100%', mt: 0.5 }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={crashFree}
                             sx={{
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              color:
-                                crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.2,
+                              height: 3,
+                              borderRadius: 1,
+                              backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                              '& .MuiLinearProgress-bar': {
+                                backgroundColor: statusColor,
+                              },
                             }}
-                          >
-                            {crashFreeDelta > 0
-                              ? '▲'
-                              : crashFreeDelta < 0
-                                ? '▼'
-                                : '-'}{' '}
-                            {Math.abs(crashFreeDelta).toFixed(1)}%
-                          </Typography>
+                          />
+                        </Box>
+                        {prevRelease && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                            <Chip
+                              label={`${crashFreeDelta > 0 ? '+' : ''}${crashFreeDelta.toFixed(2)}%`}
+                              size="small"
+                              sx={{
+                                height: 16,
+                                fontSize: '0.65rem',
+                                fontWeight: 700,
+                                backgroundColor: alpha(crashFreeDelta >= 0 ? '#4caf50' : '#f44336', 0.1),
+                                color: crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
+                                border: 'none',
+                                '& .MuiChip-label': { px: 0.5 },
+                              }}
+                            />
+                          </Box>
                         )}
                       </Box>
 
                       {/* Crash-Free Users */}
                       <Box>
                         <Typography
-                          variant="h6"
+                          variant="subtitle2"
                           fontWeight={800}
                           sx={{
                             color:
@@ -721,32 +863,51 @@ const ArgusReleasesPage: React.FC = () => {
                                   ? '#ff9800'
                                   : '#f44336',
                             lineHeight: 1.2,
+                            fontSize: '0.85rem',
                           }}
                         >
-                          {crashFreeUsers.toFixed(1)}%
+                          {crashFreeUsers.toFixed(2)}%
                         </Typography>
+                        {(() => {
+                          const userStatusColor =
+                            crashFreeUsers >= 99
+                              ? '#4caf50'
+                              : crashFreeUsers >= 95
+                                ? '#ff9800'
+                                : '#f44336';
+                          return (
+                            <Box sx={{ width: '100%', mt: 0.5 }}>
+                              <LinearProgress
+                                variant="determinate"
+                                value={crashFreeUsers}
+                                sx={{
+                                  height: 3,
+                                  borderRadius: 1,
+                                  backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                                  '& .MuiLinearProgress-bar': {
+                                    backgroundColor: userStatusColor,
+                                  },
+                                }}
+                              />
+                            </Box>
+                          );
+                        })()}
                         {prevRelease && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              color:
-                                crashFreeUsersDelta >= 0
-                                  ? '#4caf50'
-                                  : '#f44336',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.2,
-                            }}
-                          >
-                            {crashFreeUsersDelta > 0
-                              ? '▲'
-                              : crashFreeUsersDelta < 0
-                                ? '▼'
-                                : '-'}{' '}
-                            {Math.abs(crashFreeUsersDelta).toFixed(1)}%
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                            <Chip
+                              label={`${crashFreeUsersDelta > 0 ? '+' : ''}${crashFreeUsersDelta.toFixed(2)}%`}
+                              size="small"
+                              sx={{
+                                height: 16,
+                                fontSize: '0.65rem',
+                                fontWeight: 700,
+                                backgroundColor: alpha(crashFreeUsersDelta >= 0 ? '#4caf50' : '#f44336', 0.1),
+                                color: crashFreeUsersDelta >= 0 ? '#4caf50' : '#f44336',
+                                border: 'none',
+                                '& .MuiChip-label': { px: 0.5 },
+                              }}
+                            />
+                          </Box>
                         )}
                       </Box>
 
@@ -756,15 +917,18 @@ const ArgusReleasesPage: React.FC = () => {
                           <Chip
                             icon={
                               <BugReportIcon
-                                sx={{ fontSize: '14px !important' }}
+                                sx={{
+                                  fontSize: '13px !important',
+                                  animation: 'pulse 2s infinite ease-in-out',
+                                }}
                               />
                             }
                             label={`${newIssues} ${t('argus.releases.new', 'New')}`}
                             size="small"
                             sx={{
-                              height: 26,
+                              height: 22,
                               fontWeight: 700,
-                              fontSize: '0.75rem',
+                              fontSize: '0.7rem',
                               backgroundColor: alpha('#f44336', 0.1),
                               color: '#f44336',
                               border: 'none',
@@ -776,8 +940,8 @@ const ArgusReleasesPage: React.FC = () => {
                             variant="body2"
                             sx={{
                               color: 'text.disabled',
-                              fontWeight: 600,
-                              fontSize: '0.8rem',
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
                             }}
                           >
                             {t('argus.releases.noNewIssues', 'No new issues')}
@@ -787,48 +951,90 @@ const ArgusReleasesPage: React.FC = () => {
 
                       {/* Total Errors */}
                       <Box>
-                        <Typography variant="body1" fontWeight={700}>
-                          {formatCompactNumber(errorCount)}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          {errorCount > 100 && (
+                            <Box
+                              sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                backgroundColor: '#f44336',
+                                display: 'inline-block',
+                              }}
+                            />
+                          )}
+                          <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
+                            {formatCompactNumber(errorCount)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ width: '100%', mt: 0.5, height: 4, bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 1, overflow: 'hidden' }}>
+                          <Box
+                            sx={{
+                              height: '100%',
+                              width: `${(errorCount / maxErrorCount) * 100}%`,
+                              backgroundColor: alpha('#f44336', 0.6),
+                              borderRadius: 1,
+                            }}
+                          />
+                        </Box>
                       </Box>
 
                       {/* Adoption (Sessions) */}
-                      <Box>
-                        <Typography variant="body2" fontWeight={700}>
-                          {formatCompactNumber(Number(r.total_sessions))}
-                        </Typography>
-                        <Box sx={{ mt: 0.5 }}>
-                          {r.error_trend && r.error_trend.length > 1 && (
-                            <ArgusSparkline
-                              data={r.error_trend}
-                              width={70}
-                              height={20}
-                              color={isDark ? '#555' : '#ccc'}
-                            />
-                          )}
-                        </Box>
-                      </Box>
+                      {(() => {
+                        const adoptionPct = totalSessionsAll > 0 ? (Number(r.total_sessions) / totalSessionsAll) * 100 : 0;
+                        return (
+                          <Box>
+                            <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
+                              {formatCompactNumber(Number(r.total_sessions))}
+                              <span style={{ fontSize: '0.7rem', color: isDark ? '#aaa' : '#666', fontWeight: 500, marginLeft: 4 }}>
+                                ({adoptionPct.toFixed(1)}%)
+                              </span>
+                            </Typography>
+                            <Box sx={{ width: '100%', mt: 0.5, height: 4, bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 1, overflow: 'hidden' }}>
+                              <Box
+                                sx={{
+                                  height: '100%',
+                                  width: `${adoptionPct}%`,
+                                  backgroundColor: alpha('#7c4dff', 0.6),
+                                  borderRadius: 1,
+                                }}
+                              />
+                            </Box>
+                            <Box sx={{ mt: 0.75, display: 'flex', justifyContent: 'flex-start' }}>
+                              {r.error_trend && r.error_trend.length > 1 && (
+                                <ArgusSparkline
+                                  data={r.error_trend}
+                                  width={100}
+                                  height={16}
+                                  color={statusColor}
+                                />
+                              )}
+                            </Box>
+                          </Box>
+                        );
+                      })()}
 
                       {/* Performance */}
                       <Box>
                         <Typography
                           variant="body2"
-                          fontWeight={600}
+                          fontWeight={700}
                           sx={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: 0.5,
                             color: 'text.secondary',
+                            fontSize: '0.8rem',
                           }}
                         >
-                          <SpeedIcon sx={{ fontSize: 14 }} />{' '}
+                          <SpeedIcon sx={{ fontSize: 14, color: isDark ? '#aaa' : '#666' }} />{' '}
                           {p95 > 0 ? `${Math.round(p95)}ms` : '-'}
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ color: 'text.disabled', fontSize: '0.65rem' }}
+                          sx={{ color: 'text.disabled', fontSize: '0.65rem', display: 'block', mt: 0.25 }}
                         >
-                          {formatCompactNumber(txnCount)} txns
+                          {formatCompactNumber(txnCount)} {t('argus.releases.txns', 'txns')}
                         </Typography>
                       </Box>
                     </Box>

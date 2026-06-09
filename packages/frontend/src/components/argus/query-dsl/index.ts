@@ -24,6 +24,7 @@ export {
   FEEDBACK_CONFIG,
   PERFORMANCE_CONFIG,
   SESSIONS_CONFIG,
+  RELEASES_CONFIG,
   pickFields,
   getFieldByKey,
   isFieldInDomain,

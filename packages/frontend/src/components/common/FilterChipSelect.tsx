@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Popover, useTheme, alpha } from '@mui/material';
+import { Box, Typography, Popover, useTheme, alpha, SxProps, Theme } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 
 export interface FilterChipOption {
@@ -23,6 +23,8 @@ export interface FilterChipSelectProps {
   onClose: () => void;
   /** Called when an option is selected */
   onSelect: (value: string) => void;
+  /** Style override */
+  sx?: SxProps<Theme>;
 }
 
 /**
@@ -37,6 +39,7 @@ const FilterChipSelect: React.FC<FilterChipSelectProps> = ({
   onOpen,
   onClose,
   onSelect,
+  sx,
 }) => {
   const theme = useTheme();
   const currentOption = options.find((o) => o.value === value);
@@ -47,26 +50,29 @@ const FilterChipSelect: React.FC<FilterChipSelectProps> = ({
     <>
       <Box
         onClick={onOpen}
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 0.5,
-          height: 28,
-          px: 1.2,
-          borderRadius: '6px',
-          border: '1px solid',
-          borderColor: anchorEl ? 'primary.main' : 'divider',
-          bgcolor: anchorEl
-            ? alpha(theme.palette.primary.main, 0.04)
-            : 'transparent',
-          cursor: 'pointer',
-          transition: 'all 0.15s',
-          userSelect: 'none',
-          '&:hover': {
-            borderColor: 'primary.main',
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
+        sx={[
+          {
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            height: 28,
+            px: 1.2,
+            borderRadius: '6px',
+            border: '1px solid',
+            borderColor: anchorEl ? 'primary.main' : 'divider',
+            bgcolor: anchorEl
+              ? alpha(theme.palette.primary.main, 0.04)
+              : 'transparent',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+            userSelect: 'none',
+            '&:hover': {
+              borderColor: 'primary.main',
+              bgcolor: alpha(theme.palette.primary.main, 0.04),
+            },
           },
-        }}
+          ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+        ]}
       >
         {dotColor && (
           <Box
