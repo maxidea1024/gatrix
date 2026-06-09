@@ -1566,10 +1566,10 @@ export function QueryDSLEditor({
     // Force-complete any pending input
     if (inputValue.trim()) {
       commitPendingInput();
+      setShowDropdown(false);
     }
     // Clear token selection and focus input
     setSelectedTokenIdx(-1);
-    setShowDropdown(false);
     inputRef.current?.focus();
   }, [inputValue, commitPendingInput]);
 
