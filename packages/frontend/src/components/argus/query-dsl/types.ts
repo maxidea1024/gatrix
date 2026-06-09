@@ -301,8 +301,8 @@ export interface QueryDSLEditorProps {
   onSearch: (query: string) => void;
   /** Override preset fields (advanced) */
   customFields?: QueryField[];
-  /** Externally injected facet data (auto-fetched if absent) */
-  facets?: Record<string, { value: string; count: number }[]>;
+  /** Lazy-loading callback: fetches values for a specific field on demand */
+  fetchFieldValues?: (fieldKey: string) => Promise<string[]>;
   /** Maximum number of suggestion items (default: 20) */
   maxSuggestions?: number;
   /** Placeholder text (i18n key) */

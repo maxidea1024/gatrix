@@ -34,6 +34,7 @@ import {
 import { TokenEditDropdown, type EditingPart } from './TokenEditDropdown';
 import { queryToChips, chipsToQuery, type FilterChip } from './useFilterChips';
 import { getFieldByKey } from './fields';
+import { useLazyFacets, type FetchFieldValues } from './useLazyFacets';
 import {
   DATETIME_PRESET_COUNT,
   DATETIME_NAVIGABLE_COUNT,
@@ -54,11 +55,8 @@ export interface QueryDSLEditorProps {
   onSearch: (query: string) => void;
   /** Called whenever the query changes (for parent state sync) */
   onChange?: (query: string) => void;
-  /** Accepts Map<string, string[]> or Record<string, {value,count}[]> */
-  facets?:
-    | Map<string, string[]>
-    | Record<string, { value: string; count: number }[]>
-    | Record<string, string[]>;
+  /** Lazy-loading callback: fetches values for a specific field on demand */
+  fetchFieldValues?: FetchFieldValues;
   placeholder?: string;
   maxSuggestions?: number;
 }
@@ -126,7 +124,7 @@ export function QueryDSLEditor({
   initialQuery = '',
   onSearch,
   onChange,
-  facets,
+  fetchFieldValues,
   placeholder,
   maxSuggestions = 20,
 }: QueryDSLEditorProps) {
@@ -227,28 +225,10 @@ export function QueryDSLEditor({
     }
   }, [initialQuery, resetTo]);
 
-  // ─── Normalize facets ──────────────────────────────────────────────
+  const { getFieldValues, getCachedFacetMap, ensureFieldValues, isFieldLoading } =
+    useLazyFacets(fetchFieldValues);
 
-  const normalizedFacets = useMemo((): Map<string, string[]> | undefined => {
-    if (!facets) return undefined;
-    if (facets instanceof Map) return facets;
-    const map = new Map<string, string[]>();
-    for (const [key, values] of Object.entries(facets)) {
-      if (Array.isArray(values)) {
-        if (values.length === 0) {
-          map.set(key, []);
-        } else if (typeof values[0] === 'string') {
-          map.set(key, values as string[]);
-        } else {
-          map.set(
-            key,
-            (values as { value: string; count: number }[]).map((v) => v.value)
-          );
-        }
-      }
-    }
-    return map;
-  }, [facets]);
+  const normalizedFacets = getCachedFacetMap();
 
   // ─── Notify parent of chip changes ─────────────────────────────────
 
@@ -274,6 +254,16 @@ export function QueryDSLEditor({
     () => resolveCursorContext(inputValue, cursorOffset, tokens),
     [inputValue, cursorOffset, tokens]
   );
+
+  // Trigger lazy fetch when cursor context needs field values
+  useEffect(() => {
+    if (
+      (cursorContext.type === 'VALUE' || cursorContext.type === 'OPERATOR') &&
+      cursorContext.field
+    ) {
+      ensureFieldValues(cursorContext.field);
+    }
+  }, [cursorContext.type, cursorContext.field, ensureFieldValues]);
 
   // Support logical operator chips explicitly
   // Suppress suggestions when cursor is inside a quoted string (e.g., level:"")
@@ -389,8 +379,14 @@ export function QueryDSLEditor({
       setEditingToken({ chipId, part, anchorEl });
       setShowDropdown(false);
       chipEditingRef.current = true;
+
+      // Lazy-load field values for the chip being edited
+      const editChip = chips.find((c) => c.id === chipId);
+      if (editChip?.field) {
+        ensureFieldValues(editChip.field);
+      }
     },
-    [inputValue, chips]
+    [inputValue, chips, ensureFieldValues]
   );
 
   /** Handle update from TokenEditDropdown */
@@ -772,6 +768,10 @@ export function QueryDSLEditor({
             });
             chipEditingRef.current = true;
             setShowDropdown(false);
+            // Lazy-load field values for inline editing
+            if (composingChip.field) {
+              ensureFieldValues(composingChip.field);
+            }
             // Focus inline input after DOM update
             requestAnimationFrame(() => groupHandle?.focusValueInput());
           }
@@ -789,7 +789,7 @@ export function QueryDSLEditor({
     });
 
     return () => cancelAnimationFrame(raf);
-  }, [chips, editingToken]);
+  }, [chips, editingToken, ensureFieldValues]);
 
   // ─── Input handlers ───────────────────────────────────────────────
 
@@ -807,59 +807,65 @@ export function QueryDSLEditor({
     []
   );
 
+  // Helper: insert chips at the correct position
+  // When selectedTokenIdx === -2, insert at the beginning; otherwise append at the end
+  const insertChipsAtCursor = useCallback(
+    (newChips: FilterChip[]) => {
+      if (selectedTokenIdx === -2) {
+        setChips((prev) => [...newChips, ...prev]);
+        setSelectedTokenIdx(-1); // reset to end after inserting
+      } else {
+        setChips((prev) => [...prev, ...newChips]);
+      }
+    },
+    [selectedTokenIdx, setChips]
+  );
+
   /** Commit typed text in the input field as chip(s) */
   const commitInputAsChip = useCallback(
     (text: string) => {
       // Block auto-commit while multi-selecting values via checkboxes
       if (isMultiSelectingRef.current) return;
+
       const lower = text.toLowerCase();
       if (lower === 'and' || lower === 'or') {
         if (canInsertLogical(chips)) {
           // Valid position → logical chip
-          setChips((prev) => [
-            ...prev,
-            {
-              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              type: 'logical' as const,
-              label: lower.toUpperCase(),
-            },
-          ]);
+          insertChipsAtCursor([{
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'logical' as const,
+            label: lower.toUpperCase(),
+          }]);
         } else {
           // No preceding filter → free text message search
-          setChips((prev) => [
-            ...prev,
-            {
-              id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              type: 'filter' as const,
-              field: 'message',
-              operator: 'contains',
-              value: text,
-              quoted: true,
-            },
-          ]);
+          insertChipsAtCursor([{
+            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            type: 'filter' as const,
+            field: 'message',
+            operator: 'contains',
+            value: text,
+            quoted: true,
+          }]);
         }
         setInputValue('');
       } else if (lower === '(' || lower === ')') {
         // Paren → paren chip
-        setChips((prev) => [
-          ...prev,
-          {
-            id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            type: 'paren' as const,
-            label: lower,
-          },
-        ]);
+        insertChipsAtCursor([{
+          id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          type: 'paren' as const,
+          label: lower,
+        }]);
         setInputValue('');
       } else {
         // Try to parse as filter, or fall through as free text
         const parsed = queryToChips(text);
         if (parsed.length > 0) {
-          setChips((prev) => [...prev, ...parsed]);
+          insertChipsAtCursor(parsed);
           setInputValue('');
         }
       }
     },
-    [chips, setChips]
+    [chips, setChips, insertChipsAtCursor]
   );
 
   const applySuggestion = useCallback(
@@ -869,8 +875,7 @@ export function QueryDSLEditor({
       if (item.category === 'logical') {
         // AND/OR: only valid after a filter chip or closing paren
         if (canInsertLogical(chips)) {
-          setChips((prev) => [
-            ...prev,
+          insertChipsAtCursor([
             {
               id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
               type: 'logical' as const,
@@ -900,7 +905,7 @@ export function QueryDSLEditor({
             value: item.label,
             quoted: true,
           };
-          setChips((prev) => [...prev, freeTextChip]);
+          insertChipsAtCursor([freeTextChip]);
           setInputValue('');
           setCursorOffset(0);
           setShowDropdown(false);
@@ -917,8 +922,7 @@ export function QueryDSLEditor({
         }
       } else if (item.category === 'paren') {
         // (/) → immediately create a chip (Sentry-style)
-        setChips((prev) => [
-          ...prev,
+        insertChipsAtCursor([
           {
             id: `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             type: 'paren' as const,
@@ -1038,7 +1042,7 @@ export function QueryDSLEditor({
           // Value → try to create filter chips
           const completedChips = queryToChips(finalInput);
           if (completedChips.length > 0) {
-            setChips((prev) => [...prev, ...completedChips]);
+            insertChipsAtCursor(completedChips);
             setInputValue('');
             setCursorOffset(0);
             setShowDropdown(false);
@@ -1076,12 +1080,28 @@ export function QueryDSLEditor({
         // Step-by-step creation: if this is a field selection from empty input,
         // create a composing chip instead of putting text in input
         if (item.category === 'field' && !inputValue.includes(':')) {
+          // HAS suggestions (has:"fieldName") → immediately create complete chip
+          if (item.fieldCategory === 'has' && item.insertText) {
+            const completedChips = queryToChips(item.insertText);
+            if (completedChips.length > 0) {
+              insertChipsAtCursor(completedChips);
+              setInputValue('');
+              setCursorOffset(0);
+              setShowDropdown(false);
+              setSelectedIndex(-1);
+              suppressDropdownRef.current = true;
+              requestAnimationFrame(() => {
+                inputRef.current?.focus();
+                inputRef.current?.setSelectionRange(0, 0);
+              });
+              return;
+            }
+          }
           const newChipId = `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
           // Datetime fields default to 'after' operator
           const selectedField = getFieldByKey(item.label, domain);
           const defaultOp = selectedField?.type === 'datetime' ? 'after' : '=';
-          setChips((prev) => [
-            ...prev,
+          insertChipsAtCursor([
             {
               id: newChipId,
               type: 'filter' as const,
@@ -1095,6 +1115,8 @@ export function QueryDSLEditor({
           setShowDropdown(false);
           setSelectedIndex(-1);
           // useEffect will auto-open value dropdown after render
+          // Pre-fetch field values for lazy loading
+          ensureFieldValues(item.label);
           return;
         }
 
@@ -1117,7 +1139,7 @@ export function QueryDSLEditor({
         return;
       }
     },
-    [inputValue, cursorContext, setChips, chips, currentFilterInfo]
+    [inputValue, cursorContext, setChips, chips, currentFilterInfo, insertChipsAtCursor]
   );
 
   const handleKeyDown = useCallback(
@@ -1178,6 +1200,23 @@ export function QueryDSLEditor({
         applySuggestion(suggestions[selectedIndex], true);
         return;
       }
+      // Home → select first token position
+      if (e.key === 'Home' && inputValue === '') {
+        e.preventDefault();
+        if (visualTokens.length > 0) {
+          setShowDropdown(false);
+          setSelectedTokenIdx(-2);
+          requestAnimationFrame(() => inputRef.current?.focus());
+        }
+        return;
+      }
+      // End → focus input (rightmost position)
+      if (e.key === 'End' && inputValue === '') {
+        e.preventDefault();
+        setSelectedTokenIdx(-1);
+        inputRef.current?.focus();
+        return;
+      }
       // Left/Right arrow keys → token navigation (when input is empty)
       // Token navigation takes priority over tab switching when chips exist
       if (e.key === 'ArrowLeft' && inputValue === '') {
@@ -1186,7 +1225,11 @@ export function QueryDSLEditor({
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
             if (prev < 0) return visualTokens.length - 1; // input → last token
-            if (prev <= 0) return 0; // clamp at first token
+            if (prev <= 0) {
+              // first token → before-all position
+              requestAnimationFrame(() => inputRef.current?.focus());
+              return -2;
+            }
             return prev - 1;
           });
         } else if (showDropdown) {
@@ -1199,6 +1242,7 @@ export function QueryDSLEditor({
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
+            if (prev === -2) return 0; // before-all → first token
             if (prev < 0) return -1; // clamp at input
             if (prev >= visualTokens.length - 1) return -1; // last → input
             return prev + 1;
@@ -1297,6 +1341,18 @@ export function QueryDSLEditor({
         return;
       }
       if (e.key === 'Escape') {
+        // Cancel composing chip entirely
+        const composingChip = chips.find((c) => c.composingPart);
+        if (composingChip) {
+          deleteChip(composingChip.id);
+          setEditingToken(null);
+          chipEditingRef.current = false;
+        }
+        // Clear any pending input text
+        if (inputValue.trim()) {
+          setInputValue('');
+          setCursorOffset(0);
+        }
         setShowDropdown(false);
         return;
       }
@@ -1507,10 +1563,15 @@ export function QueryDSLEditor({
   const handleContainerClick = useCallback((e: React.MouseEvent) => {
     // Don't focus input if clicking on a chip (chip handles its own click)
     if ((e.target as HTMLElement).closest('[data-chip]')) return;
+    // Force-complete any pending input
+    if (inputValue.trim()) {
+      commitPendingInput();
+    }
     // Clear token selection and focus input
     setSelectedTokenIdx(-1);
+    setShowDropdown(false);
     inputRef.current?.focus();
-  }, []);
+  }, [inputValue, commitPendingInput]);
 
   const handleClear = useCallback(() => {
     setChips([]);
@@ -1577,6 +1638,7 @@ export function QueryDSLEditor({
               color: 'text.disabled',
               flexShrink: 0,
               mr: 0.5,
+              order: -2,
             }}
           />
 
@@ -1703,8 +1765,9 @@ export function QueryDSLEditor({
                 : ''
             }
             style={{
-              flex: 1,
-              minWidth: 80,
+              flex: selectedTokenIdx === -2 ? '0 0 auto' : 1,
+              minWidth: selectedTokenIdx === -2 ? 2 : 80,
+              width: selectedTokenIdx === -2 ? (inputValue.length > 0 ? `${Math.max(inputValue.length * 8, 20)}px` : '2px') : undefined,
               border: 'none',
               outline: 'none',
               background: 'transparent',
@@ -1713,9 +1776,11 @@ export function QueryDSLEditor({
               fontWeight: 500,
               fontFamily: 'inherit',
               lineHeight: '24px',
-              padding: '2px 4px',
+              padding: selectedTokenIdx === -2 && !inputValue ? '2px 0' : '2px 4px',
               // Hide caret when a token is selected (token selection IS the cursor)
               caretColor: selectedTokenIdx >= 0 ? 'transparent' : undefined,
+              // Move input before chips when in before-all position
+              order: selectedTokenIdx === -2 ? -1 : undefined,
             }}
           />
 
@@ -1751,7 +1816,7 @@ export function QueryDSLEditor({
 
         {/* Suggestion dropdown */}
         {showDropdown &&
-          (suggestions.length > 0 || recentSearches.length > 0) &&
+          (suggestions.length > 0 || recentSearches.length > 0 || (cursorContext.field && isFieldLoading(cursorContext.field))) &&
           !isComposing && (
             <QuerySuggestionDropdown
               ref={dropdownRef}
@@ -1766,6 +1831,7 @@ export function QueryDSLEditor({
               onRemoveRecent={handleRemoveRecent}
               selectedValues={selectedValues}
               dropdownLeft={dropdownLeft}
+              isLoading={!!(cursorContext.field && isFieldLoading(cursorContext.field))}
             />
           )}
 
@@ -1790,6 +1856,7 @@ export function QueryDSLEditor({
               highlightIndex={popoverHighlightIdx}
               onCheckboxToggle={handleInlineCheckboxToggle}
               onTextSelect={handleInlineTextSelect}
+              isLoading={!!(editedChip.field && isFieldLoading(editedChip.field))}
             />
           );
         })()}

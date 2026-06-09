@@ -142,6 +142,7 @@ function getFieldSuggestions(
     }
   }
 
+
   // Smart suggestions: when user types free text, suggest message operator variants
   // Use originalPrefix to preserve user's casing in displayed labels
   if (prefix !== '' && !prefix.includes(':')) {
@@ -297,6 +298,28 @@ function getFieldSuggestions(
     if (exactMatchIndex > 0) {
       const [exactMatchItem] = results.splice(exactMatchIndex, 1);
       results.unshift(exactMatchItem);
+    }
+  }
+
+  // ── has:fieldName shortcut — insert right after the exact-matched field ──
+  if (prefix !== '') {
+    const matchedField = fields.find(
+      (f) => f.key.toLowerCase() === prefix
+    );
+    if (matchedField) {
+      // Find the field in results (should be at index 0 after exact match)
+      const fieldIdx = results.findIndex(
+        (r) => r.category === 'field' && r.label === matchedField.key && r.fieldCategory !== 'has'
+      );
+      if (fieldIdx >= 0) {
+        results.splice(fieldIdx + 1, 0, {
+          label: matchedField.key,
+          insertText: `has:"${matchedField.key}"`,
+          category: 'field',
+          fieldCategory: 'has',
+          description: 'dsl.has.fieldExists',
+        });
+      }
     }
   }
 

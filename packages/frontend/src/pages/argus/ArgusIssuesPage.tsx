@@ -559,6 +559,19 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
 
+  // Lazy-loading callback for QueryDSLEditor: fetch field values from events
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      try {
+        const result = await argusService.discoverTags(projectId);
+        return (result.tags[fieldKey] || []).map((t) => t.value);
+      } catch {
+        return [];
+      }
+    },
+    [projectId]
+  );
+
   // ─── Facet data (separate fetch without activeFilters) ───
   const [facetData, setFacetData] = useState<{
     level: { value: string; count: number }[];
@@ -773,6 +786,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                   setStoreSearch(val);
                   setCurrentPage(1);
                 }}
+                fetchFieldValues={fetchFieldValues}
               />
             </Box>
             <FilterChipSelect

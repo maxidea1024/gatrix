@@ -23,6 +23,7 @@ interface LogFacets {
   services: { service: string; count: number }[];
   environments: { environment: string; count: number }[];
   loggers: { logger_name: string; count: number }[];
+  releases: { release: string; count: number }[];
 }
 
 const DEFAULT_COLUMNS = ['timestamp', 'severity', 'message'];
@@ -137,6 +138,7 @@ export function useArgusLogs() {
     services: [],
     environments: [],
     loggers: [],
+    releases: [],
   });
   const [volume, setVolume] = useState<VolumePoint[]>([]);
   const [hasMore, setHasMore] = useState(false);
@@ -367,6 +369,24 @@ export function useArgusLogs() {
     return '14d';
   }, [filters.dateRange]);
 
+  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      try {
+        const apiParams = argusFilterStateToApiParams(filters);
+        const data = await argusService.getAttributeFacet(projectId, fieldKey, {
+          period: apiParams.period || currentPeriod,
+          start: apiParams.start,
+          end: apiParams.end,
+        });
+        return data.map((d) => d.attr_value);
+      } catch {
+        return [];
+      }
+    },
+    [projectId, filters, currentPeriod]
+  );
+
   // Discovered attribute facets from backend API (time-period only, no search filter)
   const [discoveredFacets, setDiscoveredFacets] = useState<FacetGroup[]>([]);
 
@@ -403,6 +423,13 @@ export function useArgusLogs() {
       }));
       result.logger = vals;
       result.logger_name = vals;
+    }
+    if (facets.releases?.length) {
+      const vals = facets.releases.map((r) => ({
+        value: r.release,
+        count: Number(r.count),
+      }));
+      result.release = vals;
     }
 
     // Discovered facets from log attributes
@@ -447,6 +474,11 @@ export function useArgusLogs() {
           key: 'logger',
           label: t('argus.logs.facet.logger', 'Logger'),
           values: mappedFacets.logger || [],
+        },
+        {
+          key: 'release',
+          label: t('argus.logs.facet.release', 'Release'),
+          values: mappedFacets.release || [],
         },
       ].filter((g) => g.values.length > 0),
     [mappedFacets, t]
@@ -828,6 +860,7 @@ export function useArgusLogs() {
     mappedFacets,
     facetGroups,
     totalLogCount,
+    fetchFieldValues,
 
     // Handlers
     setUrlState,

@@ -84,6 +84,7 @@ const ArgusLogsPage: React.FC = () => {
     mappedFacets,
     facetGroups,
     totalLogCount,
+    fetchFieldValues,
 
     // Handlers
     setUrlState,
@@ -344,7 +345,7 @@ const ArgusLogsPage: React.FC = () => {
                   // Sync to URL so chip state survives refresh
                   setUrlState({ q });
                 }}
-                facets={mappedFacets}
+                fetchFieldValues={fetchFieldValues}
               />
             </Box>
           );

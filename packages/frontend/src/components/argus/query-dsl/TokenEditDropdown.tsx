@@ -14,6 +14,7 @@ import {
   InputBase,
   Typography,
   useTheme,
+  CircularProgress,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useTranslation } from 'react-i18next';
@@ -87,6 +88,8 @@ export interface TokenEditDropdownProps {
   highlightIndex?: number;
   onCheckboxToggle?: (value: string) => void;
   onTextSelect?: (value: string) => void;
+  /** Show loading spinner when facet values are being fetched */
+  isLoading?: boolean;
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -104,6 +107,7 @@ export function TokenEditDropdown({
   highlightIndex,
   onCheckboxToggle,
   onTextSelect,
+  isLoading = false,
 }: TokenEditDropdownProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -144,9 +148,8 @@ export function TokenEditDropdown({
     return facetValues.length > 0;
   })();
 
-  // Don't render popover at all for value types with no facets
-  // (rendering with open={false} would trigger onClose and kill the editing session)
-  if (!hasValueResults) return null;
+  // Don't render popover at all for value types with no facets AND not loading
+  if (!hasValueResults && !isLoading) return null;
 
   return (
     <Popover
@@ -221,16 +224,50 @@ export function TokenEditDropdown({
         />
       )}
       {isValueType && !isDatetimeField && (
-        <ValueSuggestionList
-          chip={chip}
-          facets={facets}
-          filterText={filterText ?? ''}
-          selectedValues={selectedValues ?? new Set()}
-          highlightIndex={highlightIndex ?? -1}
-          onCheckboxToggle={onCheckboxToggle ?? (() => {})}
-          onTextSelect={onTextSelect ?? (() => {})}
-          isDark={isDark}
-        />
+        isLoading && !hasValueResults ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              px: 1.5,
+              py: 1.5,
+              minWidth: 160,
+            }}
+          >
+            <CircularProgress
+              size={14}
+              thickness={5}
+              sx={{
+                color: isDark
+                  ? 'rgba(124,138,255,0.7)'
+                  : 'rgba(92,107,192,0.7)',
+              }}
+            />
+            <Typography
+              sx={{
+                fontSize: '11px',
+                color: isDark
+                  ? 'rgba(255,255,255,0.4)'
+                  : 'rgba(0,0,0,0.4)',
+              }}
+            >
+              Loading...
+            </Typography>
+          </Box>
+        ) : (
+          <ValueSuggestionList
+            chip={chip}
+            facets={facets}
+            filterText={filterText ?? ''}
+            selectedValues={selectedValues ?? new Set()}
+            highlightIndex={highlightIndex ?? -1}
+            onCheckboxToggle={onCheckboxToggle ?? (() => {})}
+            onTextSelect={onTextSelect ?? (() => {})}
+            isDark={isDark}
+          />
+        )
       )}
     </Popover>
   );

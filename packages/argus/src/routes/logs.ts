@@ -232,7 +232,7 @@ export default async function logsRoutes(app: FastifyInstance) {
       const timeFilter = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       try {
-        const [levelsRes, servicesRes, envsRes, loggersRes] = await Promise.all(
+        const [levelsRes, servicesRes, envsRes, loggersRes, releasesRes] = await Promise.all(
           [
             optic.rawQuery({
               query: `SELECT level, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} GROUP BY level ORDER BY count DESC`,
@@ -250,6 +250,10 @@ export default async function logsRoutes(app: FastifyInstance) {
               query: `SELECT logger_name, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND logger_name != '' GROUP BY logger_name ORDER BY count DESC LIMIT 20`,
               params: qp,
             }),
+            optic.rawQuery({
+              query: `SELECT release, count() AS count FROM argus.logs WHERE project_id = {projectId:String} AND ${timeFilter} AND release != '' GROUP BY release ORDER BY count DESC LIMIT 20`,
+              params: qp,
+            }),
           ]
         );
 
@@ -258,6 +262,7 @@ export default async function logsRoutes(app: FastifyInstance) {
           services: servicesRes.data || [],
           environments: envsRes.data || [],
           loggers: loggersRes.data || [],
+          releases: releasesRes.data || [],
         };
 
         // Cache for 5 minutes (non-blocking)

@@ -1614,6 +1614,7 @@ class ArgusService {
     services: { service: string; count: number }[];
     environments: { environment: string; count: number }[];
     loggers: { logger_name: string; count: number }[];
+    releases: { release: string; count: number }[];
   }> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/logs/facets`,
@@ -1625,6 +1626,7 @@ class ArgusService {
         services: [],
         environments: [],
         loggers: [],
+        releases: [],
       }
     );
   }

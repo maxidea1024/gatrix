@@ -18,7 +18,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton, CircularProgress } from '@mui/material';
 import {
   Close as CloseIcon,
   SearchRounded as SearchIcon,
@@ -50,6 +50,8 @@ export interface QuerySuggestionDropdownProps {
   selectedValues?: Set<string>;
   /** Left offset for positioning dropdown near cursor */
   dropdownLeft?: number;
+  /** Show loading spinner when facet values are being fetched */
+  isLoading?: boolean;
 }
 
 /** Imperative handle for tab navigation */
@@ -134,6 +136,12 @@ const CATEGORY_BADGES: Record<string, CategoryBadge> = {
     bg: 'rgba(176,122,219,0.12)',
     bgLight: 'rgba(123,31,162,0.08)',
   },
+  has: {
+    label: 'HAS',
+    color: '#4db6ac',
+    bg: 'rgba(77,182,172,0.12)',
+    bgLight: 'rgba(0,121,107,0.10)',
+  },
 };
 
 // Legacy color map for non-badge uses
@@ -169,6 +177,7 @@ export const QuerySuggestionDropdown = forwardRef<
     onSelectMultiple,
     selectedValues = new Set(),
     dropdownLeft = 0,
+    isLoading = false,
   },
   ref
 ) {
@@ -594,6 +603,38 @@ export const QuerySuggestionDropdown = forwardRef<
           )
         ) : /* ── Suggestion List ── */
         filteredSuggestions.length === 0 ? (
+          isLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1,
+                px: 1.5,
+                py: 1.5,
+              }}
+            >
+              <CircularProgress
+                size={14}
+                thickness={5}
+                sx={{
+                  color: isDark
+                    ? 'rgba(124,138,255,0.7)'
+                    : 'rgba(92,107,192,0.7)',
+                }}
+              />
+              <Typography
+                sx={{
+                  fontSize: '11px',
+                  color: isDark
+                    ? 'rgba(255,255,255,0.4)'
+                    : 'rgba(0,0,0,0.4)',
+                }}
+              >
+                {t('dsl.loadingValues', 'Loading values...')}
+              </Typography>
+            </Box>
+          ) : (
           <Typography
             sx={{
               px: 1.5,
@@ -605,6 +646,7 @@ export const QuerySuggestionDropdown = forwardRef<
           >
             {t('dsl.noSuggestions', 'No suggestions')}
           </Typography>
+          )
         ) : (
           Array.from(grouped.entries()).map(([category, items]) => (
             <Box key={category}>

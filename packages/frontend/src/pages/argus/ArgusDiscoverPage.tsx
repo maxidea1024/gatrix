@@ -495,6 +495,19 @@ const ArgusDiscoverPage: React.FC = () => {
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
 
+  // Lazy-loading callback for QueryDSLEditor: fetch field values from events
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      try {
+        const result = await argusService.discoverTags(projectId);
+        return (result.tags[fieldKey] || []).map((t) => t.value);
+      } catch {
+        return [];
+      }
+    },
+    [projectId]
+  );
+
   // ─── URL-driven state ───
   const URL_PARAMS = useMemo(
     () => ({
@@ -1131,6 +1144,7 @@ const ArgusDiscoverPage: React.FC = () => {
           domain="discover"
           initialQuery={conditions}
           onSearch={handleSearchChange}
+          fetchFieldValues={fetchFieldValues}
           placeholder={t(
             'argus.discover.searchPlaceholder',
             'Search for events, users, tags (e.g. level:error OR browser:Chrome)'
