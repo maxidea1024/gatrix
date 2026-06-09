@@ -203,7 +203,7 @@ export const FilterTokenGroup = forwardRef<
               ? 'rgba(255,255,255,0.08)'
               : 'rgba(0,0,0,0.06)',
       },
-      transition: 'all 0.15s',
+      transition: 'none',
       userSelect: 'none' as const,
       whiteSpace: 'nowrap' as const,
     };
