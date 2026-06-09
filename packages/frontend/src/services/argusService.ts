@@ -820,6 +820,24 @@ class ArgusService {
     );
   }
 
+  /**
+   * Generic attribute facet for feedback — returns top values for any column.
+   * Same pattern as getAttributeFacet (logs), but queries the user_feedback table.
+   */
+  async getFeedbackAttributeFacet(
+    projectId: number | string,
+    key: string,
+    params?: { period?: string; start?: string; end?: string }
+  ): Promise<{ attr_value: string; count: number }[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/feedback/${projectId}/attribute-facet`,
+      {
+        params: { key, ...params },
+      }
+    );
+    return response.data?.data || [];
+  }
+
   async markFeedbackRead(
     projectId: number | string,
     feedbackIds: string[]

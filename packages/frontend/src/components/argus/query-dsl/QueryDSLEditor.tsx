@@ -1261,7 +1261,12 @@ export function QueryDSLEditor({
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx((prev) => {
-            if (prev === -2) return 0; // before-all → first token
+            if (prev === -2) {
+              // before-all → first token: blur input so token gets focus
+              suppressDropdownRef.current = true;
+              inputRef.current?.blur();
+              return 0;
+            }
             if (prev < 0) return -1; // clamp at input
             if (prev >= visualTokens.length - 1) return -1; // last → input
             return prev + 1;
@@ -1653,7 +1658,9 @@ export function QueryDSLEditor({
       style={{
         flex: isAtFront ? '0 0 auto' : 1,
         minWidth: isAtFront ? 2 : 80,
-        width: isAtFront ? `${Math.max(inputValue.length + 3, 1)}ch` : undefined,
+        width: isAtFront
+          ? inputValue ? `${inputValue.length + 1}ch` : 1
+          : undefined,
         border: 'none',
         outline: 'none',
         background: 'transparent',
