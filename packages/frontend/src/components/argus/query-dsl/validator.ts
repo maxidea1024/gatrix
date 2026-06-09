@@ -62,7 +62,7 @@ function validateFilter(
   errors: ValidationError[]
 ): void {
   const resolvedKey = resolveAlias(node.field, config);
-  const field = getFieldByKey(resolvedKey, config);
+  const field = config.fields.find((f) => f.key === resolvedKey);
 
   if (!field) {
     errors.push({

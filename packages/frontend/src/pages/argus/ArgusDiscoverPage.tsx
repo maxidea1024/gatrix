@@ -1148,7 +1148,7 @@ const ArgusDiscoverPage: React.FC = () => {
           fetchFieldValues={fetchFieldValues}
           placeholder={t(
             'argus.discover.searchPlaceholder',
-            'Search for events, users, tags (e.g. level:error OR browser:Chrome)'
+            'Search by event, user, or tag...'
           )}
         />
         <Button

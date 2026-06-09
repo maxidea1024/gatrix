@@ -50,7 +50,18 @@ function serializeFilter(node: Expression & { type: 'Filter' }): string {
   const field = node.field;
 
   // Multi-value support (array representation)
-  if (node.values && node.values.length > 0) {
+  const isSingleArgFunc = [
+    'contains',
+    '!contains',
+    'startsWith',
+    '!startsWith',
+    'endsWith',
+    '!endsWith',
+    'before',
+    'after',
+  ].includes(node.operator);
+
+  if (node.values && node.values.length > 0 && !isSingleArgFunc) {
     const vals = node.values.map((v) => formatValue(v)).join(', ');
 
     // Function operators with multiple values
