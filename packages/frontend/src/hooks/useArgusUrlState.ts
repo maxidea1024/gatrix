@@ -83,6 +83,33 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
     (updates: Partial<Record<keyof T, string | string[]>>) => {
       const defs = defsRef.current;
       let shouldPush = false;
+      let changed = false;
+
+      for (const [name, value] of Object.entries(updates)) {
+        const def = defs[name];
+        if (!def) continue;
+
+        if (def.pushHistory) shouldPush = true;
+
+        const serialized = Array.isArray(value)
+          ? value.join(',')
+          : (value as string);
+
+        const currentVal = searchParams.get(def.key) ?? '';
+        const defaultOrEmpty = serialized === def.default || serialized === '';
+
+        if (defaultOrEmpty) {
+          if (searchParams.has(def.key)) {
+            changed = true;
+          }
+        } else {
+          if (currentVal !== serialized) {
+            changed = true;
+          }
+        }
+      }
+
+      if (!changed) return;
 
       setSearchParams(
         (prev) => {
@@ -92,10 +119,6 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
             const def = defs[name];
             if (!def) continue;
 
-            // Check if this update should push history
-            if (def.pushHistory) shouldPush = true;
-
-            // Serialize value
             const serialized = Array.isArray(value)
               ? value.join(',')
               : (value as string);
@@ -118,7 +141,7 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
         { replace: !shouldPush, state: location.state }
       );
     },
-    [setSearchParams, location.state]
+    [setSearchParams, searchParams, location.state]
   );
 
   return [state, setState];

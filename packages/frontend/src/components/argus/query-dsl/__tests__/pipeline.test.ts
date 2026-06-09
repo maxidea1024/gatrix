@@ -174,6 +174,33 @@ describe('Spec 11.1: Suggestions per context', () => {
     expect(suggestions.some((s) => s.label === 'staging')).toBe(true);
     expect(suggestions.some((s) => s.label === 'development')).toBe(true);
   });
+
+  it('has:"" and !has:"" inside quotes → field suggestions', () => {
+    // has:"" with cursor at 5 (inside quotes)
+    const { suggestions: hasSuggestions } = pipeline('has:""', 5, MOCK_FACETS);
+    expect(hasSuggestions.some((s) => s.label === 'level')).toBe(true);
+    expect(hasSuggestions.some((s) => s.label === 'service')).toBe(true);
+
+    // !has:"" with cursor at 6 (inside quotes)
+    const { suggestions: notHasSuggestions } = pipeline('!has:""', 6, MOCK_FACETS);
+    expect(notHasSuggestions.some((s) => s.label === 'level')).toBe(true);
+    expect(notHasSuggestions.some((s) => s.label === 'service')).toBe(true);
+
+    // has:"" with cursor at 4 (before quotes: has:|"")
+    const { suggestions: hasBeforeSuggestions } = pipeline('has:""', 4, MOCK_FACETS);
+    expect(hasBeforeSuggestions.some((s) => s.label === 'level')).toBe(true);
+    expect(hasBeforeSuggestions.some((s) => s.label === 'service')).toBe(true);
+
+    // has:"" with cursor at 6 (after quotes: has:""|)
+    const { suggestions: hasAfterSuggestions } = pipeline('has:""', 6, MOCK_FACETS);
+    expect(hasAfterSuggestions.some((s) => s.label === 'level')).toBe(true);
+    expect(hasAfterSuggestions.some((s) => s.label === 'service')).toBe(true);
+
+    // has:"se" with cursor at 7 (after "se" inside quotes)
+    const { suggestions: hasSeSuggestions } = pipeline('has:"se"', 7, MOCK_FACETS);
+    expect(hasSeSuggestions.some((s) => s.label === 'service')).toBe(true);
+    expect(hasSeSuggestions.some((s) => s.label === 'level')).toBe(false);
+  });
 });
 
 // ─── Spec 10: Autocomplete rules ────────────────────────────────────────────

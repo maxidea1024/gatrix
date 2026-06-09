@@ -125,10 +125,13 @@ function getFieldSuggestions(
     .map((f) => fieldToSuggestion(f));
 
   // Dynamic fields from facets (e.g. game.shard, custom attributes)
+  // Exclude 'has'/'!has' — they are special existence operators, not actual fields
   if (facets) {
     const staticKeys = new Set(fields.map((f) => f.key));
+    const reservedKeys = new Set(['has', '!has']);
     for (const key of facets.keys()) {
       if (staticKeys.has(key)) continue; // already in static list
+      if (reservedKeys.has(key.toLowerCase())) continue; // special operators
       if (prefix === '' || key.toLowerCase().startsWith(prefix)) {
         results.push({
           label: key,
@@ -414,6 +417,12 @@ function getValueSuggestions(
 ): SuggestionItem[] {
   if (!context.field) return [];
 
+  // ── has / !has: show field list as values ──
+  const fieldLower = context.field.toLowerCase();
+  if (fieldLower === 'has' || fieldLower === '!has') {
+    return getHasFieldSuggestions(context, config, facets, max);
+  }
+
   const field = getFieldByKey(context.field, config);
   const effectiveField =
     field ??
@@ -663,10 +672,13 @@ function getHasFieldSuggestions(
   }
 
   // Dynamic fields from facets
+  // Exclude 'has'/'!has' — nonsensical as has:has target
   if (facets) {
     const staticKeys = new Set(fields.map((f) => f.key));
+    const reservedKeys = new Set(['has', '!has']);
     for (const key of facets.keys()) {
       if (staticKeys.has(key)) continue;
+      if (reservedKeys.has(key.toLowerCase())) continue;
       if (prefix === '' || key.toLowerCase().startsWith(prefix)) {
         results.push({
           label: key,

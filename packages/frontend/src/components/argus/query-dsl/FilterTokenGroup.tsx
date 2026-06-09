@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Box, Typography, IconButton, useTheme } from '@mui/material';
+import { Box, Typography, IconButton, Tooltip, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import type { FilterChip } from './useFilterChips';
@@ -271,7 +271,8 @@ export const FilterTokenGroup = forwardRef<
       )}
 
       {/* Value token — inline input mode or display mode */}
-      {editingPart === 'value' ? (
+      {/* has/!has chips use HasFieldSelector Popover, not inline input */}
+      {editingPart === 'value' && !isHasChip ? (
         <Box
           component="span"
           sx={{
@@ -314,6 +315,19 @@ export const FilterTokenGroup = forwardRef<
           />
         </Box>
       ) : (
+        <Tooltip
+          title={
+            (() => {
+              const fullText = chip.values && chip.values.length > 1
+                ? chip.values.join(chip.operator === '!=' ? ' and ' : ' or ')
+                : chip.value ?? '';
+              return fullText.length > 30 ? fullText : '';
+            })()
+          }
+          placement="top"
+          enterDelay={300}
+          arrow
+        >
         <Box
           ref={valueRef}
           component="span"
@@ -321,6 +335,7 @@ export const FilterTokenGroup = forwardRef<
             ...tokenStyle('value'),
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
             maxWidth: 240,
             minWidth: 0,
           }}
@@ -330,6 +345,7 @@ export const FilterTokenGroup = forwardRef<
         >
           {renderValueText()}
         </Box>
+        </Tooltip>
       )}
 
       {/* Delete button */}

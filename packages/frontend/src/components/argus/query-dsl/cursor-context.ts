@@ -269,6 +269,22 @@ export function resolveCursorContext(
       type = 'FIELD';
   }
 
+  const emptyHasInfo = isEditingEmptyHasFilter(input, cursorOffset);
+  if (emptyHasInfo.isHas) {
+    const colonIdx = input.indexOf(':');
+    return {
+      type: 'VALUE',
+      field: emptyHasInfo.field,
+      operator: '=',
+      prefix: '',
+      tokenStart: colonIdx + 2, // inside the quotes
+      tokenEnd: colonIdx + 2,
+      editorState: EditorState.IN_QUOTED_STRING,
+      inQuotedString: true,
+      inParenthesis: false,
+    };
+  }
+
   return {
     type,
     field,
@@ -283,6 +299,22 @@ export function resolveCursorContext(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function isEditingEmptyHasFilter(
+  input: string,
+  cursorOffset: number
+): { isHas: boolean; field?: string } {
+  const trimmed = input.trim().toLowerCase();
+  if (trimmed === 'has:""' || trimmed === '!has:""') {
+    const field = trimmed.startsWith('!') ? '!has' : 'has';
+    const colonIdx = input.indexOf(':');
+    if (cursorOffset > colonIdx) {
+      return { isHas: true, field };
+    }
+  }
+  return { isHas: false };
+}
+
 
 /** Check if prefix looks like the start of an operator token */
 function isOperatorPrefix(prefix: string): boolean {

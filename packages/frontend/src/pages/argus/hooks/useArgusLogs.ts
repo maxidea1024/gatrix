@@ -689,7 +689,6 @@ export function useArgusLogs() {
   const handleSearchSubmit = useCallback(
     (val: string) => {
       setSearch(val);
-      lastSubmittedSearchRef.current = val;
       setUrlState({ q: val });
       setTimeout(() => fetchLogs(), 10);
     },

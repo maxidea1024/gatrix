@@ -181,10 +181,17 @@ export function TokenEditDropdown({
         },
       }}
     >
-      {type === 'field' && (
+      {type === 'field' && !isHasChip && (
         <FieldMenu
           config={config}
           currentField={chip.field ?? ''}
+          onSelect={handleFieldSelect}
+          isDark={isDark}
+        />
+      )}
+      {type === 'field' && isHasChip && (
+        <HasToggleMenu
+          currentField={chip.field ?? 'has'}
           onSelect={handleFieldSelect}
           isDark={isDark}
         />
@@ -510,10 +517,20 @@ function ValueSuggestionList({
 }) {
   const listRef = useRef<HTMLUListElement>(null);
 
-  // Merge staticValues (highest priority) + facet values, deduplicated
+  // Merge selectedValues (current chip values first) + staticValues + facet values, deduplicated
   const allValues = (() => {
     const seen = new Set<string>();
     const result: string[] = [];
+
+    // 1. Current chip values first (always show with checkmarks)
+    for (const sv of selectedValues) {
+      if (sv && !seen.has(sv)) {
+        seen.add(sv);
+        result.push(sv);
+      }
+    }
+
+    // 2. Static values + facet values
     const staticVals = fieldDef?.staticValues ?? [];
     const facetVals = facets?.get(chip.field ?? '') ?? [];
     for (const v of [...staticVals, ...facetVals]) {
@@ -588,7 +605,10 @@ function ValueSuggestionList({
                 primaryTypographyProps={{
                   fontSize: '0.8rem',
                   fontWeight: isChecked ? 600 : 400,
+                  noWrap: true,
+                  title: v.length > 40 ? v : undefined,
                 }}
+                sx={{ overflow: 'hidden', minWidth: 0 }}
               />
               {/* Checkbox on the right */}
               <Box
@@ -652,8 +672,9 @@ function HasFieldSelector({
     staticKeys.add(f.key);
   }
   if (facets) {
+    const reservedKeys = new Set(['has', '!has']);
     for (const key of facets.keys()) {
-      if (!staticKeys.has(key)) {
+      if (!staticKeys.has(key) && !reservedKeys.has(key.toLowerCase())) {
         allKeys.push(key);
       }
     }
@@ -791,5 +812,59 @@ function HasFieldSelector({
         })}
       </List>
     </Box>
+  );
+}
+
+// ─── Has Toggle Menu (has ↔ not has) ─────────────────────────────────────────
+
+function HasToggleMenu({
+  currentField,
+  onSelect,
+  isDark,
+}: {
+  currentField: string;
+  onSelect: (field: string) => void;
+  isDark: boolean;
+}) {
+  const options = [
+    { key: 'has', label: 'has' },
+    { key: '!has', label: 'not has' },
+  ];
+
+  return (
+    <List dense sx={{ py: 0.5 }}>
+      {options.map(({ key, label }) => {
+        const isCurrent = key === currentField;
+        return (
+          <ListItemButton
+            key={key}
+            onClick={() => onSelect(key)}
+            selected={isCurrent}
+            sx={{
+              py: 0.5,
+              px: 1.5,
+              '&.Mui-selected': {
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
+              },
+            }}
+          >
+            <ListItemText
+              primary={label}
+              primaryTypographyProps={{
+                fontSize: '0.8rem',
+                fontWeight: isCurrent ? 600 : 400,
+              }}
+            />
+            {isCurrent && (
+              <CheckIcon
+                sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+              />
+            )}
+          </ListItemButton>
+        );
+      })}
+    </List>
   );
 }

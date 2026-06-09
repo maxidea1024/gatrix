@@ -15,8 +15,8 @@ import React, {
   useLayoutEffect,
   useMemo,
 } from 'react';
-import { Box, IconButton, useTheme, ClickAwayListener } from '@mui/material';
-import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Box, IconButton, useTheme, ClickAwayListener, Popover, List, ListItemButton, ListItemText } from '@mui/material';
+import { Search as SearchIcon, Close as CloseIcon, Check as CheckIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 import type { DomainConfig, SuggestionItem } from './types';
@@ -156,6 +156,10 @@ export function QueryDSLEditor({
     part: EditingPart;
     anchorEl: HTMLElement;
   } | null>(null);
+  const [logicalMenu, setLogicalMenu] = useState<{
+    chipId: string;
+    anchorEl: HTMLElement;
+  } | null>(null);
   const tokenGroupRefs = useRef<Map<string, FilterTokenGroupHandle>>(new Map());
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() =>
     getRecentSearches(config.name)
@@ -186,6 +190,7 @@ export function QueryDSLEditor({
 
   // Ref to suppress onChange during programmatic chip updates (e.g. recent selection)
   const suppressOnChangeRef = useRef(false);
+  const lastInternalQueryRef = useRef<string | null>(null);
 
   const handleSelectRecent = useCallback(
     (query: string) => {
@@ -195,9 +200,8 @@ export function QueryDSLEditor({
       resetTo(queryToChips(query));
       setInputValue('');
       setShowDropdown(false);
-      // Pre-update prevInitialQuery so the sync effect won't re-reset
-      // when parent updates initialQuery in response to onSearch
-      prevInitialQuery.current = query;
+      // Track that this update was initiated internally so the sync effect won't re-reset
+      lastInternalQueryRef.current = query;
       // Delay onSearch to next tick so chips state is committed first
       requestAnimationFrame(() => {
         suppressOnChangeRef.current = false;
@@ -219,9 +223,19 @@ export function QueryDSLEditor({
   const prevInitialQuery = useRef(initialQuery);
   useEffect(() => {
     if (initialQuery !== prevInitialQuery.current) {
+      const standardInitial = chipsToQuery(queryToChips(initialQuery));
+      const standardLastInternal = lastInternalQueryRef.current
+        ? chipsToQuery(queryToChips(lastInternalQueryRef.current))
+        : null;
+      const isInternalCatchUp = standardInitial === standardLastInternal;
+      
       prevInitialQuery.current = initialQuery;
-      resetTo(queryToChips(initialQuery));
-      setInputValue('');
+      if (isInternalCatchUp) {
+        lastInternalQueryRef.current = null;
+      } else {
+        resetTo(queryToChips(initialQuery));
+        setInputValue('');
+      }
     }
   }, [initialQuery, resetTo]);
 
@@ -248,6 +262,7 @@ export function QueryDSLEditor({
     // Pre-update so the initialQuery sync effect won't re-reset
     // when parent echoes back the same query
     prevInitialQuery.current = query;
+    lastInternalQueryRef.current = query;
     onChangeRef.current?.(query);
   }, [chips, editingToken]);
 
@@ -274,11 +289,15 @@ export function QueryDSLEditor({
   const suggestions = useMemo(() => {
     // Suppress suggestions when cursor is inside a quoted string,
     // EXCEPT for datetime fields which should show presets (now-1h, etc.)
+    // and 'has'/'!has' fields which should suggest property keys.
     if (cursorContext.editorState === EditorState.IN_QUOTED_STRING) {
       const ctxField = cursorContext.field
         ? getFieldByKey(cursorContext.field, config)
         : null;
-      if (ctxField?.type !== 'datetime') {
+      const isHasField =
+        cursorContext.field?.toLowerCase() === 'has' ||
+        cursorContext.field?.toLowerCase() === '!has';
+      if (ctxField?.type !== 'datetime' && !isHasField) {
         return [];
       }
     }
@@ -465,15 +484,14 @@ export function QueryDSLEditor({
 
   // ─── Inline value editing handlers ──────────────────────────────────
 
-  /** Parsed set of currently selected values from inline text */
+  /** Set of currently selected values from the chip being edited.
+   *  Uses chip.values directly — NOT comma-split from inlineValueText,
+   *  because values themselves can contain commas (e.g., log messages). */
   const inlineSelectedValues = useMemo(() => {
-    return new Set(
-      inlineValueText
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v !== '')
-    );
-  }, [inlineValueText]);
+    if (!editingToken) return new Set<string>();
+    const chip = chips.find((c) => c.id === editingToken.chipId);
+    return new Set(chip?.values?.filter((v) => v !== '') ?? []);
+  }, [editingToken, chips]);
 
   /** Close inline editing and return focus to main input */
   const closeInlineEdit = useCallback(() => {
@@ -490,16 +508,23 @@ export function QueryDSLEditor({
     requestAnimationFrame(() => inputRef.current?.focus());
   }, []);
 
-  /** Commit inline edit: parse comma-separated values into chip */
+  /** Commit inline edit: use chip.values as source of truth.
+   *  If user manually typed (dirty), parse from inlineValueText;
+   *  otherwise use chip.values directly to avoid comma-in-value issues. */
   const commitInlineEdit = useCallback(
     (chipId: string) => {
-      // Always use inlineValueText as the source of truth.
-      // Both manual typing and checkbox toggles keep it in sync,
-      // so it always reflects the user's intended final values.
-      const vals = inlineValueText
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v !== '');
+      let vals: string[];
+      if (inlineValueDirtyRef.current) {
+        // User manually typed → parse from text (comma = separator)
+        vals = inlineValueText
+          .split(',')
+          .map((v) => v.trim())
+          .filter((v) => v !== '');
+      } else {
+        // Checkbox-only edits → use chip.values directly
+        const chip = chips.find((c) => c.id === chipId);
+        vals = chip?.values?.filter((v) => v !== '') ?? [];
+      }
 
       if (vals.length === 0) {
         // Empty → revert
@@ -519,7 +544,7 @@ export function QueryDSLEditor({
       });
       closeInlineEdit();
     },
-    [inlineValueText, updateChip, deleteChip, closeInlineEdit]
+    [inlineValueText, chips, updateChip, deleteChip, closeInlineEdit]
   );
 
   /** Revert inline edit: restore original values */
@@ -573,7 +598,8 @@ export function QueryDSLEditor({
     [chips, config, commitInlineEdit]
   );
 
-  /** Toggle a value from popover checkbox or keyboard selection */
+  /** Toggle a value from popover checkbox or keyboard selection.
+   *  Uses chip.values directly to avoid comma-in-value issues. */
   const handleInlineCheckboxToggle = useCallback(
     (value: string) => {
       if (!editingToken) return;
@@ -582,10 +608,8 @@ export function QueryDSLEditor({
         clearTimeout(blurTimeoutRef.current);
         blurTimeoutRef.current = null;
       }
-      const currentVals = inlineValueText
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v !== '');
+      const chip = chips.find((c) => c.id === editingToken.chipId);
+      const currentVals = chip?.values?.filter((v) => v !== '') ?? [];
       const valSet = new Set(currentVals);
       if (valSet.has(value)) {
         valSet.delete(value);
@@ -605,7 +629,7 @@ export function QueryDSLEditor({
         groupHandle?.focusValueInput();
       });
     },
-    [editingToken, inlineValueText, updateChip]
+    [editingToken, chips, updateChip]
   );
 
   /** Handle inline input key events */
@@ -806,14 +830,33 @@ export function QueryDSLEditor({
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
+      let val = e.target.value;
+      let cursorPos = e.target.selectionStart ?? val.length;
+
+      // Auto-insert quotes for has:/!has: → has:""|" / !has:""|"
+      const lower = val.toLowerCase();
+      if (lower === 'has:' || lower === '!has:') {
+        val = val + '""';
+        cursorPos = val.length - 1; // cursor between quotes
+      }
+
       setInputValue(val);
-      setCursorOffset(e.target.selectionStart ?? val.length);
+      setCursorOffset(cursorPos);
       // Show dropdown when there's actual text (not just spaces)
       if (val.trim().length > 0) {
         setShowDropdown(true);
       }
       setSelectedIndex(-1);
+
+      // Sync cursor position for auto-inserted quotes
+      if (lower === 'has:' || lower === '!has:') {
+        requestAnimationFrame(() => {
+          const input = e.target;
+          if (input) {
+            input.setSelectionRange(cursorPos, cursorPos);
+          }
+        });
+      }
     },
     []
   );
@@ -1205,9 +1248,24 @@ export function QueryDSLEditor({
         }
       }
 
+      // ArrowDown when dropdown closed → open it (WAI-ARIA combobox pattern)
+      // Only when no popover is open (suggestion, field edit, value edit)
+      if (
+        e.key === 'ArrowDown' &&
+        !showDropdown &&
+        !editingToken &&
+        !chipEditingRef.current &&
+        selectedTokenIdx < 0
+      ) {
+        e.preventDefault();
+        setShowDropdown(true);
+        setSelectedIndex(-1);
+        return;
+      }
       if (e.key === 'ArrowDown' && showDropdown && suggestions.length > 0) {
         e.preventDefault();
-        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
+        const maxIdx = (dropdownRef.current?.getItemCount() ?? suggestions.length) - 1;
+        setSelectedIndex((prev) => Math.min(prev + 1, maxIdx));
         return;
       }
       if (e.key === 'ArrowUp' && showDropdown && suggestions.length > 0) {
@@ -1220,13 +1278,14 @@ export function QueryDSLEditor({
         (e.key === ' ' || e.code === 'Space') &&
         showDropdown &&
         selectedIndex >= 0 &&
-        selectedIndex < suggestions.length &&
-        suggestions[selectedIndex].category === 'value' &&
         selectedTokenIdx < 0
       ) {
-        e.preventDefault();
-        applySuggestion(suggestions[selectedIndex], true);
-        return;
+        const spaceItem = dropdownRef.current?.getItemAtIndex(selectedIndex);
+        if (spaceItem?.category === 'value') {
+          e.preventDefault();
+          applySuggestion(spaceItem, true);
+          return;
+        }
       }
       // Home → select first token position
       if (e.key === 'Home' && inputValue === '') {
@@ -1234,6 +1293,7 @@ export function QueryDSLEditor({
         if (visualTokens.length > 0) {
           setShowDropdown(false);
           setSelectedTokenIdx(-2);
+          suppressDropdownRef.current = true;
           requestAnimationFrame(() => inputRef.current?.focus());
         }
         return;
@@ -1241,16 +1301,19 @@ export function QueryDSLEditor({
       // End → focus input (rightmost position)
       if (e.key === 'End' && inputValue === '') {
         e.preventDefault();
+        setShowDropdown(false);
         setSelectedTokenIdx(-1);
-        inputRef.current?.focus();
+        suppressDropdownRef.current = true;
+        requestAnimationFrame(() => inputRef.current?.focus());
         return;
       }
-      // Left/Right arrow keys → token navigation (when input is empty)
-      // Token navigation takes priority over tab switching when chips exist
+      // Left/Right arrow keys → token navigation or tab switching (when input is empty)
+      // When dropdown is open, prioritize tab switching over token navigation
       if (e.key === 'ArrowLeft' && inputValue === '') {
         e.preventDefault();
-        if (visualTokens.length > 0) {
-          setShowDropdown(false);
+        if (showDropdown) {
+          dropdownRef.current?.prevTab();
+        } else if (visualTokens.length > 0) {
           setSelectedTokenIdx((prev) => {
             if (prev === -2) return -2; // already at before-all, stay put
             if (prev === -1) return visualTokens.length - 1; // input → last token
@@ -1262,19 +1325,17 @@ export function QueryDSLEditor({
             }
             return prev - 1;
           });
-        } else if (showDropdown) {
-          dropdownRef.current?.prevTab();
         }
         return;
       }
       if (e.key === 'ArrowRight' && inputValue === '') {
         e.preventDefault();
-        if (visualTokens.length > 0) {
-          setShowDropdown(false);
+        if (showDropdown) {
+          dropdownRef.current?.nextTab();
+        } else if (visualTokens.length > 0) {
           setSelectedTokenIdx((prev) => {
             if (prev === -2) {
               // before-all → first token
-              // Input moves render slots (-2 → non-(-2)), so refocus after re-render
               suppressDropdownRef.current = true;
               requestAnimationFrame(() => inputRef.current?.focus());
               return 0;
@@ -1283,8 +1344,6 @@ export function QueryDSLEditor({
             if (prev >= visualTokens.length - 1) return -1; // last → input
             return prev + 1;
           });
-        } else if (showDropdown) {
-          dropdownRef.current?.nextTab();
         }
         return;
       }
@@ -1306,6 +1365,15 @@ export function QueryDSLEditor({
           const el = groupHandle?.getPartEl(token.part);
           if (el) {
             handlePartClick(token.chipId, token.part, el);
+          }
+        }
+        // Logical chip → open AND/OR selector menu
+        if (token && token.part === 'logical') {
+          const chipEl = containerRef.current?.querySelector(
+            `[data-chip-id="${token.chipId}"]`
+          ) as HTMLElement;
+          if (chipEl) {
+            setLogicalMenu({ chipId: token.chipId, anchorEl: chipEl });
           }
         }
         return;
@@ -1335,8 +1403,11 @@ export function QueryDSLEditor({
             return;
           }
         }
-        if (showDropdown && suggestions.length > 0 && selectedIndex >= 0) {
-          applySuggestion(suggestions[selectedIndex]);
+        if (showDropdown && selectedIndex >= 0) {
+          const tabItem = dropdownRef.current?.getItemAtIndex(selectedIndex);
+          if (tabItem) {
+            applySuggestion(tabItem);
+          }
         } else if (showDropdown && selectedIndex < 0) {
           // Nothing selected — just close the dropdown
           setShowDropdown(false);
@@ -1359,8 +1430,11 @@ export function QueryDSLEditor({
         }
         // Finalize multi-select composing state
         isMultiSelectingRef.current = false;
-        if (showDropdown && selectedIndex >= 0 && suggestions.length > 0) {
-          applySuggestion(suggestions[selectedIndex]);
+        if (showDropdown && selectedIndex >= 0) {
+          const enterItem = dropdownRef.current?.getItemAtIndex(selectedIndex);
+          if (enterItem) {
+            applySuggestion(enterItem);
+          }
         } else if (inputValue.trim()) {
           commitInputAsChip(inputValue.trim());
           setShowDropdown(false);
@@ -1742,83 +1816,162 @@ export function QueryDSLEditor({
 
             {/* Existing filter chips */}
             {chips.map((chip, chipIdx) => {
-              if (chip.type === 'logical' || chip.type === 'paren') {
-                const isToggleable =
-                  chip.type === 'logical' &&
-                  (chip.label === 'AND' || chip.label === 'OR');
+              if (chip.type === 'paren') {
+                // Check if this paren is keyboard-selected
+                const isParenSelected = (() => {
+                  if (selectedTokenIdx < 0) return false;
+                  const vt = visualTokens[selectedTokenIdx];
+                  return vt?.chipId === chip.id && vt?.part === 'paren';
+                })();
+                // Compact paren chip: minimal style, X appears on hover overlaying the text
                 return (
                   <Box
                     key={chip.id}
                     sx={{
-                      px: '6px',
+                      position: 'relative',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      px: '1px',
+                      py: '1px',
+                      mx: '1px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: isDark ? '#9e9e9e' : '#757575',
+                      userSelect: 'none',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      minWidth: 0,
+                      lineHeight: 1.2,
+                      transition: 'background-color 0.15s',
+                      '&:hover': {
+                        backgroundColor: isDark
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.06)',
+                      },
+                      // Selection highlight
+                      ...(isParenSelected && {
+                        outline: `1px solid ${isDark ? 'rgba(124,138,255,0.6)' : 'rgba(92,107,192,0.5)'}`,
+                        backgroundColor: isDark
+                          ? 'rgba(124,138,255,0.12)'
+                          : 'rgba(92,107,192,0.08)',
+                      }),
+                      '&:hover .paren-delete': {
+                        display: 'flex',
+                      },
+                    }}
+                  >
+                    {chip.label}
+                    <Box
+                      className="paren-delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteChip(chip.id);
+                      }}
+                      sx={{
+                        display: 'none',
+                        position: 'absolute',
+                        top: '-10px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: isDark ? '#ef5350' : '#e53935',
+                        cursor: 'pointer',
+                        color: '#fff',
+                      }}
+                    >
+                      <CloseIcon sx={{ fontSize: 8 }} />
+                    </Box>
+                  </Box>
+                );
+              }
+
+              if (chip.type === 'logical') {
+                const isToggleable =
+                  chip.label === 'AND' || chip.label === 'OR';
+                const isLogicalSelected = (() => {
+                  if (selectedTokenIdx < 0) return false;
+                  const vt = visualTokens[selectedTokenIdx];
+                  return vt?.chipId === chip.id && vt?.part === 'logical';
+                })();
+                return (
+                  <Box
+                    key={chip.id}
+                    data-chip-id={chip.id}
+                    sx={{
+                      position: 'relative',
+                      px: '4px',
                       py: '2px',
                       mx: '2px',
                       fontSize: '11px',
                       fontWeight: 600,
                       color:
-                        chip.type === 'logical'
-                          ? chip.label === 'OR'
-                            ? isDark
-                              ? '#e6994a'
-                              : '#e65100'
-                            : isDark
-                              ? '#4dabf5'
-                              : '#1976d2'
+                        chip.label === 'OR'
+                          ? isDark
+                            ? '#e6994a'
+                            : '#e65100'
                           : isDark
-                            ? '#9e9e9e'
-                            : '#757575',
+                            ? '#4dabf5'
+                            : '#1976d2',
                       userSelect: 'none',
                       textTransform: 'uppercase',
                       borderRadius: '4px',
                       backgroundColor: isDark
                         ? 'rgba(255,255,255,0.06)'
                         : 'rgba(0,0,0,0.04)',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.15s',
+                      '&:hover': {
+                        backgroundColor: isDark
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)',
+                      },
+                      ...(isLogicalSelected && {
+                        outline: `1px solid ${isDark ? 'rgba(124,138,255,0.6)' : 'rgba(92,107,192,0.5)'}`,
+                        backgroundColor: isDark
+                          ? 'rgba(124,138,255,0.12)'
+                          : 'rgba(92,107,192,0.08)',
+                      }),
+                      '&:hover .logical-delete': {
+                        display: 'flex',
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLogicalMenu({ chipId: chip.id, anchorEl: e.currentTarget as HTMLElement });
                     }}
                   >
+                    {chip.label}
                     <Box
-                      component="span"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isToggleable) {
-                          updateChip(chip.id, {
-                            label: chip.label === 'AND' ? 'OR' : 'AND',
-                          });
-                        }
-                      }}
-                      sx={{
-                        cursor: isToggleable ? 'pointer' : 'default',
-                        borderRadius: '2px',
-                        px: '2px',
-                        lineHeight: 1,
-                        transition: 'background-color 0.15s',
-                        ...(isToggleable && {
-                          '&:hover': {
-                            backgroundColor: isDark
-                              ? 'rgba(255,255,255,0.1)'
-                              : 'rgba(0,0,0,0.08)',
-                          },
-                        }),
-                      }}
-                    >
-                      {chip.label}
-                    </Box>
-                    <IconButton
-                      size="small"
+                      className="logical-delete"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteChip(chip.id);
                       }}
                       sx={{
-                        p: 0,
-                        ml: 0.5,
-                        opacity: 0.5,
-                        '&:hover': { opacity: 1 },
+                        display: 'none',
+                        position: 'absolute',
+                        top: '-10px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: isDark ? '#ef5350' : '#e53935',
+                        cursor: 'pointer',
+                        color: '#fff',
                       }}
                     >
-                      <CloseIcon sx={{ fontSize: 10 }} />
-                    </IconButton>
+                      <CloseIcon sx={{ fontSize: 8 }} />
+                    </Box>
                   </Box>
                 );
               }
@@ -1958,6 +2111,69 @@ export function QueryDSLEditor({
             />
           );
         })()}
+        {/* Logical chip AND/OR selector menu */}
+        <Popover
+          open={!!logicalMenu}
+          anchorEl={logicalMenu?.anchorEl ?? null}
+          onClose={() => setLogicalMenu(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+          slotProps={{
+            paper: {
+              sx: {
+                mt: 0.5,
+                borderRadius: '8px',
+                minWidth: 80,
+                boxShadow: isDark
+                  ? '0 4px 20px rgba(0,0,0,0.5)'
+                  : '0 4px 20px rgba(0,0,0,0.15)',
+              },
+            },
+          }}
+        >
+          <List dense sx={{ py: 0.5 }}>
+            {['AND', 'OR'].map((op) => {
+              const chipForMenu = logicalMenu
+                ? chips.find((c) => c.id === logicalMenu.chipId)
+                : null;
+              const isCurrent = chipForMenu?.label === op;
+              return (
+                <ListItemButton
+                  key={op}
+                  onClick={() => {
+                    if (logicalMenu) {
+                      updateChip(logicalMenu.chipId, { label: op });
+                    }
+                    setLogicalMenu(null);
+                  }}
+                  selected={isCurrent}
+                  sx={{
+                    py: 0.5,
+                    px: 1.5,
+                    '&.Mui-selected': {
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.06)'
+                        : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={op}
+                    primaryTypographyProps={{
+                      fontSize: '0.8rem',
+                      fontWeight: isCurrent ? 600 : 400,
+                    }}
+                  />
+                  {isCurrent && (
+                    <CheckIcon
+                      sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                    />
+                  )}
+                </ListItemButton>
+              );
+            })}
+          </List>
+        </Popover>
       </Box>
     </ClickAwayListener>
   );

@@ -1681,9 +1681,49 @@ interface QueryDSLEditorProps {
 |---|---|
 | `Enter` | 문법 오류 없으면 쿼리 커밋 + 검색 실행. **오류 있으면 실행 차단 + 에러 피드백** |
 | `Escape` | 드롭다운 닫기 |
-| `↑` / `↓` | 드롭다운 항목 탐색 |
+| `↑` / `↓` | 드롭다운 항목 탐색. **드롭다운이 닫혀있으면 `↓`로 열기 (WAI-ARIA combobox pattern)** |
+| `←` / `→` | 드롭다운 열린 상태: **탭 전환 우선**. 닫힌 상태: 토큰 탐색 |
 | `Tab` | 선택된 항목 적용 |
 | `Backspace` | 일반 삭제 (빈 입력에서는 무시) |
+
+#### 14.4.1 ArrowDown으로 드롭다운 열기
+
+모든 팝오버(추천, 필드 편집, 값 편집)가 닫혀있고 토큰 탐색 중이 아닐 때, `↓` 키로 추천 드롭다운을 열 수 있다.
+
+```
+조건:
+  - showDropdown === false
+  - editingToken === null
+  - chipEditingRef.current === false
+  - selectedTokenIdx < 0
+동작:
+  - setShowDropdown(true)
+  - setSelectedIndex(-1)
+```
+
+#### 14.4.2 탭 전환 vs 토큰 탐색 우선순위
+
+드롭다운이 열려있을 때 `←`/`→`는 **탭 전환을 우선**한다. 토큰 탐색을 하려면 먼저 `Escape`로 드롭다운을 닫아야 한다.
+
+```
+드롭다운 열림 + ← → dropdownRef.prevTab()
+드롭다운 열림 + → → dropdownRef.nextTab()
+드롭다운 닫힘 + ← → 토큰 탐색 (이전 토큰)
+드롭다운 닫힘 + → → 토큰 탐색 (다음 토큰)
+```
+
+#### 14.4.3 Filtered Suggestion Index 매핑
+
+`selectedIndex`는 현재 탭의 **filteredSuggestions** 기준이다. Enter/Tab 시 `dropdownRef.getItemAtIndex(selectedIndex)`로 정확한 아이템을 가져온다. 전체 `suggestions` 배열의 인덱스와 혼동하지 않는다.
+
+```typescript
+// ✅ 올바른 구현
+const item = dropdownRef.current?.getItemAtIndex(selectedIndex);
+if (item) applySuggestion(item);
+
+// ❌ 금지 — 탭 필터링 시 잘못된 아이템 선택
+applySuggestion(suggestions[selectedIndex]);
+```
 
 ### 14.5 칩 모드: 값 인라인 편집
 
@@ -1791,7 +1831,10 @@ interface QueryDSLEditorProps {
 | 엣지 케이스 | 처리 방법 |
 |-------------|-----------|
 | **빈 input + Enter** | 원래 값 복원 (빈 필터는 무의미) |
-| **has/!has 칩** | 인라인 편집 미적용 — 기존 HasFieldSelector 팝오버 유지 |
+| **has/!has 칩 field 클릭** | HasToggleMenu 표시 — `has`/`not has` 전환만 가능. 전체 FieldMenu 미표시 |
+| **has/!has 칩 value 클릭** | HasFieldSelector Popover — 인라인 input 미적용 (Popover 앵커 안정성 보장) |
+| **has:"" 자동 삽입** | 텍스트 입력에서 `has:` 또는 `!has:` 입력 시 자동으로 `""` 추가, 커서는 따옴표 사이 |
+| **facet에서 has/!has 제외** | facet 데이터에 `has`/`!has` 키가 있어도 필드 추천·HasFieldSelector에서 제외 (특수 연산자이므로) |
 | **값에 쉼표 포함** | 현재 스코프에서는 쉼표를 구분자로만 사용. 향후 따옴표 이스케이프 고려 |
 | **IME 조합 중 (한글/일본어)** | `compositionend` 이전에 Enter 무시 — 조합 완료 후에만 커밋 |
 | **앵커 안정성** | 값 셀이 `<span>` → `<input>` 전환되어도 앵커는 칩 컨테이너 `[data-chip]` 사용 → DOM 변경에 안전 |
@@ -1805,30 +1848,35 @@ interface QueryDSLEditorProps {
 
 좌/우 방향키로 칩의 토큰을 탐색할 때 **경계에서 멈춤 (clamping)** 방식을 사용한다. 순환(rotation)하지 않는다.
 
+> **중요**: 토큰 탐색은 **드롭다운이 닫혀있을 때만** 동작한다. 드롭다운이 열려있으면 `←`/`→`는 탭 전환에 사용된다 (14.4.2 참조).
+
 ```
-토큰 인덱스:  [0] [1] [2] [3] [4] [5]  → [input]
-               ↑                    ↑       ↑
-              첫 토큰            마지막    input (idx = -1)
+토큰 인덱스:  [-2]  [0] [1] [2] [3] [4] [5]  → [input]
+               ↑     ↑                    ↑       ↑
+          before-all 첫 토큰            마지막    input (idx = -1)
 ```
 
 | 현재 위치 | `←` 누름 | `→` 누름 |
 |-----------|----------|----------|
 | input (`-1`) | 마지막 토큰 (`length - 1`) | 그대로 유지 (`-1`) |
-| 첫 토큰 (`0`) | **그대로 유지 (`0`)** | 다음 토큰 (`1`) |
+| before-all (`-2`) | 그대로 유지 (`-2`) | 첫 토큰 (`0`) |
+| 첫 토큰 (`0`) | before-all (`-2`) | 다음 토큰 (`1`) |
 | 마지막 토큰 (`length - 1`) | 이전 토큰 (`length - 2`) | input (`-1`) |
 | 중간 토큰 (`n`) | `n - 1` | `n + 1` |
 
 ```typescript
-// ArrowLeft: clamp at 0 (첫 토큰에서 멈춤)
+// ArrowLeft: 드롭다운 닫힌 상태에서만
 setSelectedTokenIdx(prev => {
-  if (prev < 0) return visualTokens.length - 1;  // input → 마지막 토큰
-  if (prev <= 0) return 0;                        // 첫 토큰에서 멈춤 (순환 안함)
+  if (prev === -2) return -2;                  // before-all에서 멈춤
+  if (prev === -1) return visualTokens.length - 1;  // input → 마지막 토큰
+  if (prev <= 0) return -2;                    // 첫 토큰 → before-all
   return prev - 1;
 });
 
-// ArrowRight: clamp at -1 (input에서 멈춤)
+// ArrowRight: 드롭다운 닫힌 상태에서만
 setSelectedTokenIdx(prev => {
-  if (prev < 0) return -1;                        // input에서 멈춤 (순환 안함)
+  if (prev === -2) return 0;                   // before-all → 첫 토큰
+  if (prev < 0) return -1;                     // input에서 멈춤
   if (prev >= visualTokens.length - 1) return -1; // 마지막 → input
   return prev + 1;
 });
@@ -2475,6 +2523,13 @@ describe('Edge Cases', () => {
   // ── 매우 긴 입력 ──
   it('100자 이상 입력 성능', () => {
     // 파싱 시간 < 5ms
+  });
+
+  // ── URL 동기화 및 포맷 정규화 (Normalization) ──
+  it('Query Normalization & State Sync', () => {
+    // 최근 검색어의 원본 문자열(예: 'service: "auth"')과 내부 칩 직렬화 문자열('service:"auth"') 간의
+    // 공백, 따옴표 차이로 인한 리셋 레이스 컨디션을 방지하기 위해 두 쿼리를 표준화(Normalization)하여 비교해야 함.
+    // 표준화 방법: chipsToQuery(queryToChips(query))
   });
 });
 ```

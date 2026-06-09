@@ -390,7 +390,6 @@ const ArgusDiscoverPage: React.FC = () => {
   const handleSearchChange = useCallback(
     (query: string) => {
       setConditions(query);
-      lastSubmittedConditionsRef.current = query;
       setUrlState({ q: query });
       setTimeout(runQuery, 10);
     },

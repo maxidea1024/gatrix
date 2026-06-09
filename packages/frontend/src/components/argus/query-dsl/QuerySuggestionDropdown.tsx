@@ -58,6 +58,10 @@ export interface QuerySuggestionDropdownProps {
 export interface QuerySuggestionDropdownHandle {
   nextTab: () => void;
   prevTab: () => void;
+  /** Get the filtered suggestion item at the given display index */
+  getItemAtIndex: (index: number) => SuggestionItem | null;
+  /** Get the count of currently visible (filtered) suggestions */
+  getItemCount: () => number;
 }
 
 // ─── Tab types ───────────────────────────────────────────────────────────────
@@ -298,31 +302,9 @@ export const QuerySuggestionDropdown = forwardRef<
     }
   }, [showTabs]);
 
-  // Expose tab navigation to parent (for Left/Right arrow keys)
-  useImperativeHandle(
-    ref,
-    () => ({
-      nextTab: () => {
-        if (!showTabs || availableTabs.length <= 1) return;
-        setActiveTab((curr) => {
-          const idx = availableTabs.findIndex((t) => t.key === curr);
-          const next = (idx + 1) % availableTabs.length;
-          return availableTabs[next].key;
-        });
-        onSelectedIndexChange?.(-1);
-      },
-      prevTab: () => {
-        if (!showTabs || availableTabs.length <= 1) return;
-        setActiveTab((curr) => {
-          const idx = availableTabs.findIndex((t) => t.key === curr);
-          const prev = (idx - 1 + availableTabs.length) % availableTabs.length;
-          return availableTabs[prev].key;
-        });
-        onSelectedIndexChange?.(-1);
-      },
-    }),
-    [showTabs, availableTabs, onSelectedIndexChange]
-  );
+  // Expose tab navigation and filtered item access to parent
+  // (moved after filteredSuggestions so it can reference the computed list)
+  const _tabNavHandleRef = ref; // alias to use after filteredSuggestions
 
   // Reset tab when available tabs change
   useEffect(() => {
@@ -348,6 +330,37 @@ export const QuerySuggestionDropdown = forwardRef<
     // Filter by fieldCategory
     return suggestions.filter((s) => s.fieldCategory === activeTab);
   }, [suggestions, activeTab, showTabs]);
+
+  useImperativeHandle(
+    _tabNavHandleRef,
+    () => ({
+      nextTab: () => {
+        if (!showTabs || availableTabs.length <= 1) return;
+        setActiveTab((curr) => {
+          const idx = availableTabs.findIndex((t) => t.key === curr);
+          const next = (idx + 1) % availableTabs.length;
+          return availableTabs[next].key;
+        });
+        onSelectedIndexChange?.(-1);
+      },
+      prevTab: () => {
+        if (!showTabs || availableTabs.length <= 1) return;
+        setActiveTab((curr) => {
+          const idx = availableTabs.findIndex((t) => t.key === curr);
+          const prev = (idx - 1 + availableTabs.length) % availableTabs.length;
+          return availableTabs[prev].key;
+        });
+        onSelectedIndexChange?.(-1);
+      },
+      getItemAtIndex: (index: number) => {
+        return filteredSuggestions[index] ?? null;
+      },
+      getItemCount: () => {
+        return filteredSuggestions.length;
+      },
+    }),
+    [showTabs, availableTabs, onSelectedIndexChange, filteredSuggestions]
+  );
 
   // Pre-compute tab counts
   const tabCounts = useMemo(() => {
