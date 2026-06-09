@@ -2225,9 +2225,17 @@ function parseInputFilter(input: string): {
   let operator = '=';
   const values: string[] = [];
 
-  const fieldTok = tokens.find((t) => t.type === TokenType.FIELD);
-  if (fieldTok) {
-    field = fieldTok.value;
+  const fieldTokIdx = tokens.findIndex((t) => t.type === TokenType.FIELD);
+  if (fieldTokIdx >= 0) {
+    const fieldTok = tokens[fieldTokIdx];
+    let isNegated = false;
+    if (fieldTokIdx > 0) {
+      const prevTok = tokens[fieldTokIdx - 1];
+      if (prevTok.type === TokenType.BANG || prevTok.type === TokenType.NOT) {
+        isNegated = true;
+      }
+    }
+    field = isNegated ? `!${fieldTok.value}` : fieldTok.value;
   }
 
   for (const t of tokens) {
