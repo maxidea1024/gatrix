@@ -1,6 +1,3 @@
-/**
- * Chained autocomplete test — reproduce level:level:info bug
- */
 import { describe, it, expect } from 'vitest';
 import { tokenize } from '../lexer';
 import { resolveCursorContext } from '../cursor-context';
@@ -10,6 +7,7 @@ import {
   shouldKeepDropdownOpen,
 } from '../suggestion-engine';
 import { queryToChips } from '../useFilterChips';
+import { LOGS_CONFIG } from '../fields';
 
 const MOCK_FACETS = new Map<string, string[]>([
   ['level', ['debug', 'info', 'warn', 'error', 'warning', 'fatal']],
@@ -23,7 +21,7 @@ function pipeline(input: string, cursor?: number) {
   const ctx = resolveCursorContext(input, c, tokens);
   const textBeforeCursor = input.slice(0, c);
   const chips = queryToChips(textBeforeCursor);
-  const suggestions = getSuggestions(ctx, 'logs', MOCK_FACETS, 20, chips);
+  const suggestions = getSuggestions(ctx, LOGS_CONFIG, MOCK_FACETS, 20, chips);
   return { tokens, ctx, suggestions };
 }
 

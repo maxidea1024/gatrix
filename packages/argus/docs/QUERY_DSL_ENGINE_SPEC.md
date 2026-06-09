@@ -1,7 +1,7 @@
 # Query DSL Engine Specification
 
-> **Status**: Draft v1.0  
-> **Last Updated**: 2025-06-07  
+> **Status**: Draft v1.1  
+> **Last Updated**: 2025-06-09  
 > **Author**: Gatrix Frontend Team  
 > **Scope**: Frontend Query DSL Engine for Argus (Logs, Issues, Discover, Performance, Feedback, Sessions)
 
@@ -381,6 +381,7 @@ interface QueryField {
   autocompleteProvider?: string;  // Provider ID for value suggestions
   category: FieldCategory;       // For grouping in dropdown
   description: string;           // i18n key for field description
+  staticValues?: string[];       // 정적 자동완성 값 (예: status → ['resolved', 'unresolved', ...])
 }
 
 type QueryOperator =
@@ -407,7 +408,7 @@ type FieldCategory = 'log' | 'resource' | 'trace' | 'event' | 'user' | 'custom';
 // 모든 사용 가능한 필드를 정의하는 마스터 레지스트리
 const ALL_QUERY_FIELDS: QueryField[] = [
   // ── Log fields ──
-  { key: 'level',        label: 'dsl.field.level',        type: 'string',   category: 'log',      operators: ['=', '!='], searchable: true, description: 'dsl.field.level.desc' },
+  { key: 'level',        label: 'dsl.field.level',        type: 'string',   category: 'log',      operators: ['=', '!='], searchable: true, description: 'dsl.field.level.desc', staticValues: ['debug', 'info', 'warning', 'error', 'fatal'] },
   { key: 'message',      label: 'dsl.field.message',      type: 'string',   category: 'log',      operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'], searchable: true, description: 'dsl.field.message.desc' },
   { key: 'body',         label: 'dsl.field.body',         type: 'string',   category: 'log',      operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'], searchable: true, description: 'dsl.field.body.desc' },
   { key: 'logger_name',  label: 'dsl.field.loggerName',   type: 'string',   category: 'log',      operators: ['=', '!='], searchable: true, description: 'dsl.field.loggerName.desc' },
@@ -429,6 +430,8 @@ const ALL_QUERY_FIELDS: QueryField[] = [
   { key: 'value',        label: 'dsl.field.value',        type: 'string',   category: 'event',    operators: ['=', '!=', 'contains', 'startsWith', 'endsWith'], searchable: true, description: 'dsl.field.value.desc' },
   { key: 'handled',      label: 'dsl.field.handled',      type: 'boolean',  category: 'event',    operators: ['=', '!='], searchable: false, description: 'dsl.field.handled.desc' },
   { key: 'platform',     label: 'dsl.field.platform',     type: 'string',   category: 'event',    operators: ['=', '!='], searchable: true, description: 'dsl.field.platform.desc' },
+  { key: 'status',       label: 'dsl.field.status',       type: 'string',   category: 'event',    operators: ['=', '!='], searchable: true, description: 'dsl.field.status.desc' },
+  { key: 'assigned',     label: 'dsl.field.assigned',     type: 'string',   category: 'event',    operators: ['=', '!='], searchable: true, description: 'dsl.field.assigned.desc', staticValues: ['me', 'none', 'my_teams'] },
 
   // ── User fields ──
   { key: 'browser_name', label: 'dsl.field.browserName',  type: 'string',   category: 'user',     operators: ['=', '!='], searchable: true, description: 'dsl.field.browserName.desc' },
@@ -438,7 +441,6 @@ const ALL_QUERY_FIELDS: QueryField[] = [
   // ── Performance fields ──
   { key: 'transaction',  label: 'dsl.field.transaction',  type: 'string',   category: 'event',    operators: ['=', '!=', 'contains'], searchable: true, description: 'dsl.field.transaction.desc' },
   { key: 'duration',     label: 'dsl.field.duration',     type: 'number',   category: 'event',    operators: ['=', '!=', '>', '>=', '<', '<='], searchable: false, description: 'dsl.field.duration.desc' },
-  { key: 'status',       label: 'dsl.field.status',       type: 'string',   category: 'event',    operators: ['=', '!='], searchable: true, description: 'dsl.field.status.desc' },
 
   // ── Feedback fields ──
   { key: 'contact_email', label: 'dsl.field.contactEmail', type: 'string',  category: 'user',     operators: ['=', '!=', 'contains'], searchable: true, description: 'dsl.field.contactEmail.desc' },
@@ -446,112 +448,133 @@ const ALL_QUERY_FIELDS: QueryField[] = [
 ];
 ```
 
-### 5.4 Page-Specific Field Presets (페이지별 필드 프리셋)
+### 5.4 DomainConfig (도메인별 설정)
 
 각 페이지(로그, 이슈, 퍼포먼스, 디스커버 등)는 **서로 다른 필드 목록**을 사용한다. DSL 엔진은 동일하되, 자동완성에서 노출하는 필드가 달라진다.
 
+공용 컴포넌트는 도메인 지식을 **내부에 보유하지 않으며**, 각 페이지가 `DomainConfig` 객체를 조립하여 주입한다.
+
 ```typescript
-type QueryDomain = 'logs' | 'issues' | 'performance' | 'discover' | 'feedback' | 'sessions';
-
-interface QueryFieldPreset {
-  domain: QueryDomain;
-  fields: string[];           // ALL_QUERY_FIELDS에서 key로 참조
+interface DomainConfig {
+  /** 도메인 이름 (로깅/디버깅용) */
+  name: string;
+  /** 이 도메인에서 사용 가능한 필드 목록 */
+  fields: QueryField[];
+  /** 필드 별칭 (severity → level 등) */
   aliases?: Record<string, string>;
-  facetsEndpoint?: string;    // facet 데이터를 가져올 API 엔드포인트
+  /** 패싯 endpoint (lazy loading용) */
+  facetsEndpoint?: string;
+  /** free text 기본 매핑 필드 (기본: 'message') */
+  freeTextField?: string;
 }
+```
 
-const FIELD_PRESETS: Record<QueryDomain, QueryFieldPreset> = {
-  logs: {
-    domain: 'logs',
-    fields: [
-      'level', 'message', 'body', 'logger_name', 'timestamp',
-      'service', 'environment', 'release',
-      'trace_id', 'span_id', 'log_id', 'issue_id',
-    ],
-    aliases: { severity: 'level', logger: 'logger_name' },
-    facetsEndpoint: '/logs/facets',
-  },
+#### 도메인별 Config 정의
 
-  issues: {
-    domain: 'issues',
-    fields: [
-      'type', 'value', 'message', 'handled', 'platform',
-      'level', 'environment', 'release', 'service',
-      'browser_name', 'os_name', 'device',
-      'timestamp', 'trace_id', 'issue_id',
-    ],
-    aliases: { severity: 'level' },
-    facetsEndpoint: '/issues/facets',
-  },
+각 페이지에서 config를 정의하여 `QueryDSLEditor`에 전달한다.
 
-  performance: {
-    domain: 'performance',
-    fields: [
-      'transaction', 'duration', 'status',
-      'service', 'environment', 'release',
-      'browser_name', 'os_name',
-      'timestamp', 'trace_id', 'span_id',
-    ],
-    aliases: {},
-    facetsEndpoint: '/performance/facets',
-  },
+```typescript
+// ── Logs Config ──
+const LOGS_CONFIG: DomainConfig = {
+  name: 'logs',
+  fields: pickFields(['level', 'message', 'body', 'logger_name', 'timestamp',
+    'service', 'environment', 'release',
+    'trace_id', 'span_id', 'log_id', 'issue_id']),
+  aliases: { severity: 'level', logger: 'logger_name' },
+  facetsEndpoint: '/logs/facets',
+};
 
-  discover: {
-    domain: 'discover',
-    // Discover는 모든 필드 접근 가능 (파워유저용)
-    fields: ALL_QUERY_FIELDS.map(f => f.key),
-    aliases: { severity: 'level', logger: 'logger_name' },
-    facetsEndpoint: '/discover/facets',
-  },
+// ── Issues Config ──
+// Issues 도메인은 status, assigned 필드를 포함하며 staticValues로 정적 자동완성을 제공한다.
+const ISSUES_CONFIG: DomainConfig = {
+  name: 'issues',
+  fields: pickFields(['type', 'value', 'message', 'handled', 'platform',
+    'level', 'environment', 'release', 'service',
+    'browser_name', 'os_name', 'device',
+    'timestamp', 'trace_id', 'issue_id',
+    'status', 'assigned'],
+    // 도메인별 staticValues 오버라이드
+    {
+      status: { staticValues: ['resolved', 'unresolved', 'ignored', 'archived', 'regressed', 'escalating'] },
+    }),
+  aliases: { severity: 'level' },
+  facetsEndpoint: '/issues/facets',
+};
 
-  feedback: {
-    domain: 'feedback',
-    fields: [
-      'feedback', 'contact_email',
-      'environment', 'release', 'service',
-      'browser_name', 'os_name', 'device',
-      'timestamp',
-    ],
-    aliases: {},
-    facetsEndpoint: '/feedback/facets',
-  },
+// ── Discover Config ──
+const DISCOVER_CONFIG: DomainConfig = {
+  name: 'discover',
+  fields: ALL_QUERY_FIELDS,  // 모든 필드 접근 가능 (파워유저용)
+  aliases: { severity: 'level', logger: 'logger_name' },
+  facetsEndpoint: '/discover/facets',
+};
 
-  sessions: {
-    domain: 'sessions',
-    fields: [
-      'environment', 'release', 'service',
-      'browser_name', 'os_name', 'device',
-      'duration', 'timestamp',
-    ],
-    aliases: {},
-    facetsEndpoint: '/sessions/facets',
-  },
+// ── Feedback Config ──
+// Feedback 도메인은 free text 기본 필드가 'feedback'이다.
+const FEEDBACK_CONFIG: DomainConfig = {
+  name: 'feedback',
+  fields: pickFields(['feedback', 'contact_email',
+    'environment', 'release', 'service',
+    'browser_name', 'os_name', 'device', 'level',
+    'timestamp', 'status', 'assigned'],
+    {
+      status: { staticValues: ['resolved', 'unresolved', 'spam'] },
+    }),
+  facetsEndpoint: '/feedback/facets',
+  freeTextField: 'feedback',  // free text → feedback:contains("...")로 변환
+};
+
+// ── Performance Config ──
+const PERFORMANCE_CONFIG: DomainConfig = {
+  name: 'performance',
+  fields: pickFields(['transaction', 'duration', 'status',
+    'service', 'environment', 'release',
+    'browser_name', 'os_name',
+    'timestamp', 'trace_id', 'span_id'],
+    {
+      status: { staticValues: ['ok', 'cancelled', 'unknown', 'invalid_argument'] },
+    }),
+  facetsEndpoint: '/performance/facets',
+};
+
+// ── Sessions Config ──
+const SESSIONS_CONFIG: DomainConfig = {
+  name: 'sessions',
+  fields: pickFields(['environment', 'release', 'service',
+    'browser_name', 'os_name', 'device',
+    'duration', 'timestamp']),
+  facetsEndpoint: '/sessions/facets',
 };
 ```
 
-#### Preset 사용 예시
+#### Config 사용 예시
 
 ```typescript
 // 로그 페이지
-<QueryDSLEditor domain="logs" onSearch={handleSearch} />
+<QueryDSLEditor config={LOGS_CONFIG} onSearch={handleSearch} />
 
 // 이슈 페이지
-<QueryDSLEditor domain="issues" onSearch={handleSearch} />
+<QueryDSLEditor config={ISSUES_CONFIG} onSearch={handleSearch} />
 
 // 디스커버 (모든 필드)
-<QueryDSLEditor domain="discover" onSearch={handleSearch} />
+<QueryDSLEditor config={DISCOVER_CONFIG} onSearch={handleSearch} />
+
+// 피드백 (freeText → feedback 필드)
+<QueryDSLEditor config={FEEDBACK_CONFIG} onSearch={handleSearch} />
 ```
 
-#### Preset이 영향을 미치는 것
+#### DomainConfig가 영향을 미치는 것
 
 | 영향 받는 기능 | 동작 |
 |---|---|
-| **자동완성 필드 추천** | preset에 포함된 필드만 추천 |
-| **Validator** | preset에 없는 필드 → `UNKNOWN_FIELD` 경고 |
-| **Facet Provider** | preset의 `facetsEndpoint` 사용 |
-| **Field Aliases** | preset별 alias 적용 |
+| **자동완성 필드 추천** | config.fields에 포함된 필드만 추천 |
+| **정적 값 자동완성** | field.staticValues가 있으면 값 추천에 사용 (fetchFieldValues보다 우선) |
+| **Validator** | config.fields에 없는 필드 → `UNKNOWN_FIELD` 경고 |
+| **Facet Provider** | config.facetsEndpoint 사용 |
+| **Field Aliases** | config.aliases 적용 |
+| **Free Text 필드** | config.freeTextField로 매핑 (기본: 'message') |
 
-#### Preset이 영향을 미치지 않는 것 (= DSL 엔진 자체는 불변)
+#### DomainConfig가 영향을 미치지 않는 것 (= DSL 엔진 자체는 불변)
 
 | 불변 기능 | 이유 |
 |---|---|
@@ -981,10 +1004,25 @@ Enter를 눌렀을 때 자동으로 수정 가능한 오류는 **수정 후 실�
 |---|---|
 | `FIELD` | 필드 목록 (prefix 매칭, 카테고리별 그룹핑) |
 | `OPERATOR` | 현재 필드가 허용하는 연산자만 (필드 메타데이터 기반) |
-| `VALUE` | 타입별: string → facet 값, boolean → true/false, number → 없음, datetime → 프리셋 |
+| `VALUE` | **staticValues 우선** → facet 값 → 타입별 기본값 (boolean → true/false, number → 없음, datetime → 프리셋) |
 | `LOGICAL_OPERATOR` | `and`, `or` (조건 충족 시만) |
 
-### 11.1.1 추천 개수 제한
+#### 11.1.1 staticValues 기반 값 추천
+
+필드에 `staticValues`가 정의되어 있으면, **fetchFieldValues (동적 로딩)보다 우선**하여 정적 값을 추천한다. 두 소스의 결과는 병합되며, 중복은 제거한다.
+
+```typescript
+// 값 추천 우선순위:
+// 1. field.staticValues (정적, 즉시 제공)
+// 2. fetchFieldValues (동적, 네트워크 요청)
+// 3. 타입별 기본값 (boolean → true/false)
+//
+// 예: status 필드 (staticValues: ['resolved', 'unresolved', ...])
+//   → 사용자가 "status:" 입력 시 즉시 정적 값 추천 표시
+//   → fetchFieldValues 응답이 도착하면 병합
+```
+
+### 11.1.2 추천 개수 제한
 
 추천 목록은 **최대 20개**까지만 표시한다. 너무 많으면 사용자가 선택하기 어렵다.
 
@@ -993,11 +1031,11 @@ const DEFAULT_MAX_SUGGESTIONS = 20;
 
 function getSuggestions(
   context: CursorContext,
-  domain: QueryDomain,
+  config: DomainConfig,
   options?: { maxSuggestions?: number }
 ): SuggestionItem[] {
   const max = options?.maxSuggestions ?? DEFAULT_MAX_SUGGESTIONS;
-  const allItems = buildSuggestions(context, domain);
+  const allItems = buildSuggestions(context, config);
   
   // 정렬: prefix 매칭 우선, 사용 빈도 순
   const sorted = sortByRelevance(allItems, context.prefix);
@@ -1620,18 +1658,20 @@ const COLUMN_ALIASES = {
 
 ```typescript
 interface QueryDSLEditorProps {
-  /** 페이지별 필드 프리셋 (5.4 참조) — 자동완성 필드 목록 결정 */
-  domain: QueryDomain;
+  /** 도메인별 설정 (5.4 참조) — 필드 목록, 별칭, facet endpoint, freeText 필드 등 */
+  config: DomainConfig;
   /** 초기 쿼리 문자열 */
-  initialQuery: string;
+  initialQuery?: string;
   /** Enter 시에만 호출. 문법 오류 시 호출되지 않음 */
   onSearch: (query: string) => void;
-  /** 프리셋을 무시하고 커스텀 필드 사용 (advanced) */
-  customFields?: QueryField[];
-  /** 외부에서 주입하는 facet 데이터 (없으면 자동 fetch) */
-  facets?: Record<string, { value: string; count: number }[]>;
+  /** 쿼리 변경 시 호출 (부모 상태 동기화용) */
+  onChange?: (query: string) => void;
+  /** 필드 값 동적 로딩 콜백 (staticValues 없는 필드용) */
+  fetchFieldValues?: (fieldKey: string) => Promise<string[]>;
   /** placeholder 텍스트 (i18n key) */
   placeholder?: string;
+  /** 최대 추천 개수 (기본: 20) */
+  maxSuggestions?: number;
 }
 ```
 
@@ -2449,18 +2489,36 @@ npx vitest run src/components/argus/query-dsl/__tests__/
 
 ## 20. Extension Points
 
-### 20.1 Custom Fields
+### 20.1 DomainConfig 기반 확장
 
-`QueryField[]` 배열에 새 필드를 추가하면 자동으로 모든 기능(자동완성, 검증, 포맷팅)에 반영된다.
+`DomainConfig` 객체를 조립하여 새로운 도메인을 추가할 수 있다. 공용 컴포넌트 코드 변경 없이 필드, 별칭, facet endpoint, freeText 필드 등을 선언적으로 정의한다.
 
-### 20.2 Custom Operators
+```typescript
+// 새 도메인 추가 예시
+const CUSTOM_CONFIG: DomainConfig = {
+  name: 'custom-domain',
+  fields: [
+    ...pickFields(['environment', 'service', 'timestamp']),
+    { key: 'custom_field', label: 'Custom', type: 'string', category: 'custom',
+      operators: ['=', '!='], searchable: true, description: 'Custom field',
+      staticValues: ['value1', 'value2', 'value3'] },
+  ],
+  freeTextField: 'custom_field',
+};
+```
+
+### 20.2 Custom Fields with staticValues
+
+`QueryField`에 `staticValues`를 추가하면 해당 필드의 값 자동완성에 정적 값이 즉시 표시된다. `fetchFieldValues`와 병합되므로, 정적 값 + 동적 값을 동시에 지원한다.
+
+### 20.3 Custom Operators
 
 `QueryOperator` 타입에 새 연산자를 추가하고, Lexer/Parser에 해당 토큰 처리를 추가한다.
 
-### 20.3 Custom Providers
+### 20.4 Custom Providers
 
 `SuggestionProvider` 인터페이스를 구현하여 새로운 데이터 소스(API, WebSocket 등)를 추가할 수 있다.
 
-### 20.4 Aggregate Functions
+### 20.5 Aggregate Functions
 
 향후 `count() > 100`, `avg(duration) >= 500` 같은 집계 함수 지원을 위한 확장 포인트를 제공한다.

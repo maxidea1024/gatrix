@@ -20,7 +20,7 @@ import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ArgusFilterBar from '@/components/argus/ArgusFilterBar';
-import { QueryDSLEditor } from '@/components/argus/query-dsl';
+import { QueryDSLEditor, LOGS_CONFIG } from '@/components/argus/query-dsl';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -337,7 +337,7 @@ const ArgusLogsPage: React.FC = () => {
               }}
             >
               <QueryDSLEditor
-                domain="logs"
+                config={LOGS_CONFIG}
                 initialQuery={search}
                 onSearch={handleSearchSubmit}
                 onChange={(q) => {

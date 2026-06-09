@@ -6,7 +6,7 @@
 import type {
   Expression,
   ValidationError,
-  QueryDomain,
+  DomainConfig,
   QueryOperator,
 } from './types';
 import { getFieldByKey, resolveAlias } from './fields';
@@ -20,11 +20,11 @@ import { getFieldByKey, resolveAlias } from './fields';
  */
 export function validate(
   ast: Expression | null,
-  domain: QueryDomain
+  config: DomainConfig
 ): ValidationError[] {
   if (!ast) return [];
   const errors: ValidationError[] = [];
-  validateNode(ast, domain, errors);
+  validateNode(ast, config, errors);
   return errors;
 }
 
@@ -32,39 +32,37 @@ export function validate(
 
 function validateNode(
   node: Expression,
-  domain: QueryDomain,
+  config: DomainConfig,
   errors: ValidationError[]
 ): void {
   switch (node.type) {
     case 'Filter':
-      validateFilter(node, domain, errors);
+      validateFilter(node, config, errors);
       break;
     case 'FreeText':
-      // Free text is always valid at semantic level
       break;
     case 'Binary':
-      validateNode(node.left, domain, errors);
-      validateNode(node.right, domain, errors);
+      validateNode(node.left, config, errors);
+      validateNode(node.right, config, errors);
       break;
     case 'Not':
-      validateNode(node.expression, domain, errors);
+      validateNode(node.expression, config, errors);
       break;
     case 'Group':
-      validateNode(node.expression, domain, errors);
+      validateNode(node.expression, config, errors);
       break;
     case 'Partial':
-      // Partial nodes already have syntax errors from parser
       break;
   }
 }
 
 function validateFilter(
   node: Expression & { type: 'Filter' },
-  domain: QueryDomain,
+  config: DomainConfig,
   errors: ValidationError[]
 ): void {
-  const resolvedKey = resolveAlias(node.field, domain);
-  const field = getFieldByKey(resolvedKey, domain);
+  const resolvedKey = resolveAlias(node.field, config);
+  const field = getFieldByKey(resolvedKey, config);
 
   if (!field) {
     errors.push({

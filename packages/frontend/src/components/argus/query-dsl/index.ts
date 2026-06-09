@@ -15,16 +15,19 @@ export { resolveEditorState } from './editor-fsm';
 export { resolveCursorContext } from './cursor-context';
 export { getSuggestions, applyCompletion } from './suggestion-engine';
 
-// Field registry
+// Field registry & domain configs
 export {
   ALL_QUERY_FIELDS,
-  FIELD_PRESETS,
-  getFieldsForDomain,
+  LOGS_CONFIG,
+  ISSUES_CONFIG,
+  DISCOVER_CONFIG,
+  FEEDBACK_CONFIG,
+  PERFORMANCE_CONFIG,
+  SESSIONS_CONFIG,
+  pickFields,
   getFieldByKey,
   isFieldInDomain,
   resolveAlias,
-  getAliases,
-  getFacetsEndpoint,
 } from './fields';
 
 // UI Components
@@ -47,8 +50,7 @@ export type {
   ValidationError,
   QueryField,
   QueryOperator,
-  QueryDomain,
-  QueryFieldPreset,
+  DomainConfig,
   CursorContext,
   CursorContextType,
   SuggestionItem,

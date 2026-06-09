@@ -208,23 +208,21 @@ export interface QueryField {
   autocompleteProvider?: string;
   category: FieldCategory;
   description: string; // i18n key for field description
+  /** Static autocomplete values (e.g., status → ['resolved', 'unresolved']) */
+  staticValues?: string[];
 }
 
-// ─── Domain Presets ──────────────────────────────────────────────────────────
+// ─── Domain Config ───────────────────────────────────────────────────────────
 
-export type QueryDomain =
-  | 'logs'
-  | 'issues'
-  | 'performance'
-  | 'discover'
-  | 'feedback'
-  | 'sessions';
-
-export interface QueryFieldPreset {
-  domain: QueryDomain;
-  fields: string[];
-  aliases: Record<string, string>;
-  facetsEndpoint?: string;
+export interface DomainConfig {
+  /** Domain name (for logging/debugging and localStorage keys) */
+  name: string;
+  /** Fields available in this domain */
+  fields: QueryField[];
+  /** Field aliases (e.g., severity → level) */
+  aliases?: Record<string, string>;
+  /** Free text default mapping field (default: 'message') */
+  freeTextField?: string;
 }
 
 // ─── Editor FSM ──────────────────────────────────────────────────────────────
@@ -293,14 +291,14 @@ export interface SuggestionResult {
 // ─── Component Props ─────────────────────────────────────────────────────────
 
 export interface QueryDSLEditorProps {
-  /** Page-specific field preset — determines autocomplete fields */
-  domain: QueryDomain;
+  /** Domain config — determines fields, aliases, facet endpoints */
+  config: DomainConfig;
   /** Initial query string */
-  initialQuery: string;
+  initialQuery?: string;
   /** Called on Enter only. Not called if syntax errors exist. */
   onSearch: (query: string) => void;
-  /** Override preset fields (advanced) */
-  customFields?: QueryField[];
+  /** Called when query changes (parent state sync) */
+  onChange?: (query: string) => void;
   /** Lazy-loading callback: fetches values for a specific field on demand */
   fetchFieldValues?: (fieldKey: string) => Promise<string[]>;
   /** Maximum number of suggestion items (default: 20) */

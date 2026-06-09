@@ -4,6 +4,7 @@ import { tokenize } from '../lexer';
 import { serializeForBackend } from '../serializer';
 import { validate } from '../validator';
 import { TokenType } from '../types';
+import { DISCOVER_CONFIG } from '../fields';
 
 describe('Edge Cases', () => {
   describe('deeply nested expressions', () => {
@@ -172,7 +173,7 @@ describe('Edge Cases', () => {
   describe('validator with discover domain', () => {
     it('should accept all fields in discover domain', () => {
       const { ast } = parse('transaction:test and level:error');
-      const errors = validate(ast, 'discover');
+      const errors = validate(ast, DISCOVER_CONFIG);
       expect(errors).toHaveLength(0);
     });
   });

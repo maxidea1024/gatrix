@@ -19,7 +19,7 @@ import { Box, IconButton, useTheme, ClickAwayListener } from '@mui/material';
 import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
-import type { QueryDomain, SuggestionItem } from './types';
+import type { DomainConfig, SuggestionItem } from './types';
 import { TokenType, EditorState } from './types';
 import { tokenize } from './lexer';
 import { resolveCursorContext } from './cursor-context';
@@ -50,7 +50,7 @@ import {
 // ─── Props ───────────────────────────────────────────────────────────────────
 
 export interface QueryDSLEditorProps {
-  domain: QueryDomain;
+  config: DomainConfig;
   initialQuery?: string;
   onSearch: (query: string) => void;
   /** Called whenever the query changes (for parent state sync) */
@@ -120,7 +120,7 @@ function useChipHistory(initial: FilterChip[] | (() => FilterChip[])) {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function QueryDSLEditor({
-  domain,
+  config,
   initialQuery = '',
   onSearch,
   onChange,
@@ -158,7 +158,7 @@ export function QueryDSLEditor({
   } | null>(null);
   const tokenGroupRefs = useRef<Map<string, FilterTokenGroupHandle>>(new Map());
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() =>
-    getRecentSearches(domain)
+    getRecentSearches(config.name)
   );
 
   // ─── Inline value editing state ──────────────────────────────────
@@ -181,8 +181,8 @@ export function QueryDSLEditor({
   );
 
   const refreshRecent = useCallback(() => {
-    setRecentSearches(getRecentSearches(domain));
-  }, [domain]);
+    setRecentSearches(getRecentSearches(config.name));
+  }, [config.name]);
 
   // Ref to suppress onChange during programmatic chip updates (e.g. recent selection)
   const suppressOnChangeRef = useRef(false);
@@ -209,10 +209,10 @@ export function QueryDSLEditor({
 
   const handleRemoveRecent = useCallback(
     (query: string) => {
-      removeRecentSearch(domain, query);
+      removeRecentSearch(config.name, query);
       refreshRecent();
     },
-    [domain, refreshRecent]
+    [config.name, refreshRecent]
   );
 
   // ─── Sync initialQuery → chips when it changes externally ──────────
@@ -272,7 +272,7 @@ export function QueryDSLEditor({
     // EXCEPT for datetime fields which should show presets (now-1h, etc.)
     if (cursorContext.editorState === EditorState.IN_QUOTED_STRING) {
       const ctxField = cursorContext.field
-        ? getFieldByKey(cursorContext.field, domain)
+        ? getFieldByKey(cursorContext.field, config)
         : null;
       if (ctxField?.type !== 'datetime') {
         return [];
@@ -280,12 +280,12 @@ export function QueryDSLEditor({
     }
     return getSuggestions(
       cursorContext,
-      domain,
+      config,
       normalizedFacets,
       maxSuggestions,
       chips
     );
-  }, [cursorContext, domain, normalizedFacets, maxSuggestions, chips]);
+  }, [cursorContext, config, normalizedFacets, maxSuggestions, chips]);
 
   // ─── Visual token index computation ─────────────────────────────────
 
@@ -322,7 +322,7 @@ export function QueryDSLEditor({
       updates: Partial<
         Pick<
           FilterChip,
-          'field' | 'operator' | 'value' | 'values' | 'composingPart'
+          'field' | 'operator' | 'value' | 'values' | 'composingPart' | 'label'
         >
       >
     ) => {
@@ -556,7 +556,7 @@ export function QueryDSLEditor({
       // The DateTimePicker manages values via onSelect callback,
       // and blur fires when its calendar popup opens (stealing focus).
       const blurredChip = chips.find((c) => c.id === chipId);
-      const blurredField = getFieldByKey(blurredChip?.field ?? '', domain);
+      const blurredField = getFieldByKey(blurredChip?.field ?? '', config);
       if (blurredField?.type === 'datetime') return;
 
       // Cancel any previous pending blur
@@ -572,7 +572,7 @@ export function QueryDSLEditor({
         }
       }, 200);
     },
-    [chips, domain, commitInlineEdit]
+    [chips, config, commitInlineEdit]
   );
 
   /** Toggle a value from popover checkbox or keyboard selection */
@@ -617,7 +617,7 @@ export function QueryDSLEditor({
       if (e.nativeEvent.isComposing) return;
 
       const editedChip = chips.find((c) => c.id === chipId);
-      const editedField = getFieldByKey(editedChip?.field ?? '', domain);
+      const editedField = getFieldByKey(editedChip?.field ?? '', config);
       const isDatetime = editedField?.type === 'datetime';
 
       // Datetime fields: navigate presets with arrows, Enter/Tab to commit
@@ -654,8 +654,21 @@ export function QueryDSLEditor({
       }
 
       // Non-datetime: full popover navigation
-      const facetValues = normalizedFacets?.get(editedChip?.field ?? '') ?? [];
-      const maxIdx = Math.min(facetValues.length, 30) - 1;
+      // Build merged value list matching ValueSuggestionList (staticValues first, then facets, deduplicated)
+      const popoverValues = (() => {
+        const seen = new Set<string>();
+        const result: string[] = [];
+        const statics = editedField?.staticValues ?? [];
+        const facets = normalizedFacets?.get(editedChip?.field ?? '') ?? [];
+        for (const v of [...statics, ...facets]) {
+          if (!seen.has(v)) {
+            seen.add(v);
+            result.push(v);
+          }
+        }
+        return result;
+      })();
+      const maxIdx = Math.min(popoverValues.length, 30) - 1;
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -673,7 +686,7 @@ export function QueryDSLEditor({
           popoverHighlightIdx >= 0 &&
           popoverHighlightIdx <= maxIdx
         ) {
-          const highlightedValue = facetValues[popoverHighlightIdx];
+          const highlightedValue = popoverValues[popoverHighlightIdx];
           updateChip(chipId, {
             value: highlightedValue,
             values: [highlightedValue],
@@ -690,7 +703,7 @@ export function QueryDSLEditor({
       ) {
         // Space toggles checkbox when an item is highlighted
         e.preventDefault();
-        handleInlineCheckboxToggle(facetValues[popoverHighlightIdx]);
+        handleInlineCheckboxToggle(popoverValues[popoverHighlightIdx]);
       } else if (e.key === 'Tab') {
         e.preventDefault();
         commitInlineEdit(chipId);
@@ -701,7 +714,7 @@ export function QueryDSLEditor({
     },
     [
       chips,
-      domain,
+      config,
       normalizedFacets,
       popoverHighlightIdx,
       handleInlineCheckboxToggle,
@@ -870,6 +883,10 @@ export function QueryDSLEditor({
 
   const applySuggestion = useCallback(
     (item: SuggestionItem, isMultiSelect?: boolean) => {
+      // Discard clicks during browser window reactivation — the activation
+      // click can land on a stale dropdown DOM that has silently re-rendered
+      if (windowBlurRef.current) return;
+
       const result = applyCompletion(inputValue, cursorContext, item);
 
       if (item.category === 'logical') {
@@ -1099,7 +1116,7 @@ export function QueryDSLEditor({
           }
           const newChipId = `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
           // Datetime fields default to 'after' operator
-          const selectedField = getFieldByKey(item.label, domain);
+          const selectedField = getFieldByKey(item.label, config);
           const defaultOp = selectedField?.type === 'datetime' ? 'after' : '=';
           insertChipsAtCursor([
             {
@@ -1332,7 +1349,7 @@ export function QueryDSLEditor({
           // No input text → execute search with current chips
           const query = chipsToQuery(chips);
           if (query.trim()) {
-            addRecentSearch(domain, query);
+            addRecentSearch(config.name, query);
             refreshRecent();
           }
           onSearch(query);
@@ -1414,7 +1431,7 @@ export function QueryDSLEditor({
       applySuggestion,
       setChips,
       onSearch,
-      domain,
+      config,
       refreshRecent,
       selectedTokenIdx,
       visualTokens,
@@ -1437,9 +1454,13 @@ export function QueryDSLEditor({
       windowBlurRef.current = true;
     };
     const handleWindowFocus = () => {
-      setTimeout(() => {
+      // Reset windowBlurRef when the activation click cycle completes (mouseup)
+      // or on next keyboard interaction — NOT on a timer.
+      const resetOnInteraction = () => {
         windowBlurRef.current = false;
-      }, 50);
+      };
+      window.addEventListener('mouseup', resetOnInteraction, { once: true });
+      window.addEventListener('keydown', resetOnInteraction, { once: true });
     };
     window.addEventListener('blur', handleWindowBlur);
     window.addEventListener('focus', handleWindowFocus);
@@ -1461,7 +1482,6 @@ export function QueryDSLEditor({
   const handleFocus = useCallback(() => {
     // If focus was triggered by browser window reactivation, do not show dropdown
     if (windowBlurRef.current) {
-      windowBlurRef.current = false;
       return;
     }
     if (suppressDropdownRef.current) {
@@ -1607,6 +1627,45 @@ export function QueryDSLEditor({
     setDropdownLeft(inputLeft + textWidth);
   }, [inputValue, cursorOffset, chips.length]);
 
+  const isAtFront = selectedTokenIdx === -2;
+
+  const renderInput = () => (
+    <input
+      ref={inputRef}
+      type="text"
+      value={inputValue}
+      onChange={handleInputChange}
+      onKeyDown={handleKeyDown}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onClick={handleInputClick}
+      onCompositionStart={() => setIsComposing(true)}
+      onCompositionEnd={() => setIsComposing(false)}
+      spellCheck={false}
+      autoComplete="off"
+      placeholder={
+        chips.length === 0 && !isAtFront
+          ? (placeholder ?? t('dsl.placeholder', 'Search with DSL...'))
+          : ''
+      }
+      style={{
+        flex: isAtFront ? '0 0 auto' : 1,
+        minWidth: isAtFront ? 2 : 80,
+        width: isAtFront ? `${Math.max(inputValue.length + 3, 1)}ch` : undefined,
+        border: 'none',
+        outline: 'none',
+        background: 'transparent',
+        color: isDark ? '#ddd' : '#333',
+        fontSize: '0.8rem',
+        fontWeight: 500,
+        fontFamily: 'inherit',
+        lineHeight: '24px',
+        padding: isAtFront && !inputValue ? '2px 0' : '2px 4px',
+        caretColor: selectedTokenIdx >= 0 ? 'transparent' : undefined,
+      }}
+    />
+  );
+
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
       <Box
@@ -1620,13 +1679,13 @@ export function QueryDSLEditor({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            flexWrap: 'wrap',
             gap: 0,
             px: 1,
-            py: '3px',
             borderRadius: '6px',
-            minHeight: 32,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+            minHeight: 28,
+            py: '1px',
+            border: '1px solid',
+            borderColor: 'divider',
             backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
             transition: 'border-color 0.2s',
             cursor: 'text',
@@ -1638,13 +1697,21 @@ export function QueryDSLEditor({
               color: 'text.disabled',
               flexShrink: 0,
               mr: 0.5,
-              order: -2,
             }}
           />
+
+          {/* Chips + input area (wraps independently) */}
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', flex: 1, gap: 0, minHeight: 0 }}>
+
+          {/* Input rendered before chips when in before-all position */}
+          {selectedTokenIdx === -2 && renderInput()}
 
           {/* Existing filter chips */}
           {chips.map((chip, chipIdx) => {
             if (chip.type === 'logical' || chip.type === 'paren') {
+              const isToggleable =
+                chip.type === 'logical' &&
+                (chip.label === 'AND' || chip.label === 'OR');
               return (
                 <Box
                   key={chip.id}
@@ -1676,7 +1743,33 @@ export function QueryDSLEditor({
                     alignItems: 'center',
                   }}
                 >
-                  {chip.label}
+                  <Box
+                    component="span"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isToggleable) {
+                        updateChip(chip.id, {
+                          label: chip.label === 'AND' ? 'OR' : 'AND',
+                        });
+                      }
+                    }}
+                    sx={{
+                      cursor: isToggleable ? 'pointer' : 'default',
+                      borderRadius: '2px',
+                      px: '2px',
+                      lineHeight: 1,
+                      transition: 'background-color 0.15s',
+                      ...(isToggleable && {
+                        '&:hover': {
+                          backgroundColor: isDark
+                            ? 'rgba(255,255,255,0.1)'
+                            : 'rgba(0,0,0,0.08)',
+                        },
+                      }),
+                    }}
+                  >
+                    {chip.label}
+                  </Box>
                   <IconButton
                     size="small"
                     onClick={(e) => {
@@ -1723,7 +1816,7 @@ export function QueryDSLEditor({
                   }
                 }}
                 chip={chip}
-                domain={domain}
+                domain={config}
                 selectedPart={chipSelectedPart}
                 editingPart={
                   editingToken?.chipId === chip.id
@@ -1745,44 +1838,9 @@ export function QueryDSLEditor({
             );
           })}
 
-          {/* Inline input for new filters */}
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onClick={handleInputClick}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
-            spellCheck={false}
-            autoComplete="off"
-            placeholder={
-              chips.length === 0
-                ? (placeholder ?? t('dsl.placeholder', 'Search with DSL...'))
-                : ''
-            }
-            style={{
-              flex: selectedTokenIdx === -2 ? '0 0 auto' : 1,
-              minWidth: selectedTokenIdx === -2 ? 2 : 80,
-              width: selectedTokenIdx === -2 ? (inputValue.length > 0 ? `${Math.max(inputValue.length * 8, 20)}px` : '2px') : undefined,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-              color: isDark ? '#ddd' : '#333',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              fontFamily: 'inherit',
-              lineHeight: '24px',
-              padding: selectedTokenIdx === -2 && !inputValue ? '2px 0' : '2px 4px',
-              // Hide caret when a token is selected (token selection IS the cursor)
-              caretColor: selectedTokenIdx >= 0 ? 'transparent' : undefined,
-              // Move input before chips when in before-all position
-              order: selectedTokenIdx === -2 ? -1 : undefined,
-            }}
-          />
+          {/* Input rendered after chips (normal position) */}
+          {selectedTokenIdx !== -2 && renderInput()}
+          </Box>
 
           {/* Clear button */}
           {hasContent && (
@@ -1844,7 +1902,7 @@ export function QueryDSLEditor({
             <TokenEditDropdown
               type={editingToken.part}
               chip={editedChip}
-              domain={domain}
+              domain={config}
               facets={normalizedFacets}
               anchorEl={editingToken.anchorEl}
               onUpdate={(updates) =>

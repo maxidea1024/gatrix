@@ -32,7 +32,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 
-import { QueryDSLEditor } from '@/components/argus/query-dsl';
+import { QueryDSLEditor, ISSUES_CONFIG } from '@/components/argus/query-dsl';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -559,12 +559,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     { value: 'trends', label: t('argus.issues.sortTrends', 'Trends') },
   ];
 
-  // Lazy-loading callback for QueryDSLEditor: fetch field values from events
+  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
-        const result = await argusService.discoverTags(projectId);
-        return (result.tags[fieldKey] || []).map((t) => t.value);
+        const data = await argusService.getAttributeFacet(projectId, fieldKey);
+        return data.map((d) => d.attr_value);
       } catch {
         return [];
       }
@@ -778,11 +778,15 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                 mx: 0.25,
               }}
             />
-            <Box sx={{ width: 360, minWidth: 200, flexShrink: 1 }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <QueryDSLEditor
-                domain="issues"
+                config={ISSUES_CONFIG}
                 initialQuery={storeSearch}
                 onSearch={(val) => {
+                  setStoreSearch(val);
+                  setCurrentPage(1);
+                }}
+                onChange={(val) => {
                   setStoreSearch(val);
                   setCurrentPage(1);
                 }}

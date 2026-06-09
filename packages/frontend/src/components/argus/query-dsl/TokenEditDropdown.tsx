@@ -20,8 +20,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
-import type { QueryDomain, QueryField } from './types';
-import { getFieldsForDomain, getFieldByKey } from './fields';
+import type { DomainConfig, QueryField } from './types';
+import { getFieldByKey } from './fields';
 import { getOperatorOptions } from './operator-labels';
 import DatetimeValueEditor from './DatetimeValueEditor';
 
@@ -76,7 +76,7 @@ export type EditingPart = 'field' | 'operator' | 'value';
 export interface TokenEditDropdownProps {
   type: EditingPart;
   chip: FilterChip;
-  domain: QueryDomain;
+  domain: DomainConfig;
   facets?: Map<string, string[]>;
   anchorEl: HTMLElement;
   /** Called when the chip should be updated */
@@ -97,7 +97,7 @@ export interface TokenEditDropdownProps {
 export function TokenEditDropdown({
   type,
   chip,
-  domain,
+  domain: config,
   facets,
   anchorEl,
   onUpdate,
@@ -136,7 +136,7 @@ export function TokenEditDropdown({
   const isValueType = type === 'value' && !isHasChip;
 
   // Check if this is a datetime field
-  const field = getFieldByKey(chip.field ?? '', domain);
+  const field = getFieldByKey(chip.field ?? '', config);
   const isDatetimeField = isValueType && field?.type === 'datetime';
 
   // Check if value suggestions have results — skip popover entirely if no facets
@@ -145,7 +145,8 @@ export function TokenEditDropdown({
     if (!isValueType) return true;
     if (isDatetimeField) return true;
     const facetValues = facets?.get(chip.field ?? '') ?? [];
-    return facetValues.length > 0;
+    const staticVals = field?.staticValues ?? [];
+    return facetValues.length > 0 || staticVals.length > 0;
   })();
 
   // Don't render popover at all for value types with no facets AND not loading
@@ -182,7 +183,7 @@ export function TokenEditDropdown({
     >
       {type === 'field' && (
         <FieldMenu
-          domain={domain}
+          config={config}
           currentField={chip.field ?? ''}
           onSelect={handleFieldSelect}
           isDark={isDark}
@@ -190,7 +191,7 @@ export function TokenEditDropdown({
       )}
       {type === 'operator' && (
         <OperatorMenu
-          field={getFieldByKey(chip.field ?? '', domain)}
+          field={getFieldByKey(chip.field ?? '', config)}
           currentOperator={chip.operator ?? '='}
           onSelect={handleOperatorSelect}
           isDark={isDark}
@@ -198,7 +199,7 @@ export function TokenEditDropdown({
       )}
       {type === 'value' && isHasChip && (
         <HasFieldSelector
-          domain={domain}
+          domain={config}
           facets={facets}
           currentValue={chip.value ?? ''}
           onSelect={(v) => handleValueConfirm(v)}
@@ -259,6 +260,7 @@ export function TokenEditDropdown({
         ) : (
           <ValueSuggestionList
             chip={chip}
+            field={field}
             facets={facets}
             filterText={filterText ?? ''}
             selectedValues={selectedValues ?? new Set()}
@@ -276,12 +278,12 @@ export function TokenEditDropdown({
 // ─── Field Selection Menu ────────────────────────────────────────────────────
 
 function FieldMenu({
-  domain,
+  config,
   currentField,
   onSelect,
   isDark,
 }: {
-  domain: QueryDomain;
+  config: DomainConfig;
   currentField: string;
   onSelect: (field: string) => void;
   isDark: boolean;
@@ -290,7 +292,7 @@ function FieldMenu({
   const [filter, setFilter] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const listRef = useRef<HTMLUListElement>(null);
-  const allFields = getFieldsForDomain(domain);
+  const allFields = config.fields;
 
   // When no filter text: show only current field + fields starting with currentField.
   // When filter text: search all fields
@@ -489,6 +491,7 @@ function OperatorMenu({
 
 function ValueSuggestionList({
   chip,
+  field: fieldDef,
   facets,
   filterText,
   selectedValues,
@@ -498,6 +501,7 @@ function ValueSuggestionList({
   isDark,
 }: {
   chip: FilterChip;
+  field?: QueryField;
   facets?: Map<string, string[]>;
   filterText: string;
   selectedValues: Set<string>;
@@ -507,7 +511,21 @@ function ValueSuggestionList({
   isDark: boolean;
 }) {
   const listRef = useRef<HTMLUListElement>(null);
-  const facetValues = facets?.get(chip.field ?? '') ?? [];
+
+  // Merge staticValues (highest priority) + facet values, deduplicated
+  const allValues = (() => {
+    const seen = new Set<string>();
+    const result: string[] = [];
+    const staticVals = fieldDef?.staticValues ?? [];
+    const facetVals = facets?.get(chip.field ?? '') ?? [];
+    for (const v of [...staticVals, ...facetVals]) {
+      if (!seen.has(v)) {
+        seen.add(v);
+        result.push(v);
+      }
+    }
+    return result;
+  })();
 
   // Scroll highlighted item into view
   useEffect(() => {
@@ -520,7 +538,7 @@ function ValueSuggestionList({
     }
   }, [highlightIndex]);
 
-  if (facetValues.length === 0) return null;
+  if (allValues.length === 0) return null;
 
   return (
     <Box sx={{ minWidth: 220 }}>
@@ -529,7 +547,7 @@ function ValueSuggestionList({
         dense
         sx={{ py: 0.5, maxHeight: 240, overflow: 'auto' }}
       >
-        {facetValues.slice(0, 30).map((v, idx) => {
+        {allValues.slice(0, 30).map((v, idx) => {
           const isChecked = selectedValues.has(v);
           const isHighlighted = idx === highlightIndex;
           return (
@@ -608,13 +626,13 @@ function ValueSuggestionList({
 // ─── Has Field Selector ──────────────────────────────────────────────────────
 
 function HasFieldSelector({
-  domain,
+  domain: config,
   facets,
   currentValue,
   onSelect,
   isDark,
 }: {
-  domain: QueryDomain;
+  domain: DomainConfig;
   facets?: Map<string, string[]>;
   currentValue: string;
   onSelect: (v: string) => void;
@@ -624,7 +642,7 @@ function HasFieldSelector({
   const [filter, setFilter] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const listRef = useRef<HTMLUListElement>(null);
-  const fields = getFieldsForDomain(domain);
+  const fields = config.fields;
 
   // Build combined list: static fields + dynamic facet keys
   const allKeys: string[] = [];
@@ -715,7 +733,7 @@ function HasFieldSelector({
         {displayItems.map((key, idx) => {
           const isCurrent = key === currentValue;
           const isSelected = idx === selectedIndex || isCurrent;
-          const fieldDef = getFieldByKey(key, domain);
+          const fieldDef = getFieldByKey(key, config);
           const cat = fieldDef?.category ?? 'attribute';
           const badge = HAS_CATEGORY_BADGES[cat];
           return (

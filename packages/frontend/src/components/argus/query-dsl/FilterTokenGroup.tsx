@@ -13,7 +13,7 @@ import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import type { FilterChip } from './useFilterChips';
-import type { QueryDomain } from './types';
+import type { DomainConfig } from './types';
 import { getFieldByKey } from './fields';
 import { getOpLabel } from './operator-labels';
 
@@ -23,7 +23,7 @@ export type TokenPart = 'field' | 'operator' | 'value';
 
 export interface FilterTokenGroupProps {
   chip: FilterChip;
-  domain: QueryDomain;
+  domain: DomainConfig;
   /** Which part is currently keyboard-selected (highlighted) */
   selectedPart: TokenPart | null;
   /** Which part is currently being inline-edited (value only) */
@@ -172,7 +172,7 @@ export const FilterTokenGroup = forwardRef<
       display: 'inline-flex',
       alignItems: 'center',
       px: 0.5,
-      py: 0.25,
+      py: 0,
       cursor: 'pointer',
       borderRadius: '4px',
       fontSize: '0.8rem',
@@ -230,7 +230,7 @@ export const FilterTokenGroup = forwardRef<
         alignItems: 'center',
         gap: '1px',
         mr: 1,
-        my: 0.25,
+        my: '1px',
         maxWidth: '100%',
         backgroundColor: isDark
           ? 'rgba(255, 255, 255, 0.04)'
@@ -241,7 +241,7 @@ export const FilterTokenGroup = forwardRef<
         borderRadius: '6px',
         pl: 0.5,
         pr: 0.25,
-        py: 0.25,
+        py: 0,
       }}
     >
       {/* Field token */}

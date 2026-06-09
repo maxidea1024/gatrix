@@ -1,12 +1,12 @@
 // ============================================================================
-// Query DSL Engine — Field Registry & Page-Specific Presets
+// Query DSL Engine — Field Registry & Domain Configs
 // Spec: Section 5
 // ============================================================================
 
-import type { QueryField, QueryDomain, QueryFieldPreset } from './types';
+import type { QueryField, DomainConfig } from './types';
 
 // ─── Master Field Registry ───────────────────────────────────────────────────
-// All available fields. Each page uses a subset via presets (Section 5.4).
+// All available fields. Each domain uses a subset via DomainConfig.
 
 export const ALL_QUERY_FIELDS: QueryField[] = [
   // ── Log fields ──
@@ -18,6 +18,7 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     operators: ['=', '!='],
     searchable: true,
     description: 'dsl.field.level.desc',
+    staticValues: ['debug', 'info', 'warning', 'error', 'fatal'],
   },
   {
     key: 'message',
@@ -187,6 +188,25 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     searchable: true,
     description: 'dsl.field.platform.desc',
   },
+  {
+    key: 'status',
+    label: 'dsl.field.status',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'dsl.field.status.desc',
+  },
+  {
+    key: 'assigned',
+    label: 'dsl.field.assigned',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'dsl.field.assigned.desc',
+    staticValues: ['me', 'none', 'my_teams'],
+  },
 
   // ── User fields ──
   {
@@ -236,15 +256,6 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     searchable: false,
     description: 'dsl.field.duration.desc',
   },
-  {
-    key: 'status',
-    label: 'dsl.field.status',
-    type: 'string',
-    category: 'event',
-    operators: ['=', '!='],
-    searchable: true,
-    description: 'dsl.field.status.desc',
-  },
 
   // ── Feedback fields ──
   {
@@ -278,177 +289,164 @@ function getFieldMap(): Map<string, QueryField> {
   return _fieldMapCache;
 }
 
-// ─── Page-Specific Field Presets ─────────────────────────────────────────────
+// Invalidate cache on HMR so new fields are picked up during development
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    _fieldMapCache = null;
+  });
+}
 
-export const FIELD_PRESETS: Record<QueryDomain, QueryFieldPreset> = {
-  logs: {
-    domain: 'logs',
-    fields: [
-      'level',
-      'message',
-      'body',
-      'logger_name',
-      'timestamp',
-      'service',
-      'environment',
-      'release',
-      'trace_id',
-      'span_id',
-      'log_id',
-      'issue_id',
-    ],
-    aliases: { severity: 'level', logger: 'logger_name' },
-    facetsEndpoint: '/logs/facets',
-  },
-
-  issues: {
-    domain: 'issues',
-    fields: [
-      'type',
-      'value',
-      'message',
-      'handled',
-      'platform',
-      'level',
-      'environment',
-      'release',
-      'service',
-      'browser_name',
-      'os_name',
-      'device',
-      'timestamp',
-      'trace_id',
-      'issue_id',
-    ],
-    aliases: { severity: 'level' },
-    facetsEndpoint: '/issues/facets',
-  },
-
-  performance: {
-    domain: 'performance',
-    fields: [
-      'transaction',
-      'duration',
-      'status',
-      'service',
-      'environment',
-      'release',
-      'browser_name',
-      'os_name',
-      'timestamp',
-      'trace_id',
-      'span_id',
-    ],
-    aliases: {},
-    facetsEndpoint: '/performance/facets',
-  },
-
-  discover: {
-    domain: 'discover',
-    fields: ALL_QUERY_FIELDS.map((f) => f.key),
-    aliases: { severity: 'level', logger: 'logger_name' },
-    facetsEndpoint: '/discover/facets',
-  },
-
-  feedback: {
-    domain: 'feedback',
-    fields: [
-      'feedback',
-      'contact_email',
-      'environment',
-      'release',
-      'service',
-      'browser_name',
-      'os_name',
-      'device',
-      'timestamp',
-    ],
-    aliases: {},
-    facetsEndpoint: '/feedback/facets',
-  },
-
-  sessions: {
-    domain: 'sessions',
-    fields: [
-      'environment',
-      'release',
-      'service',
-      'browser_name',
-      'os_name',
-      'device',
-      'duration',
-      'timestamp',
-    ],
-    aliases: {},
-    facetsEndpoint: '/sessions/facets',
-  },
-};
-
-// ─── Public API ──────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Get QueryField objects for a specific domain.
- * Only returns fields included in the domain's preset.
+ * Pick fields from ALL_QUERY_FIELDS by keys, with optional per-field overrides.
+ * Overrides let domain configs customize staticValues per field.
+ * Unknown keys are warned in development mode to catch typos early.
  */
-export function getFieldsForDomain(domain: QueryDomain): QueryField[] {
-  const preset = FIELD_PRESETS[domain];
+export function pickFields(
+  keys: string[],
+  overrides?: Record<string, Partial<QueryField>>
+): QueryField[] {
   const fieldMap = getFieldMap();
   const result: QueryField[] = [];
 
-  for (const key of preset.fields) {
-    const field = fieldMap.get(key);
-    if (field) {
-      result.push(field);
+  for (const key of keys) {
+    const base = fieldMap.get(key);
+    if (!base) {
+      if (import.meta.env.DEV) {
+        console.warn(`[pickFields] Unknown field key: "${key}" — check ALL_QUERY_FIELDS`);
+      }
+      continue;
     }
+    const override = overrides?.[key];
+    result.push(override ? { ...base, ...override } : base);
   }
 
   return result;
 }
 
+// Shared alias table
+const SHARED_ALIASES: Record<string, string> = {
+  severity: 'level',
+  logger: 'logger_name',
+};
+
+// ─── Domain Configs ──────────────────────────────────────────────────────────
+
+export const LOGS_CONFIG: DomainConfig = {
+  name: 'logs',
+  fields: pickFields([
+    'level', 'message', 'body', 'logger_name', 'timestamp',
+    'service', 'environment', 'release',
+    'trace_id', 'span_id', 'log_id', 'issue_id',
+  ]),
+  aliases: SHARED_ALIASES,
+};
+
+export const ISSUES_CONFIG: DomainConfig = {
+  name: 'issues',
+  fields: pickFields(
+    [
+      'type', 'value', 'message', 'handled', 'platform',
+      'level', 'environment', 'release', 'service',
+      'browser_name', 'os_name', 'device',
+      'timestamp', 'trace_id', 'issue_id',
+      'status', 'assigned',
+    ],
+    {
+      status: {
+        staticValues: [
+          'resolved', 'unresolved', 'ignored',
+          'archived', 'regressed', 'escalating',
+        ],
+      },
+    }
+  ),
+  aliases: { severity: 'level' },
+};
+
+export const DISCOVER_CONFIG: DomainConfig = {
+  name: 'discover',
+  fields: pickFields(
+    ALL_QUERY_FIELDS.map((f) => f.key),
+    {
+      status: {
+        staticValues: [
+          'resolved', 'unresolved', 'ignored',
+          'archived', 'regressed', 'escalating',
+        ],
+      },
+    }
+  ),
+  aliases: SHARED_ALIASES,
+};
+
+export const FEEDBACK_CONFIG: DomainConfig = {
+  name: 'feedback',
+  fields: pickFields(
+    [
+      'feedback', 'contact_email',
+      'environment', 'release', 'service',
+      'browser_name', 'os_name', 'device', 'level',
+      'timestamp', 'status', 'assigned',
+    ],
+    {
+      status: { staticValues: ['resolved', 'unresolved', 'spam'] },
+    }
+  ),
+  freeTextField: 'feedback',
+};
+
+export const PERFORMANCE_CONFIG: DomainConfig = {
+  name: 'performance',
+  fields: pickFields(
+    [
+      'transaction', 'duration', 'status',
+      'service', 'environment', 'release',
+      'browser_name', 'os_name',
+      'timestamp', 'trace_id', 'span_id',
+    ],
+    {
+      status: {
+        staticValues: ['ok', 'cancelled', 'unknown', 'invalid_argument'],
+      },
+    }
+  ),
+};
+
+export const SESSIONS_CONFIG: DomainConfig = {
+  name: 'sessions',
+  fields: pickFields([
+    'environment', 'release', 'service',
+    'browser_name', 'os_name', 'device',
+    'duration', 'timestamp',
+  ]),
+  aliases: SHARED_ALIASES,
+};
+
+// ─── Public API (DomainConfig-based) ─────────────────────────────────────────
+
 /**
- * Get a single field by key, resolving aliases if necessary.
- * Returns undefined if the field is not in the domain's preset.
+ * Get a single field by key from a DomainConfig, resolving aliases.
  */
 export function getFieldByKey(
   key: string,
-  domain: QueryDomain
+  config: DomainConfig
 ): QueryField | undefined {
-  const resolved = resolveAlias(key, domain);
-  const preset = FIELD_PRESETS[domain];
-
-  if (!preset.fields.includes(resolved)) {
-    return undefined;
-  }
-
-  return getFieldMap().get(resolved);
+  const resolved = resolveAlias(key, config);
+  return config.fields.find((f) => f.key === resolved);
 }
 
 /**
- * Check if a field key exists in a domain's preset (including aliases).
+ * Check if a field key exists in a DomainConfig (including aliases).
  */
-export function isFieldInDomain(key: string, domain: QueryDomain): boolean {
-  return getFieldByKey(key, domain) !== undefined;
+export function isFieldInDomain(key: string, config: DomainConfig): boolean {
+  return getFieldByKey(key, config) !== undefined;
 }
 
 /**
  * Resolve a field alias to its canonical key.
- * Returns the original key if no alias exists.
  */
-export function resolveAlias(key: string, domain: QueryDomain): string {
-  const preset = FIELD_PRESETS[domain];
-  return preset.aliases[key] ?? key;
-}
-
-/**
- * Get all aliases for a domain.
- */
-export function getAliases(domain: QueryDomain): Record<string, string> {
-  return FIELD_PRESETS[domain].aliases;
-}
-
-/**
- * Get the facets endpoint for a domain.
- */
-export function getFacetsEndpoint(domain: QueryDomain): string | undefined {
-  return FIELD_PRESETS[domain].facetsEndpoint;
+export function resolveAlias(key: string, config: DomainConfig): string {
+  return config.aliases?.[key] ?? key;
 }

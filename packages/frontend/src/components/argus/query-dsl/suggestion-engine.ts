@@ -5,12 +5,12 @@
 
 import type {
   CursorContext,
-  QueryDomain,
+  DomainConfig,
   QueryField,
   SuggestionItem,
   SuggestionCategory,
 } from './types';
-import { getFieldsForDomain, getFieldByKey } from './fields';
+import { getFieldByKey } from './fields';
 import { getOpLabel } from './operator-labels';
 
 /** Default max suggestions (Spec 11.1.1) */
@@ -24,7 +24,7 @@ const DEFAULT_MAX_SUGGESTIONS = 20;
  */
 export function getSuggestions(
   context: CursorContext,
-  domain: QueryDomain,
+  config: DomainConfig,
   facets?: Map<string, string[]>,
   maxSuggestions: number = DEFAULT_MAX_SUGGESTIONS,
   chips?: { type?: string; label?: string }[]
@@ -33,21 +33,20 @@ export function getSuggestions(
     case 'FIELD':
       return getFieldSuggestions(
         context,
-        domain,
+        config,
         facets,
         maxSuggestions,
         chips
       );
     case 'OPERATOR':
-      // Spec 10.6 Rule 1: EXPECT_OPERATOR_OR_VALUE → show operators AND values
       return getOperatorAndValueSuggestions(
         context,
-        domain,
+        config,
         facets,
         maxSuggestions
       );
     case 'VALUE':
-      return getValueSuggestions(context, domain, facets, maxSuggestions);
+      return getValueSuggestions(context, config, facets, maxSuggestions);
     case 'LOGICAL_OPERATOR':
       return getLogicalSuggestions(maxSuggestions, chips);
     default:
@@ -111,12 +110,12 @@ export function shouldKeepDropdownOpen(item: SuggestionItem): boolean {
 
 function getFieldSuggestions(
   context: CursorContext,
-  domain: QueryDomain,
+  config: DomainConfig,
   facets?: Map<string, string[]>,
   max: number = DEFAULT_MAX_SUGGESTIONS,
   chips?: { type?: string; label?: string }[]
 ): SuggestionItem[] {
-  const fields = getFieldsForDomain(domain);
+  const fields = config.fields;
   const prefix = context.prefix.toLowerCase();
   const originalPrefix = context.prefix; // preserve original casing for display
 
@@ -332,7 +331,7 @@ function getFieldSuggestions(
  */
 function getOperatorAndValueSuggestions(
   context: CursorContext,
-  domain: QueryDomain,
+  config: DomainConfig,
   facets?: Map<string, string[]>,
   max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
@@ -341,10 +340,10 @@ function getOperatorAndValueSuggestions(
   // ── has / !has: show field list as values ──
   const fieldLower = context.field.toLowerCase();
   if (fieldLower === 'has' || fieldLower === '!has') {
-    return getHasFieldSuggestions(context, domain, facets, max);
+    return getHasFieldSuggestions(context, config, facets, max);
   }
 
-  const field = getFieldByKey(context.field, domain);
+  const field = getFieldByKey(context.field, config);
   // For dynamic facet fields not in registry, create a virtual string field
   const effectiveField =
     field ??
@@ -409,13 +408,13 @@ function getOperatorAndValueSuggestions(
 
 function getValueSuggestions(
   context: CursorContext,
-  domain: QueryDomain,
+  config: DomainConfig,
   facets?: Map<string, string[]>,
   max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   if (!context.field) return [];
 
-  const field = getFieldByKey(context.field, domain);
+  const field = getFieldByKey(context.field, config);
   const effectiveField =
     field ??
     ({
@@ -501,7 +500,24 @@ function buildValueSuggestions(
   const suggestions: SuggestionItem[] = [];
   const seen = new Set<string>();
 
-  // 1. Facet values from backend (the ONLY source of field values)
+  // 0. Static values from field definition (highest priority)
+  if (field.staticValues && field.staticValues.length > 0) {
+    for (const v of field.staticValues) {
+      if (seen.has(v)) continue;
+      if (prefix === '' || v.toLowerCase().startsWith(prefix)) {
+        seen.add(v);
+        suggestions.push({
+          label: v,
+          insertText: needsQuoting(v) ? `"${v}"` : v,
+          category: 'value',
+          fieldType: field.type,
+        });
+      }
+      if (suggestions.length >= max) return suggestions;
+    }
+  }
+
+  // 1. Facet values from backend
   if (facets && facets.has(fieldKey)) {
     const values = facets.get(fieldKey)!;
     for (const v of values) {
@@ -625,13 +641,13 @@ function needsQuoting(value: string): boolean {
  */
 function getHasFieldSuggestions(
   context: CursorContext,
-  domain: QueryDomain,
+  config: DomainConfig,
   facets?: Map<string, string[]>,
   max: number = DEFAULT_MAX_SUGGESTIONS
 ): SuggestionItem[] {
   const prefix = context.prefix.toLowerCase();
   const results: SuggestionItem[] = [];
-  const fields = getFieldsForDomain(domain);
+  const fields = config.fields;
 
   // Static fields
   for (const f of fields) {

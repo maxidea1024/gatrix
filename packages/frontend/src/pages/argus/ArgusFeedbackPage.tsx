@@ -111,6 +111,7 @@ import FeedbackListItem from './components/FeedbackListItem';
 import FeedbackActivityTimeline from './components/FeedbackActivityTimeline';
 import FeedbackStatsBar from './components/FeedbackStatsBar';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
+import { QueryDSLEditor, FEEDBACK_CONFIG } from '@/components/argus/query-dsl';
 
 ChartJS.register(
   CategoryScale,
@@ -196,6 +197,31 @@ const ArgusFeedbackPage: React.FC = () => {
       dateRange: { type: 'preset', preset: urlState.period },
     }));
   }, [urlState.period]);
+
+  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
+  // Feedback uses its own filter-options API (not the logs attribute-facet endpoint)
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      try {
+        const opts = await argusService.getFeedbackFilterOptions(
+          projectId,
+          urlState.period
+        );
+        // Map DSL field keys to API response keys
+        const fieldMap: Record<string, string[]> = {
+          environment: opts.environments ?? [],
+          browser_name: opts.browsers ?? [],
+          os_name: opts.os ?? [],
+          assigned: opts.assigned ?? [],
+        };
+        return fieldMap[fieldKey] ?? [];
+      } catch {
+        return [];
+      }
+    },
+    [projectId, urlState.period]
+  );
+
   const [search, setSearch] = useState('');
   const [searchDebounce, setSearchDebounce] = useState('');
   const statusTab = urlState.status as FeedbackStatusTab;
@@ -947,50 +973,19 @@ const ArgusFeedbackPage: React.FC = () => {
                   mx: 0.25,
                 }}
               />
-              <TextField
-                size="small"
-                placeholder={t('argus.feedback.searchPlaceholder')}
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setUrlState({ page: '1', fb: '' });
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ fontSize: 14, color: 'text.disabled' }}
-                      />
-                    </InputAdornment>
-                  ),
-                  endAdornment: search ? (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setSearch('');
-                          setUrlState({ page: '1', fb: '' });
-                        }}
-                        sx={{ p: 0.2 }}
-                      >
-                        <CloseIcon sx={{ fontSize: 14 }} />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : null,
-                }}
-                sx={{
-                  minWidth: 300,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    height: 26,
-                    backgroundColor: isDark
-                      ? 'rgba(255,255,255,0.03)'
-                      : 'rgba(0,0,0,0.02)',
-                  },
-                  '& .MuiOutlinedInput-input': { py: 0.3 },
-                }}
-              />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <QueryDSLEditor
+                  config={FEEDBACK_CONFIG}
+                  initialQuery={search}
+                  onSearch={(q) => {
+                    setSearch(q);
+                    setUrlState({ page: '1', fb: '' });
+                  }}
+                  onChange={(q) => setSearch(q)}
+                  fetchFieldValues={fetchFieldValues}
+                  placeholder={t('argus.feedback.searchPlaceholder')}
+                />
+              </Box>
               {/* Sort */}
               <FilterChipSelect
                 label={t('argus.issues.sort')}
