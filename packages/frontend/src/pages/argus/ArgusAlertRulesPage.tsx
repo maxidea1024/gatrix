@@ -1,9 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  Box,
-  Button,
-  useTheme,
-} from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 import {
   NotificationsActive as AlertIcon,
   Add as AddIcon,
@@ -299,8 +295,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({
             frequency: data.frequency,
             environment: data.environment || undefined,
             level: data.level || undefined,
-            tags:
-              Object.keys(data.tags).length > 0 ? data.tags : undefined,
+            tags: Object.keys(data.tags).length > 0 ? data.tags : undefined,
             condition_logic: data.conditionLogic,
           } as any);
         } else {
@@ -314,8 +309,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({
             enabled: true,
             environment: data.environment || undefined,
             level: data.level || undefined,
-            tags:
-              Object.keys(data.tags).length > 0 ? data.tags : undefined,
+            tags: Object.keys(data.tags).length > 0 ? data.tags : undefined,
             condition_logic: data.conditionLogic,
           } as any);
         }
@@ -339,9 +333,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({
         } as any);
         fetchRules();
         enqueueSnackbar(
-          rule.enabled
-            ? t('argus.alerts.disabled')
-            : t('argus.alerts.enabled'),
+          rule.enabled ? t('argus.alerts.disabled') : t('argus.alerts.enabled'),
           { variant: 'info' }
         );
       } catch (e) {

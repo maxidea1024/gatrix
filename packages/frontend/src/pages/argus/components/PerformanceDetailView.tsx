@@ -1,13 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Paper,
-  Chip,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
 import {
   Speed as SpeedIcon,
   Schedule as ScheduleIcon,
@@ -266,9 +259,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
               label: t('argus.performance.errorRate', 'Error Rate'),
               value: `${Number(detail.summary.error_rate).toFixed(2)}%`,
               color:
-                Number(detail.summary.error_rate) > 5
-                  ? '#f44336'
-                  : '#4caf50',
+                Number(detail.summary.error_rate) > 5 ? '#f44336' : '#4caf50',
               icon: <BugReportIcon />,
             },
           ].map((card, idx) => (
@@ -477,8 +468,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                 detail.summary.p50 > 50
               ) &&
                 !detail?.suspect_tags?.some(
-                  (tag) =>
-                    detail.summary && tag.p95 > detail.summary.p95 * 1.5
+                  (tag) => detail.summary && tag.p95 > detail.summary.p95 * 1.5
                 ))) && (
               <Typography
                 variant="body2"
@@ -526,9 +516,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
               minHeight={150}
             />
           ) : (
-            <Box
-              sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}
-            >
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
               {detail.related_issues.map((issue, idx) => {
                 const levelColor =
                   issue.level === 'fatal'
@@ -543,9 +531,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                     key={idx}
                     accentColor={levelColor}
                     onClick={() =>
-                      navigate(
-                        `/argus/issues/${projectId}/${issue.issue_id}`
-                      )
+                      navigate(`/argus/issues/${projectId}/${issue.issue_id}`)
                     }
                   >
                     <LevelAccent accentColor={levelColor} />
@@ -592,16 +578,8 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
           }}
         >
           {/* Slowest Spans */}
-          <DetailPaper
-            elevation={0}
-            isDark={isDark}
-            sx={{ flex: 1 }}
-          >
-            <Typography
-              variant="subtitle2"
-              fontWeight={600}
-              sx={{ mb: 1.5 }}
-            >
+          <DetailPaper elevation={0} isDark={isDark} sx={{ flex: 1 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
               {t('argus.performance.slowestSpans')}
             </Typography>
             {detail?.spans?.length === 0 ? (
@@ -614,9 +592,9 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                 {detail?.spans?.slice(0, 10).map((span, idx) => {
                   const opColor = getOpColor(span.op);
                   const maxDur = Math.max(
-                    ...(detail?.spans?.map((s) =>
-                      Number(s.avg_duration)
-                    ) || [1])
+                    ...(detail?.spans?.map((s) => Number(s.avg_duration)) || [
+                      1,
+                    ])
                   );
                   const pct = (Number(span.avg_duration) / maxDur) * 100;
                   return (
@@ -675,16 +653,8 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
           </DetailPaper>
 
           {/* Recent Traces */}
-          <DetailPaper
-            elevation={0}
-            isDark={isDark}
-            sx={{ flex: 1 }}
-          >
-            <Typography
-              variant="subtitle2"
-              fontWeight={600}
-              sx={{ mb: 1.5 }}
-            >
+          <DetailPaper elevation={0} isDark={isDark} sx={{ flex: 1 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
               {t('argus.performance.recentTraces')}
             </Typography>
             {!detail?.recent_traces?.length ? (

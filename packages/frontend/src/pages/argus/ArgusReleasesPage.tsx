@@ -59,8 +59,6 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import { evaluateAST } from './components/releasesHelpers';
 
-
-
 const PAGE_SIZE_STORAGE_KEY = 'argus:releases:pageSize';
 const DEEP_LINK_KEYS = ['page', 'search', 'sort'];
 

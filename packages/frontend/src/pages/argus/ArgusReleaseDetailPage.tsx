@@ -51,8 +51,6 @@ import {
   DeployHistory,
 } from './components/releaseDetailHelpers';
 
-
-
 const ArgusReleaseDetailPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();

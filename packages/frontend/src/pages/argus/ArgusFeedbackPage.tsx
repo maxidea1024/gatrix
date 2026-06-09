@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Typography,
@@ -398,8 +404,7 @@ const ArgusFeedbackPage: React.FC = () => {
       let title = '';
       let message = '';
       let confirmText = '';
-      let confirmColor: 'primary' | 'error' | 'warning' | 'success' =
-        'primary';
+      let confirmColor: 'primary' | 'error' | 'warning' | 'success' = 'primary';
 
       if (action === 'resolve') {
         title = t('argus.feedback.bulkResolveTitle');
@@ -534,10 +539,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
   const handleClearSelection = useCallback(() => setSelectedIds(new Set()), []);
 
-  const handleOpenCreateIssue = useCallback(
-    () => setCreateIssueOpen(true),
-    []
-  );
+  const handleOpenCreateIssue = useCallback(() => setCreateIssueOpen(true), []);
   const handleOpenLinkIssue = useCallback(() => setLinkIssueOpen(true), []);
 
   // ─── Derived Data ───
@@ -549,8 +551,9 @@ const ArgusFeedbackPage: React.FC = () => {
     items.find((i) => i.feedback_id === selectedFbId) || null;
 
   // Lazy-fetch linked issue detail
-  const [linkedIssueDetail, setLinkedIssueDetail] =
-    useState<ArgusIssue | null>(null);
+  const [linkedIssueDetail, setLinkedIssueDetail] = useState<ArgusIssue | null>(
+    null
+  );
 
   useEffect(() => {
     if (selectedItem?.issue_id) {
@@ -749,10 +752,7 @@ const ArgusFeedbackPage: React.FC = () => {
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {!loading && total > 0 && (
-              <TotalCountChip
-                label={formatCompactNumber(total)}
-                size="small"
-              />
+              <TotalCountChip label={formatCompactNumber(total)} size="small" />
             )}
             <Button
               size="small"
@@ -886,10 +886,7 @@ const ArgusFeedbackPage: React.FC = () => {
       )}
 
       {/* ═══════ SPLIT-PANEL INBOX ═══════ */}
-      <SplitContainer
-        ref={splitContainerRef}
-        isDark={isDark}
-      >
+      <SplitContainer ref={splitContainerRef} isDark={isDark}>
         {/* ─── LEFT: Feedback List ─── */}
         <ListPanel
           panelWidth={splitWidth}

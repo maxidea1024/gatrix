@@ -26,9 +26,18 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 export const PAGE_SIZE_STORAGE_KEY = 'argus_release_issues_page_size';
 export const COLLAPSE_STORAGE_KEY = 'argus_release_detail_collapsed';
 
-export type IssueTabType = 'all' | 'new' | 'unhandled' | 'regressed' | 'resolved';
+export type IssueTabType =
+  | 'all'
+  | 'new'
+  | 'unhandled'
+  | 'regressed'
+  | 'resolved';
 
-export const ISSUE_TABS: { key: IssueTabType; labelKey: string; fallback: string }[] = [
+export const ISSUE_TABS: {
+  key: IssueTabType;
+  labelKey: string;
+  fallback: string;
+}[] = [
   { key: 'all', labelKey: 'argus.releaseDetail.allIssues', fallback: 'All' },
   { key: 'new', labelKey: 'argus.releaseDetail.newIssues', fallback: 'New' },
   {
@@ -392,7 +401,9 @@ export const SessionStatusChart: React.FC<{
 
 // ─── CommitAuthorBreakdown ───
 
-export const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+export const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({
+  isDark,
+}) => {
   const { t } = useTranslation();
   // Placeholder — backend doesn't expose commit data yet
   // Will be populated when API is available

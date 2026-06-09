@@ -79,7 +79,11 @@ const FeedbackBulkToolbar: React.FC<FeedbackBulkToolbarProps> = ({
           size="small"
           startIcon={<ResolveIcon />}
           onClick={() => onBulkAction('resolve')}
-          sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}
+          sx={{
+            textTransform: 'none',
+            fontSize: '0.72rem',
+            borderRadius: '6px',
+          }}
         >
           {t('argus.feedback.resolve')}
         </Button>
@@ -87,7 +91,11 @@ const FeedbackBulkToolbar: React.FC<FeedbackBulkToolbarProps> = ({
           size="small"
           startIcon={<SpamIcon />}
           onClick={() => onBulkAction('spam')}
-          sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}
+          sx={{
+            textTransform: 'none',
+            fontSize: '0.72rem',
+            borderRadius: '6px',
+          }}
         >
           {t('argus.feedback.markSpam')}
         </Button>
@@ -95,7 +103,11 @@ const FeedbackBulkToolbar: React.FC<FeedbackBulkToolbarProps> = ({
           size="small"
           startIcon={<AssignIcon />}
           onClick={handleOpenMenu}
-          sx={{ textTransform: 'none', fontSize: '0.72rem', borderRadius: '6px' }}
+          sx={{
+            textTransform: 'none',
+            fontSize: '0.72rem',
+            borderRadius: '6px',
+          }}
         >
           {t('argus.feedback.assign')}
         </Button>

@@ -217,9 +217,7 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
                 <Typography sx={{ flex: 1, fontSize: '0.82rem' }}>
                   {kw.keyword}
                 </Typography>
-                {kw.is_regex && (
-                  <RegexChip label="regex" size="small" />
-                )}
+                {kw.is_regex && <RegexChip label="regex" size="small" />}
                 <IconButton
                   size="small"
                   onClick={() => handleDeleteKeyword(kw.id)}
@@ -244,9 +242,7 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
           disabled={scanLoading || keywords.length === 0}
           sx={{ textTransform: 'none', fontSize: '0.78rem', fontWeight: 600 }}
         >
-          {scanLoading
-            ? t('common.loading')
-            : t('argus.feedback.runSpamScan')}
+          {scanLoading ? t('common.loading') : t('argus.feedback.runSpamScan')}
         </Button>
         <Button onClick={onClose} sx={{ textTransform: 'none' }}>
           {t('common.close')}

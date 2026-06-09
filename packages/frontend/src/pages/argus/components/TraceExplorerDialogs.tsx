@@ -14,10 +14,7 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
+import { Close as CloseIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusSavedQuery } from '@/services/argusService';
 
@@ -167,10 +164,7 @@ export const SavedQueriesPanel: React.FC<SavedQueriesPanelProps> = ({
               gap: 1,
             }}
           >
-            <Box
-              sx={{ flex: 1, minWidth: 0 }}
-              onClick={() => onLoad(sq)}
-            >
+            <Box sx={{ flex: 1, minWidth: 0 }} onClick={() => onLoad(sq)}>
               <Typography
                 sx={{
                   fontSize: '0.82rem',
@@ -183,8 +177,7 @@ export const SavedQueriesPanel: React.FC<SavedQueriesPanelProps> = ({
                 {sq.name}
               </Typography>
               <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
-                {sq.created_by} ·{' '}
-                {new Date(sq.created_at).toLocaleDateString()}
+                {sq.created_by} · {new Date(sq.created_at).toLocaleDateString()}
               </Typography>
             </Box>
             <IconButton

@@ -1173,6 +1173,4 @@ const ArgusOverviewPage: React.FC = () => {
   );
 };
 
-
-
 export default ArgusOverviewPage;

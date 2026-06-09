@@ -127,11 +127,31 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
 
   // ─── Metadata rows ───
   const metadataRows = [
-    { icon: <UrlIcon sx={{ fontSize: 14 }} />, label: 'URL', value: selectedItem.url },
-    { icon: <MailIcon sx={{ fontSize: 14 }} />, label: t('argus.feedback.contactEmail'), value: selectedItem.contact_email },
-    { icon: <EnvIcon sx={{ fontSize: 14 }} />, label: t('argus.feedback.environment'), value: selectedItem.environment },
-    { icon: <ReleaseIcon sx={{ fontSize: 14 }} />, label: t('argus.feedback.release'), value: selectedItem.release },
-    { icon: <SourceIcon sx={{ fontSize: 14 }} />, label: t('argus.feedback.source'), value: selectedItem.source },
+    {
+      icon: <UrlIcon sx={{ fontSize: 14 }} />,
+      label: 'URL',
+      value: selectedItem.url,
+    },
+    {
+      icon: <MailIcon sx={{ fontSize: 14 }} />,
+      label: t('argus.feedback.contactEmail'),
+      value: selectedItem.contact_email,
+    },
+    {
+      icon: <EnvIcon sx={{ fontSize: 14 }} />,
+      label: t('argus.feedback.environment'),
+      value: selectedItem.environment,
+    },
+    {
+      icon: <ReleaseIcon sx={{ fontSize: 14 }} />,
+      label: t('argus.feedback.release'),
+      value: selectedItem.release,
+    },
+    {
+      icon: <SourceIcon sx={{ fontSize: 14 }} />,
+      label: t('argus.feedback.source'),
+      value: selectedItem.source,
+    },
     {
       icon: <BrowserIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.browser'),
@@ -146,8 +166,16 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
         ? `${selectedItem.os}${selectedItem.os_version ? ` ${selectedItem.os_version}` : ''}`
         : '',
     },
-    { icon: <DeviceIcon sx={{ fontSize: 14 }} />, label: t('argus.feedback.device'), value: selectedItem.device },
-    { icon: <UserIdIcon sx={{ fontSize: 14 }} />, label: t('argus.feedback.userId'), value: selectedItem.user_id },
+    {
+      icon: <DeviceIcon sx={{ fontSize: 14 }} />,
+      label: t('argus.feedback.device'),
+      value: selectedItem.device,
+    },
+    {
+      icon: <UserIdIcon sx={{ fontSize: 14 }} />,
+      label: t('argus.feedback.userId'),
+      value: selectedItem.user_id,
+    },
   ].filter((row) => row.value);
 
   // ─── Issue linking helpers ───
@@ -160,10 +188,16 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
 
   const issueTextColor =
     selectedItem.issue_status === 'resolved'
-      ? isDark ? '#66bb6a' : '#2e7d32'
+      ? isDark
+        ? '#66bb6a'
+        : '#2e7d32'
       : selectedItem.issue_status === 'ignored'
-        ? isDark ? '#bdbdbd' : '#616161'
-        : isDark ? '#ffb74d' : '#e65100';
+        ? isDark
+          ? '#bdbdbd'
+          : '#616161'
+        : isDark
+          ? '#ffb74d'
+          : '#e65100';
 
   return (
     <>
@@ -232,9 +266,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                 size="small"
                 isDark={isDark}
                 accentColor={isDark ? '#66bb6a' : '#2e7d32'}
-                startIcon={
-                  <ResolveIcon sx={{ fontSize: '14px !important' }} />
-                }
+                startIcon={<ResolveIcon sx={{ fontSize: '14px !important' }} />}
                 onClick={() =>
                   onUpdateStatus(selectedItem.feedback_id, 'resolved')
                 }
@@ -270,28 +302,20 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                     isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'
                   }
                   isSubdued
-                  startIcon={
-                    <SpamIcon sx={{ fontSize: '14px !important' }} />
-                  }
+                  startIcon={<SpamIcon sx={{ fontSize: '14px !important' }} />}
                   onClick={() => onMarkSpam(selectedItem.feedback_id)}
                 >
                   {t('argus.feedback.markSpam')}
                 </ToolbarButton>
               </>
             )}
-            <ToolbarDivider
-              orientation="vertical"
-              flexItem
-              isDark={isDark}
-            />
+            <ToolbarDivider orientation="vertical" flexItem isDark={isDark} />
             <ToolbarButton
               size="small"
               isDark={isDark}
               accentColor={isDark ? '#b388ff' : '#5e35b1'}
               isSubdued
-              startIcon={
-                <AssignIcon sx={{ fontSize: '14px !important' }} />
-              }
+              startIcon={<AssignIcon sx={{ fontSize: '14px !important' }} />}
               onClick={(e) =>
                 setAssigneeAnchor({
                   el: e.currentTarget,
@@ -317,8 +341,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                 }
                 onClick={() => navigateToIssue(selectedItem.issue_id!)}
               >
-                #{selectedItem.issue_id}{' '}
-                {selectedItem.issue_status || ''}
+                #{selectedItem.issue_id} {selectedItem.issue_status || ''}
               </ToolbarButton>
             </ToolbarButtonGroup>
           ) : (
@@ -328,18 +351,12 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                 isDark={isDark}
                 accentColor={isDark ? '#64b5f6' : '#1565c0'}
                 isSubdued
-                startIcon={
-                  <LinkIcon sx={{ fontSize: '14px !important' }} />
-                }
+                startIcon={<LinkIcon sx={{ fontSize: '14px !important' }} />}
                 onClick={onOpenLinkIssue}
               >
                 {t('argus.feedback.linkExistingIssue')}
               </ToolbarButton>
-              <ToolbarDivider
-                orientation="vertical"
-                flexItem
-                isDark={isDark}
-              />
+              <ToolbarDivider orientation="vertical" flexItem isDark={isDark} />
               <ToolbarButton
                 size="small"
                 isDark={isDark}
@@ -375,9 +392,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
           {selectedItem.issue_id && (
             <LinkedIssuePaper elevation={0} isDark={isDark}>
               <LinkedIssueHeaderBar isDark={isDark}>
-                <BugReportIcon
-                  sx={{ fontSize: 14, color: 'text.secondary' }}
-                />
+                <BugReportIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                 <Typography
                   variant="caption"
                   fontWeight={700}
@@ -574,40 +589,34 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
           )}
 
           {/* Tags */}
-          {selectedItem.tags &&
-            Object.keys(selectedItem.tags).length > 0 && (
-              <>
-                <SectionTitle
-                  variant="caption"
-                  fontWeight={600}
-                  color="text.secondary"
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                  }}
-                >
-                  <TagIcon sx={{ fontSize: 14 }} />{' '}
-                  {t('argus.feedback.tags')}
-                </SectionTitle>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 0.5,
-                    flexWrap: 'wrap',
-                    mb: 2,
-                  }}
-                >
-                  {Object.entries(selectedItem.tags).map(([k, v]) => (
-                    <TagChip
-                      key={k}
-                      label={`${k}: ${v}`}
-                      size="small"
-                    />
-                  ))}
-                </Box>
-              </>
-            )}
+          {selectedItem.tags && Object.keys(selectedItem.tags).length > 0 && (
+            <>
+              <SectionTitle
+                variant="caption"
+                fontWeight={600}
+                color="text.secondary"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                }}
+              >
+                <TagIcon sx={{ fontSize: 14 }} /> {t('argus.feedback.tags')}
+              </SectionTitle>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 0.5,
+                  flexWrap: 'wrap',
+                  mb: 2,
+                }}
+              >
+                {Object.entries(selectedItem.tags).map(([k, v]) => (
+                  <TagChip key={k} label={`${k}: ${v}`} size="small" />
+                ))}
+              </Box>
+            </>
+          )}
 
           {/* Activity Timeline */}
           <FeedbackActivityTimeline

@@ -326,7 +326,16 @@ const ArgusDiscoverPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to save query:', err);
     }
-  }, [saveName, projectId, fields, conditions, groupBy, orderBy, currentPeriod, displayMode]);
+  }, [
+    saveName,
+    projectId,
+    fields,
+    conditions,
+    groupBy,
+    orderBy,
+    currentPeriod,
+    displayMode,
+  ]);
 
   const handleRename = useCallback(
     async (newName: string) => {
@@ -428,7 +437,10 @@ const ArgusDiscoverPage: React.FC = () => {
   const handleFilterChange = useCallback(
     (newFilters: ArgusFilterState) => {
       setFilters(newFilters);
-      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      if (
+        newFilters.dateRange.type === 'preset' &&
+        newFilters.dateRange.preset
+      ) {
         setUrlState({ period: newFilters.dateRange.preset });
       }
     },
@@ -809,7 +821,11 @@ const ArgusDiscoverPage: React.FC = () => {
                           }}
                         >
                           <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                            }}
                           >
                             {key}
                             {currentOrderCol === key &&
@@ -888,7 +904,11 @@ const ArgusDiscoverPage: React.FC = () => {
                                   <IconButton
                                     size="small"
                                     onClick={() =>
-                                      handleSelectFacet(colKey, String(val), false)
+                                      handleSelectFacet(
+                                        colKey,
+                                        String(val),
+                                        false
+                                      )
                                     }
                                     sx={{
                                       p: 0.25,
@@ -907,7 +927,11 @@ const ArgusDiscoverPage: React.FC = () => {
                                   <IconButton
                                     size="small"
                                     onClick={() =>
-                                      handleSelectFacet(colKey, String(val), true)
+                                      handleSelectFacet(
+                                        colKey,
+                                        String(val),
+                                        true
+                                      )
                                     }
                                     sx={{
                                       p: 0.25,

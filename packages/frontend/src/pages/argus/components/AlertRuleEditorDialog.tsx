@@ -120,11 +120,7 @@ const ConditionCard: React.FC<{
   ].includes(cond.type);
 
   return (
-    <CardRow
-      ref={setNodeRef}
-      style={style}
-      isDark={isDark}
-    >
+    <CardRow ref={setNodeRef} style={style} isDark={isDark}>
       <DragHandle {...attributes} {...listeners}>
         <DragIcon sx={{ fontSize: 18 }} />
       </DragHandle>
@@ -143,14 +139,20 @@ const ConditionCard: React.FC<{
             }}
           >
             {conditionTypes.map((c) => (
-              <MenuItem key={c.value} value={c.value} sx={{ fontSize: '0.82rem' }}>
+              <MenuItem
+                key={c.value}
+                value={c.value}
+                sx={{ fontSize: '0.82rem' }}
+              >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Box sx={{ color: c.color }}>{c.icon}</Box>
                   <Box>
                     <Typography sx={{ fontSize: '0.82rem', fontWeight: 600 }}>
                       {c.label}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>
+                    <Typography
+                      sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
+                    >
                       {c.desc}
                     </Typography>
                   </Box>
@@ -198,7 +200,11 @@ const ConditionCard: React.FC<{
                 sx={{ fontSize: '0.82rem' }}
               >
                 {intervals.map((i) => (
-                  <MenuItem key={i.value} value={i.value} sx={{ fontSize: '0.82rem' }}>
+                  <MenuItem
+                    key={i.value}
+                    value={i.value}
+                    sx={{ fontSize: '0.82rem' }}
+                  >
                     {i.label}
                   </MenuItem>
                 ))}
@@ -212,28 +218,54 @@ const ConditionCard: React.FC<{
             <FormControl size="small" sx={{ minWidth: 110 }}>
               <Select
                 value={cond.property || 'platform'}
-                onChange={(e) => onChange({ ...cond, property: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...cond, property: e.target.value })
+                }
                 sx={{ fontSize: '0.82rem', '& .MuiSelect-select': { py: 0.6 } }}
               >
-                <MenuItem value="platform" sx={{ fontSize: '0.82rem' }}>Platform</MenuItem>
-                <MenuItem value="url" sx={{ fontSize: '0.82rem' }}>URL</MenuItem>
-                <MenuItem value="release" sx={{ fontSize: '0.82rem' }}>Release</MenuItem>
-                <MenuItem value="environment" sx={{ fontSize: '0.82rem' }}>Environment</MenuItem>
-                <MenuItem value="level" sx={{ fontSize: '0.82rem' }}>Level</MenuItem>
-                <MenuItem value="transaction" sx={{ fontSize: '0.82rem' }}>Transaction</MenuItem>
+                <MenuItem value="platform" sx={{ fontSize: '0.82rem' }}>
+                  Platform
+                </MenuItem>
+                <MenuItem value="url" sx={{ fontSize: '0.82rem' }}>
+                  URL
+                </MenuItem>
+                <MenuItem value="release" sx={{ fontSize: '0.82rem' }}>
+                  Release
+                </MenuItem>
+                <MenuItem value="environment" sx={{ fontSize: '0.82rem' }}>
+                  Environment
+                </MenuItem>
+                <MenuItem value="level" sx={{ fontSize: '0.82rem' }}>
+                  Level
+                </MenuItem>
+                <MenuItem value="transaction" sx={{ fontSize: '0.82rem' }}>
+                  Transaction
+                </MenuItem>
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 110 }}>
               <Select
                 value={cond.operator || 'equals'}
-                onChange={(e) => onChange({ ...cond, operator: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...cond, operator: e.target.value })
+                }
                 sx={{ fontSize: '0.82rem', '& .MuiSelect-select': { py: 0.6 } }}
               >
-                <MenuItem value="equals" sx={{ fontSize: '0.82rem' }}>Equals</MenuItem>
-                <MenuItem value="not_equals" sx={{ fontSize: '0.82rem' }}>Not Equals</MenuItem>
-                <MenuItem value="contains" sx={{ fontSize: '0.82rem' }}>Contains</MenuItem>
-                <MenuItem value="starts_with" sx={{ fontSize: '0.82rem' }}>Starts with</MenuItem>
-                <MenuItem value="ends_with" sx={{ fontSize: '0.82rem' }}>Ends with</MenuItem>
+                <MenuItem value="equals" sx={{ fontSize: '0.82rem' }}>
+                  Equals
+                </MenuItem>
+                <MenuItem value="not_equals" sx={{ fontSize: '0.82rem' }}>
+                  Not Equals
+                </MenuItem>
+                <MenuItem value="contains" sx={{ fontSize: '0.82rem' }}>
+                  Contains
+                </MenuItem>
+                <MenuItem value="starts_with" sx={{ fontSize: '0.82rem' }}>
+                  Starts with
+                </MenuItem>
+                <MenuItem value="ends_with" sx={{ fontSize: '0.82rem' }}>
+                  Ends with
+                </MenuItem>
               </Select>
             </FormControl>
             <TextField
@@ -275,11 +307,7 @@ const ActionCard: React.FC<{
   const config = actionTypes.find((a) => a.value === action.type);
 
   return (
-    <CardRow
-      ref={setNodeRef}
-      style={style}
-      isDark={isDark}
-    >
+    <CardRow ref={setNodeRef} style={style} isDark={isDark}>
       <DragHandle {...attributes} {...listeners}>
         <DragIcon sx={{ fontSize: 18 }} />
       </DragHandle>
@@ -304,7 +332,11 @@ const ActionCard: React.FC<{
             }}
           >
             {actionTypes.map((a) => (
-              <MenuItem key={a.value} value={a.value} sx={{ fontSize: '0.82rem' }}>
+              <MenuItem
+                key={a.value}
+                value={a.value}
+                sx={{ fontSize: '0.82rem' }}
+              >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Box sx={{ color: a.color }}>{a.icon}</Box> {a.label}
                 </Box>
@@ -456,9 +488,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
           ? JSON.parse(editingRule.tags)
           : editingRule.tags || {}
       );
-      setFormConditionLogic(
-        (editingRule as any).condition_logic || 'any'
-      );
+      setFormConditionLogic((editingRule as any).condition_logic || 'any');
     } else {
       setFormName('');
       setFormDescription('');
@@ -585,9 +615,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
             >
-              <Typography
-                sx={{ fontSize: '0.72rem', color: 'text.secondary' }}
-              >
+              <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>
                 {t('argus.alerts.conditionMatchLabel')}
               </Typography>
               <LogicToggleGroup isDark={isDark}>
@@ -807,9 +835,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
               <TagIcon sx={{ fontSize: 14 }} /> {t('argus.alerts.tagFilters')}
             </Typography>
             {Object.keys(formTags).length > 0 && (
-              <Box
-                sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}
-              >
+              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}>
                 {Object.entries(formTags).map(([k, v]) => (
                   <TagFilterChip
                     key={k}
@@ -835,9 +861,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
                   '& .MuiOutlinedInput-root': { fontSize: '0.78rem' },
                 }}
               />
-              <Typography
-                sx={{ color: 'text.disabled', fontSize: '0.78rem' }}
-              >
+              <Typography sx={{ color: 'text.disabled', fontSize: '0.78rem' }}>
                 :
               </Typography>
               <TextField
@@ -896,9 +920,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
           variant="contained"
           onClick={handleSave}
           disabled={
-            !formName ||
-            formConditions.length === 0 ||
-            formActions.length === 0
+            !formName || formConditions.length === 0 || formActions.length === 0
           }
           sx={{
             textTransform: 'none',

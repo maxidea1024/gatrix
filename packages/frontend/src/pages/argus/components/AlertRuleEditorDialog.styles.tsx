@@ -1,5 +1,13 @@
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Paper, Typography, Chip, Button, DialogTitle, DialogActions } from '@mui/material';
+import {
+  Box,
+  Paper,
+  Typography,
+  Chip,
+  Button,
+  DialogTitle,
+  DialogActions,
+} from '@mui/material';
 
 // ─── Step Badge (floating label above card) ───
 

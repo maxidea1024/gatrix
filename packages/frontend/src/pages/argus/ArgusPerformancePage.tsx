@@ -1,18 +1,8 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
-import {
-  Box,
-  useTheme,
-} from '@mui/material';
-import {
-  Speed as SpeedIcon,
-} from '@mui/icons-material';
+import { Box, useTheme } from '@mui/material';
+import { Speed as SpeedIcon } from '@mui/icons-material';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -219,7 +209,10 @@ const ArgusPerformancePage: React.FC = () => {
   const handleFilterChange = useCallback(
     (newFilters: ArgusFilterState) => {
       setFilters(newFilters);
-      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      if (
+        newFilters.dateRange.type === 'preset' &&
+        newFilters.dateRange.preset
+      ) {
         setUrlState({ period: newFilters.dateRange.preset });
       }
       if (selectedTxn && viewMode === 'detail') fetchDetail(selectedTxn);
@@ -268,14 +261,7 @@ const ArgusPerformancePage: React.FC = () => {
       });
     }
     return paths;
-  }, [
-    viewMode,
-    t,
-    selectedTxn,
-    urlState.txn,
-    urlState.trace,
-    traceData,
-  ]);
+  }, [viewMode, t, selectedTxn, urlState.txn, urlState.trace, traceData]);
 
   // Stable callback handlers
   const handleSortOpen = useCallback(

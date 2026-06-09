@@ -1,10 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, Paper, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';

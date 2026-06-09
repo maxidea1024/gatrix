@@ -80,8 +80,6 @@ import {
   type ChartConfig,
 } from './components/metricsHelpers';
 
-
-
 const ArgusMetricsExplorerPage: React.FC = () => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();

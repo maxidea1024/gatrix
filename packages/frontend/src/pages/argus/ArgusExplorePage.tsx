@@ -52,7 +52,6 @@ import {
   type SortOption,
 } from './components/exploreHelpers';
 
-
 /* ─── Main Component ─── */
 
 const ArgusExplorePage: React.FC = () => {

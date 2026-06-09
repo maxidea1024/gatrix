@@ -62,7 +62,8 @@ export const ToolbarButtonGroup = styled(Box, {
 }));
 
 export const ToolbarButton = styled(Button, {
-  shouldForwardProp: (p) => p !== 'isDark' && p !== 'accentColor' && p !== 'isSubdued',
+  shouldForwardProp: (p) =>
+    p !== 'isDark' && p !== 'accentColor' && p !== 'isSubdued',
 })<{ isDark: boolean; accentColor: string; isSubdued?: boolean }>(
   ({ isDark, accentColor, isSubdued }) => ({
     textTransform: 'none',

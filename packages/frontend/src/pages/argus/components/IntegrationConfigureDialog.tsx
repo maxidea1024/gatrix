@@ -162,9 +162,7 @@ export const IntegrationConfigureDialog: React.FC<
       <DialogTitle
         sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}
       >
-        <ProviderAvatar isDark={isDark}>
-          {info.icon}
-        </ProviderAvatar>
+        <ProviderAvatar isDark={isDark}>{info.icon}</ProviderAvatar>
         <Box sx={{ flex: 1 }}>
           <Typography
             sx={{
@@ -231,11 +229,7 @@ export const IntegrationConfigureDialog: React.FC<
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {connectedRepos.map((intg) => (
-                    <RepoCard
-                      key={intg.id}
-                      elevation={0}
-                      isDark={isDark}
-                    >
+                    <RepoCard key={intg.id} elevation={0} isDark={isDark}>
                       <CheckCircleIcon
                         sx={{ fontSize: 18, color: '#4caf50' }}
                       />

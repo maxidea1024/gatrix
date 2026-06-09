@@ -174,10 +174,7 @@ export const DiscoverSavedPanel: React.FC<DiscoverSavedPanelProps> = ({
                 alignItems: 'center',
               }}
             >
-              <Box
-                sx={{ flex: 1, minWidth: 0 }}
-                onClick={() => onLoad(sq)}
-              >
+              <Box sx={{ flex: 1, minWidth: 0 }} onClick={() => onLoad(sq)}>
                 <Typography variant="body2" fontWeight={600} noWrap>
                   {sq.name}
                 </Typography>

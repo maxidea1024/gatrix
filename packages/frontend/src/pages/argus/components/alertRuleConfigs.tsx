@@ -15,10 +15,7 @@ import {
   ViewKanban as LinearIcon,
   NotificationsActive as PagerDutyIcon,
 } from '@mui/icons-material';
-import {
-  ArgusAlertCondition,
-  ArgusAlertAction,
-} from '@/services/argusService';
+import { ArgusAlertCondition, ArgusAlertAction } from '@/services/argusService';
 
 export const getConditionTypes = (
   t: (key: string) => string

@@ -132,7 +132,10 @@ interface CronsDetailDrawerProps {
   testingSending: boolean;
   onSendTest: (status: 'ok' | 'error') => void;
   projectId: string;
-  statusConfig: Record<string, { color: string; icon: React.ReactElement; label: string }>;
+  statusConfig: Record<
+    string,
+    { color: string; icon: React.ReactElement; label: string }
+  >;
   onCopy: (text: string) => void;
 }
 
@@ -168,9 +171,7 @@ export const CronsDetailDrawer: React.FC<CronsDetailDrawerProps> = ({
       }}
     >
       {monitor && (
-        <Box
-          sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-        >
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Drawer Header */}
           <DrawerHeader isDark={isDark}>
             <Box>
@@ -195,10 +196,7 @@ export const CronsDetailDrawer: React.FC<CronsDetailDrawerProps> = ({
           {/* Monitor Summary */}
           <SummaryStrip isDark={isDark}>
             {(() => {
-              const s =
-                monitor.last_status ||
-                monitor.status ||
-                'active';
+              const s = monitor.last_status || monitor.status || 'active';
               const cfg = statusConfig[s] || statusConfig.active;
               return (
                 <Chip
@@ -222,15 +220,11 @@ export const CronsDetailDrawer: React.FC<CronsDetailDrawerProps> = ({
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {t('argus.crons.lastCheckin', 'Last')}:{' '}
-              <strong>
-                {formatRelativeTime(monitor.last_checkin_at, t)}
-              </strong>
+              <strong>{formatRelativeTime(monitor.last_checkin_at, t)}</strong>
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {t('argus.crons.nextExpected', 'Next')}:{' '}
-              <strong>
-                {formatRelativeTime(monitor.next_checkin_at, t)}
-              </strong>
+              <strong>{formatRelativeTime(monitor.next_checkin_at, t)}</strong>
             </Typography>
           </SummaryStrip>
 
@@ -414,9 +408,7 @@ export const CronsDetailDrawer: React.FC<CronsDetailDrawerProps> = ({
                 </Typography>
 
                 {/* Endpoint */}
-                <SectionLabel>
-                  Endpoint
-                </SectionLabel>
+                <SectionLabel>Endpoint</SectionLabel>
                 <CodeBlock
                   code={`POST ${argusApiBase}/projects/${projectId}/crons/${monitor.slug}/checkin`}
                   onCopy={onCopy}

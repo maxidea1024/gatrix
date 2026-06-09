@@ -23,10 +23,7 @@ import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import { ArgusSessionHealth } from '@/services/argusService';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { ArgusFilterState } from '@/components/argus/ArgusFilterBar';
-import {
-  CrashDistribution,
-  formatHour,
-} from './sessionHealthHelpers';
+import { CrashDistribution, formatHour } from './sessionHealthHelpers';
 
 interface SessionHealthChartsProps {
   data: ArgusSessionHealth | null;
@@ -339,9 +336,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
             borderRadius: 2,
           }}
         >
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <Typography
               variant="subtitle2"
               fontWeight={600}
@@ -374,9 +369,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
             borderRadius: 2,
           }}
         >
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <Typography
               variant="subtitle2"
               fontWeight={600}
@@ -422,9 +415,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
             borderRadius: 2,
           }}
         >
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <Typography
               variant="subtitle2"
               fontWeight={600}

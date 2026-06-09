@@ -41,7 +41,10 @@ export function getMethodColor(method: string): string {
 }
 
 // ─── Transaction Parser ───
-export function parseTransaction(name: string): { method: string; path: string } {
+export function parseTransaction(name: string): {
+  method: string;
+  path: string;
+} {
   const match = name.match(/^([A-Z]{2,10})\s+(.+)$/);
   if (match) return { method: match[1].toUpperCase(), path: match[2] };
   return { method: 'TXN', path: name };

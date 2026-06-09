@@ -8,9 +8,7 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
-import {
-  InfoOutlined as InfoIcon,
-} from '@mui/icons-material';
+import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
@@ -155,7 +153,9 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                       )
                     }
                   >
-                    <LegendDot dotColor={RELEASE_COLORS[idx % RELEASE_COLORS.length]} />
+                    <LegendDot
+                      dotColor={RELEASE_COLORS[idx % RELEASE_COLORS.length]}
+                    />
                     <Typography
                       variant="caption"
                       sx={{ fontSize: '0.64rem', fontWeight: 500 }}
@@ -207,10 +207,7 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                 />
                 {t('argus.sessions.releaseComparison')}
               </Typography>
-              <Tooltip
-                title={t('argus.sessions.releaseComparisonDesc')}
-                arrow
-              >
+              <Tooltip title={t('argus.sessions.releaseComparisonDesc')} arrow>
                 <InfoIcon
                   sx={{
                     fontSize: 14,
@@ -232,10 +229,7 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                 {/* Header */}
                 <Box sx={{ py: 0.5, px: 0.8 }} />
                 {data.by_release.slice(0, 5).map((r, idx) => (
-                  <Box
-                    key={idx}
-                    sx={{ py: 0.5, px: 0.5, textAlign: 'center' }}
-                  >
+                  <Box key={idx} sx={{ py: 0.5, px: 0.5, textAlign: 'center' }}>
                     <Chip
                       label={r.release}
                       size="small"

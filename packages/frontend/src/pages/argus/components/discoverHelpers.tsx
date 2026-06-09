@@ -7,9 +7,7 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
-import {
-  ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { Bar } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';

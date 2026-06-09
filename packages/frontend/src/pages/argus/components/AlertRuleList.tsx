@@ -114,9 +114,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
             onChange={onToggleSelectAll}
             color="warning"
           />
-          <Typography
-            sx={{ fontSize: '0.78rem', fontWeight: 600, flex: 1 }}
-          >
+          <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, flex: 1 }}>
             {t('argus.alerts.selectedCount', {
               count: selectedRules.size,
             })}
@@ -164,7 +162,9 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
             key={rule.id}
             elevation={0}
             isDark={isDark}
-            accentColor={isMuted ? '#9e9e9e' : rule.enabled ? '#ff9800' : 'transparent'}
+            accentColor={
+              isMuted ? '#9e9e9e' : rule.enabled ? '#ff9800' : 'transparent'
+            }
             dimmed={isMuted || !rule.enabled}
           >
             <Checkbox
@@ -254,10 +254,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                         sx={{
                           height: 22,
                           fontSize: '0.68rem',
-                          backgroundColor: alpha(
-                            cfg?.color || '#9e9e9e',
-                            0.08
-                          ),
+                          backgroundColor: alpha(cfg?.color || '#9e9e9e', 0.08),
                           color: cfg?.color,
                           border: 'none',
                         }}
@@ -302,10 +299,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                       sx={{
                         height: 22,
                         fontSize: '0.68rem',
-                        backgroundColor: alpha(
-                          cfg?.color || '#9e9e9e',
-                          0.08
-                        ),
+                        backgroundColor: alpha(cfg?.color || '#9e9e9e', 0.08),
                         color: cfg?.color,
                         border: 'none',
                       }}
@@ -337,9 +331,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                   return Object.entries(tags).map(([k, v]) => (
                     <Chip
                       key={k}
-                      icon={
-                        <TagIcon sx={{ fontSize: '10px !important' }} />
-                      }
+                      icon={<TagIcon sx={{ fontSize: '10px !important' }} />}
                       label={`${k}:${v}`}
                       size="small"
                       sx={{
@@ -359,9 +351,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
             {/* Mini Chart */}
             <Box sx={{ width: 100, height: 36, mx: 1 }}>
               {(() => {
-                const ruleStats = stats.filter(
-                  (s) => s.rule_id === rule.id
-                );
+                const ruleStats = stats.filter((s) => s.rule_id === rule.id);
                 if (ruleStats.length === 0) return null;
                 const sortedStats = [...ruleStats].sort((a, b) =>
                   a.bucket.localeCompare(b.bucket)
@@ -369,8 +359,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                 const data = {
                   labels: sortedStats.map((s) => {
                     const d = new Date(
-                      s.bucket +
-                        (s.bucket.length === 10 ? 'T00:00:00Z' : 'Z')
+                      s.bucket + (s.bucket.length === 10 ? 'T00:00:00Z' : 'Z')
                     );
                     return d.toLocaleString('en-US', {
                       month: 'short',
@@ -429,10 +418,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
             {/* Actions */}
             <Box sx={{ display: 'flex', gap: 0.3 }}>
               <Tooltip title={t('argus.alerts.test')}>
-                <IconButton
-                  size="small"
-                  onClick={() => onTest(rule.id)}
-                >
+                <IconButton size="small" onClick={() => onTest(rule.id)}>
                   <TestIcon sx={{ fontSize: 16 }} />
                 </IconButton>
               </Tooltip>

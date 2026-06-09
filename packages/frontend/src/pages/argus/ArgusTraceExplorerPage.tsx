@@ -41,8 +41,15 @@ import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SpanVolumeChart, getOpColor } from './components/traceExplorerHelpers';
-import { SpansTab, TracesTab, AggregatesTab } from './components/TraceExplorerTabs';
-import { SaveQueryDialog, SavedQueriesPanel } from './components/TraceExplorerDialogs';
+import {
+  SpansTab,
+  TracesTab,
+  AggregatesTab,
+} from './components/TraceExplorerTabs';
+import {
+  SaveQueryDialog,
+  SavedQueriesPanel,
+} from './components/TraceExplorerDialogs';
 
 const ArgusTraceExplorerPage: React.FC = () => {
   const theme = useTheme();
@@ -298,8 +305,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const handleFilterChange = useCallback(
     (newFilters: ArgusFilterState) => {
       setFilters(newFilters);
-      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-        setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
+      if (
+        newFilters.dateRange.type === 'preset' &&
+        newFilters.dateRange.preset
+      ) {
+        setUrlState({
+          period: newFilters.dateRange.preset,
+          start: '',
+          end: '',
+        });
       } else if (
         newFilters.dateRange.type === 'custom' &&
         newFilters.dateRange.start &&
@@ -782,10 +796,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
       )}
 
       {activeTab === 1 && (
-        <TracesTab
-          traceSamples={traceSamples}
-          loading={loading}
-        />
+        <TracesTab traceSamples={traceSamples} loading={loading} />
       )}
 
       {activeTab === 2 && (

@@ -142,7 +142,10 @@ const ArgusSessionHealthPage: React.FC = () => {
   const handleFilterChange = useCallback(
     (newFilters: ArgusFilterState) => {
       setFilters(newFilters);
-      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
+      if (
+        newFilters.dateRange.type === 'preset' &&
+        newFilters.dateRange.preset
+      ) {
         setUrlState({ period: newFilters.dateRange.preset });
       }
     },

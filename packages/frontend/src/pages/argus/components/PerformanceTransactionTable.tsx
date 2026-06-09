@@ -1,12 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Chip,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
 import {
   Speed as SpeedIcon,
   Schedule as ScheduleIcon,
@@ -22,10 +15,7 @@ import {
 import { ArgusTransaction } from '@/services/argusService';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
-import {
-  getMethodColor,
-  parseTransaction,
-} from './performanceHelpers';
+import { getMethodColor, parseTransaction } from './performanceHelpers';
 
 const PERF_PAGE_SIZE_KEY = 'argusPerf.pageSize';
 const PERF_DEFAULT_PAGE_SIZE = 15;
@@ -37,11 +27,9 @@ interface PerformanceTransactionTableProps {
   onTxnClick: (txnName: string) => void;
 }
 
-const PerformanceTransactionTable: React.FC<PerformanceTransactionTableProps> = ({
-  transactions,
-  loading,
-  onTxnClick,
-}) => {
+const PerformanceTransactionTable: React.FC<
+  PerformanceTransactionTableProps
+> = ({ transactions, loading, onTxnClick }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -128,17 +116,10 @@ const PerformanceTransactionTable: React.FC<PerformanceTransactionTableProps> = 
                 icon: <ScheduleIcon />,
               },
               {
-                label: t(
-                  'argus.performance.avgErrorRate',
-                  'Avg. Error Rate'
-                ),
+                label: t('argus.performance.avgErrorRate', 'Avg. Error Rate'),
                 value: `${avgErr.toFixed(2)}%`,
                 color:
-                  avgErr > 5
-                    ? '#f44336'
-                    : avgErr > 1
-                      ? '#ff9800'
-                      : '#4caf50',
+                  avgErr > 5 ? '#f44336' : avgErr > 1 ? '#ff9800' : '#4caf50',
                 icon: <SpeedIcon />,
               },
               {
@@ -343,10 +324,7 @@ const PerformanceTransactionTable: React.FC<PerformanceTransactionTableProps> = 
                           fontWeight: 700,
                           borderRadius: 0.8,
                           width: '100%',
-                          backgroundColor: alpha(
-                            getMethodColor(method),
-                            0.12
-                          ),
+                          backgroundColor: alpha(getMethodColor(method), 0.12),
                           color: getMethodColor(method),
                           border: 'none',
                         }}
@@ -403,10 +381,7 @@ const PerformanceTransactionTable: React.FC<PerformanceTransactionTableProps> = 
                       borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: '0.82rem' }}
-                    >
+                    <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>
                       {p50Val.toFixed(0)}ms
                     </Typography>
                     <Box

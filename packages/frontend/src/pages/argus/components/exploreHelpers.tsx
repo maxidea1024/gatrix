@@ -26,7 +26,10 @@ import {
   FileCopy as FileCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { type ArgusSavedQuery, type SavedQueryType } from '@/services/argusService';
+import {
+  type ArgusSavedQuery,
+  type SavedQueryType,
+} from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 /* ─── Dataset Config ─── */

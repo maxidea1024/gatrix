@@ -58,8 +58,6 @@ import {
   buildFacetCounts,
 } from './components/issuesHelpers';
 
-
-
 interface ArgusIssuesPageProps {
   projectId?: string | number;
 }

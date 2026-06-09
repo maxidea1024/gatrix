@@ -56,15 +56,13 @@ export const LegendItem = styled(Box, {
 
 // ─── Legend Color Dot ───
 
-export const LegendDot = styled(Box)<{ dotColor: string }>(
-  ({ dotColor }) => ({
-    width: 8,
-    height: 8,
-    borderRadius: '2px',
-    backgroundColor: dotColor,
-    flexShrink: 0,
-  })
-);
+export const LegendDot = styled(Box)<{ dotColor: string }>(({ dotColor }) => ({
+  width: 8,
+  height: 8,
+  borderRadius: '2px',
+  backgroundColor: dotColor,
+  flexShrink: 0,
+}));
 
 // ─── Release Row ───
 

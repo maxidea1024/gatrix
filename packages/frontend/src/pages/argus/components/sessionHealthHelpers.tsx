@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, alpha } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,

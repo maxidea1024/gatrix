@@ -16,10 +16,7 @@ import {
   Warning as WarningIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import {
-  ArgusAlertRule,
-  ArgusAlertHistory,
-} from '@/services/argusService';
+import { ArgusAlertRule, ArgusAlertHistory } from '@/services/argusService';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
@@ -117,10 +114,7 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                     : stats.filter((s) => s.rule_id === filterRuleId);
                 const dateMap = new Map<string, number>();
                 filteredStats.forEach((s) =>
-                  dateMap.set(
-                    s.bucket,
-                    (dateMap.get(s.bucket) || 0) + s.count
-                  )
+                  dateMap.set(s.bucket, (dateMap.get(s.bucket) || 0) + s.count)
                 );
                 const dates = Array.from(dateMap.keys()).sort();
                 const chartData = dates.map((d) => {
@@ -149,11 +143,7 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
 
           <Box>
             {history
-              .filter(
-                (h) =>
-                  filterRuleId === '' ||
-                  h.rule_id === filterRuleId
-              )
+              .filter((h) => filterRuleId === '' || h.rule_id === filterRuleId)
               .map((h) => (
                 <Box
                   key={h.id}
@@ -167,9 +157,7 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                 >
                   <WarningIcon sx={{ fontSize: 14, color: '#ff9800' }} />
                   <Box sx={{ flex: 1 }}>
-                    <Typography
-                      sx={{ fontSize: '0.78rem', fontWeight: 500 }}
-                    >
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 500 }}>
                       {h.rule_name ||
                         t('argus.alerts.ruleNumber', { id: h.rule_id })}
                     </Typography>
@@ -198,8 +186,7 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                             h.status === 'success'
                               ? alpha('#4caf50', 0.1)
                               : alpha('#f44336', 0.1),
-                          color:
-                            h.status === 'success' ? '#4caf50' : '#f44336',
+                          color: h.status === 'success' ? '#4caf50' : '#f44336',
                         }}
                       />
                     </Tooltip>
