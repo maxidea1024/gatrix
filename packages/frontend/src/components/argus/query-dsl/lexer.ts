@@ -453,7 +453,11 @@ class Lexer {
   }
 
   private isLetter(ch: string): boolean {
-    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+    return (
+      (ch >= 'a' && ch <= 'z') ||
+      (ch >= 'A' && ch <= 'Z') ||
+      ch.charCodeAt(0) > 127
+    );
   }
 
   /** Valid first character of an identifier: [a-zA-Z_] */

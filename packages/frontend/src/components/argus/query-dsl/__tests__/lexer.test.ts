@@ -440,5 +440,14 @@ describe('Lexer', () => {
         [TokenType.STRING, 'error'],
       ]);
     });
+
+    it('should handle Unicode / non-ASCII character words', () => {
+      expect(tv('안녕하세요')).toEqual([[TokenType.FIELD, '안녕하세요']]);
+      expect(tv('country:한국')).toEqual([
+        [TokenType.FIELD, 'country'],
+        [TokenType.COLON, ':'],
+        [TokenType.STRING, '한국'],
+      ]);
+    });
   });
 });
