@@ -822,6 +822,87 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
+  // ─── Feedback Attribute Facet (generic field value lookup) ───
+  // Same pattern as /logs/attribute-facet — returns top values for any column
+  app.get(
+    '/feedback/:projectId/attribute-facet',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const {
+        key,
+        period = '30d',
+        start,
+        end,
+      } = request.query as Record<string, string>;
+
+      if (!key) {
+        return reply.code(400).send({ error: 'key parameter is required' });
+      }
+
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+
+      try {
+        const params: Record<string, any> = {
+          projectId: String(projectId),
+          fillStart: bucket.queryParams.fillStart,
+          fillEnd: bucket.queryParams.fillEnd,
+        };
+
+        // Top-level columns that can be queried directly
+        const TOP_LEVEL_COLUMNS = new Set([
+          'message', 'name', 'email', 'contact_email', 'url',
+          'environment', 'release', 'source', 'service',
+          'browser', 'browser_version', 'os', 'os_version', 'device',
+          'user_id', 'locale', 'category', 'sentiment',
+          'status', 'assigned_to',
+        ]);
+
+        let sql: string;
+        if (TOP_LEVEL_COLUMNS.has(key)) {
+          sql = `
+            SELECT
+              ${key} AS attr_value,
+              count() AS count
+            FROM argus.user_feedback
+            WHERE project_id = {projectId:String}
+              AND ${timeCond}
+              AND ${key} != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 30
+          `;
+        } else {
+          // Dynamic tags from the Map column
+          params.attrKey = key;
+          sql = `
+            SELECT
+              tags[{attrKey:String}] AS attr_value,
+              count() AS count
+            FROM argus.user_feedback
+            WHERE project_id = {projectId:String}
+              AND ${timeCond}
+              AND mapContains(tags, {attrKey:String})
+              AND attr_value != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 30
+          `;
+        }
+
+        const result = await optic.rawQuery({ query: sql, params });
+        return reply.send({ data: result.data });
+      } catch (error) {
+        logger.error('Failed to get feedback attribute facet', {
+          projectId,
+          key,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get feedback attribute facet' });
+      }
+    }
+  );
+
   // ?�?�?� Mark Feedback as Read ?�?�?�
 
   app.post(
