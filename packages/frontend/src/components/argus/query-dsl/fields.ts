@@ -574,7 +574,14 @@ export const TRACES_CONFIG: DomainConfig = {
     ],
     {
       status: {
-        staticValues: ['ok', 'cancelled', 'unknown', 'invalid_argument', 'deadline_exceeded', 'internal'],
+        staticValues: [
+          'ok',
+          'cancelled',
+          'unknown',
+          'invalid_argument',
+          'deadline_exceeded',
+          'internal',
+        ],
       },
     }
   ),

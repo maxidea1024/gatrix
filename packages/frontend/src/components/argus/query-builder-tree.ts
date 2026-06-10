@@ -11,7 +11,8 @@ import { chipToQueryPart } from './query-dsl/useFilterChips';
 // ═════════════════════════════════════════════════════════════════════════════
 
 let _treeId = 0;
-export const nextId = () => `cond_${++_treeId}_${Math.random().toString(36).slice(2, 5)}`;
+export const nextId = () =>
+  `cond_${++_treeId}_${Math.random().toString(36).slice(2, 5)}`;
 
 export interface FilterCondition {
   id: string;
@@ -39,11 +40,25 @@ export type Condition = FilterCondition | GroupCondition;
 // Factory helpers
 // ═════════════════════════════════════════════════════════════════════════════
 
-export function createFilter(field = '', operator = '=', value = ''): FilterCondition {
-  return { id: nextId(), type: 'filter', field, operator, value, negated: false };
+export function createFilter(
+  field = '',
+  operator = '=',
+  value = ''
+): FilterCondition {
+  return {
+    id: nextId(),
+    type: 'filter',
+    field,
+    operator,
+    value,
+    negated: false,
+  };
 }
 
-export function createGroup(connector: 'AND' | 'OR' = 'AND', children: Condition[] = []): GroupCondition {
+export function createGroup(
+  connector: 'AND' | 'OR' = 'AND',
+  children: Condition[] = []
+): GroupCondition {
   return { id: nextId(), type: 'group', connector, negated: false, children };
 }
 
@@ -71,7 +86,11 @@ interface ParseResult {
   connector: 'AND' | 'OR';
 }
 
-function parseLevel(chips: FilterChip[], start: number, end: number): ParseResult {
+function parseLevel(
+  chips: FilterChip[],
+  start: number,
+  end: number
+): ParseResult {
   const items: Condition[] = [];
   let connector: 'AND' | 'OR' = 'AND';
   let i = start;
@@ -81,7 +100,8 @@ function parseLevel(chips: FilterChip[], start: number, end: number): ParseResul
 
     // Parentheses → sub-group
     if (c.type === 'paren' && c.label === '(') {
-      let depth = 1, j = i + 1;
+      let depth = 1,
+        j = i + 1;
       while (j < end && depth > 0) {
         if (chips[j].type === 'paren' && chips[j].label === '(') depth++;
         if (chips[j].type === 'paren' && chips[j].label === ')') depth--;
@@ -95,9 +115,14 @@ function parseLevel(chips: FilterChip[], start: number, end: number): ParseResul
 
     // NOT
     if (c.type === 'logical' && c.label === 'NOT') {
-      if (i + 1 < end && chips[i + 1].type === 'paren' && chips[i + 1].label === '(') {
+      if (
+        i + 1 < end &&
+        chips[i + 1].type === 'paren' &&
+        chips[i + 1].label === '('
+      ) {
         // NOT (group)
-        let depth = 1, j = i + 2;
+        let depth = 1,
+          j = i + 2;
         while (j < end && depth > 0) {
           if (chips[j].type === 'paren' && chips[j].label === '(') depth++;
           if (chips[j].type === 'paren' && chips[j].label === ')') depth--;
@@ -111,7 +136,10 @@ function parseLevel(chips: FilterChip[], start: number, end: number): ParseResul
         continue;
       }
       // NOT filter
-      if (i + 1 < end && (chips[i + 1].type === 'filter' || !chips[i + 1].type)) {
+      if (
+        i + 1 < end &&
+        (chips[i + 1].type === 'filter' || !chips[i + 1].type)
+      ) {
         const f = chipToFilter(chips[i + 1]);
         f.negated = true;
         items.push(f);
@@ -148,7 +176,10 @@ function chipToFilter(chip: FilterChip): FilterCondition {
   if (chip.values && chip.values.length > 1) {
     values = [...chip.values];
   } else if (chip.value && chip.value.includes(', ')) {
-    const parts = chip.value.split(', ').map((v) => v.trim()).filter(Boolean);
+    const parts = chip.value
+      .split(', ')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (parts.length > 1) values = parts;
   }
   return {
@@ -172,7 +203,10 @@ function resolveValues(cond: FilterCondition): string[] | null {
   if (cond.values && cond.values.length > 1) return cond.values;
   // Detect comma-separated values in the value string
   if (cond.value && cond.value.includes(', ')) {
-    const parts = cond.value.split(', ').map((v) => v.trim()).filter(Boolean);
+    const parts = cond.value
+      .split(', ')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (parts.length > 1) return parts;
   }
   return null;
@@ -202,7 +236,8 @@ export function conditionToDsl(cond: Condition): string {
   // Group
   const parts = cond.children.map(conditionToDsl).filter(Boolean);
   if (parts.length === 0) return '';
-  const inner = parts.length === 1 ? parts[0] : `(${parts.join(` ${cond.connector} `)})`;
+  const inner =
+    parts.length === 1 ? parts[0] : `(${parts.join(` ${cond.connector} `)})`;
   return cond.negated ? `NOT ${inner}` : inner;
 }
 
@@ -214,8 +249,12 @@ export function conditionToSql(cond: Condition): string {
   const esc = (s: string) => `'${s.replace(/'/g, "''")}'`;
 
   if (cond.type === 'filter') {
-    if (!cond.field || (!cond.value && cond.field !== 'has' && cond.field !== '!has')) return '';
-    
+    if (
+      !cond.field ||
+      (!cond.value && cond.field !== 'has' && cond.field !== '!has')
+    )
+      return '';
+
     let expr = '';
 
     // HAS / !HAS
@@ -237,7 +276,8 @@ export function conditionToSql(cond: Condition): string {
           endsWith: (x) => `ILIKE ${esc(`%${x}`)}`,
           '!endsWith': (x) => `NOT ILIKE ${esc(`%${x}`)}`,
         };
-        if (fm[cond.operator]) expr = `${cond.field} ${fm[cond.operator](cond.value)}`;
+        if (fm[cond.operator])
+          expr = `${cond.field} ${fm[cond.operator](cond.value)}`;
         else expr = `${cond.field} ${cond.operator} ${esc(cond.value)}`;
       }
     }
@@ -249,7 +289,9 @@ export function conditionToSql(cond: Condition): string {
   const parts = cond.children.map(conditionToSql).filter(Boolean);
   if (parts.length === 0) return '';
   if (parts.length === 1) return cond.negated ? `NOT (${parts[0]})` : parts[0];
-  return cond.negated ? `NOT (${parts.join(` ${cond.connector} `)})` : `(${parts.join(` ${cond.connector} `)})`;
+  return cond.negated
+    ? `NOT (${parts.join(` ${cond.connector} `)})`
+    : `(${parts.join(` ${cond.connector} `)})`;
 }
 
 // Helper: prefix first line with `first`, remaining lines with `rest`
@@ -267,7 +309,9 @@ export function conditionToDslPretty(cond: Condition): string {
     if (c.type === 'filter') {
       return [conditionToDsl(c)];
     }
-    const childLineGroups = c.children.map((ch) => fmt(ch, depth + 1)).filter((lines) => lines.length > 0);
+    const childLineGroups = c.children
+      .map((ch) => fmt(ch, depth + 1))
+      .filter((lines) => lines.length > 0);
     if (childLineGroups.length === 0) return [];
 
     const out: string[] = [];
@@ -300,14 +344,14 @@ export function conditionToDslPretty(cond: Condition): string {
   return lines.join('\n');
 }
 
-
-
 export function conditionToSqlPretty(cond: Condition): string {
   const fmt = (c: Condition, depth: number): string[] => {
     if (c.type === 'filter') {
       return [conditionToSql(c)];
     }
-    const childLineGroups = c.children.map((ch) => fmt(ch, depth + 1)).filter((lines) => lines.length > 0);
+    const childLineGroups = c.children
+      .map((ch) => fmt(ch, depth + 1))
+      .filter((lines) => lines.length > 0);
     if (childLineGroups.length === 0) return [];
 
     const out: string[] = [];
@@ -352,7 +396,10 @@ export function cloneTree(cond: Condition): Condition {
 }
 
 /** Find and remove a condition by ID. Returns [newTree, removedItem]. */
-export function removeCondition(root: GroupCondition, id: string): [GroupCondition, Condition | null] {
+export function removeCondition(
+  root: GroupCondition,
+  id: string
+): [GroupCondition, Condition | null] {
   let removed: Condition | null = null;
 
   function walk(group: GroupCondition): GroupCondition {
@@ -380,7 +427,7 @@ export function insertCondition(
   root: GroupCondition,
   targetGroupId: string,
   condition: Condition,
-  index: number,
+  index: number
 ): GroupCondition {
   function walk(group: GroupCondition): GroupCondition {
     if (group.id === targetGroupId) {
@@ -388,7 +435,12 @@ export function insertCondition(
       children.splice(Math.min(index, children.length), 0, condition);
       return { ...group, children };
     }
-    return { ...group, children: group.children.map((c) => c.type === 'group' ? walk(c) : { ...c }) };
+    return {
+      ...group,
+      children: group.children.map((c) =>
+        c.type === 'group' ? walk(c) : { ...c }
+      ),
+    };
   }
   return walk(root);
 }
@@ -398,7 +450,7 @@ export function moveCondition(
   root: GroupCondition,
   conditionId: string,
   targetGroupId: string,
-  index: number,
+  index: number
 ): GroupCondition {
   const [withoutCond, removed] = removeCondition(root, conditionId);
   if (!removed) return root;
@@ -429,11 +481,12 @@ export function pruneEmptyGroups(root: GroupCondition): GroupCondition {
 export function updateCondition(
   root: GroupCondition,
   id: string,
-  patch: Partial<FilterCondition> | Partial<GroupCondition>,
+  patch: Partial<FilterCondition> | Partial<GroupCondition>
 ): GroupCondition {
   function walk(cond: Condition): Condition {
     if (cond.id === id) return { ...cond, ...patch } as Condition;
-    if (cond.type === 'group') return { ...cond, children: cond.children.map(walk) };
+    if (cond.type === 'group')
+      return { ...cond, children: cond.children.map(walk) };
     return { ...cond };
   }
   return walk(root) as GroupCondition;
@@ -444,7 +497,7 @@ export function addFilterToGroup(
   root: GroupCondition,
   groupId: string,
   field = '',
-  operator = '=',
+  operator = '='
 ): GroupCondition {
   const filter = createFilter(field, operator);
   return insertCondition(root, groupId, filter, Infinity);
@@ -453,7 +506,7 @@ export function addFilterToGroup(
 /** Add a sub-group to a group. */
 export function addGroupToGroup(
   root: GroupCondition,
-  groupId: string,
+  groupId: string
 ): GroupCondition {
   const group = createGroup('AND', []);
   return insertCondition(root, groupId, group, Infinity);
@@ -490,7 +543,7 @@ function deepClone(cond: Condition): Condition {
 /** Duplicate a condition (filter or group) right after itself in the same parent. */
 export function duplicateCondition(
   root: GroupCondition,
-  conditionId: string,
+  conditionId: string
 ): GroupCondition {
   function walk(group: GroupCondition): GroupCondition {
     const children: Condition[] = [];

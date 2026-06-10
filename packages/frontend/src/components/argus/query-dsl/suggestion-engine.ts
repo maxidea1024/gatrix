@@ -132,7 +132,9 @@ function getFieldSuggestions(
       const canonicalField = fields.find((f) => f.key === canonicalKey);
       if (!canonicalField) continue;
       if (prefix === '' || aliasKey.toLowerCase().startsWith(prefix)) {
-        if (!results.some((r) => r.label.toLowerCase() === aliasKey.toLowerCase())) {
+        if (
+          !results.some((r) => r.label.toLowerCase() === aliasKey.toLowerCase())
+        ) {
           results.push({
             label: aliasKey,
             insertText: `${aliasKey}:`,

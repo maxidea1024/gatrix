@@ -256,12 +256,17 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       if (fieldKey === 'op' && tags.op) return tags.op.map((x) => x.value);
-      if (fieldKey === 'status' && tags.status) return tags.status.map((x) => x.value);
-      if (fieldKey === 'domain' && tags.domain) return tags.domain.map((x) => x.value);
+      if (fieldKey === 'status' && tags.status)
+        return tags.status.map((x) => x.value);
+      if (fieldKey === 'domain' && tags.domain)
+        return tags.domain.map((x) => x.value);
 
       if (fieldKey === 'environment') {
         try {
-          const opts = await argusService.getFilterOptions(projectId, currentPeriod);
+          const opts = await argusService.getFilterOptions(
+            projectId,
+            currentPeriod
+          );
           return opts.environments || [];
         } catch {
           return [];
@@ -668,7 +673,12 @@ const ArgusTraceExplorerPage: React.FC = () => {
               facets={Object.fromEntries(
                 Object.entries(tags || {}).map(([k, list]) => [
                   k,
-                  Array.isArray(list) ? list.map((item: any) => ({ value: item.value, count: Number(item.count || 0) })) : []
+                  Array.isArray(list)
+                    ? list.map((item: any) => ({
+                        value: item.value,
+                        count: Number(item.count || 0),
+                      }))
+                    : [],
                 ])
               )}
               fetchFieldValues={fetchFieldValues}

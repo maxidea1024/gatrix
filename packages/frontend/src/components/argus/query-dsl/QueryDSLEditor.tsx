@@ -2155,7 +2155,10 @@ export function QueryDSLEditor({
           config={config}
           query={chipsToQuery(chips)}
           facets={Object.fromEntries(
-            Array.from(normalizedFacets.entries()).map(([k, vals]) => [k, vals.map((v) => ({ value: v, count: 0 }))])
+            Array.from(normalizedFacets.entries()).map(([k, vals]) => [
+              k,
+              vals.map((v) => ({ value: v, count: 0 })),
+            ])
           )}
           fetchFieldValues={fetchFieldValues}
           onApply={(q) => {

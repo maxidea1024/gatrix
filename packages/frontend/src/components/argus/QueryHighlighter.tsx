@@ -169,7 +169,9 @@ function tokenizeSql(query: string, isDark: boolean): ColoredSpan[][] {
       if (part.startsWith("'") && part.endsWith("'")) {
         spans.push({ text: part, color: colors.string });
       } else if (
-        /^(WHERE|AND|OR|NOT|IN|BETWEEN|IS\s+NOT\s+NULL|IS\s+NULL)$/i.test(part.trim())
+        /^(WHERE|AND|OR|NOT|IN|BETWEEN|IS\s+NOT\s+NULL|IS\s+NULL)$/i.test(
+          part.trim()
+        )
       ) {
         spans.push({ text: part, color: colors.keyword, bold: true });
       } else if (/^((?:NOT\s+)?ILIKE)$/i.test(part.trim())) {
