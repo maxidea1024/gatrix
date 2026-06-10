@@ -254,7 +254,7 @@ export const ChildrenContainer = styled(Box, {
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  marginLeft: isRoot ? 10 : 6,
+  marginLeft: isRoot ? 10 : 12,
   paddingLeft: isRoot ? 14 : 10,
   position: 'relative',
 }));

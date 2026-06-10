@@ -13,15 +13,15 @@ export const SectionPaper = styled(Paper, {
 
 // ─── Section Accent ───
 
-export const SectionAccent = styled(Box)<{ gradient: string }>(
-  ({ gradient }) => ({
-    width: 3,
-    height: 16,
-    borderRadius: 4,
-    background: gradient,
-    marginRight: 4,
-  })
-);
+export const SectionAccent = styled(Box, {
+  shouldForwardProp: (p) => p !== 'gradient',
+})<{ gradient: string }>(({ gradient }) => ({
+  width: 3,
+  height: 16,
+  borderRadius: 4,
+  background: gradient,
+  marginRight: 4,
+}));
 
 // ─── Stacked Bar Container ───
 
@@ -56,7 +56,9 @@ export const LegendItem = styled(Box, {
 
 // ─── Legend Color Dot ───
 
-export const LegendDot = styled(Box)<{ dotColor: string }>(({ dotColor }) => ({
+export const LegendDot = styled(Box, {
+  shouldForwardProp: (p) => p !== 'dotColor',
+})<{ dotColor: string }>(({ dotColor }) => ({
   width: 8,
   height: 8,
   borderRadius: '2px',
