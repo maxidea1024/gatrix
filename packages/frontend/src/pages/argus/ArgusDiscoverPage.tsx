@@ -56,7 +56,11 @@ import ArgusFilterBar, {
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
-import { QueryDSLEditor, DISCOVER_CONFIG } from '@/components/argus/query-dsl';
+import {
+  QueryDSLEditor,
+  DISCOVER_CONFIG,
+  type QueryDSLEditorHandle,
+} from '@/components/argus/query-dsl';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
@@ -141,6 +145,7 @@ const ArgusDiscoverPage: React.FC = () => {
 
   const [conditions, setConditions] = useState<string>(urlState.q || '');
   const lastSubmittedConditionsRef = useRef<string>(urlState.q || '');
+  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
 
   useEffect(() => {
     const urlVal = urlState.q || '';
@@ -557,7 +562,17 @@ const ArgusDiscoverPage: React.FC = () => {
       <ArgusFilterBar
         projectId={projectId}
         value={filters}
-        onChange={handleFilterChange}
+        onChange={(newFilters) => {
+          const prevEnvs = filters.environments;
+          const newEnvs = newFilters.environments;
+          if (
+            prevEnvs.length !== newEnvs.length ||
+            prevEnvs.some((e, i) => e !== newEnvs[i])
+          ) {
+            dslEditorRef.current?.upsertFieldChip('environment', newEnvs);
+          }
+          handleFilterChange(newFilters);
+        }}
         onRefresh={hasQueried ? runQuery : undefined}
         loading={loading}
         hideFilters={['browser', 'os']}
@@ -573,6 +588,7 @@ const ArgusDiscoverPage: React.FC = () => {
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <QueryDSLEditor
+          ref={dslEditorRef}
           config={DISCOVER_CONFIG}
           initialQuery={conditions}
           onSearch={handleSearchChange}

@@ -24,7 +24,7 @@ import {
   FilterList as FilterListIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -69,7 +69,11 @@ import {
   LinkIssueDialog,
 } from './components/FeedbackDialogs';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
-import { QueryDSLEditor, FEEDBACK_CONFIG } from '@/components/argus/query-dsl';
+import {
+  QueryDSLEditor,
+  FEEDBACK_CONFIG,
+  type QueryDSLEditorHandle,
+} from '@/components/argus/query-dsl';
 import {
   PageContainer,
   TotalCountChip,
@@ -79,6 +83,7 @@ import {
   SplitterHandle,
   PaginationWrapper,
 } from './ArgusFeedbackPage.styles';
+import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 
 ChartJS.register(
   CategoryScale,
@@ -101,6 +106,12 @@ const DEFAULT_SPLIT_WIDTH = 380;
 const MIN_SPLIT_WIDTH = 280;
 const MAX_SPLIT_WIDTH = 1000;
 
+const FACET_COLLAPSED_KEY = 'argus-feedback-facet-collapsed';
+const FACET_WIDTH_KEY = 'argus-feedback-facet-width';
+const DEFAULT_FACET_WIDTH = 220;
+const MIN_FACET_WIDTH = 150;
+const MAX_FACET_WIDTH = 400;
+
 type FeedbackStatusTab = 'unresolved' | 'resolved' | 'spam' | '';
 
 // ─── Main Component ───
@@ -108,8 +119,6 @@ const ArgusFeedbackPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
@@ -135,6 +144,15 @@ const ArgusFeedbackPage: React.FC = () => {
   // ─── Core State ───
   const [data, setData] = useState<ArgusFeedbackResponse | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // ─── Derived Data ───
+  const items = data?.items || [];
+  const total = data?.total || 0;
+  const summary = data?.summary;
+  const selectedFbId = urlState.fb;
+  const selectedItem =
+    items.find((i) => i.feedback_id === selectedFbId) || null;
+
   const page = parseInt(urlState.page, 10) || 1;
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const saved = parseInt(localStorage.getItem(PAGE_SIZE_KEY) || '', 10);
@@ -183,7 +201,7 @@ const ArgusFeedbackPage: React.FC = () => {
   );
 
   const [search, setSearch] = useState('');
-  const [searchDebounce, setSearchDebounce] = useState('');
+  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
   const statusTab = urlState.status as FeedbackStatusTab;
   const sortOrder = urlState.sort;
 
@@ -252,6 +270,60 @@ const ArgusFeedbackPage: React.FC = () => {
     [splitWidth]
   );
 
+  // ─── Resizable Facet Sidebar ───
+  const [facetCollapsed, setFacetCollapsed] = useState(() => {
+    return localStorage.getItem(FACET_COLLAPSED_KEY) === 'true';
+  });
+  const [facetWidth, setFacetWidth] = useState(() => {
+    const saved = parseInt(localStorage.getItem(FACET_WIDTH_KEY) || '', 10);
+    return !isNaN(saved) && saved >= MIN_FACET_WIDTH && saved <= MAX_FACET_WIDTH
+      ? saved
+      : DEFAULT_FACET_WIDTH;
+  });
+  const [isFacetDragging, setIsFacetDragging] = useState(false);
+
+  const handleFacetSplitterMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsFacetDragging(true);
+      const startX = e.clientX;
+      const startWidth = facetWidth;
+
+      const onMouseMove = (ev: MouseEvent) => {
+        const delta = ev.clientX - startX;
+        const newWidth = Math.min(
+          MAX_FACET_WIDTH,
+          Math.max(MIN_FACET_WIDTH, startWidth + delta)
+        );
+        setFacetWidth(newWidth);
+      };
+      const onMouseUp = () => {
+        setIsFacetDragging(false);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      };
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    },
+    [facetWidth]
+  );
+
+  const handleToggleFacetCollapse = useCallback(() => {
+    setFacetCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(FACET_COLLAPSED_KEY, String(next));
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(FACET_WIDTH_KEY, String(facetWidth));
+  }, [facetWidth]);
+
   useEffect(() => {
     localStorage.setItem(SPLIT_WIDTH_KEY, String(splitWidth));
   }, [splitWidth]);
@@ -272,12 +344,6 @@ const ArgusFeedbackPage: React.FC = () => {
     fetchMembers();
   }, [projectId]);
 
-  // ─── Debounce Search ───
-  useEffect(() => {
-    const timer = setTimeout(() => setSearchDebounce(search), 400);
-    return () => clearTimeout(timer);
-  }, [search]);
-
   // ─── Fetch Data ───
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -287,7 +353,7 @@ const ArgusFeedbackPage: React.FC = () => {
         ...ap,
         page,
         limit: rowsPerPage,
-        search: searchDebounce || undefined,
+        search: search || undefined,
         status: statusTab || undefined,
         sort: sortOrder,
       });
@@ -302,10 +368,73 @@ const ArgusFeedbackPage: React.FC = () => {
     filters,
     page,
     rowsPerPage,
-    searchDebounce,
+    search,
     statusTab,
     sortOrder,
   ]);
+
+  const [facetGroups, setFacetGroups] = useState<FacetGroup[]>([]);
+  const [facetsLoading, setFacetsLoading] = useState(false);
+
+  const fetchFacets = useCallback(async () => {
+    setFacetsLoading(true);
+    try {
+      const ap = argusDateRangeToApiParams(filters.dateRange);
+      const queryParams = {
+        period: urlState.period || undefined,
+        start: ap.start,
+        end: ap.end,
+      };
+
+      const keys = [
+        { key: 'environment', label: t('argus.issues.environment', 'Environment') },
+        { key: 'release', label: t('argus.issues.release', 'Release') },
+        { key: 'browser', label: t('argus.issues.browser', 'Browser') },
+        { key: 'os', label: t('argus.issues.os', 'OS') },
+        { key: 'category', label: t('argus.feedback.category', 'Category') },
+        { key: 'sentiment', label: t('argus.feedback.sentiment', 'Sentiment') },
+        { key: 'assigned_to', label: t('argus.issues.assignee', 'Assignee') },
+      ];
+
+      const results = await Promise.all(
+        keys.map(async ({ key, label }) => {
+          try {
+            const data = await argusService.getFeedbackAttributeFacet(
+              projectId,
+              key,
+              queryParams
+            );
+            return {
+              key,
+              label,
+              values: data.map((d) => ({
+                value: d.attr_value,
+                count: Number(d.count),
+              })),
+            };
+          } catch (err) {
+            console.error(`Failed to fetch facet for ${key}:`, err);
+            return { key, label, values: [] };
+          }
+        })
+      );
+
+      setFacetGroups(results.filter((g) => g.values.length > 0));
+    } catch (error) {
+      console.error('Failed to fetch facets:', error);
+    } finally {
+      setFacetsLoading(false);
+    }
+  }, [projectId, filters.dateRange, urlState.period, t]);
+
+  useEffect(() => {
+    fetchFacets();
+  }, [fetchFacets]);
+
+  const handleRefresh = useCallback(() => {
+    fetchData();
+    fetchFacets();
+  }, [fetchData, fetchFacets]);
 
   useEffect(() => {
     fetchData();
@@ -343,14 +472,14 @@ const ArgusFeedbackPage: React.FC = () => {
             enqueueSnackbar(t('argus.feedback.statusUpdated'), {
               variant: 'success',
             });
-            fetchData();
+            handleRefresh();
           } catch {
             enqueueSnackbar(t('common.error'), { variant: 'error' });
           }
         },
       });
     },
-    [projectId, t, enqueueSnackbar, fetchData]
+    [projectId, t, enqueueSnackbar, handleRefresh]
   );
 
   const handleMarkSpam = useCallback(
@@ -370,14 +499,14 @@ const ArgusFeedbackPage: React.FC = () => {
             enqueueSnackbar(t('argus.feedback.markedSpam'), {
               variant: 'success',
             });
-            fetchData();
+            handleRefresh();
           } catch {
             enqueueSnackbar(t('common.error'), { variant: 'error' });
           }
         },
       });
     },
-    [projectId, t, enqueueSnackbar, fetchData]
+    [projectId, t, enqueueSnackbar, handleRefresh]
   );
 
   const handleAssignFeedback = useCallback(
@@ -389,12 +518,12 @@ const ArgusFeedbackPage: React.FC = () => {
         enqueueSnackbar(t('argus.feedback.assigneeUpdated'), {
           variant: 'success',
         });
-        fetchData();
+        handleRefresh();
       } catch {
         enqueueSnackbar(t('common.error'), { variant: 'error' });
       }
     },
-    [projectId, t, enqueueSnackbar, fetchData]
+    [projectId, t, enqueueSnackbar, handleRefresh]
   );
 
   const handleBulkAction = useCallback(
@@ -448,14 +577,14 @@ const ArgusFeedbackPage: React.FC = () => {
               { variant: 'success' }
             );
             setSelectedIds(new Set());
-            fetchData();
+            handleRefresh();
           } catch {
             enqueueSnackbar(t('common.error'), { variant: 'error' });
           }
         },
       });
     },
-    [selectedIds, projectId, t, enqueueSnackbar, fetchData]
+    [selectedIds, projectId, t, enqueueSnackbar, handleRefresh]
   );
 
   const handleBulkAssign = useCallback(
@@ -472,12 +601,12 @@ const ArgusFeedbackPage: React.FC = () => {
           variant: 'success',
         });
         setSelectedIds(new Set());
-        fetchData();
+        handleRefresh();
       } catch {
         enqueueSnackbar(t('common.error'), { variant: 'error' });
       }
     },
-    [selectedIds, projectId, t, enqueueSnackbar, fetchData]
+    [selectedIds, projectId, t, enqueueSnackbar, handleRefresh]
   );
 
   const handleUnlinkIssue = useCallback(async () => {
@@ -491,11 +620,11 @@ const ArgusFeedbackPage: React.FC = () => {
         variant: 'success',
       });
       setLinkedIssueDetail(null);
-      fetchData();
+      handleRefresh();
     } catch {
       enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
-  }, [projectId, t, enqueueSnackbar, fetchData]);
+  }, [projectId, t, enqueueSnackbar, handleRefresh, selectedItem]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -542,13 +671,18 @@ const ArgusFeedbackPage: React.FC = () => {
   const handleOpenCreateIssue = useCallback(() => setCreateIssueOpen(true), []);
   const handleOpenLinkIssue = useCallback(() => setLinkIssueOpen(true), []);
 
-  // ─── Derived Data ───
-  const items = data?.items || [];
-  const total = data?.total || 0;
-  const summary = data?.summary;
-  const selectedFbId = urlState.fb;
-  const selectedItem =
-    items.find((i) => i.feedback_id === selectedFbId) || null;
+  const handleAddFilter = useCallback(
+    (field: string, value: string, exclude?: boolean) => {
+      dslEditorRef.current?.upsertFieldChip(
+        field,
+        [value],
+        exclude ? '!=' : '='
+      );
+    },
+    []
+  );
+
+
 
   // Lazy-fetch linked issue detail
   const [linkedIssueDetail, setLinkedIssueDetail] = useState<ArgusIssue | null>(
@@ -793,8 +927,18 @@ const ArgusFeedbackPage: React.FC = () => {
         <ArgusFilterBar
           projectId={projectId}
           value={filters}
-          onChange={handleFilterChange}
-          onRefresh={fetchData}
+          onChange={(newFilters) => {
+            const prevEnvs = filters.environments;
+            const newEnvs = newFilters.environments;
+            if (
+              prevEnvs.length !== newEnvs.length ||
+              prevEnvs.some((e, i) => e !== newEnvs[i])
+            ) {
+              dslEditorRef.current?.upsertFieldChip('environment', newEnvs);
+            }
+            handleFilterChange(newFilters);
+          }}
+          onRefresh={handleRefresh}
           loading={loading}
           extraControls={
             <>
@@ -808,13 +952,13 @@ const ArgusFeedbackPage: React.FC = () => {
               />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <QueryDSLEditor
+                  ref={dslEditorRef}
                   config={FEEDBACK_CONFIG}
                   initialQuery={search}
                   onSearch={(q) => {
                     setSearch(q);
                     setUrlState({ page: '1', fb: '' });
                   }}
-                  onChange={(q) => setSearch(q)}
                   fetchFieldValues={fetchFieldValues}
                   placeholder={t('argus.feedback.searchPlaceholder')}
                 />
@@ -887,6 +1031,37 @@ const ArgusFeedbackPage: React.FC = () => {
 
       {/* ═══════ SPLIT-PANEL INBOX ═══════ */}
       <SplitContainer ref={splitContainerRef} isDark={isDark}>
+        {/* Facet Sidebar */}
+        <FacetSidebar
+          width={facetWidth}
+          facets={facetGroups}
+          onFilter={(key, value, exclude) => {
+            const r = dslEditorRef.current;
+            if (!r) return;
+            const mapping: Record<string, string> = {
+              browser: 'browser_name',
+              os: 'os_name',
+              assigned_to: 'assigned',
+            };
+            const fieldKey = mapping[key] || key;
+            const current = r.getFieldValues(fieldKey);
+            if (current.includes(value)) {
+              r.upsertFieldChip(fieldKey, current.filter((v) => v !== value));
+            } else {
+              r.upsertFieldChip(fieldKey, [...current, value], exclude ? '!=' : '=');
+            }
+          }}
+          collapsed={facetCollapsed}
+          onToggleCollapse={handleToggleFacetCollapse}
+          loading={facetsLoading}
+        />
+        {!facetCollapsed && (
+          <SplitterHandle
+            isDragging={isFacetDragging}
+            onMouseDown={handleFacetSplitterMouseDown}
+          />
+        )}
+
         {/* ─── LEFT: Feedback List ─── */}
         <ListPanel
           panelWidth={splitWidth}
@@ -916,7 +1091,7 @@ const ArgusFeedbackPage: React.FC = () => {
                     isActive={selectedFbId === item.feedback_id}
                     isSelected={selectedIds.has(item.feedback_id)}
                     isDark={isDark}
-                    searchHighlight={searchDebounce}
+                    searchHighlight={search}
                     onSelect={handleFeedbackSelect}
                     onToggleCheck={handleFeedbackToggleCheck}
                   />
@@ -966,6 +1141,7 @@ const ArgusFeedbackPage: React.FC = () => {
             onUnlinkIssue={handleUnlinkIssue}
             onOpenCreateIssue={handleOpenCreateIssue}
             onOpenLinkIssue={handleOpenLinkIssue}
+            onAddFilter={handleAddFilter}
           />
         ) : (
           items.length > 0 &&
@@ -986,7 +1162,7 @@ const ArgusFeedbackPage: React.FC = () => {
         open={spamFilterOpen}
         onClose={() => setSpamFilterOpen(false)}
         projectId={projectId}
-        onSpamScanComplete={fetchData}
+        onSpamScanComplete={handleRefresh}
       />
 
       <CreateIssueDialog
@@ -994,7 +1170,7 @@ const ArgusFeedbackPage: React.FC = () => {
         onClose={() => setCreateIssueOpen(false)}
         projectId={projectId}
         selectedItem={selectedItem}
-        onIssueCreated={fetchData}
+        onIssueCreated={handleRefresh}
       />
 
       <LinkIssueDialog
@@ -1002,7 +1178,7 @@ const ArgusFeedbackPage: React.FC = () => {
         onClose={() => setLinkIssueOpen(false)}
         projectId={projectId}
         feedbackId={selectedItem?.feedback_id || ''}
-        onIssueLinked={fetchData}
+        onIssueLinked={handleRefresh}
       />
 
       <ConfirmDialog

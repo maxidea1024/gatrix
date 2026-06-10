@@ -16,7 +16,6 @@ import {
 import { VolumePoint } from '../components/LogVolumeChart';
 import { FacetGroup } from '@/components/argus/FacetSidebar';
 import { PatternEntry } from '../components/LogsPatternsPanel';
-import { ActiveFilter } from '../components/ActiveFiltersBar';
 
 interface LogFacets {
   levels: { level: string; count: number }[];
@@ -180,94 +179,6 @@ export function useArgusLogs() {
     'argus_right_panel_open',
     false
   );
-
-  // ─── Active Filters (chip tags from facet sidebar / detail panel) ───
-  const parseFiltersFromUrl = useCallback((raw: string): ActiveFilter[] => {
-    if (!raw) return [];
-    return raw
-      .split(',')
-      .map((part) => {
-        let enabled = true;
-        let exclude = false;
-        let s = part.trim();
-        if (s.startsWith('~')) {
-          enabled = false;
-          s = s.slice(1);
-        }
-        if (s.startsWith('!')) {
-          exclude = true;
-          s = s.slice(1);
-        }
-        const colonIdx = s.indexOf(':');
-        if (colonIdx < 0) return null;
-        return {
-          key: s.slice(0, colonIdx),
-          value: s.slice(colonIdx + 1),
-          exclude,
-          enabled,
-        };
-      })
-      .filter(Boolean) as ActiveFilter[];
-  }, []);
-
-  const serializeFiltersToUrl = useCallback(
-    (filters: ActiveFilter[]): string => {
-      if (filters.length === 0) return '';
-      return filters
-        .map((f) => {
-          const prefix = (!f.enabled ? '~' : '') + (f.exclude ? '!' : '');
-          return `${prefix}${f.key}:${f.value}`;
-        })
-        .join(',');
-    },
-    []
-  );
-
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() =>
-    parseFiltersFromUrl(urlState.filters)
-  );
-
-  // Sync activeFilters → URL
-  useEffect(() => {
-    const serialized = serializeFiltersToUrl(activeFilters);
-    if (serialized !== (urlState.filters || '')) {
-      setUrlState({ filters: serialized });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFilters]);
-
-  const toggleActiveFilter = useCallback(
-    (key: string, value: string, exclude: boolean = false) => {
-      setActiveFilters((prev) => {
-        const idx = prev.findIndex(
-          (f) => f.key === key && f.value === value && f.exclude === exclude
-        );
-        if (idx >= 0) {
-          return prev.map((f, i) =>
-            i === idx ? { ...f, enabled: !f.enabled } : f
-          );
-        }
-        return [...prev, { key, value, exclude, enabled: true }];
-      });
-    },
-    []
-  );
-
-  const handleToggleFilterByIndex = useCallback((idx: number) => {
-    setActiveFilters((prev) =>
-      prev.map((item, i) =>
-        i === idx ? { ...item, enabled: !item.enabled } : item
-      )
-    );
-  }, []);
-
-  const removeActiveFilter = useCallback((idx: number) => {
-    setActiveFilters((prev) => prev.filter((_, i) => i !== idx));
-  }, []);
-
-  const clearAllActiveFilters = useCallback(() => {
-    setActiveFilters([]);
-  }, []);
 
   // ─── Custom Facets (user-defined attribute keys) ───
   const CUSTOM_FACETS_KEY = 'argus_custom_facets';
@@ -484,18 +395,6 @@ export function useArgusLogs() {
     [mappedFacets, t]
   );
 
-  // ─── Search + Filter Merge Helper ───
-  const buildSearchWithFilters = useCallback((): string | undefined => {
-    const parts: string[] = [];
-    if (search.trim()) parts.push(search.trim());
-    for (const f of activeFilters) {
-      if (!f.enabled) continue;
-      const prefix = f.exclude ? '!' : '';
-      parts.push(`${prefix}${f.key}:"${f.value}"`);
-    }
-    return parts.length > 0 ? parts.join(' ') : undefined;
-  }, [search, activeFilters]);
-
   // ─── Fetch ───
   const fetchLogs = useCallback(
     async (append = false, cursor?: string) => {
@@ -509,12 +408,8 @@ export function useArgusLogs() {
         };
         if (apiParams.start) params.start = apiParams.start;
         if (apiParams.end) params.end = apiParams.end;
-        if (apiParams.environment) params.environment = apiParams.environment;
         if (search.trim()) params.search = search.trim();
         if (cursor) params.cursor = cursor;
-
-        const mergedSearch = buildSearchWithFilters();
-        if (mergedSearch) params.search = mergedSearch;
 
         const result = await argusService.browseLogs(projectId, params);
         const newLogs = result.data || [];
@@ -532,7 +427,7 @@ export function useArgusLogs() {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [projectId, filters, search, activeFilters]
+    [projectId, filters, search]
   );
 
   const fetchFacets = useCallback(async () => {
@@ -609,13 +504,13 @@ export function useArgusLogs() {
         period: apiParams.period || '14d',
         start: apiParams.start,
         end: apiParams.end,
-        search: buildSearchWithFilters(),
+        search: search.trim() || undefined,
       });
       setVolume(data);
     } catch (err) {
       console.error('Failed to fetch volume', err);
     }
-  }, [projectId, filters, buildSearchWithFilters]);
+  }, [projectId, filters, search]);
 
   const fetchAll = useCallback(() => {
     fetchLogs();
@@ -633,7 +528,7 @@ export function useArgusLogs() {
           start: apiParams.start,
           end: apiParams.end,
           groupBy: groupByVal || aggGroupBy,
-          search: buildSearchWithFilters(),
+          search: search.trim() || undefined,
         });
         setAggData(data);
       } catch (err) {
@@ -642,7 +537,7 @@ export function useArgusLogs() {
         setAggLoading(false);
       }
     },
-    [projectId, filters, currentPeriod, aggGroupBy, buildSearchWithFilters]
+    [projectId, filters, currentPeriod, aggGroupBy, search]
   );
 
   useEffect(() => {
@@ -666,25 +561,20 @@ export function useArgusLogs() {
         period: apiParams.period,
         start: apiParams.start,
         end: apiParams.end,
-        search: buildSearchWithFilters(),
+        search: search.trim() || undefined,
       });
       setPatterns(data);
     } catch (e) {
       console.error('Failed to fetch patterns', e);
     }
     setPatternsLoading(false);
-  }, [projectId, filters, buildSearchWithFilters]);
+  }, [projectId, filters, search]);
 
   // Auto-fetch patterns when switching to patterns tab
   useEffect(() => {
     if (activeTab === 2) fetchPatterns();
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-fetch when activeFilters change
-  useEffect(() => {
-    fetchLogs();
-    fetchVolume();
-  }, [activeFilters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearchSubmit = useCallback(
     (val: string) => {
@@ -751,12 +641,6 @@ export function useArgusLogs() {
     [setUrlState]
   );
 
-  const handleDetailFilter = useCallback(
-    (key: string, val: string, exclude: boolean) => {
-      toggleActiveFilter(key, val, exclude);
-    },
-    [toggleActiveFilter]
-  );
 
   // ─── Saved Query Handlers ───
   const handleSaveQuery = async (finalName: string) => {
@@ -845,7 +729,6 @@ export function useArgusLogs() {
     selectedLog,
     isRightPanelOpen,
     setIsRightPanelOpen,
-    activeFilters,
     customFacetKeys,
     customFacetData,
     discoveredFacets,
@@ -869,10 +752,6 @@ export function useArgusLogs() {
     fetchAggregates,
     fetchPatterns,
     fetchAll,
-    toggleActiveFilter,
-    handleToggleFilterByIndex,
-    removeActiveFilter,
-    clearAllActiveFilters,
     handleAddCustomFacet,
     handleRemoveCustomFacet,
     handleSearchSubmit,
@@ -883,7 +762,6 @@ export function useArgusLogs() {
     handleLoadMore,
     handleFilterChange,
     handleZoom,
-    handleDetailFilter,
     handleSaveQuery,
     handleRename,
     handleDeleteSavedQuery,

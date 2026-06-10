@@ -15,9 +15,6 @@ interface IssueVolumeChartProps {
   status: string;
   level: string;
   query?: string;
-  environment?: string;
-  browser?: string;
-  os?: string;
   /** Called when user drag-selects a date range on the chart */
   onDateRangeSelect?: (start: Date, end: Date) => void;
 }
@@ -32,9 +29,6 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
   status,
   level,
   query,
-  environment,
-  browser,
-  os,
   onDateRangeSelect,
 }) => {
   const theme = useTheme();
@@ -56,9 +50,6 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
         status: status || undefined,
         level: level || undefined,
         query: query || undefined,
-        environment: environment || undefined,
-        browser: browser || undefined,
-        os: os || undefined,
       });
       setVolumeData(data);
     } catch (e) {
@@ -67,7 +58,7 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
     } finally {
       setVolumeLoading(false);
     }
-  }, [projectId, filters, status, level, query, environment, browser, os]);
+  }, [projectId, filters, status, level, query]);
 
   useEffect(() => {
     fetchVolume();

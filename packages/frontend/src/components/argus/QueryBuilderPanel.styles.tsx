@@ -40,6 +40,8 @@ export const HeaderRight = styled(Box)({
 export const TreeEditor = styled(Box)({
   flex: 1,
   overflowY: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
   paddingLeft: 16,
   paddingRight: 16,
   paddingTop: 12,
@@ -119,7 +121,11 @@ export const GroupBox = styled(Box, {
   ({ isDark, isRoot, lineColor }) => ({
     marginTop: 0,
     ...(isRoot
-      ? {}
+      ? {
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column' as const,
+        }
       : {
           border: `1px solid ${isDark ? alpha(lineColor, 0.25) : alpha(lineColor, 0.2)}`,
           borderRadius: 8,
@@ -247,6 +253,7 @@ export const ChildrenContainer = styled(Box, {
 })<{ isRoot: boolean }>(({ isRoot }) => ({
   display: 'flex',
   flexDirection: 'column',
+  flex: 1,
   marginLeft: isRoot ? 10 : 6,
   paddingLeft: isRoot ? 14 : 10,
   position: 'relative',
@@ -311,14 +318,14 @@ export const PreviewModeToggle = styled(Box, {
   ({ isActive, primaryColor }) => ({
     display: 'flex',
     alignItems: 'center',
-    gap: 2,
-    paddingLeft: 6,
-    paddingRight: 6,
-    paddingTop: 1,
-    paddingBottom: 1,
-    fontSize: '0.5rem',
+    gap: 3,
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop: 2,
+    paddingBottom: 2,
+    fontSize: '0.6rem',
     fontWeight: 600,
-    borderRadius: 10,
+    borderRadius: 12,
     cursor: 'pointer',
     userSelect: 'none' as const,
     color: isActive ? primaryColor : undefined,

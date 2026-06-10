@@ -35,6 +35,8 @@ import {
   PhoneAndroid as DeviceIcon,
   Public as OsIcon,
   AccountCircle as UserIdIcon,
+  FilterList as FilterAddIcon,
+  FilterListOff as FilterExcludeIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -83,6 +85,7 @@ interface FeedbackDetailPanelProps {
   onUnlinkIssue: () => void;
   onOpenCreateIssue: () => void;
   onOpenLinkIssue: () => void;
+  onAddFilter?: (field: string, value: string, exclude?: boolean) => void;
 }
 
 const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
@@ -97,6 +100,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
   onUnlinkIssue,
   onOpenCreateIssue,
   onOpenLinkIssue,
+  onAddFilter,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -131,26 +135,31 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
       icon: <UrlIcon sx={{ fontSize: 14 }} />,
       label: 'URL',
       value: selectedItem.url,
+      field: 'url',
     },
     {
       icon: <MailIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.contactEmail'),
       value: selectedItem.contact_email,
+      field: 'contact_email',
     },
     {
       icon: <EnvIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.environment'),
       value: selectedItem.environment,
+      field: 'environment',
     },
     {
       icon: <ReleaseIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.release'),
       value: selectedItem.release,
+      field: 'release',
     },
     {
       icon: <SourceIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.source'),
       value: selectedItem.source,
+      field: 'source',
     },
     {
       icon: <BrowserIcon sx={{ fontSize: 14 }} />,
@@ -158,6 +167,8 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
       value: selectedItem.browser
         ? `${selectedItem.browser}${selectedItem.browser_version ? ` ${selectedItem.browser_version}` : ''}`
         : '',
+      field: 'browser_name',
+      rawValue: selectedItem.browser,
     },
     {
       icon: <OsIcon sx={{ fontSize: 14 }} />,
@@ -165,16 +176,20 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
       value: selectedItem.os
         ? `${selectedItem.os}${selectedItem.os_version ? ` ${selectedItem.os_version}` : ''}`
         : '',
+      field: 'os_name',
+      rawValue: selectedItem.os,
     },
     {
       icon: <DeviceIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.device'),
       value: selectedItem.device,
+      field: 'device',
     },
     {
       icon: <UserIdIcon sx={{ fontSize: 14 }} />,
       label: t('argus.feedback.userId'),
       value: selectedItem.user_id,
+      field: 'user_id',
     },
   ].filter((row) => row.value);
 
@@ -551,7 +566,13 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
               </SectionTitle>
               <MetadataPaper elevation={0} isDark={isDark}>
                 {metadataRows.map((row, idx) => (
-                  <MetadataRow key={idx} isDark={isDark}>
+                  <MetadataRow
+                    key={idx}
+                    isDark={isDark}
+                    sx={{
+                      '&:hover .filter-actions': { opacity: 1 },
+                    }}
+                  >
                     <Box
                       sx={{
                         color: isDark ? '#666' : '#aaa',
@@ -581,6 +602,62 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                     >
                       {row.value}
                     </Typography>
+                    {onAddFilter && row.field && (
+                      <Box
+                        className="filter-actions"
+                        sx={{
+                          display: 'flex',
+                          gap: 0.25,
+                          opacity: 0,
+                          transition: 'opacity 0.15s',
+                          ml: 0.5,
+                        }}
+                      >
+                        <IconButton
+                          size="small"
+                          title={t('argus.feedback.addToFilter', 'Add to filter')}
+                          onClick={() =>
+                            onAddFilter(
+                              row.field!,
+                              (row as any).rawValue || (row.value as string)
+                            )
+                          }
+                          sx={{
+                            p: 0.25,
+                            color: isDark ? '#6b9' : '#2e7d32',
+                            '&:hover': {
+                              backgroundColor: isDark
+                                ? 'rgba(102,187,106,0.12)'
+                                : 'rgba(46,125,50,0.08)',
+                            },
+                          }}
+                        >
+                          <FilterAddIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          title={t('argus.feedback.excludeFromFilter', 'Exclude from filter')}
+                          onClick={() =>
+                            onAddFilter(
+                              row.field!,
+                              (row as any).rawValue || (row.value as string),
+                              true
+                            )
+                          }
+                          sx={{
+                            p: 0.25,
+                            color: isDark ? '#e57' : '#c62828',
+                            '&:hover': {
+                              backgroundColor: isDark
+                                ? 'rgba(229,87,119,0.12)'
+                                : 'rgba(198,40,40,0.08)',
+                            },
+                          }}
+                        >
+                          <FilterExcludeIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Box>
+                    )}
                     <CopyButton text={row.value as string} size={14} />
                   </MetadataRow>
                 ))}
@@ -612,7 +689,28 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                 }}
               >
                 {Object.entries(selectedItem.tags).map(([k, v]) => (
-                  <TagChip key={k} label={`${k}: ${v}`} size="small" />
+                  <TagChip
+                    key={k}
+                    label={`${k}: ${v}`}
+                    size="small"
+                    onClick={
+                      onAddFilter
+                        ? () => onAddFilter(k, v as string)
+                        : undefined
+                    }
+                    sx={
+                      onAddFilter
+                        ? {
+                            cursor: 'pointer',
+                            '&:hover': {
+                              boxShadow: isDark
+                                ? '0 0 0 1px rgba(255,255,255,0.2)'
+                                : '0 0 0 1px rgba(0,0,0,0.15)',
+                            },
+                          }
+                        : undefined
+                    }
+                  />
                 ))}
               </Box>
             </>

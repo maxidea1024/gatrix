@@ -20,7 +20,11 @@ import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ArgusFilterBar from '@/components/argus/ArgusFilterBar';
-import { QueryDSLEditor, LOGS_CONFIG } from '@/components/argus/query-dsl';
+import {
+  QueryDSLEditor,
+  LOGS_CONFIG,
+  type QueryDSLEditorHandle,
+} from '@/components/argus/query-dsl';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -40,7 +44,6 @@ import {
 } from './components/LogsDialogs';
 import FacetSidebar from '@/components/argus/FacetSidebar';
 import LogSidePanel from './components/LogSidePanel';
-import ActiveFiltersBar from './components/ActiveFiltersBar';
 
 // Custom Hooks
 import { useArgusLogs } from './hooks/useArgusLogs';
@@ -70,7 +73,6 @@ const ArgusLogsPage: React.FC = () => {
     selectedLog,
     isRightPanelOpen,
     setIsRightPanelOpen,
-    activeFilters,
     customFacetKeys,
     customFacetData,
     discoveredFacets,
@@ -94,10 +96,6 @@ const ArgusLogsPage: React.FC = () => {
     fetchAggregates,
     fetchPatterns,
     fetchAll,
-    toggleActiveFilter,
-    handleToggleFilterByIndex,
-    removeActiveFilter,
-    clearAllActiveFilters,
     handleAddCustomFacet,
     handleRemoveCustomFacet,
     handleSearchSubmit,
@@ -108,7 +106,6 @@ const ArgusLogsPage: React.FC = () => {
     handleLoadMore,
     handleFilterChange,
     handleZoom,
-    handleDetailFilter,
     handleSaveQuery,
     handleRename,
     handleDeleteSavedQuery,
@@ -145,6 +142,7 @@ const ArgusLogsPage: React.FC = () => {
   >('default');
 
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
   const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useLocalStorage(
     'argus_facet_sidebar_collapsed',
     false
@@ -345,51 +343,51 @@ const ArgusLogsPage: React.FC = () => {
       <ArgusFilterBar
         projectId={projectId}
         value={filters}
-        onChange={handleFilterChange}
+        onChange={(newFilters) => {
+          // Environment change → DSL chip
+          const prevEnvs = filters.environments;
+          const newEnvs = newFilters.environments;
+          if (
+            prevEnvs.length !== newEnvs.length ||
+            prevEnvs.some((e, i) => e !== newEnvs[i])
+          ) {
+            dslEditorRef.current?.upsertFieldChip('environment', newEnvs);
+          }
+          handleFilterChange(newFilters);
+        }}
         onRefresh={fetchAll}
         loading={loading}
         hideFilters={['browser', 'os']}
-        extraControls={(() => {
-          const dslQueryRef = { current: search };
-          return (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                flex: 1,
-                minWidth: 0,
+        extraControls={
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            <QueryDSLEditor
+              ref={dslEditorRef}
+              config={LOGS_CONFIG}
+              initialQuery={search}
+              placeholder={t(
+                'argus.logs.searchPlaceholder',
+                'Search by message, service, or severity...'
+              )}
+              onSearch={handleSearchSubmit}
+              onChange={(q) => {
+                setUrlState({ q });
               }}
-            >
-              <QueryDSLEditor
-                config={LOGS_CONFIG}
-                initialQuery={search}
-                placeholder={t(
-                  'argus.logs.searchPlaceholder',
-                  'Search by message, service, or severity...'
-                )}
-                onSearch={handleSearchSubmit}
-                onChange={(q) => {
-                  dslQueryRef.current = q;
-                  // Sync to URL so chip state survives refresh
-                  setUrlState({ q });
-                }}
-                fetchFieldValues={fetchFieldValues}
-                initialFacets={mappedFacets}
-              />
-            </Box>
-          );
-        })()}
+              fetchFieldValues={fetchFieldValues}
+              initialFacets={mappedFacets}
+            />
+          </Box>
+        }
       />
 
-      {/* ── Active Filter Chips ── */}
-      <ActiveFiltersBar
-        activeFilters={activeFilters}
-        isDark={isDark}
-        onToggleFilter={handleToggleFilterByIndex}
-        onRemoveFilter={removeActiveFilter}
-        onClearAll={clearAllActiveFilters}
-      />
+
 
       {/* ── Body: Sidebar + Content split ── */}
       <Box
@@ -407,7 +405,16 @@ const ArgusLogsPage: React.FC = () => {
           <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
-            onFilter={toggleActiveFilter}
+            onFilter={(key, value) => {
+              const ref = dslEditorRef.current;
+              if (!ref) return;
+              const current = ref.getFieldValues(key);
+              if (current.includes(value)) {
+                ref.upsertFieldChip(key, current.filter((v) => v !== value));
+              } else {
+                ref.upsertFieldChip(key, [...current, value]);
+              }
+            }}
             collapsed={facetSidebarCollapsed}
             onToggleCollapse={handleToggleFacetCollapse}
             loading={loading}
@@ -598,7 +605,14 @@ const ArgusLogsPage: React.FC = () => {
                         setUrlState({ groupBy: val });
                         fetchAggregates(val);
                       }}
-                      onAddFilter={(key, val) => toggleActiveFilter(key, val)}
+                      onAddFilter={(key, val) => {
+                        const r = dslEditorRef.current;
+                        if (!r) return;
+                        const current = r.getFieldValues(key);
+                        if (!current.includes(val)) {
+                          r.upsertFieldChip(key, [...current, val]);
+                        }
+                      }}
                     />
                   )}
 
@@ -660,7 +674,19 @@ const ArgusLogsPage: React.FC = () => {
                     onClose={handleCloseSidePanel}
                     onPrev={handlePrevLog}
                     onNext={handleNextLog}
-                    onFilter={handleDetailFilter}
+                    onFilter={(key, val, exclude) => {
+                      const r = dslEditorRef.current;
+                      if (!r) return;
+                      const current = r.getFieldValues(key);
+                      if (exclude) {
+                        // For exclude, we don't add to existing — just set as NOT filter
+                        r.upsertFieldChip(key, [val], '!=');
+                      } else if (current.includes(val)) {
+                        r.upsertFieldChip(key, current.filter((v) => v !== val));
+                      } else {
+                        r.upsertFieldChip(key, [...current, val]);
+                      }
+                    }}
                     hasPrev={selectedLogIndex !== null && selectedLogIndex > 0}
                     hasNext={
                       selectedLogIndex !== null &&

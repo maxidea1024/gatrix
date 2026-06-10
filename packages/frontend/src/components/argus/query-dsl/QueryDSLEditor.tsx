@@ -14,6 +14,8 @@ import React, {
   useEffect,
   useLayoutEffect,
   useMemo,
+  forwardRef,
+  useImperativeHandle,
 } from 'react';
 import {
   Box,
@@ -85,6 +87,16 @@ export interface QueryDSLEditorProps {
   maxSuggestions?: number;
 }
 
+/** Imperative handle for external filter integration */
+export interface QueryDSLEditorHandle {
+  /** Set values for a field chip (add if missing, update if exists, remove if values empty) */
+  upsertFieldChip: (field: string, values: string[], operator?: string) => void;
+  /** Remove all chips matching a field key */
+  removeFieldChip: (field: string) => void;
+  /** Get current values for a field from chips */
+  getFieldValues: (field: string) => string[];
+}
+
 // ─── Undo/Redo Hook ──────────────────────────────────────────────────────────
 
 const MAX_HISTORY = 50;
@@ -143,16 +155,20 @@ function useChipHistory(initial: FilterChip[] | (() => FilterChip[])) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function QueryDSLEditor({
-  config,
-  initialQuery = '',
-  onSearch,
-  onChange,
-  fetchFieldValues,
-  initialFacets,
-  placeholder,
-  maxSuggestions = 20,
-}: QueryDSLEditorProps) {
+export const QueryDSLEditor = forwardRef<QueryDSLEditorHandle, QueryDSLEditorProps>(
+  function QueryDSLEditor(
+    {
+      config,
+      initialQuery = '',
+      onSearch,
+      onChange,
+      fetchFieldValues,
+      initialFacets,
+      placeholder,
+      maxSuggestions = 20,
+    },
+    ref
+  ) {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -275,6 +291,83 @@ export function QueryDSLEditor({
   } = useLazyFacets(fetchFieldValues, initialFacets);
 
   const normalizedFacets = getCachedFacetMap();
+
+  // ─── Imperative handle for external filter integration ─────────────
+  useImperativeHandle(
+    ref,
+    () => ({
+      upsertFieldChip(field: string, values: string[], operator?: string) {
+        if (values.length === 0) {
+          // Remove all chips with this field
+          setChips((prev) => {
+            const next = prev.filter((c) => c.field !== field);
+            requestAnimationFrame(() => {
+              const query = chipsToQuery(next);
+              prevInitialQuery.current = query;
+              lastInternalQueryRef.current = query;
+              onChangeRef.current?.(query);
+              onSearch(query);
+            });
+            return next;
+          });
+          return;
+        }
+        setChips((prev) => {
+          const existing = prev.find((c) => c.type === 'filter' && c.field === field);
+          let next: FilterChip[];
+          if (existing) {
+            next = prev.map((c) =>
+              c.id === existing.id
+                ? {
+                    ...c,
+                    value: values[0],
+                    values,
+                    operator: operator ?? (values.length > 1 ? 'IN' : c.operator ?? '='),
+                  }
+                : c
+            );
+          } else {
+            const newChip: FilterChip = {
+              id: `chip-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              type: 'filter',
+              field,
+              operator: operator ?? (values.length > 1 ? 'IN' : '='),
+              value: values[0],
+              values,
+            };
+            next = [...prev, newChip];
+          }
+          requestAnimationFrame(() => {
+            const query = chipsToQuery(next);
+            prevInitialQuery.current = query;
+            lastInternalQueryRef.current = query;
+            onChangeRef.current?.(query);
+            onSearch(query);
+          });
+          return next;
+        });
+      },
+      removeFieldChip(field: string) {
+        setChips((prev) => {
+          const next = prev.filter((c) => c.field !== field);
+          requestAnimationFrame(() => {
+            const query = chipsToQuery(next);
+            prevInitialQuery.current = query;
+            lastInternalQueryRef.current = query;
+            onChangeRef.current?.(query);
+            onSearch(query);
+          });
+          return next;
+        });
+      },
+      getFieldValues(field: string): string[] {
+        const chip = chips.find((c) => c.type === 'filter' && c.field === field);
+        if (!chip) return [];
+        return chip.values?.filter((v) => v !== '') ?? (chip.value ? [chip.value] : []);
+      },
+    }),
+    [chips, setChips, onSearch]
+  );
 
   // ─── Notify parent of chip changes ─────────────────────────────────
 
@@ -2458,7 +2551,8 @@ export function QueryDSLEditor({
       </Box>
     </ClickAwayListener>
   );
-}
+  }
+);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

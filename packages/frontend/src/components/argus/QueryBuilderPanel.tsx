@@ -47,6 +47,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import SafeTooltip from '@/components/common/SafeTooltip';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { QueryHighlighter } from './QueryHighlighter';
 import { queryToChips } from './query-dsl/useFilterChips';
@@ -314,6 +315,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
     groupId: string;
     el: HTMLElement;
   } | null>(null);
+  const [fieldSearch, setFieldSearch] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [previewHeight, setPreviewHeight] = useLocalStorage<number>(
     'qb-preview-height',
@@ -850,6 +852,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
               <Autocomplete
                 multiple
                 freeSolo
+                disableCloseOnSelect
                 size="small"
                 options={valueOpts}
                 value={(() => {
@@ -977,7 +980,8 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
         isRoot={isRoot}
         lineColor={lineColor}
       >
-        {/* Group header */}
+        {/* Group header — hidden when root group is empty (EmptyPlaceholder has its own buttons) */}
+        {!(isRoot && group.children.length === 0) && (
         <GroupHeader>
           {/* NOT badge for group */}
           <SafeTooltip
@@ -1010,97 +1014,13 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
           <AddRuleButton
             size="small"
             startIcon={<AddIcon sx={{ fontSize: 10 }} />}
+            sx={{ ml: 'auto' }}
             onClick={(e) =>
               setRuleMenuAnchor({ groupId: group.id, el: e.currentTarget })
             }
           >
             {t('argus.builder.addRule', 'Rule')}
           </AddRuleButton>
-          <Menu
-            anchorEl={
-              ruleMenuAnchor?.groupId === group.id ? ruleMenuAnchor.el : null
-            }
-            open={ruleMenuAnchor?.groupId === group.id}
-            onClose={() => setRuleMenuAnchor(null)}
-            slotProps={{
-              paper: {
-                sx: { maxHeight: 300, minWidth: 160, fontSize: '0.7rem' },
-              },
-            }}
-          >
-            <ListSubheader
-              sx={{
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                lineHeight: '24px',
-                color: 'text.disabled',
-                letterSpacing: '0.06em',
-              }}
-            >
-              {t('argus.builder.specialFields', 'SPECIAL')}
-            </ListSubheader>
-            {['has', '!has'].map((f) => (
-              <MenuItem
-                key={f}
-                sx={{ fontSize: '0.7rem', gap: 0.5 }}
-                onClick={() => {
-                  addFilter(group.id, f);
-                  setRuleMenuAnchor(null);
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 24 }}>
-                  <CategoryBadge category="has" isDark={isDark} />
-                </ListItemIcon>
-                {f === '!has' ? 'has not' : f}
-              </MenuItem>
-            ))}
-            <Divider sx={{ my: 0.3 }} />
-            <ListSubheader
-              sx={{
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                lineHeight: '24px',
-                color: 'text.disabled',
-                letterSpacing: '0.06em',
-              }}
-            >
-              {t('argus.builder.fields', 'FIELDS')}
-            </ListSubheader>
-            {sortedFields.map((f) => {
-              const fc = config.fields.find((x) => x.key === f);
-              return (
-                <MenuItem
-                  key={f}
-                  sx={{ fontSize: '0.7rem', gap: 0.5 }}
-                  onClick={() => {
-                    addFilter(group.id, f);
-                    setRuleMenuAnchor(null);
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 24 }}>
-                    <CategoryBadge
-                      category={fc?.category || 'custom'}
-                      isDark={isDark}
-                    />
-                  </ListItemIcon>
-                  {f}
-                  {facets[f]?.length > 0 && (
-                    <Typography
-                      component="span"
-                      sx={{
-                        ml: 'auto',
-                        pl: 1,
-                        fontSize: '0.55rem',
-                        color: 'text.disabled',
-                      }}
-                    >
-                      ({facets[f].length})
-                    </Typography>
-                  )}
-                </MenuItem>
-              );
-            })}
-          </Menu>
           <AddGroupButton
             size="small"
             startIcon={<AddIcon sx={{ fontSize: 10 }} />}
@@ -1140,42 +1060,244 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             </>
           )}
         </GroupHeader>
+        )}
+
+        {/* Field picker menu — outside GroupHeader so it works from EmptyPlaceholder too */}
+        <Menu
+          anchorEl={
+            ruleMenuAnchor?.groupId === group.id ? ruleMenuAnchor.el : null
+          }
+          open={ruleMenuAnchor?.groupId === group.id}
+          onClose={() => {
+            setRuleMenuAnchor(null);
+            setFieldSearch('');
+          }}
+          slotProps={{
+            paper: {
+              sx: { maxHeight: 350, minWidth: 200, fontSize: '0.7rem' },
+            },
+          }}
+          TransitionProps={{
+            onEntered: () => setFieldSearch(''),
+          }}
+        >
+          {/* Search input */}
+          <Box
+            sx={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+              px: 1,
+              pt: 0.5,
+              pb: 0.5,
+              backgroundColor: 'background.paper',
+            }}
+          >
+            <TextField
+              size="small"
+              placeholder={t('argus.builder.searchField', 'Search fields...')}
+              value={fieldSearch}
+              onChange={(e) => setFieldSearch(e.target.value)}
+              autoFocus
+              onKeyDown={(e) => e.stopPropagation()}
+              InputProps={{
+                sx: { height: 28, fontSize: '0.7rem' },
+              }}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+          {(() => {
+            const q = fieldSearch.toLowerCase();
+            const specialFields = ['has', '!has'].filter(
+              (f) => !q || f.includes(q) || (f === '!has' && 'has not'.includes(q))
+            );
+            const filteredFields = sortedFields.filter(
+              (f) => !q || f.toLowerCase().includes(q)
+            );
+            return (
+              <>
+                {specialFields.length > 0 && (
+                  <>
+                    <ListSubheader
+                      sx={{
+                        fontSize: '0.55rem',
+                        fontWeight: 700,
+                        lineHeight: '24px',
+                        color: 'text.disabled',
+                        letterSpacing: '0.06em',
+                      }}
+                    >
+                      {t('argus.builder.specialFields', 'SPECIAL')}
+                    </ListSubheader>
+                    {specialFields.map((f) => (
+                      <MenuItem
+                        key={f}
+                        sx={{ fontSize: '0.7rem', gap: 0.5 }}
+                        onClick={() => {
+                          addFilter(group.id, f);
+                          setRuleMenuAnchor(null);
+                          setFieldSearch('');
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 24 }}>
+                          <CategoryBadge category="has" isDark={isDark} />
+                        </ListItemIcon>
+                        {f === '!has' ? 'has not' : f}
+                      </MenuItem>
+                    ))}
+                    <Divider sx={{ my: 0.3 }} />
+                  </>
+                )}
+                {filteredFields.length > 0 && (
+                  <>
+                    <ListSubheader
+                      sx={{
+                        fontSize: '0.55rem',
+                        fontWeight: 700,
+                        lineHeight: '24px',
+                        color: 'text.disabled',
+                        letterSpacing: '0.06em',
+                      }}
+                    >
+                      {t('argus.builder.fields', 'FIELDS')}
+                    </ListSubheader>
+                    {filteredFields.map((f) => {
+                      const fc = config.fields.find((x) => x.key === f);
+                      return (
+                        <MenuItem
+                          key={f}
+                          sx={{ fontSize: '0.7rem', gap: 0.5 }}
+                          onClick={() => {
+                            addFilter(group.id, f);
+                            setRuleMenuAnchor(null);
+                            setFieldSearch('');
+                          }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 24 }}>
+                            <CategoryBadge
+                              category={fc?.category || 'custom'}
+                              isDark={isDark}
+                            />
+                          </ListItemIcon>
+                          {f}
+                          {facets[f]?.length > 0 && (
+                            <Typography
+                              component="span"
+                              sx={{
+                                ml: 'auto',
+                                pl: 1,
+                                fontSize: '0.55rem',
+                                color: 'text.disabled',
+                              }}
+                            >
+                              ({facets[f].length})
+                            </Typography>
+                          )}
+                        </MenuItem>
+                      );
+                    })}
+                  </>
+                )}
+                {specialFields.length === 0 && filteredFields.length === 0 && (
+                  <MenuItem disabled sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}>
+                    {t('argus.builder.noFieldMatch', 'No matching fields')}
+                  </MenuItem>
+                )}
+              </>
+            );
+          })()}
+        </Menu>
 
         {/* Children */}
-        <ChildrenContainer isRoot={isRoot}>
+        <ChildrenContainer
+          isRoot={isRoot}
+          sx={group.children.length === 0 ? { ml: 0, pl: 0 } : {}}
+        >
           {group.children.length === 0 ? (
-            <EmptyGroupHint
+            <Box
+              sx={{ display: 'flex', flex: isRoot ? 1 : undefined }}
               onDragOver={(e) => handleDragOver(e, group.id, 0)}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, group.id, 0)}
-              sx={{
-                border:
-                  drag.dropTargetId === group.id && drag.dropIndex === 0
-                    ? `1px dashed ${primary}`
-                    : undefined,
-                backgroundColor:
-                  drag.dropTargetId === group.id && drag.dropIndex === 0
-                    ? alpha(primary, 0.06)
-                    : undefined,
-              }}
             >
-              <AddIcon
-                sx={{ fontSize: 14, color: 'text.disabled', opacity: 0.4 }}
-              />
-              <Typography
-                sx={{
-                  fontSize: '0.65rem',
-                  color: 'text.disabled',
-                  fontStyle: 'italic',
-                }}
-              >
-                {t(
-                  'argus.builder.emptyGroup',
-                  '+ 규칙 버튼을 눌러 조건을 추가하세요'
-                )}
-              </Typography>
-            </EmptyGroupHint>
+              {isRoot ? (
+                <EmptyPlaceholder
+                  message={t(
+                    'argus.builder.emptyGroup',
+                    'Add rules or groups to build your query'
+                  )}
+                  description={t(
+                    'argus.builder.emptyGroupDesc',
+                    'Use the buttons below to start adding conditions.'
+                  )}
+                  sx={{
+                    flex: 1,
+                    ...(drag.dropTargetId === group.id && drag.dropIndex === 0
+                      ? {
+                          border: `1px dashed ${primary}`,
+                          backgroundColor: alpha(primary, 0.06),
+                        }
+                      : {}),
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1.5 }}>
+                    <AddRuleButton
+                      size="small"
+                      startIcon={<AddIcon sx={{ fontSize: 10 }} />}
+                      onClick={(e) =>
+                        setRuleMenuAnchor({ groupId: group.id, el: e.currentTarget })
+                      }
+                    >
+                      {t('argus.builder.addRule', 'Rule')}
+                    </AddRuleButton>
+                    <AddGroupButton
+                      size="small"
+                      startIcon={<AddIcon sx={{ fontSize: 10 }} />}
+                      onClick={() => addGroup(group.id)}
+                    >
+                      {t('argus.builder.addGroup', 'Group')}
+                    </AddGroupButton>
+                  </Box>
+                </EmptyPlaceholder>
+              ) : (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 0.5,
+                    py: 1.5,
+                    width: '100%',
+                    border: '1px dashed',
+                    borderColor: drag.dropTargetId === group.id && drag.dropIndex === 0
+                      ? primary
+                      : 'divider',
+                    borderRadius: '4px',
+                    backgroundColor:
+                      drag.dropTargetId === group.id && drag.dropIndex === 0
+                        ? alpha(primary, 0.06)
+                        : 'transparent',
+                  }}
+                >
+                  <AddIcon
+                    sx={{ fontSize: 12, color: 'text.disabled', opacity: 0.5 }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: '0.65rem',
+                      color: 'text.disabled',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {t(
+                      'argus.builder.emptySubGroup',
+                      'Add rules using the buttons above'
+                    )}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           ) : (
             group.children.map((child, idx) => {
               const isFirst = idx === 0;
@@ -1394,7 +1516,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             </Box>
             {!previewCollapsed && (
               <Box
-                sx={{ display: 'flex', gap: 0.25 }}
+                sx={{ display: 'flex', gap: 0.5 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {(['dsl', 'clickhouse'] as const).map((m) => (
@@ -1405,9 +1527,9 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                     onClick={() => setPreviewMode(m)}
                   >
                     {m === 'dsl' ? (
-                      <DslIcon sx={{ fontSize: 9 }} />
+                      <DslIcon sx={{ fontSize: 11 }} />
                     ) : (
-                      <SqlIcon sx={{ fontSize: 9 }} />
+                      <SqlIcon sx={{ fontSize: 11 }} />
                     )}
                     {m === 'dsl' ? 'DSL' : 'ClickHouse'}
                   </PreviewModeToggle>
@@ -1416,13 +1538,21 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             )}
           </PreviewHeader>
           {!previewCollapsed && (
-            <PreviewContainer>
+            isValid ? (
+              <PreviewContainer>
+                <QueryHighlighter
+                  query={previewMode === 'dsl' ? dslPreview : sqlPreview}
+                  mode={previewMode}
+                  isDark={isDark}
+                />
+              </PreviewContainer>
+            ) : (
               <QueryHighlighter
                 query={previewMode === 'dsl' ? dslPreview : sqlPreview}
                 mode={previewMode}
                 isDark={isDark}
               />
-            </PreviewContainer>
+            )
           )}
 
           {/* Actions */}

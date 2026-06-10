@@ -33,7 +33,7 @@ export {
 
 // UI Components
 export { QueryDSLEditor } from './QueryDSLEditor';
-export type { QueryDSLEditorProps } from './QueryDSLEditor';
+export type { QueryDSLEditorProps, QueryDSLEditorHandle } from './QueryDSLEditor';
 export { QuerySuggestionDropdown } from './QuerySuggestionDropdown';
 export type { QuerySuggestionDropdownProps } from './QuerySuggestionDropdown';
 

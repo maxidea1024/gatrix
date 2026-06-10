@@ -246,16 +246,9 @@ export function argusFilterStateToApiParams(state: ArgusFilterState): {
   period?: string;
   start?: string;
   end?: string;
-  environment?: string;
-  browser?: string;
-  os?: string;
 } {
   const dateParams = dateRangeToApiParams(state.dateRange);
   return {
     ...dateParams,
-    environment:
-      state.environments.length === 1 ? state.environments[0] : undefined,
-    browser: state.browsers.length === 1 ? state.browsers[0] : undefined,
-    os: state.os.length === 1 ? state.os[0] : undefined,
   };
 }

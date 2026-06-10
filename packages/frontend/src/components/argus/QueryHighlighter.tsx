@@ -7,6 +7,7 @@ import {
   EmptyPreview,
   CopyButton,
 } from './QueryHighlighter.styles';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -237,13 +238,16 @@ export const QueryHighlighter: React.FC<QueryHighlighterProps> = ({
 
   if (!query) {
     return (
-      <EmptyPreview isDark={isDark}>
-        {emptyText ||
+      <EmptyPlaceholder
+        message={
+          emptyText ||
           t(
             'argus.builder.noConditions',
-            'No valid conditions to generate a query.'
-          )}
-      </EmptyPreview>
+            'Add conditions above to preview the generated query.'
+          )
+        }
+        sx={{ flex: 1 }}
+      />
     );
   }
 

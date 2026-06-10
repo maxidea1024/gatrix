@@ -354,7 +354,7 @@ const HighlightedQuery: React.FC<{ sql: string; isDark: boolean }> = ({
       >
         {t(
           'argus.builder.noConditions',
-          'No valid conditions to generate a query.'
+          'Add conditions above to preview the generated query.'
         )}
       </Box>
     );

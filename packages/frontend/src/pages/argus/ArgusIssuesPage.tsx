@@ -32,7 +32,11 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 
-import { QueryDSLEditor, ISSUES_CONFIG } from '@/components/argus/query-dsl';
+import {
+  QueryDSLEditor,
+  ISSUES_CONFIG,
+  type QueryDSLEditorHandle,
+} from '@/components/argus/query-dsl';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -49,7 +53,6 @@ import {
   DEFAULT_PAGE_SIZE,
   VALID_PAGE_SIZES,
   DEEP_LINK_KEYS,
-  type ActiveFilter,
   getStatusOptions,
   getLevelOptions,
   getSortOptions,
@@ -209,33 +212,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     [setFacetCollapsed]
   );
 
-  // ─── Active Filters (chip tags from facet sidebar) ─────────────
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
-
-  const toggleActiveFilter = useCallback(
-    (key: string, value: string, exclude: boolean = false) => {
-      setActiveFilters((prev) => {
-        const idx = prev.findIndex(
-          (f) => f.key === key && f.value === value && f.exclude === exclude
-        );
-        if (idx >= 0) {
-          return prev.map((f, i) =>
-            i === idx ? { ...f, enabled: !f.enabled } : f
-          );
-        }
-        return [...prev, { key, value, exclude, enabled: true }];
-      });
-    },
-    []
-  );
-
-  const removeActiveFilter = useCallback((idx: number) => {
-    setActiveFilters((prev) => prev.filter((_, i) => i !== idx));
-  }, []);
-
-  const clearAllActiveFilters = useCallback(() => {
-    setActiveFilters([]);
-  }, []);
+  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
 
   // ─── Real-time SSE ──────────────────────────────────────────────
   const { newIssueCount, resetNewIssueCount } = useArgusRealtime(
@@ -323,17 +300,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   }, [projectId]);
 
   // ─── Fetch issues ──────────────────────────────────────────────
-  /** Merge search text + active chip filters into a single query string */
-  const buildSearchWithFilters = useCallback((): string | undefined => {
-    const parts: string[] = [];
-    if (storeSearch.trim()) parts.push(storeSearch.trim());
-    for (const f of activeFilters) {
-      if (!f.enabled) continue;
-      parts.push(`${f.exclude ? '!' : ''}${f.key}:${f.value}`);
-    }
-    return parts.length > 0 ? parts.join(' ') : undefined;
-  }, [storeSearch, activeFilters]);
-
   const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
@@ -344,14 +310,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         sort,
         limit: rowsPerPage,
         offset: (currentPage - 1) * rowsPerPage,
-        query: buildSearchWithFilters(),
-        environment:
-          filters.environments.length === 1
-            ? filters.environments[0]
-            : undefined,
-        browser:
-          filters.browsers.length === 1 ? filters.browsers[0] : undefined,
-        os: filters.os.length === 1 ? filters.os[0] : undefined,
+        query: storeSearch.trim() || undefined,
         ...dateParams,
         substatus: substatus || undefined,
         assigned_to: assignedTo || undefined,
@@ -373,7 +332,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     sort,
     currentPage,
     rowsPerPage,
-    buildSearchWithFilters,
+    storeSearch,
     filters,
     substatus,
     assignedTo,
@@ -676,12 +635,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     [mappedFacets, t]
   );
 
-  // Re-fetch displayed issues when activeFilters change
-  useEffect(() => {
-    fetchIssues();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFilters]);
-
   // ─── Custom Facets (user-defined attribute keys) ───
   const CUSTOM_FACETS_KEY = 'argus_issue_custom_facets';
   const [customFacetKeys, setCustomFacetKeys] = useState<string[]>(() => {
@@ -769,7 +722,17 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
       <ArgusFilterBar
         projectId={String(projectId)}
         value={filters}
-        onChange={handleFilterChange}
+        onChange={(newFilters) => {
+          const prevEnvs = filters.environments;
+          const newEnvs = newFilters.environments;
+          if (
+            prevEnvs.length !== newEnvs.length ||
+            prevEnvs.some((e, i) => e !== newEnvs[i])
+          ) {
+            dslEditorRef.current?.upsertFieldChip('environment', newEnvs);
+          }
+          handleFilterChange(newFilters);
+        }}
         onRefresh={fetchIssues}
         loading={loading}
         extraControls={
@@ -784,6 +747,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
             />
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <QueryDSLEditor
+                ref={dslEditorRef}
                 config={ISSUES_CONFIG}
                 initialQuery={storeSearch}
                 placeholder={t(
@@ -836,91 +800,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         }
       />
 
-      {/* ── Active Filter Chips ── */}
-      {activeFilters.length > 0 && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 0.5,
-            px: 2,
-            py: 0.75,
-            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-            backgroundColor: isDark
-              ? 'rgba(255,255,255,0.01)'
-              : 'rgba(0,0,0,0.01)',
-            alignItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          {activeFilters.map((f, idx) => (
-            <Chip
-              key={`${f.key}-${f.value}-${f.exclude}-${idx}`}
-              label={`${f.key}${f.exclude ? ' ≠ ' : ': '}${f.value}`}
-              size="small"
-              onClick={() => {
-                setActiveFilters((prev) =>
-                  prev.map((item, i) =>
-                    i === idx ? { ...item, enabled: !item.enabled } : item
-                  )
-                );
-              }}
-              onDelete={() => removeActiveFilter(idx)}
-              sx={{
-                height: 24,
-                fontSize: '0.73rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                backgroundColor: !f.enabled
-                  ? isDark
-                    ? 'rgba(255,255,255,0.04)'
-                    : 'rgba(0,0,0,0.04)'
-                  : f.exclude
-                    ? alpha(theme.palette.error.main, 0.12)
-                    : alpha(theme.palette.primary.main, 0.1),
-                color: !f.enabled
-                  ? 'text.disabled'
-                  : f.exclude
-                    ? theme.palette.error.main
-                    : theme.palette.primary.main,
-                borderRadius: '6px',
-                opacity: f.enabled ? 1 : 0.55,
-                textDecoration: f.enabled ? 'none' : 'line-through',
-                transition: 'all 0.15s ease',
-                '& .MuiChip-label': {
-                  textDecoration: f.enabled ? 'none' : 'line-through',
-                },
-                '& .MuiChip-deleteIcon': {
-                  fontSize: 14,
-                  color: !f.enabled
-                    ? 'text.disabled'
-                    : f.exclude
-                      ? theme.palette.error.main
-                      : theme.palette.primary.main,
-                  opacity: 0.6,
-                  '&:hover': { opacity: 1 },
-                },
-              }}
-            />
-          ))}
-          <Typography
-            component="span"
-            onClick={clearAllActiveFilters}
-            sx={{
-              fontSize: '0.7rem',
-              color: 'text.disabled',
-              cursor: 'pointer',
-              ml: 0.5,
-              '&:hover': {
-                color: 'text.secondary',
-                textDecoration: 'underline',
-              },
-            }}
-          >
-            {t('argus.logs.clearAll', 'Clear all')}
-          </Typography>
-        </Box>
-      )}
+
 
       {/* ── Body: Sidebar + Content split ── */}
       <Box
@@ -928,10 +808,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           display: 'flex',
           flex: 1,
           overflow: 'hidden',
-          borderTop:
-            activeFilters.length === 0
-              ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`
-              : 'none',
+          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
         }}
       >
         {/* Left: Facet Sidebar */}
@@ -939,7 +816,16 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           <FacetSidebar
             width={facetWidth}
             facets={facetGroups}
-            onFilter={toggleActiveFilter}
+            onFilter={(key, value) => {
+              const r = dslEditorRef.current;
+              if (!r) return;
+              const current = r.getFieldValues(key);
+              if (current.includes(value)) {
+                r.upsertFieldChip(key, current.filter((v) => v !== value));
+              } else {
+                r.upsertFieldChip(key, [...current, value]);
+              }
+            }}
             collapsed={facetCollapsed}
             onToggleCollapse={handleToggleFacetCollapse}
             loading={loading}
@@ -1003,18 +889,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                 filters={filters}
                 status={status}
                 level={level}
-                query={buildSearchWithFilters()}
-                environment={
-                  filters.environments.length === 1
-                    ? filters.environments[0]
-                    : undefined
-                }
-                browser={
-                  filters.browsers.length === 1
-                    ? filters.browsers[0]
-                    : undefined
-                }
-                os={filters.os.length === 1 ? filters.os[0] : undefined}
+                query={storeSearch.trim() || undefined}
                 onDateRangeSelect={handleDateRangeSelect}
               />
             </Box>

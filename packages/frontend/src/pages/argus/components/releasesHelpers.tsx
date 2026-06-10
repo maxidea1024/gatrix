@@ -52,6 +52,17 @@ export const evaluateAST = (
       }
 
       const op = node.operator;
+
+      // ── Multi-value: node.values is an array (e.g. release is ["a","b","c"]) ──
+      if (node.values && node.values.length > 0) {
+        const strVal = String(rVal).toLowerCase();
+        const matchesAny = node.values.some(
+          (v) => String(v).toLowerCase() === strVal
+        );
+        // '=' / 'is' → any match; '!=' → none match
+        return op === '!=' ? !matchesAny : matchesAny;
+      }
+
       const target = node.value;
 
       if (typeof rVal === 'number') {

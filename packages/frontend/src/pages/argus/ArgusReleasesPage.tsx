@@ -53,6 +53,7 @@ import {
   QueryDSLEditor,
   parse,
   RELEASES_CONFIG,
+  type QueryDSLEditorHandle,
 } from '@/components/argus/query-dsl';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -136,6 +137,7 @@ const ArgusReleasesPage: React.FC = () => {
     defaultArgusFilterState(urlState.period)
   );
   const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
+  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
 
   const sortOptions = useMemo(
     () => [
@@ -348,7 +350,17 @@ const ArgusReleasesPage: React.FC = () => {
       <ArgusFilterBar
         projectId={projectId}
         value={filters}
-        onChange={handleFilterChange}
+        onChange={(newFilters) => {
+          const prevEnvs = filters.environments;
+          const newEnvs = newFilters.environments;
+          if (
+            prevEnvs.length !== newEnvs.length ||
+            prevEnvs.some((e, i) => e !== newEnvs[i])
+          ) {
+            dslEditorRef.current?.upsertFieldChip('environment', newEnvs);
+          }
+          handleFilterChange(newFilters);
+        }}
         loading={loading}
       />
 
@@ -464,6 +476,7 @@ const ArgusReleasesPage: React.FC = () => {
             >
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <QueryDSLEditor
+                  ref={dslEditorRef}
                   config={RELEASES_CONFIG}
                   initialQuery={searchTerm}
                   placeholder={t(
